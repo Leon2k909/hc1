@@ -1,0 +1,12 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var folder=System.IO.Path.Combine(root,"output/firstperson-clothing-v3-20261021/density");
+System.IO.Directory.CreateDirectory(folder);
+var rows=new System.Collections.Generic.List<object>();
+foreach(var item in new[]{(Name:"shirt",Path:"models/citizen_clothes/shirt/army_shirt/model/army_shirt_m_human.vmdl"),(Name:"gloves",Path:"models/citizen_clothes/gloves/fingerless_gloves/models/fingerless_gloves_m_human.vmdl")})
+{
+ var model=Model.Load(item.Path);
+ var verts=model.GetVertices().Select(v=>new{P=new[]{v.Position.x,v.Position.y,v.Position.z},UV=new[]{v.TexCoord0.x,v.TexCoord0.y},N=new[]{v.Normal.x,v.Normal.y,v.Normal.z}}).ToArray();
+ System.IO.File.WriteAllText(System.IO.Path.Combine(folder,item.Name+"-vertices.json"),System.Text.Json.JsonSerializer.Serialize(verts));
+ rows.Add(new{item.Name,Vertices=verts.Length});
+}
+return new{Models=rows,SharedStateChanged=false};

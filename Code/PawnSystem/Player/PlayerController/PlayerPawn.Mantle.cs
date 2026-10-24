@@ -15,8 +15,8 @@ public partial class PlayerPawn
 	/// <summary>The highest ledge you can climb from a standstill: ~2.1 m, a fit soldier's pull-up onto a wall.</summary>
 	public const float MaxMantleHeight = 84f;
 
-	/// <summary>How much higher a ledge can be when you jump at it and catch it.</summary>
-	public const float AirMantleBonus = 10f;
+	/// <summary>Highest jumping grab over the floor (~2.85 m); the hands must also reach it from the current jump.</summary>
+	public const float MaxJumpMantleHeight = 112f;
 
 	/// <summary>How far past the body's front the hands reach for a ledge.</summary>
 	public const float MantleReach = 20f;
@@ -50,6 +50,7 @@ public partial class PlayerPawn
 	private const float VaultMinSpeed = 150f;
 	private const float VaultMaxSpeed = 310f;
 	private const float ClimbOverSpeed = 150f;
+	private const float HighClimbOverSpeed = 90f;
 
 	/// <summary>Tags of things you don't climb: people, bots' and zombies' boxes, doors, glass and player clips (or trees).</summary>
 	private static readonly string[] NotClimbable = { "player", "movement", "enemy", "door", "glass", "playerclip" };
@@ -180,7 +181,8 @@ public partial class PlayerPawn
 		// How far the wall's face is from our centre, along the way over.
 		var face = (wall.HitPosition - pos).WithZ( 0 ).Dot( dir );
 
-		// The floor the height counts from. In the air that's the floor under you, so a jump doesn't add its own height.
+		// Keep a floor-relative ceiling, but let the hands rise with the actual jump.
+		// The old floor + 84 + 10 rule rejected a 102-inch container even at the jump's apex.
 		var groundZ = pos.z;
 		if ( airborne )
 		{
@@ -189,7 +191,9 @@ public partial class PlayerPawn
 		}
 
 		var minZ = MathF.Max( groundZ + MinMantleHeight, airborne ? pos.z + 4f : pos.z + MinMantleHeight );
-		var maxZ = groundZ + MaxMantleHeight + (airborne ? AirMantleBonus : 0f);
+		var maxZ = airborne
+			? MathF.Min( pos.z + MaxMantleHeight, groundZ + MaxJumpMantleHeight )
+			: groundZ + MaxMantleHeight;
 		if ( minZ > maxZ ) { reason = "too high"; return false; }
 
 		// Where the top is, straight ahead of our centre, just inside the face: the first solid then free height in that
@@ -217,6 +221,7 @@ public partial class PlayerPawn
 
 		var top = topTrace.EndPosition.z;
 		if ( top < minZ - step || top > maxZ ) { reason = "out of reach"; return false; }
+		var highClimb = airborne && top - groundZ > MaxMantleHeight;
 
 		// How deep the top is. One that ends within VaultMaxDepth is a wall to go over.
 		var depth = float.NaN;
@@ -231,7 +236,7 @@ public partial class PlayerPawn
 		var vault = false;
 		var to = Vector3.Zero;
 
-		if ( !float.IsNaN( depth ) )
+		if ( !highClimb && !float.IsNaN( depth ) )
 		{
 			// Over it, landing past its far side, if there's a floor within a few metres down.
 			to = (pos + dir * (face + depth + radius + 2f)).WithZ( riseZ );
@@ -252,8 +257,11 @@ public partial class PlayerPawn
 		}
 
 		var riseHeight = MathF.Max( riseZ - pos.z, 0f );
+		// A high grab still needs a deliberate pull-up, even when caught near the jump's apex.
+		var effortHeight = highClimb ? MathF.Max( riseHeight, top - groundZ ) : riseHeight;
 		var entrySpeed = MathF.Max( cc.Velocity.WithZ( 0 ).Dot( dir ), 0f );
-		var overSpeed = vault ? entrySpeed.Clamp( VaultMinSpeed, VaultMaxSpeed ) : ClimbOverSpeed;
+		var overSpeed = vault ? entrySpeed.Clamp( VaultMinSpeed, VaultMaxSpeed )
+			: highClimb ? HighClimbOverSpeed : ClimbOverSpeed;
 
 		plan = new MantlePlan
 		{
@@ -262,7 +270,7 @@ public partial class PlayerPawn
 			RiseZ = riseZ,
 			// A step up is quick and a pull-up slow: 0.24 s for 20 units, 0.44 s waist high, 0.72 s chest high, 1.2 s
 			// for a ledge at 2 m.
-			RiseTime = 0.12f + 0.004f * riseHeight + 0.0001f * riseHeight * riseHeight,
+			RiseTime = 0.12f + 0.004f * effortHeight + 0.0001f * effortHeight * effortHeight,
 			OverTime = MathF.Max( (to - pos).WithZ( 0 ).Length / overSpeed, 0.12f ),
 			Exit = dir * overSpeed * (vault ? 1f : 0.5f),
 			Vault = vault,
@@ -272,7 +280,8 @@ public partial class PlayerPawn
 
 		// The legs start over while the arms are still lifting (a vault's swing more than a climb's), if that path is
 		// clear; else up first, then over.
-		var overlap = MathF.Min( plan.OverTime * (vault ? 0.5f : 0.25f), plan.RiseTime * 0.6f );
+		// For a high pull-up, clear the edge before bringing the legs onto the roof.
+		var overlap = highClimb ? 0f : MathF.Min( plan.OverTime * (vault ? 0.5f : 0.25f), plan.RiseTime * 0.6f );
 		var box = MantleBox( radius - 0.5f, tuck );
 		plan.OverStart = plan.RiseTime - overlap;
 		if ( overlap > 0f && !MantlePathClear( plan, box ) )

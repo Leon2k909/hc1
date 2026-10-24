@@ -1,0 +1,7 @@
+var source=Sandbox.FileSystem.Mounted.ReadAllText("shaders/common/sbox_vertex.fxc");
+var lines=source.Split('\n');
+var wanted=new System.Collections.Generic.SortedSet<int>();
+for(var i=0;i<lines.Length;i++)
+    if(lines[i].Contains("ProcessVertex")||lines[i].Contains("Skinning")||lines[i].Contains("VertexAnimation")||lines[i].Contains("vPositionOs"))
+        for(var j=Math.Max(0,i-6);j<Math.Min(lines.Length,i+12);j++)wanted.Add(j);
+return wanted.Select(i=>(i+1)+": "+lines[i]).ToArray();

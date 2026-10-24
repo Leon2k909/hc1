@@ -1,0 +1,54 @@
+// Copy into the sbox-cli exchange directory and run with run_csharp. Imports the scoped Mars mesh and two
+// materials staged in output/ares/terrain-20261019/stage. Compile the materials, then ares_backdrop.vmdl.
+// The backdrop is drawn only: the scene, the facility's models, collision and editor camera are untouched.
+var project = Sandbox.Project.Current.GetRootPath();
+var directory = System.IO.Path.Combine( project, "output/ares/terrain-20261019" );
+var stage = System.IO.Path.Combine( directory, "stage" );
+var before = System.Text.Json.Nodes.JsonNode.Parse( System.IO.File.ReadAllText(
+    System.IO.Path.Combine( directory, "before/manifest.json" ) ) ).AsObject();
+var installedPath = System.IO.Path.Combine( directory, "installed.json" );
+var expected = System.IO.File.Exists( installedPath )
+    ? System.Text.Json.Nodes.JsonNode.Parse( System.IO.File.ReadAllText( installedPath ) ).AsObject() : before;
+var scene = Editor.SceneEditorSession.Active?.Scene;
+if ( scene?.Name != "ares" || Game.IsPlaying ) throw new InvalidOperationException( "Open Ares in edit mode before importing" );
+string Hash( string path ) => Convert.ToHexString( System.Security.Cryptography.SHA256.HashData( System.IO.File.ReadAllBytes( path ) ) ).ToLowerInvariant();
+var imported = new System.Collections.Generic.List<string>();
+var plan = new System.Collections.Generic.List<(string Source, string Target)>();
+foreach ( var source in System.IO.Directory.GetFiles( stage, "*", System.IO.SearchOption.AllDirectories ) )
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    var relative = "Assets/" + System.IO.Path.GetRelativePath( stage, source ).Replace( '\\', '/' );
+    var allowed = relative.StartsWith( "Assets/models/maps/ares/ares_backdrop." )
+        || relative.StartsWith( "Assets/materials/ares/ar_regolith" ) || relative.StartsWith( "Assets/materials/ares/ar_rock" )
+        || relative == "Assets/materials/ares/ar_terrain.vmat" || relative == "Assets/shaders/hc1_ares_land.shader";
+    if ( !allowed ) throw new InvalidOperationException( "Unexpected staged file: " + relative );
+    var target = System.IO.Path.Combine( project, relative );
+    if ( System.IO.File.Exists( target ) && Hash( target ) != Hash( source )
+        && ( expected[relative] is null || Hash( target ) != expected[relative].GetValue<string>() ) )
+        throw new InvalidOperationException( "Changed since backup: " + relative );
+    plan.Add( (source, target) );
+}
+// All current files have been checked before any replacement. The model source precedes its vmdl.
+foreach ( var item in plan.OrderBy( item => item.Target.EndsWith( ".vmdl" ) ) )
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    System.IO.Directory.CreateDirectory( System.IO.Path.GetDirectoryName( item.Target ) );
+    if ( !System.IO.File.Exists( item.Target ) || Hash( item.Target ) != Hash( item.Source ) )
+        System.IO.File.Copy( item.Source, item.Target, true );
+    Editor.AssetSystem.RegisterFile( item.Target );
+    imported.Add( System.IO.Path.GetRelativePath( project, item.Target ) );
+}
+var shader = await Editor.EditorUtility.CompileShader( "shaders/hc1_ares_land.shader", new() { ForceRecompile = true }, cancellationToken );
+if ( !shader.Success ) throw new InvalidOperationException( "Ares land shader failed: "
+    + String.Join( "\n", shader.Programs.SelectMany( p => p.Output ?? new System.Collections.Generic.List<string>() ) ) );
+if ( shader.CompiledShader is { Length: > 0 } )
+    System.IO.File.WriteAllBytes( System.IO.Path.Combine( project, "Assets/shaders/hc1_ares_land.shader_c" ), shader.CompiledShader );
+System.IO.File.WriteAllText( installedPath, System.Text.Json.JsonSerializer.Serialize( imported.ToDictionary(
+    path => path.Replace( '\\', '/' ), path => Hash( System.IO.Path.Combine( project, path ) ) ),
+    new System.Text.Json.JsonSerializerOptions { WriteIndented = true } ) );
+var report = new { Imported = imported, Scene = scene.Name, SceneUnchanged = scene == Editor.SceneEditorSession.Active?.Scene,
+    Game.IsPlaying, SceneFileUnchanged = Hash( System.IO.Path.Combine( project, "Assets/scenes/maps/Ares/ares.scene" ) )
+        == before["Assets/scenes/maps/Ares/ares.scene"].GetValue<string>() };
+System.IO.File.WriteAllText( System.IO.Path.Combine( directory, "import.json" ),
+    System.Text.Json.JsonSerializer.Serialize( report, new System.Text.Json.JsonSerializerOptions { WriteIndented = true } ) );
+return report;

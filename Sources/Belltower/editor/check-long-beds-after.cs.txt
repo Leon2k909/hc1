@@ -1,0 +1,32 @@
+var session=Editor.SceneEditorSession.Active;
+if(Game.IsPlaying || session is null || session.HasUnsavedChanges ||
+    !session.Scene.Source.ResourcePath.Equals("scenes/maps/belltower/belltower.scene",StringComparison.OrdinalIgnoreCase))
+    throw new InvalidOperationException("Requires active, stopped, saved Belltower.");
+var root=Sandbox.Project.Current.GetRootPath();var directory=System.IO.Path.Combine(root,"output/belltower/long-bed");
+var plan=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(directory,"plant-plan.json")));
+var objects=session.Scene.GetAllObjects(true).ToDictionary(o=>o.Id);
+var ids=System.Text.Json.JsonSerializer.Deserialize<Guid[]>(System.IO.File.ReadAllText(System.IO.Path.Combine(directory,"native-object-ids-before.json")));
+if(!objects.Keys.ToHashSet().SetEquals(ids)) throw new InvalidOperationException("Scene object identities changed.");
+float rootError=0,topError=0;
+foreach(var row in plan["objects"].AsArray())
+{
+    var obj=objects[Guid.Parse(row["id"].GetValue<string>())];
+    if(Vector3.DistanceBetween(obj.WorldPosition,Vector3.Parse(row["position"].GetValue<string>()))>.001f ||
+        Vector3.DistanceBetween(obj.WorldScale,Vector3.Parse(row["scale"].GetValue<string>()))>.00001f)
+        throw new InvalidOperationException("A saved plant differs from its plan.");
+    rootError=MathF.Max(rootError,MathF.Abs(obj.WorldPosition.z+obj.WorldScale.z*plan["root_local_z"].GetValue<float>()-(row["soil_z"].GetValue<float>()-.5f)));
+    topError=MathF.Max(topError,MathF.Abs(obj.WorldPosition.z+obj.WorldScale.z*plan["top_local_z"].GetValue<float>()-row["preserved_top_z"].GetValue<float>()));
+}
+if(rootError>.001f || topError>.001f) throw new InvalidOperationException("Root contact or canopy height failed.");
+var prior=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/belltower/bush-grounding/plan.json")));
+foreach(var row in prior["objects"].AsArray())
+{
+    var obj=objects[Guid.Parse(row["id"].GetValue<string>())];
+    if(Vector3.DistanceBetween(obj.WorldPosition,Vector3.Parse(row["position"].GetValue<string>()))>.001f ||
+        Vector3.DistanceBetween(obj.WorldScale,Vector3.Parse(row["scale"].GetValue<string>()))>.00001f)
+        throw new InvalidOperationException("An earlier grounded shrub changed.");
+}
+var result=new {Verified=32,MaxRootContactError=rootError,MaxCanopyTopError=topError,
+    AllObjectIdentitiesPreserved=true,Earlier244GroundedPlantsPreserved=true,Saved=true};
+System.IO.File.WriteAllText(System.IO.Path.Combine(directory,"native-verification.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

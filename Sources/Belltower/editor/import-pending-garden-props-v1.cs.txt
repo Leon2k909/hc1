@@ -1,0 +1,73 @@
+// Publish only the rebased roof, lock and scarecrow assets; preserve the editor document.
+var root = Sandbox.Project.Current.GetRootPath();
+var stage = System.IO.Path.Combine(root, "output/belltower/roof-lock-apply/stage-v2");
+var manifest = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(stage, "manifest.json")));
+var session = Editor.SceneEditorSession.Active;
+if (Game.IsPlaying || session is null || !session.Scene.Source.ResourcePath.Equals("scenes/maps/belltower/belltower.scene", StringComparison.OrdinalIgnoreCase))
+    throw new InvalidOperationException("Requires stopped Belltower; preserve the shared editor's current state.");
+string Hash(string path) { using var s = System.IO.File.OpenRead(path); return Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(s)).ToLowerInvariant(); }
+if (manifest["revision"].GetValue<string>() != "pending-garden-props-v1") throw new InvalidOperationException("Unexpected staging revision.");
+foreach (var pair in manifest["input_guards"].AsObject())
+    if (Hash(System.IO.Path.Combine(root, pair.Key)) != pair.Value.GetValue<string>())
+        throw new InvalidOperationException("Shared input changed; rebase before importing: " + pair.Key);
+var scenePath = System.IO.Path.Combine(root, "Assets/scenes/maps/Belltower/belltower.scene");
+var sceneHash = Hash(scenePath);
+var unsaved = session.HasUnsavedChanges;
+var runtime = Game.ActiveScene?.Id;
+var ids = session.Scene.GetAllObjects(true).Select(o => o.Id).ToHashSet();
+var cameras = session.Scene.GetAllComponents<CameraComponent>().Select(c => new { Camera = c, State = c.Serialize()?.ToJsonString() }).ToArray();
+var plan = new System.Collections.Generic.List<(string Source, string Target, string Backup, string Before, string After)>();
+foreach (var pair in manifest["files"].AsObject())
+{
+    var relative = pair.Key.Replace('\\', '/');
+    if (relative.Contains("..") || !(relative.StartsWith("Assets/models/maps/belltower/") ||
+        relative.StartsWith("Assets/materials/belltower/gazebo-v1/") || relative == "Assets/materials/belltower/shed_lock_steel.vmat"))
+        throw new InvalidOperationException("Unexpected publication target: " + relative);
+    var source = System.IO.Path.Combine(stage, relative);
+    var target = System.IO.Path.Combine(root, relative);
+    var backup = System.IO.Path.Combine(stage, "before", relative);
+    var before = pair.Value["before"]?.GetValue<string>();
+    var after = pair.Value["after"].GetValue<string>();
+    if (Hash(source) != after || (System.IO.File.Exists(target) ? Hash(target) : null) != before)
+        throw new InvalidOperationException("Publication input changed: " + relative);
+    if (before is not null && Hash(backup) != before) throw new InvalidOperationException("Backup differs: " + relative);
+    plan.Add((source, target, backup, before, after));
+}
+plan = plan.OrderBy(p => p.Target.EndsWith(".vmat") ? 0 : p.Target.EndsWith(".vmdl") ? 3 : 1).ToList();
+var changed = new System.Collections.Generic.List<(string Target, string Backup, string Before)>();
+try
+{
+    foreach (var item in plan)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        if ((System.IO.File.Exists(item.Target) ? Hash(item.Target) : null) != item.Before)
+            throw new InvalidOperationException("A target changed during publication: " + item.Target);
+        var incoming = item.Target + ".garden-props-incoming";
+        try
+        {
+            System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(item.Target));
+            System.IO.File.Copy(item.Source, incoming, true);
+            if (Hash(incoming) != item.After) throw new InvalidOperationException("Incoming asset differs.");
+            changed.Add((item.Target, item.Backup, item.Before));
+            System.IO.File.Move(incoming, item.Target, true);
+        }
+        finally { if (System.IO.File.Exists(incoming)) System.IO.File.Delete(incoming); }
+    }
+}
+catch
+{
+    foreach (var item in changed.AsEnumerable().Reverse())
+        if (item.Before is null) System.IO.File.Delete(item.Target);
+        else System.IO.File.Copy(item.Backup, item.Target, true);
+    throw;
+}
+foreach (var item in plan) Editor.AssetSystem.RegisterFile(item.Target);
+bool preserved = ReferenceEquals(session, Editor.SceneEditorSession.Active) && session.HasUnsavedChanges == unsaved &&
+    !Game.IsPlaying && Game.ActiveScene?.Id == runtime && Hash(scenePath) == sceneHash &&
+    ids.SetEquals(session.Scene.GetAllObjects(true).Select(o => o.Id)) &&
+    cameras.All(c => c.Camera.IsValid() && c.Camera.Serialize()?.ToJsonString() == c.State);
+var result = new { Imported = plan.Count, Roofs = 2, Locks = 6, Scarecrows = 2, SceneSha256 = sceneHash,
+    SceneCameraAndEditorStatePreserved = preserved, PhysicsPreserved = true, BoundedImportsPreserved = true };
+System.IO.File.WriteAllText(System.IO.Path.Combine(stage, "native-import.json"), System.Text.Json.JsonSerializer.Serialize(result));
+if (!preserved) throw new InvalidOperationException("Editor state changed during publication; inspect the saved result before continuing.");
+return result;

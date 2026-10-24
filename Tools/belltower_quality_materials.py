@@ -51,7 +51,7 @@ def scanned_relief(ident, scale, depth, tint=(1, 1, 1), roughness=1):
     return properties
 
 
-def scanned_plaster(tint, coverage=.49):
+def scanned_plaster(tint, coverage=.24):
     properties = {key: value for key, value in scan("painted_plaster_wall", 1).items()
                   if key.startswith("Texture")}
     properties.update({
@@ -83,12 +83,12 @@ def definitions():
             "TextureStoneSeams": "materials/belltower/generated/wall-limestone-v3-quilt.png",
             "g_vMasonryUvScale": "[.677333 .677333]",
             "g_vMasonryQuiltShift": "[.37001595 .42982456]",
-            "g_vMasonryTint": "[.92 1.0 .84]",
+            "g_vMasonryTint": "[1.04 1.0 .90]",
             "g_flMasonryDepth": .65,
             "g_flMasonryNormal": .65,
             "g_flMasonrySaturation": .72,
-            "g_flMasonryContrast": .86,
-            "g_flMasonryWeather": .28,
+            "g_flMasonryContrast": 1.04,
+            "g_flMasonryWeather": .12,
         },
         "ivy_climb": {
             "shader": "shaders/belltower_plants.shader",
@@ -105,6 +105,13 @@ def definitions():
         "wood_planks_dark": scan("brown_planks_03",48/(1000/25.4),(.83,.73,.60),.8),
         "furniture_wood": scan("brown_planks_03",1,(1.08,.97,.82),.8),
         "furniture_wood_dark": scan("brown_planks_03",1,(.83,.73,.60),.8),
+        **{name: {
+            **scan("brown_planks_03",1,tint),
+            "shader": "shaders/belltower_door_wood_v1.shader",
+            "g_flDoorNormal": .16,
+            "g_flDoorRoughnessScale": .68,
+            "g_flDoorAo": .18,
+        } for name,tint in (("door_b",(.78,.65,.50)),("door_e",(1.18,.95,.72)))},
     }
     # The original ripple normal supplies imperfect glass, while the bright
     # painted pane is replaced by genuine transparent glass and a separate bulb.
@@ -168,14 +175,9 @@ def definitions():
             "g_flInteriorBrightness": .13,
             "g_flRoughness": .16,
         }
-    for k,depth,brightness in (("a",28,.25),("b",34,.29),("c",24,.23)):
-        result[f"shopfront_{k}"] = {
-            "shader": "shaders/belltower_window.shader",
-            "TextureRoomBack": "materials/belltower/generated/shop-shelves-v1.png",
-            "TextureRoomWall": f"{SCAN}/painted_plaster_wall_diffuse_4k.png",
-            "g_flRoomDepth": depth,
-            "g_flInteriorBrightness": brightness,
-        }
+    from belltower_shop_displays_v2 import glass_properties
+    for k in "abc":
+        result[f"shopfront_{k}"] = glass_properties()
     result["window_plants"] = {
         "shader": "shaders/belltower_plants.shader",
         "TexturePlants": "materials/belltower/generated/window-plants-v1.png",

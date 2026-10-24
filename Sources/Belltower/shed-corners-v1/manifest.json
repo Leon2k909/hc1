@@ -1,0 +1,94 @@
+{
+  "revision": "shed-corners-v1",
+  "sheds": 6,
+  "large_sheds": 4,
+  "small_sheds": 2,
+  "scope": "Existing shed corner trims, adjacent cladding, door boards and door surround.",
+  "changes": [
+    "Rounded and locally chipped exposed timber arrises.",
+    "Small deterministic bow and unequal worn ends.",
+    "Grain-correct UVs on the narrow side returns."
+  ],
+  "preserved": {
+    "roof": true,
+    "hinges_and_padlock": true,
+    "all_gameplay_collision": true,
+    "model_definitions": true,
+    "saved_scene": true
+  },
+  "source": [
+    "Tools/belltower_gardens.py",
+    "Tools/belltower_shed_wood.py"
+  ],
+  "publication_manifests": [
+    "output/belltower/shed-corners-v1/r4/stage/manifest.json",
+    "output/belltower/shed-corners-v1/r5/stage/manifest.json",
+    "output/belltower/shed-corners-v1/r6/stage/manifest.json"
+  ],
+  "geometry_check": {
+    "models": {
+      "west": {
+        "triangles": 36960,
+        "minimum_triangle_area": 0.0009660000000001301,
+        "minimum_uv_triangle_area": 2.7299999999996016e-07,
+        "minimum_normal_facing_dot": 0.5916880205814227
+      },
+      "east": {
+        "triangles": 36960,
+        "minimum_triangle_area": 0.0009660000000001301,
+        "minimum_uv_triangle_area": 2.7299999999996016e-07,
+        "minimum_normal_facing_dot": 0.5916880205814227
+      }
+    },
+    "geometry_and_uv_valid": true,
+    "all_published_assets_match": false,
+    "installed_shed_blocks": {
+      "Assets/models/maps/belltower/belltower_west.obj": {
+        "entire_asset_matches": false,
+        "unrelated_edits_preserved": true,
+        "shed_tables_and_faces_exact": true,
+        "global_index_offsets_exact": true
+      },
+      "Assets/models/maps/belltower/compiler-safe/west/west_115_furniture_wood.obj": {
+        "entire_asset_matches": true
+      },
+      "Assets/models/maps/belltower/compiler-safe/west/west_117_furniture_wood_dark.obj": {
+        "entire_asset_matches": true
+      },
+      "Assets/models/maps/belltower/belltower_east.obj": {
+        "entire_asset_matches": false,
+        "unrelated_edits_preserved": true,
+        "shed_tables_and_faces_exact": true,
+        "global_index_offsets_exact": true
+      },
+      "Assets/models/maps/belltower/compiler-safe/east/east_112_furniture_wood.obj": {
+        "entire_asset_matches": true
+      },
+      "Assets/models/maps/belltower/compiler-safe/east/east_114_furniture_wood_dark.obj": {
+        "entire_asset_matches": true
+      }
+    },
+    "all_shed_mesh_blocks_intact": true
+  },
+  "native_model_compilation": {
+    "west": "success",
+    "east": "success",
+    "west_evidence": "output/belltower/shed-corners-v1/compile-west-final/asset_compile.json",
+    "east_evidence": "output/belltower/shed-corners-v1/compile-east-final/asset_compile.json"
+  },
+  "native_visual_evidence": [
+    "output/belltower/quality/shed-corners-v1-after/corner-ready.png",
+    "output/belltower/quality/shed-corners-v1-after/corner-detail-final.png"
+  ],
+  "excluded_visual_evidence": [
+    "output/belltower/quality/shed-corners-v1-before/corner.png",
+    "output/belltower/quality/shed-corners-v1-after/corner-final.png"
+  ],
+  "excluded_visual_reason": "Town models were temporarily absent during concurrent asset recompilation; these captures are not accepted visual evidence.",
+  "source_format_rule": "Keep every canonical OBJ v, vt and vn table before the first face. New table data must follow the existing tables so global face indices remain valid.",
+  "source_layout_migration": "r6 relocates only this patch table block; every face index, numeric value and unrelated byte is preserved.",
+  "source_sha256": {
+    "Tools/belltower_gardens.py": "e76348748a63c08df507db4358d4251cc9492f51046446e3d6a9f2f0f81e392a",
+    "Tools/belltower_shed_wood.py": "4e40a9b61a2f9d89e59434a2efd4e748dd7d58adb9b9645a40d3b20e56c9e13c"
+  }
+}

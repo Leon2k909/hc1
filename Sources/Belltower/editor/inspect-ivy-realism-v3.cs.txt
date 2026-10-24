@@ -1,0 +1,12 @@
+var models=new[]{"west","east"}.Select(side=>{
+    var model=Model.Load("models/maps/belltower/belltower_"+side+".vmdl");
+    return new {Side=side,model.IsError,IvyMaterials=model.Materials.Where(m=>m.ResourcePath?.StartsWith("materials/belltower/ivy-realism-v3/")==true).Select(m=>m.ResourcePath).ToArray()};
+}).ToArray();
+var leaf=Material.Load("materials/belltower/ivy-realism-v3/leaves.vmat");
+var texture=leaf.GetTexture("g_tPlants");
+if (models.Any(m=>m.IsError||m.IvyMaterials.Length!=3)||leaf.IsError||texture.IsError)
+    throw new InvalidOperationException("The installed ivy resources did not load.");
+var result=new {Models=models,LeafMaterialValid=!leaf.IsError,TextureValid=!texture.IsError,texture.Width,texture.Height};
+var root=Sandbox.Project.Current.GetRootPath();
+System.IO.File.WriteAllText(System.IO.Path.Combine(root,"output/belltower/ivy-realism-v3/native-resources.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

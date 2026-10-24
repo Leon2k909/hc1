@@ -1,0 +1,37 @@
+// Verify the saved native transforms and all editor object identities after grounding.
+var session=Editor.SceneEditorSession.Active;
+if (Game.IsPlaying || session is null || session.HasUnsavedChanges ||
+    !session.Scene.Source.ResourcePath.Equals("scenes/maps/belltower/belltower.scene",StringComparison.OrdinalIgnoreCase))
+    throw new InvalidOperationException("Requires active, stopped, saved Belltower.");
+var directory=System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(),"output/belltower/bush-grounding");
+var plan=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(directory,"plan.json")));
+var objects=session.Scene.GetAllObjects(true).ToDictionary(o=>o.Id);
+var idsPath=System.IO.Path.Combine(directory,"native-object-ids-before.json");
+bool fullLiveIdentityComparison=System.IO.File.Exists(idsPath);
+if (fullLiveIdentityComparison)
+{
+    var originalIds=System.Text.Json.JsonSerializer.Deserialize<Guid[]>(System.IO.File.ReadAllText(idsPath));
+    if (!objects.Keys.ToHashSet().SetEquals(originalIds)) throw new InvalidOperationException("Scene object identities changed.");
+}
+float maxRootError=0,maxTopError=0;
+int count=0;
+foreach (var row in plan["objects"].AsArray())
+{
+    var obj=objects[Guid.Parse(row["id"].GetValue<string>())];
+    var position=obj.WorldPosition;var scale=obj.WorldScale;
+    if (Vector3.DistanceBetween(position,Vector3.Parse(row["position"].GetValue<string>()))>.001f ||
+        Vector3.DistanceBetween(scale,Vector3.Parse(row["scale"].GetValue<string>()))>.00001f)
+        throw new InvalidOperationException("Saved shrub differs from the reviewed grounding plan.");
+    var root=position.z+scale.z*plan["root_anchor_local_z"].GetValue<float>();
+    var top=position.z+scale.z*plan["model_top_local_z"].GetValue<float>();
+    maxRootError=MathF.Max(maxRootError,MathF.Abs(root-(row["ground_z"].GetValue<float>()-.5f)));
+    maxTopError=MathF.Max(maxTopError,MathF.Abs(top-row["preserved_top_z"].GetValue<float>()));
+    count++;
+}
+if (count!=244 || maxRootError>.001f || maxTopError>.001f)
+    throw new InvalidOperationException("Root contact or canopy height failed native verification.");
+var result=new {Verified=count,MaxRootContactError=maxRootError,MaxCanopyTopError=maxTopError,
+    TargetObjectIdentitiesPreserved=true,FullLiveIdentityComparison=fullLiveIdentityComparison,
+    Saved=true,EditorStatePreserved=true};
+System.IO.File.WriteAllText(System.IO.Path.Combine(directory,"native-verification.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

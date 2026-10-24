@@ -1,0 +1,46 @@
+// Run a copy in sbox-cli's exchange directory. Imports only the exterior backdrop and its private ar_ext_* paints.
+// The preceding terrain pass, facility assets and scene are checked separately against preserve-manifest.json.
+var project = Sandbox.Project.Current.GetRootPath();
+var directory = System.IO.Path.Combine( project, "output/ares/outpost-20261019" );
+var stage = System.IO.Path.Combine( directory, "stage" );
+var backup = System.Text.Json.Nodes.JsonNode.Parse( System.IO.File.ReadAllText(
+    System.IO.Path.Combine( directory, "before/manifest.json" ) ) ).AsObject();
+var installedPath = System.IO.Path.Combine( directory, "installed.json" );
+var expected = System.IO.File.Exists( installedPath )
+    ? System.Text.Json.Nodes.JsonNode.Parse( System.IO.File.ReadAllText( installedPath ) ).AsObject() : backup;
+var scene = Editor.SceneEditorSession.Active?.Scene;
+if ( scene?.Name != "ares" || Game.IsPlaying ) throw new InvalidOperationException( "Open Ares in edit mode before importing" );
+string Hash( string path ) => Convert.ToHexString( System.Security.Cryptography.SHA256.HashData( System.IO.File.ReadAllBytes( path ) ) ).ToLowerInvariant();
+var plan = new System.Collections.Generic.List<(string Source, string Target, string Relative)>();
+foreach ( var source in System.IO.Directory.GetFiles( stage, "*", System.IO.SearchOption.AllDirectories ) )
+{
+    var relative = "Assets/" + System.IO.Path.GetRelativePath( stage, source ).Replace( '\\', '/' );
+    if ( !relative.StartsWith( "Assets/models/maps/ares/ares_backdrop." )
+        && !relative.StartsWith( "Assets/materials/ares/ar_ext_" ) )
+        throw new InvalidOperationException( "Unexpected staged file: " + relative );
+    var target = System.IO.Path.Combine( project, relative );
+    if ( System.IO.File.Exists( target ) && Hash( target ) != Hash( source )
+        && ( expected[relative] is null || Hash( target ) != expected[relative].GetValue<string>() ) )
+        throw new InvalidOperationException( "Changed since staging: " + relative );
+    plan.Add( (source, target, relative) );
+}
+foreach ( var item in plan.OrderBy( item => item.Target.EndsWith( ".vmdl" ) ) )
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    System.IO.Directory.CreateDirectory( System.IO.Path.GetDirectoryName( item.Target ) );
+    if ( !System.IO.File.Exists( item.Target ) || Hash( item.Target ) != Hash( item.Source ) )
+        System.IO.File.Copy( item.Source, item.Target, true );
+    Editor.AssetSystem.RegisterFile( item.Target );
+}
+var installed = plan.ToDictionary( item => item.Relative, item => Hash( item.Target ) );
+System.IO.File.WriteAllText( installedPath, System.Text.Json.JsonSerializer.Serialize( installed,
+    new System.Text.Json.JsonSerializerOptions { WriteIndented = true } ) );
+var preserved = System.Text.Json.Nodes.JsonNode.Parse( System.IO.File.ReadAllText(
+    System.IO.Path.Combine( directory, "preserve-manifest.json" ) ) ).AsObject();
+var changed = preserved.Where( item => Hash( System.IO.Path.Combine( project, item.Key ) ) != item.Value.GetValue<string>() )
+    .Select( item => item.Key ).ToArray();
+var report = new { Imported = installed.Count, MaterialCount = installed.Keys.Count( path => path.EndsWith( ".vmat" ) ),
+    SceneUnchanged = Editor.SceneEditorSession.Active?.Scene == scene, Game.IsPlaying, PreservedAssetsChanged = changed };
+System.IO.File.WriteAllText( System.IO.Path.Combine( directory, "import.json" ), System.Text.Json.JsonSerializer.Serialize( report,
+    new System.Text.Json.JsonSerializerOptions { WriteIndented = true } ) );
+return report;

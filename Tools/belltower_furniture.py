@@ -191,6 +191,46 @@ def cart(model, p):
     beam(model,p.at((-6,-38,24)),p.at((-6,38,24)),(2.4,2.4),IRON,.1)
 
 
+def bench_arm(model, p, x, grip_seed):
+    """One swept iron arm and its wooden grip, independent of the leg frame."""
+    profile = [(-6.5,17),(-7.5,22),(-5.8,25.2),(-2.5,26.2),(5.5,26.2),(9.8,29.2)]
+    for a,b in zip(profile,profile[1:]):
+        beam(model,p.at((x,*a)),p.at((x,*b)),(1.1,1.1),IRON,.2)
+    box(model,p,(x-1.1,-4.5,25.8),(x+1.1,5.5,27.1),DARK,.3,grip_seed)
+
+
+def bench_back_support(model, p, x):
+    """Raked rear strap with a seat-clearing offset at its welded foot."""
+    rake = math.radians(8)
+
+    def rear_y(z):
+        # Back board half-depth + strap half-depth + a 1 mm contact clearance.
+        return 7.4+(z-18)*math.tan(rake)+(0.7+0.7+0.04)/math.cos(rake)
+
+    start = (rear_y(19.0), 19.0)
+    # The lower bracket stays behind the last seat board, then meets the strap.
+    profile = [(9.62,15.4), (9.62,18.2), start, (rear_y(32.8),32.8)]
+    centres = [p.at((x,*q)) for q in profile]
+    directions = [b-a for a,b in zip(centres,centres[1:])]
+    directions = [q/np.linalg.norm(q) for q in directions]
+    normals = [np.cross(q,p.x) for q in directions]
+    offsets = [normals[0]]
+    for a,b in zip(normals,normals[1:]):
+        offsets.append((a+b)/(1+np.dot(a,b)))
+    offsets.append(normals[-1])
+    # A single closed casting, with mitred bends and two eased exposed edges.
+    # Six corners keep this three-segment support at the old upright's 44 tris.
+    section = ((-.65,-.7),(.65,-.7),(.65,.54),(.49,.7),(-.49,.7),(-.65,.54))
+    rings = [[c+p.x*u+normal*v for u,v in section] for c,normal in zip(centres,offsets)]
+    for j,(a,b) in enumerate(zip(rings,rings[1:])):
+        for k in range(len(section)):
+            n = (k+1)%len(section)
+            edge = a[n]-a[k]
+            face(model,IRON,[a[k],a[n],b[n],b[k]],np.cross(edge,directions[j]))
+    face(model,IRON,rings[0],-directions[0])
+    face(model,IRON,rings[-1],directions[-1])
+
+
 def bench(model, p, length):
     half = length/2
     # Five eased seat boards with daylight between them; three raked back slats.
@@ -209,13 +249,11 @@ def bench(model, p, length):
             box(model,p,(x-2.0,y-2,0),(x+2.0,y+2,.8),IRON,.18)
             beam(model,p.at((x,y,1)),p.at((x,y*.58,15.7)),(1.4,1.4),IRON,.24)
         beam(model,p.at((x,-8,15.4)),p.at((x,9.5,15.4)),(1.7,1.4),IRON,.22)
-        beam(model,p.at((x,5.5,12)),p.at((x,11.4,34.0)),(1.3,1.4),IRON,.2)
+        bench_back_support(model, p, x)
         beam(model,p.at((x,-6,5)),p.at((x,6,14)),(1.0,1.0),IRON,.15)
-        # Swept armrest profile, with a wooden hand grip on its flat crown.
-        profile = [(-6.5,17),(-7.5,22),(-5.8,25.2),(-2.5,26.2),(5.5,26.2),(9.8,29.2)]
-        for a,b in zip(profile,profile[1:]):
-            beam(model,p.at((x,*a)),p.at((x,*b)),(1.1,1.1),IRON,.2)
-        box(model,p,(x-1.1,-4.5,25.8),(x+1.1,5.5,27.1),DARK,.3,140+int(x))
+        # The grip's outer edge meets the slat ends; the leg frame stays inset.
+        arm_x = math.copysign(half-1.1, x)
+        bench_arm(model, p, arm_x, 140+int(x))
         for k in range(5):
             bolt(model,p.at((x,-7.2+k*3.6,18.03)),p.z,.23,False)
         for k in range(3):
@@ -225,23 +263,9 @@ def bench(model, p, length):
 
 
 def crate(model,p,size):
-    half=size/2; rows=max(4,round(size/6))
-    for row in range(rows):
-        za,zb=row*size/rows+.13,(row+1)*size/rows-.13
-        for side in (-1,1):
-            y=side*(half-.65)
-            box(model,p,(-half,y-.65,za),(half,y+.65,zb),WOOD,.10,row+200)
-            x=side*(half-.65)
-            box(model,p,(x-.65,-half+1.3,za),(x+.65,half-1.3,zb),WOOD,.10,row+210)
-    for k in range(rows):
-        x0,x1=-half+k*size/rows+.13,-half+(k+1)*size/rows-.13
-        box(model,p,(x0,-half,size-1.3),(x1,half,size),WOOD,.10,k+220)
-    for side in (-1,1):
-        for y in (-half-.6,half+.6):
-            x=side*half*.7
-            box(model,p,(x-1.65,y-.6,0),(x+1.65,y+.6,size),DARK,.14,230+side)
-            for z in (2.3,size-2.3):
-                bolt(model,p.at((x,y+math.copysign(.63,y),z)),p.y*math.copysign(1,y),.18,False)
+    # Separate module keeps shipping-crate wear out of the shared furniture primitives.
+    import belltower_crates
+    belltower_crates.build(model,p,size)
 
 
 def sack(model, p, centre, size=(28,22,14), seed=0):

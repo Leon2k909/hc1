@@ -1,0 +1,27 @@
+// Read-only live clothing inspection. No shared renderer or camera changes.
+var scenes=Scene.All.ToArray();
+var rows=new System.Collections.Generic.List<object>();
+foreach(var scene in scenes)
+{
+    foreach(var r in scene.GetAllObjects(true).SelectMany(o=>o.Components.GetAll<SkinnedModelRenderer>()).Distinct())
+    {
+        if(r.Model is null||r.Model.IsError)continue;
+        var garment=r.Model.ResourcePath??"";
+        if(!garment.Contains("army_shirt")&&!garment.Contains("fingerless_gloves"))continue;
+        var slots=new System.Collections.Generic.List<object>();
+        for(var i=0;i<r.Model.Materials.Length;i++)
+        {
+            var original=r.Model.Materials[i];var over=r.Materials.GetOverride(i);var m=over??original;
+            if(m is null||m.IsError)continue;
+            slots.Add(new{Slot=i,Original=original.ResourcePath,Override=over?.ResourcePath,m.ShaderName,
+                Textures=new[]{"g_tColor","g_tNormal","g_tFineNormal","g_tFineData"}.Select(key=>{
+                    var t=m.GetTexture(key);return new{Key=key,Width=t?.Width,Height=t?.Height,Mips=t?.Mips,Loaded=t?.IsLoaded,Error=t?.IsError};}).ToArray()});
+        }
+        rows.Add(new{Scene=scene.Name,Object=r.GameObject.Name,Model=garment,r.Enabled,r.Active,r.Tint,Slots=slots});
+    }
+}
+var result=new{Playing=Game.IsPlaying,Scenes=scenes.Select(s=>new{s.Name,s.IsEditor}).ToArray(),Garments=rows};
+var folder=System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(),"output/firstperson-clothing-v3-20261021");
+System.IO.Directory.CreateDirectory(folder);
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"live-baseline.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

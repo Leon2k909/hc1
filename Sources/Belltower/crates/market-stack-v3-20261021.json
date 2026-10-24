@@ -1,0 +1,135 @@
+{
+  "revision": "market-crates-v3",
+  "status": "applied-and-verified",
+  "date": "2026-10-21",
+  "scope": "The pictured three Market Street shipping crates and their mirrored copy.",
+  "placement": "Compact stall-side storage: two ground crates, one supported on the larger crate; lamp and alley clear.",
+  "appearance": [
+    "shallow board bow and cup",
+    "chamfered and chipped plank edges",
+    "slight fastener variation",
+    "existing photographed wood materials"
+  ],
+  "placements_west": [
+    {
+      "old": [
+        -1370.4945685272105,
+        1182.8048374969237,
+        0.0
+      ],
+      "new": [
+        -1514.0,
+        1127.0,
+        0.0
+      ],
+      "size": 36.0,
+      "yaw": 2.5085951026555886
+    },
+    {
+      "old": [
+        -1324.4612177370714,
+        1186.640174289331,
+        0.0
+      ],
+      "new": [
+        -1476.0,
+        1174.0,
+        0.0
+      ],
+      "size": 44.0,
+      "yaw": 1.8494746102398982
+    },
+    {
+      "old": [
+        -1278.8040906382168,
+        1192.6091816622286,
+        0.0
+      ],
+      "new": [
+        -1476.0,
+        1174.0,
+        44.0
+      ],
+      "size": 40.0,
+      "yaw": 0.6311568176593507
+    }
+  ],
+  "east_is_mirrored": true,
+  "authoring_module": "Tools/belltower_market_crates_v3.py",
+  "generator_hook": "MarketCratesV3.stack in Tools/belltower_map.py; preserves later prop random draws.",
+  "import": {
+    "Revision": "market-crates-v3",
+    "Imported": 16,
+    "EditorStatePreserved": true,
+    "Crates": 6,
+    "CoverBoxesRelocated": 6,
+    "SceneChanged": false,
+    "UnrelatedObjBytesExact": true
+  },
+  "models_compiled": [
+    "belltower_west.vmdl",
+    "belltower_east.vmdl"
+  ],
+  "collision": {
+    "probes_passed": 12,
+    "old_positions_ground_height": 0,
+    "new_visible_top_heights": [
+      36,
+      84
+    ],
+    "relocated_boxes": 6
+  },
+  "source_random_sequence": {
+    "rng_preserved_seeds": 128,
+    "crate_count_variants": {
+      "4": 46,
+      "2": 26,
+      "3": 56
+    },
+    "subsequent_map_prop_random_draws_unchanged": true
+  },
+  "geometry": {
+    "west": {
+      "triangles": 15188,
+      "minimum_triangle_area": 0.0016855416785138628,
+      "all_normals_follow_winding": true,
+      "finite_vertices": true
+    },
+    "east": {
+      "triangles": 15188,
+      "minimum_triangle_area": 0.0016855416785138628,
+      "all_normals_follow_winding": true,
+      "finite_vertices": true
+    }
+  },
+  "unrelated_geometry_preserved_at_publication": true,
+  "concurrent_authoring_updates": "Canonical OBJs also received unrelated updates; direct face matching confirms all replacement crate faces remain and old faces are absent.",
+  "canonical_group_inspection": {
+    "west": {
+      "sha256": "06f62589dcbc6ec3e8476ef1db76054de36113b570f7f5d5a153980e4922aac6",
+      "old_faces_present": 0,
+      "new_faces_present": 15188,
+      "new_faces_expected": 15188
+    },
+    "east": {
+      "sha256": "18b705f83eab386d2b7c6a8d83207eaa62dd522a5f342e9a509c4a11d8f0e0b3",
+      "old_faces_present": 0,
+      "new_faces_present": 15188,
+      "new_faces_expected": 15188
+    }
+  },
+  "private_mesh_bounded_import_and_model_hashes_verified": true,
+  "captures": {
+    "before_wide": "output/belltower/quality/market-crates-v3-before/wide.png",
+    "after_wide": "output/belltower/quality/market-crates-v3-after/wide.png",
+    "after_detail": "output/belltower/quality/market-crates-v3-after/detail.png"
+  },
+  "capture_camera_and_scene_state_restored": true,
+  "last_editor_check": {
+    "compile_errors": 0,
+    "scene": "scenes/maps/belltower/belltower.scene",
+    "unsaved": false,
+    "playing": false
+  },
+  "manifest": "output/belltower/crates-v3-20261021/stage-current/manifest.json"
+}

@@ -1,0 +1,58 @@
+{
+  "revision": "soft-shop-props-v1",
+  "state": "native compilation and representative saved-map geometry review verified",
+  "displays": 18,
+  "features": [
+    "slight continuous bow in long timber shelves and their front rails",
+    "inward paper creases and uneven folded seams on parcels",
+    "gently curled price cards retaining their metal clips"
+  ],
+  "source_sha256": {
+    "Tools/belltower_soft_props.py": "7b892a6a9ba065ebac88d49826f42b014a9d80384ad011645234ef55b89030a8",
+    "Tools/belltower_shop_displays_v2.py": "f4aaac036c485965197370d64dc18fea42286c0116c05740a76c8cf1406c9b4a",
+    "Tools/belltower_stage_soft_props.py": "f652b759a1c1d6b6341ec9d1301abda0f16f343b95d7894809997fd7468b5c84",
+    "Tools/belltower_stage_shop_displays_v2.py": "bd962c97ea3b9e0d77b15d9cfe566bd44df20c154f046c2cd81e05d94ed42014",
+    "Sources/Belltower/editor/import-soft-shop-props-v1.cs.txt": "a3ea37ac055ec96b0fe6547f268024b57f09b11f80e61e6b1fa78dbc099bebaa"
+  },
+  "model": "Assets/models/maps/belltower/shop-display-v2/shop_displays.obj",
+  "model_sha256": "29540fd43c99251bc166eddc62968c3f58fb97fafad420a6b5e28251dce98b79",
+  "before_triangles": 322508,
+  "after_triangles": 402832,
+  "geometry_checks": {
+    "all_exported_triangles_checked": 402832,
+    "degenerate_triangles": 0,
+    "finite_positions_normals_and_label_uvs": true
+  },
+  "new_colliders": 0,
+  "town_meshes_written": [],
+  "saved_scene_written": false,
+  "materials_or_texture_pixels_changed": false,
+  "editor_launched_stopped_or_restarted": false,
+  "native_compilation_verified": true,
+  "native_map_visual_review_verified": true,
+  "stage": "output/belltower/prop-edge-audit/stage/manifest.json",
+  "publication": "output/belltower/prop-edge-audit/offline-publication.json",
+  "construction_preview": {
+    "path": "output/belltower/prop-edge-audit/construction-final/detail.png",
+    "sha256": "621989f8ae030a971858944723b031614f3b1ddd894956f706b52208ab7ae1bf",
+    "kind": "Blender CPU construction render; shader translation is approximate; not an engine capture",
+    "reviewed": true,
+    "scope": "Final parcel folds, seam contact and the supporting timber shelf."
+  },
+  "verification": "output/belltower/prop-edge-audit/verification.json",
+  "native_verification": "output/belltower/prop-edge-audit/native-check-20261020/native-verification.json",
+  "shader_compile_compatibility_fix": {
+    "problem": "AlphaWeighted mip filtering rejected the original 1254x1254 label artwork.",
+    "solution": "Use Box colour filtering inside CommonInputs for this fully opaque shader.",
+    "paths": [
+      "Assets/shaders/belltower_shop_display_v2.shader",
+      "Sources/Belltower/shop-displays/shop_display_v2.shader"
+    ],
+    "before_sha256": "b4b9462d66881454639c3e7d21a52cab91a70c559fa805a829f46fa01b8eae52",
+    "after_sha256": "2ed6e581815ddb8b99dc7210dbd9905390603a12b3f85a4a60371a6d023304a5",
+    "texture_pixels_changed": false,
+    "label_pixels_sha256": "4d65d15a761f3802ef7a0a74a113c6779d6a26b08a4b86176b3a3a5b52644c50",
+    "originals": "output/belltower/prop-edge-audit/native-check-20261020/before"
+  },
+  "native_visual_review": "output/belltower/prop-edge-audit/native-check-20261020/native-visual-review.json"
+}

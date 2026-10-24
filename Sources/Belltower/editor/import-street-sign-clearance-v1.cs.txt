@@ -1,0 +1,74 @@
+// Publish only the two marble slabs, including their existing stone edge faces.
+var root = Sandbox.Project.Current.GetRootPath();
+var directory = System.IO.Path.Combine(root,"output/belltower/street-sign-clearance-v1");
+var manifest = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(directory,"stage/manifest.json")));
+if (Game.IsPlaying) throw new InvalidOperationException("Requires the saved editor document outside play.");
+var session = Editor.SceneEditorSession.Active;
+if (session is null || session.HasUnsavedChanges || session.Scene.Source?.ResourcePath?.Equals("scenes/maps/belltower/belltower.scene",StringComparison.OrdinalIgnoreCase)!=true)
+    throw new InvalidOperationException("Requires the existing saved Belltower document.");
+var gameId = Game.ActiveScene?.Id;
+var ids = session.Scene.GetAllObjects(true).Select(o=>o.Id).ToHashSet();
+string Hash(string path) => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+var scenePath = System.IO.Path.Combine(root,"Assets/scenes/maps/Belltower/belltower.scene");
+var sceneHash = Hash(scenePath);
+foreach (var group in new[] {"source_sha256","protected_sha256"})
+    foreach (var pair in manifest[group].AsObject())
+        if (Hash(System.IO.Path.Combine(root,pair.Key))!=pair.Value.GetValue<string>())
+            throw new InvalidOperationException("Shared input changed: "+pair.Key);
+var allowed = new System.Collections.Generic.HashSet<string> {
+    "Assets/models/maps/belltower/belltower_west.obj",
+    "Assets/models/maps/belltower/belltower_east.obj",
+    "Assets/models/maps/belltower/compiler-safe/west/west_000_ashlar.obj",
+    "Assets/models/maps/belltower/compiler-safe/west/west_057_plaque_7.obj",
+    "Assets/models/maps/belltower/compiler-safe/east/east_000_ashlar.obj",
+    "Assets/models/maps/belltower/compiler-safe/east/east_056_plaque_7.obj" };
+if (manifest["files"].AsObject().Count!=6 || !manifest["only_street_plaque_slabs_changed"].GetValue<bool>() || manifest["physics_changed"].GetValue<bool>())
+    throw new InvalidOperationException("Missing plaque-only preservation proof.");
+var plan = new System.Collections.Generic.List<(string Source,string Target,string Backup,string After)>();
+foreach (var pair in manifest["files"].AsObject())
+{
+    if (!allowed.Contains(pair.Key) || !pair.Value["only_plaque_vertices_moved"].GetValue<bool>() ||
+        !pair.Value["all_unrelated_source_bytes_preserved"].GetValue<bool>() ||
+        pair.Value["triangles_before"].GetValue<int>()!=pair.Value["triangles_after"].GetValue<int>())
+        throw new InvalidOperationException("Unexpected target: "+pair.Key);
+    var source = System.IO.Path.Combine(root,pair.Value["source"].GetValue<string>());
+    var target = System.IO.Path.Combine(root,pair.Key);
+    var backup = System.IO.Path.Combine(root,pair.Value["backup"].GetValue<string>());
+    var before = pair.Value["before"].GetValue<string>();
+    var after = pair.Value["after"].GetValue<string>();
+    if (Hash(source)!=after || Hash(backup)!=before) throw new InvalidOperationException("Stage or backup changed.");
+    var current = Hash(target);
+    if (current==after) continue;
+    if (current!=before) throw new InvalidOperationException("Shared mesh changed: "+pair.Key);
+    plan.Add((source,target,backup,after));
+}
+var changed = new System.Collections.Generic.List<(string Target,string Backup)>();
+try
+{
+    foreach (var item in plan)
+    {
+        var incoming=item.Target+".street-sign-clearance-incoming";
+        try
+        {
+            System.IO.File.Copy(item.Source,incoming,true);
+            if (Hash(incoming)!=item.After) throw new InvalidOperationException("Incoming checksum failed.");
+            changed.Add((item.Target,item.Backup));
+            System.IO.File.Move(incoming,item.Target,true);
+        }
+        finally { if (System.IO.File.Exists(incoming)) System.IO.File.Delete(incoming); }
+    }
+}
+catch
+{
+    foreach (var item in changed.AsEnumerable().Reverse()) System.IO.File.Copy(item.Backup,item.Target,true);
+    throw;
+}
+foreach (var item in plan) Editor.AssetSystem.RegisterFile(item.Target);
+if (Hash(scenePath)!=sceneHash || session.HasUnsavedChanges || Game.IsPlaying || Game.ActiveScene?.Id!=gameId ||
+    !ReferenceEquals(session,Editor.SceneEditorSession.Active) || !session.Scene.GetAllObjects(true).Select(o=>o.Id).ToHashSet().SetEquals(ids))
+    throw new InvalidOperationException("Editor state changed during publication; inspect before continuing.");
+var result = new { Imported=plan.Count, Plaques=2, RiseInches=24, GapAboveBandInches=4,
+    TriangleCountUnchanged=true, OnlyPlaqueVerticesMoved=true, SceneUnchanged=true,
+    SceneSha256=sceneHash, ActiveDocumentPreserved=true, ModelDescriptionsAndPhysicsUnchanged=true };
+System.IO.File.WriteAllText(System.IO.Path.Combine(directory,"native-import.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

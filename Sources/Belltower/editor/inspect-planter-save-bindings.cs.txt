@@ -1,0 +1,13 @@
+// Read-only: identify automatically refreshed prefab instance bindings after Save Scene.
+var session=Editor.SceneEditorSession.Active;
+if (Game.IsPlaying || session is null || !session.Scene.Source.ResourcePath.Equals("scenes/maps/belltower/belltower.scene",StringComparison.OrdinalIgnoreCase))
+    throw new InvalidOperationException("Requires stopped Belltower.");
+var ids=new System.Collections.Generic.HashSet<Guid>{
+    Guid.Parse("4dd32d0d-82a4-8eff-9f2e-7e16f59a5f9a"),
+    Guid.Parse("ae05a707-bd2c-81ce-b4d0-0c4ec07b932b"),
+    Guid.Parse("aad6bf84-e453-885e-a25f-78d83db2b3bf")};
+return new {
+    Components=session.Scene.GetAllComponents<Component>().Where(c=>ids.Contains(c.Id))
+        .Select(c=>new {c.Id,Type=c.GetType().FullName,ObjectName=c.GameObject.Name,ObjectId=c.GameObject.Id}).ToArray(),
+    Objects=session.Scene.GetAllObjects(true).Where(o=>ids.Contains(o.Id)).Select(o=>new {o.Id,o.Name}).ToArray()
+};

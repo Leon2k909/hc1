@@ -1,0 +1,110 @@
+{
+  "vertices": 7055,
+  "triangles": 8107,
+  "removed_degenerate": 0,
+  "materials": {
+    "m_859aeba86487": "viper/mw/attachments/attachment_vm_minireddot03_lens",
+    "m_72462e813a1c": "viper/mw/attachments/attachment_vm_reflex_west01_lens_ads",
+    "m_d2084a8c78b4": "viper/mw/attachments/attachment_vm_minireddot03_body",
+    "m_ad5bdfa0d50c": "viper/mw/attachments/attachment_vm_riser03",
+    "m_7617252bd7f3": "viper/mw/attachments/attachment_vm_minireddot_railmount"
+  },
+  "bounds": [
+    [
+      0.0,
+      -0.5910000205039978,
+      -0.22300100326538086
+    ],
+    [
+      2.7929999828338623,
+      0.614998996257782,
+      1.5199999809265137
+    ]
+  ],
+  "key": "att_vm_minireddot03_tall",
+  "name": "Cronen LP945 Mini Reflex",
+  "category": "Optic",
+  "source": "models/viper/mw/attachments/attachment_vm_minireddot03_tall.mdl",
+  "vmdl": "attachments/mw2022/models/att_vm_minireddot03_tall/att_vm_minireddot03_tall.vmdl",
+  "bodygroups": [
+    {
+      "name": "optic",
+      "choices": [
+        {
+          "source": "attachment_vm_minireddot03_tall.smd",
+          "mesh": "mesh_00"
+        }
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "tag_reflex",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tag_reticle_attach",
+      "head": [
+        2.006999969482422,
+        0.0020000000949949026,
+        1.1030000448226929
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          2.006999969482422
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.001999974250793457
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          1.1030000448226929
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

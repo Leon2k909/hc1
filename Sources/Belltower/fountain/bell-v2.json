@@ -1,0 +1,26 @@
+{
+  "revision": "bell-v2",
+  "date": "2026-10-21",
+  "request": "Apply the Belltower fountain bell quality fix and check it in game.",
+  "generator": "Tools/belltower_bell.py",
+  "generator_hook": "Tools/belltower_fountain.py",
+  "stage_generator": "Tools/belltower_stage_bell.py",
+  "native_import": "Sources/Belltower/editor/import-bell-v2.cs.txt",
+  "changes": [
+    "Continuous curved cast profile with smooth vertex normals and 128 radial sides",
+    "Closed shell with a darker inner wall, rolled lip and visible clapper",
+    "Continuous rounded crown loops and fine cast beads",
+    "Dedicated 1024px bronze material with restrained colour and roughness variation"
+  ],
+  "scope": "Bell render geometry and dedicated materials only. The yoke, all non-bell mesh bytes, physics, scene, water and shared bronze material are preserved.",
+  "removed_bell_triangles": 2394,
+  "replacement_bell_triangles": 30564,
+  "publication_manifest": "output/belltower/bell-v2/stage/manifest.json",
+  "publication_receipt": "output/belltower/bell-v2/native-import.json",
+  "native_compilation": "output/belltower/bell-v2/compile/call_tools.json",
+  "editor_capture": "output/belltower/bell-v2/after-bell-close.png",
+  "live_runtime_capture": "output/belltower/bell-v2/game-bell-close.png",
+  "live_loaded_resources": "output/belltower/bell-v2/game-bell-close.json",
+  "verification": "output/belltower/bell-v2/verification.json",
+  "review": "Native close-up and running Belltower reviewed. New bronze and inner materials loaded without resource errors; camera restored. The existing play session was preserved. The archived before-bell-close view is column-occluded and is not a valid visual comparison; the user's supplied image is the before reference. Runtime close-up includes the existing weapon overlay."
+}

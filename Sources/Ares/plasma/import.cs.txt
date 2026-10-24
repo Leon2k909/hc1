@@ -1,0 +1,40 @@
+// Run a copy in the CLI exchange directory. Compile the new shader before replacing the live material.
+// The existing Ares scene, meshes, lights, glass and plasma textures are preserved.
+var project = Sandbox.Project.Current.GetRootPath();
+var directory = System.IO.Path.Combine( project, "output/ares/plasma-20261020" );
+var sourceScene = Editor.SceneEditorSession.Active?.Scene;
+var gameScene = Game.ActiveScene;
+if ( Game.IsPlaying ) throw new InvalidOperationException( "Import plasma assets in edit mode" );
+string Hash( string path ) => Convert.ToHexString( System.Security.Cryptography.SHA256.HashData(
+    System.IO.File.ReadAllBytes( path ) ) ).ToLowerInvariant();
+var expectedPath = System.IO.Path.Combine( directory, "installed.json" );
+var expected = System.Text.Json.Nodes.JsonNode.Parse( System.IO.File.ReadAllText(
+    System.IO.File.Exists( expectedPath ) ? expectedPath : System.IO.Path.Combine( directory, "before/manifest.json" ) ) ).AsObject();
+var names = new[] { "shaders/hc1_ares_plasma.shader", "materials/ares/ar_plasma.vmat" };
+foreach ( var name in names )
+{
+    var target = System.IO.Path.Combine( project, "Assets", name );
+    var stage = System.IO.Path.Combine( directory, "stage", name );
+    if ( !System.IO.File.Exists( stage ) ) throw new InvalidOperationException( "Missing staged asset: " + name );
+    if ( System.IO.File.Exists( target ) && Hash( target ) != Hash( stage )
+        && ( expected["Assets/" + name] is null || Hash( target ) != expected["Assets/" + name].GetValue<string>() ) )
+        throw new InvalidOperationException( "Changed since staging: " + name );
+}
+var shaderPath = System.IO.Path.Combine( project, "Assets", names[0] );
+System.IO.File.Copy( System.IO.Path.Combine( directory, "stage", names[0] ), shaderPath, true );
+Editor.AssetSystem.RegisterFile( shaderPath );
+var compiled = await Editor.EditorUtility.CompileShader( names[0], new() { ForceRecompile = true }, cancellationToken );
+if ( !compiled.Success ) throw new InvalidOperationException( "Ares plasma shader failed: " + String.Join( "\n",
+    compiled.Programs.SelectMany( p => p.Output ?? new System.Collections.Generic.List<string>() ) ) );
+if ( compiled.CompiledShader is { Length: > 0 } ) System.IO.File.WriteAllBytes( shaderPath + "_c", compiled.CompiledShader );
+cancellationToken.ThrowIfCancellationRequested();
+var materialPath = System.IO.Path.Combine( project, "Assets", names[1] );
+System.IO.File.Copy( System.IO.Path.Combine( directory, "stage", names[1] ), materialPath, true );
+Editor.AssetSystem.RegisterFile( materialPath );
+var installed = names.ToDictionary( name => "Assets/" + name, name => Hash( System.IO.Path.Combine( project, "Assets", name ) ) );
+var options = new System.Text.Json.JsonSerializerOptions { WriteIndented = true };
+System.IO.File.WriteAllText( expectedPath, System.Text.Json.JsonSerializer.Serialize( installed, options ) );
+var report = new { Imported = installed.Keys, ShaderCompiled = compiled.Success,
+    SceneUnchanged = sourceScene == Editor.SceneEditorSession.Active?.Scene && gameScene == Game.ActiveScene, Game.IsPlaying };
+System.IO.File.WriteAllText( System.IO.Path.Combine( directory, "import.json" ), System.Text.Json.JsonSerializer.Serialize( report, options ) );
+return report;

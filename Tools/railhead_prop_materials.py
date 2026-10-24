@@ -391,6 +391,7 @@ def write( root ):
     _write_text( out / "rw_vend_band.vmat", _atlas_vmat( "rw_prop_signs", ( 1.0, 1.0, 1.0 ), illum=1.4 ) )
     _signs( out )
     write_round2( out )
+    write_bench( out )
     print( f"wrote {len( PAINTS )} prop materials to {out}" )
 
 
@@ -426,6 +427,30 @@ PAINTS2 = {
     "rw_container_code": 1.0,       # the container's owner code, type code and plates (explicit UVs, alpha tested)
 }
 PAINTS.update( PAINTS2 )
+
+# The benches' sawn slat ends (railhead_bench): the gunsmith range's oak end grain, tinted to the varnished slats'
+# brown and a shade darker, as end grain soaks up the finish. Explicit UVs.
+PAINTS3 = {
+    "rw_wood_end": 1.0,
+}
+PAINTS.update( PAINTS3 )
+WOOD_END = "materials/gunsmith_range/bench_oak_endgrain"
+WOOD_END_TINT = ( 0.72, 0.53, 0.35 )
+
+
+def write_bench( root_or_out ):
+    """ The bench paints (PAINTS3), into root/materials/railhead (or an out folder ending in materials/railhead). """
+    out = Path( root_or_out )
+    if out.name != "railhead":
+        out = out / RESOURCE
+    out.mkdir( parents=True, exist_ok=True )
+    r, g, b = WOOD_END_TINT
+    _write_text( out / "rw_wood_end.vmat", "\n".join( [
+        "// Tools/railhead_prop_materials.py: the gunsmith range's oak end grain, tinted to Railhead's bench slats",
+        '"Layer0"', "{", '    shader "shaders/complex.shader"', '    F_SPECULAR "1"', '    g_flMetalness "0"',
+        '    g_flRoughnessScaleFactor "1"', f'    g_vColorTint "[{r:.3f} {g:.3f} {b:.3f} 1]"', '    g_flModelTintAmount "1"',
+        f'    TextureColor "{WOOD_END}_color.png"', f'    TextureNormal "{WOOD_END}_normal.png"',
+        f'    TextureRoughness "{WOOD_END}_roughness.png"', f'    TextureAmbientOcclusion "{DEFAULT_AO}"', "}" ] ) + "\n" )
 
 
 def glass_vmat( tint, rough=0.05, absorb=0.15 ):
@@ -605,8 +630,11 @@ def main():
     ap = argparse.ArgumentParser( description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter )
     ap.add_argument( "--out", required=True, type=Path, help="a root laid out as Assets (a stage folder, or Assets)" )
     ap.add_argument( "--round2", action="store_true", help="only the round-2 paints (PAINTS2)" )
+    ap.add_argument( "--bench", action="store_true", help="only the bench paints (PAINTS3)" )
     args = ap.parse_args()
-    if args.round2:
+    if args.bench:
+        write_bench( args.out )
+    elif args.round2:
         write_round2( args.out )
     else:
         write( args.out )

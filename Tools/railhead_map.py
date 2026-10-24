@@ -945,10 +945,13 @@ def under_bridge_battens( m, es ):
         S.luminaire( m, ( e, UNDER_BRIDGE_N, S.DECK_Z - 12.0 ), "n", length=47.2 )
 
 
+BIN_HALF_WIDTH = 20.1      # railhead_props' double bin: 40.2 wide, its back 8.7 behind its centre (facing the walkway)
+
+
 def footbridge_kit( m, s ):
     """ What a DB footbridge carries, all off the walking line and with no collision but the bins': at each stair head a
     platform plate (the stair's Gleis over an Ausgang arrow pointing at the opening) on the glazing beside the opening,
-    a bin on the opening's other side, DIN A1 frames on every second panel along the parapets, alternating sides, and
+    a bin on the opening's other side, DIN A3 frames on every second panel along the parapets, alternating sides, and
     an extinguisher on the end wall. East half; s mirrors it. """
     if D is None:
         return
@@ -978,12 +981,17 @@ def footbridge_kit( m, s ):
         detail( "wall_sign", m, at[0], at[1], facing, names, [ gleis_h * aspect ], S.DECK_Z + 41.0 + row_h + 2.5, gleis_h )
         detail( "wall_sign", m, at[0], at[1], facing, [ arrow ], [ w_arrow ], S.DECK_Z + 41.0, row_h )
         taken.append( ( side, e_plate - 28.0, e_plate + 28.0 ) )
-        # The bin on the opening's other side, 4 in off the panel, clear of the handrail.
-        e_bin = ( e0 - 16.0 ) if plate_side > 0 else ( e1 + 16.0 )
-        put( "bin", m, s * e_bin, face + inward * 12.0, facing, S.DECK_Z )
+        # The bin on the opening's other side, 4 past the stair's parapet; the centre stairs' beyond their plate, 4 clear
+        # of it: between the two centre stairs it stood inside the other half's bin and in both openings. 13.5 off the
+        # face, its back is 1.15 in front of the handrail (7.65 off the panel); at 12 its lid went through the rail.
+        e_bin = ( e_plate + 23.5 + 4.0 + BIN_HALF_WIDTH ) if plate_side > 0 else ( e1 + 4.0 + BIN_HALF_WIDTH )
+        put( "bin", m, s * e_bin, face + inward * 13.5, facing, S.DECK_Z )
         taken.append( ( side, e_bin - 14.0, e_bin + 14.0 ) )
         taken.append( ( side, e0 - 8.0, e1 + 8.0 ) )
-    # A1 frames, centred between the panels' stiffeners (every 60 from 31.5), every 120, alternating sides.
+    # A3 frames on the steel panels under the handrail, centred between the panels' stiffeners (every 60 from 31.5),
+    # every 120, alternating sides. The panel is 36 high, the handrail at its top and its brackets' wall plates from
+    # 30.5 up (railhead_architecture.footbridge), so a frame stays under 30.5. It was A1 from 22 up, running past the
+    # handrail onto the glass, the rail across its middle.
     entries = ( "poster_city", "network_map", "poster_sea", "notice_a4", "poster_bike", "poster_alps" )
     k = 0
     e = 121.5
@@ -992,7 +1000,7 @@ def footbridge_kit( m, s ):
         if not any( sd == side and a - 14.0 < e < b + 14.0 for sd, a, b in taken ):
             face, facing, inward = faces[side]
             detail( "notice_board", m, s * e, face + inward * 0.6, facing, entries[k % len( entries )],
-                    bottom=S.DECK_Z + 22.0 )
+                    bottom=S.DECK_Z + 11.0, size=( 11.7, 16.5 ) )
         k += 1
         e += 120.0
     # The extinguisher on the bridge's end, against the shed wall's inside face.
@@ -1142,14 +1150,25 @@ def head_building( m, s ):
     # The wings' pendants, one over each quarter of the room.
     for e, n in WING_LAMPS:
         pendant( m, s * e, n, S.WING_CEILING, WING_LAMP_Z )
-    # Posters and an extinguisher on the wing's free walls: by the travel centre's queue west, the lockers east.
-    wall_e = s * ( S.WALL_IN - 0.5 )
-    inward = "-e" if s > 0 else "+e"
-    detail( "city_light", m, wall_e, 1480.0, inward, "poster_alps" if s > 0 else "poster_bike", bottom=36.0 )
-    detail( "extinguisher", m, wall_e, 1390.0, inward )
+    wing_wall_kit( m, s )
 
 
-ROAD_VEHICLES_ENABLED = True
+# The wing's poster and extinguisher, on its inner wall (the hall's side wall, solid from HALL_N0 to the hall's door at
+# 1675) facing the cab road's door. The outer wall has no run a City-Light case fits between its door (1430..1530) and
+# windows: there the poster hung in the doorway and the extinguisher's sign in front of the window at 1380.
+WING_POSTER_N, WING_EXTINGUISHER_N = 1540.0, 1400.0
+
+
+def wing_wall_kit( m, s ):
+    wall_e = s * ( S.SIDE_E + 0.5 )
+    facing = "+e" if s > 0 else "-e"
+    detail( "city_light", m, wall_e, WING_POSTER_N, facing, "poster_alps" if s > 0 else "poster_bike", bottom=36.0 )
+    detail( "extinguisher", m, wall_e, WING_EXTINGUISHER_N, facing )
+
+
+# Off since 2026-10-25: the user is going to rework the cars, so the cab roads stand empty until then. The cars, the
+# SUV and the van (railhead_props.car, suv, van) and their placements are kept; set it True to bring them back.
+ROAD_VEHICLES_ENABLED = False
 # German taxis are RAL 1015 light ivory: railhead_materials' rw_car_ivory once it's registered, white until then.
 TAXI_PAINT = "rw_car_ivory" if RM is not None and "rw_car_ivory" in getattr( RM, "PAINTED", {} ) else "rw_car_white"
 
@@ -2410,14 +2429,15 @@ def main():
     parser.add_argument( "--no-scene", action="store_true", help="write the models only, not the scene or the radar picture" )
     parser.add_argument( "--backdrop", action="store_true", help="put the city in the previews too (slow)" )
     parser.add_argument( "--art", action="store_true", help="write the menus' stand-in picture from the preview" )
-    parser.add_argument( "--stage", metavar="DIR", help="write the models and scene under DIR (laid out as Assets) instead "
-                         "of Assets, and no radar picture: for trying changes without the editor compiling them. "
+    parser.add_argument( "--stage", metavar="DIR", help="write the models, the scene and the radar picture under DIR "
+                         "(laid out as Assets) instead of Assets: for trying changes without the editor compiling them. "
                          "Tools/railhead_render.py --stage DIR renders it." )
     args = parser.parse_args()
-    global OUT_DIR, SCENE_FILE
+    global OUT_DIR, SCENE_FILE, MINIMAP_FILE
     if args.stage:
         OUT_DIR = Path( args.stage ).resolve() / "models/maps/railhead"
         SCENE_FILE = Path( args.stage ).resolve() / "scenes/maps/Railhead/railhead.scene"
+        MINIMAP_FILE = Path( args.stage ).resolve() / MINIMAP_PATH
 
     kiosk_art = optional( "railhead_kiosk_art" )
     if kiosk_art is not None and kiosk_art.missing():
@@ -2493,8 +2513,7 @@ def main():
 
     props = [ prop for model in models.values() for prop in model.props ]
     if not args.no_scene:
-        if not args.stage:
-            write_minimap( solid )
+        write_minimap( solid )
         write_scene( written, light_list, props )
     preview_names = [ n for n in models if n not in ( "railhead_north", "railhead_south", "railhead_skyline" ) or args.backdrop ]
     if out:

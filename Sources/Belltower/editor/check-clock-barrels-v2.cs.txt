@@ -1,0 +1,32 @@
+// Read-only rays: the doorway must clear, and the moved casks must retain collision.
+var root=Sandbox.Project.Current.GetRootPath();
+var path=System.IO.Path.Combine(root,"output/belltower/barrels-v2/collision-request.json");
+var config=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(path));
+var relocated=config["relocated"].GetValue<bool>();
+var session=Editor.SceneEditorSession.All.Single(s=>s.Scene.IsEditor && s.Scene.Source?.ResourcePath?.Equals("scenes/maps/belltower/belltower.scene",StringComparison.OrdinalIgnoreCase)==true);
+var scene=session.Scene;
+var results=new System.Collections.Generic.List<object>();var passed=true;
+using(scene.Push())
+foreach(var sign in new[]{1,-1})
+{
+    var side=sign==1?"west":"east";
+    foreach(var sample in new (string Name,float East,float North,float Height)[]{
+        ("old-first",-260,1160,relocated?0:36),("old-second",-235.877f,1147.8728f,relocated?0:36),
+        ("new-first",-419,1120,relocated?36:0),("new-second",-389,1119,relocated?36:0)})
+    {
+        var start=new Vector3(sample.North,-sample.East*sign,60);
+        var hit=scene.Trace.Ray(start,start.WithZ(-5)).UsePhysicsWorld(true).UseRenderMeshes(false).Run();
+        var ok=hit.Hit && !hit.StartedSolid && MathF.Abs(hit.EndPosition.z-sample.Height)<1;
+        passed&=ok;
+        results.Add(new{Side=side,sample.Name,ExpectedHeight=sample.Height,hit.Hit,hit.StartedSolid,
+            Height=hit.EndPosition.z,Object=hit.GameObject?.Name,Passed=ok});
+    }
+    var from=new Vector3(1220,260*sign,18);var to=new Vector3(1106,260*sign,18);
+    var door=scene.Trace.Ray(from,to).UsePhysicsWorld(true).UseRenderMeshes(false).Run();
+    var clear=!door.Hit && !door.StartedSolid;var doorOk=clear==relocated;passed&=doorOk;
+    results.Add(new{Side=side,Name="door-approach",Clear=clear,ExpectedClear=relocated,door.Hit,door.StartedSolid,
+        Position=door.EndPosition.ToString(),Object=door.GameObject?.Name,Passed=doorOk});
+}
+var result=new{Passed=passed,Relocated=relocated,Checks=results};
+System.IO.File.WriteAllText(System.IO.Path.Combine(root,"output/belltower/barrels-v2/collision-"+(relocated?"after":"before")+".json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

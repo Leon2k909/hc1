@@ -162,8 +162,11 @@ public class CharacterController : Component
 		var vBumpOrigin = Position;
 		var wasOnGround = IsOnGround;
 
-		// We're flying upwards too fast, never land on ground
-		if ( !IsOnGround && Velocity.z > 40.0f )
+		// Rising too fast to land: straight after a jump, whatever is underneath. After that, only rising away from the
+		// surface counts (below). Landing on a slope while moving uphill turns the fall into motion along it, which rises
+		// too: with the rise alone a jump onto stairs left you sliding up them in the air (2026-10-19).
+		var rising = !IsOnGround && Velocity.z > 40.0f;
+		if ( rising && _timeSincePunch < JumpLandingGrace )
 		{
 			ClearGround();
 			return;
@@ -182,6 +185,13 @@ public class CharacterController : Component
 		// we didn't hit - or the ground is too steep to be ground
 		//
 		if ( !pm.Hit || Vector3.GetAngle( Vector3.Up, pm.Normal ) > GroundAngle )
+		{
+			ClearGround();
+			return;
+		}
+
+		// Moving away from the ground's surface, not along it. On level ground this is the rise itself.
+		if ( rising && Vector3.Dot( Velocity, pm.Normal ) > 40.0f )
 		{
 			ClearGround();
 			return;
@@ -210,7 +220,15 @@ public class CharacterController : Component
 	{
 		ClearGround();
 		Velocity += amount;
+		_timeSincePunch = 0f;
 	}
+
+	/// <summary>
+	/// How long after a <see cref="Punch"/> (a jump) rising never lands. A jump uphill into a steep slope barely moves away
+	/// from it, so the surface test alone could land it on its first tick and cancel the jump.
+	/// </summary>
+	const float JumpLandingGrace = 0.2f;
+	TimeSince _timeSincePunch;
 
 	void ClearGround()
 	{

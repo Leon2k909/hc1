@@ -12,10 +12,31 @@ public sealed partial class LightweightCombatBot
 	private Vector3 _proneFacing;
 	private static readonly float[] ProneFloorChecks = { -38f, 0f, 26f };
 
+	/// <summary>
+	/// How far down to a crouch the body, eyes and gun are (0 stood, 1 crouched), eased in and out. The host's
+	/// <see cref="IsCrouching"/> flips at once; a person takes about a third of a second to drop and a little longer to
+	/// come back up, against their weight. The graph's <c>duck</c> was set straight to 0 or 1, so bots snapped between
+	/// standing and crouching (the user: "very unrealistic the way they transition from standing to crouch").
+	/// </summary>
+	public float CrouchBlend { get; private set; }
+	private float _crouchProgress;
+	private const float CrouchDownTime = 0.35f;
+	private const float CrouchUpTime = 0.45f;
+
 	/// <summary>All machines lower the body, eyes and movement box together.</summary>
 	private void UpdateStance()
 	{
 		if ( !IsAlive ) return;
+		// A slide drives its own pose and eye (SlideBlend), so it doesn't sink the crouch: after one the body would
+		// otherwise dip as the slide's pose let go.
+		var crouching = IsCrouching && !IsSliding;
+		_crouchProgress = crouching
+			? MathF.Min( 1f, _crouchProgress + Time.Delta / CrouchDownTime )
+			: MathF.Max( 0f, _crouchProgress - Time.Delta / CrouchUpTime );
+		CrouchBlend = _crouchProgress * _crouchProgress * (3f - 2f * _crouchProgress);
+		if ( _wasCrouching && !IsCrouching )
+			_timeSinceStood = 0f;
+		_wasCrouching = IsCrouching;
 		var step = Time.Delta / 0.45f;
 		_proneBlend = IsProne ? MathF.Min( 1f, _proneBlend + step ) : MathF.Max( 0f, _proneBlend - step );
 		SlideBlend = MathX.Lerp( SlideBlend, IsSliding ? 1f : 0f, (Time.Delta * (IsSliding ? 16f : 7f)).Clamp( 0f, 1f ) );

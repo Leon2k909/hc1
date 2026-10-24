@@ -282,8 +282,7 @@ public partial class Equipment : Component, Component.INetworkListener, IDescrip
 			wmRenderer.SetBodyGroup( "sight", 0 );
 			wmRenderer.SetBodyGroup( "muzzle", 0 );
 		}
-		if ( ApplySavedAttachments )
-			Facepunch.Gunsmith.GunsmithLoadoutManager.ApplyAttachments( Resource, wm );
+		FitHolderBuild( wm );
 
 		wm.Flags |= GameObjectFlags.NotSaved | GameObjectFlags.NotNetworked;
 		wm.Enabled = true;

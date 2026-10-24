@@ -1,0 +1,19 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var directory=System.IO.Path.Combine(root,"output/belltower/ivy-realism-v3/preview");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(directory,"stage/manifest.json")));
+var relative="shaders/belltower_ivy_realism_v3.shader";
+var path=System.IO.Path.Combine(root,"Assets",relative);
+string Hash(string file)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(file))).ToLowerInvariant();
+var expected=manifest["files"]["Assets/"+relative]["after"].GetValue<string>();
+if (Hash(path)!=expected) throw new InvalidOperationException("The private shader changed.");
+var selected=Editor.SceneEditorSession.Active;var game=Game.ActiveScene?.Id;var playing=Game.IsPlaying;
+var pending=Editor.EditorUtility.CompileShader(relative,new(),cancellationToken);
+await pending;
+var reported=pending.GetType().GetProperty("Result")?.GetValue(pending);
+var success=reported is bool b ? b : reported?.GetType().GetProperty("Success")?.GetValue(reported) as bool?;
+if (success==false || !System.IO.File.Exists(path+"_c") || System.IO.File.GetLastWriteTimeUtc(path+"_c")<System.IO.File.GetLastWriteTimeUtc(path))
+    throw new InvalidOperationException("The private shader did not compile.");
+var preserved=ReferenceEquals(selected,Editor.SceneEditorSession.Active)&&game==Game.ActiveScene?.Id&&playing==Game.IsPlaying;
+var result=new {Shader=relative,Compiled=true,SourceSha256=Hash(path),EditorStatePreserved=preserved};
+System.IO.File.WriteAllText(System.IO.Path.Combine(directory,"native-shader-compile.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

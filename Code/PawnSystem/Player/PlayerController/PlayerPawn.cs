@@ -209,6 +209,7 @@ public sealed partial class PlayerPawn : Pawn, IDescription, IAreaDamageReceiver
 			if ( IsMantling && IsLocallyControlled )
 				StopMantle( Vector3.Zero );
 			if ( IsLocallyControlled ) StopSlide();
+			if ( IsLocallyControlled ) ClearWeaponMount();
 
 			return;
 		}
@@ -243,6 +244,7 @@ public sealed partial class PlayerPawn : Pawn, IDescription, IAreaDamageReceiver
 		if ( IsPipeClimbing )
 		{
 			StopSlide();
+			ClearWeaponMount();
 			UpdatePipeClimb();
 			UpdateRecoilAndSpread();
 			return;
@@ -252,13 +254,14 @@ public sealed partial class PlayerPawn : Pawn, IDescription, IAreaDamageReceiver
 		if ( IsMantling )
 		{
 			StopSlide();
+			ClearWeaponMount();
 			UpdateMantle();
 			UpdateRecoilAndSpread();
 			return;
 		}
 
 		BuildInput();
-			UpdateWeaponMount();
+		UpdateWeaponMount();
 
 		UpdateRecoilAndSpread();
 		ApplyAcceleration();

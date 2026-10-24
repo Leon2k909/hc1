@@ -1,0 +1,32 @@
+def awning( model, wall, r0, r1, z, reach, paint, name=None ):
+    """ A canvas awning off the wall from z, sloping down and out by reach, with side cheeks and a scalloped valance
+    along its front carrying the shop's name (name: belltower_fronts.SIGNS' index) in cut-out letters. No collision. """
+    d, sign, out = wall_out( wall )
+    key = AWNING_KEYS.get( paint )
+    canvas, flap = ( f"awning_{key}", f"valance_{key}" ) if key else ( paint, paint )
+    drop = reach * 0.45
+    slope = math.hypot( reach, drop )
+    length = r1 - r0
+    front = d + sign * reach
+    top = z - drop
+    # The canvas: belltower_fronts' 48 x 48 tile, x along the front and y up the slope from the front edge.
+    p = [ wall.point( r0, d, z ), wall.point( r1, d, z ), wall.point( r1, front, top ), wall.point( r0, front, top ) ]
+    uv = [ ( 0.0, slope / 48 ), ( length / 48, slope / 48 ), ( length / 48, 0.0 ), ( 0.0, 0.0 ) ] if key else None
+    card( model, canvas, p, out + np.array( ( 0, 0, 2.0 ) ), uv, both=True )
+    for r, side in ( ( r0, -1 ), ( r1, 1 ) ):
+        along = np.zeros( 3 )
+        along[0 if wall.axis == "e" else 1] = side
+        card( model, canvas, [ wall.point( r, d, z ), wall.point( r, front, top ), wall.point( r, front, top - 12 ) ], along,
+              both=True )
+    # The valance, 48 x 12 a repeat.
+    v = [ wall.point( r0, front, top - 12 ), wall.point( r1, front, top - 12 ), wall.point( r1, front, top ),
+          wall.point( r0, front, top ) ]
+    card( model, flap, v, out, [ ( 0.0, 0.0 ), ( length / 48, 0.0 ), ( length / 48, 1.0 ), ( 0.0, 1.0 ) ] if key else None,
+          both=True )
+    if name is not None and key:
+        lw = min( length - 4, 117.0 )
+        lh = lw * 10 / 130
+        rc, zc, f = ( r0 + r1 ) / 2, top - 4.6, front + sign * 0.25
+        facing( model, f"letters_{name}", [ wall.point( rc - lw / 2, f, zc - lh / 2 ), wall.point( rc + lw / 2, f, zc - lh / 2 ),
+                                             wall.point( rc + lw / 2, f, zc + lh / 2 ), wall.point( rc - lw / 2, f, zc + lh / 2 ) ],
+                out )

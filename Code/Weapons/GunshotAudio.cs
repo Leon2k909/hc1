@@ -17,7 +17,13 @@ namespace Facepunch;
 /// Anyone else's shot is heard when its sound gets there, at the speed of sound (<see cref="PlayDelayed"/>): 0.3 s from
 /// 100 m. Downrange of a supersonic round its crack comes first (<see cref="BulletFlyby"/>).
 /// </para>
-	/// Local shots retain their close, punchy sound, with a small spatial contribution so the room can respond.
+/// <para>
+/// The shooter's own shot plays close and punchy, nearly flat, with a little of it placed so the room can answer. Under a
+/// roof with walls round the muzzle (<see cref="RoomEnclosure"/>) the engine's reverb takes more of every shot. Copies of
+/// the shot played 65 ms and 145 ms later as "room reflections" were taken out: delays that long, past the ear's echo
+/// threshold for a bang (~30 ms), are heard as more shots, so automatic fire in a hall sounded like a table tennis rally.
+/// A real room's reflections come from every surface at once and blur into its reverb.
+/// </para>
 /// </summary>
 public static class GunshotAudio
 {
@@ -39,13 +45,6 @@ public static class GunshotAudio
 	/// </summary>
 	private const float EnclosureLifetime = 0.4f;
 	private const float EnclosureRadius = 48f;
-
-	/// <summary>
-	/// The quietest a room reflection is played, against the shot at <see cref="ReferenceDistance"/> (-40 dB). Further off
-	/// it's lost under the shot's own reverb, and not worth two more voices with occlusion each: a shot in a closed room
-	/// past ~77 m, or a third enclosed past ~25 m, plays without them.
-	/// </summary>
-	private const float QuietestReflection = 0.01f;
 
 	/// <summary> A muzzle's enclosure, kept for the shots after it (<see cref="EnclosureAt"/>). </summary>
 	private struct Enclosure
@@ -80,7 +79,6 @@ public static class GunshotAudio
 			flat.SpacialBlend = 0.15f;
 			flat.ReverbEnabled = true;
 			flat.Reverb = MathX.Lerp( 0.15f, 1f, room );
-			PlayRoomReflections( sound, position, volume, room, 0f, true );
 			return flat;
 		}
 
@@ -99,9 +97,7 @@ public static class GunshotAudio
 		handle.AirAbsorption = true;
 		handle.ReverbEnabled = true;
 		handle.Reverb = MathX.Lerp( 0.2f, 1f, room );
-		var directionGain = Directivity( position, forward );
-		handle.Volume *= directionGain;
-		PlayRoomReflections( sound, position, volume * directionGain, room, SoundDelay( position ), false );
+		handle.Volume *= Directivity( position, forward );
 		return handle;
 	}
 
@@ -147,43 +143,6 @@ public static class GunshotAudio
 		Enclosures[_nextEnclosure] = new Enclosure { Kept = true, Position = position, Value = room, Since = 0f };
 		_nextEnclosure = (_nextEnclosure + 1) % Enclosures.Length;
 		return room;
-	}
-
-	/// <summary>Early room reflections, audible even with a very quiet native reverb mix.</summary>
-	private static void PlayRoomReflections( SoundEvent sound, Vector3 position, float volume, float room, float delay, bool own )
-	{
-		if ( room <= 0f || sound.UI || Application.IsHeadless )
-			return;
-
-		// Anyone else's shot falls off with the inverse-distance law (FalloffFor), and its reflections with it.
-		if ( !own && sound.DistanceAttenuation && sound.Distance > ReferenceDistance
-			&& Game.ActiveScene?.Camera is { } listener && listener.IsValid() )
-		{
-			var distance = listener.WorldPosition.Distance( position );
-			if ( distance >= sound.Distance
-				|| volume * room * 0.19f * ReferenceDistance / MathF.Max( distance, ReferenceDistance ) < QuietestReflection )
-				return;
-		}
-
-		for ( var i = 0; i < 2; i++ )
-		{
-			var reflection = PlayDelayed( sound, position, delay + (i == 0 ? 0.065f : 0.145f) );
-			if ( reflection is null )
-				continue;
-
-			reflection.Volume *= volume * room * (i == 0 ? 0.19f : 0.10f);
-			reflection.SpacialBlend = own ? 0.35f : 1f;
-			reflection.DistanceAttenuation = !own && sound.DistanceAttenuation;
-			if ( reflection.DistanceAttenuation && sound.Distance > ReferenceDistance )
-			{
-				reflection.Distance = sound.Distance;
-				reflection.Falloff = FalloffFor( sound.Distance );
-			}
-			reflection.OcclusionEnabled = !own;
-			reflection.AirAbsorption = !own;
-			reflection.ReverbEnabled = true;
-			reflection.Reverb = 1f;
-		}
 	}
 
 	/// <summary> How long a sound made at <paramref name="position"/> takes to reach the listener, in seconds. </summary>

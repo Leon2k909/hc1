@@ -23,7 +23,7 @@ public interface ICameraSetup : ISceneEvent<ICameraSetup>
 	public void LateSetup( CameraComponent cc ) { }
 }
 
-public sealed class CameraController : PawnCameraController, IGameEventHandler<DamageTakenEvent>
+public sealed partial class CameraController : PawnCameraController, IGameEventHandler<DamageTakenEvent>
 {
 	[Property] public PlayerPawn Player { get; set; }
 
@@ -145,6 +145,7 @@ public sealed class CameraController : PawnCameraController, IGameEventHandler<D
 			ViewBob();
 		}
 
+		ApplyAimBreathing();
 		Update( eyeHeight );
 	}
 

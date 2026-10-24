@@ -1,0 +1,55 @@
+// Publish one independent display OBJ without scene, camera or town-mesh edits.
+var root = Sandbox.Project.Current.GetRootPath();
+var directory = System.IO.Path.Combine(root, "output/belltower/prop-edge-audit");
+var manifest = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(directory, "stage/manifest.json")));
+var previous = Editor.SceneEditorSession.Active;
+var gameId = Game.ActiveScene?.Id;
+var playing = Game.IsPlaying;
+if (playing) throw new InvalidOperationException("Wait for stopped play; do not interrupt the main editor task.");
+string Hash(string path) => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+foreach (var group in new[] { "source_sha256", "protected_sha256" })
+    foreach (var pair in manifest[group].AsObject())
+        if (Hash(System.IO.Path.Combine(root, pair.Key)) != pair.Value.GetValue<string>())
+            throw new InvalidOperationException("Display input changed: " + pair.Key);
+var relative = "Assets/models/maps/belltower/shop-display-v2/shop_displays.obj";
+if (manifest["files"].AsObject().Count != 1 || manifest["files"][relative] is null)
+    throw new InvalidOperationException("This pass may publish only the independent display mesh.");
+var row = manifest["files"][relative];
+var source = System.IO.Path.Combine(root, row["source"].GetValue<string>());
+var backup = System.IO.Path.Combine(root, row["backup"].GetValue<string>());
+var target = System.IO.Path.Combine(root, relative);
+var before = row["before"].GetValue<string>();
+var after = row["after"].GetValue<string>();
+if (Hash(source) != after || Hash(backup) != before)
+    throw new InvalidOperationException("Staged display or backup changed.");
+var current = Hash(target);
+if (current != before && current != after)
+    throw new InvalidOperationException("A newer display revision is installed; preserve it.");
+var scenePath = System.IO.Path.Combine(root, "Assets/scenes/maps/Belltower/belltower.scene");
+var sceneHash = Hash(scenePath);
+var states = Editor.SceneEditorSession.All.Select(s => (Session: s, Unsaved: s.HasUnsavedChanges)).ToArray();
+if (current != after)
+{
+    var incoming = target + ".soft-props-incoming";
+    try
+    {
+        System.IO.File.Copy(source, incoming, true);
+        if (Hash(incoming) != after) throw new InvalidOperationException("Incoming display checksum failed.");
+        System.IO.File.Move(incoming, target, true);
+    }
+    finally { if (System.IO.File.Exists(incoming)) System.IO.File.Delete(incoming); }
+    Editor.AssetSystem.RegisterFile(target);
+}
+if (Hash(scenePath) != sceneHash || !ReferenceEquals(previous, Editor.SceneEditorSession.Active)
+    || Game.ActiveScene?.Id != gameId || Game.IsPlaying != playing
+    || !states.All(s => Editor.SceneEditorSession.All.Contains(s.Session) && s.Session.HasUnsavedChanges == s.Unsaved))
+    throw new InvalidOperationException("Editor state changed during publication; inspect before continuing.");
+var result = new {
+    Imported = current == after ? 0 : 1, DisplaySha256 = after,
+    SavedSceneUnchanged = true, TownMeshesWritten = false, MaterialsWritten = false,
+    EditorSceneAndPlayStatePreserved = true, CollidersAdded = 0,
+    BeforeTriangles = manifest["before_triangles"].GetValue<int>(),
+    AfterTriangles = manifest["after_triangles"].GetValue<int>()
+};
+System.IO.File.WriteAllText(System.IO.Path.Combine(directory, "native-import.json"), System.Text.Json.JsonSerializer.Serialize(result));
+return result;

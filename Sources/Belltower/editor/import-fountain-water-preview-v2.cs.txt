@@ -1,0 +1,23 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var folder=System.IO.Path.Combine(root,"output/belltower/fountain-water-v2");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"preview-stage/manifest.json")));
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+var selected=Editor.SceneEditorSession.Active;var playing=Game.IsPlaying;var game=Game.ActiveScene?.Id;var dirty=selected?.HasUnsavedChanges;
+foreach(var pair in manifest["files"].AsObject().OrderBy(p=>p.Key.EndsWith(".vmdl",StringComparison.Ordinal)?2:0))
+{
+    if(!(pair.Key.StartsWith("Assets/models/maps/belltower/fountain-water-v2-preview/",StringComparison.Ordinal)
+         ||pair.Key.StartsWith("Assets/materials/belltower/fountain-water-v2-preview/",StringComparison.Ordinal))||pair.Key.Contains(".."))
+        throw new InvalidOperationException("Unexpected preview path.");
+    var source=System.IO.Path.Combine(root,pair.Value["source"].GetValue<string>());
+    var target=System.IO.Path.Combine(root,pair.Key);
+    var hash=pair.Value["sha256"].GetValue<string>();
+    if(Hash(source)!=hash||(System.IO.File.Exists(target)&&Hash(target)!=hash)) throw new InvalidOperationException("Preview input changed.");
+    if(!System.IO.File.Exists(target))
+    {
+        System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target));System.IO.File.Copy(source,target);
+    }
+    Editor.AssetSystem.RegisterFile(target);
+}
+var preserved=ReferenceEquals(selected,Editor.SceneEditorSession.Active)&&game==Game.ActiveScene?.Id&&playing==Game.IsPlaying&&dirty==selected?.HasUnsavedChanges;
+if(!preserved) throw new InvalidOperationException("Editor state changed during preview import.");
+return new {Files=manifest["files"].AsObject().Count,EditorStatePreserved=preserved};

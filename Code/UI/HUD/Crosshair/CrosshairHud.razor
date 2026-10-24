@@ -46,11 +46,12 @@
     }
 }
 
-@if ( MainHUD.IsHudEnabled && Client.Viewer.PlayerPawn is { } pawn && pawn.IsValid() && pawn.CanMountWeapon )
+@{ var mount = MountState(); }
+@if ( mount != 0 )
 {
     <div class="mount-indicator">
-        <span>@(pawn.IsWeaponMounted ? "MOUNTED" : "MOUNT")</span>
-        @if ( !pawn.IsWeaponMounted )
+        <span>@(mount == 2 ? "MOUNTED" : "MOUNT")</span>
+        @if ( mount == 1 )
         {
             <InputHint class="small" Action="WeaponMount" />
         }
@@ -71,6 +72,16 @@
             return true;
 
         return false;
+    }
+
+    /// <summary> 0 nothing, 1 a mount is in reach, 2 mounted. </summary>
+    static int MountState()
+    {
+        if ( !MainHUD.IsHudEnabled ) return 0;
+        var pawn = Client.Viewer.PlayerPawn;
+        if ( !pawn.IsValid() ) return 0;
+        if ( pawn.IsWeaponMounted ) return 2;
+        return pawn.CanMountWeapon ? 1 : 0;
     }
 
     static (int r, int g, int b) HexToRgb( string hex )
@@ -113,6 +124,10 @@
         h.Add( c.HitOutlineThickness );
         h.Add( c.HitOutlineAlpha );
         h.Add( IsAimingDownSights() );
+        // The mount prompt wasn't in the hash, so it stayed as it was at the last rebuild: up at the hip, gone when
+        // mounted (the user's report, 2026-10-25).
+        h.Add( MainHUD.IsHudEnabled );
+        h.Add( MountState() );
         return h.ToHashCode();
     }
 }

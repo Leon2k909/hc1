@@ -11,6 +11,13 @@ public partial class DroppedEquipment : Component, IUse, Component.ICollisionLis
 	[Property] public EquipmentResource Resource { get; set; }
 	[Sync( SyncFlags.FromHost )] public bool ApplySavedAttachments { get; set; } = true;
 
+	/// <summary>
+	/// The build the gun is drawn with on the floor, on every machine, as a build code
+	/// (<see cref="Gunsmith.GunsmithLoadoutManager.ExportWeaponBuildCode"/>): its parts, camo and reticle as its holder
+	/// had them. Empty for the factory gun.
+	/// </summary>
+	[Sync( SyncFlags.FromHost )] public string Build { get; set; } = "";
+
 	public Rigidbody Rigidbody { get; private set; }
 
 	/// <summary>
@@ -23,6 +30,8 @@ public partial class DroppedEquipment : Component, IUse, Component.ICollisionLis
 
 	protected override void OnUpdate()
 	{
+		UpdateModel();
+
 		if ( !Networking.IsHost || Resource is null || Resource.Slot == EquipmentSlot.Special ) return;
 		if ( _timeSinceDropped > Lifetime ) GameObject.Destroy();
 	}
@@ -47,18 +56,21 @@ public partial class DroppedEquipment : Component, IUse, Component.ICollisionLis
 		go.Name = resource.Name;
 		go.Tags.Add( "pickup" );
 
-		var wmPrefabFile = resource.MainPrefab.Scene.Source as PrefabFile;
-		var worldModel = resource.WorldModel;
-		var bounds = worldModel.Bounds;
+		var bounds = FloorBounds( resource );
 
 		var droppedWeapon = go.Components.Create<DroppedEquipment>();
 		droppedWeapon.Resource = resource;
 		droppedWeapon.ApplySavedAttachments = heldWeapon?.ApplySavedAttachments ?? true;
+		droppedWeapon.Build = heldWeapon.IsValid() ? heldWeapon.HolderBuild : "";
 
-		var renderer = go.Components.Create<SkinnedModelRenderer>();
-		renderer.Model = worldModel;
-
-		renderer.BodyGroups |= resource.WorldModelBodyGroups;
+		// A gun is drawn from its world model prefab, as in someone's hands, by each machine (UpdateModel). Only things
+		// with no prefab (the cash bag, the drone) are the bare model.
+		if ( resource.WorldModelPrefab is null )
+		{
+			var renderer = go.Components.Create<SkinnedModelRenderer>();
+			renderer.Model = resource.WorldModel;
+			renderer.BodyGroups |= resource.WorldModelBodyGroups;
+		}
 
 		// Fit the model where it is: a gun model isn't centred above its origin. Guns and knives get a ridged hull
 		// (see RidgedProfile); grenades, the bomb and the like keep a box.
@@ -117,6 +129,59 @@ public partial class DroppedEquipment : Component, IUse, Component.ICollisionLis
 		}
 
 		return droppedWeapon;
+	}
+
+	/// <summary>
+	/// The bounds of the model the gun is drawn with on the floor (its world model prefab's renderer, which may sit off
+	/// the prefab's root: the 1911's does), in the dropped object's space.
+	/// </summary>
+	private static BBox FloorBounds( EquipmentResource resource )
+	{
+		var prefab = resource.WorldModelPrefab;
+		var renderer = prefab?.GetComponentInChildren<SkinnedModelRenderer>( true );
+		if ( renderer?.Model is { } model )
+			return model.Bounds.Transform( prefab.WorldTransform.ToLocal( renderer.WorldTransform ) );
+
+		return resource.WorldModel?.Bounds ?? default;
+	}
+
+	private BBox? _bounds;
+	private GameObject _model;
+	private string _modelBuild;
+
+	/// <summary>
+	/// Draws the gun as it was held: its world model prefab with <see cref="Build"/> fitted, as Equipment.CreateWorldModel
+	/// fits a gun in someone's hands, but from the build rather than this machine's own loadout. Each machine makes its
+	/// own copy, which isn't networked, and makes it again if the build changes.
+	/// </summary>
+	private void UpdateModel()
+	{
+		var build = Build ?? "";
+		if ( _modelBuild == build || Application.IsDedicatedServer || Resource?.WorldModelPrefab is not { } prefab )
+			return;
+
+		_modelBuild = build;
+		_model?.Destroy();
+
+		// A gun dropped before guns were drawn this way has its bare model on the root.
+		if ( GetComponent<SkinnedModelRenderer>() is { } bare )
+			bare.Enabled = false;
+
+		_model = prefab.Clone( new CloneConfig { Name = "Model", Transform = new Transform(), Parent = GameObject, StartEnabled = false } );
+		if ( !_model.IsValid() )
+			return;
+
+		_model.Flags |= GameObjectFlags.NotSaved | GameObjectFlags.NotNetworked;
+		if ( _model.Components.TryGet<SkinnedModelRenderer>( out var renderer, FindMode.EverythingInSelfAndDescendants ) )
+		{
+			renderer.SetBodyGroup( "sight", 0 );
+			renderer.SetBodyGroup( "muzzle", 0 );
+		}
+
+		if ( build.Length > 0 )
+			Gunsmith.GunsmithLoadoutManager.ApplyBuild( Resource, _model, build );
+
+		_model.Enabled = true;
 	}
 
 	/// <summary>How far off the middle the ridges sit, as a share of the half-width, so a gun dropped dead level still falls one way.</summary>
@@ -325,7 +390,7 @@ public partial class DroppedEquipment : Component, IUse, Component.ICollisionLis
 	}
 
 	/// <summary>The middle of the gun's model in the world, which E aims for (see PlayerPawn.PickupReach).</summary>
-	public Vector3 Center => WorldTransform.PointToWorld( Resource?.WorldModel?.Bounds.Center ?? Vector3.Zero );
+	public Vector3 Center => WorldTransform.PointToWorld( Resource is null ? Vector3.Zero : (_bounds ??= FloorBounds( Resource )).Center );
 
 	/// <summary>
 	/// Where is the marker?

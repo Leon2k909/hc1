@@ -1,0 +1,54 @@
+// Blue cafe only; no scene edits, camera movement, play changes or scene saves.
+var root=Sandbox.Project.Current.GetRootPath();
+var folder=System.IO.Path.Combine(root,"output/belltower/cafe-spacing-v1");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"stage/manifest.json")));
+var selected=Editor.SceneEditorSession.Active; var playing=Game.IsPlaying; var game=Game.ActiveScene?.Id; var dirty=selected?.HasUnsavedChanges;
+if(playing) throw new InvalidOperationException("Wait for the shared play session before updating the cafe.");
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+foreach(var group in new[]{"source_sha256","protected_sha256"})
+    foreach(var pair in manifest[group].AsObject())
+        if(Hash(System.IO.Path.Combine(root,pair.Key))!=pair.Value.GetValue<string>()) throw new InvalidOperationException("Shared input changed: "+pair.Key);
+var plans=new System.Collections.Generic.List<(string Source,string Target,string Backup,string After)>();
+foreach(var pair in manifest["files"].AsObject())
+{
+    if(!(pair.Key.StartsWith("Assets/models/maps/belltower/compiler-safe/east/",StringComparison.Ordinal)
+        || pair.Key=="Assets/models/maps/belltower/belltower_east.obj"
+        || pair.Key=="Assets/models/maps/belltower/belltower_east_hulls_metal.obj")||pair.Key.Contains(".."))
+        throw new InvalidOperationException("Unexpected cafe publication target.");
+    var source=System.IO.Path.Combine(root,pair.Value["source"].GetValue<string>());
+    var target=System.IO.Path.Combine(root,pair.Key); var before=pair.Value["before"].GetValue<string>();
+    var after=pair.Value["after"].GetValue<string>(); var backup=System.IO.Path.Combine(root,pair.Value["backup"].GetValue<string>());
+    if(Hash(source)!=after||Hash(backup)!=before) throw new InvalidOperationException("Stage or backup changed.");
+    if(Hash(target)==after) continue;
+    if(Hash(target)!=before) throw new InvalidOperationException("Shared mesh changed: "+pair.Key);
+    plans.Add((source,target,backup,after));
+}
+var changed=new System.Collections.Generic.List<(string Target,string Backup)>();
+try
+{
+    foreach(var item in plans)
+    {
+        var incoming=item.Target+".cafe-spacing-v1-incoming";
+        try
+        {
+            System.IO.File.Copy(item.Source,incoming,true);
+            if(Hash(incoming)!=item.After) throw new InvalidOperationException("Incoming checksum failed.");
+            System.IO.File.Move(incoming,item.Target,true); changed.Add((item.Target,item.Backup));
+        }
+        finally {if(System.IO.File.Exists(incoming)) System.IO.File.Delete(incoming);}
+    }
+}
+catch
+{
+    foreach(var item in changed.AsEnumerable().Reverse()) System.IO.File.Copy(item.Backup,item.Target,true);
+    throw;
+}
+foreach(var item in plans) Editor.AssetSystem.RegisterFile(item.Target);
+var preserved=ReferenceEquals(selected,Editor.SceneEditorSession.Active)&&playing==Game.IsPlaying&&game==Game.ActiveScene?.Id&&dirty==selected?.HasUnsavedChanges;
+foreach(var pair in manifest["protected_sha256"].AsObject())
+    if(Hash(System.IO.Path.Combine(root,pair.Key))!=pair.Value.GetValue<string>()) throw new InvalidOperationException("Protected input changed during publication: "+pair.Key);
+var result=new {Imported=plans.Count,EditorStatePreserved=preserved,Scope="Blue eastern cafe",Tables=3,Chairs=9,
+    MovedTableColliders=3,RemovedTableColliders=1,RedCafeUnchanged=true,SceneSourceUnchanged=true};
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"native-import.json"),System.Text.Json.JsonSerializer.Serialize(result));
+if(!preserved) throw new InvalidOperationException("Editor state changed during import; inspect the completed result.");
+return result;

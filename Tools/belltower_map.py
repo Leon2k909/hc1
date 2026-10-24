@@ -8,7 +8,7 @@ for roofs and round things), so what you see is what stops players, bots and bul
 The town is mirror-symmetric about its north-south centre line. Red Team (Team.Terrorist) spawns on the west road, inside
 the town wall, and Blue Team (Team.CounterTerrorist) on the east one. Three lanes run between them:
 
-- North: Market Street, long and open, with market stalls, a lorry and the market cross in the middle. Bomb site A is
+- North: Market Street, long and open, with market stalls and the market cross in the middle. Bomb site A is
   at its east end.
 - Middle: West Street and East Street, through the square with its fountain. The Town Hall stands on the square's north
   side: a loggia at the front, a passage under the belltower through to Market Street, side rooms with stairs, and the
@@ -34,7 +34,7 @@ square, the churchyards and the terrace.
   z 0 and the gardens at -48.
 - Houses nobody goes into are one collision box each, with their fronts drawn over it: windows glazed or shuttered, doors
   shut, shops behind rolling shutters. The Town Hall, the church, the Bakery, the Dairy, the Inn and the Tavern are open,
-  through doorways (no doors: bots can't open them).
+  through clear doorways. The Town Hall's two north entrances have fixed-open timber doors; no route needs a door opened.
 - Roofs are 42 degrees, steeper than the navmesh's 40, and every attic is filled with the roof's hull, so the navmesh
   finds no floor up there. Stairs are 8 up and 11 along with room at both ends; doorways 56-64 wide.
 - The west half is built and the east half is its mirror (Model.mirrored), repainted from warm colours to cool ones
@@ -55,13 +55,30 @@ from PIL import Image, ImageDraw
 import building_textures as BT
 import map_kit as K
 import belltower_detail as Detail
+import belltower_cafe_spacing as CafeSpacing
 import belltower_architecture as Architecture
 import belltower_fountain as Fountain
+import belltower_church_windows as ChurchWindows
+import belltower_open_windows as OpenWindows
+import belltower_open_doors as OpenDoors
 import belltower_furniture as Furniture
+import belltower_market_crates_v3 as MarketCratesV3
 import belltower_interiors as Interiors
 import belltower_gardens as Gardens
+import belltower_scarecrow as Scarecrow
+import belltower_gazebo as Gazebo
+import belltower_gate as Gate
+import belltower_clock as Clock
+import belltower_well as Well
+import belltower_planters as Planters
+import belltower_long_beds as LongBeds
+import belltower_ivy as Ivy
+import belltower_stall_canvas as StallCanvas
+import belltower_shop_awning_cloth as ShopAwning
 import belltower_firewood_trial as Firewood
 import belltower_wall_cleanup as WallCleanup
+import belltower_wall_edges as WallEdges
+import belltower_stone_wear as StoneWear
 import belltower_vista as Vista
 import belltower_vista_props as VistaProps
 from map_kit import Model, Wall, arc, normalise
@@ -185,10 +202,10 @@ def ring( model, centre, r_in, r_out, z0, z1, sides, paints, surface=None, turn=
                                   np.array( ( length, r_out - r_in, z1 - z0 ) ), surface ) )
 
 
-def blob( model, centre, radius, paint, squash=0.8, segments=9, rings=5, seed=0 ):
+def blob( model, centre, radius, paint, squash=0.8, segments=9, rings=5, seed=0, *, ground_z=None ):
     """ A lumpy ball (a tree's crown), no collision. """
     if paint == "hedge" or (paint == "canvas_red" and radius <= 14):
-        Detail.shrub( model, centre, radius, squash, seed )
+        Detail.shrub( model, centre, radius, squash, seed, ground_z=ground_z )
         return
     rng = np.random.default_rng( seed )
     c = np.asarray( centre, float )
@@ -486,6 +503,11 @@ def dress( model, wall, style, rng ):
         width = o.r1 - o.r0
         rc = ( o.r0 + o.r1 ) / 2
         key = ( wall.outward, wall.across[0], rc, o.z0 )
+        if kind == "glass_arch" and style.get("church_front_windows"):
+            ChurchWindows.build(model, wall, o)
+            if style.get("glass_surface"):
+                slab_at(model, wall, o.r0, o.r1, -6.0, -4.0, o.z0, o.z1, None, style["glass_surface"])
+            continue
         if kind in ( "glass", "glass_arch" ):
             closed = solid and shutter and not o.arched and rng.random() < 0.22
             if closed:
@@ -509,6 +531,7 @@ def dress( model, wall, style, rng ):
                 shutters_open( model, wall, o, shutter )
         elif kind == "window":
             frame( model, wall, o, trim, 1.5, mullion=False )
+            OpenWindows.build(model, wall, o, trim, covered=wall.outward in style.get("covered_windows", ()))
             if o.z0 > 20:
                 Architecture.window_sill(model,wall,o,style.get("sill","ashlar"))
             if shutter and style.get( "shutters", True ):
@@ -656,38 +679,8 @@ def window_box( model, wall, o, key ):
 
 
 def awning( model, wall, r0, r1, z, reach, paint, name=None ):
-    """ A canvas awning off the wall from z, sloping down and out by reach, with side cheeks and a scalloped valance
-    along its front carrying the shop's name (name: belltower_fronts.SIGNS' index) in cut-out letters. No collision. """
-    d, sign, out = wall_out( wall )
-    key = AWNING_KEYS.get( paint )
-    canvas, flap = ( f"awning_{key}", f"valance_{key}" ) if key else ( paint, paint )
-    drop = reach * 0.45
-    slope = math.hypot( reach, drop )
-    length = r1 - r0
-    front = d + sign * reach
-    top = z - drop
-    # The canvas: belltower_fronts' 48 x 48 tile, x along the front and y up the slope from the front edge.
-    p = [ wall.point( r0, d, z ), wall.point( r1, d, z ), wall.point( r1, front, top ), wall.point( r0, front, top ) ]
-    uv = [ ( 0.0, slope / 48 ), ( length / 48, slope / 48 ), ( length / 48, 0.0 ), ( 0.0, 0.0 ) ] if key else None
-    card( model, canvas, p, out + np.array( ( 0, 0, 2.0 ) ), uv, both=True )
-    for r, side in ( ( r0, -1 ), ( r1, 1 ) ):
-        along = np.zeros( 3 )
-        along[0 if wall.axis == "e" else 1] = side
-        card( model, canvas, [ wall.point( r, d, z ), wall.point( r, front, top ), wall.point( r, front, top - 12 ) ], along,
-              both=True )
-    # The valance, 48 x 12 a repeat.
-    v = [ wall.point( r0, front, top - 12 ), wall.point( r1, front, top - 12 ), wall.point( r1, front, top ),
-          wall.point( r0, front, top ) ]
-    card( model, flap, v, out, [ ( 0.0, 0.0 ), ( length / 48, 0.0 ), ( length / 48, 1.0 ), ( 0.0, 1.0 ) ] if key else None,
-          both=True )
-    if name is not None and key:
-        lw = min( length - 4, 117.0 )
-        lh = lw * 10 / 130
-        rc, zc, f = ( r0 + r1 ) / 2, top - 4.6, front + sign * 0.25
-        facing( model, f"letters_{name}", [ wall.point( rc - lw / 2, f, zc - lh / 2 ), wall.point( rc + lw / 2, f, zc - lh / 2 ),
-                                             wall.point( rc + lw / 2, f, zc + lh / 2 ), wall.point( rc - lw / 2, f, zc + lh / 2 ) ],
-                out )
-
+    """Soft shop canvas; wall attachments, existing paints and lettering stay."""
+    ShopAwning.build(model, wall, r0, r1, z, reach, paint, name)
 
 def balcony( model, wall, r0, r1, z, reach=30.0, rail="iron_black", slab="ashlar", key=None ):
     """ A balcony on the wall at floor height z: a stone slab on two stepped corbels and a wrought-iron railing (a cut-out
@@ -793,11 +786,15 @@ def street_plaque( model, wall, end, paint ):
     """ A street's name on a marble plaque an inch proud of the wall (paint: one of belltower_fronts' plaque pictures),
     as near the wall's corner at end (0: its run's low end, 1: its high end) as fixture_room() allows: just under the
     first floor's string course, else just over it (over a shop's board), else over a shop's awning. It's then noted in
-    wall.fixtures. Drawn only. """
+    wall.fixtures. Projecting stone mouldings must also clear its whole slab.
+    Drawn only. """
     w, h = PLAQUE
     for inset in ( 14.0, 24.0, 34.0, 44.0, 54.0, 64.0 ):
         r0 = wall.run[0] + inset if end == 0 else wall.run[1] - inset - w
         for z0 in ( 110.0, 134.0, 148.0 ):
+            if any( a < r0+w+2 and b > r0-2 and c < z0+h+2 and d > z0-2
+                    for a,b,c,d in getattr( wall, "plaque_obstacles", () ) ):
+                continue
             if fixture_room( wall, r0, r0 + w, z0, z0 + h ):
                 wall.fixtures = list( getattr( wall, "fixtures", () ) ) + [ ( r0, r0 + w, z0, z0 + h ) ]
                 slab_at( model, wall, r0, r0 + w, 0.0, 1.0, z0, z0 + h, { wall.outward: paint, "default": "ashlar" } )
@@ -821,16 +818,18 @@ IVY = ( 48.0, 96.0 )        # belltower_fronts' ivy patches, w x h
 def ivy( model, wall, rc, z0, scale, paint="ivy_climb", out=3.2, key=() ):
     """ A patch of ivy on the wall centred on rc, scale times belltower_fronts' 48 x 96 (paint: ivy_climb, rooted at z0,
     or ivy_hang, coming over the wall's top at z0), out from its face: in front of a plinth or a coping. Only where
-    fixture_room() finds the wall clear; it's then noted in wall.fixtures. key picks which way round it shows. Drawn
-    only. """
+    fixture_room() finds the wall clear; it's then noted in wall.fixtures. Branches and curved leaves use a stable
+    seed from the patch's position. Drawn only, with the original clearance envelope and no collision. """
     w, h = IVY[0] * scale, IVY[1] * scale
     z_lo, z_hi = ( z0, z0 + h ) if paint == "ivy_climb" else ( z0 - h, z0 )
     box = ( rc - w / 2, rc + w / 2, z_lo, z_hi )
     if not fixture_room( wall, *box ):
         return False
     wall.fixtures = list( getattr( wall, "fixtures", () ) ) + [ box ]
-    crop = ( 1.0, 0.0, 0.0, 1.0 ) if chance( 0.5, "ivy_flip", *key ) else ( 0.0, 1.0, 0.0, 1.0 )
-    picture( model, wall, box[0], box[1], z_lo, z_hi, out, paint, crop=crop )
+    d, sign, outward = wall_out( wall )
+    points = [ wall.point( r, d + sign * out, z )
+               for r, z in ( ( box[0], z_lo ), ( box[1], z_lo ), ( box[1], z_hi ), ( box[0], z_hi ) ) ]
+    Ivy.build( model, points, outward, hanging=paint == "ivy_hang" )
     return True
 
 
@@ -871,6 +870,7 @@ def bands( model, wall, levels, paint, skip=() ):
         for c0, c1 in cuts + [ ( wall.run[1], wall.run[1] ) ]:
             if c0 > r + 1:
                 slab_at( model, wall, r, c0, 0.0, 2.0, z, z + 6, paint )
+                wall.plaque_obstacles = list( getattr( wall, "plaque_obstacles", () ) ) + [ ( r, c0, z, z+6 ) ]
             r = max( r, c1 )
 
 
@@ -1292,19 +1292,7 @@ def town_hall( model, lights ):
 
     # The belltower, from the roof: shaft, clock, belfry and a copper spire.
     model.box( ( -110, 715, CEIL ), ( 110, 935, 780 ), { "+z": "flagstones", "-z": None, "default": "ashlar" }, STONE )
-    for face, centre, axis in ( ( "-n", ( 0, 715 ), ( 1, 0 ) ), ( "+n", ( 0, 935 ), ( -1, 0 ) ),
-                                ( "-e", ( -110, 825 ), ( 0, -1 ) ), ( "+e", ( 110, 825 ), ( 0, 1 ) ) ):
-        out = np.array( ( axis[1], -axis[0], 0.0 ) )
-        along = np.array( ( axis[0], axis[1], 0.0 ) )
-        c = np.array( ( *centre, 690.0 ) )
-        for half, depth, paint in ( ( 52, 1.0, "ashlar_grey" ), ( 40, 2.0, "clock" ) ):
-            pts = [ c + out * depth + along * sa * half + np.array( ( 0, 0, sz * half ) ) for sa, sz in ( ( -1, -1 ), ( 1, -1 ), ( 1, 1 ), ( -1, 1 ) ) ]
-            facing( model, paint, pts, out )
-            if paint == "ashlar_grey":
-                # The surround's edges.
-                for k in range( 4 ):
-                    a, b = pts[k], pts[( k + 1 ) % 4]
-                    facing( model, paint, [ a, b, b - out * depth, a - out * depth ], ( a + b ) / 2 - c )
+    Clock.build( model )
     model.box( ( -116, 709, 770 ), ( 116, 941, 782 ), "ashlar" )
     belfry = { "outside": "ashlar", "inside": "ashlar", "reveal": "ashlar", "sill": "ashlar" }
     for face, wall in ( ( "-n", Wall( "e", ( -110, 110 ), ( 715, 735 ), ( 782, 900 ), "-n" ) ),
@@ -1351,9 +1339,12 @@ def church( model, lights ):
     style = { "trim": "iron_black", "shutter": None, "sill": "ashlar", "glass_surface": GLASS }
     rng = np.random.default_rng( 11 )
     for face, wall in walls.items():
-        dress( model, wall, style, rng )
+        dress( model, wall, dict(style, church_front_windows=True) if face == "+n" else style, rng )
         courses( model, wall, 0, 24, 4.0, "ashlar_grey" )
-        slab_at( model, wall, wall.run[0], wall.run[1], 0.0, 8.0, EAVE - 25, EAVE - 13, "ashlar_grey" )
+        if face == "+n":
+            ChurchWindows.front_band(model, wall)
+        else:
+            slab_at( model, wall, wall.run[0], wall.run[1], 0.0, 8.0, EAVE - 25, EAVE - 13, "ashlar_grey" )
         if face in ( "-e", "+e" ):
             # Buttresses between the windows.
             for n in ( -440, -520, -600, -700, -780, -860 ):
@@ -1405,11 +1396,9 @@ def fountain( model ):
 
 
 def market_cross( model ):
-    for r, z0, z1 in ( ( 100, 0, 12 ), ( 80, 12, 24 ), ( 60, 24, 36 ) ):
-        model.cylinder( MARKET_CROSS, r, z0, z1, { "side": "ashlar_grey", "top": "ashlar" }, sides=8, surface=STONE, turn=math.pi / 8 )
+    StoneWear.market_steps( model, MARKET_CROSS, STONE )
     model.cylinder( MARKET_CROSS, 13, 36, 200, { "side": "ashlar" }, sides=8, surface=STONE, turn=math.pi / 8 )
     e, n = MARKET_CROSS
-    model.box( ( e - 18, n - 18, 200 ), ( e + 18, n + 18, 212 ), "ashlar_grey" )
     model.beam( ( e, n, 212 ), ( e, n, 266 ), ( 8, 8 ), "ashlar" )
     model.beam( ( e - 20, n, 244 ), ( e + 20, n, 244 ), ( 8, 8 ), "ashlar" )
 
@@ -1417,8 +1406,10 @@ def market_cross( model ):
 def garden_well( model ):
     e, n = GARDEN_WELL
     z = GARDEN_Z
-    ring( model, GARDEN_WELL, 30, 42, z, z + 34, 10, { "outside": "rubble", "inside": "rubble", "top": "ashlar_grey" }, STONE )
-    model.cylinder( GARDEN_WELL, 30, z + 8, z + 9, { "top": "water" }, sides=10, turn=math.pi / 10 )
+    well_collision = Model()
+    ring( well_collision, GARDEN_WELL, 30, 42, z, z + 34, 10, { "outside": "rubble", "inside": "rubble", "top": "ashlar_grey" }, STONE )
+    model.boxes.extend( well_collision.boxes )
+    Well.build( model, GARDEN_WELL, z )
     for se in ( -1, 1 ):
         model.box( ( e + se * 38 - 4, n - 4, z + 34 ), ( e + se * 38 + 4, n + 4, z + 116 ), "planks_dark", WOOD )
     model.beam( ( e - 44, n, z + 106 ), ( e + 44, n, z + 106 ), ( 6, 6 ), "planks_dark" )
@@ -1462,15 +1453,30 @@ def crates( model, centre, yaw, rng, z=0.0 ):
 
 
 def barrel( model, centre, z=0.0, r=13.0, h=36.0 ):
+    import belltower_barrels_v2 as BarrelV2
+    import belltower_barrels_v3 as BarrelV3
+    replacement = BarrelV2.resolve( centre, z, r, h )
+    if replacement is not None:
+        centre = replacement["new"]
+    centre = BarrelV3.placed( centre )
     model.cylinder( centre, r, z, z + h, {}, sides=10, surface=WOOD )
-    Detail.barrel( model, centre, z, r, h )
+    # Every cask is a coopered one (v3); the clock frontage's pair keeps v2's placement.
+    BarrelV3.build( model, centre, z, r, h )
 
 
-def barrels( model, centre, count, rng, z=0.0 ):
+# Stored against the shop's side wall, beyond the market-front shutter.
+MARKET_STORAGE_BARRELS = ( (-1873.0, 1475.0), (-1873.0, 1506.0), (-1906.0, 1487.0) )
+
+
+def barrels( model, centre, count, rng, z=0.0, placements=None ):
+    if placements is not None:
+        assert len( placements ) == count
     for k in range( count ):
         a = rng.uniform( 0, 2 * math.pi )
         d = 0 if k == 0 else 27.0
-        barrel( model, ( centre[0] + d * math.cos( a + k * 2.1 ), centre[1] + d * math.sin( a + k * 2.1 ) ), z )
+        at = ( centre[0] + d * math.cos( a + k * 2.1 ), centre[1] + d * math.sin( a + k * 2.1 ) )
+        # Consume the original random draws so all following props stay in place.
+        barrel( model, placements[k] if placements is not None else at, z )
 
 
 def sacks( model, centre, yaw, count, z=0.0 ):
@@ -1546,34 +1552,7 @@ def stall( model, centre, yaw, canvas, rng, width=120.0, depth=64.0 ):
     for sx in ( -1, 1 ):
         for sy, top in ( ( -1, 106 ), ( 1, 92 ) ):
             p.box( model, ( sx * w - 2, sy * d - 2, 32 ), ( sx * w + 2, sy * d + 2, top ), "planks_dark" )
-    roof = [ p.at( ( -w - 8, -d - 8, 108 ) ), p.at( ( w + 8, -d - 8, 108 ) ), p.at( ( w + 8, d + 14, 90 ) ),
-             p.at( ( -w - 8, d + 14, 90 ) ) ]
-    facing( model, canvas, roof, ( 0, 0, 1 ) )
-    facing( model, canvas, roof, ( 0, 0, -1 ) )
-    front = [ p.at( ( -w - 8, d + 14, 90 ) ), p.at( ( w + 8, d + 14, 90 ) ), p.at( ( w + 8, d + 14, 80 ) ), p.at( ( -w - 8, d + 14, 80 ) ) ]
-    facing( model, canvas, front, p.y )
-    facing( model, canvas, front, -p.y )
-
-
-def lorry( model, centre, yaw, cab="trim_red" ):
-    """ A small flatbed lorry with a canvas tilt, its cab along local +x. Collision: the cab and the body. """
-    p = Place( ( centre[0], centre[1], 0 ), yaw )
-    p.box( model, ( -150, -44, 20 ), ( 150, 44, 30 ), "iron_black" )
-    p.box( model, ( -150, -48, 30 ), ( 50, 48, 50 ), "planks_dark", METAL )
-    p.box( model, ( -150, -48, 50 ), ( 50, 48, 128 ), { "default": "canvas_green", "-z": None }, FABRIC )
-    for x in ( -120, -60, 0, 40 ):
-        p.box( model, ( x - 2, -49, 50 ), ( x + 2, 49, 129 ), "iron_black" )
-    p.box( model, ( 58, -44, 30 ), ( 150, 44, 80 ), cab, SHEET )
-    p.box( model, ( 58, -42, 80 ), ( 118, 42, 112 ), { "default": cab, "+x": "glass" }, SHEET )
-    p.box( model, ( 119, -40, 82 ), ( 119.5, 40, 108 ), "glass" )
-    for s in ( -1, 1 ):
-        p.box( model, ( 70, s * 44 - s * 0.5 - 0.5, 84 ), ( 110, s * 44 + s * 0.5 - 0.5, 106 ), "glass" )
-    p.box( model, ( 150, -46, 26 ), ( 156, 46, 42 ), "iron_black" )
-    for x in ( -100, 110 ):
-        for s in ( -1, 1 ):
-            axle( model, p.at( ( x, s * 40, 20 ) ), p.y, 20, 12, { "side": "iron_black", "end": "roller_grey" }, sides=12 )
-    p.box( model, ( -150, -48, 0 ), ( 50, 48, 20 ), None, METAL )
-    p.box( model, ( 58, -46, 0 ), ( 150, 46, 30 ), None, METAL )
+    StallCanvas.build( model, p, w, d, canvas )
 
 
 def tree( model, centre, z, height, spread, seed, leaves="hedge", trunk_r=9.0, solid=True, coarse=False ):
@@ -1601,8 +1580,9 @@ def bench( model, centre, yaw, length=84.0, z=0.0 ):
 def planter( model, centre, z=0.0, size=40.0, seed=0 ):
     e, n = centre
     h = size / 2
-    model.box( ( e - h, n - h, z ), ( e + h, n + h, z + 28 ), { "default": "ashlar", "+z": "soil" }, STONE )
-    blob( model, ( e, n, z + 44 ), h * 0.9, "hedge", squash=0.8, segments=8, rings=4, seed=seed )
+    model.box( ( e - h, n - h, z ), ( e + h, n + h, z + 28 ), None, STONE )
+    Planters.build( model, centre, z, size, seed )
+    blob( model, ( e, n, z + 36 ), h * 0.9, "hedge", squash=0.8, segments=8, rings=4, seed=seed )
 
 
 def low_wall( model, e0, e1, n0, n1, z0, z1, paint="rubble", cap="ashlar_grey" ):
@@ -1650,7 +1630,7 @@ def hedge( model, e0, e1, n0, n1, z0, height ):
     for i in range( count ):
         at = ((e0 + (i+.5)*length/count) if along_e else (e0+e1)/2,
               (n0+n1)/2 if along_e else n0 + (i+.5)*length/count, z0 + height*.52)
-        Detail.shrub( model, at, max( 12, height*.48 ), 1, abs(int(e0+n0+i*31)) )
+        Detail.shrub( model, at, max( 12, height*.48 ), 1, abs(int(e0+n0+i*31)), ground_z=z0 )
 
 
 def area( model, e0, e1, n0, n1, z, base, overlays=() ):
@@ -1783,7 +1763,7 @@ def bakery( model, lights, rng ):
                 ( 1000, 46, 184, 254, "glass" ) ],
     }
     walls = shell( model, e0, e1, n0, n1, 0, EAVE, openings, paints, T, hidden=( "+e", ) )
-    style = { "trim": "trim_brown", "shutter": "shutter_red", "sill": "ashlar", "solid": True }
+    style = { "trim": "trim_brown", "shutter": "shutter_red", "sill": "ashlar", "solid": True, "covered_windows": ("+n",) }
     for face, wall in walls.items():
         if face == "+e":
             continue
@@ -1957,9 +1937,7 @@ def churchyard( model, rng ):
             height = rng.uniform( 24, 34 )
             p.box( model, ( -3, -11, 0 ), ( 3, 11, height ), "ashlar_grey", STONE )
     for centre in ( ( -560, -700 ), ( -290, -770 ) ):
-        e, n = centre
-        model.box( ( e - 22, n - 42, 0 ), ( e + 22, n + 42, 30 ), "ashlar", STONE )
-        model.box( ( e - 25, n - 45, 30 ), ( e + 25, n + 45, 34 ), "ashlar_grey", STONE )
+        StoneWear.tomb( model, centre, STONE )
     tree( model, ( -620, -640 ), 0, 190, 70, seed=33, trunk_r=11 )
     bench( model, ( -190, -820 ), -90, 50 )
 
@@ -2009,23 +1987,19 @@ def gardens( model, rng ):
             hedge( model, eb - 10, eb, n0 + 10, n1 - 10, z, 22 )
             for k in range( 6 ):
                 blob( model, ( rng.uniform( ea + 20, eb - 20 ), rng.uniform( n0 + 20, n1 - 20 ), z + 8 ), 10,
-                      "canvas_red" if k % 2 else "hedge", squash=0.6, segments=6, rings=3, seed=int( rng.integers( 0, 9999 ) ) )
+                      "canvas_red" if k % 2 else "hedge", squash=0.6, segments=6, rings=3, seed=int( rng.integers( 0, 9999 ) ), ground_z=z )
     # Vegetable beds, a shed and a scarecrow in the west plot; more beds and the potting shed further in.
     for ea, eb in ( ( -1700, -1480 ), ( -720, -460 ) ):
         for n in ( -1420, -1370, -1320 ):
             model.box( ( ea, n - 15, z ), ( eb, n + 15, z + 10 ), { "+z": "soil", "default": "planks_dark" }, DIRT )
             for e in np.arange( ea + 14, eb - 10, 26 ):
                 blob( model, ( e + rng.uniform( -4, 4 ), n + rng.uniform( -4, 4 ), z + 16 ), 8, "hedge", squash=0.6,
-                      segments=6, rings=3, seed=int( rng.integers( 0, 9999 ) ) )
+                      segments=6, rings=3, seed=int( rng.integers( 0, 9999 ) ), ground_z=z+10 )
     shed( model, -1840, -1720, -1440, -1340, z, "+n", rng )
     shed( model, -420, -300, -1440, -1360, z, "+n", rng )
     shed( model, -1440, -1380, -1090, -1030, z, "+e", rng, small=True )
     p = Place( ( -1590, -1345, z ), 0 )
-    p.beam( model, ( 0, 0, 0 ), ( 0, 0, 74 ), ( 3, 3 ), "planks_dark" )
-    p.beam( model, ( -24, 0, 56 ), ( 24, 0, 56 ), ( 3, 3 ), "planks_dark" )
-    p.box( model, ( -12, -6, 30 ), ( 12, 6, 60 ), "canvas_green" )
-    blob( model, p.at( ( 0, 0, 68 ) ), 7, "canvas_plain", squash=1.1, segments=6, rings=4, seed=4 )
-    cone( model, p.at( ( 0, 0, 0 ) )[:2], 12, z + 73, z + 84, "canvas_plain", sides=8 )
+    Scarecrow.build( model, p )
     # The orchard, and its well.
     k = 0
     for e in ( -1380, -1290, -1200, -1000, -910, -820 ):
@@ -2050,13 +2024,16 @@ def gardens( model, rng ):
         a = 2 * math.pi * k / 6
         model.cylinder( ( -500 + 56 * math.cos( a ), -1130 + 56 * math.sin( a ) ), 4, z, z + 96, { "side": "iron_green" },
                         sides=6, surface=METAL )
-    cone( model, ( -500, -1130 ), 72, z + 96, z + 150, "copper", sides=6, turn=0.0 )
+    Gazebo.build( model, ( -500, -1130 ), z )
     bench( model, ( -500, -1160 ), 0, 60, z )
     for e, n in ( ( -650, -1160 ), ( -350, -1160 ) ):
-        model.box( ( e - 60, n - 18, z ), ( e + 60, n + 18, z + 14 ), { "+z": "soil", "default": "ashlar_grey" }, STONE )
+        model.box( ( e - 60, n - 18, z ), ( e + 60, n + 18, z + 14 ), None, STONE )
+        LongBeds.build( model, ( e, n ), z, seed=abs(e) )
         for k in range( 8 ):
-            blob( model, ( e - 50 + k * 14, n + rng.uniform( -8, 8 ), z + 20 ), 8, "canvas_red" if k % 3 == 0 else "hedge",
-                  squash=0.7, segments=6, rings=3, seed=int( rng.integers( 0, 9999 ) ) )
+            flower_e, flower_n = e - 50 + k * 14, n + rng.uniform( -8, 8 )
+            blob( model, ( flower_e, flower_n, z + 20 ), 8, "canvas_red" if k % 3 == 0 else "hedge",
+                  squash=0.7, segments=6, rings=3, seed=int( rng.integers( 0, 9999 ) ),
+                  ground_z=z+LongBeds.soil_height(flower_e-e, flower_n-n) )
 
 
 def shed( model, e0, e1, n0, n1, z, door, rng, small=False ):
@@ -2075,21 +2052,12 @@ def town_walls( model, trim_buried=True ):
     wall.add( 0, 160, 0, 200, "arch" )
     wall.build( model, "rubble", "rubble", "ashlar", "rubble", STONE )
     rect( model, "ashlar_grey", TOWN_WALL[0], TOWN_WALL[1], SOUTH_EDGE, 1800, 240 )
-    # The blocked gate: a studded leaf in the arch.
-    model.box( ( -2346, -80, 0 ), ( -2334, 80, 200 ), "planks_dark", WOOD )
-    for z in ( 30, 100, 170 ):
-        model.box( ( -2334, -78, z ), ( -2333, 78, z + 5 ), "iron_black" )
+    # The same blocked passage; the constructed leaves and hardware are visual.
+    model.box( ( -2346, -80, 0 ), ( -2334, 80, 200 ), None, WOOD )
+    Gate.build( model )
     # Gate towers either side.
     for n0, n1 in ( ( -230, -110 ), ( 110, 230 ) ):
-        model.box( ( -2410, n0, -500 ), ( -2280, n1, 330 ), { "default": "rubble", "+z": "ashlar_grey" }, STONE )
-        model.box( ( -2414, n0 - 4, 318 ), ( -2276, n1 + 4, 330 ), "ashlar_grey" )
-        for k in range( 3 ):
-            ce = -2410 + 20 + k * 45
-            model.box( ( ce - 12, n0 - 4, 330 ), ( ce + 12, n0 + 12, 362 ), "rubble", STONE )
-            model.box( ( ce - 12, n1 - 12, 330 ), ( ce + 12, n1 + 4, 362 ), "rubble", STONE )
-        for nn in ( n0 + 36, n1 - 36 ):
-            model.box( ( -2410, nn - 12, 360 - 30 ), ( -2398, nn + 12, 362 ), "rubble", STONE )
-            model.box( ( -2292, nn - 12, 330 ), ( -2280, nn + 12, 362 ), "rubble", STONE )
+        WallEdges.tower( model, n0, n1, STONE )
         # The town's banner over the road (belltower_fronts' 36 x 72, half as big again), hung flat from an iron rod
         # on two brackets. The east's is blue (EAST_PAINTS).
         face, nc, top = TOWN_WALL[1] + 20, ( n0 + n1 ) / 2, 252.0
@@ -2129,10 +2097,10 @@ def town_walls( model, trim_buried=True ):
     for n in np.arange( SOUTH_EDGE + 30, 1860, 70 ):
         if -250 < n < 250:
             continue
-        model.box( ( -2380, n - 20, 240 ), ( -2366, n + 20, 274 ), "rubble", STONE )
+        WallEdges.merlon( model, ( -2380, n - 20, 240 ), ( -2366, n + 20, 274 ), STONE )
     model.box( ( -2380, 1800, -500 ), ( ROAD[1], 1880, 240 ), { "default": "rubble", "+z": "ashlar_grey" }, STONE )
     for e in np.arange( -2330, ROAD[1] - 10, 70 ):
-        model.box( ( e - 20, 1866, 240 ), ( e + 20, 1880, 274 ), "rubble", STONE )
+        WallEdges.merlon( model, ( e - 20, 1866, 240 ), ( e + 20, 1880, 274 ), STONE )
     # The north row stands on the hill's edge.
     model.box( ( ROAD[1], 1788, -500 ), ( 0, 1800, 0 ), { "default": "rubble", "+z": None, "-n": None, "+e": None }, STONE )
     # The south parapet over the drop.
@@ -2200,23 +2168,22 @@ def street_cables( model ):
 
 
 def street_props( model, rng ):
-    # Market Street's stalls, the lorry, crates and barrels.
+    # Market Street's stalls, crates and barrels. Its lorries came out on 2026-10-19 (the user: "it looks awful").
     for e, canvas in ( ( -1700, "canvas_red" ), ( -1540, "canvas_plain" ), ( -1180, "canvas_green" ), ( -1020, "canvas_red" ),
                        ( -620, "canvas_plain" ), ( -460, "canvas_green" ) ):
         stall( model, ( e, 1410 ), 180, canvas, rng )
     for e, canvas in ( ( -1600, "canvas_green" ), ( -1180, "canvas_red" ), ( -560, "canvas_plain" ) ):
         stall( model, ( e, 1140 ), 0, canvas, rng )
-    lorry( model, ( -900, 1290 ), 8 )
-    crates( model, ( -1370, 1180 ), 10, rng )
+    MarketCratesV3.stack( model, rng, Place, WOOD )
     crates( model, ( -770, 1400 ), 180, rng )
-    barrels( model, ( -1840 + 30, 1300 ), 3, rng )
+    barrels( model, ( -1840 + 30, 1300 ), 3, rng, placements=MARKET_STORAGE_BARRELS )
     barrels( model, ( -260, 1160 ), 2, rng )
     for e in ( -1450, -760, -330 ):
         lamp_post( model, ( e, 1122 ) )
     # West Street.
     cart( model, ( -1620, 300 ), 176, load="crates" )
-    model.box( ( -1500, -88, 0 ), ( -1410, -58, 30 ), { "default": "ashlar_grey", "+z": "water" }, STONE )
-    for centre in ( ( -1780, 330 ), ( -1180, 330 ), ( -870, -80 ) ):
+    StoneWear.trough( model, ( -1500, -88, 0 ), ( -1410, -58, 30 ), STONE )
+    for centre in Planters.CENTRES:
         planter( model, centre, seed=abs( int( centre[0] * 7 + centre[1] ) ) )
     crates( model, ( -800, 320 ), 0, rng )
     barrels( model, ( -1815, -55 ), 2, rng )
@@ -2237,7 +2204,8 @@ def street_props( model, rng ):
             sheet = [ ( e, n, 188 ), ( e + 30, n, 188 ), ( e + 30, n, 140 + rng.uniform( 0, 20 ) ), ( e, n, 150 ) ]
             facing( model, paint, sheet, ( 0, 1, 0 ) )
             facing( model, paint, sheet, ( 0, -1, 0 ) )
-    # The square: the café's tables and chairs under parasols, benches round the fountain, trees and lamps.
+    # The square: the café's tables and chairs under parasols, benches round the fountain, and lamps. Its oak in the
+    # north-west corner came out on 2026-10-25: its crown went 6 ft into the shopfronts either side of it.
     for k, centre in enumerate( ( ( -600, -330 ), ( -520, -250 ), ( -600, -170 ), ( -520, -90 ) ) ):
         cafe = np.random.default_rng( 70 + k )
         top = Detail.bistro_table( model, centre )
@@ -2250,7 +2218,6 @@ def street_props( model, rng ):
             Detail.bistro_chair( model, ( e, n ), math.degrees( a ) + 180 + cafe.uniform( -12, 12 ) )
     for yaw, centre in ( ( 90, ( -150, 130 ) ), ( 45, ( -110, 240 ) ), ( 135, ( -110, 20 ) ) ):
         bench( model, centre, yaw, 70 )
-    tree( model, ( -560, 450 ), 0, 330, 120, seed=11, trunk_r=12 )
     for centre in ( ( -420, 330 ), ( -420, -150 ) ):
         lamp_post( model, centre )
     # The spawn road: a cart, crates, barrels and a trough.
@@ -2259,7 +2226,7 @@ def street_props( model, rng ):
     crates( model, ( -2240, -560 ), 90, rng )
     barrels( model, ( -1890, 1060 ), 3, rng )
     barrels( model, ( -1890, -870 ), 2, rng )
-    model.box( ( -2290, 330, 0 ), ( -2260, 430, 30 ), { "default": "ashlar_grey", "+z": "water" }, STONE )
+    StoneWear.trough( model, ( -2290, 330, 0 ), ( -2260, 430, 30 ), STONE )
     for n in ( -800, -350, 450, 1000, 1550 ):
         lamp_post( model, ( -1870, n ) )
     # Menu boards on the pavement: the café's onto the square, the Bakery's and the Inn's by their doors.
@@ -2962,6 +2929,7 @@ def write_scene( lights, models ):
         model_object( "Centre", "town/centre", "belltower_centre" ),
         model_object( "West Half", "town/west", "belltower_west" ),
         model_object( "East Half", "town/east", "belltower_east" ),
+        model_object( "Hall Entrance Doors", "town/open_doors", OpenDoors.NAME, collide=False ),
         model_object( "Vista", "town/vista", "belltower_vista", collide=False, shadows=False ),
         model_object( "Vista Props", "town/vista_props", VistaProps.NAME, collide=False, shadows=False ),
     ] )
@@ -3136,6 +3104,7 @@ def main():
     centre = build_centre( centre_lights )
     west = build_west( west_lights, np.random.default_rng( 2024 ) )
     east = west.mirrored( EAST_PAINTS )
+    CafeSpacing.apply_east( east, EAST_PAINTS )
     models = [("centre", centre), ("west", west), ("east", east)]
     for name, model in models:
         Detail.configure( model, render=( name != "vista" ) )
@@ -3149,6 +3118,7 @@ def main():
     print( f"{Vista.LAND_NAME}: {count} triangles, lowest at {lowest:.0f}" )
     # Its buildings and trees (Tools/belltower_vista_props.py). The painter grounds them: their yards, roads and shadows.
     print( f"{VistaProps.NAME}: {VistaProps.write( OUT_DIR, RESOURCE_DIR )} triangles" )
+    print( f"{OpenDoors.NAME}: {OpenDoors.write( OUT_DIR, RESOURCE_DIR )} triangles" )
     assert lowest > CATCH_FLOOR_Z, "the land goes below the catch floor"
     painted = { paint for model in ( centre, west, east ) for paint in model.polygons }
     missing = sorted( p for p in painted if p not in Detail.MATERIALS and not ( BT.OUT_DIR / f"{p}_color.png" ).exists() )

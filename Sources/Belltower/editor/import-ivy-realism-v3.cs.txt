@@ -1,0 +1,76 @@
+// Publish only the guarded wall-ivy sources, preserving the shared document.
+var root = Sandbox.Project.Current.GetRootPath();
+var directory = System.IO.Path.Combine(root, "output/belltower/ivy-realism-v3/publication");
+var manifest = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(directory,"stage/manifest.json")));
+var session = Editor.SceneEditorSession.Active;
+var playingBefore=Game.IsPlaying;
+var gameBefore=Game.ActiveScene?.Id;
+if (Game.IsPlaying && Game.ActiveScene.GetAllComponents<ModelRenderer>().Any(r =>
+    r.Model?.ResourcePath?.StartsWith("models/maps/belltower/",StringComparison.OrdinalIgnoreCase)==true))
+    throw new InvalidOperationException("Belltower is running; defer this asset update until its test stops.");
+if (session is null)
+    throw new InvalidOperationException("Requires a stopped, saved editor document.");
+var scenes = Editor.SceneEditorSession.All.ToDictionary(s => s, s => s.HasUnsavedChanges);
+string Hash(string path) => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+var scenePath = System.IO.Path.Combine(root,"Assets/scenes/maps/Belltower/belltower.scene");
+var sceneHash = Hash(scenePath);
+foreach (var pair in manifest["source_sha256"].AsObject())
+    if (Hash(System.IO.Path.Combine(root,pair.Key)) != pair.Value.GetValue<string>())
+        throw new InvalidOperationException("Source changed since staging: "+pair.Key);
+var plan = new System.Collections.Generic.List<(string Source,string Target,string Backup,string After)>();
+foreach (var pair in manifest["files"].AsObject())
+{
+    var relative = pair.Key;
+    var allowed = relative.StartsWith("Assets/models/maps/belltower/",StringComparison.Ordinal) ||
+        relative.StartsWith("Assets/materials/belltower/ivy-3d-v1/",StringComparison.Ordinal);
+    if (!allowed || relative.Contains("..")) throw new InvalidOperationException("Unexpected import target.");
+    var source = System.IO.Path.Combine(root,pair.Value["source"].GetValue<string>());
+    var target = System.IO.Path.Combine(root,relative);
+    var backupRelative = pair.Value["backup"]?.GetValue<string>();
+    var backup = backupRelative is null ? null : System.IO.Path.Combine(root,backupRelative);
+    var before = pair.Value["before"]?.GetValue<string>();
+    var after = pair.Value["after"].GetValue<string>();
+    if (Hash(source) != after || (backup is not null && Hash(backup) != before))
+        throw new InvalidOperationException("Stage or backup changed: "+relative);
+    var current = System.IO.File.Exists(target) ? Hash(target) : null;
+    if (current == after) continue;
+    if (current != before) throw new InvalidOperationException("Shared asset changed: "+relative);
+    plan.Add((source,target,backup,after));
+}
+if (manifest["files"].AsObject().Count < 14) throw new InvalidOperationException("Unexpected target count.");
+var applied = new System.Collections.Generic.List<(string Target,string Backup)>();
+try
+{
+    // Make the texture/material available before importing any model remap.
+    foreach (var item in plan.OrderBy(p => p.Target.EndsWith(".png") ? 0 : p.Target.EndsWith(".vmat") ? 1 : p.Target.EndsWith(".mtl") ? 2 : p.Target.EndsWith(".obj") ? 3 : 4))
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(item.Target));
+        var incoming = item.Target+".ivy-3d-incoming";
+        try
+        {
+            System.IO.File.Copy(item.Source,incoming,true);
+            if (Hash(incoming) != item.After) throw new InvalidOperationException("Incoming checksum mismatch.");
+            System.IO.File.Move(incoming,item.Target,true);
+            applied.Add((item.Target,item.Backup));
+        }
+        finally { if (System.IO.File.Exists(incoming)) System.IO.File.Delete(incoming); }
+    }
+}
+catch
+{
+    foreach (var item in applied.AsEnumerable().Reverse())
+    {
+        if (item.Backup is null) System.IO.File.Delete(item.Target);
+        else System.IO.File.Copy(item.Backup,item.Target,true);
+    }
+    throw;
+}
+foreach (var item in plan) Editor.AssetSystem.RegisterFile(item.Target);
+if (!ReferenceEquals(session,Editor.SceneEditorSession.Active) || Game.IsPlaying!=playingBefore || Game.ActiveScene?.Id!=gameBefore || Hash(scenePath) != sceneHash ||
+    scenes.Any(p => !Editor.SceneEditorSession.All.Contains(p.Key) || p.Key.HasUnsavedChanges != p.Value))
+    throw new InvalidOperationException("Editor state changed; inspect before continuing.");
+var result = new { Imported=plan.Count, SceneUnchanged=true, CollisionUnchanged=true, OtherTownArtPreserved=true,
+    ExistingBoundedImportsPreserved=true, NewSceneObjects=0, ForcedFullCompile=false };
+System.IO.File.WriteAllText(System.IO.Path.Combine(directory,"native-import.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

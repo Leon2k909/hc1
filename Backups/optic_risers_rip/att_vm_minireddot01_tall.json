@@ -1,0 +1,111 @@
+{
+  "vertices": 6930,
+  "triangles": 8162,
+  "removed_degenerate": 0,
+  "materials": {
+    "m_328e7d15d018": "viper/mw/attachments/attachment_vm_minireddot_lens",
+    "m_774f66dd7aef": "viper/mw/attachments/attachment_vm_minireddot_lens_ads",
+    "m_1fb506184396": "viper/mw/attachments/attachment_vm_minireddot_decals",
+    "m_7617252bd7f3": "viper/mw/attachments/attachment_vm_minireddot_railmount",
+    "m_ad5bdfa0d50c": "viper/mw/attachments/attachment_vm_riser03",
+    "m_a3432d42b8fa": "viper/mw/attachments/attachment_vm_minireddot_body"
+  },
+  "bounds": [
+    [
+      0.0,
+      -0.607001006603241,
+      -0.22300100326538086
+    ],
+    [
+      2.7920000553131104,
+      0.614998996257782,
+      1.4819999933242798
+    ]
+  ],
+  "key": "att_vm_minireddot01_tall",
+  "name": "G.I. Mini Reflex",
+  "category": "Optic",
+  "source": "models/viper/mw/attachments/attachment_vm_minireddot_tall.mdl",
+  "vmdl": "attachments/mw2022/models/att_vm_minireddot01_tall/att_vm_minireddot01_tall.vmdl",
+  "bodygroups": [
+    {
+      "name": "optic",
+      "choices": [
+        {
+          "source": "attachment_vm_minireddot_tall_2.smd",
+          "mesh": "mesh_00"
+        }
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "tag_reflex",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tag_reticle_attach",
+      "head": [
+        2.1579999923706055,
+        0.003000000026077032,
+        1.0789999961853027
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          2.1579999923706055
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.003000020980834961
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          1.0789999961853027
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

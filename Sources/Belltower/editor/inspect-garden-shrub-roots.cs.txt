@@ -1,0 +1,18 @@
+// Read the open Belltower document without switching or stopping another scene.
+var selected=Editor.SceneEditorSession.Active;
+var playing=Game.IsPlaying;
+var session=Editor.SceneEditorSession.All.Single(s=>s.Scene.IsEditor &&
+    s.Scene.Source?.ResourcePath?.Equals("scenes/maps/belltower/belltower.scene",StringComparison.OrdinalIgnoreCase)==true);
+var root=Sandbox.Project.Current.GetRootPath();
+var shrubs=session.Scene.GetAllComponents<ModelRenderer>()
+    .Where(r=>r.Model?.ResourcePath?.Equals("models/sbox_props/shrubs/beech/beech_bush_small.vmdl",StringComparison.OrdinalIgnoreCase)==true)
+    .Select(r=>new {Id=r.GameObject.Id,Position=r.WorldPosition.ToString(),Scale=r.WorldScale.ToString(),
+        ModelBounds=r.Model.Bounds.ToString(),MinZ=r.Model.Bounds.Mins.z,MaxZ=r.Model.Bounds.Maxs.z,
+        OriginAboveGarden=r.WorldPosition.z+48}).ToArray();
+if (!ReferenceEquals(selected,Editor.SceneEditorSession.Active) || playing!=Game.IsPlaying)
+    throw new InvalidOperationException("Shared editor state changed during read-only inspection.");
+var path=System.IO.Path.Combine(root,"output/belltower/bush-grounding/native-shrubs-before.json");
+System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(path));
+System.IO.File.WriteAllText(path,System.Text.Json.JsonSerializer.Serialize(shrubs));
+return new {Shrubs=shrubs.Length,LargeGardenHedges=shrubs.Where(r=>r.OriginAboveGarden>15 && r.OriginAboveGarden<25).ToArray(),
+    EditorStatePreserved=true,Playing=playing};

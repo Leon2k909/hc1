@@ -1,0 +1,72 @@
+// Publish only reviewed revision-two shop assets. No scene changes are made.
+var root=Sandbox.Project.Current.GetRootPath();
+var stage=System.IO.Path.Combine(root,"output/belltower/shop-displays/stage-v10");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(stage,"manifest.json")));
+var selected=Editor.SceneEditorSession.Active;
+if (Game.IsPlaying || selected is null || selected.HasUnsavedChanges ||
+    !selected.Scene.Source.ResourcePath.Equals("scenes/maps/belltower/belltower.scene",StringComparison.OrdinalIgnoreCase))
+    throw new InvalidOperationException("Requires stopped, saved Belltower; preserve other editor work.");
+if(manifest["revision"].GetValue<string>()!="shop-displays-v2")
+    throw new InvalidOperationException("Unexpected review revision.");
+string Hash(string path)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+foreach(var group in new[]{"source_sha256","town_model_sha256"})
+    foreach(var pair in manifest[group].AsObject())
+        if(Hash(System.IO.Path.Combine(root,pair.Key))!=pair.Value.GetValue<string>())
+            throw new InvalidOperationException("Reviewed input changed: "+pair.Key);
+var scenePath=System.IO.Path.Combine(root,"Assets/scenes/maps/Belltower/belltower.scene");
+var sceneHash=Hash(scenePath);var game=Game.ActiveScene?.Id;
+var ids=selected.Scene.GetAllObjects(true).Select(o=>o.Id).ToHashSet();
+var plan=new System.Collections.Generic.List<(string Source,string Target,string Backup,string Before,string After)>();
+foreach(var pair in manifest["files"].AsObject())
+{
+    var relative=pair.Key.Replace('\\','/');
+    if(relative.Contains("..") || !(relative.StartsWith("Assets/models/maps/belltower/shop-display-v2/") ||
+         relative.StartsWith("Assets/materials/belltower/shop-display-v2/") ||
+         new[]{"Assets/materials/belltower/shopfront_a.vmat","Assets/materials/belltower/shopfront_b.vmat","Assets/materials/belltower/shopfront_c.vmat","Assets/shaders/belltower_shop_display_v2.shader"}.Contains(relative)))
+        throw new InvalidOperationException("Unexpected publication path: "+relative);
+    var source=System.IO.Path.Combine(stage,relative);var target=System.IO.Path.Combine(root,relative);
+    var before=pair.Value["before"]?.GetValue<string>();var after=pair.Value["after"].GetValue<string>();
+    if(Hash(source)!=after || (System.IO.File.Exists(target)?Hash(target):null)!=before)
+        throw new InvalidOperationException("Publication input changed: "+relative);
+    var backup=System.IO.Path.Combine(stage,"before",relative);
+    if(before is not null)
+    {
+        System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(backup));
+        if(!System.IO.File.Exists(backup))System.IO.File.Copy(target,backup);
+        if(Hash(backup)!=before)throw new InvalidOperationException("Backup differs.");
+    }
+    plan.Add((source,target,backup,before,after));
+}
+if(plan.Count!=28)throw new InvalidOperationException("Unexpected display asset count.");
+plan=plan.OrderBy(p=>p.Target.EndsWith(".png") || p.Target.EndsWith(".shader")?0:p.Target.EndsWith(".vmat")?1:p.Target.EndsWith(".vmdl")?3:2).ToList();
+var changed=new System.Collections.Generic.List<(string Target,string Backup,string Before)>();
+try
+{
+    foreach(var item in plan)
+    {
+        if(item.Before==item.After)continue;
+        System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(item.Target));
+        var temp=item.Target+".display-incoming";
+        try
+        {
+            System.IO.File.Copy(item.Source,temp,true);
+            if(Hash(temp)!=item.After)throw new InvalidOperationException("Incoming asset differs.");
+            changed.Add((item.Target,item.Backup,item.Before));System.IO.File.Move(temp,item.Target,true);
+        }
+        finally{if(System.IO.File.Exists(temp))System.IO.File.Delete(temp);}
+    }
+}
+catch
+{
+    foreach(var item in changed.AsEnumerable().Reverse())
+        if(item.Before is null)System.IO.File.Delete(item.Target);
+        else System.IO.File.Copy(item.Backup,item.Target,true);
+    throw;
+}
+foreach(var item in plan)Editor.AssetSystem.RegisterFile(item.Target);
+if(!ReferenceEquals(selected,Editor.SceneEditorSession.Active) || Game.IsPlaying || selected.HasUnsavedChanges ||
+    Game.ActiveScene?.Id!=game || Hash(scenePath)!=sceneHash || !ids.SetEquals(selected.Scene.GetAllObjects(true).Select(o=>o.Id)))
+    throw new InvalidOperationException("Editor state changed during import.");
+var result=new {Verified=plan.Count,Imported=changed.Count,Revision="shop-displays-v2",ExistingTownModelsUnchanged=true,SceneUnchanged=true,SceneSha256=sceneHash};
+System.IO.File.WriteAllText(System.IO.Path.Combine(stage,"native-import.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

@@ -1,0 +1,59 @@
+// Publish only the two varnished door materials after compiling their private shader.
+// The selected scene, play state, camera and unsaved work are never changed.
+var root=Sandbox.Project.Current.GetRootPath();
+var folder=System.IO.Path.Combine(root,"output/belltower/door-wood-20261020");
+var entries=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"import.json"))).AsArray();
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+var allowed=new System.Collections.Generic.HashSet<string>{"Assets/shaders/belltower_door_wood_v1.shader",
+    "Assets/materials/belltower/door_b.vmat","Assets/materials/belltower/door_e.vmat"};
+if (!allowed.SetEquals(entries.Select(e=>e["target"].GetValue<string>()))) throw new InvalidOperationException("Unexpected door import.");
+var selected=Editor.SceneEditorSession.Active;var game=Game.ActiveScene?.Id;var playing=Game.IsPlaying;
+var unsaved=selected?.HasUnsavedChanges;
+var scenePath=System.IO.Path.Combine(root,"Assets/scenes/maps/Belltower/belltower.scene");
+var sceneHash=Hash(scenePath);
+foreach(var entry in entries)
+{
+    var target=System.IO.Path.Combine(root,entry["target"].GetValue<string>());
+    var source=System.IO.Path.Combine(root,entry["source"].GetValue<string>());
+    if(Hash(source)!=entry["after_sha256"].GetValue<string>()) throw new InvalidOperationException("Door stage changed.");
+    var before=entry["before_sha256"]?.GetValue<string>();
+    if(before is null ? System.IO.File.Exists(target) : !System.IO.File.Exists(target) || Hash(target)!=before)
+        throw new InvalidOperationException("Door target changed; inspect before retrying.");
+}
+var shader=entries.Single(e=>e["target"].GetValue<string>().EndsWith(".shader"));
+var shaderPath=System.IO.Path.Combine(root,shader["target"].GetValue<string>());
+System.IO.File.Copy(System.IO.Path.Combine(root,shader["source"].GetValue<string>()),shaderPath);
+var compilation=Editor.EditorUtility.CompileShader("shaders/belltower_door_wood_v1.shader",new(),cancellationToken);
+await compilation;
+var reported=compilation.GetType().GetProperty("Result")?.GetValue(compilation);
+var success=reported is bool b?b:reported?.GetType().GetProperty("Success")?.GetValue(reported) as bool?;
+if(success!=true || !System.IO.File.Exists(shaderPath+"_c")) throw new InvalidOperationException("Door shader did not compile; original materials are intact.");
+var changed=new System.Collections.Generic.List<string>();
+try
+{
+    foreach(var entry in entries.Where(e=>e["target"].GetValue<string>().EndsWith(".vmat")))
+    {
+        var relative=entry["target"].GetValue<string>();var target=System.IO.Path.Combine(root,relative);
+        if(Hash(target)!=entry["before_sha256"].GetValue<string>()) throw new InvalidOperationException("Door changed during shader compile.");
+        var incoming=target+".door-incoming";
+        try
+        {
+            System.IO.File.Copy(System.IO.Path.Combine(root,entry["source"].GetValue<string>()),incoming,true);
+            changed.Add(relative);System.IO.File.Move(incoming,target,true);Editor.AssetSystem.RegisterFile(target);
+        }
+        finally {if(System.IO.File.Exists(incoming)) System.IO.File.Delete(incoming);}
+    }
+}
+catch
+{
+    foreach(var relative in changed) System.IO.File.Copy(System.IO.Path.Combine(folder,"before",relative),System.IO.Path.Combine(root,relative),true);
+    throw;
+}
+var preserved=ReferenceEquals(selected,Editor.SceneEditorSession.Active) && Game.ActiveScene?.Id==game && Game.IsPlaying==playing
+    && selected?.HasUnsavedChanges==unsaved && Hash(scenePath)==sceneHash;
+var result=new {MaterialsUpdated=changed.Count,ShaderCompilerSuccess=success,EditorStatePreserved=preserved,
+    SceneSha256=sceneHash,SceneUnchanged=Hash(scenePath)==sceneHash,TexturePixelsUnchanged=true,
+    Files=entries.Select(e=>new{Path=e["target"].GetValue<string>(),Sha256=Hash(System.IO.Path.Combine(root,e["target"].GetValue<string>()))}).ToArray()};
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"native-import.json"),System.Text.Json.JsonSerializer.Serialize(result));
+if(!preserved) throw new InvalidOperationException("Another editor operation changed state; inspect completed import, do not repeat it.");
+return result;

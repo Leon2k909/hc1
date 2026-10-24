@@ -1,0 +1,130 @@
+{
+  "revision": "cafe-spacing-v1",
+  "status": "applied-and-native-verified",
+  "scope": "blue eastern cafe",
+  "clearances": {
+    "tables_before": 4,
+    "tables_after": 3,
+    "chairs_before": 12,
+    "chairs_after": 9,
+    "minimum_canopy_gap_inches": 43.05441169852742,
+    "minimum_canopy_wall_gap_inches": 33.0,
+    "table_centres_plan_inches": [
+      [
+        565,
+        -340
+      ],
+      [
+        520,
+        -200
+      ],
+      [
+        565,
+        -60
+      ]
+    ]
+  },
+  "changed_mesh_files": [
+    "Assets/models/maps/belltower/belltower_east.obj",
+    "Assets/models/maps/belltower/belltower_east_hulls_metal.obj",
+    "Assets/models/maps/belltower/compiler-safe/east/east_032_iron_black.obj",
+    "Assets/models/maps/belltower/compiler-safe/east/east_034_iron_green.obj",
+    "Assets/models/maps/belltower/compiler-safe/east/east_048_parasol_blue.obj",
+    "Assets/models/maps/belltower/compiler-safe/east/east_049_parasol_cream.obj",
+    "Assets/models/maps/belltower/compiler-safe/east/east_050_planks.obj",
+    "Assets/models/maps/belltower/compiler-safe/east/east_051_planks_dark.obj"
+  ],
+  "compile": {
+    "Success": true,
+    "Path": "models/maps/belltower/belltower_east.vmdl",
+    "CompiledFile": "c:/sbox-projects/hc1/forked-shooter-main/assets/models/maps/belltower/belltower_east.vmdl_c",
+    "Hint": null
+  },
+  "collision_checks": {
+    "Passed": true,
+    "Checks": [
+      {
+        "Name": "new-0",
+        "Plan": "565,-340",
+        "ExpectedHeight": 29,
+        "Hit": true,
+        "StartedSolid": false,
+        "Height": 29,
+        "Object": "East Half",
+        "Passed": true
+      },
+      {
+        "Name": "new-1",
+        "Plan": "520,-200",
+        "ExpectedHeight": 29,
+        "Hit": true,
+        "StartedSolid": false,
+        "Height": 29,
+        "Object": "East Half",
+        "Passed": true
+      },
+      {
+        "Name": "new-2",
+        "Plan": "565,-60",
+        "ExpectedHeight": 29,
+        "Hit": true,
+        "StartedSolid": false,
+        "Height": 29,
+        "Object": "East Half",
+        "Passed": true
+      },
+      {
+        "Name": "old-0",
+        "Plan": "600,-330",
+        "ExpectedHeight": 0,
+        "Hit": true,
+        "StartedSolid": false,
+        "Height": 0,
+        "Object": "East Half",
+        "Passed": true
+      },
+      {
+        "Name": "old-1",
+        "Plan": "520,-250",
+        "ExpectedHeight": 0,
+        "Hit": true,
+        "StartedSolid": false,
+        "Height": 0,
+        "Object": "East Half",
+        "Passed": true
+      },
+      {
+        "Name": "old-2",
+        "Plan": "600,-170",
+        "ExpectedHeight": 0,
+        "Hit": true,
+        "StartedSolid": false,
+        "Height": 0,
+        "Object": "East Half",
+        "Passed": true
+      },
+      {
+        "Name": "removed-3",
+        "Plan": "520,-90",
+        "ExpectedHeight": 0,
+        "Hit": true,
+        "StartedSolid": false,
+        "Height": 0,
+        "Object": "East Half",
+        "Passed": true
+      }
+    ],
+    "Scene": "scenes/maps/belltower/belltower.scene"
+  },
+  "capture_restoration": {
+    "AssetsRestored": true,
+    "MainCameraRestored": true,
+    "ToneRestored": true,
+    "CamerasRestored": true,
+    "ObjectsRestored": true,
+    "EditorStatePreserved": true
+  },
+  "scene_source_unchanged": true,
+  "red_cafe_unchanged": true,
+  "after_image": "output/belltower/quality/cafe-spacing-v1-after/frontage.png"
+}

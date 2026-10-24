@@ -1,0 +1,49 @@
+// Publish only new first-person resources via the existing engine connection.
+// All targets are preflighted before copying. No selected scene, play or camera edits.
+var root=Sandbox.Project.Current.GetRootPath();
+var folder=System.IO.Path.Combine(root,"output/firstperson-clothing-v4-20261021");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"shader-position-fix/manifest.json")));
+string Hash(string path)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+var selected=Editor.SceneEditorSession.Active;
+var playing=Game.IsPlaying;
+var documents=Editor.SceneEditorSession.All.ToDictionary(s=>s,s=>s.HasUnsavedChanges);
+var plans=new System.Collections.Generic.List<(string Source,string Target,System.Text.Json.Nodes.JsonNode Entry)>();
+foreach(var p in manifest["files"].AsObject())
+{
+    if(p.Key.Contains("..")||!(p.Key.StartsWith("Assets/materials/operators/first_person/v4/",StringComparison.Ordinal)
+        ||p.Key=="Assets/shaders/viewmodel_fabric_v4.shader"))throw new InvalidOperationException("Unexpected target");
+    var source=System.IO.Path.Combine(root,p.Value["source"].GetValue<string>());
+    var target=System.IO.Path.GetFullPath(System.IO.Path.Combine(root,p.Key));
+    if(!target.StartsWith(System.IO.Path.GetFullPath(root)+System.IO.Path.DirectorySeparatorChar,StringComparison.OrdinalIgnoreCase))throw new InvalidOperationException("Target outside project");
+    if(Hash(source)!=p.Value["sha256"].GetValue<string>())throw new InvalidOperationException("Stage changed");
+    var before=p.Value["before"]?.GetValue<string>();
+    if(before is null ? System.IO.File.Exists(target) : !System.IO.File.Exists(target)||Hash(target)!=before)
+        throw new InvalidOperationException("Private clothing target changed: "+target);
+    plans.Add((source,target,p.Value));
+}
+var rows=new System.Collections.Generic.List<object>();
+foreach(var p in plans)
+{
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(p.Target));
+    if(p.Entry["compiler_size"] is {} size)
+    {
+        using var original=Bitmap.CreateFromBytes(System.IO.File.ReadAllBytes(p.Source));
+        using var resized=original.Resize(size[0].GetValue<int>(),size[1].GetValue<int>(),true);
+        System.IO.File.WriteAllBytes(p.Target,resized.ToPng());
+        rows.Add(new{Path=System.IO.Path.GetRelativePath(root,p.Target),Sha256=Hash(p.Target),
+            NativeWidth=original.Width,NativeHeight=original.Height,CompilerWidth=resized.Width,CompilerHeight=resized.Height,ResizeAddsDetail=false});
+    }
+    else
+    {
+        System.IO.File.Copy(p.Source,p.Target,true);
+        rows.Add(new{Path=System.IO.Path.GetRelativePath(root,p.Target),Sha256=Hash(p.Target)});
+    }
+}
+foreach(var p in plans)Editor.AssetSystem.RegisterFile(p.Target);
+await Editor.EditorUtility.CompileShader("shaders/viewmodel_fabric_v4.shader",new(),cancellationToken);
+var preserved=ReferenceEquals(selected,Editor.SceneEditorSession.Active)&&playing==Game.IsPlaying
+    &&documents.All(p=>Editor.SceneEditorSession.All.Contains(p.Key)&&p.Key.HasUnsavedChanges==p.Value);
+var result=new{Published=rows,SharedEditorStatePreserved=preserved,SceneChanged=false,PlayChanged=false};
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"native-import-final-shader.json"),System.Text.Json.JsonSerializer.Serialize(result));
+if(!preserved)throw new InvalidOperationException("Shared editor state changed externally during publication; inspect before continuing");
+return result;

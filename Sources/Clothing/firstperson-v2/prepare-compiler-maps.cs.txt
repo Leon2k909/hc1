@@ -1,0 +1,32 @@
+// Engine-required PNG resampling only. Original imagegen outputs remain pinned.
+var root = Sandbox.Project.Current.GetRootPath();
+var folder = System.IO.Path.Combine(root,"output/firstperson-clothing-v2-20261021");
+var manifest = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"stage/manifest.json")));
+var records = new System.Collections.Generic.List<object>();
+string Hash(string p) => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+foreach(var pair in manifest["files"].AsObject().Where(p=>p.Key.EndsWith(".png",StringComparison.Ordinal)))
+{
+    var path = System.IO.Path.Combine(root,pair.Key);
+    if(Hash(path)!=pair.Value["after"].GetValue<string>()) throw new InvalidOperationException("A private clothing map changed: "+pair.Key);
+    using var bitmap = Bitmap.CreateFromBytes(System.IO.File.ReadAllBytes(path));
+    int Power(int n) { var result=1; while(result<n) result*=2; return result; }
+    var w=Power(bitmap.Width); var h=Power(bitmap.Height);
+    if(w==bitmap.Width && h==bitmap.Height) continue;
+    var backup = System.IO.Path.Combine(folder,"pre-compiler-maps",System.IO.Path.GetFileName(path));
+    if(System.IO.File.Exists(backup)) throw new InvalidOperationException("Preserve the original compiler-conversion evidence");
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(backup));
+    System.IO.File.Copy(path,backup,false);
+    using var converted=bitmap.Resize(w,h,true);
+    System.IO.File.WriteAllBytes(path,converted.ToPng());
+    Editor.AssetSystem.RegisterFile(path);
+    records.Add(new{Path=pair.Key,SourceWidth=bitmap.Width,SourceHeight=bitmap.Height,Width=w,Height=h,
+        Reason="Power-of-two compiler mip filtering requirement; not newly generated resolution",Sha256=Hash(path)});
+}
+var shader = System.IO.Path.Combine(root,"Assets/shaders/viewmodel_fabric_v2.shader");
+if(!System.IO.File.Exists(shader+"_c") || System.IO.File.GetLastWriteTimeUtc(shader+"_c")<System.IO.File.GetLastWriteTimeUtc(shader))
+    await Editor.EditorUtility.CompileShader("shaders/viewmodel_fabric_v2.shader",new(),cancellationToken);
+if(!System.IO.File.Exists(shader+"_c") || System.IO.File.GetLastWriteTimeUtc(shader+"_c")<System.IO.File.GetLastWriteTimeUtc(shader))
+    throw new InvalidOperationException("The clothing shader did not compile");
+var result = new { Converted=records, ShaderCompiled=true, SceneChanged=false, PlayChanged=false };
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"compiler-map-conversion.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

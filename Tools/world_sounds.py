@@ -28,18 +28,27 @@ what makes an impact sound heavy. Then whatever the material does, and the surro
 later, early reflections and a short diffuse tail, kept low (s&box plays a sound dry).
 - masonry (concrete, brick, stone, plaster): the crater's "pock" and brittle fracture, a crackle over ~10 ms; spall
   thrown out, a short hiss; then grit and 10-24 chips falling from wherever the round hit (0.3-1.5 m up) and bouncing
-  at a third of their speed, within about half a second. One take in five has a ricochet: a fragment whining off, its
-  pitch falling as it recedes and slows (Doppler), buzzing at its tumble rate.
+  at a third of their speed, within about half a second.
 - tile (ceramic, glazed): brighter and more brittle than concrete, with a short ceramic ring and harder chips.
-- metal (thick steel): the plate's bending modes from ~120 Hz to 9 kHz, the high ones dying first, and the "ping" of the
-  modes round the strike, under a splash of lead and jacket fragments. Two takes in five ricochet.
-- sheetmetal (a car panel, a tin roof): the puncture's crack and tear, then a thin sheet's dense modes, a boomy wobble
-  that dies in a quarter of a second, and a rattle against its fixings.
+- metal (steelwork: a deck, a bulkhead, a beam): a bright crack and a short clank. The plate's bending modes are dense
+  and pitchless, and built into a structure they die fast (a loss factor of 1-2.5%, T60 ~0.1 s at 2 kHz), under a
+  splash of lead and jacket fragments and the frame's brief thud. It used to ring like a
+  steel target hung on chains (70% of its sound after the first 50 ms, a pitched ~1.4 kHz "ping" 0.25 s long), which
+  in a steel hall under automatic fire sounded like table tennis.
+- sheetmetal (a car panel, a tin roof): the puncture's crack and tear, then a thin sheet's dense modes, damped by the
+  air, its fixings and its seams (a loss factor of 2-6%), a short wobble and a rattle against its fixings.
 - glass (a pane that doesn't give way): the hole's sharp crack, cracks running out across the pane, the pane's thump and
   short ring, and fragments tinkling down.
 - wood (a beam, a door, a crate): a hollow "thock" from the member's modes (110-240 Hz up, Q ~ 25), splintering fibres,
   a few splinters landing, soft and dull.
 - plastic: a hollow shell's heavily damped modes and a dull crack.
+- ricochet (not a material): a round glancing off a hard face, deformed and tumbling, flying away. Its wake buzzes at
+  the tumble rate, Doppler-shifted down from the first moment as it recedes, and fades within ~0.15-0.2 s as it flies
+  off and slows. WorldSounds.BulletRicochet plays it beside the impact only for a grazing hit (under ~15 degrees on
+  steel, 10 on stone or tile), heard from tens of metres at most, 15 dB under the strike. One masonry take and one metal
+  take in five used to carry a whine instead, a scream gliding down an octave over half a second (the movie "pyeeow",
+  which needs the round to come at you and pass close), on any hit and wherever the impact carried: under fire it was
+  heard as "pews" from across a hall.
 - dirt: no crack: the soil gives, a low thud and the "pfft" of the spray, then soil pattering back down. Most of what's
   thrown up is dust, which lands unheard.
 - grass: dirt's thud and spray, with the blades' rustle and a few stems snapping, and less soil in the air.
@@ -69,23 +78,28 @@ Grenade bounces, at ~6 m/s (a harder landing plays louder, WorldSounds.BounceVol
 - can: smoke, stun and thermite grenades, a thin sheet-steel can: a hollow tonk (modes from 700-1000 Hz) that rings a
   little longer, and its lid and fuze rattling.
 Then the floor: on concrete a click from the ~0.2 ms steel-on-stone contact and the slab's dull knock, on tile its
-glazed ring, a steel deck's ring on (the loudest), floorboards' hollow modes, soil and turf giving with a thud (and
-grass's blades), a body's or a cushion's dull thump. The frag on concrete's octave spectrum was compared with s&box's
+glazed ring, a steel deck's bright clank (the loudest, damped within ~0.1 s by the structure it's built into: it
+used to ring on like a hung plate), floorboards' hollow modes, soil and turf giving with a thud (and grass's blades), a body's or a cushion's dull thump. The frag on concrete's octave spectrum was compared with s&box's
 metal-on-hard-surface Foley: within 6 dB of it from 250 Hz up, but for the click's 2 kHz band, 8 dB brighter.
 
 Footsteps of a soldier in combat boots (rubber lug soles, ~95 kg with kit). Each part of the sole that meets the floor
 (heel, then forefoot) slaps the rubber on it, the heel's rubber and the leg behind it compress (a 150-650 Hz knock, the
 body of a step) and the leg's weight arrives through it (a low thump). The floor adds its own: concrete grit crushed
-under the lugs, a glazed tile's click, floorboards' hollow modes on their joists (the odd creak), a steel deck's ring,
-soil crunching, turf giving and grass blades swishing. Then the sole scuffs as the foot pushes off.
+under the lugs, a glazed tile's click, floorboards' hollow modes on their joists (the odd creak), a steel deck's
+hollow clank, soil crunching, turf giving and grass blades swishing. Then the sole scuffs as the foot pushes off.
 - step: a walk, heel then forefoot 70-110 ms later, a light push-off.
 - run: a sprint, forefoot first and the heel just after, a hard push-off, the trousers and the kit (magazines in their
   pouches, the sling's hardware) rattling as the body comes down.
 - land: both feet within 15-45 ms, at several times body weight: a heavy thump through the floor, the kit clattering.
 Their levels follow the real ones against each other, not s&box's (which had grass 21 dB under concrete and a metal
-deck 15 dB under it): walking on concrete stays where s&box's was, tile +1 dB, floorboards +2, a steel deck +4, dirt
+deck 15 dB under it): walking on concrete stays where s&box's was, tile +1 dB, floorboards +2, a steel deck +2, dirt
 -5, grass -10; a run is 6 dB over a walk (measured footfalls rise 6-10 dB from walking to running), a landing 4 dB over
 a run. That landing is a jump's; in the game it's louder the faster you land (PlayerPawn.PlayFallSound).
+A steel deck under a boot doesn't ping: the rubber heel's few ms of contact barely reach the plate's upper modes (a
+hard object's sub-millisecond contact is what pings a plate), and a plate built into a frame or laid on a slab, with
+the boot standing on it, damps the rest (loss 2.5-5%): a hollow clank, 20 dB down by 60-100 ms in its own band. It
+used to ring on 16 sparse modes for up to a second, so a sprint's steps (every 0.25 s) overlapped into constant pinging,
+and it was 4 dB over concrete (now 2).
 
 The menus' clicks (s&box's were Kenney's game sounds): the press is a sealed tactile push-button, its metal dome
 snapping through and the plunger bottoming out; the hover is a rotary switch's detent, a tick you barely hear. The press
@@ -118,7 +132,7 @@ SBOX_CORE = r"D:/SteamLibrary/steamapps/common/sbox/core"
 IMPACTS = {
     "masonry": (-15.0, 5000, 5),
     "tile": (-15.0, 5000, 5),
-    "metal": (-11.0, 6000, 5),
+    "metal": (-13.0, 6000, 5),
     "sheetmetal": (-13.0, 5000, 5),
     "glass": (-16.0, 5000, 5),
     "wood": (-18.0, 4000, 5),
@@ -127,6 +141,9 @@ IMPACTS = {
     "grass": (-24.0, 3000, 5),
     "fabric": (-26.0, 2000, 4),
     "flesh": (-21.0, 2500, 5),
+    # Not a material: the whir of a round glancing off a hard face, beside its impact (WorldSounds.BulletRicochet). A
+    # tumbling slug's flow noise, heard from tens of metres at most, ~35 dB under a round's strike, squeezed to 15.
+    "ricochet": (-30.0, 1500, 5),
 }
 
 # Knife strikes: (target loudness in dB, the event's distance in units). A thrust lands with a few tens of joules
@@ -173,7 +190,7 @@ FLOORS = {
     "concrete": -36.0,
     "tile": -35.0,
     "wood": -34.0,
-    "metal": -32.0,
+    "metal": -34.0,
     "dirt": -41.0,
     "grass": -46.0,
 }
@@ -328,20 +345,38 @@ def dust(rng, seconds, hits, low, high, level):
 
 
 def ricochet(rng, seconds):
-    """A fragment whining off: its pitch falls as it recedes and slows (Doppler), and it buzzes at its tumble rate."""
+    """A round glancing off a hard face, deformed and tumbling, flying away. Its wake buzzes at the tumble rate: noise
+    round the flow's shedding pitch, chopped a few hundred times a second, with a faint tone where the vortices lock
+    to the tumble. It leaves at 250-500 m/s straight away from where it struck, so to anyone not on its new path it's
+    Doppler-shifted down from the first moment and stays there, falling a little as it slows. The movie "pyeeow", a
+    scream gliding down an octave, needs it to come at you and pass close. It fades as it flies off (its distance
+    doubling every few tens of ms) and as it slows."""
     t = seconds_axis(seconds)
-    start = rng.uniform(2600, 4300)
-    end = start * rng.uniform(0.33, 0.5)
-    glide = rng.uniform(0.1, 0.25)
-    f = end + (start - end) * np.exp(-t / glide)
-    f *= 1 + 0.04 * np.exp(-t / 0.012)                 # a shade higher as it passes closest, just after the strike
-    phase = 2 * np.pi * np.cumsum(f) / SR
-    tumble = rng.uniform(70, 220) * (1 + 0.15 * np.sin(2 * np.pi * rng.uniform(3, 7) * t))
-    am = 1 - 0.55 * (0.5 + 0.5 * np.sin(2 * np.pi * np.cumsum(tumble) / SR + rng.uniform(0, 6)))
-    tone = np.sin(phase) + 0.3 * np.sin(2 * phase + 1.1) + 0.12 * np.sin(3 * phase + 2.3)
-    rough = 1 + 0.45 * unit(band(rng.standard_normal(len(t)), 0, 400))    # the whine is breathy, not a pure tone
-    env = envelope(t, rng.uniform(0.006, 0.015), rng.uniform(0.22, 0.4)) * (1 - np.clip((t - seconds + 0.08) / 0.08, 0, 1))
-    return unit(tone * am * rough * env)
+    speed = rng.uniform(250, 500) * np.exp(-t / rng.uniform(0.3, 0.6))      # m/s, drag slowing a tumbling slug
+    receding = speed * rng.uniform(0.5, 0.95)                               # its speed away from the listener
+    doppler = 343.0 / (343.0 + receding)
+    shed = rng.uniform(6.0, 12.0) * speed * doppler                         # the wake's pitch, with its speed
+    tumble = rng.uniform(1.0, 3.0) * speed * doppler                        # tumbles a second, heard shifted
+    chop = 1 - rng.uniform(0.5, 0.8) * (0.5 + 0.5 * np.sin(2 * np.pi * np.cumsum(tumble) / SR + rng.uniform(0, 6)))
+    # The wake's noise, swept with its pitch: a narrow band of noise, by ring modulation of a lowpassed noise.
+    base = band(rng.standard_normal(len(t)), 0, 350)
+    carrier = np.sin(2 * np.pi * np.cumsum(shed) / SR + rng.uniform(0, 6))
+    wake = unit(base) * carrier + 0.35 * noise(rng, len(t), 1500, 7000)
+    harmonic = np.round(shed / np.maximum(tumble, 1.0))
+    tone = 0.2 * np.sin(2 * np.pi * np.cumsum(harmonic * tumble) / SR)      # the vortices locking to the tumble
+    near = rng.uniform(3.0, 10.0)                                           # m, the listener off its path
+    away = near / np.sqrt(near ** 2 + (np.cumsum(receding) / SR) ** 2)      # inverse distance as it flies off
+    env = envelope(t, rng.uniform(0.002, 0.005), 1e9) * away * (speed / speed[0]) ** 3
+    env *= 1 - np.clip((t - seconds + 0.04) / 0.04, 0, 1)
+    return unit((wake + tone) * chop * env)
+
+
+def bullet_ricochet(rng, take):
+    """A round's ricochet off a glancing hit on a hard face, played beside its impact (WorldSounds.BulletRicochet)."""
+    seconds = 0.45
+    out = np.zeros(int(seconds * SR))
+    add(out, ricochet(rng, 0.4), 0.0)
+    return surroundings(rng, out, 0.5, 0.3)
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -415,8 +450,6 @@ def bullet_masonry(rng, take):
     hits = falling(rng, int(rng.integers(10, 24)), (0.3, 1.5), (0.5, 2.5), 0.3, 2)
     sizes = rng.lognormal(np.log(4.0), 0.5, len(hits))
     add(out, debris(rng, seconds, hits, sizes / 8.0, lambda r, s: stone_chip(r, s * 8.0), 0.16), 0.0)
-    if take == 3:
-        add(out, 0.4 * ricochet(rng, 0.9), rng.uniform(0.002, 0.006))
     return surroundings(rng, out)
 
 
@@ -441,50 +474,69 @@ def bullet_tile(rng, take):
     return surroundings(rng, out)
 
 
+def structural_modes(rng, count, low, high, loss, coincidence, sigma=0.25):
+    """A plate built into a structure, struck: `count` bending modes between `low` and `high` Hz, at random (a plate's
+    modes are dense and evenly spread, so there's no note to them). Each dies in T60 = 2.2 / (f loss), the higher ones
+    sooner. The plate radiates well only above its coincidence frequency, so the modes under it are weak."""
+    freqs = np.exp(rng.uniform(np.log(low), np.log(high), count))
+    partials = [(f, rng.lognormal(0, sigma) / np.sqrt(1.0 + (coincidence / f) ** 4), 2.2 / (f * loss) / 6.91)
+                for f in freqs]
+    return unit(modes(min(0.8, 2.2 / (low * loss)), partials, 0.00003, rng))
+
+
+def soft_strike_modes(rng, count, low, high, loss, contact, radiation):
+    """structural_modes struck by something soft and slow, a boot's rubber heel. A strike that lasts a few ms puts
+    little force into the modes above about 1 / its length (`contact` Hz), which is why a hard object pings a plate
+    and a boot doesn't. A deck panel on its frame radiates its low modes poorly (under `radiation` Hz)."""
+    freqs = np.exp(rng.uniform(np.log(low), np.log(high), count))
+    partials = [(f, rng.lognormal(0, 0.3) / (1.0 + (f / contact) ** 2) / np.sqrt(1.0 + (radiation / f) ** 4),
+                 2.2 / (f * loss) / 6.91) for f in freqs]
+    return unit(modes(min(0.5, 2.2 / (low * loss)), partials, 0.0004, rng))
+
+
 def bullet_metal(rng, take):
-    seconds = 1.3
+    seconds = 0.9
     out = np.zeros(int(seconds * SR))
-    add(out, 0.9 * spike(rng, 0.00007), 0.0)
+    add(out, 1.0 * spike(rng, 0.00006), 0.0)
     add(out, 0.6 * blast(rng, rng.uniform(0.0005, 0.0009)), 0.0001)
-    # A heavy steel plate or body: its bending modes from the low hundreds up, the high ones dying first, and the
-    # strong "ping" of the modes round the strike.
-    freqs = np.exp(rng.uniform(np.log(120), np.log(9000), 26))
-    plate = [(f, (f / 1000) ** -0.15 * rng.lognormal(0, 0.35), float(np.clip(0.18 * (500 / f) ** 0.6, 0.02, 0.28)))
-             for f in freqs]
-    add(out, 0.75 * unit(modes(1.0, plate, 0.00005, rng)), 0.0001)
-    base = rng.uniform(1100, 1700)
-    ping = [(base * r * rng.uniform(0.98, 1.02), r ** -0.5, 0.25 * r ** -0.8) for r in (1.0, 1.58, 2.13, 2.71, 3.4)]
-    add(out, 0.55 * unit(modes(1.0, ping, 0.00005, rng)), 0.0001)
+    # Steelwork: a deck, a bulkhead, a beam or a wall's plating, welded or bolted into the structure round it. The
+    # joints and the plates beyond carry the blow's energy off, so a built-up structure's loss factor is 1-2.5%
+    # (measured on ships' and buildings' steelwork), against well under 0.1% for a steel target hung on chains. So it
+    # clanks, a bright crack with a short metallic smear (T60 ~0.1 s at 2 kHz), where a hung plate rings on ("ding").
+    # Its plating, 10-20 mm thick, radiates well above ~1 kHz, its coincidence frequency.
+    add(out, 0.8 * structural_modes(rng, 64, 250, 11000, rng.uniform(0.01, 0.025), rng.uniform(800, 1400)), 0.0001)
+    # The structure round it thudding with the blow, briefly.
+    add(out, 0.3 * structure(rng, 90, 400, 8, 0.045, 0.4), 0.0003)
     # Lead and jacket splashing off it, and a few fragments ticking off whatever is nearby.
-    add(out, 0.4 * crackle(rng, 0.05, int(rng.integers(30, 60)), 2500, 13000, 0.004), 0.0003)
+    add(out, 0.5 * crackle(rng, 0.04, int(rng.integers(40, 80)), 2500, 14000, 0.003), 0.0002)
+    add(out, 0.25 * burst(rng, 0.06, 2000, 12000, 0.0003, 0.008), 0.0002)
     ticks = falling(rng, int(rng.integers(3, 8)), (0.2, 1.2), (0.5, 2.0), 0.4, 1, 0.05)
     lead = lambda r, s: fragment(r, r.uniform(2500, 6000), r.uniform(0.001, 0.003), 2)
-    add(out, debris(rng, seconds, ticks, np.ones(len(ticks)), lead, 0.1), 0.0)
-    if take in (1, 4):
-        add(out, 0.45 * ricochet(rng, 0.9), rng.uniform(0.002, 0.005))
-    return surroundings(rng, out, 0.8, 0.8)
+    add(out, debris(rng, seconds, ticks, np.ones(len(ticks)), lead, 0.08), 0.0)
+    return surroundings(rng, out, 0.8, 0.6)
 
 
 def bullet_sheetmetal(rng, take):
-    seconds = 0.9
+    seconds = 0.6
     out = np.zeros(int(seconds * SR))
     add(out, 0.9 * spike(rng, 0.00008), 0.0)
     add(out, 0.5 * blast(rng, rng.uniform(0.0006, 0.001)), 0.0001)
-    # The puncture tearing through, then the thin sheet's dense modes.
+    # The puncture tearing through, then the thin sheet's dense modes. A panel loses far more to the air it pumps,
+    # its fixings and its seams (and a car's to its sound deadening) than a thick plate: a loss factor of 2-6%, so
+    # it's a short "pank", not a ring. Its coincidence frequency is high (~8 kHz at 1.5 mm), but a panel radiates
+    # from its edges and fixings well below it.
     add(out, 0.7 * crackle(rng, 0.03, int(rng.integers(20, 40)), 2000, 12000, 0.0015), 0.0002)
-    freqs = np.exp(rng.uniform(np.log(90), np.log(7000), 40))
-    sheet = [(f, (f / 300) ** -0.3 * rng.lognormal(0, 0.4), float(np.clip(0.2 * (300 / f) ** 0.5, 0.02, 0.3)))
-             for f in freqs]
-    add(out, 0.75 * unit(modes(0.8, sheet, 0.0002, rng)), 0.0002)
+    add(out, 0.75 * structural_modes(rng, 48, 90, 7000, rng.uniform(0.02, 0.06), rng.uniform(150, 300), 0.35),
+        0.0002)
     # The panel's lowest modes beating (the wobble), and its rattle against its fixings.
     low = rng.uniform(60, 110)
-    add(out, 0.2 * unit(modes(0.6, [(low, 1.0, 0.18), (low * rng.uniform(1.04, 1.09), 0.8, 0.15)], 0.002, rng)),
+    add(out, 0.2 * unit(modes(0.4, [(low, 1.0, 0.07), (low * rng.uniform(1.04, 1.09), 0.8, 0.06)], 0.002, rng)),
         0.001)
-    rattle_t = seconds_axis(0.25)
+    rattle_t = seconds_axis(0.2)
     gate = (np.sin(2 * np.pi * rng.uniform(55, 90) * rattle_t) > 0.6).astype(float)
-    rattle = noise(rng, len(rattle_t), 1500, 6000) * gate * envelope(rattle_t, 0.01, 0.07)
+    rattle = noise(rng, len(rattle_t), 1500, 6000) * gate * envelope(rattle_t, 0.008, 0.04)
     add(out, 0.12 * rattle, 0.005)
-    return surroundings(rng, out, 0.8, 0.8)
+    return surroundings(rng, out, 0.8, 0.6)
 
 
 def glass_fragment(rng, size):
@@ -619,6 +671,7 @@ def bullet_flesh(rng, take):
 
 
 BULLETS = {
+    "ricochet": bullet_ricochet,
     "masonry": bullet_masonry,
     "tile": bullet_tile,
     "metal": bullet_metal,
@@ -679,15 +732,16 @@ def floor_contact(rng, floor, force, brightness):
         add(parts, 0.45 * knock(rng, 150, 600, 0.008), 0.0)
         add(parts, 0.3 * thump(rng, 100, 150, 0.012), 0.0)
     elif floor == "metal":
-        add(parts, 0.75 * slap(rng, 150, 2000, 0.003, brightness), 0.0)
-        # A steel deck plate: its modes ring on under the boot, which damps them a little.
-        freqs = np.exp(rng.uniform(np.log(70), np.log(4000), 16))
-        plate = [(f, (f / 300) ** -0.4 * rng.lognormal(0, 0.3), float(np.clip(0.18 * (300 / f) ** 0.5, 0.03, 0.25)))
-                 for f in freqs]
-        add(parts, 0.55 * unit(modes(0.5, plate, 0.0005, rng)), 0.0)
-        add(parts, 0.5 * knock(rng, 150, 650, 0.006), 0.0)
+        # A steel deck or floor plate under a boot. The rubber heel's few ms of contact barely reach the plate's
+        # upper modes, and a plate bolted to its frame or laid on a slab, with the boot standing on it, damps the rest
+        # within a tenth of a second (loss factor 2.5-5%): a hollow clank with no note to it. Grit and the lugs' edges
+        # tick on the bare steel.
+        add(parts, 0.75 * slap(rng, 150, 2200, 0.003, brightness), 0.0)
+        add(parts, 0.6 * soft_strike_modes(rng, 40, 120, 3000, rng.uniform(0.025, 0.05), rng.uniform(400, 600),
+                                           rng.uniform(300, 450)), 0.0)
+        add(parts, 0.55 * knock(rng, 150, 650, 0.006), 0.0)
         add(parts, 0.35 * thump(rng, 110, 160, 0.01), 0.0)
-        add(parts, 0.06 * crackle(rng, 0.03, int(rng.integers(4, 10)), 3000, 9000, 0.006), 0.0005)
+        add(parts, 0.08 * crackle(rng, 0.02, int(rng.integers(4, 10)), 3000, 10000, 0.004), 0.0005)
     elif floor == "dirt":
         add(parts, 0.5 * slap(rng, 100, 900, 0.006, 1.0), 0.0)
         add(parts, 0.65 * knock(rng, 150, 550, 0.01), 0.0)
@@ -1055,11 +1109,13 @@ def bounce(rng, body, floor):
             add(out, 0.3 * knock(rng, 300, 1500, 0.003), 0.0)
             add(out, 0.25 * structure(rng, 150, 700, 6, 0.008, 0.2), 0.0003)
         else:
-            # A steel deck or a plate rings on: the loudest floor to land a grenade on.
-            freqs = np.exp(rng.uniform(np.log(70), np.log(6000), 20))
-            plate = [(f, (f / 300) ** -0.3 * rng.lognormal(0, 0.3), float(np.clip(0.2 * (300 / f) ** 0.5, 0.03, 0.3)))
-                     for f in freqs]
-            add(out, 0.8 * unit(modes(0.7, plate, 0.0003, rng)), 0.0001)
+            # Steel on a steel deck: the hard contact reaches the plate's upper modes, a bright clank, the loudest
+            # floor to land a grenade on. A deck built into its frame damps them within a tenth of a second
+            # (structural_modes, loss 1.5-3%), where a hung plate would ring on.
+            add(out, 0.7 * structural_modes(rng, 48, 150, 8000, rng.uniform(0.015, 0.03), rng.uniform(800, 1400)),
+                0.0001)
+            add(out, 0.3 * knock(rng, 300, 1500, 0.003), 0.0)
+            add(out, 0.25 * structure(rng, 100, 500, 6, 0.012, 0.25), 0.0003)
     elif floor == "wood":
         # Floorboards over joists: the board's hollow modes carry most of it.
         add(out, 0.5 * spike(rng, 0.00012), 0.0)

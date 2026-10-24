@@ -1,0 +1,58 @@
+{
+  "revision": "round-clock-v1",
+  "accepted_utc": "2026-10-19T19:12:35.168752+00:00",
+  "request": "the white around the clock is weird",
+  "project_root": "C:\\sbox-projects\\hc1\\forked-shooter-main",
+  "generator": "Tools/belltower_clock.py",
+  "source_sha256": {
+    "Tools/belltower_clock.py": "eb3fc9882e2a162c5b4bf4b1be24b039ecfc336869caf34089b3338e8c349746",
+    "Tools/belltower_stage_clock.py": "cd7f4a25f7dc6ad8b70c80643b9c5b3ba0aa6a636d0930e0201afa598854003d",
+    "Tools/map_kit.py": "cc60204c747d064cb1fecdb666b24c847ae89dc863c2533d3811a0445f22020d",
+    "Tools/belltower_furniture.py": "36c83d4883b3084b90b3ff46d9ef56e5aef7cd916f9e4c399058884105974a24",
+    "Tools/belltower_map.py": "c5126278e1b9c7432cd18c21e7c035dbfa101dec2e990dc56d9573ecfba8c576",
+    "Tools/belltower_check_clock.py": "fd775bb057d5176a682af50486042f3f0f613970eb114c001c070630a8fdc47a",
+    "Sources/Belltower/editor/import-round-clocks-v1.cs.txt": "03e00bb927266fc80f6eceeb4e839d897fe6f6b15e24cf9bd55091dd6c0ab085"
+  },
+  "installed_mesh": {
+    "path": "Assets/models/maps/belltower/belltower_centre.obj",
+    "sha256": "e03df470f1b0e449d7618f2b88f4f396cf69b64f960c7f106a42e896c8388160"
+  },
+  "unchanged_textures": {
+    "Assets/materials/buildings/clock_color.png": "ff9338d097f7318e60dd1ae507c90b0b2b8c0e515d65a940f95d525a765d3b06",
+    "Assets/materials/buildings/clock_normal.png": "f59e7ec13357eb35b8348fb525a32691658654be9d24dd7b76e8e987b9e75f61",
+    "Assets/materials/buildings/clock_rough.png": "e5a32f76f930321213230ca389e817cdf2bf6de3361bdf8782df2da3288281c1"
+  },
+  "unchanged_model_resource_sha256": "a6d2aacd66f207c307b7e965bf9f5b6bfde61630dc69f0678ed57c30ffa54ab6",
+  "unchanged_material_mapping_sha256": "dc0ca367ec6676ba671c0ae1bc2eb043c9d8d5b0f092cf7f0b2b495df459645a",
+  "saved_scene_sha256": "5ea26d816c6b752225a5bd4ea2d761ba2791543c1ab7c89682f98d54219b373d",
+  "removed_triangles": 48,
+  "added_triangles": 8056,
+  "clock_count": 4,
+  "circular_dial_radius": 37.1,
+  "bronze_bezel_outer_radius": 40.6,
+  "bezel_maximum_projection": 3.45,
+  "new_materials": 0,
+  "new_game_objects": 0,
+  "new_colliders": 0,
+  "physics_unchanged": true,
+  "other_mesh_lines_preserved": true,
+  "verification": "output/belltower/clock-v1/verification.json",
+  "native_import": "output/belltower/clock-v1/stage/native-import.json",
+  "native_model_info": "output/belltower/clock-v1/native-model-info/asset_info.json",
+  "native_final_state": "output/belltower/clock-v1/status-final/editor_status.json",
+  "native_views": {
+    "front": {
+      "path": "output/belltower/quality/clock-v1-after/front.png",
+      "sha256": "0efeedea48be866f8700bc0af459fdb18afb857fa3bfa9378e0a23d89c2bc907"
+    },
+    "angle": {
+      "path": "output/belltower/quality/clock-v1-after/angle.png",
+      "sha256": "aa0d48f1034a6b04ec347d76cddf57523b3a489f2443994fc20515a2d29d31dd"
+    }
+  },
+  "review": "The opaque white corners and square stone backing are gone. The original dial marks and hands retain their scale and orientation; the circular bronze rim has a raised edge and casts a narrow shadow on the tower. Front and oblique native views reviewed.",
+  "native_visual_review_verified": true,
+  "native_play_test_performed": false,
+  "runtime_performance_verified": false,
+  "overall_map_quality_goal_complete": false
+}

@@ -1,0 +1,20 @@
+// Read-only inspection of the actual loaded models and casement material slots.
+var scene = Editor.SceneEditorSession.All.Single(s => s.Scene.Source?.ResourcePath?.Equals("scenes/maps/belltower/belltower.scene", StringComparison.OrdinalIgnoreCase) == true).Scene;
+var models = new System.Collections.Generic.List<object>();
+foreach (var part in new[] { "centre", "west", "east" })
+{
+    var path = "models/maps/belltower/belltower_" + part + ".vmdl";
+    var renderer = scene.GetAllComponents<ModelRenderer>().Single(r => r.Model?.ResourcePath?.Equals(path, StringComparison.OrdinalIgnoreCase) == true);
+    var slots = Enumerable.Range(0, renderer.Materials.Count).Select(i => new {
+        Index = i, Material = renderer.Materials.GetOverride(i) ?? renderer.Materials.GetOriginal(i)
+    }).Where(s => s.Material?.ResourcePath?.Contains("church-windows-v1/", StringComparison.OrdinalIgnoreCase) == true
+        || s.Material?.ResourcePath?.Contains("/trim_", StringComparison.OrdinalIgnoreCase) == true).ToArray();
+    if (renderer.Model.IsError || slots.Length < 4 || slots.Any(s => s.Material is null || s.Material.IsError))
+        throw new InvalidOperationException("Model or window material failed to load: " + part);
+    models.Add(new { Part = part, renderer.Model.IsError, MaterialSlots = renderer.Materials.Count,
+        WindowMaterials = slots.Select(s => new { s.Index, Path = s.Material.ResourcePath, s.Material.IsError }).ToArray() });
+}
+var result = new { Models = models, SceneDirty = Editor.SceneEditorSession.Active.HasUnsavedChanges, IsPlaying = Game.IsPlaying };
+var root = Sandbox.Project.Current.GetRootPath();
+System.IO.File.WriteAllText(System.IO.Path.Combine(root, "output/belltower/open-windows-v1/native-verify.json"), System.Text.Json.JsonSerializer.Serialize(result));
+return result;

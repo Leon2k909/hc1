@@ -1,0 +1,24 @@
+var session=Editor.SceneEditorSession.Active;
+if(session is null || !session.Scene.Source.ResourcePath.Equals("scenes/maps/belltower/belltower.scene",StringComparison.OrdinalIgnoreCase))
+    throw new InvalidOperationException("Requires the existing Belltower document.");
+var rows=new System.Collections.Generic.List<object>();
+foreach(var r in session.Scene.GetAllComponents<ModelRenderer>())
+{
+    var path=r.Model?.ResourcePath;
+    if(path is null)continue;
+    if(path.EndsWith("belltower_west.vmdl") || path.EndsWith("belltower_east.vmdl"))
+    {
+        var materials=Enumerable.Range(0,r.Materials.Count).Select(i=>r.Materials.GetOverride(i)??r.Materials.GetOriginal(i)).Where(m=>m is not null).ToArray();
+        if(r.Model.IsError || !materials.Any(m=>m.ResourcePath.Contains("gazebo_copper.vmat")) ||
+            !materials.Any(m=>m.ResourcePath.Contains("shed_lock_steel.vmat")) ||
+            !materials.Any(m=>m.ResourcePath.Contains("scarecrow")))
+            throw new InvalidOperationException("The live town model has not loaded the replacement materials: "+path);
+        rows.Add(new {r.GameObject.Name,Path=path,Error=r.Model.IsError,
+            ReplacementMaterials=materials.Where(m=>m.ResourcePath.Contains("gazebo")||m.ResourcePath.Contains("shed_lock")||m.ResourcePath.Contains("scarecrow")).Select(m=>new{m.ResourcePath,m.IsError}).ToArray()});
+    }
+    if(path.Contains("shop-display"))rows.Add(new {r.GameObject.Name,Path=path,Enabled=r.Enabled,Error=r.Model.IsError});
+}
+var result=new {Models=rows,Unsaved=session.HasUnsavedChanges,Playing=Game.IsPlaying};
+var output=System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(),"output/belltower/roof-lock-apply/native-loaded-models.json");
+System.IO.File.WriteAllText(output,System.Text.Json.JsonSerializer.Serialize(result));
+return result;

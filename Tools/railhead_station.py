@@ -598,8 +598,10 @@ def footbridge( model, glass ):
         D.bridge_panel_outer( model, side_n, out, runs, DECK_Z, 248.0, seed=int( abs( side_n ) ) )
     model.box( ( 0, n0 - 6, BRIDGE_ROOF ), ( WALL_IN, n1 + 6, BRIDGE_ROOF + 6 ),
                { "+z": "corrugated", "-z": "corrugated", "default": "rw_steel_dark", "-e": None }, SHEET )
+    # The ceiling battens across the bridge, between the I-beams, fixed to the undersides of the two purlins they
+    # cross (railhead_architecture.footbridge). Set flush with the roof, they ran through the purlins.
     for k in range( int( WALL_IN // 120 ) ):
-        luminaire( model, ( 60.0 + 120.0 * k, ( n0 + n1 ) / 2, BRIDGE_ROOF ), "n" )
+        luminaire( model, ( 60.0 + 120.0 * k, ( n0 + n1 ) / 2, BRIDGE_ROOF - A.BRIDGE_PURLIN_D ), "n" )
     A.footbridge( model, n0, n1, BRIDGE_ROOF, DECK_Z, WALL_IN, ( 510.0, 755.0, 935.0 ), BRIDGE_STAIRS, DECK_Z + 36 )
     for e0, e1, down in BRIDGE_STAIRS:
         bridge_stair( model, e0, e1, down )
@@ -687,13 +689,23 @@ def canopies( model ):
             for cn in CANOPY_COLUMNS_N:
                 model.collision_box( ( col - 5, cn - 5, 0 ), ( col + 5, cn + 5, CANOPY_Z - 12 ), METAL )
                 A.canopy_column( model, col, cn, CANOPY_Z )
-        # Lamps under it, in lines along it.
+        # Lamps under it, in lines along it, one in each bay between the cantilevers. A line that runs along a purlin
+        # (the outer canopy's west one) is fixed to its underside; set flush with the sheeting it was inside the purlin.
+        purlins = A.canopy_purlins( spine, [ e1 ] if col is None else [ e0, e1 ] )
         for le in ( ( e0 + e1 ) / 2 - 70, ( e0 + e1 ) / 2 + 70 ) if e1 - e0 > 200 else ( ( e0 + e1 ) / 2 + 20, ):
-            n = n0 + 50
-            while n < n1 - 30:
-                luminaire( model, ( le, n + 24, CANOPY_Z ), "n" )
-                n += 120
+            top = CANOPY_Z - A.CANOPY_PURLIN_D if any( abs( le - r ) < 3.0 for r in purlins ) else CANOPY_Z
+            for n in CANOPY_BATTENS_N:
+                luminaire( model, ( le, n, top ), "n" )
     return spine
+
+
+# The canopies' battens' centres along n: one in each bay between the cantilevers (railhead_architecture's
+# CANOPY_BEAMS_N, 6 wide), at least 2.5 clear of their flanges, and over railhead_map.CANOPY_LAMPS' lights (n -1626 and
+# -1506). Every 120 from n -1626, they ran through the cantilevers at n -1620 and -1520.
+CANOPY_BATTENS_N = ( -1656.0, -1570.0, -1484.0, -1382.0 )
+BATTEN_HALF = 30.4          # luminaire's half length with its end caps
+for _n in CANOPY_BATTENS_N:
+    assert all( abs( _n - b ) >= BATTEN_HALF + 3.0 + 2.5 for b in A.CANOPY_BEAMS_N ), _n
 
 
 # ---------------------------------------------------------------------------------------------------------------------

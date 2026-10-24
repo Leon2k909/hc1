@@ -2485,25 +2485,34 @@ BENCH_SEAT = 17.7           # 450 mm
 
 def bench( model, e, n, z0=0.0, facing="+e", length=78.7, slats="rw_wood", frame=DARK ):
     """ A platform bench (2 m by default): four varnished hardwood seat slats 450 mm up and three in a backrest leaning
-    back 14 degrees, on anthracite steel frames of 40 mm square tube at each end (and the middle of a long one). The
-    footprint is 560 mm deep. Wooden collision: the seat down to the floor, and the backrest. """
+    back 14 degrees, their edges eased (railhead_bench.slat), on anthracite steel frames of 40 mm square tube at each
+    end (and the middle of a long one, with its cast armrest). The footprint is 560 mm deep. Wooden collision: the seat
+    down to the floor, and the backrest. """
     F = frame_for( e, n, z0, facing )
-    model.grain_paints.add( slats )
     c, hl = 2.55, length / 2                                    # c centres the footprint (the backrest leans out)
     width = ( 16.5 - 3 * 0.5 ) / 4
-    for k in range( 4 ):
-        y0 = -8.0 + c + k * ( width + 0.5 )
-        try:
-            import railhead_buffer as B
-            B.bevel_box( model, F, ( -hl, y0, BENCH_SEAT - 1.3 ), ( hl, y0 + width, BENCH_SEAT ), slats, 0.55 )
-        except Exception:
-            F.box( model, -hl, hl, y0, y0 + width, BENCH_SEAT - 1.3, BENCH_SEAT, slats )
     t = math.radians( 14.0 )
     up, nrm = np.array( ( 0.0, -math.sin( t ), math.cos( t ) ) ), np.array( ( 0.0, math.cos( t ), math.sin( t ) ) )
     base = np.array( ( 0.0, -8.6 + c, 19.0 ) )
-    for k in range( 3 ):
-        centre = base + up * ( 1.75 + k * 4.05 ) - nrm * 0.6
-        _obox( model, F, centre, ( 1, 0, 0 ), nrm, ( length, 1.2, 3.5 ), slats )
+    try:
+        # Eased slats with their own UVs, one plank of rw_wood to a face, and end grain at their ends.
+        import railhead_bench as RBN
+        for k in range( 4 ):
+            y0 = -8.0 + c + k * ( width + 0.5 )
+            RBN.slat( model, F, -hl, hl, ( y0 + width / 2, BENCH_SEAT - 0.65 ), ( 1.0, 0.0 ), ( 0.0, 1.0 ), width, 1.3,
+                      slats, index=k )
+        for k in range( 3 ):
+            centre = base + up * ( 1.75 + k * 4.05 ) - nrm * 0.6
+            RBN.slat( model, F, -hl, hl, centre[1:], up[1:], nrm[1:], 3.5, 1.2, slats, index=4 + k )
+    except Exception as error:
+        print( f"railhead_bench.slat failed: {error}" )
+        model.grain_paints.add( slats )
+        for k in range( 4 ):
+            y0 = -8.0 + c + k * ( width + 0.5 )
+            F.box( model, -hl, hl, y0, y0 + width, BENCH_SEAT - 1.3, BENCH_SEAT, slats )
+        for k in range( 3 ):
+            centre = base + up * ( 1.75 + k * 4.05 ) - nrm * 0.6
+            _obox( model, F, centre, ( 1, 0, 0 ), nrm, ( length, 1.2, 3.5 ), slats )
     posts = [ -hl + 7.0, hl - 7.0 ] + ( [ 0.0 ] if length > 70.0 else [] )
     back0, back1 = base - nrm * 2.0 - up * 3.0, base - nrm * 2.0 + up * 11.0
     try:
@@ -2521,7 +2530,7 @@ def bench( model, e, n, z0=0.0, facing="+e", length=78.7, slats="rw_wood", frame
         import railhead_furniture as FU
         if cast is not None:
             cast( model, F, posts, c, BENCH_SEAT, frame, ( back0[1], back0[2] ), ( back1[1], back1[2] ) )
-        FU.bench_details( model, F, posts, c, BENCH_SEAT, frame )
+        FU.bench_details( model, F, posts, c, BENCH_SEAT, frame, backrest=( base[1], base[2], t ) )
     except Exception as error:
         print( f"railhead_furniture.bench_details failed: {error}" )
     F.collide( model, -hl, hl, -9.4 + c, 8.5 + c, 0.0, BENCH_SEAT, "wood" )

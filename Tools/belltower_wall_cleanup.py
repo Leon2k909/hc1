@@ -55,9 +55,12 @@ def visible_pieces(points):
     normal = np.cross(original[1]-original[0], original[2]-original[0])
     if np.allclose([p[1] for p in original], 1800) and normal[1] > 0:
         return [original]  # exposed north-row foundation, facing away from town
+    # This boundary faces the flat garden, not the rising road on its other
+    # side. Subtracting the ramp here leaves a triangular hole above the grass.
+    garden_ramp_face = np.allclose([p[0] for p in original], -1850, rtol=0, atol=1e-7) and normal[0] > 0
     def floor_at(p):
         e, n, _ = p
-        if e <= -1850 and n < -1000:
+        if e <= -1850 and n < -1000 and not garden_ramp_face:
             return float(np.clip(.24*n+240, -48, 0))
         return -48 if n < -1000 else 0
     if normal[2] > 0 and all(abs(p[2]-floor_at(p)) < 1e-7 for p in original):
@@ -65,7 +68,9 @@ def visible_pieces(points):
     # A face wholly under the floor needs no seam overlap of its own.
     overlap = 0 if all(p[2] <= floor_at(p)+1e-7 for p in original) else 2
     pieces = [original]
-    for planes in ground_volumes(overlap):
+    for volume_index, planes in enumerate(ground_volumes(overlap)):
+        if volume_index == 2 and garden_ramp_face:
+            continue
         remaining = []
         for polygon in pieces:
             inside = polygon

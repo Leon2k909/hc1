@@ -196,7 +196,9 @@ public sealed partial class ViewModelClothing : Component, ICameraSetup
 	// Every camera in the scene runs this, so only the player's view (not a scope's lens or the minimap) places the body.
 	void ICameraSetup.LateSetup( CameraComponent cc )
 	{
-		if ( cc.IsMainCamera ) Apply( cc.WorldTransform );
+		if ( !cc.IsMainCamera ) return;
+		if ( _root.IsValid() && _root.Active ) RequestDetailedTextureMips();
+		Apply( cc.WorldTransform );
 	}
 
 	/// <param name="eye">The camera's world transform, where the body's eyes go.</param>

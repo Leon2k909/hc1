@@ -1,0 +1,44 @@
+{
+  "revision": "garden-well-v1",
+  "state": "standalone replacement installed; live-map replacement staged, not applied",
+  "updated_utc": "2026-10-20T11:59:36.714317+00:00",
+  "generator": "Tools/belltower_well.py",
+  "generator_sha256": "76fb5ffe47e90e07c3388c23d749295788ba16992a38a9cbb00370eec7b9daa0",
+  "standalone_model": "models/maps/belltower/well-v1/garden_well.vmdl",
+  "private_assets": {
+    "Assets/models/maps/belltower/well-v1/garden_well.mtl": "9713ba87343bd1b7e14ff1484b993282e722e67dfbbd15de99ed8a7f0d69eb8a",
+    "Assets/models/maps/belltower/well-v1/garden_well.obj": "f737a8628a20f042770a941f1bb3c5fd30453f9bf190e3ec9acaec99decc4a6b",
+    "Assets/models/maps/belltower/well-v1/garden_well.vmdl": "a5c0aa72dbc84de59992b773ee34b9b0f2899b5a44bccf47f80e36ba3e7cfde3",
+    "Assets/materials/belltower/well-v1/well_cut_stone.vmat": "422541497d425163e14b6da6a79b2485430c23554bb51a355516145b7af27fec",
+    "Assets/materials/belltower/well-v1/well_damp_stone.vmat": "446c71841b90602170c2db41cdb930013a8537b00c111df2114c95a225787e07",
+    "Assets/materials/belltower/well-v1/well_depth.vmat": "3ac1aa7f64d3b96168f196c127e929cd61d175d8974b44a2763c0422f6c65ceb",
+    "Assets/materials/belltower/well-v1/well_mortar.vmat": "d11c5bad0966f43b239bac7e9fd04bb4be1d2c365b4fab1b3496e6ee31bbeb85",
+    "Assets/materials/belltower/well-v1/well_water.vmat": "6b54ea8c9edcaab9a20d1914ecb90a278718dd30d36591963fcd2b0ddceb54b6"
+  },
+  "stones": 60,
+  "triangles": 4944,
+  "water_level_delta_inches": -5,
+  "construction_views": [
+    {
+      "path": "output/belltower/well-v1/preview/above.png",
+      "sha256": "040bd85a1be62209b19d711fc47cbb2f88a39fb178010b5e6ce937a431857467"
+    },
+    {
+      "path": "output/belltower/well-v1/preview/low.png",
+      "sha256": "6963293c7c215eaaadadbded9c2c5c2a2a263c19a11452d0a8d3046125761307"
+    }
+  ],
+  "construction_preview_renderer": "Blender 5.1.1, CPU, 24 samples",
+  "native_appearance_verified": false,
+  "native_resource_compilation_verified": false,
+  "publication_helper_api_compile_verified": true,
+  "main_scene_and_source_not_changed_by_this_task": true,
+  "existing_centre_assets_unchanged": true,
+  "publication_requires_main_chat_editor_slot": true,
+  "staged_replacement": "output/belltower/well-v1/stage/manifest.json",
+  "source_integration_patch": "output/belltower/well-v1/source-integration.patch",
+  "preservation_verification": "output/belltower/well-v1/verification.json",
+  "source_revalidation": "output/belltower/well-v1/source-revalidation.json",
+  "publication_helper": "Sources/Belltower/editor/import-garden-well-v1.cs.txt",
+  "native_blocker": "No running editor reported by the installed CLI during import and private-resource installation; no editor was launched."
+}

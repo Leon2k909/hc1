@@ -19,6 +19,10 @@ def wall_moulding(model, wall, r0, r1, z0, profile, paint):
     Horizontal steps create the lips and shadow gaps. Each return is split into
     monotone strips so projecting cornices have no overlapping cap triangles.
     """
+    # Street plaques stand only an inch off the wall. Record the actual stone
+    # envelope so their placement can clear projecting window hoods and sills.
+    wall.plaque_obstacles = list(getattr(wall, 'plaque_obstacles', ())) + [
+        (r0, r1, z0+profile[0][1], z0+profile[-1][1])]
     d, sign = wall.outer()
     axis = np.array((1.,0.,0.)) if wall.axis == 'e' else np.array((0.,1.,0.))
     out = np.array((0.,sign,0.)) if wall.axis == 'e' else np.array((sign,0.,0.))

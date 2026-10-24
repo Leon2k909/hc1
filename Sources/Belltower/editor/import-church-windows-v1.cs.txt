@@ -1,0 +1,72 @@
+// Publish only the facade's guarded visual resources. Existing fountain imports
+// and all scene, gameplay, camera and physics data remain unchanged.
+var root = Sandbox.Project.Current.GetRootPath();
+var folder = System.IO.Path.Combine(root, "output/belltower/church-windows-v1");
+var revision = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder, "import-request.json")))["revision"].GetValue<string>();
+if (!System.Text.RegularExpressions.Regex.IsMatch(revision, "^[a-z0-9-]+$")) throw new InvalidOperationException("Invalid revision.");
+var manifest = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder, revision, "stage/manifest.json")));
+if (manifest["revision"].GetValue<string>() != "church-windows-v1") throw new InvalidOperationException("Wrong manifest.");
+var selected = Editor.SceneEditorSession.Active;
+var playing = Game.IsPlaying;
+var game = Game.ActiveScene?.Id;
+var dirty = selected?.HasUnsavedChanges;
+if (playing) throw new InvalidOperationException("Inspect the running play session before importing the windows.");
+string Hash(string path) => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+foreach (var group in new[] { "source_sha256", "protected_sha256" })
+    foreach (var pair in manifest[group].AsObject())
+        if (Hash(System.IO.Path.Combine(root, pair.Key)) != pair.Value.GetValue<string>()) throw new InvalidOperationException("Shared input changed: " + pair.Key);
+var plans = new System.Collections.Generic.List<(string Source, string Target, string Backup, string After, int Order)>();
+foreach (var pair in manifest["files"].AsObject())
+{
+    var relative = pair.Key;
+    if (!(relative.StartsWith("Assets/models/maps/belltower/church-windows-v1/", StringComparison.Ordinal)
+        || relative.StartsWith("Assets/materials/belltower/church-windows-v1/", StringComparison.Ordinal)
+        || relative == "Assets/models/maps/belltower/belltower_centre.obj"
+        || relative == "Assets/models/maps/belltower/belltower_centre.mtl"
+        || relative == "Assets/models/maps/belltower/belltower_centre.vmdl") || relative.Contains(".."))
+        throw new InvalidOperationException("Unexpected target.");
+    var source = System.IO.Path.Combine(root, pair.Value["source"].GetValue<string>());
+    var target = System.IO.Path.Combine(root, relative);
+    var after = pair.Value["after"].GetValue<string>();
+    var before = pair.Value["before"]?.GetValue<string>();
+    var backup = before is null ? null : System.IO.Path.Combine(root, pair.Value["backup"].GetValue<string>());
+    if (Hash(source) != after || (backup is not null && Hash(backup) != before)) throw new InvalidOperationException("Stage or backup differs.");
+    if (System.IO.File.Exists(target) && Hash(target) == after) continue;
+    if (before is null ? System.IO.File.Exists(target) : !System.IO.File.Exists(target) || Hash(target) != before)
+        throw new InvalidOperationException("Shared target changed: " + relative);
+    var order = relative.EndsWith(".vmdl", StringComparison.Ordinal) ? 2 : relative.StartsWith("Assets/materials/", StringComparison.Ordinal) ? 0 : 1;
+    plans.Add((source, target, backup, after, order));
+}
+var changed = new System.Collections.Generic.List<(string Target, string Backup)>();
+try
+{
+    foreach (var item in plans.OrderBy(p => p.Order))
+    {
+        System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(item.Target));
+        var incoming = item.Target + ".church-windows-v1-incoming";
+        try
+        {
+            System.IO.File.Copy(item.Source, incoming, true);
+            if (Hash(incoming) != item.After) throw new InvalidOperationException("Incoming checksum failed.");
+            System.IO.File.Move(incoming, item.Target, true);
+            changed.Add((item.Target, item.Backup));
+        }
+        finally { if (System.IO.File.Exists(incoming)) System.IO.File.Delete(incoming); }
+    }
+}
+catch
+{
+    foreach (var item in changed.AsEnumerable().Reverse())
+        if (item.Backup is not null) System.IO.File.Copy(item.Backup, item.Target, true);
+        else if (System.IO.File.Exists(item.Target)) System.IO.File.Delete(item.Target);
+    throw;
+}
+foreach (var item in plans.OrderBy(p => p.Order)) Editor.AssetSystem.RegisterFile(item.Target);
+foreach (var pair in manifest["protected_sha256"].AsObject())
+    if (Hash(System.IO.Path.Combine(root, pair.Key)) != pair.Value.GetValue<string>()) throw new InvalidOperationException("Protected resource changed: " + pair.Key);
+var preserved = ReferenceEquals(selected, Editor.SceneEditorSession.Active) && playing == Game.IsPlaying && game == Game.ActiveScene?.Id && dirty == selected?.HasUnsavedChanges;
+var result = new { Revision = revision, Imported = plans.Count, Windows = 3,
+    EditorStatePreserved = preserved, SceneChanged = false, PhysicsChanged = false, FountainChanged = false };
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder, revision, "native-import.json"), System.Text.Json.JsonSerializer.Serialize(result));
+if (!preserved) throw new InvalidOperationException("Editor state changed during publication; inspect the completed result before continuing.");
+return result;

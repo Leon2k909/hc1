@@ -1,0 +1,67 @@
+// Fountain-only import. No scene switching, play changes, camera changes or saves.
+var root=Sandbox.Project.Current.GetRootPath();
+var folder=System.IO.Path.Combine(root,"output/belltower/fountain-water-v2");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"stage/manifest.json")));
+var phase=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"import-phase.json")))["phase"].GetValue<string>();
+if(phase!="shaders" && phase!="publish") throw new InvalidOperationException("Unknown import phase.");
+var allowed=new System.Collections.Generic.HashSet<string>{
+    "Assets/shaders/belltower_fountain_surface_v2.shader","Assets/shaders/belltower_fountain_stream_v2.shader",
+    "Assets/materials/belltower/fountain_water.vmat","Assets/materials/belltower/fountain_jet.vmat",
+    "Assets/models/maps/belltower/belltower_centre.obj"};
+var selected=Editor.SceneEditorSession.Active;var playing=Game.IsPlaying;var game=Game.ActiveScene?.Id;
+var dirty=selected?.HasUnsavedChanges;
+if(phase=="publish" && playing && Game.ActiveScene.GetAllComponents<ModelRenderer>().Any(r=>
+    r.Model?.ResourcePath?.Equals("models/maps/belltower/belltower_centre.vmdl",StringComparison.OrdinalIgnoreCase)==true))
+    throw new InvalidOperationException("Wait for the current Belltower play session to finish before importing its water mesh.");
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+var scenePath=System.IO.Path.Combine(root,"Assets/scenes/maps/Belltower/belltower.scene");var sceneHash=Hash(scenePath);
+foreach(var group in new[]{"source_sha256","protected_sha256"})
+    foreach(var pair in manifest[group].AsObject())
+        if(Hash(System.IO.Path.Combine(root,pair.Key))!=pair.Value.GetValue<string>()) throw new InvalidOperationException("Input changed: "+pair.Key);
+var plans=new System.Collections.Generic.List<(string Source,string Target,string Backup,string After)>();
+foreach(var pair in manifest["files"].AsObject())
+{
+    if(!allowed.Contains(pair.Key)) throw new InvalidOperationException("Unexpected target.");
+    if(phase=="shaders" && !pair.Key.EndsWith(".shader",StringComparison.Ordinal)) continue;
+    var source=System.IO.Path.Combine(root,pair.Value["source"].GetValue<string>());
+    var target=System.IO.Path.Combine(root,pair.Key);
+    var after=pair.Value["after"].GetValue<string>();
+    var before=pair.Value["before"]?.GetValue<string>();
+    var backup=before is null?null:System.IO.Path.Combine(root,pair.Value["backup"].GetValue<string>());
+    if(Hash(source)!=after || (backup is not null && Hash(backup)!=before)) throw new InvalidOperationException("Stage or backup changed.");
+    if(System.IO.File.Exists(target) && Hash(target)==after) continue;
+    if(before is null?System.IO.File.Exists(target):!System.IO.File.Exists(target)||Hash(target)!=before)
+        throw new InvalidOperationException("Shared target changed: "+pair.Key);
+    plans.Add((source,target,backup,after));
+}
+var changed=new System.Collections.Generic.List<(string Target,string Backup)>();
+try
+{
+    foreach(var item in plans.OrderBy(p=>p.Target.EndsWith(".obj",StringComparison.Ordinal)?2:p.Target.EndsWith(".vmat",StringComparison.Ordinal)?1:0))
+    {
+        System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(item.Target));
+        var incoming=item.Target+".fountain-water-v2-incoming";
+        try
+        {
+            System.IO.File.Copy(item.Source,incoming,true);
+            if(Hash(incoming)!=item.After) throw new InvalidOperationException("Incoming checksum failed.");
+            System.IO.File.Move(incoming,item.Target,true);changed.Add((item.Target,item.Backup));
+        }
+        finally {if(System.IO.File.Exists(incoming)) System.IO.File.Delete(incoming);}
+    }
+}
+catch
+{
+    foreach(var item in changed.AsEnumerable().Reverse())
+        if(item.Backup is not null) System.IO.File.Copy(item.Backup,item.Target,true);
+        else if(System.IO.File.Exists(item.Target)) System.IO.File.Delete(item.Target);
+    throw;
+}
+foreach(var item in plans) Editor.AssetSystem.RegisterFile(item.Target);
+var preserved=ReferenceEquals(selected,Editor.SceneEditorSession.Active)&&playing==Game.IsPlaying&&game==Game.ActiveScene?.Id
+    &&dirty==selected?.HasUnsavedChanges&&sceneHash==Hash(scenePath);
+var result=new {Phase=phase,Imported=plans.Count,EditorStatePreserved=preserved,SceneSha256=sceneHash,
+    SceneChanged=false,CollisionChanged=false,OtherCentreMeshBytesPreserved=true,ForcedFullCompile=false};
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"native-import-"+phase+".json"),System.Text.Json.JsonSerializer.Serialize(result));
+if(!preserved) throw new InvalidOperationException("Editor state changed during import; inspect before further work.");
+return result;

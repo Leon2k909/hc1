@@ -1,0 +1,22 @@
+// Shader sources use EditorUtility; the generic asset compiler does not handle them.
+var root=Sandbox.Project.Current.GetRootPath();
+var stage=System.IO.Path.Combine(root,"output/belltower/planter-v1/stage");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(stage,"manifest.json")));
+var relative="shaders/belltower_planter_v1.shader";
+string Hash(string path)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+var source=System.IO.Path.Combine(root,"Assets",relative);
+var expected=manifest["files"]["Assets/"+relative]["after"].GetValue<string>();
+if (Hash(source)!=expected) throw new InvalidOperationException("Imported shader changed.");
+var selected=Editor.SceneEditorSession.Active;var game=Game.ActiveScene?.Id;var playing=Game.IsPlaying;
+var pending=Editor.EditorUtility.CompileShader(relative,new(),cancellationToken);
+await pending;
+var reported=pending.GetType().GetProperty("Result")?.GetValue(pending);
+var success=reported is bool b?b:reported?.GetType().GetProperty("Success")?.GetValue(reported) as bool?;
+var compiled=source+"_c";
+if (success==false || !System.IO.File.Exists(compiled) || System.IO.File.GetLastWriteTimeUtc(compiled)<System.IO.File.GetLastWriteTimeUtc(source)
+    || Hash(source)!=expected) throw new InvalidOperationException("Shader compilation did not produce a current resource.");
+var preserved=ReferenceEquals(selected,Editor.SceneEditorSession.Active) && Game.ActiveScene?.Id==game && Game.IsPlaying==playing;
+if (!preserved) throw new InvalidOperationException("Editor state changed during shader compilation.");
+var result=new {Shader=relative,CompilerReportedSuccess=success,SourceSha256=Hash(source),CompiledFileSha256=Hash(compiled),EditorStatePreserved=preserved};
+System.IO.File.WriteAllText(System.IO.Path.Combine(stage,"native-compile-shader.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

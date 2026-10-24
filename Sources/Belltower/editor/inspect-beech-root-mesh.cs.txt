@@ -1,0 +1,10 @@
+// Read-only model coordinates; no scene or renderer mutation.
+var model=Model.Load("models/sbox_props/shrubs/beech/beech_bush_small.vmdl");
+if (model is null || model.IsError) throw new InvalidOperationException("Beech model is unavailable.");
+var vertices=model.GetVertices();
+var positions=vertices.Select(v=>new[]{v.Position.x,v.Position.y,v.Position.z}).ToArray();
+var path=System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(),"output/belltower/bush-grounding/beech-root-vertices.json");
+System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(path));
+System.IO.File.WriteAllText(path,System.Text.Json.JsonSerializer.Serialize(positions));
+return new {Vertices=positions.Length,Materials=model.GetMaterials(0).Select(m=>m.ResourcePath).ToArray(),
+    CentralLowPoints=positions.Where(p=>p[0]*p[0]+p[1]*p[1]<25 && p[2]<10).OrderBy(p=>p[2]).Take(15).ToArray()};

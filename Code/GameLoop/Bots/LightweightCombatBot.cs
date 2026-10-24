@@ -72,7 +72,7 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 
 	public bool IsAlive => HealthComponent.IsValid() && HealthComponent.State == LifeState.Alive;
 	public Vector3 EyePosition => WorldTransform.PointToWorld( Vector3.Lerp(
-		BotPronePose.EyeOffset( IsCrouching, _proneBlend ), SlideEye, SlideBlend ) );
+		BotPronePose.EyeOffset( CrouchBlend, _proneBlend ), SlideEye, SlideBlend ) );
 
 	[Sync( SyncFlags.FromHost ), Property, ReadOnly] public int Kills { get; private set; }
 	[Sync( SyncFlags.FromHost ), Property, ReadOnly] public int Deaths { get; private set; }
@@ -351,6 +351,9 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 
 		var dropped = DroppedEquipment.Create( WeaponResource, position, rotation, networkSpawn: false );
 		dropped.ApplySavedAttachments = false;
+		// On the floor it keeps the suppressor it had in the bot's hands (see the weapon model above).
+		if ( IsSuppressed )
+			dropped.Build = Gunsmith.GunsmithLoadoutManager.BuildCode( WeaponResource, MuzzlePart );
 		var templateAmmo = WeaponResource.MainPrefab.IsValid()
 			? WeaponResource.MainPrefab.GetComponentInChildren<WeaponAmmo>( true )
 			: null;
@@ -714,7 +717,7 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 
 			// The procedural slide controls the hips and knees; the graph's crouch
 			// pose otherwise keeps the bot balled up while moving along the floor.
-			Renderer.Set( "duck", IsCrouching && _proneBlend <= 0f ? 1f - SlideBlend : 0f );
+			Renderer.Set( "duck", _proneBlend <= 0f ? CrouchBlend * (1f - SlideBlend) : 0f );
 
 		// The host decides where the bot aims and syncs it, so every client sees it look at what it's shooting.
 		var aim = LiveAimDirection.IsNearZeroLength ? WorldRotation.Forward : LiveAimDirection;

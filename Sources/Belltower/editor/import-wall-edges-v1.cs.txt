@@ -1,0 +1,73 @@
+// Publish only the checksum-pinned wall-edge mesh patch through the live editor.
+var root = Sandbox.Project.Current.GetRootPath();
+var directory = System.IO.Path.Combine(root, "output/belltower/wall-edges/revision2");
+var manifest = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(directory, "stage/manifest.json")));
+var session = Editor.SceneEditorSession.Active;
+if (Game.IsPlaying || session is null || !session.Scene.IsEditor || session.HasUnsavedChanges ||
+    !session.Scene.Source.ResourcePath.Equals("scenes/maps/belltower/belltower.scene", StringComparison.OrdinalIgnoreCase))
+    throw new InvalidOperationException("Requires the active, stopped, saved Belltower document.");
+string Hash(string path) => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+var scenePath = System.IO.Path.Combine(root, "Assets/scenes/maps/Belltower/belltower.scene");
+var sceneHash = Hash(scenePath);
+if (sceneHash != manifest["scene_sha256"].GetValue<string>()) throw new InvalidOperationException("Saved shared scene changed since staging.");
+foreach (var group in new[] { "source_sha256", "protected_sha256" })
+    foreach (var pair in manifest[group].AsObject())
+        if (Hash(System.IO.Path.Combine(root, pair.Key)) != pair.Value.GetValue<string>())
+            throw new InvalidOperationException("Input changed: " + pair.Key);
+var ids = session.Scene.GetAllObjects(true).Select(o => o.Id).ToHashSet();
+var plan = new System.Collections.Generic.List<(string Source, string Target, string Backup, string Before, string After)>();
+foreach (var pair in manifest["files"].AsObject())
+{
+    var relative = pair.Key;
+    bool allowed = relative.StartsWith("Assets/models/maps/belltower/wall-edges-v1/", StringComparison.Ordinal)
+        && (relative.EndsWith(".obj", StringComparison.Ordinal) || relative.EndsWith(".mtl", StringComparison.Ordinal));
+    allowed |= relative.StartsWith("Assets/models/maps/belltower/compiler-safe/", StringComparison.Ordinal) && relative.EndsWith(".obj", StringComparison.Ordinal);
+    allowed |= new[] { "west", "east" }.Any(side => relative == "Assets/models/maps/belltower/belltower_" + side + ".obj"
+        || relative == "Assets/models/maps/belltower/belltower_" + side + ".vmdl");
+    if (!allowed || relative.Contains("..")) throw new InvalidOperationException("Unexpected target.");
+    var source = System.IO.Path.Combine(root, pair.Value["source"].GetValue<string>());
+    var target = System.IO.Path.Combine(root, relative);
+    var backup = pair.Value["backup"] is null ? null : System.IO.Path.Combine(root, pair.Value["backup"].GetValue<string>());
+    var before = pair.Value["before"]?.GetValue<string>();
+    var after = pair.Value["after"].GetValue<string>();
+    if (Hash(source) != after || (backup is not null && Hash(backup) != before)) throw new InvalidOperationException("Stage or backup changed: " + relative);
+    var current = System.IO.File.Exists(target) ? Hash(target) : null;
+    if (current == after) continue;
+    if (current != before) throw new InvalidOperationException("Shared asset changed: " + relative);
+    plan.Add((source, target, backup, before, after));
+}
+if (!manifest["original_collision_exact"].GetValue<bool>() || !manifest["all_other_town_wall_geometry_exact"].GetValue<bool>())
+    throw new InvalidOperationException("Missing preservation proof.");
+var changed = new System.Collections.Generic.List<(string Target, string Backup)>();
+try
+{
+    // Source pieces first; model descriptions last, so all imports exist already.
+    foreach (var item in plan.OrderBy(p => p.Target.EndsWith(".vmdl", StringComparison.Ordinal) ? 2 : p.Before is null ? 0 : 1))
+    {
+        System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(item.Target));
+        var incoming = item.Target + ".wall-edges-incoming";
+        try
+        {
+            System.IO.File.Copy(item.Source, incoming, true);
+            if (Hash(incoming) != item.After) throw new InvalidOperationException("Incoming checksum failed.");
+            changed.Add((item.Target, item.Backup));
+            System.IO.File.Move(incoming, item.Target, true);
+        }
+        finally { if (System.IO.File.Exists(incoming)) System.IO.File.Delete(incoming); }
+    }
+}
+catch
+{
+    foreach (var item in changed.AsEnumerable().Reverse())
+        if (item.Backup is null) System.IO.File.Delete(item.Target);
+        else System.IO.File.Copy(item.Backup, item.Target, true);
+    throw;
+}
+foreach (var item in plan) Editor.AssetSystem.RegisterFile(item.Target);
+if (Hash(scenePath) != sceneHash || session.HasUnsavedChanges || Game.IsPlaying || !ReferenceEquals(session, Editor.SceneEditorSession.Active)
+    || !session.Scene.GetAllObjects(true).Select(o => o.Id).ToHashSet().SetEquals(ids))
+    throw new InvalidOperationException("Editor state changed during import; inspect before further edits.");
+var result = new { Imported = plan.Count, GateTowers = 4, SceneUnchanged = true, OriginalCollisionPreserved = true,
+    BoundedImportsPreserved = true, NewSceneObjects = 0, ForcedFullCompile = false };
+System.IO.File.WriteAllText(System.IO.Path.Combine(directory, "native-import.json"), System.Text.Json.JsonSerializer.Serialize(result));
+return result;

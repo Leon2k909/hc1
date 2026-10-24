@@ -1,0 +1,74 @@
+// Publish only checked Belltower render sources, through the open editor.
+var root=Sandbox.Project.Current.GetRootPath();
+var folder=System.IO.Path.Combine(root,"output/belltower/edge-realism-v1");
+var stage=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"import-request.json")))["stage"].GetValue<string>();
+if(!System.Text.RegularExpressions.Regex.IsMatch(stage,"^[a-z0-9-]+$")) throw new InvalidOperationException("Invalid stage name.");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,stage,"manifest.json")));
+if(manifest["revision"].GetValue<string>()!="belltower-stone-wear-v1") throw new InvalidOperationException("Wrong stone-wear revision.");
+var selected=Editor.SceneEditorSession.Active;var playing=Game.IsPlaying;var game=Game.ActiveScene?.Id;var dirty=selected?.HasUnsavedChanges;
+if(playing) throw new InvalidOperationException("Inspect the active play session before replacing its stone geometry.");
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+foreach(var group in new[]{"source_sha256","protected_sha256"})
+    foreach(var pair in manifest[group].AsObject())
+        if(Hash(System.IO.Path.Combine(root,pair.Key))!=pair.Value.GetValue<string>()) throw new InvalidOperationException("Shared input changed: "+pair.Key);
+var canonical=new System.Collections.Generic.HashSet<string>();
+foreach(var side in new[]{"west","east","centre"})
+    foreach(var extension in new[]{".obj",".mtl",".vmdl"}) canonical.Add("Assets/models/maps/belltower/belltower_"+side+extension);
+var plans=new System.Collections.Generic.List<(string Source,string Target,string Backup,string After,int Order)>();
+foreach(var pair in manifest["files"].AsObject())
+{
+    var relative=pair.Key;
+    if(relative.Contains("..") || !(canonical.Contains(relative)
+        || relative.StartsWith("Assets/models/maps/belltower/wall-edges-v1/",StringComparison.Ordinal)
+        || relative.StartsWith("Assets/models/maps/belltower/edge-realism-v1/",StringComparison.Ordinal)
+        || relative.StartsWith("Assets/models/maps/belltower/compiler-safe/",StringComparison.Ordinal)
+        || relative=="Assets/models/maps/belltower/church-windows-v1/centre_001_ashlar_grey.obj"
+        || relative.StartsWith("Assets/models/maps/belltower/fountain-ornaments-v2/centre/",StringComparison.Ordinal)))
+        throw new InvalidOperationException("Unexpected render target: "+relative);
+    if(!(relative.EndsWith(".obj",StringComparison.Ordinal)||relative.EndsWith(".mtl",StringComparison.Ordinal)||relative.EndsWith(".vmdl",StringComparison.Ordinal)))
+        throw new InvalidOperationException("Unexpected resource type.");
+    var source=System.IO.Path.Combine(root,pair.Value["source"].GetValue<string>());
+    var target=System.IO.Path.Combine(root,relative);
+    var after=pair.Value["after"].GetValue<string>();var before=pair.Value["before"]?.GetValue<string>();
+    var backup=before is null?null:System.IO.Path.Combine(root,pair.Value["backup"].GetValue<string>());
+    if(Hash(source)!=after || (backup is not null && Hash(backup)!=before)) throw new InvalidOperationException("Stage or backup changed.");
+    if(System.IO.File.Exists(target)&&Hash(target)==after) continue;
+    if(before is null?System.IO.File.Exists(target):!System.IO.File.Exists(target)||Hash(target)!=before)
+        throw new InvalidOperationException("Shared target changed: "+relative);
+    var order=relative.Contains("/edge-realism-v1/")||relative.Contains("/wall-edges-v1/")?0:
+        relative.EndsWith(".vmdl",StringComparison.Ordinal)?2:canonical.Contains(relative)?3:1;
+    plans.Add((source,target,backup,after,order));
+}
+var changed=new System.Collections.Generic.List<(string Target,string Backup)>();
+try
+{
+    foreach(var item in plans.OrderBy(p=>p.Order))
+    {
+        System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(item.Target));
+        var incoming=item.Target+".stone-wear-v1-incoming";
+        try
+        {
+            System.IO.File.Copy(item.Source,incoming,true);
+            if(Hash(incoming)!=item.After) throw new InvalidOperationException("Incoming checksum differs.");
+            System.IO.File.Move(incoming,item.Target,true);changed.Add((item.Target,item.Backup));
+        }
+        finally {if(System.IO.File.Exists(incoming)) System.IO.File.Delete(incoming);}
+    }
+}
+catch
+{
+    foreach(var item in changed.AsEnumerable().Reverse())
+        if(item.Backup is not null) System.IO.File.Copy(item.Backup,item.Target,true);
+        else if(System.IO.File.Exists(item.Target)) System.IO.File.Delete(item.Target);
+    throw;
+}
+foreach(var item in plans.OrderBy(p=>p.Order)) Editor.AssetSystem.RegisterFile(item.Target);
+foreach(var pair in manifest["protected_sha256"].AsObject())
+    if(Hash(System.IO.Path.Combine(root,pair.Key))!=pair.Value.GetValue<string>()) throw new InvalidOperationException("Protected file changed during publication.");
+var preserved=ReferenceEquals(selected,Editor.SceneEditorSession.Active)&&playing==Game.IsPlaying&&game==Game.ActiveScene?.Id&&dirty==selected?.HasUnsavedChanges;
+var result=new {Imported=plans.Count,EditorStatePreserved=preserved,SceneChanged=false,CollisionChanged=false,
+    TexturePixelsChanged=false,FountainCarvingsPreserved=true,Scope=manifest["scope"],
+    MaxNewImportTriangles=manifest["max_new_triangles_per_import"].GetValue<int>()};
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"native-import.json"),System.Text.Json.JsonSerializer.Serialize(result));
+if(!preserved) throw new InvalidOperationException("Editor state changed during import; inspect the completed result.");
+return result;

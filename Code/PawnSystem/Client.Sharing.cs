@@ -5,8 +5,8 @@ namespace Facepunch;
 public partial class Client
 {
 	// Lives on the client state, so deaths/respawns don't remove the player's last shared builds or crosshair.
-	[Sync( SyncFlags.FromHost )] public string SharedPrimaryBuild { get; private set; } = "";
-	[Sync( SyncFlags.FromHost )] public string SharedSecondaryBuild { get; private set; } = "";
+	[Sync( SyncFlags.FromHost ), Change( nameof( OnSharedBuildChanged ) )] public string SharedPrimaryBuild { get; private set; } = "";
+	[Sync( SyncFlags.FromHost ), Change( nameof( OnSharedBuildChanged ) )] public string SharedSecondaryBuild { get; private set; } = "";
 	[Sync( SyncFlags.FromHost )] public string SharedCrosshairSettings { get; private set; } = "";
 
 	private RealTimeSince _sinceSharingCheck = 1f;
@@ -73,6 +73,21 @@ public partial class Client
 		SharedPrimaryBuild = primary ?? "";
 		SharedSecondaryBuild = secondary ?? "";
 		SharedCrosshairSettings = settings.ToJson();
+	}
+
+	/// <summary>
+	/// Everyone else draws this player's guns in the build they share (<see cref="Equipment.FitHolderBuild"/>), which can
+	/// arrive after a gun is drawn (a new spawn's class, a part changed mid-match), so the guns are fitted again.
+	/// </summary>
+	private void OnSharedBuildChanged( string before, string after )
+	{
+		if ( this == Local || !PlayerPawn.IsValid() )
+			return;
+
+		foreach ( var equipment in PlayerPawn.GetComponentsInChildren<Equipment>( true ) )
+			equipment.RefitHolderBuild();
+
+		PlayerPawn.GetComponentInChildren<EquipmentMountPoints>( true )?.RefitHolderBuilds();
 	}
 
 	private static bool IsSharedGun( string code, EquipmentSlot slot ) => string.IsNullOrEmpty( code )

@@ -1,0 +1,26 @@
+// Read-only IL call discovery. Confirm that saving a specific document does not activate it.
+var method=typeof(Editor.SceneEditorSession).GetMethod("Save",new[]{typeof(bool)});
+var bytes=method.GetMethodBody().GetILAsByteArray();
+var opcodes=typeof(System.Reflection.Emit.OpCodes).GetFields(System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.Static)
+    .Where(f=>f.FieldType==typeof(System.Reflection.Emit.OpCode)).Select(f=>(System.Reflection.Emit.OpCode)f.GetValue(null))
+    .ToDictionary(o=>unchecked((ushort)o.Value));
+var lines=new System.Collections.Generic.List<string>();
+for (int i=0;i<bytes.Length;)
+{
+    int offset=i;ushort value=bytes[i++];if(value==0xfe)value=(ushort)(0xfe00|bytes[i++]);
+    var op=opcodes[value];var kind=op.OperandType;
+    int size=kind switch {
+        System.Reflection.Emit.OperandType.InlineNone=>0,
+        System.Reflection.Emit.OperandType.ShortInlineBrTarget or System.Reflection.Emit.OperandType.ShortInlineI or System.Reflection.Emit.OperandType.ShortInlineVar=>1,
+        System.Reflection.Emit.OperandType.InlineVar=>2,
+        System.Reflection.Emit.OperandType.InlineI8 or System.Reflection.Emit.OperandType.InlineR=>8,
+        System.Reflection.Emit.OperandType.InlineSwitch=>4+4*BitConverter.ToInt32(bytes,i),
+        _=>4};
+    string operand="";
+    if(kind==System.Reflection.Emit.OperandType.InlineMethod || kind==System.Reflection.Emit.OperandType.InlineField || kind==System.Reflection.Emit.OperandType.InlineType)
+    {var member=method.Module.ResolveMember(BitConverter.ToInt32(bytes,i));operand=member.DeclaringType?.FullName+"."+member;}
+    else if(kind==System.Reflection.Emit.OperandType.InlineString)operand=method.Module.ResolveString(BitConverter.ToInt32(bytes,i));
+    else if(size>0 && size<=4)operand=Convert.ToHexString(bytes.AsSpan(i,size));
+    lines.Add(offset+": "+op.Name+" "+operand);i+=size;
+}
+return new {Parameters=method.GetParameters().Select(p=>new{p.Name,Default=p.DefaultValue?.ToString()}).ToArray(),Instructions=lines};

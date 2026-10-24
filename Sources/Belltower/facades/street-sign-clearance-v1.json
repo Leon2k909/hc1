@@ -1,0 +1,23 @@
+{
+  "revision": "street-sign-clearance-v1",
+  "request": "Fix the VIA DELLE MURA plaque clipping through its projecting stone hood",
+  "state": "Applied through the native editor and reviewed from the front, obliquely and on the mirrored east side",
+  "generator_sources": ["Tools/belltower_map.py", "Tools/belltower_architecture.py"],
+  "staging_tool": "Tools/belltower_stage_street_sign.py",
+  "publication_manifest": "output/belltower/street-sign-clearance-v1/stage/manifest.json",
+  "verification": "output/belltower/street-sign-clearance-v1/verification.json",
+  "native_import": "output/belltower/street-sign-clearance-v1/native-import.json",
+  "preview_front": "output/belltower/quality/street-sign-clearance-v1-after/west.png",
+  "preview_oblique": "output/belltower/quality/street-sign-clearance-v1-after/west-oblique.png",
+  "preview_mirrored": "output/belltower/quality/street-sign-clearance-v1-after/east.png",
+  "plaques_moved": 2,
+  "rise_inches": 24,
+  "new_bottom_inches": 134,
+  "gap_above_floor_band_inches": 4,
+  "whole_slab_including_backing_and_edges_moved": true,
+  "placement_now_checks_projecting_mouldings": true,
+  "triangle_count_unchanged": true,
+  "textures_unchanged": true,
+  "scene_and_physics_unchanged": true,
+  "native_compile_note": "The explicit west compile call timed out. Both updated compiled resources were subsequently present and both loaded models displayed the corrected placement in native captures. No duplicate compile was dispatched."
+}

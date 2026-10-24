@@ -1,0 +1,38 @@
+// Publish only new private clothing resources; no scene or play-state edits.
+var root = Sandbox.Project.Current.GetRootPath();
+var folder = System.IO.Path.Combine(root,"output/firstperson-clothing-v2-20261021");
+var manifest = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"stage/manifest.json")));
+string Hash(string p) => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+var selected = Editor.SceneEditorSession.Active;
+var playing = Game.IsPlaying;
+var dirty = selected?.HasUnsavedChanges;
+var scene = selected?.Scene.Source?.ResourcePath;
+var plans = new System.Collections.Generic.List<(string Source,string Target,string Sha)>();
+foreach(var pair in manifest["files"].AsObject())
+{
+    if(pair.Key.Contains("..") || !(pair.Key.StartsWith("Assets/materials/operators/first_person/v2/",StringComparison.Ordinal)
+        || pair.Key=="Assets/shaders/viewmodel_fabric_v2.shader")) throw new InvalidOperationException("Unexpected clothing target");
+    var source = System.IO.Path.Combine(root,pair.Value["source"].GetValue<string>());
+    var target = System.IO.Path.Combine(root,pair.Key);
+    var sha = pair.Value["after"].GetValue<string>();
+    if(Hash(source)!=sha) throw new InvalidOperationException("Stage changed");
+    if(System.IO.File.Exists(target))
+    {
+        if(Hash(target)==sha) continue;
+        throw new InvalidOperationException("A private target was changed by another task");
+    }
+    plans.Add((source,target,sha));
+}
+foreach(var item in plans.OrderBy(p=>p.Target.EndsWith(".shader",StringComparison.Ordinal)?0:p.Target.EndsWith(".vmat",StringComparison.Ordinal)?2:1))
+{
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(item.Target));
+    System.IO.File.Copy(item.Source,item.Target,false);
+    if(Hash(item.Target)!=item.Sha) throw new InvalidOperationException("Published clothing checksum differs");
+}
+foreach(var item in plans) Editor.AssetSystem.RegisterFile(item.Target);
+var preserved = ReferenceEquals(selected,Editor.SceneEditorSession.Active) && playing==Game.IsPlaying
+    && dirty==selected?.HasUnsavedChanges && scene==selected?.Scene.Source?.ResourcePath;
+var result = new { Imported=plans.Count, EditorStatePreserved=preserved, SceneChanged=false, PlayChanged=false };
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"native-import.json"),System.Text.Json.JsonSerializer.Serialize(result));
+if(!preserved) throw new InvalidOperationException("Editor state changed externally during clothing publication; inspect before continuing");
+return result;

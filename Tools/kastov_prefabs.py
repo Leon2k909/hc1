@@ -1532,30 +1532,34 @@ PREFABS = {
         # 74u's. The irons sit high on the carry handle, 1.5 over the rail, hence the z. Tune in-game with
         # dev_optic_correction.
         optic_aim_correction="1.613,0,0.079",
-        # The 1x sights' collimated dots sat 0.055 degrees low (output/reticle-survey-20261018/collimated).
-        optic_aim_angles="-0.0547,0.0031,0",
+        # The angle the ADS pose holds the rail off the view, so the 1x sights' collimated dots sit on the screen's centre
+        # (output/reticle-survey-20261018/collimated). It was -0.0547 down; the aim's 0.293 degrees nose up for the
+        # screwed-down post (kastov_weapons M16) put the dots 0.287 high.
+        optic_aim_angles="0.2325,-0.0001,0",
         # The front sight post stays up under an optic, so each 1x optic's dot co-witnesses with it. The dot is
         # collimated (it only shows where the sight points), so only the eye moves, here in the aimed gun's frame: up into
-        # the window (negative z) until the post's tip sits on the dot (absolute) or 0.14" under it at the post (lower
-        # 1/3). The eye stays within the middle 60% of the window's height, past which the dot would leave a small
-        # window, so on six optics the tip stays that much over its mark. Solved from the settled aimed view
-        # (2026-10-18). Absolute for the sights that sit low on the rail, as a holographic sight does on a flat-top;
+        # the window (negative z) or down (positive) until the post's tip sits on the dot (absolute) or 0.14" under it at
+        # the post (lower 1/3). With the post at a real AR's 1.41" over the rail (kastov_weapons M16 part_moves) and the
+        # mini red dots, the Tube Red Dot and the Tube Collimator on real-height mounts (Tools/optic_risers.py), every eye
+        # is inside the middle 60% of its window's height (the QD Holographic's nearest that limit, 0.258 of 0.303).
+        # Solved from the settled aimed view with output/reticle-survey-20261018/collimated/m16-cowitness.cs.txt
+        # (2026-10-19). Absolute for the sights that sit low on the rail, as a holographic sight does on a flat-top;
         # lower 1/3 for those on raised mounts or bases.
         optic_sight_lines=[
-            ("gunsmith/m4a1/mw2022/att_vm_holo_east01.gnsmth", "0,-0.019,-0.2432", "0,0,0"),  # window limit: tip 0.15" high
-            ("gunsmith/m4a1/mw2022/att_vm_holo_west01.gnsmth", "0,-0.001,-0.1749", "0,0,0"),
-            ("gunsmith/m4a1/mw2022/att_vm_reflex_02.gnsmth", "0,-0.001,-0.1749", "0,0,0"),
-            ("gunsmith/m4a1/mw2022/att_vm_reflex_east01.gnsmth", "0,-0.001,-0.2299", "0,0,0"),
-            ("gunsmith/m4a1/mw2022/att_vm_reflex_west03.gnsmth", "0,-0.001,-0.1509", "0,0,0"),
-            ("gunsmith/m4a1/mw2022/att_vm_reflex_west04.gnsmth", "0,-0.001,-0.1999", "0,0,0"),
+            ("gunsmith/m4a1/mw2022/att_vm_holo_east01.gnsmth", "0,-0.0183,0.0316", "0,0,0"),
+            ("gunsmith/m4a1/mw2022/att_vm_holo_west01.gnsmth", "0,-0.0003,-0.0615", "0,0,0"),
+            ("gunsmith/m4a1/mw2022/att_vm_reflex_02.gnsmth", "0,-0.0003,-0.0615", "0,0,0"),
+            ("gunsmith/m4a1/mw2022/att_vm_reflex_east01.gnsmth", "0,-0.0003,-0.1165", "0,0,0"),
+            ("gunsmith/m4a1/mw2022/att_vm_reflex_west03.gnsmth", "0,-0.0003,-0.0375", "0,0,0"),
+            ("gunsmith/m4a1/mw2022/att_vm_reflex_west04.gnsmth", "0,-0.0003,-0.0865", "0,0,0"),
             # Lower 1/3: the raised-base and enclosed holographics, and the sights on tall mounts.
-            ("gunsmith/m4a1/mw2022/att_vm_2x_west02_holo.gnsmth", "0,-0.001,-0.3149", "0,0,0"),
-            ("gunsmith/m4a1/mw2022/att_vm_holo_west02.gnsmth", "0,0.002,-0.3533", "0,0,0"),  # window limit: tip 0.06" high
-            ("gunsmith/m4a1/mw2022/att_vm_minireddot01_tall.gnsmth", "0,0.002,-0.1879", "0,0,0"),  # window limit: tip 0.37" high
-            ("gunsmith/m4a1/mw2022/att_vm_minireddot02_tall.gnsmth", "0,-0.001,-0.1873", "0,0,0"),  # window limit: tip 0.37" high
-            ("gunsmith/m4a1/mw2022/att_vm_minireddot03_tall.gnsmth", "0,0.001,-0.1907", "0,0,0"),  # window limit: tip 0.34" high
-            ("gunsmith/m4a1/mw2022/att_vm_reflex_east02_tall.gnsmth", "0,-0.001,-0.2309", "0,0,0"),
-            ("gunsmith/m4a1/mw2022/att_vm_reflex_west02_tall.gnsmth", "0,-0.001,-0.2327", "0,0,0"),  # window limit: tip 0.14" high
+            ("gunsmith/m4a1/mw2022/att_vm_2x_west02_holo.gnsmth", "0,-0.0003,-0.2015", "0,0,0"),
+            ("gunsmith/m4a1/mw2022/att_vm_holo_west02.gnsmth", "0,0.0027,-0.2985", "0,0,0"),
+            ("gunsmith/m4a1/mw2022/att_vm_minireddot01_tall.gnsmth", "0,0.0027,0.0315", "0,0,0"),
+            ("gunsmith/m4a1/mw2022/att_vm_minireddot02_tall.gnsmth", "0,-0.0003,0.0315", "0,0,0"),
+            ("gunsmith/m4a1/mw2022/att_vm_minireddot03_tall.gnsmth", "0,0.0017,0.032", "0,0,0"),
+            ("gunsmith/m4a1/mw2022/att_vm_reflex_east02_tall.gnsmth", "0,-0.0003,-0.1175", "0,0,0"),
+            ("gunsmith/m4a1/mw2022/att_vm_reflex_west02_tall.gnsmth", "0,-0.0003,0.032", "0,0,0"),
         ],
         gameplay=gameplay_m16,
         guid_salt="m16/",

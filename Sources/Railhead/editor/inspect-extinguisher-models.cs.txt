@@ -1,0 +1,5 @@
+var session=Editor.SceneEditorSession.Active;
+var scene=session.Scene;
+return new {Scene=scene.Source?.ResourcePath,Game.IsPlaying,Dirty=session.HasUnsavedChanges,
+    Models=scene.GetAllComponents<ModelRenderer>().Where(r=>r.Model?.ResourcePath?.Contains("railhead",StringComparison.OrdinalIgnoreCase)==true)
+        .GroupBy(r=>r.Model.ResourcePath).Select(g=>new {Path=g.Key,Count=g.Count(),Objects=g.Select(r=>new {r.GameObject.Name,Position=r.WorldPosition.ToString()}).Take(2).ToArray()}).ToArray()};

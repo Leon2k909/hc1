@@ -1,0 +1,7 @@
+var materials=new[]{"materials/belltower/forest/volume-v1/control.vmat","materials/belltower/forest/volume-v1/rounded.vmat"}
+    .Select(p=>Material.Load(p)).ToArray();
+return new {Materials=materials.Select(m=>new {m.ResourcePath,m.IsError}),
+    Methods=typeof(Material).GetMethods(System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.Instance)
+        .Where(m=>m.Name.StartsWith("Get") && (m.Name.Contains("Float")||m.Name.Contains("Param")||m.Name.Contains("Attribute")))
+        .Select(m=>m.ToString()),
+    Properties=typeof(Material).GetProperties().Where(p=>p.Name.Contains("Param")||p.Name.Contains("Attribute")).Select(p=>p.ToString())};

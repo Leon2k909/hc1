@@ -14,13 +14,6 @@
         <div class="stamina-track"><div class="stamina-fill" @ref="StaminaFill" /></div>
         <label class="stamina-value">@(Pawn.SprintExhausted ? Tr( "RECOVERING" ) : $"{StaminaPercent}%")</label>
     </div>
-    @if ( SoldierTraining.TimeSinceLevelUp < 4f )
-    {
-        <div class="training-notice">
-            <label class="notice-title">@Tr( "SKILL IMPROVED" )</label>
-            <label>@Tr( SoldierTraining.LastImprovedSkill == SoldierSkill.Endurance ? "ENDURANCE" : "WEAPON HANDLING" ) · @Tr( "LEVEL {0}", SoldierTraining.GetLevel( SoldierTraining.LastImprovedSkill ) )</label>
-        </div>
-    }
 </root>
 
 @code
@@ -32,9 +25,9 @@
     private Panel RankFill { get; set; }
     private Panel StaminaFill { get; set; }
 
+    // A skill's level-up shows as a medal at the top (MedalFeed).
     protected override int BuildHash() => HashCode.Combine( Show, Pawn, StaminaPercent,
-        Pawn.IsValid() && Pawn.SprintExhausted, Progression.GetXP(), SoldierTraining.LevelUpRevision,
-        SoldierTraining.TimeSinceLevelUp < 4f, GameText.Current );
+        Pawn.IsValid() && Pawn.SprintExhausted, Progression.GetXP(), GameText.Current );
 
     public override void Tick()
     {

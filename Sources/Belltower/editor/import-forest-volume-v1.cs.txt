@@ -1,0 +1,55 @@
+// Import three unused, versioned woodland trial resources. No document switch,
+// scene mutation, model replacement, play change or saved-map write.
+var root=Sandbox.Project.Current.GetRootPath();
+var stage=System.IO.Path.Combine(root,"output/belltower/quality/forest-volume-v1");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(stage,"manifest.json")));
+string Hash(string path)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+foreach (var input in manifest["source_sha256"].AsObject())
+    if (Hash(System.IO.Path.Combine(root,input.Key))!=input.Value.GetValue<string>()) throw new InvalidOperationException("Trial source changed: "+input.Key);
+var engine=System.IO.Path.GetDirectoryName(Environment.ProcessPath);
+foreach (var input in manifest["engine_source_sha256"].AsObject())
+    if (Hash(System.IO.Path.Combine(engine,input.Key))!=input.Value.GetValue<string>()) throw new InvalidOperationException("Engine shader input changed.");
+var allowed=new System.Collections.Generic.HashSet<string>{"shaders/belltower_forest_volume_trial.shader",
+    "materials/belltower/forest/volume-v1/control.vmat","materials/belltower/forest/volume-v1/rounded.vmat"};
+if (!allowed.SetEquals(manifest["files"].AsArray().Select(f=>f["path"].GetValue<string>()))) throw new InvalidOperationException("Unexpected trial asset set.");
+var selected=Editor.SceneEditorSession.Active;var game=Game.ActiveScene?.Id;var playing=Game.IsPlaying;
+var created=new System.Collections.Generic.List<string>();
+try
+{
+    foreach (var entry in manifest["files"].AsArray())
+    {
+        var relative=entry["path"].GetValue<string>();var expected=entry["sha256"].GetValue<string>();
+        var source=System.IO.Path.Combine(stage,"Assets",relative);var target=System.IO.Path.Combine(root,"Assets",relative);
+        if (Hash(source)!=expected) throw new InvalidOperationException("Staged trial changed.");
+        if (System.IO.File.Exists(target))
+        {
+            if (Hash(target)!=expected) throw new InvalidOperationException("Trial target already has different bytes.");
+            continue;
+        }
+        System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target));
+        System.IO.File.Copy(source,target);created.Add(target);
+        if (Hash(target)!=expected) throw new InvalidOperationException("Imported bytes differ.");
+        Editor.AssetSystem.RegisterFile(target);
+    }
+}
+catch
+{
+    foreach (var target in created.AsEnumerable().Reverse()) if (System.IO.File.Exists(target)) System.IO.File.Delete(target);
+    throw;
+}
+if (!ReferenceEquals(selected,Editor.SceneEditorSession.Active) || Game.ActiveScene?.Id!=game || Game.IsPlaying!=playing)
+    throw new InvalidOperationException("Editor state changed during private import; inspect before any further action.");
+var shader="shaders/belltower_forest_volume_trial.shader";
+var pending=Editor.EditorUtility.CompileShader(shader,new(),cancellationToken);
+await pending;
+var reported=pending.GetType().GetProperty("Result")?.GetValue(pending);
+var success=reported is bool b?b:reported?.GetType().GetProperty("Success")?.GetValue(reported) as bool?;
+var sourceFile=System.IO.Path.Combine(root,"Assets",shader);var compiled=sourceFile+"_c";
+if (success==false || !System.IO.File.Exists(compiled) || System.IO.File.GetLastWriteTimeUtc(compiled)<System.IO.File.GetLastWriteTimeUtc(sourceFile))
+    throw new InvalidOperationException("Volume trial shader compilation failed.");
+var result=new {Imported=created.Count,CompilerReportedSuccess=success,ShaderSha256=Hash(sourceFile),CompiledSha256=Hash(compiled),
+    SelectedDocumentPreserved=ReferenceEquals(selected,Editor.SceneEditorSession.Active),
+    GameStatePreserved=Game.ActiveScene?.Id==game && Game.IsPlaying==playing,
+    SceneMutations=false,AcceptedAssetsChanged=false,NativeVisualReviewVerified=false};
+System.IO.File.WriteAllText(System.IO.Path.Combine(stage,"native-import-compile.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

@@ -1,0 +1,37 @@
+// Install only new private well resources. Existing models and scenes are untouched.
+var root=Sandbox.Project.Current.GetRootPath();
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(
+    System.IO.Path.Combine(root,"output/belltower/well-v1/preview-assets/manifest.json")));
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+var selected=Editor.SceneEditorSession.Active;var playing=Game.IsPlaying;var game=Game.ActiveScene?.Id;
+var dirty=selected?.HasUnsavedChanges;
+var scenePath=System.IO.Path.Combine(root,"Assets/scenes/maps/Belltower/belltower.scene");var sceneHash=Hash(scenePath);
+var plans=new System.Collections.Generic.List<(string Source,string Target,string Hash)>();
+foreach(var pair in manifest["files"].AsObject())
+{
+    if (!(pair.Key.StartsWith("Assets/models/maps/belltower/well-v1/") || pair.Key.StartsWith("Assets/materials/belltower/well-v1/"))
+        || pair.Key.Contains("..")) throw new InvalidOperationException("Unexpected preview path.");
+    var source=pair.Value["path"].GetValue<string>();var target=System.IO.Path.Combine(root,pair.Key);
+    var hash=pair.Value["after"].GetValue<string>();
+    if(Hash(source)!=hash || (System.IO.File.Exists(target) && Hash(target)!=hash))
+        throw new InvalidOperationException("Preview resource changed: "+pair.Key);
+    plans.Add((source,target,hash));
+}
+int imported=0;
+foreach(var p in plans.OrderBy(p=>System.IO.Path.GetExtension(p.Target)==".vmdl"?2:0))
+{
+    if(!System.IO.File.Exists(p.Target))
+    {
+        System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(p.Target));
+        System.IO.File.Copy(p.Source,p.Target);imported++;
+    }
+    Editor.AssetSystem.RegisterFile(p.Target);
+}
+if(!ReferenceEquals(selected,Editor.SceneEditorSession.Active) || playing!=Game.IsPlaying || game!=Game.ActiveScene?.Id
+    || dirty!=selected?.HasUnsavedChanges || sceneHash!=Hash(scenePath))
+    throw new InvalidOperationException("Shared editor state changed during preview import.");
+var result=new {Imported=imported,NewPrivateResources=plans.Count,ExistingModelsChanged=false,SceneChanged=false,
+    EditorStatePreserved=true,SourceSceneSha256=sceneHash};
+System.IO.File.WriteAllText(System.IO.Path.Combine(root,"output/belltower/well-v1/preview-assets/native-import.json"),
+    System.Text.Json.JsonSerializer.Serialize(result));
+return result;

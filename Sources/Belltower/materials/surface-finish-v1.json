@@ -1,0 +1,82 @@
+{
+  "revision": "surface-finish-v1",
+  "state": "published after three matched native comparisons",
+  "updated_utc": "2026-10-20T11:15:08.498315+00:00",
+  "original_manifest": "output/belltower/quality/surface-finish-v1/manifest.json",
+  "original_manifest_sha256": "0d5c2ecc79f1288a16fc66ab5f5877652335f979fa027ffadc173351229f35a8",
+  "materials": {
+    "Assets/materials/belltower/plaster_rose.vmat": "cfc6386f0cbdfbc346bbdac55676e455041391915172fdd19ff986a17513e7cd",
+    "Assets/materials/belltower/plaster_terracotta.vmat": "23cc5b7bd04652db5c54779da80c2064a1e0a8c08f64c4d4045543dcf1f5dfb3",
+    "Assets/materials/belltower/plaster_ochre.vmat": "0abcd1e5523a422e5a18d29c5365953d03a2cc1886d258e8ed5fd29306d6d2d4",
+    "Assets/materials/belltower/plaster_cream.vmat": "f817386eae16e1d8c32ea807383e9dbeca309150df834adee08ecdc27e0f848e",
+    "Assets/materials/belltower/plaster_blue.vmat": "9506bdd7abe9170fd8d2cddb5c5a3fa524e66b6b0968c24f5b18a8a78004ff91",
+    "Assets/materials/belltower/plaster_sage.vmat": "217a57740b3874f61c17d5f5759f959f0703d8da9e7e514ac1970aa772003845",
+    "Assets/materials/belltower/plaster_pale.vmat": "178eb77928d270f3fb6735438380dc08ed5ff9736e2cf3b0d8a64244263738a7",
+    "Assets/materials/belltower/plaster_whitewash.vmat": "5119296f6922c288a223a2e80006d62028ceb8a923ea5e0c5d16b614571fa555",
+    "Assets/materials/belltower/rubble.vmat": "df2eebb4227d55aea512a6238907d9c9660eaf9c2b59ccd160d046c56862d8d6"
+  },
+  "generator": "Tools/belltower_quality_materials.py",
+  "generator_sha256": "99f01af96a5ca8c446983d11a5c5fa7000cd37fe2bee56c6966203eab4d2ffa7",
+  "generator_matches_all_nine_assets": true,
+  "native_compile_evidence": "output/belltower/quality/oct20-continuation/verify-plants-and-compile-surfaces/call_tools.json",
+  "native_review": "output/belltower/quality/surface-finish-v1/native-review-oct20.json",
+  "parameters": {
+    "plaster_wear_coverage": 0.24,
+    "rubble_tint": [
+      1.04,
+      1,
+      0.9
+    ],
+    "rubble_contrast": 1.04,
+    "rubble_weather": 0.12
+  },
+  "texture_pixels_unchanged": true,
+  "shaders_unchanged": true,
+  "mesh_and_collision_unchanged_by_surface_publication": true,
+  "intentional_original_guard_changes": {
+    "Tools/belltower_quality_materials.py": {
+      "before": "eab76c8797d93d94a5eb616266903952e741be788aa8978506e92d0bcf0977ee",
+      "after": "99f01af96a5ca8c446983d11a5c5fa7000cd37fe2bee56c6966203eab4d2ffa7"
+    },
+    "Assets/materials/belltower/plaster_rose.vmat": {
+      "before": "67ff65d21d4b316c9707b61a3698dd3463b1d542f5543dcfa2b424405ced611e",
+      "after": "cfc6386f0cbdfbc346bbdac55676e455041391915172fdd19ff986a17513e7cd"
+    },
+    "Assets/materials/belltower/plaster_terracotta.vmat": {
+      "before": "dd2b8a88cdb4618594c886b54290b1e7ae896c88cd96f3a709bf9a49f7585ced",
+      "after": "23cc5b7bd04652db5c54779da80c2064a1e0a8c08f64c4d4045543dcf1f5dfb3"
+    },
+    "Assets/materials/belltower/plaster_ochre.vmat": {
+      "before": "89195f356b081a9c8b89552e981ed2b729d2a3577c58f97fd48cbca61397a3da",
+      "after": "0abcd1e5523a422e5a18d29c5365953d03a2cc1886d258e8ed5fd29306d6d2d4"
+    },
+    "Assets/materials/belltower/plaster_cream.vmat": {
+      "before": "8179826b3d0dcd013e6b4ada4be5362bba39925e4e7f5cd533c41927f15f256d",
+      "after": "f817386eae16e1d8c32ea807383e9dbeca309150df834adee08ecdc27e0f848e"
+    },
+    "Assets/materials/belltower/plaster_blue.vmat": {
+      "before": "53d72156200643bf581dec50c2356a480c2d85d7f5035214eb2e1865ab740d47",
+      "after": "9506bdd7abe9170fd8d2cddb5c5a3fa524e66b6b0968c24f5b18a8a78004ff91"
+    },
+    "Assets/materials/belltower/plaster_sage.vmat": {
+      "before": "1e0988efa43030e7ac0ada0c629dfe8b34b84b7fb6c7be6f582c6b81b87a9e52",
+      "after": "217a57740b3874f61c17d5f5759f959f0703d8da9e7e514ac1970aa772003845"
+    },
+    "Assets/materials/belltower/plaster_pale.vmat": {
+      "before": "88edd896f9e2bbf0734697d7bbf70a73ff413d30d3cdebd399338b8a6e264807",
+      "after": "178eb77928d270f3fb6735438380dc08ed5ff9736e2cf3b0d8a64244263738a7"
+    },
+    "Assets/materials/belltower/plaster_whitewash.vmat": {
+      "before": "4e6f77d06f235193145f60798d7fee951766d62c9e387277a3105430f3f1f61f",
+      "after": "5119296f6922c288a223a2e80006d62028ceb8a923ea5e0c5d16b614571fa555"
+    },
+    "Assets/materials/belltower/rubble.vmat": {
+      "before": "4b089f04c88e31b6d5b6d0493f300cbfb9aa5193f7713f9ef257a0e005ae015c",
+      "after": "df2eebb4227d55aea512a6238907d9c9660eaf9c2b59ccd160d046c56862d8d6"
+    }
+  },
+  "current_scene_sha256": "f92a810e80e3cced2ae9ede667d692c712207a58637a927673a7be7eced5af1f",
+  "later_saved_image": "output/belltower/quality/surface-finish-v1-saved/west-ridge.png",
+  "later_saved_image_limitation": "Qualitative confirmation only; its static regions drift by about 1 RGB8 from the earlier temporary candidate and fail the strict cross-session photometric gate. Matched baseline/candidate controls passed.",
+  "performance_measured": false
+}

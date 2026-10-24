@@ -373,7 +373,7 @@ public static class DevCommands
 			UI.Toast.Instance?.Show( which, UI.ToastType.Generic, duration );
 	}
 
-	/// <summary>Show a kill medal locally: dev_medal oneshot|headshot|streak|double|triple|fury|frenzy [seconds on screen].</summary>
+	/// <summary>Show a medal locally: dev_medal oneshot|headshot|streak|double|triple|fury|frenzy|handling|endurance [seconds on screen].</summary>
 	[ConCmd( "dev_medal" )]
 	public static void ShowMedal( string which = "oneshot", float seconds = 1.6f )
 	{

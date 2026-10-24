@@ -1,0 +1,26 @@
+// Publish only the staged blood appearance change through the connected editor.
+var root=System.IO.Path.GetFullPath(Sandbox.Project.Current.GetRootPath());
+var expectedRoot=System.IO.Path.GetFullPath(@"C:\sbox-projects\hc1\forked-shooter-main");
+if(!string.Equals(root.TrimEnd('\\'),expectedRoot.TrimEnd('\\'),StringComparison.OrdinalIgnoreCase))
+    throw new InvalidOperationException("Wrong project; no resource was changed");
+var folder=System.IO.Path.Combine(root,"output/firstperson-grime-fix-20261021");
+using var manifest=System.Text.Json.JsonDocument.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"publish-manifest.json")));
+var record=manifest.RootElement;
+var source=System.IO.Path.Combine(root,record.GetProperty("StagedShader").GetString());
+var target=System.IO.Path.Combine(root,record.GetProperty("CanonicalShader").GetString());
+string Hash(string path)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+var before=Hash(target);var staged=Hash(source);
+if(before!=record.GetProperty("BeforeSha256").GetString()||staged!=record.GetProperty("AfterSha256").GetString())
+    throw new InvalidOperationException("Source changed externally; inspect before publishing");
+var selected=Editor.SceneEditorSession.Active;var playing=Game.IsPlaying;
+var dirty=Editor.SceneEditorSession.All.ToDictionary(s=>s,s=>s.HasUnsavedChanges);
+System.IO.File.Copy(source,target,true);
+Editor.AssetSystem.RegisterFile(target);
+await Editor.EditorUtility.CompileShader("shaders/hc1_grime.shader",new(),cancellationToken);
+var preserved=ReferenceEquals(selected,Editor.SceneEditorSession.Active)&&playing==Game.IsPlaying
+    &&dirty.All(p=>Editor.SceneEditorSession.All.Contains(p.Key)&&p.Key.HasUnsavedChanges==p.Value);
+var result=new{Resource="shaders/hc1_grime.shader",BeforeSha256=before,AfterSha256=Hash(target),
+    NativeShaderCompileCompleted=true,SharedEditorStatePreserved=preserved,IsPlaying=Game.IsPlaying};
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"publish-receipt.json"),System.Text.Json.JsonSerializer.Serialize(result));
+if(!preserved)throw new InvalidOperationException("Shared editor state changed externally; inspect before proceeding");
+return result;

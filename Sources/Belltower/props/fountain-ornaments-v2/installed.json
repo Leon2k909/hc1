@@ -1,0 +1,89 @@
+{
+  "revision": "fountain-ornaments-v2",
+  "published_stage": "revision4",
+  "installed": true,
+  "ornaments": {
+    "lions": 4,
+    "large_lilies": 4,
+    "basin_lilies": 8
+  },
+  "preservation": {
+    "removed_triangles": 17832,
+    "new_triangles": 121164,
+    "unrelated_obj_bytes_sha256": "b5e78daa1339051828596a65de2fd91210b14ca2608b8eb4495d672c6577d2fd",
+    "unrelated_obj_bytes_exact": true
+  },
+  "bounded_imports": 42,
+  "max_triangles_per_import": 65000,
+  "non_render_vmdl_content_exact": true,
+  "vmdl_line_endings_normalized_to_crlf": true,
+  "water_materials_and_geometry_unchanged": true,
+  "lion": {
+    "triangles": 18000,
+    "vertices": 8996,
+    "closed": true,
+    "connected_components": 1,
+    "source": "Sources/Belltower/props/fountain-ornaments-v2/lion-d6d3738f2be0.npz"
+  },
+  "native_compilation": {
+    "Success": true,
+    "Path": "models/maps/belltower/belltower_centre.vmdl",
+    "CompiledFile": "c:/sbox-projects/hc1/forked-shooter-main/assets/models/maps/belltower/belltower_centre.vmdl_c",
+    "Hint": null
+  },
+  "native_editor_status": {
+    "EngineVersion": "26.10.13a",
+    "Project": "razedtest",
+    "ProjectTitle": "RazedTest",
+    "ActiveScene": "belltower",
+    "ActiveScenePath": "scenes/maps/belltower/belltower.scene",
+    "SceneHasUnsavedChanges": false,
+    "IsPlaying": false,
+    "IsPaused": false,
+    "ToolCount": 128,
+    "IsCompiling": false,
+    "LastCompileSucceeded": true,
+    "LastCompileErrors": 0,
+    "Paths": {
+      "Engine": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\sbox",
+      "Logs": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\sbox\\logs",
+      "ProjectRoot": "C:\\sbox-projects\\hc1\\forked-shooter-main",
+      "ProjectSettings": "C:\\sbox-projects\\hc1\\forked-shooter-main\\ProjectSettings"
+    }
+  },
+  "native_visuals": {
+    "lion": {
+      "before": {
+        "path": "output/belltower/quality/fountain-ornaments-v2-before/lion.png",
+        "sha256": "5961077a976e875c067f379f6d8a1bc385b7c5fd67b6ca4254eb9e5238bb0814"
+      },
+      "after": {
+        "path": "output/belltower/quality/fountain-ornaments-v2-after/lion.png",
+        "sha256": "72bf75593459cbb0f7c81507b50ede7a67c54c0e580f5716a75dd155fe64da9c"
+      }
+    },
+    "lily": {
+      "before": {
+        "path": "output/belltower/quality/fountain-ornaments-v2-before/lily.png",
+        "sha256": "b16924ff9458e078f2563847f3b8e51d632c4319ae5a1f9b6c4ab94f6d92c1db"
+      },
+      "after": {
+        "path": "output/belltower/quality/fountain-ornaments-v2-after/lily.png",
+        "sha256": "b89c27344958beb9aec1c83d8ab8697c288d65f6074a64ec686e58d973e0a6c3"
+      }
+    },
+    "overview": {
+      "before": {
+        "path": "output/belltower/quality/fountain-ornaments-v2-before/overview.png",
+        "sha256": "db5bdf047c1279ac23af20ba96632783fb67879a6b81a162a757fc150ea4f503"
+      },
+      "after": {
+        "path": "output/belltower/quality/fountain-ornaments-v2-after/overview.png",
+        "sha256": "7de742c9ed32ecbdaef989a6524f7c7e65e285775119debff7b7fa0abbb4769e"
+      }
+    }
+  },
+  "scene_and_cameras_preserved": true,
+  "visual_review": "Native close-ups and overview inspected: solid masks, rounded limestone lilies, outlets aligned with existing water.",
+  "limit": "Native editor visual and resource checks; no new full-match performance benchmark."
+}

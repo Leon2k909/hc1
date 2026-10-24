@@ -208,7 +208,101 @@ Scenario( "Corrupt saved values and repeated maximum awards stay bounded", () =>
     Check( SoldierTraining.Revision == revision && Game.Cookies.Writes == writes, "No redundant cap notification or save" );
 } );
 
-Console.WriteLine( $"PASS: {scenarios} training scenarios using the production rules and profile code." );
+Scenario( "A rested novice has small continuous aimed breathing, never a motionless hold", () =>
+{
+    var state = default( AimBreathingRules.State );
+    var minPitch = float.MaxValue;
+    var maxPitch = float.MinValue;
+    var minYaw = float.MaxValue;
+    var maxYaw = float.MinValue;
+    for ( var i = 0; i < 7200; i++ )
+    {
+        var sample = AimBreathingRules.Step( state, 1f / 120f, 1f, 1f, 0 );
+        state = sample.State;
+        Check( Math.Abs( sample.Pitch ) <= 0.11901f && Math.Abs( sample.Yaw ) <= 0.05551f, "Conservative novice bounds" );
+        if ( i < 120 ) continue;
+        minPitch = Math.Min( minPitch, sample.Pitch ); maxPitch = Math.Max( maxPitch, sample.Pitch );
+        minYaw = Math.Min( minYaw, sample.Yaw ); maxYaw = Math.Max( maxYaw, sample.Yaw );
+    }
+    Check( maxPitch - minPitch > 0.16f && maxYaw - minYaw > 0.06f, "Breathing continues after ADS settles" );
+} );
+
+Scenario( "Handling steadily improves breathing control but retains natural motion at maximum", () =>
+{
+    var state = new AimBreathingRules.State( 9d, 7d, 1f, 0f );
+    var novice = AimBreathingRules.Step( state, 0f, 1f, 1f, 0 );
+    var previous = Math.Abs( novice.Pitch );
+    for ( var level = 1; level <= MaxLevel; level++ )
+    {
+        var sample = AimBreathingRules.Step( state, 0f, 1f, 1f, XPForLevel( level ) );
+        Check( Math.Abs( sample.Pitch ) <= previous + 0.000001f && Math.Abs( sample.Pitch ) > 0.01f, $"Natural control at level {level}" );
+        previous = Math.Abs( sample.Pitch );
+    }
+    var trained = AimBreathingRules.Step( state, 0f, 1f, 1f, int.MaxValue );
+    Near( trained.Pitch, novice.Pitch * 0.85f, 0.000001f, "Existing 15% sway cap applies to breathing" );
+    Near( trained.Yaw, novice.Yaw * 0.85f, 0.000001f, "Handling improves both axes" );
+} );
+
+Scenario( "Stances steady breathing and exertion increases it without removing the trained benefit", () =>
+{
+    var state = new AimBreathingRules.State( 9d, 7d, 1f, 0f );
+    var standing = AimBreathingRules.Step( state, 0f, 1f, 1f, 0 );
+    var crouched = AimBreathingRules.Step( state, 0f, 1f, 1f, 0, crouched: true );
+    var prone = AimBreathingRules.Step( state, 0f, 1f, 1f, 0, prone: true );
+    var mounted = AimBreathingRules.Step( state, 0f, 1f, 1f, 0, crouched: true, prone: true, mounted: true );
+    Check( standing.Pitch > crouched.Pitch && crouched.Pitch > prone.Pitch && prone.Pitch > mounted.Pitch && mounted.Pitch > 0f,
+        "Progressively better support, always some motion" );
+    var exertedState = new AimBreathingRules.State( 9d, 7d, 1f, 1f );
+    var exerted = AimBreathingRules.Step( exertedState, 0f, 1f, 0f, 0 );
+    var exertedTrained = AimBreathingRules.Step( exertedState, 0f, 1f, 0f, int.MaxValue );
+    Near( exerted.Pitch, standing.Pitch * 1.8f, 0.000001f, "Bounded exertion effect" );
+    Near( exertedTrained.Pitch, exerted.Pitch * 0.85f, 0.000001f, "Training still helps while tired" );
+    var recovering = AimBreathingRules.Step( exertedState, 0.25f, 1f, 1f, 0 );
+    Check( recovering.State.Fatigue is > 0f and < 1f, "Breathing recovers smoothly rather than resetting" );
+} );
+
+Scenario( "Breathing rate and ADS transitions are continuous across frame rates", () =>
+{
+    AimBreathingRules.Sample Simulate( int hz )
+    {
+        var state = default( AimBreathingRules.State );
+        var sample = default( AimBreathingRules.Sample );
+        for ( var i = 0; i < hz * 5; i++ )
+        {
+            sample = AimBreathingRules.Step( state, 1f / hz, 1f, 0.2f, 240 );
+            state = sample.State;
+        }
+        return sample;
+    }
+    var baseline = Simulate( 60 );
+    foreach ( var hz in new[] { 30, 120, 144 } )
+    {
+        var sample = Simulate( hz );
+        Near( sample.Pitch, baseline.Pitch, 0.00001f, $"Pitch at {hz} Hz" );
+        Near( sample.Yaw, baseline.Yaw, 0.00001f, $"Yaw at {hz} Hz" );
+        Check( Math.Abs( sample.State.Phase - baseline.State.Phase ) < 0.00001d, $"Continuous rate at {hz} Hz" );
+    }
+    var initial = AimBreathingRules.Step( default, 1f / 60f, 1f, 1f, 0 );
+    Check( initial.State.AimWeight is > 0f and < 0.2f, "ADS breath fades in" );
+    var fading = AimBreathingRules.Step( baseline.State, 1f / 60f, 0f, 1f, 240 );
+    Check( fading.State.AimWeight is > 0f and < 1f, "ADS breath fades out" );
+    for ( var i = 0; i < 90; i++ ) fading = AimBreathingRules.Step( fading.State, 1f / 60f, 0f, 1f, 240 );
+    Check( fading.Pitch == 0f && fading.Yaw == 0f && fading.State.Phase > baseline.State.Phase,
+        "No lingering hip sway or restartable breathing cycle" );
+} );
+
+Scenario( "Invalid breathing inputs cannot corrupt aim or create an unbounded hitch", () =>
+{
+    var invalid = new AimBreathingRules.State( double.NaN, double.PositiveInfinity, float.NaN, float.NaN );
+    var sample = AimBreathingRules.Step( invalid, float.NaN, float.NaN, float.NaN, int.MinValue );
+    Check( sample.Pitch == 0f && sample.Yaw == 0f && double.IsFinite( sample.State.Phase ), "Invalid values stay neutral and finite" );
+    var stalled = AimBreathingRules.Step( default, 10f, 1f, 0f, 0 );
+    Near( (float)stalled.State.Elapsed, 0.25f, 0.000001f, "Hitches cannot skip whole breaths" );
+    var unchanged = AimBreathingRules.Step( stalled.State, -1f, 1f, 0f, 0 );
+    Near( unchanged.Pitch, stalled.Pitch, 0.000001f, "Negative time does not advance the aim" );
+} );
+
+Console.WriteLine( $"PASS: {scenarios} training and breathing scenarios using the production rules and profile code." );
 
 // Only the engine's account, clock and cookie boundary are replaced. Rules and save/merge behavior are production code.
 namespace Facepunch

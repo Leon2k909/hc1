@@ -1,0 +1,8 @@
+var session=Editor.SceneEditorSession.Active;
+if (session is null || !session.Scene.Source.ResourcePath.Equals("scenes/maps/belltower/belltower.scene",StringComparison.OrdinalIgnoreCase))
+    throw new InvalidOperationException("Requires Belltower.");
+return session.Scene.GetAllComponents<ModelRenderer>()
+    .Where(r=>r.Model?.ResourcePath?.Contains("beech_bush_small",StringComparison.OrdinalIgnoreCase)==true)
+    .Where(r=>MathF.Abs(r.WorldPosition.x-330)<1 && MathF.Abs(MathF.Abs(r.WorldPosition.y)-1780)<1)
+    .Select(r=>new {r.GameObject.Name,Position=r.WorldPosition.ToString(),Scale=r.WorldScale.ToString(),
+        Model=r.Model.ResourcePath,Bounds=r.Model.Bounds.ToString()}).ToArray();
