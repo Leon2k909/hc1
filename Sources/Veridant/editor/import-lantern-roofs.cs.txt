@@ -1,0 +1,69 @@
+// Import the scoped roof-only OBJ edits; preserve the open document and collision.
+var root = Sandbox.Project.Current.GetRootPath();
+var folder = System.IO.Path.Combine(root, "output/veridant/lantern-roof-v1");
+var manifest = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder, "manifest.json")));
+if (manifest["revision"].GetValue<string>() != "veridant-lantern-roof-v1") throw new InvalidOperationException("Wrong staged change.");
+var session = Editor.SceneEditorSession.Active;
+if (Game.IsPlaying) throw new InvalidOperationException("A play session started; no files imported.");
+var sceneId = session?.Scene.Id;
+var dirty = session?.HasUnsavedChanges;
+string Hash(string path) => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+void CheckProtected()
+{
+    foreach (var pair in manifest["protected"].AsObject())
+        if (Hash(System.IO.Path.Combine(root, pair.Key)) != pair.Value.GetValue<string>())
+            throw new InvalidOperationException("Shared input changed: " + pair.Key);
+}
+CheckProtected();
+var plans = new System.Collections.Generic.List<(string Target, string Stage, string Backup, string Before, string After)>();
+foreach (var pair in manifest["files"].AsObject())
+{
+    if (pair.Key != "Assets/models/maps/veridant/veridant_buildings.obj" && pair.Key != "Assets/models/maps/veridant/veridant_dress.obj")
+        throw new InvalidOperationException("Unexpected asset.");
+    var target = System.IO.Path.Combine(root, pair.Key);
+    var stage = System.IO.Path.Combine(root, pair.Value["stage"].GetValue<string>());
+    var backup = System.IO.Path.Combine(root, pair.Value["backup"].GetValue<string>());
+    var before = pair.Value["before"].GetValue<string>();
+    var after = pair.Value["after"].GetValue<string>();
+    if (Hash(stage) != after || Hash(backup) != before) throw new InvalidOperationException("Stage or backup changed.");
+    if (Hash(target) == after) continue;
+    if (Hash(target) != before) throw new InvalidOperationException("Shared model changed: " + pair.Key);
+    plans.Add((target, stage, backup, before, after));
+}
+var changed = new System.Collections.Generic.List<(string Target, string Backup)>();
+try
+{
+    foreach (var plan in plans)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        if (Hash(plan.Target) != plan.Before) throw new InvalidOperationException("Shared model changed during import.");
+        System.IO.File.Copy(plan.Stage, plan.Target, true);
+        changed.Add((plan.Target, plan.Backup));
+        if (Hash(plan.Target) != plan.After) throw new InvalidOperationException("Import checksum differs.");
+        Editor.AssetSystem.RegisterFile(plan.Target);
+    }
+}
+catch
+{
+    foreach (var item in changed.AsEnumerable().Reverse()) System.IO.File.Copy(item.Backup, item.Target, true);
+    throw;
+}
+var compiled = new System.Collections.Generic.List<object>();
+foreach (var name in new[] { "veridant_buildings", "veridant_dress" })
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    var file = System.IO.Path.Combine(root, "Assets/models/maps/veridant", name + ".vmdl");
+    var asset = Editor.AssetSystem.FindByPath(file) ?? Editor.AssetSystem.RegisterFile(file);
+    var ok = asset.Compile(true);
+    await Task.Delay(16, cancellationToken);
+    compiled.Add(new { Model = name, Ok = ok, asset.IsCompiled, asset.IsCompileFailed });
+    if (!ok || asset.IsCompileFailed) throw new InvalidOperationException("Model compilation failed: " + name);
+}
+CheckProtected();
+var preserved = ReferenceEquals(session, Editor.SceneEditorSession.Active) && sceneId == session?.Scene.Id
+    && dirty == session?.HasUnsavedChanges && !Game.IsPlaying;
+var result = new { Imported = plans.Count, Lamps = manifest["lamps"].AsArray().Count,
+    Compiled = compiled, EditorStatePreserved = preserved, SceneChanged = false, CollisionChanged = false };
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder, "import-result.json"), System.Text.Json.JsonSerializer.Serialize(result));
+if (!preserved) throw new InvalidOperationException("Editor state changed during import; inspect the completed result.");
+return result;

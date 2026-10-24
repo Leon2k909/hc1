@@ -1,0 +1,14 @@
+// Tools/veridant_lounger.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    g_flRoughnessScaleFactor "1"
+    g_flMetalness "0"
+    TextureColor "materials/veridant/lounger-v2/cloth_color.png"
+    TextureNormal "materials/veridant/lounger-v2/cloth_normal.png"
+    TextureRoughness "materials/veridant/lounger-v2/cloth_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[1.0 1.0 1.0 1]"
+    g_flModelTintAmount "1.0"
+}

@@ -6392,6 +6392,104 @@ simulate_input.
   with shadows), and any sound (it has no ambience).
 
 ## Veridant (multiplayer map, `Tools/veridant_map.py`)
+- Pergola flowers (2026-10-24): `veridant_parts.bougainvillea()` delegates to
+  `Tools/veridant_bougainvillea.py` for branching vines, folded green leaves and
+  small shaded pink bracts. The six old atlas cards (24 triangles) are removed
+  from a byte-preserved `pergola-flowers-v2/foliage-base.obj`; the foliage VMDL
+  also imports `pergola-flowers-v2/flowers.obj`. Original foliage indices, atlas,
+  scene and collision are preserved. `configure()` keeps the `vr_bv_` material
+  overrides. Final stage-v5, native compile receipts and front/angle captures
+  are documented in `Sources/Veridant/pergola-flowers-v2/README.md`.
+- Garden table planter shrub (2026-10-24): the single olive at (-470,740,148)
+  now uses `Tools/veridant_planter_shrub.py` with the installed beech shrub's
+  authored mesh/material, finer branches, embedded roots and textured soil.
+  The canonical foliage OBJ and active `pergola-flowers-v2/foliage-base.obj`
+  both replace precisely 466 old triangles with 2,972; retained bytes and index
+  mappings are preserved. Scene and physics stay unchanged. Native compilation,
+  live material checks and matched captures passed. See
+  `Sources/Veridant/planter-shrub-v1/README.md` and its installed receipt.
+- Lounger upholstery realism (2026-10-24): `Tools/veridant_lounger_soft.py` adds
+  crowned and compressed foam, irregular cloth outlines, smooth seam pulls,
+  piping/stitches and rounded, subtly varied teak sections. The existing lounger
+  generator delegates to it, and all eight dedicated lounger imports plus the
+  reusable prop are updated through their existing `lounger-v2` resource paths.
+  Model documents, physics, scene, shared map OBJs and other prop imports retain
+  their hashes. Final publication: `output/veridant/lounger-v3/stage-v3/manifest.json`.
+  Seven materials and three models compiled; garden and rooftop captures were
+  reviewed. See `Sources/Veridant/lounger-v3/README.md` and the validation receipt.
+- Bistro tables (2026-10-24): `Tools/veridant_table.py` supplies the 128-segment honed stone top with a 3 mm eased
+  edge, a 64-segment bevelled pedestal base and a 32-segment stem. All 11 published tables retain their 30-inch
+  diameter, 29.5-inch height, 1.5-inch slab thickness, placements and collision. The tabletop's own material uses
+  restrained relief and UVs inside one limestone panel; OBJ import flips V, so source V=.75 becomes engine V=.25.
+  Scoped imports and native mesh/UV/rim checks are in `output/veridant/table-v2/`; the reviewed final view is
+  `output/veridant/quality/table-v2-complete/angled.png`. Resolve current VMDL render imports when patching: the
+  dressing now uses `chair-v2/dress-base.obj`. These OBJs contain interleaved vertex tables; append new tables
+  after all retained bytes so existing vertex, UV and normal indices keep their original meaning.
+- West bar doorway clearance (2026-10-24): `shelves_beside_doors()` keeps shelving
+  outside the cafe entrances at N=-80 and N=100 and lounge entrance at N=-390,
+  using the wall's shared 60x96 inch doorway definitions plus 4 inch jamb margins.
+  The active buildings render import is `lounger-v2/veridant_buildings-base.obj`;
+  its shelf correction and the canonical OBJ retain subsequent lounger work.
+  `stage-v5-index-repair` restores the original OBJ index allocation while keeping
+  face/material records unchanged. Sparse patches must append new tables after
+  all original tables, including declarations after faces. Native compile and
+  27 doorway collision rays passed; final evidence is in
+  `output/veridant/door-obstruction/validation.json` and
+  `output/veridant/quality/door-obstruction-after-repaired/cafe-south.png`.
+- Bistro chair clearance correction (2026-10-24): `Tools/veridant_chair.py` now
+  routes the rear uprights behind the backrest and around the seat. Rear mounting
+  spacers replace the collars that pierced the wicker. All 12 instances use the
+  two `models/maps/veridant/chair-v3/chairs-*.obj` imports, at 4,480 triangles each.
+  The chair-v2 base and current lounger import remain. See
+  `Sources/Veridant/chair-v3/README.md` and `output/veridant/chair-v3/after/` for
+  front, rear and side close-ups. Scene placement, materials and physics are preserved.
+- Bistro chair rebuild (2026-10-24): `Tools/veridant_parts.chair()` delegates to
+  `Tools/veridant_chair.py`; all 12 published chairs now have curved wicker panels,
+  rounded bound edges and smooth tapered steel legs. `veridant_materials` generates
+  the 1024px wicker PBR maps. The dressing model references two six-chair imports
+  and `models/maps/veridant/chair-v2/dress-base.obj`; physics and scene placements
+  are preserved. See `Sources/Veridant/chair-v2/README.md` and the final stage-v8
+  manifest. Existing Veridant OBJs interleave tables and faces: append new table
+  declarations after all old data, since inserting before the first `usemtl`
+  shifts indices in later declarations. Final editor captures are under
+  `output/veridant/chair-v2/final/`.
+- Inland hillside image backdrop (2026-10-24): `Tools/veridant_inland_vista.py` removes the remaining box villas and
+  polygon trees after the bay-impostor pass. Three distinct photographic sectors from one RGBA atlas (288 triangles total,
+  radius 14000) replace the earlier enlarged picture. Each keeps equal world scale per image pixel; uniform vertical
+  translations match the ridge heights. `mainland_arc()` derives the bearings from the actual coast at that radius
+  (currently -140.945 to 73.831 degrees), preventing scenery from being placed offshore. The horizon shader blends
+  adjacent image samples in texture space, preserving full interior coverage; only the two outer ends fade into haze.
+  ModelDoc flips the OBJ's V coordinates, so shader atlas samples use top-down PNG row order directly.
+  `Tools/veridant_vista_ground.py` builds a closed rolling mainland outside the play rectangle with separate cliff faces,
+  smoothly shaded normals, a continuous grass/soil material and 180 photographic scrub clumps (720 triangles). A coarse
+  backing extends to radius 60000 so elevated inland views cannot expose the sea behind low photographic valleys.
+  Clipped triangles interpolate their original plane, and scrub bases sample those actual triangles. There is no photo
+  projected on the ground. The two backdrop meshes total 32,438 triangles, down from 164,312 (80.3% fewer); FPS is unmeasured.
+  The near sea wall/riprap and original bay/boat cards remain byte-for-byte. No scene, physics, water, camera, lighting,
+  probe or gameplay changes were made. `veridant_backdrop.build()` applies the replacement; the material generator's
+  `impostors` command writes its five materials and two exact generated PNGs. Active shaders are
+  `hc1_veridant_horizon_v4.shader` and `hc1_veridant_scrub_v3.shader`. Sources, both built-in imagegen prompts, alpha
+  measurements and native scripts are in `Sources/Veridant/inland-vista-v1/distance-fix/`; published textures are
+  `materials/veridant/vista/inland-v1.png` and `inland-scrub.png`. The guarded native import atomically replaces existing
+  sources to avoid overwriting files mapped by the model compiler. Final stage: `output/veridant/inland-vista-v1/distance-fix/stage-v26/`;
+  original meshes remain in the parent run's `before-assets/`. Native shader/material/model compiles and 13 isolated
+  captures passed (`distance-fix/after-v26/`). Verification measured less than 0.05% per-sector pixel-scale variation
+  and zero internal cracks across 766 ground boundary edges; the source scene and stopped play state were preserved.
+- West bar door clearance (2026-10-24): the cafe's two west entrances and the lounge's west entrance were hidden
+  behind the continuous wooden backs of `counter_shelves`. `shelves_beside_doors` splits complete shelf units,
+  bottles and LED strips around the shared wall-opening definitions, with 4 in of jamb clearance. Only those two
+  assemblies were patched in `veridant_buildings.obj` (3,432 triangles replaced by 1,926); all unrelated OBJ bytes,
+  materials and physics sources were retained at publication. This task did not write the scene or physics sources.
+  Native compilation and 27 collision rays across the three openings passed; a matched screenshot verifies the
+  doorway in the user's picture. An optional player-box sweep timed out and is not claimed as passed. Other capture
+  attempts overlapped unrelated shared asset recompiles. `Sources/Veridant/door-clearance-v1/installed.json` and
+  `output/veridant/door-obstruction/validation.json` record the import and verification.
+- Pine planter bushes (2026-10-24): the north terrace's leaning stone pine now has 12 grounded beech bushes
+  (`facepunch.beech_bush_small#145429`, also used on Belltower), replacing its 15 crossed grass clumps. Only the
+  exact 120 old grass triangles were removed from `veridant_foliage.obj`; the tree and collision stay.
+  `Tools/veridant_planter_bushes.py` defines the varied placement and root embed, and `veridant_map.py` retains
+  the instances and package reference on regeneration. Saved native scene group: `Veridant/Pine planter beech bushes`.
+  Before/after captures and the scoped verification are in `output/veridant/planter-bushes-v1/`.
 - Distant bay image impostors (2026-10-18): `Tools/veridant_impostors.py` replaces the headland, castle/town and
   anchored boats with two generated RGBA textures in `Assets/materials/veridant/vista/` (`headland.png`, `boats.png`).
   The headland is a fixed curved strip (96 triangles); the yacht and nine sailboats have separate fixed quads at
@@ -6474,6 +6572,13 @@ simulate_input.
     instances load with valid materials, and the generator's 97 spot, route and Retakes checks pass.
   - `output/veridant/cerroblanco-bushes/` holds the pre-change sources, staging manifest and reviewed native
     tall-hedge, low-border and garden overview captures. The scene was saved through the editor.
+- Terrace stone pine: `veridant_parts.stone_pine` delegates to `Tools/veridant_stone_pine.py`. The old flat dark disc
+  and oversized foliage planes are replaced with branching limbs and 13 separate mountain-pine sprays from
+  `facepunch.pine_shrub_wide#145484`; their exported mesh/provenance is in `Sources/Veridant/stone-pine-v2/`.
+  `veridant_map.configure` preserves its cloud material override and `write_scene` pins that dependency. The scoped
+  splice (`Tools/veridant_stage_stone_pine.py`) replaced 606 triangles with 30,310 and retained the other 41,946 foliage
+  triangles exactly; no collision or scene transforms changed. Native import/verification scripts are under
+  `Sources/Veridant/editor/*stone-pine-v2*`; reviewed map captures and checks are in `output/veridant/stone-pine-v2/`.
 - Player clips: a clip's BoxCollider turned to its rail's heading (`K.yaw_rotation( yaw - 90 )`) lies along its local
   x, so its Scale is ( length, thickness, height ). Checked in the engine: with the length on y every path through the
   terraces came back Partial. Riverdale and Riverside write ( size[1], size[0], size[2] ), which lays each of their

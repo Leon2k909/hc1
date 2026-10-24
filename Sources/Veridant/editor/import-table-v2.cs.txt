@@ -1,0 +1,59 @@
+// Guarded, local publication of only bistro tops and their material remaps.
+var root = Sandbox.Project.Current.GetRootPath();
+if (!System.IO.Path.GetFullPath(root).TrimEnd('\\').Equals(@"C:\sbox-projects\hc1\forked-shooter-main", StringComparison.OrdinalIgnoreCase))
+    throw new InvalidOperationException("Unexpected project.");
+var folder = System.IO.Path.Combine(root, "output/veridant/table-v2");
+var manifest = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder, "stage-pedestal-v1/manifest.json")));
+if (manifest["revision"].GetValue<string>() != "veridant-table-v2") throw new InvalidOperationException("Wrong revision.");
+var session = Editor.SceneEditorSession.Active;
+var playing = Game.IsPlaying;
+var game = Game.ActiveScene?.Id;
+var dirty = session.HasUnsavedChanges;
+if (playing || dirty || session.Scene.Source?.ResourcePath?.Equals("scenes/maps/veridant/veridant.scene", StringComparison.OrdinalIgnoreCase) != true)
+    throw new InvalidOperationException("The saved, stopped Veridant document is required; inspect current editor state.");
+string Hash(string p) => System.IO.File.Exists(p) ? Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant() : null;
+foreach (var group in new[] { "source_sha256", "protected_sha256" })
+    foreach (var pair in manifest[group].AsObject())
+        if (Hash(System.IO.Path.Combine(root, pair.Key)) != pair.Value.GetValue<string>())
+            throw new InvalidOperationException("Shared input changed: " + pair.Key);
+var files = manifest["files"].AsObject();
+foreach (var pair in files)
+{
+    var relative = pair.Key;
+    if (!relative.StartsWith("Assets/models/maps/veridant/", StringComparison.Ordinal) && relative != "Assets/materials/veridant/table-v2/honed.vmat")
+        throw new InvalidOperationException("Unexpected publication target.");
+    var item = pair.Value;
+    var target = System.IO.Path.Combine(root, relative);
+    var before = item["before"]?.GetValue<string>();
+    var after = item["after"].GetValue<string>();
+    if (Hash(target) != before && Hash(target) != after) throw new InvalidOperationException("Shared asset changed: " + relative);
+    if (Hash(System.IO.Path.Combine(root, item["source"].GetValue<string>())) != after) throw new InvalidOperationException("Staged asset changed.");
+    if (before != null && Hash(System.IO.Path.Combine(root, item["backup"].GetValue<string>())) != before) throw new InvalidOperationException("Backup changed.");
+}
+var imported = new System.Collections.Generic.List<string>();
+foreach (var pair in files)
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    var target = System.IO.Path.Combine(root, pair.Key);
+    var item = pair.Value;
+    var after = item["after"].GetValue<string>();
+    if (Hash(target) == after) continue;
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target));
+    var incoming = target + ".table-v2-incoming";
+    try
+    {
+        System.IO.File.Copy(System.IO.Path.Combine(root, item["source"].GetValue<string>()), incoming, true);
+        if (Hash(incoming) != after) throw new InvalidOperationException("Incoming checksum differs.");
+        System.IO.File.Move(incoming, target, true);
+    }
+    finally { if (System.IO.File.Exists(incoming)) System.IO.File.Delete(incoming); }
+    Editor.AssetSystem.RegisterFile(target);
+    imported.Add(pair.Key);
+}
+foreach (var pair in manifest["protected_sha256"].AsObject())
+    if (Hash(System.IO.Path.Combine(root, pair.Key)) != pair.Value.GetValue<string>()) throw new InvalidOperationException("Protected file changed.");
+var preserved = ReferenceEquals(session, Editor.SceneEditorSession.Active) && playing == Game.IsPlaying && game == Game.ActiveScene?.Id && dirty == session.HasUnsavedChanges;
+var result = new { Imported = imported, Instances = manifest["active_instances"].GetValue<int>(), EditorStatePreserved = preserved, CollisionChanged = false, SceneChanged = false };
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder, "native-import.json"), System.Text.Json.JsonSerializer.Serialize(result));
+if (!preserved) throw new InvalidOperationException("Editor state changed; inspect completed import.");
+return result;

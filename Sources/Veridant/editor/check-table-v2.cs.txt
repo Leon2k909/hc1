@@ -1,0 +1,49 @@
+// Read actual compiled draw-call buffers, including the complete flat caps.
+var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic;
+var results=new System.Collections.Generic.List<object>();
+var sets=new[]{
+    (Path:"models/maps/veridant/veridant_buildings.vmdl",Rows:new[]{(-520f,-100f,0f),(-520f,40f,0f),(-400f,-120f,0f),(-400f,20f,0f),(-400f,140f,0f),(-520f,150f,0f),(110f,380f,128f)}),
+    (Path:"models/maps/veridant/veridant_dress.vmdl",Rows:new[]{(-520f,800f,128f),(-330f,820f,128f),(220f,-1060f,0f),(-460f,-1240f,0f)})
+};
+foreach(var set in sets)
+{
+    var model=Model.Load(set.Path);
+    if(model.IsError||model.Materials.Any(m=>m.IsError))throw new InvalidOperationException("Compiled model or material failed.");
+    var areas=new float[set.Rows.Length];var counts=new int[set.Rows.Length];
+    var uv=new System.Collections.Generic.List<Vector2>();var minimumNormal=1f;
+    var count=(int)typeof(Model).GetMethod("GetLodDrawCallCount",flags).Invoke(model,new object[]{0});
+    for(var draw=0;draw<count;draw++)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        object[] data={0,draw,null,null,null};
+        if(!(bool)typeof(Model).GetMethod("TryReadDrawCall",flags).Invoke(model,data))continue;
+        var vs=(Vertex[])data[2];var indices=(uint[])data[3];
+        for(var i=0;i+2<indices.Length;i+=3)
+        {
+            var va=vs[indices[i]];var vb=vs[indices[i+1]];var vc=vs[indices[i+2]];
+            var a=va.Position;var b=vb.Position;var c=vc.Position;
+            for(var row=0;row<set.Rows.Length;row++)
+            {
+                var (e,n,z)=set.Rows[row];
+                bool Near(Vector3 p)=>MathF.Abs(p.x-n)<15.1f&&MathF.Abs(p.y+e)<15.1f&&MathF.Abs(p.z-(z+29.5f))<.0001f;
+                if(!Near(a)||!Near(b)||!Near(c))continue;
+                var area=Vector3.Cross(b-a,c-a).z*.5f;
+                if(area<=0)throw new InvalidOperationException("A tabletop cap faces downwards.");
+                areas[row]+=area;counts[row]++;
+                uv.Add(va.TexCoord0);uv.Add(vb.TexCoord0);uv.Add(vc.TexCoord0);
+                minimumNormal=MathF.Min(minimumNormal,MathF.Min(va.Normal.z,MathF.Min(vb.Normal.z,vc.Normal.z)));
+            }
+        }
+    }
+    if(areas.Any(a=>a<694||a>698)||counts.Any(n=>n<126))throw new InvalidOperationException("A compiled cap is incomplete: "+string.Join(",",areas));
+    if(uv.Any(p=>p.x<.34f||p.x>.66f||p.y<.09f||p.y>.41f))throw new InvalidOperationException("A cap samples outside its single stone panel.");
+    var allVertices=model.GetVertices();
+    var baseCounts=set.Rows.Select(row=>allVertices.Where(v=>MathF.Abs(v.Position.z-row.Item3)<.001f && MathF.Abs(MathF.Sqrt(MathF.Pow(v.Position.x-row.Item2,2)+MathF.Pow(v.Position.y+row.Item1,2))-9)<.001f)
+        .Select(v=>(MathF.Round(v.Position.x,3),MathF.Round(v.Position.y,3))).Distinct().Count()).ToArray();
+    if(baseCounts.Any(n=>n!=64))throw new InvalidOperationException("A pedestal still has polygon corners: "+string.Join(",",baseCounts));
+    results.Add(new{set.Path,Instances=set.Rows.Length,FlatCapAreaSquareInches=areas,CapTriangles=counts,MinimumCapNormalZ=minimumNormal,
+        UvMinimum=new[]{uv.Min(p=>p.x),uv.Min(p=>p.y)},UvMaximum=new[]{uv.Max(p=>p.x),uv.Max(p=>p.y)},BaseRimVertices=baseCounts,ModelAndMaterialsValid=true});
+}
+var result=new{Models=results,CompleteCaps=11,HasUnsavedChanges=Editor.SceneEditorSession.Active.HasUnsavedChanges,Game.IsPlaying};
+System.IO.File.WriteAllText(System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(),"output/veridant/table-v2/compiled-check.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

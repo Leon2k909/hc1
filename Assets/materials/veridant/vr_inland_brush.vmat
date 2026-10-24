@@ -1,0 +1,9 @@
+// Tools/veridant_inland_vista.py
+"Layer0"
+{
+    shader "shaders/hc1_veridant_impostor.shader"
+    F_ALPHA_TEST "1"
+    TextureVista "materials/veridant/vista/inland-scrub.png"
+    g_flAlphaTestReference "0.65"
+    g_flVistaBrightness "0.9"
+}

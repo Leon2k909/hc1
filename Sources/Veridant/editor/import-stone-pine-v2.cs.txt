@@ -1,0 +1,45 @@
+// Install exactly the reviewed tree splice through the open editor.
+var root=Sandbox.Project.Current.GetRootPath();
+var work=System.IO.Path.Combine(root,"output/veridant/stone-pine-v2");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(work,"stage/manifest.json")));
+var session=Editor.SceneEditorSession.Active;
+var before=new{Scene=session?.Scene?.Id,Dirty=session?.HasUnsavedChanges,Game.IsPlaying,GameScene=Game.ActiveScene?.Id};
+if(Game.IsPlaying) throw new InvalidOperationException("A play session started; the pine has not been installed.");
+string Hash(string path)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+var files=new System.Collections.Generic.List<(string Source,string Target,string Backup,string Before,string After)>();
+foreach(var row in manifest["Files"].AsArray()) {
+    var relative=row["Path"].GetValue<string>();
+    if(!new[]{"Assets/models/maps/veridant/veridant_foliage.obj","Assets/models/maps/veridant/veridant_foliage.mtl","Assets/models/maps/veridant/veridant_foliage.vmdl"}.Contains(relative))
+        throw new InvalidOperationException("Unexpected target.");
+    var target=System.IO.Path.Combine(root,relative);
+    var source=System.IO.Path.Combine(root,row["Staged"].GetValue<string>());
+    var backup=System.IO.Path.Combine(work,"before",System.IO.Path.GetFileName(target));
+    var original=row["Before"].GetValue<string>(); var expected=row["After"].GetValue<string>();
+    if(Hash(source)!=expected||Hash(backup)!=original) throw new InvalidOperationException("Stage or backup changed.");
+    if(Hash(target)==expected) continue;
+    if(Hash(target)!=original) throw new InvalidOperationException("Shared foliage changed; no files installed.");
+    files.Add((source,target,backup,original,expected));
+}
+var written=new System.Collections.Generic.List<(string Target,string Backup)>();
+try {
+    foreach(var item in files) {
+        cancellationToken.ThrowIfCancellationRequested();
+        if(Hash(item.Target)!=item.Before) throw new InvalidOperationException("Shared file changed during import.");
+        var incoming=item.Target+".pine-v2-incoming";
+        try {
+            System.IO.File.Copy(item.Source,incoming,true);
+            if(Hash(incoming)!=item.After) throw new InvalidOperationException("Incoming checksum differs.");
+            System.IO.File.Move(incoming,item.Target,true);
+            written.Add((item.Target,item.Backup));
+        } finally { if(System.IO.File.Exists(incoming)) System.IO.File.Delete(incoming); }
+    }
+} catch {
+    foreach(var item in written.AsEnumerable().Reverse()) System.IO.File.Copy(item.Backup,item.Target,true);
+    throw;
+}
+foreach(var item in files) Editor.AssetSystem.RegisterFile(item.Target);
+var preserved=ReferenceEquals(session,Editor.SceneEditorSession.Active)&&session?.Scene?.Id==before.Scene&&session?.HasUnsavedChanges==before.Dirty&&Game.IsPlaying==before.IsPlaying&&Game.ActiveScene?.Id==before.GameScene;
+var result=new{Installed=files.Count,OldTreeTriangles=manifest["OldTreeTriangles"].GetValue<int>(),NewTreeTriangles=manifest["NewTreeTriangles"].GetValue<int>(),RetainedTriangles=manifest["RetainedTriangles"].GetValue<int>(),EditorStatePreserved=preserved,SceneChanged=false,CollisionChanged=false};
+System.IO.File.WriteAllText(System.IO.Path.Combine(work,"installed.json"),System.Text.Json.JsonSerializer.Serialize(result));
+if(!preserved) throw new InvalidOperationException("Editor state changed; inspect the installed result.");
+return result;

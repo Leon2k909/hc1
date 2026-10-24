@@ -1,0 +1,14 @@
+// Tools/veridant_backbar.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    g_flMetalness "0"
+    g_flRoughnessScaleFactor "1"
+    TextureColor "materials/veridant/backbar-v1/labels_color.png"
+    TextureNormal "materials/veridant/backbar-v1/flat_normal.png"
+    TextureRoughness "[0.65 0.65 0.65 0]"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[1 1 1 1]"
+    g_flModelTintAmount "1.0"
+}

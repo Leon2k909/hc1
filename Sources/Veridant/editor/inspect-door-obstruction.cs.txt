@@ -1,0 +1,4 @@
+var session=Editor.SceneEditorSession.Active;
+return new {Scene=session.Scene.Source?.ResourcePath,session.HasUnsavedChanges,Game.IsPlaying,
+    Models=session.Scene.GetAllComponents<ModelRenderer>().Where(r=>r.Model?.ResourcePath?.Contains("veridant",StringComparison.OrdinalIgnoreCase)==true)
+        .Select(r=>new {r.GameObject.Name,Model=r.Model.ResourcePath,Position=r.WorldPosition.ToString(),Scale=r.WorldScale.ToString(),Rotation=r.WorldRotation.ToString()}).ToArray()};

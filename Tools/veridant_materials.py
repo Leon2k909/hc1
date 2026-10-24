@@ -59,7 +59,7 @@ TILES = { "vr_stone": 192.0, "vr_stone_dark": 192.0, "vr_stone_light": 96.0, "vr
           "vr_floor": 192.0, "vr_timber": 48.0, "vr_timber_dark": 48.0, "vr_steel": 48.0, "vr_case_black": 48.0,
           "vr_case_olive": 48.0, "vr_tarp": 64.0, "vr_bark": 48.0, "vr_palm_bark": 48.0, "vr_rock": 128.0,
           "vr_cliff": 3072.0, "vr_render": 192.0, "vr_grate": 24.0, "vr_hedge": 64.0, "vr_gravel": 96.0,
-          "vr_lawn": 128.0 }
+          "vr_lawn": 128.0, "vr_palm_mulch": 48.0 }
 
 
 def px( n ):
@@ -302,20 +302,26 @@ def bark( seed=61, n=None ):
 
 
 def palm_bark( seed=63, n=None ):
-    """ A date palm's trunk: the cut leaf bases in a diamond pattern, fibrous. """
+    """ Weathered fibrous date-palm bark with broken leaf scars, rather than a drawn diamond grid. """
     n = n or px( 1024 )
     tile = TILES["vr_palm_bark"]
     rng = np.random.default_rng( seed )
     nz, x, z, ppi = field( rng, n, tile )
-    a = ( x + z * 0.9 ) / 6.0
-    b = ( x - z * 0.9 ) / 6.0
-    diamond = np.minimum( np.abs( np.sin( a * math.pi ) ), np.abs( np.sin( b * math.pi ) ) )
-    scar = smoothstep( 0.18, 0.05, diamond )
-    fibre = aniso( rng, n, ppi, ( 1.0, 4.0 ), 1.4, 2, 0.05 )
-    c = lin( ( 122, 104, 82 ) )[None, None, :] * ( 1.0 + 0.08 * fibre + 0.06 * nz( 2.0, 10, 1 ) )[..., None]
-    c = mix( c, lin( ( 54, 44, 34 ) ), scar[..., None] * 0.8 )
-    r = 0.88 + 0.04 * fibre
-    h = 0.3 * ( 1 - scar ) + 0.04 * fibre
+    broad = nz( 1.8, 15, 1.0 )
+    fibre = aniso( rng, n, ppi, ( .22, 4.5 ), 1.4, 3.0, .04 )
+    fine = aniso( rng, n, ppi, ( .12, 2.8 ), 1.0, .7, .025 )
+    warp = nz( 1.5, 6.0, .6 )
+    rows = ( z + .50 * warp ) * 13 / tile
+    rid = np.floor( rows )
+    # Short staggered, curved scars, broken up by the fibrous surface.
+    sx = np.mod( x + rid * ( 40 / 13 ) + .7 * warp, 8.0 ) / 8.0
+    scar_line = .20 + .35 * np.abs( sx * 2 - 1 )
+    scar = smoothstep( .09, .015, np.abs( np.mod( rows, 1 ) - scar_line ) )
+    scar *= smoothstep( .05, .2, sx ) * smoothstep( .98, .80, sx ) * smoothstep( -1.2, .4, fibre )
+    c = lin( ( 113, 96, 73 ) )[None, None, :] * ( 1 + .12 * broad + .12 * fibre + .055 * fine )[..., None]
+    c = mix( c, lin( ( 65, 53, 39 ) ), scar[..., None] * .38 )
+    r = .9 + .025 * fibre + .015 * fine
+    h = .045 * fibre + .012 * fine + .025 * broad - .045 * scar
     return c, np.clip( r, 0.5, 1 ), h, ppi
 
 
@@ -867,7 +873,6 @@ PAINTED = {
     "vr_chrome": ( ( 204, 204, 208 ), 1.0, 0.18, 0 ),
     "vr_brass": ( ( 178, 134, 72 ), 1.0, 0.3, 0 ),
     "vr_planter": ( ( 46, 48, 50 ), 0.0, 0.7, 0 ),
-    "vr_soil": ( ( 38, 30, 24 ), 0.0, 0.95, 0 ),
     "vr_leaf_far": ( ( 70, 86, 62 ), 0.0, 0.85, 0 ),
     "vr_olive_mass": ( ( 98, 112, 84 ), 0.0, 0.85, 0 ),
     "vr_pine_dark": ( ( 30, 44, 32 ), 0.0, 0.9, 0 ),
@@ -887,7 +892,6 @@ PAINTED = {
     "vr_flowerpot": ( ( 166, 92, 62 ), 0.0, 0.8, 0 ),
     "vr_cloth_white": ( ( 236, 232, 222 ), 0.0, 0.9, 0 ),
     "vr_mattress": ( ( 210, 204, 190 ), 0.0, 0.9, 0 ),
-    "vr_wicker": ( ( 128, 104, 76 ), 0.0, 0.85, 0 ),
     "vr_mast": ( ( 220, 220, 216 ), 0.4, 0.4, 0 ),
     "vr_beacon_red": ( ( 255, 50, 40 ), 0.0, 0.3, 3 ),
     "vr_screen": ( ( 40, 120, 160 ), 0.0, 0.2, 1.0 ),
@@ -1015,6 +1019,7 @@ def write_surface_vmat( out, name, metalness=0.0, alpha_path=None, illum_path=No
 
 
 SURFACES = {
+    "vr_wicker": lambda: __import__("veridant_chair").wicker_surface(px(1024)),
     "vr_stone": lambda: stone( pits=1.9 ),
     "vr_stone_dark": lambda: stone( seed=12, base=( 118, 116, 110 ), grime=0.7, pits=1.6 ),
     "vr_stone_light": lambda: stone( seed=13, base=( 192, 188, 178 ), tile=TILES["vr_stone_light"], n=px( 1024 ), panel=( 48.0, 48.0 ),
@@ -1045,14 +1050,17 @@ SURFACE_TINT = { "vr_stone": ( 0.76, 0.76, 0.78 ), "vr_stone_light": ( 0.78, 0.7
 ROUGH_EXP = { "vr_paving": 1.45 }
 NORMAL_SIZE = { "vr_paving": 2048, "vr_cliff": 1024 }
 # Text-only materials over another surface's maps, tinted: the backdrop's distant cliffs.
-DERIVED = { "vr_cliff_far": ( "vr_cliff", ( 0.60, 0.62, 0.68 ) ), "vr_cliff_grey": ( "vr_cliff", ( 0.78, 0.83, 0.94 ) ),
+DERIVED = { "vr_soil": ( "vr_gravel", ( .60, .55, .48 ) ),
+            "vr_palm_mulch": ( "vr_gravel", ( .48, .31, .18 ) ),
+            "vr_cliff_far": ( "vr_cliff", ( 0.60, 0.62, 0.68 ) ), "vr_cliff_grey": ( "vr_cliff", ( 0.78, 0.83, 0.94 ) ),
             "vr_rock_dark": ( "vr_rock", ( 0.55, 0.54, 0.54 ) ) }
 NAMES = list( SURFACES ) + [ "foliage", "prints", "letters", "water", "glass", "painted", "derived", "impostors" ]
 
 
 def all_paints():
     return ( list( SURFACES ) + [ "vr_foliage", "vr_print", "vr_letters_dark", "vr_letters_light", "vr_sea", "vr_pool",
-                                  "vr_glass", "vr_glass_clear", "vr_bay_headland", "vr_bay_boats" ] + list( PAINTED ) + list( DERIVED ) )
+                                  "vr_glass", "vr_glass_clear", "vr_bay_headland", "vr_bay_boats", "vr_inland_vista",
+                                  "vr_inland_vista_b", "vr_inland_vista_c", "vr_inland_scrub", "vr_inland_brush" ] + list( PAINTED ) + list( DERIVED ) )
 
 
 def build( name, out ):
@@ -1060,6 +1068,8 @@ def build( name, out ):
     if name == "impostors":
         from veridant_impostors import write_materials
         write_materials(out)
+        from veridant_inland_vista import write_materials as write_inland_materials
+        write_inland_materials(out)
     elif name in SURFACES:
         c, r, h, ppi = SURFACES[name]()
         done[name] = write_surface( out, name, c, r, h, ppi, METALNESS.get( name, 0.0 ), normal_size=NORMAL_SIZE.get( name ) )

@@ -1,0 +1,8 @@
+var paths = new[] { "materials/veridant/lounger-v2/cloth.vmat", "materials/veridant/lounger-v2/teak.vmat",
+    "models/maps/veridant/veridant_buildings.vmdl", "models/maps/veridant/veridant_dress.vmdl",
+    "models/props/veridant/lounger-v2/lounger.vmdl" };
+return paths.Select(path => {
+    var asset = Editor.AssetSystem.FindByPath(path);
+    return new { Path = path, Found = asset is not null, Compiled = asset?.IsCompiled,
+        UpToDate = asset?.IsCompiledAndUpToDate, Failed = asset?.IsCompileFailed };
+}).ToArray();

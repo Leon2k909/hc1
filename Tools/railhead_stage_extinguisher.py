@@ -94,16 +94,18 @@ def replace_obj(source,canonical,base,wanted,addition):
             tokens = [b'/'.join(str(int(v)+counts[k]).encode() for k,v in zip((b'v',b'vt',b'vn'),token.split(b'/'))) for token in line.split()[1:]]
             tail.append(b'f '+b' '.join(tokens)+b'\n')
     canonical.parent.mkdir(parents=True,exist_ok=True); base.parent.mkdir(parents=True,exist_ok=True)
-    retained = hashlib.sha256(); inserted = False
+    retained = hashlib.sha256()
     with canonical.open('wb') as authored,base.open('wb') as unchanged:
         for number,line in enumerate(source.open('rb')):
-            if not inserted and line.startswith(b'usemtl '): authored.writelines(tables); inserted = True
             if number not in removed:
                 authored.write(line); unchanged.write(line); retained.update(line)
-        authored.writelines(tail)
-    assert inserted and sha(base) == retained.hexdigest()
-    actual = canonical.read_bytes().replace(b''.join(tables),b'',1)
-    actual = actual[:-len(b''.join(tail))]
+        # Original OBJ tables may be interleaved with faces by material. Keep
+        # every existing index stable by appending new tables after all of them.
+        authored.writelines(tables); authored.writelines(tail)
+    assert sha(base) == retained.hexdigest()
+    actual = canonical.read_bytes(); table_bytes = b''.join(tables); tail_bytes = b''.join(tail)
+    assert actual.endswith(table_bytes+tail_bytes)
+    actual = actual[:-len(table_bytes)-len(tail_bytes)]
     assert hashlib.sha256(actual).hexdigest() == retained.hexdigest()
     assert sha(source) == before, 'Shared model changed while staging.'
     return {'removed_triangles':len(removed),'unrelated_obj_bytes_exact':True,

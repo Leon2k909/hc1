@@ -1,0 +1,22 @@
+// One synchronous diagnostic render; restore the temporary material override.
+var session=Editor.SceneEditorSession.Active;
+if(Game.IsPlaying||session.HasUnsavedChanges)throw new InvalidOperationException("Inspect current editor state.");
+var scene=session.Scene;
+var renderer=scene.GetAllComponents<ModelRenderer>().Single(r=>r.Model?.ResourcePath=="models/maps/veridant/veridant_buildings.vmdl");
+var slot=Enumerable.Range(0,renderer.Materials.Count).Single(i=>renderer.Materials.GetOriginal(i)?.ResourcePath=="materials/veridant/table-v2/honed.vmat");
+var original=renderer.Materials.GetOverride(slot);var snapshot=renderer.Serialize().ToJsonString();
+var camera=scene.GetAllComponents<CameraComponent>().Single(c=>c.GameObject.Name=="editor_camera"&&c.GameObject.Flags.HasFlag(GameObjectFlags.EditorOnly));
+var path=System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(),"output/veridant/table-v2/diagnostic-stone.png");
+try
+{
+    renderer.Materials.SetOverride(slot,Material.Load("materials/veridant/vr_stone_light.vmat"));
+    using(scene.Push())
+    {
+        using var bitmap=new Bitmap(1280,720);
+        camera.RenderToBitmap(bitmap,false);
+        System.IO.File.WriteAllBytes(path,bitmap.ToPng());
+    }
+}
+finally{renderer.Materials.SetOverride(slot,original);}
+if(renderer.Serialize().ToJsonString()!=snapshot)throw new InvalidOperationException("Temporary material override restoration differs.");
+return new{Path=path,Restored=true,session.HasUnsavedChanges};

@@ -1,0 +1,30 @@
+var root = Sandbox.Project.Current.GetRootPath();
+var models = new System.Collections.Generic.List<object>();
+foreach (var path in new[] { "models/maps/veridant/veridant_foliage.vmdl", "models/maps/veridant/veridant_dress.vmdl",
+                            "models/maps/veridant/veridant_palm_pits.vmdl" })
+{
+    var model = Model.Load(path);
+    if (model is null || model.IsError) throw new InvalidOperationException("Model failed to load: " + path);
+    models.Add(new { Path = path, IsError = model.IsError, Vertices = model.GetVertices().Count() });
+}
+var materials = new System.Collections.Generic.List<object>();
+foreach (var name in new[] { "vr_palm_bark", "vr_palm_mulch" })
+{
+    var path = "materials/veridant/" + name + ".vmat";
+    var material = Material.Load(path);
+    if (material is null || material.IsError) throw new InvalidOperationException("Material failed to load: " + path);
+    var color = material.GetTexture("g_tColor");
+    var normal = material.GetTexture("g_tNormal");
+    if (color is null || color.IsError || normal is null || normal.IsError) throw new InvalidOperationException("Invalid texture: " + path);
+    materials.Add(new { Path = path, IsError = material.IsError, ColorWidth = color.Width, ColorHeight = color.Height });
+}
+var session = Editor.SceneEditorSession.Active;
+var planting = session.Scene.GetAllComponents<ModelRenderer>()
+    .Where(m => m.Model?.ResourcePath == "models/maps/veridant/veridant_palm_pits.vmdl").ToArray();
+if (planting.Length != 1) throw new InvalidOperationException("Expected exactly one planting model instance.");
+if (planting[0].GameObject.Components.Get<ModelCollider>() is not null)
+    throw new InvalidOperationException("The low planting surrounds should not add a movement obstacle.");
+var result = new { Models = models, Materials = materials, ActiveScene = session.Scene.Source?.ResourcePath,
+    Game.IsPlaying, SceneHasUnsavedChanges = session.HasUnsavedChanges, PlantingInstances = planting.Length };
+System.IO.File.WriteAllText(System.IO.Path.Combine(root, "output/veridant/palm-terrace-v1/native-validation.json"), System.Text.Json.JsonSerializer.Serialize(result));
+return result;

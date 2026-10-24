@@ -1,0 +1,38 @@
+def stone_pine( m, base, h=560.0, crown_r=230.0, seed=0, lean=( 0.0, 0.0 ) ):
+    """ An Italian stone pine: a tall bare trunk with reddish plates, forking near the top into limbs, under the
+    species' flat umbrella crown: needle-tuft cards laid nearly level in a broad disc, with standing ones round its
+    rim for the silhouette and a dark underside. """
+    rng = np.random.default_rng( abs( int( seed ) ) )
+    b = v( *base )
+    fork = b + v( lean[0], lean[1], 0 ) + UP * ( h * 0.62 )
+    tube( m, bent( b, fork, v( lean[0] * 0.3, lean[1] * 0.3, 0 ) + v( *rng.normal( 0, 8, 2 ), 0 ), 5, rng, 2.0 ),
+          [ 11.0, 9.6, 8.6, 7.8, 7.0, 6.4 ], "vr_bark", 9 )
+    crown = b + v( lean[0] * 1.2, lean[1] * 1.2, 0 ) + UP * ( h * 0.84 )
+    limbs = []
+    for k in range( 5 ):
+        ang = 2 * math.pi * k / 5 + rng.uniform( -0.3, 0.3 )
+        tip = crown + v( math.cos( ang ), math.sin( ang ), 0 ) * ( crown_r * rng.uniform( 0.45, 0.7 ) ) - UP * ( h * 0.04 )
+        tube( m, bent( fork, tip, UP * ( h * 0.05 ), 3 ), [ 5.5, 4.4, 3.4, 2.4 ], "vr_bark", 6 )
+        limbs.append( tip )
+    # The underside: a dark ragged disc.
+    ring = [ crown + v( math.cos( a ), math.sin( a ), 0 ) * ( crown_r * ( 0.82 + 0.1 * math.sin( 3 * a + seed ) ) ) - UP * ( h * 0.03 )
+             for a in np.linspace( 0, 2 * math.pi, 18, endpoint=False ) ]
+    card( m, "vr_pine_dark", ring[::-1], -UP )
+    card( m, "vr_pine_dark", ring, UP )
+    for i in range( 54 ):
+        r = crown_r * math.sqrt( rng.uniform( 0.0, 1.0 ) )
+        a = rng.uniform( 0, 2 * math.pi )
+        c = crown + v( math.cos( a ) * r, math.sin( a ) * r, rng.uniform( -0.02, 0.06 ) * h )
+        w = crown_r * rng.uniform( 0.7, 1.1 )
+        yaw = rng.uniform( 0, 2 * math.pi )
+        right = v( math.cos( yaw ), math.sin( yaw ), 0 )
+        tilt = rng.uniform( 0.15, 0.55 )
+        side = np.cross( UP, right )
+        up = unit( side * math.cos( tilt ) + UP * math.sin( tilt ) )
+        leaves( m, "pine", c, right, up, w * 0.5, w )
+    for i in range( 22 ):
+        a = 2 * math.pi * i / 22 + rng.uniform( -0.1, 0.1 )
+        c = crown + v( math.cos( a ), math.sin( a ), 0 ) * ( crown_r * rng.uniform( 0.8, 1.02 ) ) + UP * ( h * rng.uniform( -0.01, 0.05 ) )
+        right = v( -math.sin( a ), math.cos( a ), 0 )
+        w = crown_r * rng.uniform( 0.6, 0.9 )
+        leaves( m, "pine", c, right, UP, w * 0.42, w )

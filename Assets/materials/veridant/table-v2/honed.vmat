@@ -1,0 +1,14 @@
+// Tools/veridant_stage_tables.py: honed slab, restrained surface relief
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    g_flRoughnessScaleFactor "1"
+    g_flMetalness "0.00"
+    TextureColor "materials/veridant/vr_stone_light_color.jpg"
+    TextureNormal "materials/default/default_normal.tga"
+    TextureRoughness "materials/veridant/vr_stone_light_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[0.780000 0.780000 0.800000 1.000000]"
+    g_flModelTintAmount "1.0"
+}

@@ -1,0 +1,8 @@
+var scene=Editor.SceneEditorSession.Active.Scene;
+return scene.GetAllComponents<ModelRenderer>().Where(r=>r.Model?.ResourcePath=="models/maps/veridant/veridant_backdrop.vmdl")
+    .Select(r=>new { r.GameObject.Name, r.WorldPosition, r.WorldRotation, r.WorldScale,
+        Materials=r.Model.Materials.Where(m=>m.Name.Contains("inland_vista")).Select(m=>new {m.Name,m.Shader,
+            Rect0=m.GetVector4("g_vAtlasRect0"),Rect1=m.GetVector4("g_vAtlasRect1"),Rect2=m.GetVector4("g_vAtlasRect2"),
+            Sector=m.GetVector4("g_flSector"),Scale=m.GetVector4("g_flPixelScale"),
+            Width=m.GetVector4("g_flAtlasWidth"),Height=m.GetVector4("g_flAtlasHeight"),
+            Bottom0=m.GetVector4("g_flBottom0"),Bottom1=m.GetVector4("g_flBottom1"),Bottom2=m.GetVector4("g_flBottom2") }).ToArray() }).ToArray();

@@ -1,0 +1,98 @@
+// Run a copy from the native CLI exchange directory. Uses an isolated visual
+// scene so chair QA does not move or save the shared editor's camera or scene.
+var root = Sandbox.Project.Current.GetRootPath();
+var output = System.IO.Path.Combine(root, "output/veridant/chair-v3");
+var config = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(output, "capture-request.json")));
+var manifest = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(output, config["stage"].GetValue<string>(), "manifest.json")));
+var source = Editor.SceneEditorSession.Active;
+var before = new { Scene = source?.Scene?.Id, Unsaved = source?.HasUnsavedChanges, Game.IsPlaying };
+var document = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root, "Assets/scenes/maps/Veridant/veridant.scene"))).AsObject();
+var visual = new[] { "Sun", "Sky", "Fog", "Look", "Veridant", "Lights", "Reflection Probes", "Volumetric Fog" };
+var objects = new System.Text.Json.Nodes.JsonArray();
+foreach (var go in document["GameObjects"].AsArray())
+    if (visual.Contains(go["Name"]?.GetValue<string>() ?? "")) objects.Add(go.DeepClone());
+document["GameObjects"] = objects;
+document["SceneProperties"]["NavMesh"]["Enabled"] = false;
+document["SceneProperties"]["WantsSystemScene"] = false;
+var scene = Scene.CreateEditorScene();
+var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
+var preRender = typeof(Scene).GetMethod("PreRender", flags, null, Type.EmptyTypes, null);
+var preCamera = typeof(Scene).GetMethod("PreCameraRender", flags, null, Type.EmptyTypes, null);
+var files = new System.Collections.Generic.List<string>();
+try
+{
+    CameraComponent camera;
+    using (scene.Push())
+    {
+        scene.Deserialize(document);
+        foreach (var tonemap in scene.GetAllComponents<Tonemapping>())
+        {
+            tonemap.AutoExposureEnabled = true;
+            tonemap.MinimumExposure = tonemap.MaximumExposure = 2.25f;
+            tonemap.ExposureCompensation = 0;
+            tonemap.Rate = 20;
+        }
+        var holder = new GameObject(false, "Chair QA camera");
+        camera = holder.Components.Create<CameraComponent>();
+        camera.ZNear = 1;
+        camera.ZFar = 120000;
+        holder.Enabled = true;
+        scene.EditorTick(.016f,.016f);
+        preRender.Invoke(scene,null);
+        preCamera.Invoke(scene,null);
+    }
+    foreach (var material in scene.GetAllComponents<ModelRenderer>().Where(r=>r.Model is not null).SelectMany(r=>r.Model.Materials).Distinct())
+        foreach (var name in new[] { "g_tColor", "g_tNormal", "g_tRoughness" })
+            material.GetTexture(name)?.MarkUsed(1024);
+    for (var frame=0;frame<25;frame++)
+    {
+        using (scene.Push()) { scene.EditorTick(.016f,.016f); preRender.Invoke(scene,null); }
+        await Task.Delay(25,cancellationToken);
+    }
+    var renderProbe = typeof(EnvmapProbe).GetMethod("RenderCubemap",flags,null,Type.EmptyTypes,null);
+    foreach (var probe in scene.GetAllComponents<EnvmapProbe>())
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        using (scene.Push()) renderProbe?.Invoke(probe,null);
+        await Task.Delay(16,cancellationToken);
+    }
+    var destination = System.IO.Path.Combine(output, config["phase"].GetValue<string>());
+    System.IO.Directory.CreateDirectory(destination);
+    foreach (var spec in new[] { (Index:0, Name:"front-close", Forward:24f, Side:4f, Height:29f, Target:25f),
+                                 (Index:0, Name:"side", Forward:4f, Side:34f, Height:28f, Target:22f),
+                                 (Index:8, Name:"rear-close", Forward:-27f, Side:14f, Height:29f, Target:24f),
+                                 (Index:0, Name:"terrace", Forward:36f, Side:40f, Height:47f, Target:17.2f) })
+    {
+        var row = manifest["placements"][spec.Index];
+        var at = row["at"].AsArray();
+        var facing = row["facing"].AsArray();
+        var z0 = row["z0"].GetValue<float>();
+        var centre = new Vector3(at[1].GetValue<float>(), -at[0].GetValue<float>(), z0);
+        var f = new Vector3(facing[1].GetValue<float>(), -facing[0].GetValue<float>(),0);
+        var side = Vector3.Cross(Vector3.Up,f);
+        var eye = centre+f*spec.Forward+side*spec.Side+Vector3.Up*spec.Height;
+        var target = centre+Vector3.Up*spec.Target;
+        using var bitmap = new Bitmap(1080,1080);
+        for (var frame=0;frame<12;frame++)
+        {
+            using (scene.Push())
+            {
+                camera.WorldPosition = eye;
+                camera.WorldRotation = Rotation.LookAt(target-eye);
+                camera.FieldOfView = 49;
+                scene.EditorTick(.016f,.016f);
+                preRender.Invoke(scene,null);
+                preCamera.Invoke(scene,null);
+                camera.RenderToBitmap(bitmap);
+            }
+            await Task.Delay(16,cancellationToken);
+        }
+        var file = System.IO.Path.Combine(destination,spec.Name+".png");
+        System.IO.File.WriteAllBytes(file,bitmap.ToPng());
+        files.Add(file);
+    }
+    return new { Files=files, SourceSceneUnchanged=Editor.SceneEditorSession.Active?.Scene?.Id==before.Scene,
+        UnsavedStateUnchanged=Editor.SceneEditorSession.Active?.HasUnsavedChanges==before.Unsaved,
+        PlayStateUnchanged=Game.IsPlaying==before.IsPlaying };
+}
+finally { scene.Destroy(); }

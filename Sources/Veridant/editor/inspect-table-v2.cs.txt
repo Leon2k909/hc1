@@ -1,0 +1,10 @@
+// Read the current view and table model imports without changing the scene.
+var session = Editor.SceneEditorSession.Active;
+var scene = session.Scene;
+var camera = scene.GetAllComponents<CameraComponent>().Single(c => c.GameObject.Name == "editor_camera" && c.GameObject.Flags.HasFlag(GameObjectFlags.EditorOnly));
+return new {
+    Scene = scene.Source?.ResourcePath, session.HasUnsavedChanges, Game.IsPlaying,
+    Camera = new { Position = camera.WorldPosition.ToString(), Angles = camera.WorldRotation.Angles().ToString(), camera.FieldOfView, FovAxis = camera.FovAxis.ToString() },
+    Renderers = scene.GetAllComponents<ModelRenderer>().Where(r => r.Model?.ResourcePath?.Contains("models/maps/veridant/veridant_", StringComparison.OrdinalIgnoreCase) == true)
+        .Select(r => new { r.GameObject.Name, Path = r.Model.ResourcePath, Transform = r.WorldTransform.ToString() }).ToArray()
+};

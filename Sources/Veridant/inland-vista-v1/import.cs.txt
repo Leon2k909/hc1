@@ -1,0 +1,44 @@
+// Guarded native import of the two non-colliding backdrop meshes and one texture/material.
+// No scene, camera, lighting, water, probes or gameplay code is changed.
+var project = System.IO.Path.GetFullPath(Sandbox.Project.Current.GetRootPath()).TrimEnd('\\', '/');
+var expected = System.IO.Path.GetFullPath("C:/sbox-projects/hc1/forked-shooter-main").TrimEnd('\\', '/');
+if (!String.Equals(project, expected, StringComparison.OrdinalIgnoreCase)) throw new Exception("Wrong project");
+var folder = System.IO.Path.Combine(project, "output/veridant/inland-vista-v1");
+var stage = System.IO.Path.Combine(folder, "stage-v10");
+var manifest = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(stage, "manifest.json")));
+var source = Editor.SceneEditorSession.Active?.Scene;
+var sourceId = source?.Id;
+var wasPlaying = Game.IsPlaying;
+string Hash(string path) => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+foreach (var pair in manifest["expected_sha256"].AsObject())
+    if (Hash(System.IO.Path.Combine(project, pair.Key)) != pair.Value.GetValue<string>()
+        && Hash(System.IO.Path.Combine(project, pair.Key)) != Hash(System.IO.Path.Combine(stage, pair.Key)))
+        throw new Exception("Source changed after staging: " + pair.Key);
+var sceneFile = System.IO.Path.Combine(project, "Assets/scenes/maps/Veridant/veridant.scene");
+var sceneHash = Hash(sceneFile);
+var saved = new System.Collections.Generic.List<object>();
+var files = manifest["files"].AsArray().Select(n => n.GetValue<string>()).ToArray();
+foreach (var relative in files)
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    var target = System.IO.Path.GetFullPath(System.IO.Path.Combine(project, relative));
+    if (!target.StartsWith(project + System.IO.Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase)) throw new Exception("Invalid target");
+    if (System.IO.File.Exists(target) && Hash(target) == Hash(System.IO.Path.Combine(stage, relative)))
+    {
+        saved.Add(new { Path = relative, Sha256 = Hash(target) });
+        continue;
+    }
+    if (System.IO.File.Exists(target))
+    {
+        var backup = System.IO.Path.Combine(folder, "before-assets", relative);
+        System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(backup));
+        if (!System.IO.File.Exists(backup)) System.IO.File.Copy(target, backup);
+    }
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target));
+    System.IO.File.Copy(System.IO.Path.Combine(stage, relative), target, true);
+    saved.Add(new { Path = relative, Sha256 = Hash(target) });
+}
+var report = new { SourceScene = source?.Name, SourceUnchanged = sourceId == Editor.SceneEditorSession.Active?.Scene?.Id,
+    PlayStateUnchanged = Game.IsPlaying == wasPlaying, SceneFileUnchanged = sceneHash == Hash(sceneFile), Files = saved };
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder, "import.json"), System.Text.Json.JsonSerializer.Serialize(report, new System.Text.Json.JsonSerializerOptions { WriteIndented = true }));
+return report;
