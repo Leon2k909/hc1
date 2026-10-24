@@ -81,6 +81,7 @@ SLAB = 164.0
 SG_ROOF = 330.0        # the South Gallery: one tall storey
 CAFE_TOP = SLAB
 DOOR_H = 124.0
+GROUND_HEAD = 150.0    # a ground-floor window's head with a first floor behind it: under the slab (164)
 
 ROTUNDA = ( 313.0, 1200.0 )
 ROT_IN, ROT_OUT = 375.0, 393.0
@@ -255,19 +256,19 @@ def west_gallery( m, g, d ):
           windows=[ glass( -1030, 120, 20, 150 ), glass( -750, 120, 20, 150 ), upper( -1010 ) ], parapet=True, upper_=TRAV,
           parapet_paint=TRAV )
     wall( m, g, "n", ( -142, 1492 ), ( -1126, -1108 ), "-e", doors=[ door( 200 ), door( 1300 ) ],
-          windows=[ glass( 500, 160 ), glass( 800, 160 ), glass( 1030, 140 ),
+          windows=[ glass( 500, 160, z1=GROUND_HEAD ), glass( 800, 160, z1=GROUND_HEAD ), glass( 1030, 140, z1=GROUND_HEAD ),
                     upper( 0 ), upper( 350 ), upper( 650 ), upper( 950 ), upper( 1250 ) ], ends=False, parapet=True )
     wall( m, g, "e", ( -1126, -200 ), ( 1492, 1510 ), "+n", doors=[ door( -650 ) ],
-          windows=[ glass( -950, 200 ), glass( -400, 200 ), upper( -1000 ), upper( -800 ), upper( -500 ), upper( -330 ) ],
+          windows=[ glass( -950, 200, z1=GROUND_HEAD ), glass( -400, 200, z1=GROUND_HEAD ), upper( -1000 ), upper( -800 ), upper( -500 ), upper( -330 ) ],
           parapet=True )
     wall( m, g, "n", ( -142, 1050 ), ( -668, -650 ), "+e", doors=[ door( 100 ), door( 650 ), door( 380, 100, FLOOR1, 110 ) ],
           windows=[ glass( 380, 300, 20, 150 ), glass( 880, 200, 20, 150 ), upper( 140, 120, 200, 286 ),
                     upper( 640, 120, 200, 286 ), upper( 880, 120, 200, 286 ) ],
           ends=False, parapet=True, lower=PANEL, upper_=TRAV, split=300, parapet_paint=TRAV )
-    wall( m, g, "e", ( -650, -200 ), ( 1050, 1068 ), "-n", windows=[ glass( -300, 120 ), upper( -470 ), upper( -300 ) ],
+    wall( m, g, "e", ( -650, -200 ), ( 1050, 1068 ), "-n", windows=[ glass( -300, 120, z1=GROUND_HEAD ), upper( -470 ), upper( -300 ) ],
           parapet=True )
     wall( m, g, "n", ( 1068, 1492 ), ( -218, -200 ), "+e", doors=[ door( 1300 ) ],
-          windows=[ glass( 1150, 120 ), upper( 1150 ), upper( 1400 ) ], ends=False, parapet=True )
+          windows=[ glass( 1150, 120, z1=GROUND_HEAD ), upper( 1150 ), upper( 1400 ) ], ends=False, parapet=True )
     # The inside corner of the L, where the east wall meets the north wing's south wall.
     m.box( ( -668, 1050, 0 ), ( -650, 1068, ROOF ), { "default": None, "-e": PLASTER, "+n": PLASTER, "+z": P.ROOF }, STONE )
     parapet_on( m, "e", ( -668, -650 ), ( 1050, 1068 ), None, ROOF )
@@ -497,12 +498,12 @@ def east_block( m, g, d ):
 
     # The North Gallery.
     wall( m, g, "e", ( 1000, 2060 ), ( 697, 715 ), "+n", doors=[ door( 1300 ), door( 1800 ) ],
-          windows=[ glass( 1550, 200 ), upper( 1200 ), upper( 1550 ), upper( 1900 ) ], parapet=True )
-    wall( m, g, "n", ( 0, 697 ), ( 2042, 2060 ), "+e", doors=[ door( 200 ) ], windows=[ glass( 450, 160 ), upper( 300 ),
+          windows=[ glass( 1550, 200, z1=GROUND_HEAD ), upper( 1200 ), upper( 1550 ), upper( 1900 ) ], parapet=True )
+    wall( m, g, "n", ( 0, 697 ), ( 2042, 2060 ), "+e", doors=[ door( 200 ) ], windows=[ glass( 450, 160, z1=GROUND_HEAD ), upper( 300 ),
                                                                                        upper( 550 ) ], ends=False, parapet=True )
     wall( m, g, "e", ( 1000, 1400 ), ( -18, 0 ), None, doors=[ door( 1200 ), door( 1300, 100, FLOOR1, 120 ) ], ends=False )
     wall( m, g, "e", ( 1400, 2060 ), ( -18, 0 ), "-n", doors=[ door( 1500 ), door( 1900 ) ],
-          windows=[ glass( 1700, 200 ), upper( 1500 ), upper( 1700 ), upper( 1900 ) ], parapet=True )
+          windows=[ glass( 1700, 200, z1=GROUND_HEAD ), upper( 1500 ), upper( 1700 ), upper( 1900 ) ], parapet=True )
     parapet_on( m, "e", ( 1000, 1400 ), ( -18, 0 ), None, ROOF )
     floor( m, *NG )
     P.slab( m, 1018, 2042, 0, 697, SLAB, FLOOR1, holes=[ ( 1964, 2042, 300, 600 ) ], top=HONED )
@@ -523,11 +524,11 @@ def east_block( m, g, d ):
 
     # The East Hall: tall, open to its roof but for the mezzanine along its east side.
     wall( m, g, "e", ( 480, 1400 ), ( -1000, -982 ), "-n", doors=[ door( 640 ) ],
-          windows=[ glass( 900, 240 ), glass( 1200, 160 ), upper( 900 ), upper( 1300 ) ], parapet=True )
+          windows=[ glass( 900, 240 ), glass( 1200, 160, z1=GROUND_HEAD ), upper( 900 ), upper( 1300 ) ], parapet=True )
     wall( m, g, "n", ( -982, 0 ), ( 480, 498 ), "-e", doors=[ door( -500 ), door( -200 ) ],
           windows=[ glass( -800, 160 ), upper( -650 ), upper( -350 ) ], parapet=True )
     wall( m, g, "n", ( -982, -18 ), ( 1382, 1400 ), "+e", doors=[ door( -500 ), door( -800 ) ],
-          windows=[ glass( -250, 160 ), upper( -650 ), upper( -350 ) ], ends=False, parapet=True )
+          windows=[ glass( -250, 160, z1=GROUND_HEAD ), upper( -650 ), upper( -350 ) ], ends=False, parapet=True )
     floor( m, *EH )
     roof_slab( m, 498, 1382, -982, -18, ROOF )
     P.slab( m, 1220, 1382, -982, -18, SLAB, FLOOR1, top=HONED )

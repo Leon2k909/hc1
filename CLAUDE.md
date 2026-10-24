@@ -5495,6 +5495,23 @@ simulate_input.
     pin exposure (4 outdoors, 5 indoors), above the game's; nothing of this pass has been seen in a match yet. The
     critique's other findings are still open: doorways' black reveals, the art's look, sparse rooms and roofs, the
     indirect light not covering the spawns or site B, the sierra's colour, and the perimeter wall.
+- Ground-floor windows under an upper floor end at `GROUND_HEAD` (150), under the slab (2026-10-25, the user's
+  screenshot: "this looks a bit mad"). Twelve of them (the West and North Galleries', and the East Hall's beside its
+  mezzanine) took `glass()`'s default head of 190, over the first floor's top (180), so a 10" strip of glass, with the
+  ground outside seen through it, ran along the foot of the upper rooms' walls. Give a new one there `z1=GROUND_HEAD`.
+  - The fit-out took each strip for a door out of the upper room and hung an exit sign over it. A wall face lists every
+    opening up the wall, so every ground-floor door and window also got a sign and a room plate from the room over it:
+    stray signs at 159 over the 150-high windows, one over the cafe's inside door to the North Gallery, and a second sign
+    on each ground-floor door out. `door_fittings` now takes only openings that start at the room's floor: 30 exit signs
+    and 34 plates, from 57 and 51.
+  - Published by `Tools/cerroblanco_stage_window_heads.py` and `Sources/CerroBlanco/editor/import-window-heads.cs.txt`:
+    the buildings model (and its collision boxes), the three detail models, two new pane models and the scene's
+    Breakable Glass group (359 panes from 392; the panes renumber, so their ids shift) from a fresh build, each checked
+    to be the old build's before; the stray signs and plates taken out of the installed `cerroblanco_fitout_fine.obj`,
+    every other line kept. The import puts the same glass group into an open, unchanged Cerro Blanco document. Its
+    panes asked for the two new models before they had compiled and got error models until those were compiled again.
+  - Checked in isolated renders (`output/cerroblanco/glass-strip/after/`): the upper walls meet the floor along an
+    unbroken skirting, the façades' ground windows end under a stone band like their neighbours. Not yet in a match.
 - To play it: `dev_mode team_deathmatch cerroblanco` (or `dev_mode bomb_defusal cerroblanco`).
 
 ## Riverdale (multiplayer map, `Tools/riverdale_map.py`)

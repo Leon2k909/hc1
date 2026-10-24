@@ -603,7 +603,10 @@ def door_fittings( m, room, faces, layout, stats, outdoors ):
     for f in faces:
         side, right, up = frame_axes( f.out )
         for a, b, z0, z1 in f.openings:
-            if z0 > room.floor + 10 or z1 - z0 < 90 or not ( f.run[0] - 1 <= ( a + b ) / 2 <= f.run[1] + 1 ):
+            # A doorway starts at this room's floor. A face lists every opening up its wall, so the ground floor's
+            # windows and doors counted for the room over them too: an exit sign and a plate on the upper floor's wall
+            # over each, and a second sign on the ground floor's (2026-10-25).
+            if abs( z0 - room.floor ) > 10 or z1 - z0 < 90 or not ( f.run[0] - 1 <= ( a + b ) / 2 <= f.run[1] + 1 ):
                 continue
             mid = ( a + b ) / 2
             beyond = f.point( mid, room.floor + 60, -40.0 )
