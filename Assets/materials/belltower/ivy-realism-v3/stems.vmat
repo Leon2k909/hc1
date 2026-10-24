@@ -1,0 +1,15 @@
+// Tools/belltower_quality_materials.py; sources: Sources/Belltower/scans/manifest.json
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    TextureColor "materials/belltower/scans/brown_planks_03_diffuse_4k.png"
+    TextureNormal "materials/belltower/scans/brown_planks_03_nor_gl_4k.png"
+    TextureRoughness "materials/belltower/scans/brown_planks_03_rough_4k.png"
+    TextureAmbientOcclusion "materials/belltower/scans/brown_planks_03_ao_4k.png"
+    g_vTexCoordScale "[1.21920 1.21920]"
+    g_vColorTint "[1.02 0.98 0.86 1]"
+    g_flRoughnessScaleFactor "0.8"
+    g_flModelTintAmount "1"
+    g_flMetalness "0"
+}

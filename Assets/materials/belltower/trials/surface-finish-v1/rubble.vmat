@@ -1,0 +1,16 @@
+// Tools/belltower_quality_materials.py; sources: Sources/Belltower/wall-v3/generation.json
+"Layer0"
+{
+    shader "shaders/belltower_masonry_v3.shader"
+    TextureStoneColor "materials/belltower/generated/wall-limestone-v3-color.png"
+    TextureStoneHeight "materials/belltower/generated/wall-limestone-v3-height.png"
+    TextureStoneSeams "materials/belltower/generated/wall-limestone-v3-quilt.png"
+    g_vMasonryUvScale "[.677333 .677333]"
+    g_vMasonryQuiltShift "[.37001595 .42982456]"
+    g_vMasonryTint "[1.04 1.0 .90]"
+    g_flMasonryDepth "0.65"
+    g_flMasonryNormal "0.65"
+    g_flMasonrySaturation "0.72"
+    g_flMasonryContrast "1.04"
+    g_flMasonryWeather "0.12"
+}

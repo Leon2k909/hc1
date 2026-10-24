@@ -1,0 +1,13 @@
+// Tools/belltower_shop_displays_v2.py
+"Layer0"
+{
+    shader "shaders/belltower_shop_display_v2.shader"
+    TextureColor "materials/belltower/shop-display-v2/price-cards.png"
+    TextureNormal "materials/belltower/shop-display-v2/surface_normal.png"
+    TextureRoughness "materials/belltower/shop-display-v2/surface_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vShopTint "[1 1 1]"
+    g_flShopRoughness "0.94"
+    g_flShopMetalness "0"
+    g_flShopNormal "0.35"
+}

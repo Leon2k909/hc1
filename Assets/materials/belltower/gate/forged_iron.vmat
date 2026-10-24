@@ -1,0 +1,14 @@
+// Tools/belltower_stage_gate.py: oxidised forged iron with bevel highlights.
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    TextureColor "materials/buildings/iron_black_color.png"
+    TextureNormal "materials/buildings/iron_normal.png"
+    TextureRoughness "materials/buildings/iron_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[1.55 1.48 1.38 1]"
+    g_flRoughnessScaleFactor ".72"
+    g_flMetalness ".35"
+    g_flModelTintAmount "1"
+}

@@ -1,0 +1,14 @@
+// Tools/railhead_stage_extinguisher.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    g_flRoughnessScaleFactor "0.8226"
+    g_flMetalness "0.08"
+    TextureColor "materials/default/default_color.tga"
+    TextureNormal "materials/railhead/plain_normal.png"
+    TextureRoughness "materials/railhead/plain_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[0.038 0.042 0.044 1.0]"
+    g_flModelTintAmount "1.0"
+}

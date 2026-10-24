@@ -1,19 +1,13 @@
 // Tools/ares_materials.py
-"Layer0"
+Layer0
 {
-    shader "shaders/complex.shader"
-    F_SPECULAR "1"
-    g_flRoughnessScaleFactor "1"
-    g_flMetalness "0.00"
+    shader "shaders/hc1_ares_plasma.shader"
     TextureColor "materials/ares/ar_plasma_color.png"
-    TextureNormal "materials/default/default_normal.tga"
-    TextureRoughness "[0.400000 0.400000 0.400000 0.000000]"
-    TextureAmbientOcclusion "materials/default/default_ao.tga"
-    g_vColorTint "[1.000000 1.000000 1.000000 1.000000]"
-    g_flModelTintAmount "1.0"
-    F_SELF_ILLUM "1"
-    TextureSelfIllumMask "materials/ares/ar_plasma_illum.png"
-    g_flSelfIllumBrightness "2.400"
-    g_flSelfIllumAlbedoFactor "1.0"
-    g_vSelfIllumTint "[1.000000 1.000000 1.000000 0.000000]"
+    g_flBrightness "1.8"
+    g_flRiseSpeed "0.018"
+    g_flSwirlSpeed "0.008"
+    g_flFlowHeight "180"
+    g_flWarp "0.055"
+    g_flDarkAreas "0.85"
+    g_flPulseAmount "0.03"
 }

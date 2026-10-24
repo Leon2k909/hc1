@@ -1,0 +1,17 @@
+"Layer0"
+{
+    shader "shaders/viewmodel_fabric_v2.shader"
+    F_ALPHA_TEST "1"
+    TextureColor "materials/operators/first_person/v2/gloves_albedo.png"
+    TextureNormal "materials/operators/first_person/v2/gloves_macro_normal.png"
+    TextureRoughness "materials/operators/first_person/v2/gloves_roughness.png"
+    TextureMetalness "materials/default/default_metal.tga"
+    TextureAmbientOcclusion "materials/operators/first_person/v2/gloves_ao.png"
+    TextureTranslucency "materials/operators/first_person/v2/gloves_coverage.png"
+    TextureTintMask "materials/operators/first_person/v2/gloves_tint.png"
+    TextureFineNormal "materials/operators/first_person/v2/gloves_fine_normal.png"
+    TextureFineData "materials/operators/first_person/v2/gloves_fine_data.png"
+    g_flFineScale "7"
+    g_flFineNormalStrength "0.42"
+    g_flFineColourStrength "0.025"
+}

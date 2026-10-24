@@ -1,0 +1,13 @@
+// Tools/belltower_stage_planters.py; unchanged source texture pixels.
+"Layer0"
+{
+    shader "shaders/belltower_planter_v1.shader"
+    TextureColor "materials/buildings/soil_color.png"
+    TextureNormal "materials/buildings/soil_normal.png"
+    TextureRoughness "materials/buildings/soil_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_flTintColor "[.64 .56 .46]"
+    g_flPlanterNormal "0.75"
+    g_flPlanterAo "0.78"
+    g_flPlanterRoughness "0.93"
+}

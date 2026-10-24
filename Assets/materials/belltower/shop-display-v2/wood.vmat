@@ -1,0 +1,13 @@
+// Tools/belltower_shop_displays_v2.py
+"Layer0"
+{
+    shader "shaders/belltower_shop_display_v2.shader"
+    TextureColor "materials/belltower/scans/brown_planks_03_diffuse_4k.png"
+    TextureNormal "materials/belltower/scans/brown_planks_03_nor_gl_4k.png"
+    TextureRoughness "materials/belltower/scans/brown_planks_03_rough_4k.png"
+    TextureAmbientOcclusion "materials/belltower/scans/brown_planks_03_ao_4k.png"
+    g_vShopTint "[0.57 0.43 0.28]"
+    g_flShopRoughness "0.9"
+    g_flShopMetalness "0"
+    g_flShopNormal "0.22"
+}

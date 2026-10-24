@@ -1,0 +1,19 @@
+// Tools/belltower_quality_materials.py; sources: Sources/Belltower/scans/manifest.json
+"Layer0"
+{
+    shader "shaders/belltower_plaster.shader"
+    TextureColor "materials/belltower/scans/painted_plaster_wall_diffuse_4k.png"
+    TextureNormal "materials/belltower/scans/painted_plaster_wall_nor_gl_4k.png"
+    TextureRoughness "materials/belltower/scans/painted_plaster_wall_rough_4k.png"
+    TextureAmbientOcclusion "materials/belltower/scans/painted_plaster_wall_ao_4k.png"
+    TextureWearColor "materials/belltower/scans/rough_plaster_broken_diffuse_4k.png"
+    TextureWearNormal "materials/belltower/scans/rough_plaster_broken_nor_gl_4k.png"
+    TextureWearRoughness "materials/belltower/scans/rough_plaster_broken_rough_4k.png"
+    TextureWearAo "materials/belltower/scans/rough_plaster_broken_ao_4k.png"
+    TextureWearHeight "materials/belltower/scans/rough_plaster_broken_displacement_4k.png"
+    g_vPlasterUvScale "[6.5024 6.5024]"
+    g_vWearUvScale "[8.66987 8.66987]"
+    g_flTintColor "[1.32300 1.28250 1.14750]"
+    g_flWearCoverage "0.24"
+    g_flWearBrightness "2.3"
+}

@@ -1,0 +1,17 @@
+"Layer0"
+{
+    shader "shaders/viewmodel_fabric_v2.shader"
+    F_ALPHA_TEST "0"
+    TextureColor "materials/operators/first_person/v2/shirt_albedo.png"
+    TextureNormal "materials/operators/first_person/v2/shirt_macro_normal.png"
+    TextureRoughness "materials/operators/first_person/v2/shirt_roughness.png"
+    TextureMetalness "materials/default/default_metal.tga"
+    TextureAmbientOcclusion "materials/operators/first_person/v2/shirt_ao.png"
+    TextureTranslucency "materials/operators/first_person/v2/shirt_coverage.png"
+    TextureTintMask "materials/operators/first_person/v2/shirt_tint.png"
+    TextureFineNormal "materials/operators/first_person/v2/shirt_fine_normal.png"
+    TextureFineData "materials/operators/first_person/v2/shirt_fine_data.png"
+    g_flFineScale "12"
+    g_flFineNormalStrength "0.45"
+    g_flFineColourStrength "0.025"
+}
