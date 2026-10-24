@@ -1,0 +1,18 @@
+var paths = new[] { "attachments/m4a1/optics/reflex.vmdl", "attachments/m4a1/optics/scout.vmdl", "attachments/m4a1/tube_red_dot/tube_red_dot.vmdl", "attachments/mw2022/models/att_vm_2x_west01/att_vm_2x_west01.vmdl", "attachments/mw2022/models/att_vm_2x_west01/att_vm_2x_west01_magnifier.vmdl", "attachments/mw2022/models/att_vm_2x_west02/att_vm_2x_west02.vmdl", "attachments/mw2022/models/att_vm_2x_west02/att_vm_2x_west02_magnifier.vmdl", "attachments/mw2022/models/att_vm_2x_west02_holo/att_vm_2x_west02_holo.vmdl", "attachments/mw2022/models/att_vm_4x_east01_tall/att_vm_4x_east01_tall.vmdl", "attachments/mw2022/models/att_vm_4x_west01_tall/att_vm_4x_west01_tall.vmdl", "attachments/mw2022/models/att_vm_4x_west02_tall/att_vm_4x_west02_tall.vmdl", "attachments/mw2022/models/att_vm_holo_east01/att_vm_holo_east01.vmdl", "attachments/mw2022/models/att_vm_holo_west01/att_vm_holo_west01.vmdl", "attachments/mw2022/models/att_vm_holo_west02/att_vm_holo_west02.vmdl", "attachments/mw2022/models/att_vm_hybrid_west01/att_vm_hybrid_west01.vmdl", "attachments/mw2022/models/att_vm_hybrid_west02/att_vm_hybrid_west02.vmdl", "attachments/mw2022/models/att_vm_hybrid_west02/att_vm_hybrid_west02_magnifier.vmdl", "attachments/mw2022/models/att_vm_hybrid_west03/att_vm_hybrid_west03.vmdl", "attachments/mw2022/models/att_vm_minireddot01_tall/att_vm_minireddot01_tall.vmdl", "attachments/mw2022/models/att_vm_minireddot02_tall/att_vm_minireddot02_tall.vmdl", "attachments/mw2022/models/att_vm_minireddot03_tall/att_vm_minireddot03_tall.vmdl", "attachments/mw2022/models/att_vm_reflex_02/att_vm_reflex_02.vmdl", "attachments/mw2022/models/att_vm_reflex_east01/att_vm_reflex_east01.vmdl", "attachments/mw2022/models/att_vm_reflex_east02_tall/att_vm_reflex_east02_tall.vmdl", "attachments/mw2022/models/att_vm_reflex_west02_tall/att_vm_reflex_west02_tall.vmdl", "attachments/mw2022/models/att_vm_reflex_west03/att_vm_reflex_west03.vmdl", "attachments/mw2022/models/att_vm_reflex_west04/att_vm_reflex_west04.vmdl", "attachments/mw2022/models/att_vm_scope_mike14/att_vm_scope_mike14.vmdl", "attachments/mw2022/models/att_vm_scope_vz/att_vm_scope_vz.vmdl", "attachments/mw2022/models/att_vm_thermal_east01/att_vm_thermal_east01.vmdl", "attachments/mw2022/models/att_vm_thermal_east01_hybrid/att_vm_thermal_east01_hybrid.vmdl", "attachments/mw2022/models/att_vm_thermal_west01/att_vm_thermal_west01.vmdl" };
+var recompile = false;
+var report = new System.Collections.Generic.List<string>();
+foreach ( var path in paths )
+{
+	var model = Model.Load( path );
+	var bad = model?.Materials.Any( m => m is null || (m.ResourcePath ?? "").Contains( "error.vmat" ) ) ?? true;
+	if ( !bad ) continue;
+	if ( recompile )
+	{
+		var ok = Editor.AssetSystem.FindByPath( path )?.Compile( true ) ?? false;
+		model = Model.Load( path );
+		bad = model?.Materials.Any( m => m is null || (m.ResourcePath ?? "").Contains( "error.vmat" ) ) ?? true;
+		report.Add( path + " recompiled " + ok + ", still error " + bad );
+	}
+	else report.Add( path + " has error.vmat" );
+}
+return new { Checked = paths.Length, Report = report };

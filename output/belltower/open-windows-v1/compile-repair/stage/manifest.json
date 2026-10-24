@@ -1,0 +1,31 @@
+{
+  "revision": "open-windows-v1",
+  "source_sha256": {
+    "Tools/belltower_open_windows.py": "c4fd759223aea962fc824a49160d7d682ff37f1f5631764d8804f927c60034e0",
+    "Tools/belltower_stage_open_windows.py": "90c93e58332d2ec774cfe4468385cff7d6282b33f27ba38770cf43ec07f192a5",
+    "Tools/belltower_map.py": "b6f3787b145b45e0c868c128122e326e24aa72a137270cdc0e9f471d0e0e5252"
+  },
+  "protected_sha256": {
+    "Assets/scenes/maps/Belltower/belltower.scene": "7c81362d419176d9bb98caf5287e1949f19b1d867a8c2cb030971b5ecac865cd",
+    "Assets/materials/belltower/church-windows-v1/church_window_glass_0.vmat": "44271a922c948a02662b379ae844a3af1b702a1c444908e86dbba7f954e66e04",
+    "Assets/materials/belltower/church-windows-v1/church_window_glass_1.vmat": "70314e9e687f0ee6e89cb3e9264ceeaa5d8cdd6d545ca0db5b1072592650de4c",
+    "Assets/materials/belltower/church-windows-v1/church_window_glass_2.vmat": "0292567359fff5e8750d2172caa35b848b077d3ca5cfb527576cc8e6a4c57719"
+  },
+  "windows": 42,
+  "leaves": 84,
+  "files": {
+    "Assets/models/maps/belltower/belltower_west.vmdl": {
+      "source": "output/belltower/open-windows-v1/compile-repair/stage/Assets/models/maps/belltower/belltower_west.vmdl",
+      "before": "4a60a97643653ae62c52bffac7788d268c1dccbaedcd88fe6ee3d57d1630e1c0",
+      "after": "beebe4057c19f7830f6d22fdd20dfd86924393e390f8551f121ea352a84da682",
+      "backup": "output/belltower/open-windows-v1/compile-repair/stage/backup/Assets/models/maps/belltower/belltower_west.vmdl"
+    },
+    "Assets/models/maps/belltower/belltower_east.vmdl": {
+      "source": "output/belltower/open-windows-v1/compile-repair/stage/Assets/models/maps/belltower/belltower_east.vmdl",
+      "before": "0ebc197f59cab2bb17f99437f3289122b37fad84dbf8625598ab048410457455",
+      "after": "35deadc11e59fc4cc3734544382c2882bd189ae9a9bd067a16fb74ad049a24a1",
+      "backup": "output/belltower/open-windows-v1/compile-repair/stage/backup/Assets/models/maps/belltower/belltower_east.vmdl"
+    }
+  },
+  "note": "One missing comma before each pre-existing shop awning import; no node changes."
+}

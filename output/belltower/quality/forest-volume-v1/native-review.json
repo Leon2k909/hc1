@@ -1,0 +1,83 @@
+{
+  "updated_utc": "2026-10-20T11:04:11.456803+00:00",
+  "decision": "withheld; no visible or measurable improvement above repeat variation",
+  "native_shader_compile_verified": true,
+  "native_material_load_verified": true,
+  "native_render_verified": true,
+  "appearance_effect_verified": false,
+  "accepted_assets_changed": false,
+  "saved_scene_changed": false,
+  "regions": {
+    "forest": [
+      650,
+      70,
+      1370,
+      280
+    ],
+    "sky": [
+      650,
+      30,
+      1000,
+      90
+    ],
+    "street": [
+      740,
+      850,
+      1150,
+      1000
+    ],
+    "stone": [
+      1040,
+      650,
+      1210,
+      780
+    ]
+  },
+  "mean_absolute_rgb8": {
+    "shapes_vs_control": {
+      "forest": 0.009850088506937027,
+      "sky": 0.00034920635516755283,
+      "street": 0.0002439024392515421,
+      "stone": 0.00016591251187492162
+    },
+    "control_vs_rounded": {
+      "forest": 0.017325837165117264,
+      "sky": 0.00788888894021511,
+      "street": 0.006102981045842171,
+      "stone": 0.006711915601044893
+    },
+    "control_vs_repeat": {
+      "forest": 0.017965167760849,
+      "sky": 0.008349206298589706,
+      "street": 0.006363143678754568,
+      "stone": 0.007028657477349043
+    }
+  },
+  "evidence": {
+    "shapes": {
+      "image": "output/belltower/quality/forest-volume-v1-native-shapes/west-ridge-detail.png",
+      "image_sha256": "fcac24f58be2b87dc1be82010c36e406fc6a1307e4eebaef4e8a34f93012993f",
+      "metadata": "output/belltower/quality/forest-volume-v1-native-shapes/west-ridge-detail-camera.json",
+      "restoration_verified": true
+    },
+    "control": {
+      "image": "output/belltower/quality/forest-volume-v1-native-control/west-ridge-detail.png",
+      "image_sha256": "9b834d632c8da387a9b14f296ca43490659441cc6bd62a39b35b53fda3c5eaf0",
+      "metadata": "output/belltower/quality/forest-volume-v1-native-control/west-ridge-detail-camera.json",
+      "restoration_verified": true
+    },
+    "rounded": {
+      "image": "output/belltower/quality/forest-volume-v1-native-rounded/west-ridge-detail.png",
+      "image_sha256": "7df67cb69de661f3804a247d736dd646f70250a5cd537f7494d1c7cbb9f1488e",
+      "metadata": "output/belltower/quality/forest-volume-v1-native-rounded/west-ridge-detail-camera.json",
+      "restoration_verified": true
+    },
+    "repeat": {
+      "image": "output/belltower/quality/forest-volume-v1-native-repeat/west-ridge-detail.png",
+      "image_sha256": "a3763f73b423dce29210a5dddcc45adc341d00ac6ce85ec3b69cc27e065e2f62",
+      "metadata": "output/belltower/quality/forest-volume-v1-native-repeat/west-ridge-detail-camera.json",
+      "restoration_verified": true
+    }
+  },
+  "limitation": "Cause of negligible effect is unresolved; do not claim volumetric crowns or publish this trial."
+}

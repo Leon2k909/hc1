@@ -1,0 +1,102 @@
+{
+  "revision": "gazebo-roof-v1",
+  "models": {
+    "belltower_west": {
+      "removed_faces": [
+        4886974,
+        4886975,
+        4886976,
+        4886977,
+        4886978,
+        4886979,
+        4886980,
+        4886981,
+        4886982,
+        4886983
+      ],
+      "removed_triangles": 10,
+      "added_triangles": 6052,
+      "old_vertex_counts": {
+        "v": 2065305,
+        "vt": 2065305,
+        "vn": 719019
+      },
+      "vmdl_inserted_remaps": "\t\t\t\t\t\t\t{ from = \"gazebo_copper.vmat\" to = \"materials/belltower/gazebo-v1/gazebo_copper.vmat\" },\n\t\t\t\t\t\t\t{ from = \"gazebo_copper_seam.vmat\" to = \"materials/belltower/gazebo-v1/gazebo_copper_seam.vmat\" },\n",
+      "non_roof_bytes_preserved": true,
+      "physics_byte_identical": true
+    },
+    "belltower_east": {
+      "removed_faces": [
+        4886974,
+        4886975,
+        4886976,
+        4886977,
+        4886978,
+        4886979,
+        4886980,
+        4886981,
+        4886982,
+        4886983
+      ],
+      "removed_triangles": 10,
+      "added_triangles": 6052,
+      "old_vertex_counts": {
+        "v": 2065305,
+        "vt": 2065305,
+        "vn": 719019
+      },
+      "vmdl_inserted_remaps": "\t\t\t\t\t\t\t{ from = \"gazebo_copper.vmat\" to = \"materials/belltower/gazebo-v1/gazebo_copper.vmat\" },\n\t\t\t\t\t\t\t{ from = \"gazebo_copper_seam.vmat\" to = \"materials/belltower/gazebo-v1/gazebo_copper_seam.vmat\" },\n",
+      "non_roof_bytes_preserved": true,
+      "physics_byte_identical": true
+    }
+  },
+  "files": {
+    "Assets/materials/belltower/gazebo-v1/gazebo_copper.vmat": {
+      "before": null,
+      "after": "e03286883ab17329264cdf5d2449e4f1afe28426149d5352b3681c3455dd74e2"
+    },
+    "Assets/materials/belltower/gazebo-v1/gazebo_copper_seam.vmat": {
+      "before": null,
+      "after": "55b35847d1fd9d4803bfd1987e300409e0c58ea4241a98f104ab1414814d0b80"
+    },
+    "Assets/models/maps/belltower/belltower_east.mtl": {
+      "before": "49c44726d8adff7f4015e9ad2e9d18202c672ae46e08c0dc22d778bf069dd2f1",
+      "after": "eaefc481f64e550819d903d258b0e70ddae6c3785e7f9ba6220ae5e6befa7545"
+    },
+    "Assets/models/maps/belltower/belltower_east.obj": {
+      "before": "f7b0b95e8ecd5ff082ef78921013a319480588dcccb63d46cdce954f990113ea",
+      "after": "f38d8ed3e35dd36846b5bf391d60c36a4f031cd12ab0be3a59da61bbc41b2a37"
+    },
+    "Assets/models/maps/belltower/belltower_east.vmdl": {
+      "before": "b6cb48b5a14f3d7d7abc715f1eb2437281cc0e5b7b855eecfbb9dbd71225ba47",
+      "after": "04210b4a7f68da6a9f7b3c9f3b589544d987302d8e43499e08c39aabce423718"
+    },
+    "Assets/models/maps/belltower/belltower_west.mtl": {
+      "before": "201958d751df9e3ca3dde37971a10074280934f4b4f18d8428297effe45f98ae",
+      "after": "165e631f3ad30b36538a2ebc94ce4e31e01087beb3f4e18c62294edf7e36caa5"
+    },
+    "Assets/models/maps/belltower/belltower_west.obj": {
+      "before": "24f73f648e32ffdf758eafef90f6789bb60a646eedf97a5f757771abeabfcb5a",
+      "after": "1cb8dc4268ededb136a8cd37da71b8a8ce0071a64f2e3749cdfadff475055143"
+    },
+    "Assets/models/maps/belltower/belltower_west.vmdl": {
+      "before": "36865241f43ac7994ec54c85259eac6b9b6bea3d11a8b541acf4f229025921dc",
+      "after": "7ed551b76a6321508b37db8ea73ed39063ed03a411c906e3ed45a986102a77a0"
+    }
+  },
+  "source_sha256": {
+    "Tools/belltower_gazebo.py": "db95e924adbd9e2b30092fd4cfe3e34935493ea4feabaef36bcc60c00393a2c3",
+    "Tools/belltower_stage_gazebo.py": "2dfc937beea7bfba1d934af38eb6e92de367e61ec63f23580c18fea777ba1d65",
+    "Tools/map_kit.py": "cc60204c747d064cb1fecdb666b24c847ae89dc863c2533d3811a0445f22020d",
+    "Tools/belltower_furniture.py": "36c83d4883b3084b90b3ff46d9ef56e5aef7cd916f9e4c399058884105974a24"
+  },
+  "texture_sha256": {
+    "Assets/materials/buildings/copper_color.png": "0cc25ccb57e00db1251571acc95a481e428a1e7c301bc43393af21a57d4d8820",
+    "Assets/materials/buildings/copper_brown_color.png": "a55fa136c6f5a738083760031c1dae25183d4092fe94824382f1b82c7cab4a2e",
+    "Assets/materials/buildings/copper_rough.png": "7c350f8d30666f6ad2a881ecd2d3e35891169ae3af809a8bc6d7087c5e27483b"
+  },
+  "scene_sha256_at_stage": "f92a810e80e3cced2ae9ede667d692c712207a58637a927673a7be7eced5af1f",
+  "scene_changed_by_this_task": false,
+  "collision_changed": false,
+  "texture_pixels_changed": false
+}

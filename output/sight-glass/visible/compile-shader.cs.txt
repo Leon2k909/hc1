@@ -1,0 +1,18 @@
+// Compiles m4_optic_lens.shader (a code-only change: HEADER Version stays 9) and checks its .shader_c was rewritten.
+var root = Sandbox.Project.Current.GetRootPath();
+var source = System.IO.Path.Combine( root, "Assets/shaders/m4_optic_lens.shader" );
+var compiled = source + "_c";
+var before = System.IO.File.GetLastWriteTimeUtc( compiled );
+var pending = Editor.EditorUtility.CompileShader( "shaders/m4_optic_lens.shader", new(), cancellationToken );
+await pending;
+var reported = pending.GetType().GetProperty( "Result" )?.GetValue( pending );
+var success = reported is bool b ? b : reported?.GetType().GetProperty( "Success" )?.GetValue( reported ) as bool?;
+return new
+{
+	Reported = reported?.ToString(),
+	Success = success,
+	CompiledBefore = before.ToString( "HH:mm:ss" ),
+	CompiledAfter = System.IO.File.GetLastWriteTimeUtc( compiled ).ToString( "HH:mm:ss" ),
+	SourceWritten = System.IO.File.GetLastWriteTimeUtc( source ).ToString( "HH:mm:ss" ),
+	Bytes = new System.IO.FileInfo( compiled ).Length
+};

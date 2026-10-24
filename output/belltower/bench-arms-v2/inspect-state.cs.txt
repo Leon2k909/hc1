@@ -1,0 +1,11 @@
+return new {
+    Playing = Game.IsPlaying,
+    Active = Editor.SceneEditorSession.Active?.Scene.Source?.ResourcePath,
+    Sessions = Editor.SceneEditorSession.All.Select(s => new {
+        s.Scene.Name, s.Scene.IsEditor, Path = s.Scene.Source?.ResourcePath, s.HasUnsavedChanges,
+        Active = ReferenceEquals(s, Editor.SceneEditorSession.Active),
+        Cameras = s.Scene.GetAllComponents<CameraComponent>().Select(c => new {
+            Name = c.GameObject.Name, Position = c.WorldPosition.ToString(), Angles = c.WorldRotation.Angles().ToString(), c.FieldOfView
+        }).ToArray()
+    }).ToArray()
+};

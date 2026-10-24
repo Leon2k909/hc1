@@ -1,0 +1,66 @@
+{
+  "object": {
+    "__guid": "53374670-a251-4458-b65f-9b7a6cc53d7e",
+    "__version": 2,
+    "Flags": 0,
+    "Name": "Shop Display Lighting v2",
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Tags": "",
+    "Enabled": true,
+    "NetworkMode": 2,
+    "NetworkFlags": 0,
+    "NetworkOrphaned": 0,
+    "NetworkTransmit": true,
+    "OwnerTransfer": 1,
+    "Components": [],
+    "Children": [
+      {
+        "__guid": "17a87cc3-7b6a-4ed5-b8ea-c2c58694ccf5",
+        "__version": 2,
+        "Flags": 0,
+        "Name": "Shop Display Light 01",
+        "Position": "1097,1475,101",
+        "Rotation": "-0.60876143,-2.66098077E-08,0.793353319,-3.46785747E-08",
+        "Scale": "1,1,1",
+        "Tags": "light_spot,light",
+        "Enabled": true,
+        "NetworkMode": 2,
+        "NetworkFlags": 0,
+        "NetworkOrphaned": 0,
+        "NetworkTransmit": true,
+        "OwnerTransfer": 1,
+        "Components": [
+          {
+            "__type": "Sandbox.SpotLight",
+            "__guid": "ab158086-0c5c-4298-b374-40c911a750b1",
+            "__enabled": true,
+            "Flags": 0,
+            "Attenuation": 1,
+            "ConeInner": 50,
+            "ConeOuter": 75,
+            "Contribution": "Diffuse, Specular, Transmissive",
+            "Cookie": null,
+            "FogMode": "Enabled",
+            "FogStrength": 0,
+            "LightColor": "1.5,1.24,0.86,1",
+            "OnComponentDestroy": null,
+            "OnComponentDisabled": null,
+            "OnComponentEnabled": null,
+            "OnComponentFixedUpdate": null,
+            "OnComponentStart": null,
+            "OnComponentUpdate": null,
+            "Radius": 130,
+            "ShadowBias": 0,
+            "ShadowHardness": 0,
+            "Shadows": true
+          }
+        ],
+        "Children": []
+      }
+    ]
+  },
+  "present_in_live_preflight_ids": true,
+  "reason": "This live object already existed at native preflight. Our native batch changes only the 32 plant transforms; saving also persists this shared live object."
+}

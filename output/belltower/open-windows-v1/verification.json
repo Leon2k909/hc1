@@ -1,0 +1,70 @@
+{
+  "revision": "open-windows-v1",
+  "date": "2026-10-21",
+  "windows": 42,
+  "leaves": 84,
+  "buildings": {
+    "Town Hall": 14,
+    "Bakery": 4,
+    "Dairy": 4,
+    "Inn": 10,
+    "Tavern": 10
+  },
+  "outward_windows": 38,
+  "covered_windows_folded_inside": 4,
+  "description": "Bevelled timber casements, separate wavy glass panes, glazing beads and iron hinges/latches. Openings remain clear.",
+  "generator": "Tools/belltower_open_windows.py",
+  "hook": "Tools/belltower_map.py: dress window branch; bakery covered_windows style",
+  "stage_manifest": "output/belltower/open-windows-v1/covered-a/stage/manifest.json",
+  "geometry": {
+    "centre": {
+      "triangles": 42072,
+      "minimum_triangle_area": 0.0010957303500413972,
+      "collision_shapes": 0
+    },
+    "west": {
+      "triangles": 33992,
+      "minimum_triangle_area": 0.0010957303500398815,
+      "collision_shapes": 0
+    },
+    "east": {
+      "triangles": 33992,
+      "minimum_triangle_area": 0.0010957303500398815,
+      "collision_shapes": 0
+    }
+  },
+  "all_existing_imports_preserved": true,
+  "physics_exact": {
+    "centre": true,
+    "west": true,
+    "east": true
+  },
+  "all_three_models_compiled": true,
+  "all_window_materials_loaded_without_errors": true,
+  "geometry_checks": "Finite vertices, outward triangle winding, no zero-area triangles after OBJ rounding, mirrored east geometry, no added collision.",
+  "concurrent_physics_changes_after_initial_publication": {
+    "centre": false,
+    "west": true,
+    "east": true
+  },
+  "editor_state_restored_after_each_capture": true,
+  "captures": {
+    "hall": "output/belltower/quality/open-windows-v1-final/hall.png",
+    "bakery-covered": "output/belltower/quality/open-windows-v1-final/bakery-covered.png",
+    "bakery-inside": "output/belltower/quality/open-windows-v1-final/bakery-inside.png",
+    "tavern": "output/belltower/quality/open-windows-v1-final/tavern.png"
+  },
+  "private_asset_sha256": {
+    "Assets/models/maps/belltower/open-windows-v1/centre/windows.obj": "c5eeda4699a7c2fea7bba97cb44fccc5c47765844083c2b61c65d8b0957a889a",
+    "Assets/models/maps/belltower/open-windows-v1/centre/windows.mtl": "1f1d1c5aaf6c7d8e5c4d263cdb96dc20c8ba69ce1a94318742e48647de84fab3",
+    "Assets/models/maps/belltower/open-windows-v1/west/windows.obj": "d50fbe462c6868b07eff5f729f3d5ccddc5d894155dc6802e022ca51f9e406f8",
+    "Assets/models/maps/belltower/open-windows-v1/west/windows.mtl": "e0cdd9298f769c402a2763728ed39317921c3b62d8e43522304eaaec2e6a07af",
+    "Assets/models/maps/belltower/open-windows-v1/east/windows.obj": "0a73378b3cd9c3132a0e5a82534ba84d9aadfc6d128aed2c261a299544113877",
+    "Assets/models/maps/belltower/open-windows-v1/east/windows.mtl": "e0cdd9298f769c402a2763728ed39317921c3b62d8e43522304eaaec2e6a07af"
+  },
+  "current_scene_sha256_for_reference": "35b19f224d30a22bc7fa3639861f5586ca90be5b6f872a7aafbf2a9ec2421bea",
+  "notes": [
+    "Only window work belongs to this side conversation. Concurrent map/scene work is preserved.",
+    "No scene save, scene reload, or play-session stop was issued for this change."
+  ]
+}

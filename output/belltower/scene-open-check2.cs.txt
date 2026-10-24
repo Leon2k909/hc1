@@ -1,0 +1,21 @@
+var found = new System.Collections.Generic.List<string>();
+var flags = System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.DeclaredOnly;
+foreach ( var asm in AppDomain.CurrentDomain.GetAssemblies() )
+{
+	System.Type[] types;
+	try { types = asm.GetTypes(); } catch ( System.Reflection.ReflectionTypeLoadException e ) { types = e.Types.Where( t => t is not null ).ToArray(); } catch { continue; }
+	foreach ( var t in types )
+	{
+		System.Reflection.MethodInfo[] ms;
+		try { ms = t.GetMethods( flags ); } catch { continue; }
+		foreach ( var m in ms )
+			foreach ( var a in m.GetCustomAttributes( false ) )
+				if ( a.GetType().Name == "EditorForAssetTypeAttribute" )
+					found.Add( a.GetType().GetProperty( "Extension" )?.GetValue( a ) + " -> " + asm.GetName().Name + ": " + t.FullName + "." + m.Name );
+		foreach ( var a in t.GetCustomAttributes( false ) )
+			if ( a.GetType().Name == "EditorForAssetTypeAttribute" )
+				found.Add( a.GetType().GetProperty( "Extension" )?.GetValue( a ) + " -> " + asm.GetName().Name + ": " + t.FullName + " (type)" );
+	}
+}
+var lib = AppDomain.CurrentDomain.GetAssemblies().Select( a => a.GetType( "Editor.EditorTypeLibrary" ) ?? a.GetType( "Sandbox.Internal.GlobalToolsNamespace" ) ).FirstOrDefault( t => t is not null );
+return new { Found = found.OrderBy( x => x ), Lib = lib?.FullName };

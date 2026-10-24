@@ -1,0 +1,733 @@
+{
+  "result": "Higher-density first-person sleeve and cuff textures applied and verified live",
+  "density": [
+    {
+      "region": "sleeve-left",
+      "bounds": [
+        0,
+        0,
+        0.52232856,
+        0.3197767
+      ],
+      "source_pixels": [
+        655,
+        401
+      ],
+      "authored_pixels": [
+        1604,
+        981
+      ],
+      "linear_gain": [
+        2.448854961832061,
+        2.4463840399002494
+      ]
+    },
+    {
+      "region": "sleeve-right",
+      "bounds": [
+        0.4784689,
+        0,
+        1,
+        0.3197767
+      ],
+      "source_pixels": [
+        654,
+        401
+      ],
+      "authored_pixels": [
+        1602,
+        982
+      ],
+      "linear_gain": [
+        2.44954128440367,
+        2.4488778054862843
+      ]
+    },
+    {
+      "region": "cuff-main",
+      "bounds": [
+        0.23923445,
+        0.27910686,
+        0.6379585,
+        0.53429025
+      ],
+      "source_pixels": [
+        500,
+        320
+      ],
+      "authored_pixels": [
+        1568,
+        1003
+      ],
+      "linear_gain": [
+        3.136,
+        3.134375
+      ]
+    },
+    {
+      "region": "cuff-strip",
+      "bounds": [
+        0.861244,
+        0.23923445,
+        1,
+        0.53429025
+      ],
+      "source_pixels": [
+        174,
+        370
+      ],
+      "authored_pixels": [
+        860,
+        1828
+      ],
+      "linear_gain": [
+        4.942528735632184,
+        4.940540540540541
+      ]
+    }
+  ],
+  "published": [
+    {
+      "Path": "Assets\\materials\\operators\\first_person\\v3\\sleeve-left.png",
+      "Sha256": "d4467415fe44d1e6e4bf6437fa6980914707032d3a39c54705b3d1712a3f9bb2",
+      "NativeWidth": 1604,
+      "NativeHeight": 981,
+      "CompilerWidth": 2048,
+      "CompilerHeight": 1024,
+      "ResizeAddsDetail": false
+    },
+    {
+      "Path": "Assets\\materials\\operators\\first_person\\v3\\sleeve-right.png",
+      "Sha256": "d609dfefe97836f777524286b4fb4c84c4c57464f1926c9bf4e66687de02e306",
+      "NativeWidth": 1602,
+      "NativeHeight": 982,
+      "CompilerWidth": 2048,
+      "CompilerHeight": 1024,
+      "ResizeAddsDetail": false
+    },
+    {
+      "Path": "Assets\\materials\\operators\\first_person\\v3\\cuff-main.png",
+      "Sha256": "17a453b1a9b056abb3f325270cbc49c70542a68820b8cedeced2a11d731b1135",
+      "NativeWidth": 1568,
+      "NativeHeight": 1003,
+      "CompilerWidth": 2048,
+      "CompilerHeight": 1024,
+      "ResizeAddsDetail": false
+    },
+    {
+      "Path": "Assets\\materials\\operators\\first_person\\v3\\cuff-strip.png",
+      "Sha256": "e51ce77208ca26300bc94055461edc15de299a125b8d67583ee8680f81c15f68",
+      "NativeWidth": 860,
+      "NativeHeight": 1828,
+      "CompilerWidth": 1024,
+      "CompilerHeight": 2048,
+      "ResizeAddsDetail": false
+    },
+    {
+      "Path": "Assets\\materials\\operators\\first_person\\v3\\shirt-fold-normal.png",
+      "Sha256": "544a0e8697c50a62715946c5ef08467798de4a0bbc42feecbd9503755c6bbd70"
+    },
+    {
+      "Path": "Assets\\materials\\operators\\first_person\\v3\\shirt.vmat",
+      "Sha256": "21b086fcde6bdf8a61c976f8f130efbd9151f3e80819da42ea5262e4113b8616"
+    },
+    {
+      "Path": "Assets\\shaders\\viewmodel_fabric_v3.shader",
+      "Sha256": "ddb4ea953e2aac8fc8aa2318db55f799add09f9d94bf3a1101adb0537f27eff0"
+    }
+  ],
+  "source_hashes": {
+    "Code\\Weapons\\ViewModelClothing.Materials.cs": "f9254495b3eeeacb6432f842517aac0c4474494bf9d0eedb5ce2f75011a93ce0",
+    "Sources\\Clothing\\firstperson-v3\\capture-args.json": "f44d1587117dee88e97756d602b2432e5bea68c7ff1596d11a235c6382e02f96",
+    "Sources\\Clothing\\firstperson-v3\\capture-native.cs.txt": "296a7f873c7a274da744ca9067382fb67109643ec47eabaad005e59d6d29027b",
+    "Sources\\Clothing\\firstperson-v3\\compile-material-args.json": "27d95c149ba62beeb05980e25640cd64cf41b78fd8fddd58b0eb30317eb936a7",
+    "Sources\\Clothing\\firstperson-v3\\export-density.cs.txt": "a9fd346ba98c0b4a93e76e3d46a61ac2a8c7d809b22affc5f2ed8e59c72ed664",
+    "Sources\\Clothing\\firstperson-v3\\extract-regions.cs.txt": "cc1e04a0ca79439754ac7db094ee79f727ef804e2ed964c1620d273708d0789f",
+    "Sources\\Clothing\\firstperson-v3\\imagegen-prompts.json": "898105f383c15c122af133d674c46199cf458bfa6989ac71299be78d18172b0e",
+    "Sources\\Clothing\\firstperson-v3\\import-native.cs.txt": "2ae36695e2ef5da29a6f159680ecb4732d87066a6847eb8f2caaabd0757f68ac",
+    "Sources\\Clothing\\firstperson-v3\\inspect-normals.cs.txt": "2059694e2233afca3fe8cc7ac5e15e66db091cdb7b26dfad5627400582bd4435",
+    "Sources\\Clothing\\firstperson-v3\\live-components.cs.txt": "308c95f63f43e9f6d0f2a939b4a9dd2b3dd88800166dfe57c42cd7df97062ee5",
+    "Sources\\Clothing\\firstperson-v3\\live-inspect.cs.txt": "dac52f8536a4d38812094625cd3451fc2d43cdfa1965934698ae7c28b582443d",
+    "Sources\\Clothing\\firstperson-v3\\verify-live.cs.txt": "ff33550d742a8551de62ddbb8bd496b76a0d2e1ed90ccd79e7923dd8b5b0190c",
+    "Sources\\Clothing\\firstperson-v3\\viewmodel_fabric_v3.shader": "ddb4ea953e2aac8fc8aa2318db55f799add09f9d94bf3a1101adb0537f27eff0"
+  },
+  "prompts": {
+    "mode": "built-in imagegen edit",
+    "date": "2026-10-21",
+    "purpose": "Higher native pixel density for first-person sleeve and cuff regions",
+    "records": [
+      {
+        "name": "sleeve-left",
+        "source": "C:\\Users\\leon2\\.codex\\generated_images\\01a15def-db47-7cc1-94ed-03eba3599cc0\\exec-a415c43f-e8c4-4915-a73f-4d5489d7b5c2.png",
+        "prompt": "Use case: precise-object-edit. Asset type: directly sampled first-person military sleeve albedo UV patch for a realistic game. Input image is the exact edit target, a registered rectangular crop of an existing shirt atlas, NOT a photograph of a worn shirt. Rebuild this exact texture crop at substantially higher native detail. Keep the identical rectangular framing, aspect ratio 655:401, every camouflage shape boundary, cuff/placket shape, pocket edge, button, seam, insignia, padding and UV island in exactly the same normalized position. Do not rearrange or add objects. Preserve the muted tan, olive and dark brown colour palette and overall brightness. Resolve printed camo edges smoothly with sharply resolved tiny cotton yarn, restrained short twill fibres and individual small stitch loops; the cloth should look like fine realistic military cotton at arm's length rather than coarse sackcloth. Clean distinct stitching on the narrow cuff/placket at the right. The weave must be very fine, never large embossed crosshatching. Flat diffuse base-colour texture lighting, no glossy highlights, no new baked folds or shadows, no blur, no painterly strokes, no pixel grid, no sharpening halos. Keep edge colours and boundary shapes registered to the source because the material will blend this crop into the existing atlas. Output only the improved UV texture crop at the highest native landscape resolution; no labels or borders.",
+        "input": "output/firstperson-clothing-v3-20261021/regions/sleeve-left.png"
+      },
+      {
+        "name": "sleeve-right",
+        "source": "C:\\Users\\leon2\\.codex\\generated_images\\01a15def-db47-7cc1-94ed-03eba3599cc0\\exec-d28e50e4-f6d8-476b-85f8-f4ee19648ee4.png",
+        "prompt": "Use case: precise-object-edit. Asset type: directly sampled first-person military sleeve albedo UV patch for a realistic game. Input image is the exact edit target, a registered rectangular crop of an existing shirt atlas, NOT a photograph of a worn shirt. Rebuild this exact texture crop at substantially higher native detail. Keep the identical rectangular framing, aspect ratio 654:401, every camouflage shape boundary, cuff/placket shape, pocket edge, button, seam, padding and UV island in exactly the same normalized position. Do not rearrange or add objects. Preserve the muted tan, olive and dark brown colour palette and overall brightness. Resolve printed camo edges smoothly with sharply resolved tiny cotton yarn, restrained short twill fibres and individual small stitch loops; the cloth should look like fine realistic military cotton at arm's length rather than coarse sackcloth. Clean distinct stitching on the narrow cuff/placket at the left. The weave must be very fine, never large embossed crosshatching. Flat diffuse base-colour texture lighting, no glossy highlights, no new baked folds or shadows, no blur, no painterly strokes, no pixel grid, no sharpening halos. Keep edge colours and boundary shapes registered to the source because the material will blend this crop into the existing atlas. Output only the improved UV texture crop at the highest native landscape resolution; no labels or borders.",
+        "input": "output/firstperson-clothing-v3-20261021/regions/sleeve-right.png"
+      },
+      {
+        "name": "cuff-main",
+        "source": "C:\\Users\\leon2\\.codex\\generated_images\\01a15def-db47-7cc1-94ed-03eba3599cc0\\exec-d1994e54-82d4-4a28-814c-0986438ee775.png",
+        "prompt": "Use case: precise-object-edit. Asset type: close-up first-person military shirt cuff albedo UV patch in a realistic game. The input image is the exact edit target: a registered 500:320 rectangular crop of a UV texture atlas. Rebuild this same cropped image with finely resolved native detail suitable for a sleeve seen close to the player's camera. Preserve the exact framing, the location and silhouette of every seam, horizontal fold, stitch row, button, buttonhole and all camouflage colour shapes. Keep the muted tan, olive and dark brown palette and original brightness. The central cuff tab with its horizontal stitched bands and two small dark olive buttons must remain in exactly the same normalized coordinates. Resolve every tiny stitch thread, clean realistic button rims and button holes, fine cotton twill with subtle yarn structure; restrained matte cloth rather than coarse sackcloth or a shiny raised grid. Keep the atlas bleed/gutter regions and edge pixels aligned to the source. This is an albedo texture asset, not a photograph of an actual shirt: no perspective, no backdrop or new object, no new lighting or shadows, no grain filter, no blur, no painterly strokes, no sharpening halos. Highest native landscape resolution in the same 500:320 aspect ratio, image only.",
+        "input": "output/firstperson-clothing-v3-20261021/regions/cuff-main.png"
+      },
+      {
+        "name": "cuff-strip",
+        "source": "C:\\Users\\leon2\\.codex\\generated_images\\01a15def-db47-7cc1-94ed-03eba3599cc0\\exec-8116a093-1bd0-416f-870a-5661832092f1.png",
+        "prompt": "Use case: precise-object-edit. Asset type: close-up first-person military shirt cuff and button strip albedo UV patch in a realistic game. The input is the exact edit target: a registered narrow vertical 174:370 rectangular crop from an existing UV atlas. Rebuild the exact same crop at genuinely higher native detail. Keep every camouflage colour shape, the curved and straight seam outlines, narrow bleed/gutter columns, the number, position and shape of all little olive buttons in exactly the same normalized coordinates. Do not add or rearrange anything or change the crop. Preserve the source tan, olive and dark brown palette and its overall brightness. Fine matte cotton fibres, precise individual small stitch loops and realistic button rims and button holes should be clearly resolved instead of pixelated. Fine military cotton twill, not coarse sackcloth and not a raised metallic grid. Flat diffuse albedo texture asset: no perspective or backdrop, no new shadows, no new highlights, no blur or sharpening halos, no labels or borders. Output just the texture in exactly the input's 174:370 portrait aspect ratio at the highest native resolution.",
+        "input": "output/firstperson-clothing-v3-20261021/regions/cuff-strip.png"
+      }
+    ]
+  },
+  "live": {
+    "LiveProductionBindingVerified": true,
+    "Shirts": 1,
+    "Garments": [
+      {
+        "Scene": "belltower",
+        "Object": "vm_kastov74u",
+        "Assembly": "package.verarp.razedtest, Version=0.0.121.0, Culture=neutral, PublicKeyToken=null",
+        "Model": "models/citizen_clothes/shirt/army_shirt/model/army_shirt_m_human.vmdl",
+        "Material": "materials/operators/first_person/v3/shirt.vmat",
+        "Shader": "shaders/viewmodel_fabric_v3.shader",
+        "Tint": "1,1,1,1",
+        "Textures": [
+          {
+            "Key": "g_tColor",
+            "Width": 2048,
+            "Height": 2048,
+            "Mips": 10,
+            "IsLoaded": true
+          },
+          {
+            "Key": "g_tNormal",
+            "Width": 1024,
+            "Height": 1024,
+            "Mips": 9,
+            "IsLoaded": true
+          },
+          {
+            "Key": "g_tRma",
+            "Width": 1024,
+            "Height": 1024,
+            "Mips": 9,
+            "IsLoaded": true
+          },
+          {
+            "Key": "g_tFineNormal",
+            "Width": 2048,
+            "Height": 2048,
+            "Mips": 10,
+            "IsLoaded": true
+          },
+          {
+            "Key": "g_tFineData",
+            "Width": 2048,
+            "Height": 2048,
+            "Mips": 10,
+            "IsLoaded": true
+          },
+          {
+            "Key": "g_tSleeveLeft",
+            "Width": 2048,
+            "Height": 1024,
+            "Mips": 9,
+            "IsLoaded": true
+          },
+          {
+            "Key": "g_tSleeveRight",
+            "Width": 2048,
+            "Height": 1024,
+            "Mips": 9,
+            "IsLoaded": true
+          },
+          {
+            "Key": "g_tCuffMain",
+            "Width": 2048,
+            "Height": 1024,
+            "Mips": 9,
+            "IsLoaded": true
+          },
+          {
+            "Key": "g_tCuffStrip",
+            "Width": 1024,
+            "Height": 2048,
+            "Mips": 9,
+            "IsLoaded": true
+          }
+        ],
+        "Camera": {
+          "Position": "498.773041,-2171.08398,60.041256",
+          "Scale": "1,1,1",
+          "Rotation": "0,0,0.753767192,0.657141626"
+        },
+        "CameraFov": 85
+      }
+    ],
+    "SharedEditorStatePreserved": true,
+    "GameOrCameraChanged": false
+  },
+  "native_comparisons": {
+    "Captures": [
+      {
+        "View": "right",
+        "Version": "v2",
+        "Material": "materials/operators/first_person/v2/shirt.vmat",
+        "Shader": "shaders/viewmodel_fabric_v2.shader",
+        "Captured": "C:\\sbox-projects\\hc1\\forked-shooter-main\\output/firstperson-clothing-v3-20261021/native-r1\\right-v2.png",
+        "Frames": 14,
+        "Textures": [
+          {
+            "Key": "g_tColor",
+            "Width": 2048,
+            "Height": 2048,
+            "Valid": true,
+            "Error": false
+          },
+          {
+            "Key": "g_tNormal",
+            "Width": 1024,
+            "Height": 1024,
+            "Valid": true,
+            "Error": false
+          },
+          {
+            "Key": "g_tRma",
+            "Width": 1024,
+            "Height": 1024,
+            "Valid": true,
+            "Error": false
+          },
+          {
+            "Key": "g_tFineNormal",
+            "Width": 2048,
+            "Height": 2048,
+            "Valid": true,
+            "Error": false
+          },
+          {
+            "Key": "g_tFineData",
+            "Width": 2048,
+            "Height": 2048,
+            "Valid": true,
+            "Error": false
+          },
+          {
+            "Key": "g_tSleeveLeft",
+            "Width": null,
+            "Height": null,
+            "Valid": null,
+            "Error": null
+          },
+          {
+            "Key": "g_tSleeveRight",
+            "Width": null,
+            "Height": null,
+            "Valid": null,
+            "Error": null
+          },
+          {
+            "Key": "g_tCuffMain",
+            "Width": null,
+            "Height": null,
+            "Valid": null,
+            "Error": null
+          },
+          {
+            "Key": "g_tCuffStrip",
+            "Width": null,
+            "Height": null,
+            "Valid": null,
+            "Error": null
+          }
+        ]
+      },
+      {
+        "View": "right",
+        "Version": "v3",
+        "Material": "materials/operators/first_person/v3/shirt.vmat",
+        "Shader": "shaders/viewmodel_fabric_v3.shader",
+        "Captured": "C:\\sbox-projects\\hc1\\forked-shooter-main\\output/firstperson-clothing-v3-20261021/native-r1\\right-v3.png",
+        "Frames": 14,
+        "Textures": [
+          {
+            "Key": "g_tColor",
+            "Width": 2048,
+            "Height": 2048,
+            "Valid": true,
+            "Error": false
+          },
+          {
+            "Key": "g_tNormal",
+            "Width": 1024,
+            "Height": 1024,
+            "Valid": true,
+            "Error": false
+          },
+          {
+            "Key": "g_tRma",
+            "Width": 1024,
+            "Height": 1024,
+            "Valid": true,
+            "Error": false
+          },
+          {
+            "Key": "g_tFineNormal",
+            "Width": 2048,
+            "Height": 2048,
+            "Valid": true,
+            "Error": false
+          },
+          {
+            "Key": "g_tFineData",
+            "Width": 2048,
+            "Height": 2048,
+            "Valid": true,
+            "Error": false
+          },
+          {
+            "Key": "g_tSleeveLeft",
+            "Width": 2048,
+            "Height": 1024,
+            "Valid": true,
+            "Error": false
+          },
+          {
+            "Key": "g_tSleeveRight",
+            "Width": 2048,
+            "Height": 1024,
+            "Valid": true,
+            "Error": false
+          },
+          {
+            "Key": "g_tCuffMain",
+            "Width": 2048,
+            "Height": 1024,
+            "Valid": true,
+            "Error": false
+          },
+          {
+            "Key": "g_tCuffStrip",
+            "Width": 1024,
+            "Height": 2048,
+            "Valid": true,
+            "Error": false
+          }
+        ]
+      },
+      {
+        "View": "left",
+        "Version": "v2",
+        "Material": "materials/operators/first_person/v2/shirt.vmat",
+        "Shader": "shaders/viewmodel_fabric_v2.shader",
+        "Captured": "C:\\sbox-projects\\hc1\\forked-shooter-main\\output/firstperson-clothing-v3-20261021/native-r1\\left-v2.png",
+        "Frames": 14,
+        "Textures": [
+          {
+            "Key": "g_tColor",
+            "Width": 2048,
+            "Height": 2048,
+            "Valid": true,
+            "Error": false
+          },
+          {
+            "Key": "g_tNormal",
+            "Width": 1024,
+            "Height": 1024,
+            "Valid": true,
+            "Error": false
+          },
+          {
+            "Key": "g_tRma",
+            "Width": 1024,
+            "Height": 1024,
+            "Valid": true,
+            "Error": false
+          },
+          {
+            "Key": "g_tFineNormal",
+            "Width": 2048,
+            "Height": 2048,
+            "Valid": true,
+            "Error": false
+          },
+          {
+            "Key": "g_tFineData",
+            "Width": 2048,
+            "Height": 2048,
+            "Valid": true,
+            "Error": false
+          },
+          {
+            "Key": "g_tSleeveLeft",
+            "Width": null,
+            "Height": null,
+            "Valid": null,
+            "Error": null
+          },
+          {
+            "Key": "g_tSleeveRight",
+            "Width": null,
+            "Height": null,
+            "Valid": null,
+            "Error": null
+          },
+          {
+            "Key": "g_tCuffMain",
+            "Width": null,
+            "Height": null,
+            "Valid": null,
+            "Error": null
+          },
+          {
+            "Key": "g_tCuffStrip",
+            "Width": null,
+            "Height": null,
+            "Valid": null,
+            "Error": null
+          }
+        ]
+      },
+      {
+        "View": "left",
+        "Version": "v3",
+        "Material": "materials/operators/first_person/v3/shirt.vmat",
+        "Shader": "shaders/viewmodel_fabric_v3.shader",
+        "Captured": "C:\\sbox-projects\\hc1\\forked-shooter-main\\output/firstperson-clothing-v3-20261021/native-r1\\left-v3.png",
+        "Frames": 14,
+        "Textures": [
+          {
+            "Key": "g_tColor",
+            "Width": 2048,
+            "Height": 2048,
+            "Valid": true,
+            "Error": false
+          },
+          {
+            "Key": "g_tNormal",
+            "Width": 1024,
+            "Height": 1024,
+            "Valid": true,
+            "Error": false
+          },
+          {
+            "Key": "g_tRma",
+            "Width": 1024,
+            "Height": 1024,
+            "Valid": true,
+            "Error": false
+          },
+          {
+            "Key": "g_tFineNormal",
+            "Width": 2048,
+            "Height": 2048,
+            "Valid": true,
+            "Error": false
+          },
+          {
+            "Key": "g_tFineData",
+            "Width": 2048,
+            "Height": 2048,
+            "Valid": true,
+            "Error": false
+          },
+          {
+            "Key": "g_tSleeveLeft",
+            "Width": 2048,
+            "Height": 1024,
+            "Valid": true,
+            "Error": false
+          },
+          {
+            "Key": "g_tSleeveRight",
+            "Width": 2048,
+            "Height": 1024,
+            "Valid": true,
+            "Error": false
+          },
+          {
+            "Key": "g_tCuffMain",
+            "Width": 2048,
+            "Height": 1024,
+            "Valid": true,
+            "Error": false
+          },
+          {
+            "Key": "g_tCuffStrip",
+            "Width": 1024,
+            "Height": 2048,
+            "Valid": true,
+            "Error": false
+          }
+        ]
+      },
+      {
+        "View": "cuff",
+        "Version": "v2",
+        "Material": "materials/operators/first_person/v2/shirt.vmat",
+        "Shader": "shaders/viewmodel_fabric_v2.shader",
+        "Captured": "C:\\sbox-projects\\hc1\\forked-shooter-main\\output/firstperson-clothing-v3-20261021/native-r1\\cuff-v2.png",
+        "Frames": 14,
+        "Textures": [
+          {
+            "Key": "g_tColor",
+            "Width": 2048,
+            "Height": 2048,
+            "Valid": true,
+            "Error": false
+          },
+          {
+            "Key": "g_tNormal",
+            "Width": 1024,
+            "Height": 1024,
+            "Valid": true,
+            "Error": false
+          },
+          {
+            "Key": "g_tRma",
+            "Width": 1024,
+            "Height": 1024,
+            "Valid": true,
+            "Error": false
+          },
+          {
+            "Key": "g_tFineNormal",
+            "Width": 2048,
+            "Height": 2048,
+            "Valid": true,
+            "Error": false
+          },
+          {
+            "Key": "g_tFineData",
+            "Width": 2048,
+            "Height": 2048,
+            "Valid": true,
+            "Error": false
+          },
+          {
+            "Key": "g_tSleeveLeft",
+            "Width": null,
+            "Height": null,
+            "Valid": null,
+            "Error": null
+          },
+          {
+            "Key": "g_tSleeveRight",
+            "Width": null,
+            "Height": null,
+            "Valid": null,
+            "Error": null
+          },
+          {
+            "Key": "g_tCuffMain",
+            "Width": null,
+            "Height": null,
+            "Valid": null,
+            "Error": null
+          },
+          {
+            "Key": "g_tCuffStrip",
+            "Width": null,
+            "Height": null,
+            "Valid": null,
+            "Error": null
+          }
+        ]
+      },
+      {
+        "View": "cuff",
+        "Version": "v3",
+        "Material": "materials/operators/first_person/v3/shirt.vmat",
+        "Shader": "shaders/viewmodel_fabric_v3.shader",
+        "Captured": "C:\\sbox-projects\\hc1\\forked-shooter-main\\output/firstperson-clothing-v3-20261021/native-r1\\cuff-v3.png",
+        "Frames": 14,
+        "Textures": [
+          {
+            "Key": "g_tColor",
+            "Width": 2048,
+            "Height": 2048,
+            "Valid": true,
+            "Error": false
+          },
+          {
+            "Key": "g_tNormal",
+            "Width": 1024,
+            "Height": 1024,
+            "Valid": true,
+            "Error": false
+          },
+          {
+            "Key": "g_tRma",
+            "Width": 1024,
+            "Height": 1024,
+            "Valid": true,
+            "Error": false
+          },
+          {
+            "Key": "g_tFineNormal",
+            "Width": 2048,
+            "Height": 2048,
+            "Valid": true,
+            "Error": false
+          },
+          {
+            "Key": "g_tFineData",
+            "Width": 2048,
+            "Height": 2048,
+            "Valid": true,
+            "Error": false
+          },
+          {
+            "Key": "g_tSleeveLeft",
+            "Width": 2048,
+            "Height": 1024,
+            "Valid": true,
+            "Error": false
+          },
+          {
+            "Key": "g_tSleeveRight",
+            "Width": 2048,
+            "Height": 1024,
+            "Valid": true,
+            "Error": false
+          },
+          {
+            "Key": "g_tCuffMain",
+            "Width": 2048,
+            "Height": 1024,
+            "Valid": true,
+            "Error": false
+          },
+          {
+            "Key": "g_tCuffStrip",
+            "Width": 1024,
+            "Height": 2048,
+            "Valid": true,
+            "Error": false
+          }
+        ]
+      }
+    ],
+    "SharedEditorStatePreserved": true,
+    "TemporarySceneDestroyed": true,
+    "LiveMatchCapture": false
+  },
+  "compilation": {
+    "all_successful": true,
+    "errors": 0,
+    "warnings": {
+      "sboxshare.sboxshare.editor": 1,
+      "sboxskinsgg.claudebridge.editor": 9,
+      "verarp.razedtest": 75,
+      "verarp.razedtest.editor": 4
+    }
+  },
+  "limits": [
+    "Native generated pixel counts, rather than compiler-resized dimensions, determine the reported density gain.",
+    "Live before and after cameras differ because the existing game remained interactive; use the fixed-camera native captures for direct comparisons.",
+    "Original body garment geometry, animation rig and coverage remain; this revision changes only the first-person shirt material and its streaming bindings."
+  ]
+}

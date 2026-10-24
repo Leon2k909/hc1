@@ -1,0 +1,29 @@
+{
+  "revision": "shop-awning-cloth-v1",
+  "awnings_per_half": 14,
+  "map_awning_hook": "def awning( model, wall, r0, r1, z, reach, paint, name=None ):\n    \"\"\"Soft shop canvas; wall attachments, existing paints and lettering stay.\"\"\"\n    ShopAwning.build(model, wall, r0, r1, z, reach, paint, name)",
+  "protected_sha256": {
+    "Assets/models/maps/belltower/belltower_west.mtl": "7f9fabd8b03d0b7e3a8dc7cdb90991ff55ebce377ec374ea39d086d5bf3cb2be",
+    "Assets/models/maps/belltower/belltower_east.mtl": "1d39e353ca5a709477e7b23a76198411a6d49d1337dd4bed2bf468eef9f17e57"
+  },
+  "stage_revision": "repair-separator",
+  "source_sha256": {
+    "Tools/belltower_shop_awning_cloth.py": "d30e85d35c928b2cf5c7fb4fd98cac83a5c83d75111cc2a2d006112068a057b1",
+    "Tools/belltower_stage_shop_awning_cloth.py": "8757645c435401d42f741245fcdfb351b871806c33625af56624add1187677ef",
+    "Sources/Belltower/props/shop-awning-cloth-v1/legacy-awning.py.txt": "2524b5795a3409f0ba635134d5ba1c1ff3738b2f96e9fe7503b5ba04106b2ed4"
+  },
+  "files": {
+    "Assets/models/maps/belltower/belltower_west.vmdl": {
+      "source": "output/belltower/shop-awning-cloth-v1/repair-separator/stage/Assets/models/maps/belltower/belltower_west.vmdl",
+      "backup": "output/belltower/shop-awning-cloth-v1/repair-separator/stage/before/Assets/models/maps/belltower/belltower_west.vmdl",
+      "before": "4a60a97643653ae62c52bffac7788d268c1dccbaedcd88fe6ee3d57d1630e1c0",
+      "after": "beebe4057c19f7830f6d22fdd20dfd86924393e390f8551f121ea352a84da682"
+    },
+    "Assets/models/maps/belltower/belltower_east.vmdl": {
+      "source": "output/belltower/shop-awning-cloth-v1/repair-separator/stage/Assets/models/maps/belltower/belltower_east.vmdl",
+      "backup": "output/belltower/shop-awning-cloth-v1/repair-separator/stage/before/Assets/models/maps/belltower/belltower_east.vmdl",
+      "before": "0ebc197f59cab2bb17f99437f3289122b37fad84dbf8625598ab048410457455",
+      "after": "35deadc11e59fc4cc3734544382c2882bd189ae9a9bd067a16fb74ad049a24a1"
+    }
+  }
+}

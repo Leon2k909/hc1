@@ -1,0 +1,27 @@
+{
+  "previous_scene": "scenes/maps/ares/ares.scene",
+  "previous_scene_sha256": "fb5f5eb035ac5517b104d08f71e8e974ce653bafc81e2b1163efdad6bf5b18a9",
+  "previous_playing": true,
+  "previous_unsaved": false,
+  "pid": 10216,
+  "restore_required": false,
+  "restored": false,
+  "prepared_utc": "2026-10-20T11:04:41.931218+00:00",
+  "evidence": "output/belltower/quality/oct20-continuation/current-editor-before-slot2/call_tools.json",
+  "reason": "Ares chat latest turn completed; brief authorized scene edit, restart Ares play afterward.",
+  "previous_edit_camera": {
+    "Position": "195.52858,-280.417175,161.141754",
+    "Angles": "14.2000866,116.70153,4.40341495E-07",
+    "FieldOfView": 80
+  },
+  "superseded_utc": "2026-10-20T11:13:01.489197+00:00",
+  "superseded_reason": "The Ares chat resumed a new stair investigation and switched the editor back to stopped Ares with its own new camera during final read-only checks. Preserve this newer state; do not restart the older preview or restore the stale camera.",
+  "observed_evidence": "output/belltower/quality/oct20-continuation/return-state-check/call_tools.json",
+  "superseding_chat": {
+    "threadId": "01a15547-eb49-7920-8b06-675298d7ce63",
+    "title": "Improve Ares terrain realism",
+    "turnId": "01a15902-57a6-77f0-b5de-b1bea4138dde"
+  },
+  "ares_source_file_unchanged_since_slot": true,
+  "saved_belltower_tab_retained": true
+}

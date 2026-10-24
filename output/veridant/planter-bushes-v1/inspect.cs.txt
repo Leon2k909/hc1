@@ -1,0 +1,22 @@
+var session = Editor.SceneEditorSession.Active;
+var scene = session.Scene;
+var paths = new[] {
+    "models/sbox_props/shrubs/beech/beech_bush_small.vmdl",
+    "models/sbox_props/shrubs/beech/beech_bush_regular_small.vmdl"
+};
+return new {
+    Scene = scene.Source?.ResourcePath, session.HasUnsavedChanges, Game.IsPlaying,
+    Models = paths.Select(path => {
+        var model = Model.Load(path);
+        var vertices = model.GetVertices().ToArray();
+        return new {
+            Path = path, model.IsError, Bounds = model.Bounds.ToString(), Vertices = vertices.Length,
+            Materials = model.Materials.Select(m => new { m.ResourcePath, m.IsError }).ToArray(),
+            CenterStem = vertices.Where(v => MathF.Abs(v.Position.x) < 3 && MathF.Abs(v.Position.y) < 3)
+                .OrderBy(v => v.Position.z).Take(8).Select(v => v.Position.ToString()).ToArray()
+        };
+    }).ToArray(),
+    Renderers = scene.GetAllComponents<ModelRenderer>().Where(r => r.Model?.ResourcePath?.Contains("veridant", StringComparison.OrdinalIgnoreCase) == true)
+        .Select(r => new { r.GameObject.Name, r.GameObject.Id, Model = r.Model.ResourcePath,
+            Position = r.WorldPosition.ToString(), Scale = r.WorldScale.ToString(), Rotation = r.WorldRotation.ToString() }).ToArray()
+};

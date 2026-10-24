@@ -1,0 +1,400 @@
+{
+  "revision": "worn-gazebo-flower-beds-v1",
+  "beds": 4,
+  "original_cover_collision_exact": true,
+  "new_colliders": 0,
+  "new_scene_objects": 0,
+  "changed_plants_per_half": 16,
+  "all_other_garden_props_exact": true,
+  "source_sha256": {
+    "Tools/belltower_map.py": "65d146ffa8e50776c192f8b559b625c3494e8b285bfd1c2bbb9894c0cd8260c1",
+    "Tools/belltower_long_beds.py": "9cbdd3657767530094047009da7a7d28f6002959dc779743ce15b5724f06d33b",
+    "Tools/belltower_planters.py": "f4bc0b07e3aca2f2f53451081585ea2219b01be144cd90d8d01329ebf9b2a8b0",
+    "Tools/belltower_stage_long_beds.py": "b63ffda2236d96e0cf7ed7a26bd6225be0e06035f71e0eb03c2d340fb51089c0"
+  },
+  "files": {
+    "Assets/models/maps/belltower/belltower_west.obj": {
+      "before": "a6496b51f730bf3824c41ed0d6ea920859366b580bb18a77b93bbe152f4dce70",
+      "after": "c0fdde87c3d096b10de4647d694d4cf3292520a433de4cde74f9c6fa8063a74e",
+      "removed_faces": 24,
+      "added_faces": 7810,
+      "all_non_bed_source_bytes_preserved": true,
+      "source": "output/belltower/long-bed/stage/Assets/models/maps/belltower/belltower_west.obj",
+      "backup": "output/belltower/long-bed/before/Assets/models/maps/belltower/belltower_west.obj"
+    },
+    "Assets/models/maps/belltower/compiler-safe/west/west_001_ashlar_grey.obj": {
+      "before": "b6e6b81796947c42c17afb9b9810ebb9b763a941db362d29848bc353dff78efa",
+      "after": "75467b83c4f4fe605619903aecfbd21ad5600743699d9e64ecd30da18c3e6e67",
+      "removed_faces": 20,
+      "added_faces": 0,
+      "source": "output/belltower/long-bed/stage/Assets/models/maps/belltower/compiler-safe/west/west_001_ashlar_grey.obj",
+      "backup": "output/belltower/long-bed/before/Assets/models/maps/belltower/compiler-safe/west/west_001_ashlar_grey.obj",
+      "import_compaction": {
+        "source": "C:/sbox-projects/hc1/forked-shooter-main/output/belltower/long-bed/stage/Assets/models/maps/belltower/compiler-safe/west/west_001_ashlar_grey.obj",
+        "staged": "C:/sbox-projects/hc1/forked-shooter-main/output/belltower/long-bed/stage/Assets/models/maps/belltower/compiler-safe/west/west_001_ashlar_grey.compact.obj",
+        "before_sha256": "b3007eb20f94b6df9e7da58de18ba91c91bca0b55d7d5e4ae0510f2dbf315e71",
+        "after_sha256": "c79ec38efd5713a2030dbe8f65bbe696d0bf180f9089ee9d858db381f8108bf2",
+        "before_entries": {
+          "v": 8746,
+          "vt": 30050,
+          "vn": 556
+        },
+        "after_entries": {
+          "v": 8730,
+          "vt": 30018,
+          "vn": 556
+        },
+        "removed_unused_entries": {
+          "v": 16,
+          "vt": 32,
+          "vn": 0
+        },
+        "merged_identical_used_entries": {
+          "v": 0,
+          "vt": 0,
+          "vn": 0
+        },
+        "faces": 15636,
+        "face_semantics_sha256": "95a955e9b7234a5c88c3fda3474222ccc65423fd07d63717476966cff12b26e3",
+        "all_face_material_position_uv_normal_bytes_identical": true
+      },
+      "removed_trailing_empty_material_marker": "usemtl ashlar_grey",
+      "all_non_bed_source_bytes_preserved_before_import_compaction": true,
+      "all_non_bed_face_attributes_preserved": true
+    },
+    "Assets/models/maps/belltower/compiler-safe/west/west_099_soil.obj": {
+      "before": "8623bbd25bbc440d64c7a43718f2db39538a0d08ac45c810a82ec57e480ef915",
+      "after": "db4b6d7ffb68be4c24c2bec4cc25d893d670a7a5ba7c29fb66bf7ea6c46502af",
+      "removed_faces": 4,
+      "added_faces": 0,
+      "source": "output/belltower/long-bed/stage/Assets/models/maps/belltower/compiler-safe/west/west_099_soil.obj",
+      "backup": "output/belltower/long-bed/before/Assets/models/maps/belltower/compiler-safe/west/west_099_soil.obj",
+      "import_compaction": {
+        "source": "C:/sbox-projects/hc1/forked-shooter-main/output/belltower/long-bed/stage/Assets/models/maps/belltower/compiler-safe/west/west_099_soil.obj",
+        "staged": "C:/sbox-projects/hc1/forked-shooter-main/output/belltower/long-bed/stage/Assets/models/maps/belltower/compiler-safe/west/west_099_soil.compact.obj",
+        "before_sha256": "e9af56d868adee8f138a6729a44b7e137108d6ea6140e075865e47e6f9bd650f",
+        "after_sha256": "061a90441eabf88d554a7afd72aba6c1456d63b20a92302bf47448c0e08db4b3",
+        "before_entries": {
+          "v": 248,
+          "vt": 272,
+          "vn": 6
+        },
+        "after_entries": {
+          "v": 240,
+          "vt": 264,
+          "vn": 6
+        },
+        "removed_unused_entries": {
+          "v": 8,
+          "vt": 8,
+          "vn": 0
+        },
+        "merged_identical_used_entries": {
+          "v": 0,
+          "vt": 0,
+          "vn": 0
+        },
+        "faces": 170,
+        "face_semantics_sha256": "0a77569ee26fd7af562082963cd1189ba018b5b23c5fee136ee1a484993ac116",
+        "all_face_material_position_uv_normal_bytes_identical": true
+      },
+      "removed_trailing_empty_material_marker": "usemtl soil",
+      "all_non_bed_source_bytes_preserved_before_import_compaction": true,
+      "all_non_bed_face_attributes_preserved": true
+    },
+    "Assets/models/maps/belltower/compiler-safe/west/west_119_planter_cut_stone.obj": {
+      "before": "e5516e9b1c46af0f830aa4373aa3ec53b9221903a3c59d86b3499f576146fa2f",
+      "after": "f42b469cedf432f22cba389dbdbd36ecb92dda3dd10b04eabb68c75ea8f1d66c",
+      "removed_faces": 0,
+      "added_faces": 6650,
+      "source": "output/belltower/long-bed/stage/Assets/models/maps/belltower/compiler-safe/west/west_119_planter_cut_stone.obj",
+      "backup": "output/belltower/long-bed/before/Assets/models/maps/belltower/compiler-safe/west/west_119_planter_cut_stone.obj",
+      "import_compaction": {
+        "source": "C:/sbox-projects/hc1/forked-shooter-main/output/belltower/long-bed/stage/Assets/models/maps/belltower/compiler-safe/west/west_119_planter_cut_stone.obj",
+        "staged": "C:/sbox-projects/hc1/forked-shooter-main/output/belltower/long-bed/stage/Assets/models/maps/belltower/compiler-safe/west/west_119_planter_cut_stone.compact.obj",
+        "before_sha256": "efe25b23dd7c0d28c31064a191b70ef6bd4271ad0768a6a4014324e22abe7767",
+        "after_sha256": "f42b469cedf432f22cba389dbdbd36ecb92dda3dd10b04eabb68c75ea8f1d66c",
+        "before_entries": {
+          "v": 22643,
+          "vt": 24911,
+          "vn": 6960
+        },
+        "after_entries": {
+          "v": 6218,
+          "vt": 11588,
+          "vn": 418
+        },
+        "removed_unused_entries": {
+          "v": 0,
+          "vt": 0,
+          "vn": 0
+        },
+        "merged_identical_used_entries": {
+          "v": 16425,
+          "vt": 13323,
+          "vn": 6542
+        },
+        "faces": 11688,
+        "face_semantics_sha256": "954c2cd06acccf5e2e84aeebe4445c2f82111f34c2bac3ddcf001372ee7f5018",
+        "all_face_material_position_uv_normal_bytes_identical": true
+      },
+      "all_non_bed_source_bytes_preserved_before_import_compaction": true,
+      "all_non_bed_face_attributes_preserved": true
+    },
+    "Assets/models/maps/belltower/compiler-safe/west/west_118_planter_compost.obj": {
+      "before": "86d8d52c2f3cd8dbcf1b2e0a8504002f8135b67c39248f825f334cfe0a4aabfa",
+      "after": "cf6b58fae828e4576a4c454b63c4a2c6296d45db57df5180962dfe5d0cd9a102",
+      "removed_faces": 0,
+      "added_faces": 1160,
+      "source": "output/belltower/long-bed/stage/Assets/models/maps/belltower/compiler-safe/west/west_118_planter_compost.obj",
+      "backup": "output/belltower/long-bed/before/Assets/models/maps/belltower/compiler-safe/west/west_118_planter_compost.obj",
+      "import_compaction": {
+        "source": "C:/sbox-projects/hc1/forked-shooter-main/output/belltower/long-bed/stage/Assets/models/maps/belltower/compiler-safe/west/west_118_planter_compost.obj",
+        "staged": "C:/sbox-projects/hc1/forked-shooter-main/output/belltower/long-bed/stage/Assets/models/maps/belltower/compiler-safe/west/west_118_planter_compost.compact.obj",
+        "before_sha256": "894ecc00a6f6b008493c24f5d778480991297fb3bcf9c1b59a709095482dc9fa",
+        "after_sha256": "cf6b58fae828e4576a4c454b63c4a2c6296d45db57df5180962dfe5d0cd9a102",
+        "before_entries": {
+          "v": 4302,
+          "vt": 5536,
+          "vn": 3074
+        },
+        "after_entries": {
+          "v": 1572,
+          "vt": 3975,
+          "vn": 1508
+        },
+        "removed_unused_entries": {
+          "v": 0,
+          "vt": 0,
+          "vn": 0
+        },
+        "merged_identical_used_entries": {
+          "v": 2730,
+          "vt": 1561,
+          "vn": 1566
+        },
+        "faces": 2546,
+        "face_semantics_sha256": "c464b2b5933a03c7e1235897657a97e5ac1da29bedaa64f2236ea499bbddcdb9",
+        "all_face_material_position_uv_normal_bytes_identical": true
+      },
+      "all_non_bed_source_bytes_preserved_before_import_compaction": true,
+      "all_non_bed_face_attributes_preserved": true
+    },
+    "Assets/models/maps/belltower/belltower_east.obj": {
+      "before": "d13fd857a24445e0a86d240e9f305579030db6bb1dc11f0a20bebacd9ee8651c",
+      "after": "4787e352898f7a0500fb5b60905ab82d3c39680ef897ac91994b6c9b85d34587",
+      "removed_faces": 24,
+      "added_faces": 7810,
+      "all_non_bed_source_bytes_preserved": true,
+      "source": "output/belltower/long-bed/stage/Assets/models/maps/belltower/belltower_east.obj",
+      "backup": "output/belltower/long-bed/before/Assets/models/maps/belltower/belltower_east.obj"
+    },
+    "Assets/models/maps/belltower/compiler-safe/east/east_001_ashlar_grey.obj": {
+      "before": "dda4cc197f84c30ef6de5597fc22c632b49fd727dcd747d709da32c801aafb9b",
+      "after": "527c86f11b00e22e71c2784be51b3d31831f90216cdd8c3f20105c8f9d6b38ad",
+      "removed_faces": 20,
+      "added_faces": 0,
+      "source": "output/belltower/long-bed/stage/Assets/models/maps/belltower/compiler-safe/east/east_001_ashlar_grey.obj",
+      "backup": "output/belltower/long-bed/before/Assets/models/maps/belltower/compiler-safe/east/east_001_ashlar_grey.obj",
+      "import_compaction": {
+        "source": "C:/sbox-projects/hc1/forked-shooter-main/output/belltower/long-bed/stage/Assets/models/maps/belltower/compiler-safe/east/east_001_ashlar_grey.obj",
+        "staged": "C:/sbox-projects/hc1/forked-shooter-main/output/belltower/long-bed/stage/Assets/models/maps/belltower/compiler-safe/east/east_001_ashlar_grey.compact.obj",
+        "before_sha256": "a341d8b9b16528ee427799eb3208419fcc2ce8c2468e87551efc135d37d7d23b",
+        "after_sha256": "719d3e17b6f79dd5ff47ee1781ff7973ad5fc81f17925c21da562dfed8549a37",
+        "before_entries": {
+          "v": 8746,
+          "vt": 30034,
+          "vn": 556
+        },
+        "after_entries": {
+          "v": 8730,
+          "vt": 30002,
+          "vn": 556
+        },
+        "removed_unused_entries": {
+          "v": 16,
+          "vt": 32,
+          "vn": 0
+        },
+        "merged_identical_used_entries": {
+          "v": 0,
+          "vt": 0,
+          "vn": 0
+        },
+        "faces": 15636,
+        "face_semantics_sha256": "a9f8edfaef2c3ee6a2281770e3d418f115940d047e0cd36812938aada7047c4e",
+        "all_face_material_position_uv_normal_bytes_identical": true
+      },
+      "removed_trailing_empty_material_marker": "usemtl ashlar_grey",
+      "all_non_bed_source_bytes_preserved_before_import_compaction": true,
+      "all_non_bed_face_attributes_preserved": true
+    },
+    "Assets/models/maps/belltower/compiler-safe/east/east_096_soil.obj": {
+      "before": "20682d615c2db55c5f56f5858dd2fb0d4caeb0eff9bb1f1b9e35fe25c4bcc589",
+      "after": "bba7def9f9555fcea747bb0c20e64257be7272ea05b8f33e02a58c38cdb519c4",
+      "removed_faces": 4,
+      "added_faces": 0,
+      "source": "output/belltower/long-bed/stage/Assets/models/maps/belltower/compiler-safe/east/east_096_soil.obj",
+      "backup": "output/belltower/long-bed/before/Assets/models/maps/belltower/compiler-safe/east/east_096_soil.obj",
+      "import_compaction": {
+        "source": "C:/sbox-projects/hc1/forked-shooter-main/output/belltower/long-bed/stage/Assets/models/maps/belltower/compiler-safe/east/east_096_soil.obj",
+        "staged": "C:/sbox-projects/hc1/forked-shooter-main/output/belltower/long-bed/stage/Assets/models/maps/belltower/compiler-safe/east/east_096_soil.compact.obj",
+        "before_sha256": "825f19d1fc7445074229e40983680a74ec3730f0bb1d4dd3ba85e3630a1b6c2d",
+        "after_sha256": "f3949a88124cf0baa3f876c97462f7b8becd10e52089a0646bb14a301813caa2",
+        "before_entries": {
+          "v": 248,
+          "vt": 272,
+          "vn": 6
+        },
+        "after_entries": {
+          "v": 240,
+          "vt": 264,
+          "vn": 6
+        },
+        "removed_unused_entries": {
+          "v": 8,
+          "vt": 8,
+          "vn": 0
+        },
+        "merged_identical_used_entries": {
+          "v": 0,
+          "vt": 0,
+          "vn": 0
+        },
+        "faces": 170,
+        "face_semantics_sha256": "5b1793be007e3bde733475b4ef5c1bd7d2cf34ea9d262ba3001c9c40e922aa00",
+        "all_face_material_position_uv_normal_bytes_identical": true
+      },
+      "removed_trailing_empty_material_marker": "usemtl soil",
+      "all_non_bed_source_bytes_preserved_before_import_compaction": true,
+      "all_non_bed_face_attributes_preserved": true
+    },
+    "Assets/models/maps/belltower/compiler-safe/east/east_116_planter_cut_stone.obj": {
+      "before": "bb1af4bca670891acb1211f3f9fd456c3f4585616aaa6bdeddea7f1803f36185",
+      "after": "1dc384b019737e2f098a8ae430b02dbe5b0acc293e3581c9845f9eb0901962f7",
+      "removed_faces": 0,
+      "added_faces": 6650,
+      "source": "output/belltower/long-bed/stage/Assets/models/maps/belltower/compiler-safe/east/east_116_planter_cut_stone.obj",
+      "backup": "output/belltower/long-bed/before/Assets/models/maps/belltower/compiler-safe/east/east_116_planter_cut_stone.obj",
+      "import_compaction": {
+        "source": "C:/sbox-projects/hc1/forked-shooter-main/output/belltower/long-bed/stage/Assets/models/maps/belltower/compiler-safe/east/east_116_planter_cut_stone.obj",
+        "staged": "C:/sbox-projects/hc1/forked-shooter-main/output/belltower/long-bed/stage/Assets/models/maps/belltower/compiler-safe/east/east_116_planter_cut_stone.compact.obj",
+        "before_sha256": "b83689c262a33bc635b3bc4997a2767596fc597a61c241dcaf75d98e26ba99b4",
+        "after_sha256": "1dc384b019737e2f098a8ae430b02dbe5b0acc293e3581c9845f9eb0901962f7",
+        "before_entries": {
+          "v": 22643,
+          "vt": 24911,
+          "vn": 6960
+        },
+        "after_entries": {
+          "v": 6218,
+          "vt": 11588,
+          "vn": 418
+        },
+        "removed_unused_entries": {
+          "v": 0,
+          "vt": 0,
+          "vn": 0
+        },
+        "merged_identical_used_entries": {
+          "v": 16425,
+          "vt": 13323,
+          "vn": 6542
+        },
+        "faces": 11688,
+        "face_semantics_sha256": "fc91e9dee645326dcc178d4878c6c77f5e41ce63ac578549e3d5c9ff87902fe6",
+        "all_face_material_position_uv_normal_bytes_identical": true
+      },
+      "all_non_bed_source_bytes_preserved_before_import_compaction": true,
+      "all_non_bed_face_attributes_preserved": true
+    },
+    "Assets/models/maps/belltower/compiler-safe/east/east_115_planter_compost.obj": {
+      "before": "16b77fae6db773e9368a948e145650824c2882c89e9e50a35079eb47381e7e5a",
+      "after": "f1b78f2c9fdd46e47638a31e4cff721c855f4f1299358addb4802b0d1217f60e",
+      "removed_faces": 0,
+      "added_faces": 1160,
+      "source": "output/belltower/long-bed/stage/Assets/models/maps/belltower/compiler-safe/east/east_115_planter_compost.obj",
+      "backup": "output/belltower/long-bed/before/Assets/models/maps/belltower/compiler-safe/east/east_115_planter_compost.obj",
+      "import_compaction": {
+        "source": "C:/sbox-projects/hc1/forked-shooter-main/output/belltower/long-bed/stage/Assets/models/maps/belltower/compiler-safe/east/east_115_planter_compost.obj",
+        "staged": "C:/sbox-projects/hc1/forked-shooter-main/output/belltower/long-bed/stage/Assets/models/maps/belltower/compiler-safe/east/east_115_planter_compost.compact.obj",
+        "before_sha256": "3d159394feaf12a790f276b1199d89bbc29e9aeebffc5a30cfcee3f50e9fb206",
+        "after_sha256": "f1b78f2c9fdd46e47638a31e4cff721c855f4f1299358addb4802b0d1217f60e",
+        "before_entries": {
+          "v": 4302,
+          "vt": 5536,
+          "vn": 3074
+        },
+        "after_entries": {
+          "v": 1572,
+          "vt": 3975,
+          "vn": 1508
+        },
+        "removed_unused_entries": {
+          "v": 0,
+          "vt": 0,
+          "vn": 0
+        },
+        "merged_identical_used_entries": {
+          "v": 2730,
+          "vt": 1561,
+          "vn": 1566
+        },
+        "faces": 2546,
+        "face_semantics_sha256": "6fd001e7d1ece23e60749eba20b0ec10837f1d58435c3fb12eb8ad3ebfb77647",
+        "all_face_material_position_uv_normal_bytes_identical": true
+      },
+      "all_non_bed_source_bytes_preserved_before_import_compaction": true,
+      "all_non_bed_face_attributes_preserved": true
+    }
+  },
+  "vmdl_guards": {
+    "Assets/models/maps/belltower/belltower_west.vmdl": "b0f7f21cf3d0c9e46f1b890749eebb05ff9225d6918cb7db7e8e6c92ca9f78c4",
+    "Assets/models/maps/belltower/belltower_east.vmdl": "dd65947f31f953015ad9eeb599b35125b8190592afd30e3a230ea3ce6e5ecb8b"
+  },
+  "models": {
+    "west": {
+      "changes": {
+        "ashlar_grey": {
+          "removed": 20,
+          "added": 0
+        },
+        "soil": {
+          "removed": 4,
+          "added": 0
+        },
+        "planter_cut_stone": {
+          "removed": 0,
+          "added": 6650
+        },
+        "planter_compost": {
+          "removed": 0,
+          "added": 1160
+        }
+      },
+      "new_visual_triangles": 7810
+    },
+    "east": {
+      "changes": {
+        "ashlar_grey": {
+          "removed": 20,
+          "added": 0
+        },
+        "soil": {
+          "removed": 4,
+          "added": 0
+        },
+        "planter_cut_stone": {
+          "removed": 0,
+          "added": 6650
+        },
+        "planter_compost": {
+          "removed": 0,
+          "added": 1160
+        }
+      },
+      "new_visual_triangles": 7810
+    }
+  },
+  "scene_sha256": "529b7eac18eb3c697fecace9d68a59b6e4db7a5e99caaf0a2f1b878c6a9aa713"
+}

@@ -1,0 +1,9 @@
+var selected=Editor.SceneEditorSession.Active;var playing=Game.IsPlaying;var game=Game.ActiveScene?.Id;var dirty=selected?.HasUnsavedChanges;
+var materials=new[]{"fountain_water","fountain_jet"}.Select(name=>{
+    var material=Material.Load("materials/belltower/"+name+".vmat");
+    return new {Name=name,material.IsError,material.ShaderName};
+}).ToArray();
+var model=Model.Load("models/maps/belltower/belltower_centre.vmdl");
+return new {Materials=materials,Model=new{model.IsError,model.ResourcePath},
+    Playing=Game.IsPlaying,Active=Editor.SceneEditorSession.Active?.Scene.Source?.ResourcePath,
+    EditorStatePreserved=ReferenceEquals(selected,Editor.SceneEditorSession.Active)&&playing==Game.IsPlaying&&game==Game.ActiveScene?.Id&&dirty==selected?.HasUnsavedChanges};

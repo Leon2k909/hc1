@@ -1,0 +1,112 @@
+// Temporary measurements in the audit-owned play test. Settings are restored.
+var scene = Editor.SceneEditorSession.All.Single(s => !s.Scene.IsEditor).Scene;
+if (!Game.IsPlaying || !Editor.SceneEditorSession.All.Any(s => s.Scene.IsEditor
+    && s.Scene.Source?.ResourcePath?.Equals("scenes/maps/boxyard/boxyard.scene", StringComparison.OrdinalIgnoreCase) == true))
+    throw new InvalidOperationException("Requires the audit-owned play test; it may have advanced to the next map.");
+var root = Sandbox.Project.Current.GetRootPath();
+var folder = System.IO.Path.Combine(root, "output/player-scale-audit-20261020/live-fov");
+System.IO.Directory.CreateDirectory(folder);
+var flags = System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance;
+object Read(object target, string name) => target?.GetType().GetProperty(name, flags)?.GetValue(target);
+void Write(object target, string name, object value) => target.GetType().GetProperty(name, flags).SetValue(target, value);
+Component FindPawn() => scene.GetAllObjects(true).SelectMany(o => o.Components.GetAll<Component>()).Distinct()
+    .Single(c => c.IsValid() && c.GetType().Name == "PlayerPawn" && (bool?)Read(c, "IsViewer") == true);
+var pawn = FindPawn();
+var client = Read(pawn, "Client");
+if (Read(Read(pawn, "HealthComponent"), "State")?.ToString() != "Alive")
+{
+    client.GetType().GetMethod("Respawn", new[] { typeof(bool) }).Invoke(client, new object[] { false });
+    pawn = (Component)Read(client, "PlayerPawn");
+}
+var health = Read(pawn, "HealthComponent");
+var god = (bool)Read(health, "IsGodMode");
+var assembly = Read(pawn, "CameraController").GetType().Assembly;
+var settingsType = assembly.GetType("Facepunch.GameSettingsSystem");
+var settings = settingsType.GetProperty("Current").GetValue(null);
+var oldFov = (float)Read(settings, "FieldOfView");
+var oldIndependent = (bool)Read(settings, "IndependentAdsFov");
+var lastFov = oldFov;
+var samples = new System.Collections.Generic.List<object>();
+object restoration = null;
+float lastIndependent = oldIndependent ? 1 : 0;
+try
+{
+    Write(health, "IsGodMode", true);
+    Write(settings, "IndependentAdsFov", false); lastIndependent = 0;
+    foreach (float requested in new[] { 60f, 85f, 120f })
+    {
+        Write(settings, "FieldOfView", requested); lastFov = requested;
+        await Task.Delay(2400, cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
+        if (!scene.IsValid() || !Game.IsPlaying || !ReferenceEquals(scene, Editor.SceneEditorSession.Active?.Scene)
+            || !pawn.IsValid() || !ReferenceEquals(settings, settingsType.GetProperty("Current").GetValue(null))
+            || (float)Read(settings, "FieldOfView") != requested)
+            throw new InvalidOperationException("The audit match or settings changed during the check.");
+        var controller = Read(pawn, "CameraController");
+        var camera = (CameraComponent)Read(controller, "Camera");
+        var body = Read(Read(pawn, "Body"), "Renderer") as SkinnedModelRenderer;
+        var bones = new System.Collections.Generic.List<object>();
+        foreach (var name in new[] { "eye_L", "eye_R", "head", "ankle_L", "ankle_R" })
+        {
+            var bone = body?.Model?.Bones.GetBone(name);
+            if (bone is not null && body.SceneModel.IsValid())
+            {
+                var transform = body.SceneModel.GetBoneWorldTransform(bone.Index);
+                bones.Add(new { Name = name, Height = transform.Position.z-pawn.WorldPosition.z, Position = transform.Position.ToString() });
+            }
+        }
+        var bottom = camera.WorldPosition+camera.WorldRotation.Forward*393.701f-camera.WorldRotation.Up*34.4744f;
+        var top = bottom+camera.WorldRotation.Up*68.9488f;
+        var a = camera.PointToScreenNormal(bottom, out var behindA);
+        var b = camera.PointToScreenNormal(top, out var behindB);
+        var oldSize = camera.CustomSize;
+        try
+        {
+            using (scene.Push())
+            {
+                camera.CustomSize = new Vector2(1280, 720);
+                using var bitmap = new Bitmap(1280, 720);
+                camera.RenderToBitmap(bitmap, false);
+                System.IO.File.WriteAllBytes(System.IO.Path.Combine(folder, "fov-"+(int)requested+".png"), bitmap.ToPng());
+            }
+        }
+        finally { camera.CustomSize = oldSize; }
+        samples.Add(new {
+            Requested = requested, Actual = camera.FieldOfView, Axis = camera.FovAxis.ToString(),
+            Mode = Read(controller, "Mode")?.ToString(), LifeState = Read(health, "State")?.ToString(),
+            CameraHeight = camera.WorldPosition.z-pawn.WorldPosition.z,
+            PlayerScale = pawn.WorldScale.ToString(), BodyScale = body?.WorldScale.ToString(),
+            EyeBones = bones, Screen = Screen.Size.ToString(),
+            ReferenceTarget = new { Height = 68.9488f, Distance = 393.701f, Bottom = a.ToString(), Top = b.ToString(),
+                FractionOfViewportHeight = MathF.Abs(a.y-b.y), Behind = behindA || behindB },
+            Image = "output/player-scale-audit-20261020/live-fov/fov-"+(int)requested+".png"
+        });
+    }
+    // Exercise the real aim helper separately from the hip camera, including low-FOV Independent.
+    var equipment = assembly.GetType("Facepunch.Equipment");
+    var magnification = equipment.GetMethod("OffsetMagnification").Invoke(null, new object[] { -5f });
+    var ads = new System.Collections.Generic.List<object>();
+    foreach (var independent in new[] { false, true })
+    {
+        Write(settings, "IndependentAdsFov", independent); lastIndependent = independent ? 1 : 0;
+        foreach (float hip in new[] { 60f, 85f, 120f })
+            ads.Add(new { Independent = independent, Hip = hip, ActualAds = equipment.GetMethod("AimFov").Invoke(null, new object[] { hip, magnification }) });
+    }
+    System.IO.File.WriteAllText(System.IO.Path.Combine(folder, "ads.json"), System.Text.Json.JsonSerializer.Serialize(ads));
+}
+finally
+{
+    if (ReferenceEquals(settings, settingsType.GetProperty("Current").GetValue(null)))
+    {
+        if ((float)Read(settings, "FieldOfView") == lastFov) Write(settings, "FieldOfView", oldFov);
+        if ((bool)Read(settings, "IndependentAdsFov") == (lastIndependent > .5f)) Write(settings, "IndependentAdsFov", oldIndependent);
+    }
+    if (pawn.IsValid()) Write(health, "IsGodMode", god);
+    restoration = new { FovRestored = (float)Read(settings, "FieldOfView") == oldFov,
+        AdsRestored = (bool)Read(settings, "IndependentAdsFov") == oldIndependent,
+        GodModeRestored = !pawn.IsValid() || (bool)Read(health, "IsGodMode") == god,
+        SceneIsAuditMatch = scene.IsValid() && ReferenceEquals(scene, Editor.SceneEditorSession.Active?.Scene) };
+    System.IO.File.WriteAllText(System.IO.Path.Combine(folder, "restoration.json"), System.Text.Json.JsonSerializer.Serialize(restoration));
+    System.IO.File.WriteAllText(System.IO.Path.Combine(folder, "measurements.json"), System.Text.Json.JsonSerializer.Serialize(samples));
+}
+return new { Samples = samples, Restoration = restoration };

@@ -1,0 +1,10 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var session=Editor.SceneEditorSession.Active;
+if(Game.IsPlaying || session?.Scene.Source?.ResourcePath?.ToLowerInvariant()!="scenes/maps/belltower/belltower.scene" || session.HasUnsavedChanges)
+    throw new InvalidOperationException("Start this check only from the saved, stopped Belltower document.");
+var camera=session.Scene.GetAllComponents<CameraComponent>().Single(c=>c.GameObject.Name=="editor_camera");
+var result=new {Scene=session.Scene.Source.ResourcePath,Playing=Game.IsPlaying,Session=session.Scene.Id,
+    CameraPosition=camera.WorldPosition.ToString(),CameraRotation=camera.WorldRotation.ToString(),camera.FieldOfView,
+    OpenDocuments=Editor.SceneEditorSession.All.Select(s=>s.Scene.Source?.ResourcePath).ToArray()};
+System.IO.File.WriteAllText(System.IO.Path.Combine(root,"output/belltower/bell-v2/game-check-before.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

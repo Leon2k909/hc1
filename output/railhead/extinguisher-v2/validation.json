@@ -1,0 +1,175 @@
+{
+  "revision": "railhead-extinguisher-v2",
+  "placements_replaced": 6,
+  "triangles_per_instance": 7430,
+  "models": {
+    "east": {
+      "native_compile": true,
+      "physics_bytes_exact": true,
+      "unrelated_geometry_bytes_exact": true,
+      "placements": 3,
+      "new_import_triangles": 22290
+    },
+    "west": {
+      "native_compile": true,
+      "physics_bytes_exact": true,
+      "unrelated_geometry_bytes_exact": true,
+      "placements": 3,
+      "new_import_triangles": 22290
+    }
+  },
+  "standalone_model": {
+    "StandaloneModel": "models/props/extinguisher-v2/extinguisher.vmdl",
+    "IsError": false,
+    "Vertices": 10282,
+    "Materials": [
+      {
+        "Path": "materials/props/extinguisher-v2/red.vmat",
+        "IsError": false,
+        "ColorWidth": 1254,
+        "ColorHeight": 1254
+      },
+      {
+        "Path": "materials/props/extinguisher-v2/label.vmat",
+        "IsError": false,
+        "ColorWidth": 1254,
+        "ColorHeight": 1254
+      },
+      {
+        "Path": "materials/props/extinguisher-v2/sign.vmat",
+        "IsError": false,
+        "ColorWidth": 1254,
+        "ColorHeight": 1254
+      },
+      {
+        "Path": "materials/props/extinguisher-v2/gauge.vmat",
+        "IsError": false,
+        "ColorWidth": 1254,
+        "ColorHeight": 1254
+      },
+      {
+        "Path": "materials/props/extinguisher-v2/rubber.vmat",
+        "IsError": false,
+        "ColorWidth": 4,
+        "ColorHeight": 4
+      },
+      {
+        "Path": "materials/props/extinguisher-v2/steel.vmat",
+        "IsError": false,
+        "ColorWidth": 4,
+        "ColorHeight": 4
+      },
+      {
+        "Path": "materials/props/extinguisher-v2/brass.vmat",
+        "IsError": false,
+        "ColorWidth": 4,
+        "ColorHeight": 4
+      },
+      {
+        "Path": "materials/props/extinguisher-v2/dark.vmat",
+        "IsError": false,
+        "ColorWidth": 4,
+        "ColorHeight": 4
+      },
+      {
+        "Path": "materials/props/extinguisher-v2/seal.vmat",
+        "IsError": false,
+        "ColorWidth": 4,
+        "ColorHeight": 4
+      }
+    ],
+    "ActiveScene": "scenes/maps/railhead/railhead.scene",
+    "IsPlaying": false,
+    "SceneHasUnsavedChanges": false
+  },
+  "source_generation_hook": "Tools/railhead_dress_detail.py:extinguisher",
+  "published_asset_sha256": {
+    "Assets/materials/props/extinguisher-v2/atlas.png": "75605fa4b135629dd26e95dafaf8851a976817a1599a00c4b85b29a6ffdf616d",
+    "Assets/materials/props/extinguisher-v2/red.vmat": "44534ced0b0750dc03ba3bae141c5a6d8a10ce1c767145c437e6668d57fa6f9f",
+    "Assets/materials/props/extinguisher-v2/label.vmat": "20c158880b5f7f3b13260d7190329dbf10e016e5df7ae9a0b65e73ad6f824510",
+    "Assets/materials/props/extinguisher-v2/sign.vmat": "d535070120e3c1a7993e75248d4cebbc3427dc927844b5cfcbf48190f14f7c15",
+    "Assets/materials/props/extinguisher-v2/gauge.vmat": "93ac8492c9ad665ebbcff3a6729dcd38b9a607012b7457665e01da16e566315e",
+    "Assets/materials/props/extinguisher-v2/rubber.vmat": "1342aa5c24894889a1c9fba59ffc3ea36919f45e174f813d4e2541dc15ef9d0e",
+    "Assets/materials/props/extinguisher-v2/steel.vmat": "b64b8ab0d13dbc2b04631cca16f91743c5ba987f5b1f97fec8e2e65f1df656e6",
+    "Assets/materials/props/extinguisher-v2/brass.vmat": "f78b25d2b391878d3ff544f79d6a3495d8a4c66b12e58d16ae431df3903e7abc",
+    "Assets/materials/props/extinguisher-v2/dark.vmat": "53bc06840aa3f9f453b8be3e8ba381eea6702bbddd40a984c8dc2f58e34a0dd0",
+    "Assets/materials/props/extinguisher-v2/seal.vmat": "92b8d3496f105b6e48e999afe606a1bdd350bac487899c82d7628c6b86854116",
+    "Assets/models/maps/railhead/extinguisher-v2/east.obj": "6c5057a39ed06a3237227340c2d8e9f3784da3bbf7fbfd2ceb7eab2fe53850c4",
+    "Assets/models/maps/railhead/extinguisher-v2/east.mtl": "1477e465a1c70a8c1798283f38266bc86e7c78764d19b2996277814cc81c9336",
+    "Assets/models/maps/railhead/railhead_dress_east.obj": "f9ad49ae4f18f1dd4f6d52e8d4db6843e810ec772f9879097333b3503976322b",
+    "Assets/models/maps/railhead/extinguisher-v2/east-base.obj": "a251258c824a28162cd2271d92bf3865e980743d6a75e13dce774ed10d22d57f",
+    "Assets/models/maps/railhead/extinguisher-v2/railhead_dress_east.mtl": "dde8a8e4b37535c70c920b41888a227ab1c9f0d8890b9b364189725e2fe3010d",
+    "Assets/models/maps/railhead/railhead_dress_east.mtl": "0ce0806f0f2976662cf930b05b96ec8409aeedea5891205d2ad9304e48bd4c4e",
+    "Assets/models/maps/railhead/railhead_dress_east.vmdl": "1593aa917c81e21b28366197000164823b13228cf9b9d7a75c52d6812db6a45c",
+    "Assets/models/maps/railhead/extinguisher-v2/west.obj": "0b2721943bca8685e05496d03932562a0a9c5bb6eaf2720d0fc1e2d33e879142",
+    "Assets/models/maps/railhead/extinguisher-v2/west.mtl": "1477e465a1c70a8c1798283f38266bc86e7c78764d19b2996277814cc81c9336",
+    "Assets/models/maps/railhead/railhead_dress_west.obj": "e85a4a92ec3c6edfa930570076129a793e9af1ddfcbc7e8862131cabb3c4b4a6",
+    "Assets/models/maps/railhead/extinguisher-v2/west-base.obj": "d4c64c852ec73ec540fb9481479a00a9111c6ebc5c1f6b4039fd79bd8c9c3086",
+    "Assets/models/maps/railhead/extinguisher-v2/railhead_dress_west.mtl": "f9f65cf61e2c5a8f8cd7b6b0351238451d24daad613086fd883dfbeaa361d856",
+    "Assets/models/maps/railhead/railhead_dress_west.mtl": "3aac55f953b87431182ea80f3f51121bd2f98a1716b378c4eb35e5e0cd58a728",
+    "Assets/models/maps/railhead/railhead_dress_west.vmdl": "9dc944c07c65a5d959bdf9c48fe6523c7e5103448d653fcf1ab0010dd79ef85b",
+    "Assets/models/props/extinguisher-v2/extinguisher.obj": "2be8fda21de41bb6cfed6e3c34f111b48eb401656e638e85e3fa06d29d9f62a5",
+    "Assets/models/props/extinguisher-v2/extinguisher.mtl": "1477e465a1c70a8c1798283f38266bc86e7c78764d19b2996277814cc81c9336",
+    "Assets/models/props/extinguisher-v2/extinguisher.vmdl": "4dd28514700c5dc728e22b1ec3613f931a3fd5946746d5ad715bb92c42bd865f"
+  },
+  "scene_hash_preserved": true,
+  "camera_preserved": true,
+  "native_visual_views": {
+    "front": {
+      "image": "output/railhead/quality/extinguisher-v2-after/front.png",
+      "sha256": "b0fe71c6cf01a19fee81d88672b1730eb59b18089084bc5abde31269ef772580",
+      "editor_state_restored": true,
+      "visually_reviewed": true
+    },
+    "hero": {
+      "image": "output/railhead/quality/extinguisher-v2-after/hero.png",
+      "sha256": "a657d18fd334adf7fb553267f268c56e643b595775367a64cc3b867655866bdf",
+      "editor_state_restored": true,
+      "visually_reviewed": true
+    },
+    "oblique": {
+      "image": "output/railhead/quality/extinguisher-v2-after/oblique.png",
+      "sha256": "4a22ea19967c35af30af1b75bd86c829698db42929eaa9a089060b7ce56aa069",
+      "editor_state_restored": true,
+      "visually_reviewed": true
+    },
+    "east": {
+      "image": "output/railhead/quality/extinguisher-v2-after/east.png",
+      "sha256": "f87ea165020d0763999cd58cda1c19c566b0f4b8b6752bbe9ed0bb47f641e3ae",
+      "editor_state_restored": true,
+      "visually_reviewed": true
+    },
+    "east-close": {
+      "image": "output/railhead/quality/extinguisher-v2-after/east-close.png",
+      "sha256": "27d57e810a034d37eff5e0bd274a8f5a292e615e727a424e8f978ceca7367ac6",
+      "editor_state_restored": true,
+      "visually_reviewed": true
+    }
+  },
+  "matched_before_after_front": true,
+  "bridge_capture_note": "Initial bridge views are partly occluded by the existing handrail; use the clear platform views.",
+  "gpu_exposure_measurement_claimed": false,
+  "editor_status": {
+    "EngineVersion": "26.10.13b",
+    "Project": "razedtest",
+    "ProjectTitle": "RazedTest",
+    "ActiveScene": "railhead",
+    "ActiveScenePath": "scenes/maps/railhead/railhead.scene",
+    "SceneHasUnsavedChanges": false,
+    "IsPlaying": false,
+    "IsPaused": false,
+    "ToolCount": 128,
+    "IsCompiling": false,
+    "LastCompileSucceeded": true,
+    "LastCompileErrors": 0,
+    "Paths": {
+      "Engine": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\sbox",
+      "Logs": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\sbox\\logs",
+      "ProjectRoot": "C:\\sbox-projects\\hc1\\forked-shooter-main",
+      "ProjectSettings": "C:\\sbox-projects\\hc1\\forked-shooter-main\\ProjectSettings"
+    }
+  },
+  "reference": "Sources/Belltower/generated/fire-extinguisher-taste-20261025-v1.png",
+  "texture_generation": "built-in image_gen",
+  "texture_prompt": "Sources/Railhead/props/extinguisher-v2/atlas-generation.json"
+}

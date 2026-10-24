@@ -1,0 +1,145 @@
+// Native attachment regression. Temporary, unselected scene; no live equipment or documents are edited.
+var project = Sandbox.Project.Current.GetRootPath();
+var folder = System.IO.Path.Combine(project, "output/optic-mount-motion-20261020");
+var cases = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder, "cases.json"))).AsArray();
+var flags = System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic;
+var type = typeof(Facepunch.Gunsmith.GunsmithMw22Attachment);
+var mount = type.GetMethod("BoneDelta", flags);
+var following = type.GetProperty("FollowingCamera", flags);
+if (mount is null || following is null || type.GetField("boneOffsets", flags) is not null)
+    throw new InvalidOperationException("The current attachment fix is not loaded.");
+var previousFollowing = following.GetValue(null);
+var previousSession = Editor.SceneEditorSession.Active;
+var previousGame = Game.ActiveScene;
+var previousPlaying = Game.IsPlaying;
+var documents = Editor.SceneEditorSession.All.Select(s => new { Session = s, s.HasUnsavedChanges }).ToArray();
+var scene = new Scene();
+var rows = new System.Collections.Generic.List<object>();
+var failures = new System.Collections.Generic.List<object>();
+var samples = 0;
+var worstPosition = 0f;
+var worstAngle = 0f;
+var legacyAnimationLag = 0f;
+var injectedLegacyLag = 0f;
+try
+{
+    using var scope = scene.Push();
+    foreach (var entry in cases)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        var path = entry["model"].GetValue<string>();
+        var boneName = entry["bone"].GetValue<string>();
+        var anchor = Vector3.Parse(entry["anchor"].GetValue<string>());
+        var go = new GameObject(true, "Attachment motion regression");
+        go.Flags |= GameObjectFlags.NotSaved | GameObjectFlags.NotNetworked;
+        var renderer = go.AddComponent<SkinnedModelRenderer>(false);
+        renderer.Model = Model.Load(path);
+        renderer.UseAnimGraph = true;
+        renderer.Enabled = true;
+        if (renderer.Model is null || renderer.Model.IsError || !renderer.SceneModel.IsValid())
+            throw new InvalidOperationException("Model unavailable: " + path);
+        var native = renderer.SceneModel;
+        var bone = renderer.Model.Bones.GetBone(boneName);
+        if (bone is null)
+        {
+            // The AK's rigid world model has no animated skeleton; its parts follow the renderer origin.
+            var worldOrigin = (Transform)mount.Invoke(null, new object[] { renderer, boneName });
+            if (worldOrigin.Position.Distance(renderer.WorldPosition) > .0001f)
+                throw new InvalidOperationException("Boneless world-model fallback changed: " + path);
+            rows.Add(new { Model = path, BonelessRendererFallbackPassed = true });
+            go.Destroy();
+            continue;
+        }
+        var bind = renderer.Model.GetBoneTransform(bone.Index);
+        var anchors = new[] { anchor, anchor+Vector3.Forward*4, anchor+Vector3.Up*2 };
+        var maxPosition = 0f;
+        var maxAngle = 0f;
+        var modelSamples = 0;
+        Facepunch.AnimBools.SetBool(renderer, "b_deploy_skip", true);
+        Facepunch.AnimBools.SetBool(renderer, "b_grounded", true);
+        foreach (var phase in new[] { "hip", "sprint", "ads", "reload", "new-pose-after-update" })
+        {
+            renderer.WorldTransform = global::Transform.Zero;
+            native.Transform = global::Transform.Zero;
+            native.ClearBoneOverrides();
+            Facepunch.AnimBools.SetBool(renderer, "b_sprint", phase == "sprint");
+            Facepunch.AnimBools.SetBool(renderer, "b_reload", phase == "reload");
+            native.SetAnimParameter("ironsights_weight", phase == "ads" ? 1f : 0f);
+            native.SetAnimParameter("ironsights", phase == "ads" ? 1 : 0);
+            for (var step = 0; step < 40; step++) native.Update(1f/60f);
+            for (var frame = 0; frame < 8; frame++)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                renderer.WorldTransform = global::Transform.Zero;
+                native.Transform = global::Transform.Zero;
+                native.ClearBoneOverrides();
+                native.Update(0);
+                var updatePose = native.GetBoneWorldTransform(bone.Index);
+                following.SetValue(null, false);
+                mount.Invoke(null, new object[] { renderer, boneName });
+                native.Update(1f/60f);
+                var pose = native.GetBoneWorldTransform(bone.Index);
+                // Force an animation advance after the update-phase read, independent of a clip's idle frames.
+                if (phase == "new-pose-after-update")
+                    pose = new Transform(pose.Position+Vector3.Up*.75f, Rotation.FromYaw(7f)*pose.Rotation, pose.Scale);
+                native.SetBoneOverride(bone.Index, pose);
+                native.Update(0);
+                pose = native.GetBoneWorldTransform(bone.Index);
+                foreach (var currentSpace in new[] {
+                    global::Transform.Zero,
+                    new Transform(new Vector3(600, -1000, 110), Rotation.From(-20, 45, 15)),
+                    new Transform(new Vector3(603, -1002, 122), Rotation.From(13, -70, -8), Vector3.One*.8f)
+                })
+                foreach (var synchronized in new[] { false, true })
+                {
+                    renderer.WorldTransform = currentSpace;
+                    // Native rendering may still use the previous camera placement when PostSetup runs.
+                    native.Transform = synchronized ? currentSpace : new Transform(new Vector3(-30, 12, -4), Rotation.From(4, -18, 3));
+                    native.Update(0);
+                    foreach (var postSetup in new[] { false, true })
+                    {
+                        following.SetValue(null, postSetup);
+                        var actual = (Transform)mount.Invoke(null, new object[] { renderer, boneName });
+                        var angle = actual.Rotation.Distance(currentSpace.Rotation*pose.Rotation*bind.Rotation.Inverse);
+                        maxAngle = Math.Max(maxAngle, angle);
+                        foreach (var point in anchors)
+                        {
+                            var expected = currentSpace.PointToWorld(pose.PointToWorld(bind.PointToLocal(point)));
+                            var error = expected.Distance(actual.PointToWorld(point));
+                            maxPosition = Math.Max(maxPosition, error);
+                            var old = currentSpace.PointToWorld(updatePose.PointToWorld(bind.PointToLocal(point)));
+                            if (phase == "new-pose-after-update") injectedLegacyLag = Math.Max(injectedLegacyLag, old.Distance(expected));
+                            else legacyAnimationLag = Math.Max(legacyAnimationLag, old.Distance(expected));
+                            if (error > .003f || angle > .06f)
+                                failures.Add(new { Model = path, Phase = phase, Frame = frame, Synchronized = synchronized, PostSetup = postSetup, PositionError = error, AngleError = angle });
+                            samples++; modelSamples++;
+                        }
+                    }
+                }
+            }
+        }
+        // Missing bones retain the original renderer-origin fallback.
+        var fallback = (Transform)mount.Invoke(null, new object[] { renderer, "not_a_mount_bone" });
+        if (fallback.Position.Distance(renderer.WorldPosition) > .0001f)
+            throw new InvalidOperationException("Missing-bone fallback changed.");
+        worstPosition = Math.Max(worstPosition, maxPosition);
+        worstAngle = Math.Max(worstAngle, maxAngle);
+        rows.Add(new { Model = path, Bone = boneName, Samples = modelSamples, MaxPositionError = maxPosition, MaxAngleError = maxAngle });
+        go.Destroy();
+    }
+}
+finally
+{
+    following.SetValue(null, previousFollowing);
+    scene.Destroy();
+}
+var preserved = ReferenceEquals(Editor.SceneEditorSession.Active, previousSession) && ReferenceEquals(Game.ActiveScene, previousGame)
+    && Game.IsPlaying == previousPlaying && documents.All(s => Editor.SceneEditorSession.All.Contains(s.Session) && s.Session.HasUnsavedChanges == s.HasUnsavedChanges);
+var result = new { Success = failures.Count == 0 && preserved && injectedLegacyLag > .1f,
+    Samples = samples, MaxPositionError = worstPosition, MaxAngleError = worstAngle,
+    OldCacheAnimationLag = legacyAnimationLag, OldCacheInjectedPoseLag = injectedLegacyLag,
+    UserSceneAndPlayStatePreserved = preserved, Models = rows, Failures = failures.Take(12).ToArray(), FailureCount = failures.Count,
+    SourceSha256 = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(System.IO.Path.Combine(project, "Code/Gunsmith/Attachments/GunsmithMw22Attachment.cs")))).ToLowerInvariant() };
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder, "verification.json"), System.Text.Json.JsonSerializer.Serialize(result, new System.Text.Json.JsonSerializerOptions { WriteIndented = true }));
+if (!result.Success) throw new InvalidOperationException(System.Text.Json.JsonSerializer.Serialize(result));
+return result;

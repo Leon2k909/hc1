@@ -1,0 +1,110 @@
+{
+  "revision": "street-sign-clearance-v1",
+  "verified_utc": "2026-10-21T12:15:52.616362+00:00",
+  "placement": {
+    "old_bottom": 110,
+    "new_bottom": 134,
+    "new_top": 143,
+    "floor_band_top": 130,
+    "vertical_gap_above_band_inches": 4,
+    "window_hood_and_slab_clear": true
+  },
+  "runtime_files_match": {
+    "Assets/models/maps/belltower/belltower_west.obj": false,
+    "Assets/models/maps/belltower/compiler-safe/west/west_000_ashlar.obj": true,
+    "Assets/models/maps/belltower/compiler-safe/west/west_057_plaque_7.obj": true,
+    "Assets/models/maps/belltower/belltower_east.obj": false,
+    "Assets/models/maps/belltower/compiler-safe/east/east_000_ashlar.obj": true,
+    "Assets/models/maps/belltower/compiler-safe/east/east_056_plaque_7.obj": true
+  },
+  "actual_slabs": {
+    "Assets/models/maps/belltower/belltower_west.obj": {
+      "triangles": 12,
+      "matches_published_slab": true
+    },
+    "Assets/models/maps/belltower/compiler-safe/west/west_000_ashlar.obj": {
+      "triangles": 10,
+      "matches_published_slab": true
+    },
+    "Assets/models/maps/belltower/compiler-safe/west/west_057_plaque_7.obj": {
+      "triangles": 2,
+      "matches_published_slab": true
+    },
+    "Assets/models/maps/belltower/belltower_east.obj": {
+      "triangles": 12,
+      "matches_published_slab": true
+    },
+    "Assets/models/maps/belltower/compiler-safe/east/east_000_ashlar.obj": {
+      "triangles": 10,
+      "matches_published_slab": true
+    },
+    "Assets/models/maps/belltower/compiler-safe/east/east_056_plaque_7.obj": {
+      "triangles": 2,
+      "matches_published_slab": true
+    }
+  },
+  "protected_file_count": 272,
+  "protected_mismatches": [
+    "Assets/models/maps/belltower/belltower_east_hulls_wood.obj",
+    "Assets/models/maps/belltower/belltower_west_hulls_wood.obj",
+    "Assets/models/maps/belltower/compiler-safe/east/east_032_iron_black.obj",
+    "Assets/models/maps/belltower/compiler-safe/east/east_050_planks.obj",
+    "Assets/models/maps/belltower/compiler-safe/east/east_051_planks_dark.obj",
+    "Assets/models/maps/belltower/compiler-safe/west/west_033_iron_black.obj",
+    "Assets/models/maps/belltower/compiler-safe/west/west_051_planks.obj",
+    "Assets/models/maps/belltower/compiler-safe/west/west_052_planks_dark.obj"
+  ],
+  "other_authoring_sources_match": {
+    "Tools/belltower_architecture.py": true,
+    "Tools/belltower_stage_street_sign.py": true
+  },
+  "plaque_and_band_function_bodies_match": true,
+  "current_map_generator_sha256": "34de2f1a25bb3c97a79ca52cf46cf9b997d316e62ebad9e1f4e076d7cd1b8759",
+  "concurrent_change_scope": "Subsequent crate work changed canonical OBJs, separate wood hulls, and iron/plank imports. The raised slabs still match the publication in both canonical OBJs; all four referenced plaque imports remain byte-identical. No shared work was reverted.",
+  "shared_map_generator_received_unrelated_changes_since_import": true,
+  "native_import": {
+    "Imported": 6,
+    "Plaques": 2,
+    "RiseInches": 24,
+    "GapAboveBandInches": 4,
+    "TriangleCountUnchanged": true,
+    "OnlyPlaqueVerticesMoved": true,
+    "SceneUnchanged": true,
+    "SceneSha256": "7c81362d419176d9bb98caf5287e1949f19b1d867a8c2cb030971b5ecac865cd",
+    "ActiveDocumentPreserved": true,
+    "ModelDescriptionsAndPhysicsUnchanged": true
+  },
+  "compiled_models": {
+    "west": {
+      "exists": true,
+      "modified_utc": "2026-10-21T12:12:17.550451+00:00",
+      "newer_than_changed_inputs": true
+    },
+    "east": {
+      "exists": true,
+      "modified_utc": "2026-10-21T12:12:25.367086+00:00",
+      "newer_than_changed_inputs": true
+    }
+  },
+  "explicit_compile_call": "West asset_compile timed out; no blind retry. Both watcher-built resources are newer than imported inputs; both loaded models were visually reviewed in the saved scene.",
+  "native_views": {
+    "west": {
+      "image": "output/belltower/quality/street-sign-clearance-v1-after/west.png",
+      "sha256": "3ca2f08f68d05092622bed2dda735433fa27414e85b11bcf39d674aadfb10f65",
+      "all_state_restored": true
+    },
+    "west-oblique": {
+      "image": "output/belltower/quality/street-sign-clearance-v1-after/west-oblique.png",
+      "sha256": "6fbec923e918f1ca82ab64e60514dae6974c4bc2f803caa7cf224c0e3a2117c8",
+      "all_state_restored": true
+    },
+    "east": {
+      "image": "output/belltower/quality/street-sign-clearance-v1-after/east.png",
+      "sha256": "24e4b1e6bd7e0e5b2c3497d288cbc7cc5a0b885a78e136e54a23568296ea9a9c",
+      "all_state_restored": true
+    }
+  },
+  "all_non_plaque_bytes_exact": true,
+  "triangle_count_unchanged": true,
+  "effective_gpu_exposure_verified": false
+}

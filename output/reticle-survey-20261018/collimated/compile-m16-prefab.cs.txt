@@ -1,0 +1,10 @@
+// Recompile the M16A4's gameplay prefab and report its ManualOffset as loaded.
+var report = new System.Collections.Generic.List<string>();
+var asset = Editor.AssetSystem.FindByPath( "weapons/m16/weapon_m16.prefab" );
+report.Add( $"compiled {asset?.Compile( true )}" );
+await Task.Yield();
+var manual = SceneUtility.GetPrefabScene( ResourceLibrary.Get<PrefabFile>( "weapons/m16/weapon_m16.prefab" ) )
+	.Components.GetAll<Facepunch.ManualOffset>( FindMode.EverythingInSelfAndDescendants ).First();
+report.Add( $"correction {manual.OpticAimCorrection} angles {manual.OpticAimAngleCorrection} lines {manual.OpticSightLines?.Count}" );
+foreach ( var line in manual.OpticSightLines ?? new() ) report.Add( $"  {line.Optic?.ResourcePath} {line.Position} {line.Angles}" );
+return string.Join( "\n", report );

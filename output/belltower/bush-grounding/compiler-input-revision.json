@@ -1,0 +1,45 @@
+{
+  "revision": 3,
+  "changes": [
+    {
+      "field": "model_guards",
+      "path": "Assets/models/maps/belltower/belltower_east.vmdl",
+      "before": "71d1363211ed3aae4450fe11b3b7b24bbe7d1f106cef826b149210b30da15cc1",
+      "after": "dd65947f31f953015ad9eeb599b35125b8190592afd30e3a230ea3ce6e5ecb8b"
+    },
+    {
+      "field": "model_guards",
+      "path": "Assets/models/maps/belltower/belltower_west.vmdl",
+      "before": "68b014eca1a9caea03c9080b316dde6c9d4d43c36114fc75abfc19eaf5e18cd1",
+      "after": "b0f7f21cf3d0c9e46f1b890749eebb05ff9225d6918cb7db7e8e6c92ca9f78c4"
+    },
+    {
+      "field": "model_guards",
+      "path": "Assets/models/maps/belltower/belltower_west.obj",
+      "before": "22f5e5aecec9af06d9eb7e4bda87ff5170decbdaf32a5ded1fe43b33c61f97a8",
+      "after": "a6496b51f730bf3824c41ed0d6ea920859366b580bb18a77b93bbe152f4dce70"
+    },
+    {
+      "field": "model_guards",
+      "path": "Assets/models/maps/belltower/belltower_east.obj",
+      "before": "264e9db691f6981fd73ea2b8bc02f29764513295d6e54df6e2f9b0d6536e8ab1",
+      "after": "d13fd857a24445e0a86d240e9f305579030db6bb1dc11f0a20bebacd9ee8651c"
+    },
+    {
+      "field": "source_after",
+      "path": "Tools/belltower_map.py",
+      "before": "c7a9c6501230335f284aa7240780d6016984975bf55366668f9fb3deff7bc92d",
+      "after": "9472cfcf3db0d6ca616e653c53b8b56b92f3960a68e1da4d1c0b5e882d29110d"
+    }
+  ],
+  "bush_transforms_unchanged": true,
+  "scene_sha256": "e8663616674d431707973609b85e225cf7606885281a6835ead711c594967453",
+  "evidence": [
+    "output/belltower/bush-grounding/compiler-repair-deduplicated/compaction-report.json",
+    "output/belltower/bush-grounding/zero-area-repair-publication.json",
+    "output/belltower/bush-grounding/safe-import-offline-check.json",
+    "output/belltower/bush-grounding/compiler-safe-imports-stage/manifest.json",
+    "output/belltower/bush-grounding/generator-check-revision3.json"
+  ],
+  "explanation": "Retain the newer shared source revision, then the lossless OBJ cleanup and bounded render imports that recovered startup. Collision and every renderable triangle remain exact. Grounding is still the same 244 transforms."
+}

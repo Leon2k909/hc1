@@ -1,0 +1,21 @@
+var asset = Editor.AssetSystem.FindByPath( "scenes/maps/belltower/belltower.scene" );
+var handlers = new System.Collections.Generic.List<string>();
+foreach ( var asm in AppDomain.CurrentDomain.GetAssemblies() )
+{
+	System.Type[] types;
+	try { types = asm.GetTypes(); } catch ( System.Reflection.ReflectionTypeLoadException e ) { types = e.Types.Where( t => t is not null ).ToArray(); } catch { continue; }
+	foreach ( var t in types )
+	{
+		foreach ( var a in t.GetCustomAttributes( false ) )
+		{
+			var n = a.GetType().Name;
+			if ( !n.Contains( "EditorForAssetType" ) && !n.Contains( "AssetEditor" ) ) continue;
+			var ext = a.GetType().GetProperties().Select( p => { try { return p.Name + "=" + p.GetValue( a ); } catch { return ""; } } );
+			var text = string.Join( " ", ext );
+			if ( text.Contains( "scene", StringComparison.OrdinalIgnoreCase ) || text.Contains( "prefab", StringComparison.OrdinalIgnoreCase ) )
+				handlers.Add( asm.GetName().Name + ": " + t.FullName + " [" + n + " " + text + "]" );
+		}
+	}
+}
+return new { Game.IsPlaying, Found = asset is not null, Type = asset?.AssetType?.FriendlyName, Ext = asset?.AssetType?.FileExtension,
+	Handlers = handlers, Sessions = Editor.SceneEditorSession.All.Select( s => s.Scene?.Source?.ResourcePath ) };

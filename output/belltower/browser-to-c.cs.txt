@@ -1,0 +1,26 @@
+var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
+var asm = AppDomain.CurrentDomain.GetAssemblies().First( a => a.GetName().Name.Contains( "toolbase" ) );
+var main = asm.GetTypes().First( t => t.Name == "MainAssetBrowser" ).GetField( "_instance", flags | System.Reflection.BindingFlags.Static ).GetValue( null );
+object local = null;
+for ( var t = main.GetType(); t is not null && local is null; t = t.BaseType ) local = t.GetField( "<Local>k__BackingField", flags | System.Reflection.BindingFlags.DeclaredOnly )?.GetValue( main );
+var diskType = asm.GetTypes().First( t => t.Name == "DiskLocation" );
+var target = @"C:\sbox-projects\hc1\forked-shooter-main\Assets\scenes\maps\Belltower";
+var ctor = diskType.GetConstructors( flags ).Select( c => (c, p: c.GetParameters()) ).ToArray();
+object loc = null;
+foreach ( var (c, p) in ctor )
+{
+	if ( p.Length == 1 && p[0].ParameterType == typeof( System.IO.DirectoryInfo ) ) { loc = c.Invoke( new object[] { new System.IO.DirectoryInfo( target ) } ); break; }
+	if ( p.Length == 1 && p[0].ParameterType == typeof( string ) ) { loc = c.Invoke( new object[] { target } ); break; }
+}
+var nav = local.GetType().GetMethods( flags ).Where( m => m.GetParameters().Length >= 1 && m.GetParameters()[0].ParameterType.Name == "Location"
+	&& (m.Name.Contains( "Navigate" ) || m.Name.Contains( "Location" )) ).ToArray();
+var signatures = nav.Select( m => m.Name + "(" + string.Join( ",", m.GetParameters().Select( p => p.ParameterType.Name ) ) + ")" ).ToArray();
+var chosen = nav.FirstOrDefault( m => m.Name == "NavigateTo" ) ?? nav.FirstOrDefault( m => m.Name.Contains( "Navigate" ) ) ?? nav.FirstOrDefault();
+if ( loc is not null && chosen is not null )
+{
+	var args = chosen.GetParameters().Select( (p, i) => i == 0 ? loc : (p.HasDefaultValue ? p.DefaultValue : (p.ParameterType.IsValueType ? Activator.CreateInstance( p.ParameterType ) : null)) ).ToArray();
+	chosen.Invoke( local, args );
+}
+var now = local.GetType().GetProperty( "CurrentLocation", flags )?.GetValue( local );
+return new { Ctors = ctor.Select( c => string.Join( ",", c.p.Select( p => p.ParameterType.Name ) ) ), Methods = signatures, Used = chosen?.Name,
+	Now = now?.GetType().GetProperty( "Path" )?.GetValue( now ) };

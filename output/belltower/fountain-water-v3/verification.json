@@ -1,0 +1,57 @@
+{
+  "revision": "fountain-water-v3",
+  "verified_utc": "2026-10-21T11:26:38.430598+00:00",
+  "geometry_revision": "revision4",
+  "shader_revision": "revision10",
+  "runtime_files_match": {
+    "Assets/models/maps/belltower/belltower_centre.obj": true,
+    "Assets/models/maps/belltower/fountain-ornaments-v2/centre/centre_035_fountain_water.obj": true,
+    "Assets/models/maps/belltower/fountain-ornaments-v2/centre/centre_034_fountain_jet.obj": true,
+    "Assets/materials/belltower/fountain_water.vmat": true,
+    "Assets/materials/belltower/fountain_jet.vmat": true,
+    "Assets/shaders/belltower_fountain_surface_v3.shader": true,
+    "Assets/shaders/belltower_fountain_stream_v3.shader": true
+  },
+  "authoring_sources_match": {
+    "Tools/belltower_fountain_water.py": true,
+    "Tools/belltower_stage_fountain_water_v3.py": true,
+    "Sources/Belltower/shaders/belltower_fountain_surface_v3.shader": true,
+    "Sources/Belltower/shaders/belltower_fountain_stream_v3.shader": true
+  },
+  "protected_file_count": 49,
+  "protected_mismatches": [],
+  "all_non_water_bytes_exact": true,
+  "water_triangles": 22022,
+  "native_shader_compilation": {
+    "Shaders": [
+      {
+        "Shader": "shaders/belltower_fountain_surface_v3.shader",
+        "Compiled": true,
+        "CompiledWriteUtc": "2026-10-21T11:23:49.6818513Z"
+      },
+      {
+        "Shader": "shaders/belltower_fountain_stream_v3.shader",
+        "Compiled": true,
+        "CompiledWriteUtc": "2026-10-21T11:22:35.1158809Z"
+      }
+    ],
+    "EditorStatePreserved": true
+  },
+  "native_model_compile_success": true,
+  "captures": {
+    "stream": {
+      "image": "output\\belltower\\quality\\fountain-water-v3-final-r10\\stream.png",
+      "sha256": "7c25fea11c7ed86d1340489d0db1313e2c5bdc8b7e886b61121cc03dab009543",
+      "state_restored": true,
+      "metadata": "output\\belltower\\quality\\fountain-water-v3-final-r10\\stream-camera.json"
+    },
+    "impact": {
+      "image": "output\\belltower\\quality\\fountain-water-v3-final-r10\\impact.png",
+      "sha256": "d3f7621830077496a4a1d6fa5f7e22a67515d7aa3bf12af840028233ef4caf5a",
+      "state_restored": true,
+      "metadata": "output\\belltower\\quality\\fountain-water-v3-final-r10\\impact-camera.json"
+    }
+  },
+  "runtime_performance_measured": false,
+  "effective_gpu_exposure_verified": false
+}

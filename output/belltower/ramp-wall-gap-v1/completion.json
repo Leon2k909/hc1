@@ -1,0 +1,27 @@
+{
+  "fix": "Garden-facing divider wall reaches the flat garden floor; road-facing slope preserved.",
+  "canonical_project": "C:\\sbox-projects\\hc1\\forked-shooter-main",
+  "source": "Tools/belltower_wall_cleanup.py",
+  "applied_asset_files": {
+    "Assets/models/maps/belltower/belltower_west.obj": true,
+    "Assets/models/maps/belltower/compiler-safe/west/west_086_rubble.obj": true,
+    "Assets/models/maps/belltower/belltower_east.obj": true,
+    "Assets/models/maps/belltower/compiler-safe/east/east_084_rubble.obj": true
+  },
+  "protected_assets_unchanged": {
+    "C:\\sbox-projects\\hc1\\forked-shooter-main\\Assets/models/maps/belltower/belltower_west.vmdl": true,
+    "C:\\sbox-projects\\hc1\\forked-shooter-main\\Assets/models/maps/belltower/belltower_east.vmdl": true,
+    "C:\\sbox-projects\\hc1\\forked-shooter-main\\Assets/models/maps/belltower/belltower_west_hulls_default.obj": true,
+    "C:\\sbox-projects\\hc1\\forked-shooter-main\\Assets/models/maps/belltower/belltower_west_hulls_metal.obj": true,
+    "C:\\sbox-projects\\hc1\\forked-shooter-main\\Assets/models/maps/belltower/belltower_west_hulls_wood.obj": true,
+    "C:\\sbox-projects\\hc1\\forked-shooter-main\\Assets/models/maps/belltower/belltower_east_hulls_default.obj": true,
+    "C:\\sbox-projects\\hc1\\forked-shooter-main\\Assets/models/maps/belltower/belltower_east_hulls_metal.obj": true,
+    "C:\\sbox-projects\\hc1\\forked-shooter-main\\Assets/models/maps/belltower/belltower_east_hulls_wood.obj": true,
+    "C:\\sbox-projects\\hc1\\forked-shooter-main\\Assets/materials/belltower/rubble.vmat": true
+  },
+  "geometry_regressions_passed": true,
+  "both_models_compiled_successfully": true,
+  "west_screenshot": "output/belltower/quality/ramp-wall-gap-v1-after/west-garden.png",
+  "capture_restored_editor_state": true,
+  "no_scene_edits": true
+}

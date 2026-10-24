@@ -1,0 +1,18 @@
+var root = Sandbox.Project.Current.GetRootPath();
+var active = Editor.SceneEditorSession.Active;
+var settingsType = AppDomain.CurrentDomain.GetAssemblies().Where(a => a.GetType("Facepunch.GameSettingsSystem") is not null)
+    .OrderByDescending(a => a.GetName().Version).First().GetType("Facepunch.GameSettingsSystem");
+var settings = settingsType.GetProperty("Current").GetValue(null);
+var result = new {
+    Playing = Game.IsPlaying, Active = active?.Scene.Source?.ResourcePath,
+    HasUnsavedChanges = active?.HasUnsavedChanges,
+    OpenDocuments = Editor.SceneEditorSession.All.Select(s => s.Scene.Source?.ResourcePath).ToArray(),
+    FieldOfView = settings.GetType().GetProperty("FieldOfView").GetValue(settings),
+    IndependentAdsFov = settings.GetType().GetProperty("IndependentAdsFov").GetValue(settings),
+    Restored = !Game.IsPlaying && active?.Scene.Source?.ResourcePath == "scenes/menu.scene" && !active.HasUnsavedChanges
+        && Editor.SceneEditorSession.All.Count() == 1
+};
+System.IO.File.WriteAllText(System.IO.Path.Combine(root, "output/player-scale-audit-20261020/editor-restoration.json"),
+    System.Text.Json.JsonSerializer.Serialize(result));
+if (!result.Restored) throw new InvalidOperationException("Inspect editor restoration before further actions.");
+return result;

@@ -1,0 +1,209 @@
+{
+  "status": "applied",
+  "scope": "First-person army-shirt sleeves and fingerless gloves; clothing models and UVs retained",
+  "canonical_project": "C:\\sbox-projects\\hc1\\forked-shooter-main",
+  "materials": [
+    "materials/operators/first_person/v2/shirt.vmat",
+    "materials/operators/first_person/v2/gloves.vmat"
+  ],
+  "production_dressing": {
+    "Dressing": {
+      "ProductionDressVerified": true,
+      "Style": "Field",
+      "Garments": [
+        {
+          "Name": "shirt",
+          "Model": "models/citizen_clothes/shirt/army_shirt/model/army_shirt_m_human.vmdl",
+          "Material": "materials/operators/first_person/v2/shirt.vmat",
+          "Tint": "0.76, 0.86, 0.66, 1.00"
+        },
+        {
+          "Name": "gloves",
+          "Model": "models/citizen_clothes/gloves/fingerless_gloves/models/fingerless_gloves_m_human.vmdl",
+          "Material": "materials/operators/first_person/v2/gloves.vmat",
+          "Tint": "1.00, 1.00, 1.00, 1.00"
+        }
+      ],
+      "ArmsBodygroupHidden": true,
+      "ExistingGameChanged": false
+    },
+    "EditorStatePreserved": true,
+    "TemporarySceneDestroyed": true
+  },
+  "native_render_validation": {
+    "Garments": [
+      {
+        "Name": "shirt",
+        "Model": "models/citizen_clothes/shirt/army_shirt/model/army_shirt_m_human.vmdl",
+        "ExpectedMaterial": "materials/operators/first_person/v2/shirt.vmat",
+        "ActualMaterials": [
+          "materials/operators/first_person/v2/shirt.vmat"
+        ],
+        "Shader": "shaders/viewmodel_fabric_v2.shader",
+        "AlphaTest": 0,
+        "BaseWidth": 2048,
+        "FineWidth": 2048,
+        "OutfitTintPreserved": true,
+        "NonGarmentMaterialsPreserved": true,
+        "RenderedFramesPerPhase": 14
+      },
+      {
+        "Name": "gloves",
+        "Model": "models/citizen_clothes/gloves/fingerless_gloves/models/fingerless_gloves_m_human.vmdl",
+        "ExpectedMaterial": "materials/operators/first_person/v2/gloves.vmat",
+        "ActualMaterials": [
+          "materials/operators/first_person/v2/gloves.vmat"
+        ],
+        "Shader": "shaders/viewmodel_fabric_v2.shader",
+        "AlphaTest": 1,
+        "BaseWidth": 2048,
+        "FineWidth": 256,
+        "OutfitTintPreserved": true,
+        "NonGarmentMaterialsPreserved": true,
+        "RenderedFramesPerPhase": 14
+      }
+    ],
+    "ProductionMaterialBindingVerified": true,
+    "NativeGarmentRenders": true,
+    "EditorStatePreserved": true,
+    "TemporarySceneDestroyed": true,
+    "LiveMatchCapture": false
+  },
+  "asset_sha256": {
+    "Assets/shaders/viewmodel_fabric_v2.shader": "7da9bfae62f52d574b4ef9eb23c5023081b0eae54438713fcc1e316589a0fafa",
+    "Assets/materials/operators/first_person/v2/gloves.vmat": "0dcb136cdd36f62caa14874ea960b2bc09d0eac0655312c2bf5bd13a90e6e05b",
+    "Assets/materials/operators/first_person/v2/gloves_albedo.png": "714948ebd1a89ca32158b61dda6458dc097c8d46ff5713e0b5c0d811cc571fa2",
+    "Assets/materials/operators/first_person/v2/gloves_ao.png": "bd5a445e3e62bf92ded50898d4e076b661eba6e2fd5ff924f4ad9d8faf457ccc",
+    "Assets/materials/operators/first_person/v2/gloves_coverage.png": "eac4c1c915f0a2e347c020a7a9698e5a28dea925df88f842e1ab856ec53f503d",
+    "Assets/materials/operators/first_person/v2/gloves_fine_data.png": "5d5f2acbe2487888727a6a948d2e11e0a9f9dd3f5a024425598897e002e0cc9c",
+    "Assets/materials/operators/first_person/v2/gloves_fine_normal.png": "2113ce93218b842de581246a499410a04334aa6910a4b9e4d9395e820021494e",
+    "Assets/materials/operators/first_person/v2/gloves_macro_normal.png": "f6c887a0ba5a7d879f11fab4e7b6c4865bdf5704a85440774b4a458b87a89b05",
+    "Assets/materials/operators/first_person/v2/gloves_roughness.png": "46a87c7054df2352921b4bab4bd48573f898600525400db79626b62b21da771c",
+    "Assets/materials/operators/first_person/v2/gloves_tint.png": "9dad2718702ed67ee484d97970751945c69d73ad5e3281b032e848be22f05ba5",
+    "Assets/materials/operators/first_person/v2/shirt.vmat": "479da7755eecc3fd5232d9df49f2bf056d16b6f347ea4131541c3b88172be7a6",
+    "Assets/materials/operators/first_person/v2/shirt_albedo.png": "68c46f21acb772744dfe897a63879340e6fd226caa7cf2387484063258bafa44",
+    "Assets/materials/operators/first_person/v2/shirt_ao.png": "5b047bcbbd1f18969720ad10d5d7466f5a816964335621de1b26ee374899784f",
+    "Assets/materials/operators/first_person/v2/shirt_coverage.png": "2eaf0540caf1ec7eb8fc2fe9cc9fb5bf82bfbc6f3a99aca0c8fcbef2a44b9b63",
+    "Assets/materials/operators/first_person/v2/shirt_fine_data.png": "50488eddb6fb1231b020c452f0eba7e3dfe2d9e8f30d21a254e1b36d96de81b2",
+    "Assets/materials/operators/first_person/v2/shirt_fine_normal.png": "30d26a8f3ee591dbfb67aa6dcde6623576b62d83b0da492d57fc2eacf9ce1b5f",
+    "Assets/materials/operators/first_person/v2/shirt_macro_normal.png": "183c82c57f5ede1c2b7f4b5c96083fa79f94b02e875e29a47c9fd81120a995df",
+    "Assets/materials/operators/first_person/v2/shirt_roughness.png": "a8f1df1c86fe85f6946be46b8d56b82ff00b84c9c2e25c071deacf84a2e18e81",
+    "Assets/materials/operators/first_person/v2/shirt_tint.png": "76a530af024bf1f10b7a8934880e334dd62c2609a9fc59e77a750aeb84365af1"
+  },
+  "source_sha256": {
+    "Code/Weapons/ViewModelClothing.Materials.cs": "c600b3db3609012c5762219b68a9c957481282cb68b4c2b530ca05a16a90c7c0",
+    "Code/Weapons/ViewModelClothing.cs": "92842360f3f57f45ba0cefed63fc1af3b117dbc2d54046dc08a540248a68a713",
+    "Sources/Clothing/firstperson-v2/capture-native.cs.txt": "4b22244373a41406ace46e40e17dba854f73e05c7f8f836b4120208d30417d4c",
+    "Sources/Clothing/firstperson-v2/capture-settled.cs.txt": "df5731032a7554739c538cb75dfdd5ef7c9bf2c03861d9cb74fba0aa7457e328",
+    "Sources/Clothing/firstperson-v2/export-originals.cs.txt": "3f32adda8a16059b5ca73d0f373aca9b0afbed84c11e41093501d65f88f02913",
+    "Sources/Clothing/firstperson-v2/imagegen-prompts.json": "b37d7b683815b099eacb5de821864765d79bc61cae467a8f6674b4b25f21d2b3",
+    "Sources/Clothing/firstperson-v2/import-native.cs.txt": "f0bfd4bef1ab7e7074f08a4840468c6fb4425cb7d4cf138bb151c265be1ee124",
+    "Sources/Clothing/firstperson-v2/prepare-compiler-maps.cs.txt": "6790a865fd880113944d243318275aec3d828aa5209a0fe0d52344d8bbc72b54",
+    "Sources/Clothing/firstperson-v2/verify-dressing.cs.txt": "07c2f0044f2399356c6f74b92292bc1f53966e3b6c11ffc7804bed3210d83154",
+    "Sources/Clothing/firstperson-v2/viewmodel_fabric_v2.shader": "7da9bfae62f52d574b4ef9eb23c5023081b0eae54438713fcc1e316589a0fafa",
+    "Tools/build_firstperson_clothing_v2.py": "efa21a6bdaa92e352737a4af7b68c90bad9b7948acaadafbe56ee996719102c0",
+    "Tools/finalize_firstperson_clothing_v2.py": "ca22f18ec845e7066db1aa122a987d2148799c62c49954996fb41e61c5118139"
+  },
+  "image_generation": {
+    "mode": "built-in image_gen",
+    "date": "2026-10-21",
+    "shirt": {
+      "input": "Assets/materials/operators/first_person/fp_army_shirt_color.png",
+      "output": "output/firstperson-clothing-v2-20261021/imagegen/shirt.png",
+      "prompt": "Use case: precise-object-edit. Asset type: production UV base-colour texture atlas for the existing British military shirt in a first-person game. The supplied square image is the EXACT edit target, not a garment reference. Preserve its full edge-to-edge normalized UV layout, all island boundaries, pocket and cuff contours, every seam, stitch location, button position, camouflage shape, patch and existing lettering. Do not move or resize any part. Output the same square atlas, at the highest native image resolution available, ideally 4096 by 4096. Rebuild the material finish for close-up sleeves: tightly woven fine cotton ripstop with fine threads, clear restrained stitching and clean panel borders. Remove the large coarse burlap-like weave, waxy look, smeared fabric, exaggerated bright seam halos and harsh baked highlights. Cloth should be dry, matte, detailed and photographic, with subdued natural tan, olive and brown matching the input. Keep all folds and structural seam locations exactly aligned with the source but use neutral evenly diffuse albedo lighting rather than deep painted shadows. Fine fabric grain should be subtle and considerably smaller than stitches. The game adds surface relief and lighting separately. Do not redesign the camouflage, add new patches or words, change the atlas composition, create a picture of a shirt or person, change the square aspect ratio, add a background or border, or introduce perspective. Full square texture atlas only, no annotations or watermark."
+    },
+    "gloves": {
+      "input": "Assets/materials/operators/first_person/fp_fingerless_gloves_albedo.png",
+      "output": "output/firstperson-clothing-v2-20261021/imagegen/gloves.png",
+      "prompt": "Use case: precise-object-edit. The input is the exact square UV texture atlas for brown fingerless leather gloves used close to a first-person game camera. Rebuild its material quality while preserving the normalized layout exactly: every UV island, seam, fingertip opening, strap, stitched oval, panel outline, stitched rectangle, edge and boundary remains at the same position and shape. Maintain exact square aspect ratio and full atlas framing; do not create a rendered glove or hand. Keep original transparency/cutout locations. Use subdued medium-dark brown leather with fine tight natural pores, restrained scuffing and clean fine stitching. Replace the coarse gravel-like cracks, exaggerated bright edges and smeared painted highlights with convincing fine leather grain and crisp restrained stitch detail. Neutral evenly diffuse base colour only: the engine will supply actual lighting, relief and gloss. No dramatic reflections, baked specular highlights, new wrinkles or islands, new holes, new text, logos, decoration, border, labels or background. Genuine transparent areas at the existing finger openings and original UV gutters; preserve the garment design and layout. Highest available native square image resolution, ideally 4096 by 4096. Texture atlas only."
+    },
+    "weave": {
+      "output": "output/firstperson-clothing-v2-20261021/imagegen/weave.png",
+      "prompt": "Use case: photorealistic-natural. Asset type: one production seamless microdetail texture tile for tightly woven military cotton twill/ripstop cloth, used as a repeating detail layer in a first-person game material. Show only a perfectly flat square swatch filling the image, viewed exactly straight-on, in even cross-polarised illumination. This square represents about SIX centimetres of real fabric, with about 160 fine warp yarns across the width. Very fine tightly packed natural cotton yarns with subtle irregular fibre twist and alternating woven over-under structure; extremely restrained ripstop reinforcement every approximately 4 mm. Low-contrast neutral middle-grey monochrome fabric, no camouflage, no strong dark holes, no rough burlap or hessian, no knitted wool, no big lumps. Sharp individual yarn detail at the native image resolution, subtle natural tonal variation, dry matte material, uniform brightness, no wrinkles or folds, no lighting gradients, glossy highlights, cast shadows, vignette, objects, seams, stitches, text, border or watermark. Exactly tileable seamlessly in both directions. Highest native square image resolution available, ideally 2048 by 2048."
+    }
+  },
+  "generated_native_dimensions": {
+    "shirt": [
+      1254,
+      1254
+    ],
+    "gloves": [
+      1254,
+      1254
+    ],
+    "weave": [
+      1254,
+      1254
+    ]
+  },
+  "compiler_map_conversion": {
+    "Converted": [
+      {
+        "Path": "Assets/materials/operators/first_person/v2/gloves_albedo.png",
+        "SourceWidth": 1254,
+        "SourceHeight": 1254,
+        "Width": 2048,
+        "Height": 2048,
+        "Reason": "Power-of-two compiler mip filtering requirement; not newly generated resolution",
+        "Sha256": "714948ebd1a89ca32158b61dda6458dc097c8d46ff5713e0b5c0d811cc571fa2"
+      },
+      {
+        "Path": "Assets/materials/operators/first_person/v2/gloves_fine_data.png",
+        "SourceWidth": 213,
+        "SourceHeight": 214,
+        "Width": 256,
+        "Height": 256,
+        "Reason": "Power-of-two compiler mip filtering requirement; not newly generated resolution",
+        "Sha256": "5d5f2acbe2487888727a6a948d2e11e0a9f9dd3f5a024425598897e002e0cc9c"
+      },
+      {
+        "Path": "Assets/materials/operators/first_person/v2/gloves_fine_normal.png",
+        "SourceWidth": 213,
+        "SourceHeight": 214,
+        "Width": 256,
+        "Height": 256,
+        "Reason": "Power-of-two compiler mip filtering requirement; not newly generated resolution",
+        "Sha256": "2113ce93218b842de581246a499410a04334aa6910a4b9e4d9395e820021494e"
+      },
+      {
+        "Path": "Assets/materials/operators/first_person/v2/shirt_albedo.png",
+        "SourceWidth": 1254,
+        "SourceHeight": 1254,
+        "Width": 2048,
+        "Height": 2048,
+        "Reason": "Power-of-two compiler mip filtering requirement; not newly generated resolution",
+        "Sha256": "68c46f21acb772744dfe897a63879340e6fd226caa7cf2387484063258bafa44"
+      },
+      {
+        "Path": "Assets/materials/operators/first_person/v2/shirt_fine_data.png",
+        "SourceWidth": 1254,
+        "SourceHeight": 1254,
+        "Width": 2048,
+        "Height": 2048,
+        "Reason": "Power-of-two compiler mip filtering requirement; not newly generated resolution",
+        "Sha256": "50488eddb6fb1231b020c452f0eba7e3dfe2d9e8f30d21a254e1b36d96de81b2"
+      },
+      {
+        "Path": "Assets/materials/operators/first_person/v2/shirt_fine_normal.png",
+        "SourceWidth": 1254,
+        "SourceHeight": 1254,
+        "Width": 2048,
+        "Height": 2048,
+        "Reason": "Power-of-two compiler mip filtering requirement; not newly generated resolution",
+        "Sha256": "30d26a8f3ee591dbfb67aa6dcde6623576b62d83b0da492d57fc2eacf9ce1b5f"
+      }
+    ],
+    "ShaderCompiled": true,
+    "SceneChanged": false,
+    "PlayChanged": false
+  },
+  "source_coverage_and_tint_masks_preserved": true,
+  "native_before_after_images": "output/firstperson-clothing-v2-20261021/native-r5/",
+  "limits": [
+    "These are isolated native garment renders, not a running-match capture.",
+    "The base atlas resampling is for compiler mip compatibility, not newly generated 2048-pixel art.",
+    "The separate repeating fine-detail layer supplies close-up surface detail.",
+    "The new material does not replace third-person uniforms or the Militia flannel shirt.",
+    "A neutral AO fallback replaces an unusable all-black engine AO readback."
+  ]
+}

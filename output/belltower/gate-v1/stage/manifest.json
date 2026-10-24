@@ -1,0 +1,169 @@
+{
+  "version": 1,
+  "status": "staged",
+  "scene_unchanged": true,
+  "physics_unchanged": true,
+  "triangles_removed_per_half": 48,
+  "triangles_added_per_half": 12260,
+  "files": {
+    "Assets/materials/belltower/gate/forged_iron.vmat": {
+      "before": null,
+      "after": "34e36ece1e58c52bf3464312826e6743904b003dbef1fb467853d2e3f53199ad"
+    },
+    "Assets/models/maps/belltower/belltower_east.mtl": {
+      "before": "ad4fb6cc6e37f8cc3bf7f951689d933f1fdb64e6031a64ea6f6bc5d5ad80c120",
+      "after": "d0f46c99dcf1d8ab6efa55169c0608d00add335a5189a8f6f8a2dde7ea0e0c2d"
+    },
+    "Assets/models/maps/belltower/belltower_east.obj": {
+      "before": "c747b3649f37ac4fff4ca0eafeca93f7d14d1524ddc2ee95b13efd15b167d930",
+      "after": "8c1922603ccf382ab6a4fd50e298cdce114db78e8005061b8fdc87746f04585d"
+    },
+    "Assets/models/maps/belltower/belltower_east.vmdl": {
+      "before": "a1150baaf26092f3fb97942bb8888510a97b10c5903b640ce0b1278a666ca4cb",
+      "after": "bed50aab611f4993e5ce8481f9ac52b7357277d3a7a48a17568e493b79f0edaf"
+    },
+    "Assets/models/maps/belltower/belltower_west.mtl": {
+      "before": "c1f7972ab6bd6c6ef3e010072b523994054bb64af43b73e39c8dc1f13eb22013",
+      "after": "0478ed15430cf66ceb1c6f30893dd66b5a8f4421114cf58f504eae59b6025c43"
+    },
+    "Assets/models/maps/belltower/belltower_west.obj": {
+      "before": "83dfa234109fcf8cf81df471d5fe886e53ecabc56a64bdcc2f471a0a619c9e10",
+      "after": "f13f9a734b920412a17351d797e8a5516579dce8a26300124f1602ce64984f00"
+    },
+    "Assets/models/maps/belltower/belltower_west.vmdl": {
+      "before": "18aa7ca9b2810606c07c9210c28d288d3033f9e04c532772b56b72d82c57e22f",
+      "after": "25a3d4d7b76b596ef01481fe8d1a1a05ef6270c42977db15df7e07a336b1fd52"
+    }
+  },
+  "sources": {
+    "Tools/belltower_gate.py": "7c4ef47de68b9792814ac483442fcba1173128ed59dea2c5819cbccfb5913ce9",
+    "Tools/belltower_stage_gate.py": "c1ef1579c9b66fc136eb070a8369902e506c6ea73b73d120e8464f98450d85c0",
+    "Tools/map_kit.py": "cc60204c747d064cb1fecdb666b24c847ae89dc863c2533d3811a0445f22020d",
+    "Tools/belltower_detail.py": "fa4f756709e670c3053fb9d0be3c48f01cffec87eaa39c35f01497b9bf4f50bf",
+    "Tools/belltower_furniture.py": "36c83d4883b3084b90b3ff46d9ef56e5aef7cd916f9e4c399058884105974a24"
+  },
+  "models": {
+    "belltower_west": {
+      "removed_face_lines": [
+        4892995,
+        4892996,
+        4892997,
+        4892998,
+        4892999,
+        4893000,
+        4893001,
+        4893002,
+        4893003,
+        4893004,
+        4893005,
+        4893006,
+        4893007,
+        4893008,
+        4893009,
+        4893010,
+        4893011,
+        4893012,
+        4893013,
+        4893014,
+        4893015,
+        4893016,
+        4893017,
+        4893018,
+        4893019,
+        4893020,
+        4893021,
+        4893022,
+        4893023,
+        4893024,
+        4893025,
+        4893026,
+        4893027,
+        4893028,
+        4893029,
+        4893030,
+        5051059,
+        5051060,
+        5051061,
+        5051062,
+        5051063,
+        5051064,
+        5051065,
+        5051066,
+        5051067,
+        5051068,
+        5051069,
+        5051070
+      ],
+      "removed_triangles": 48,
+      "added_triangles": 12260,
+      "all_other_obj_lines_preserved": true,
+      "physics_byte_identical": true,
+      "old_vertex_counts": {
+        "v": 2020867,
+        "vt": 2020867,
+        "vn": 697733
+      }
+    },
+    "belltower_east": {
+      "removed_face_lines": [
+        4892994,
+        4892995,
+        4892996,
+        4892997,
+        4892998,
+        4892999,
+        4893000,
+        4893001,
+        4893002,
+        4893003,
+        4893004,
+        4893005,
+        4893006,
+        4893007,
+        4893008,
+        4893009,
+        4893010,
+        4893011,
+        4893012,
+        4893013,
+        4893014,
+        4893015,
+        4893016,
+        4893017,
+        4893018,
+        4893019,
+        4893020,
+        4893021,
+        4893022,
+        4893023,
+        4893024,
+        4893025,
+        4893026,
+        4893027,
+        4893028,
+        4893029,
+        5051058,
+        5051059,
+        5051060,
+        5051061,
+        5051062,
+        5051063,
+        5051064,
+        5051065,
+        5051066,
+        5051067,
+        5051068,
+        5051069
+      ],
+      "removed_triangles": 48,
+      "added_triangles": 12260,
+      "all_other_obj_lines_preserved": true,
+      "physics_byte_identical": true,
+      "old_vertex_counts": {
+        "v": 2020867,
+        "vt": 2020867,
+        "vn": 697733
+      }
+    }
+  }
+}

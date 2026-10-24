@@ -1,0 +1,51 @@
+{
+  "revision": "bench-arm-placement-v2",
+  "benches_verified": 18,
+  "armrests_verified": 36,
+  "all_installed_file_hashes_match": true,
+  "all_referenced_bench_geometry_matches_corrected_generator": true,
+  "all_model_descriptions_and_physics_unchanged": true,
+  "native_assets": [
+    {
+      "Path": "models/maps/belltower/belltower_west.vmdl",
+      "IsCompiledAndUpToDate": true,
+      "IsCompileFailed": false
+    },
+    {
+      "Path": "models/maps/belltower/belltower_east.vmdl",
+      "IsCompiledAndUpToDate": true,
+      "IsCompileFailed": false
+    }
+  ],
+  "compile_errors": 0,
+  "native_publication": {
+    "Imported": 6,
+    "Benches": 18,
+    "Armrests": 36,
+    "StageRevision": 1,
+    "SceneUnchanged": true,
+    "SceneSha256": "7c81362d419176d9bb98caf5287e1949f19b1d867a8c2cb030971b5ecac865cd",
+    "CollisionAndModelDescriptionsUnchanged": true,
+    "SeatsBacksLegsAndBoltsPreserved": true,
+    "GameScenePreserved": true,
+    "PlayStatePreserved": true,
+    "ActiveDocumentPreserved": true,
+    "NewTriangles": 0,
+    "NewSceneObjects": 0,
+    "ForcedFullCompile": false
+  },
+  "native_preview_reviewed": true,
+  "native_preview_review": "Rear-oblique native thumbnails show the grips moved to the slat ends, with the inset leg frames retained.",
+  "in_map_screenshot_captured": false,
+  "in_map_review_limit": "The shared editor was running other maps; its scene and play state were preserved.",
+  "previews": {
+    "before": {
+      "path": "output\\belltower\\bench-arms-v2\\native-before\\asset_thumbnail.png",
+      "sha256": "abeff57bf85a4e92abdfe8b7e3ea44b60e7aa5dd7642444d35805966ca4da997"
+    },
+    "after": {
+      "path": "output\\belltower\\bench-arms-v2\\native-after\\asset_thumbnail.png",
+      "sha256": "c143dac629cb5e5528eaab8edd31d3823b7a6fe8ede901182d26099cb5f08932"
+    }
+  }
+}

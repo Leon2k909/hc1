@@ -1,0 +1,6 @@
+return new {
+    Assembly = typeof(Model).Assembly.FullName,
+    Methods = typeof(Model).GetMethods().Where(m => new[] { "Indices", "Index", "Vert", "Mesh", "Lod", "Draw", "Material" }.Any(s => m.Name.Contains(s))).Select(m => new { Signature = m.ToString(), Parameters = m.GetParameters().Select(p => new { p.Name, Type = p.ParameterType.ToString() }).ToArray() }).ToArray(),
+    MeshInfoProperties = typeof(Model).GetProperty("MeshInfo").PropertyType.GetProperties().Select(p => new { p.Name, Type = p.PropertyType.ToString() }).ToArray(),
+    MeshInfoFields = typeof(Model).GetProperty("MeshInfo").PropertyType.GetFields().Select(p => new { p.Name, Type = p.FieldType.ToString() }).ToArray()
+};

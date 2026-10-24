@@ -1,0 +1,74 @@
+{
+  "files": {
+    "Assets/materials/operators/first_person/v4/sleeve-left.png": {
+      "source": "output/firstperson-clothing-v4-20261021/imagegen/sleeve-left.png",
+      "sha256": "51c851721d4001430d96e6771020a64acbe0d13eb04c4e6aec700a3a0fa1aa60",
+      "before": null,
+      "native_size": [
+        1604,
+        981
+      ],
+      "compiler_size": [
+        2048,
+        1024
+      ]
+    },
+    "Assets/materials/operators/first_person/v4/sleeve-right.png": {
+      "source": "output/firstperson-clothing-v4-20261021/imagegen/sleeve-right.png",
+      "sha256": "4883f21636d2d063cb9f7b6224e7665949c469ad656d3b7a2fa82907fe739852",
+      "before": null,
+      "native_size": [
+        1601,
+        982
+      ],
+      "compiler_size": [
+        2048,
+        1024
+      ]
+    },
+    "Assets/materials/operators/first_person/v4/cuff-main.png": {
+      "source": "output/firstperson-clothing-v4-20261021/imagegen/cuff-main.png",
+      "sha256": "9a25ad1012a1b7c092ea5450c6da3f0b811291ffde5d7d0e98e1d2bf80a4f219",
+      "before": null,
+      "native_size": [
+        1568,
+        1003
+      ],
+      "compiler_size": [
+        2048,
+        1024
+      ]
+    },
+    "Assets/materials/operators/first_person/v4/cuff-strip.png": {
+      "source": "output/firstperson-clothing-v4-20261021/imagegen/cuff-strip.png",
+      "sha256": "ff2c0efaeae652a42ed7a506a3fd3ab6886d8e6ec54d5ca61d7f73da085b93ff",
+      "before": null,
+      "native_size": [
+        860,
+        1828
+      ],
+      "compiler_size": [
+        1024,
+        2048
+      ]
+    },
+    "Assets/materials/operators/first_person/v4/shirt-fold-normal.png": {
+      "source": "output/firstperson-clothing-v4-20261021/clean-stage/shirt-fold-normal.png",
+      "sha256": "482f3e76adb89edec05714aedd17a1cf6e1723958c4d21aa899b018e989f63c0",
+      "before": null
+    },
+    "Assets/shaders/viewmodel_fabric_v4.shader": {
+      "source": "Sources/Clothing/firstperson-v4/viewmodel_fabric_v4.shader",
+      "sha256": "3512b92066a8265a50ae1eae2c4c9a1e62800edb2919c91fc3ad3e9be8d145ec",
+      "before": "2878912db79348a02c02b13192bbfcec6f997b82fe1fc7735b1621eeae8786e0"
+    },
+    "Assets/materials/operators/first_person/v4/shirt.vmat": {
+      "source": "output/firstperson-clothing-v4-20261021/clean-stage/shirt.vmat",
+      "sha256": "b7364a9ac64256f89903b6ffa6ef0dd34b62ce343b43e5fe72a020e30056e177",
+      "before": "3bbb021815883e23058acd74203a9ba4891019bcc08a4eab0afe3f3a1d1389e8"
+    }
+  },
+  "rejected_filter_preserved": true,
+  "change": "Remove baked coarse weave from albedo; keep fine fibres and fold lighting separate",
+  "compiler_resize_adds_detail": false
+}

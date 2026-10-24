@@ -1,0 +1,34 @@
+{
+  "saved_image": "output/belltower/quality/surface-finish-v1-saved/west-ridge.png",
+  "source_scene_sha256": "f92a810e80e3cced2ae9ede667d692c712207a58637a927673a7be7eced5af1f",
+  "image_sha256": "aa24ee12ca6c9ac00c416de27cdb864925b7a84d2e7220ccbe3d34e27521b346",
+  "capture_restored": true,
+  "regions": {
+    "sky": [
+      650,
+      20,
+      1250,
+      180
+    ],
+    "distant_forest": [
+      920,
+      400,
+      1040,
+      460
+    ],
+    "plaster": [
+      40,
+      30,
+      200,
+      100
+    ]
+  },
+  "candidate_vs_published_mean_absolute_rgb8": {
+    "sky": 0.9638576507568359,
+    "distant_forest": 1.0810185670852661,
+    "plaster": 0.9808035492897034
+  },
+  "static_control_gate": 0.1,
+  "controls_passed": false,
+  "scope": "Static regions outside the six lowered plants; no runtime/performance inference."
+}

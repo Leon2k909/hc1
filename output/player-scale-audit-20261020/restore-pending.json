@@ -1,0 +1,81 @@
+{
+  "pid": 29540,
+  "active_scene": "scenes/menu.scene",
+  "playing": false,
+  "settings": {
+    "FieldOfView": 85,
+    "ThirdPersonFieldOfView": 85,
+    "IndependentAdsFov": false,
+    "WeaponDistance": 0,
+    "WeaponSidePosition": 0,
+    "WeaponHeightPosition": 0,
+    "ViewBob": 100
+  },
+  "sessions": [
+    {
+      "Id": "1d8ef449-9ae1-421d-b754-49f414e52d74",
+      "Name": "menu",
+      "IsEditor": true,
+      "Path": "scenes/menu.scene",
+      "HasUnsavedChanges": false,
+      "Active": true,
+      "Cameras": [
+        {
+          "Id": "ceb4734c-b80a-450f-bd8a-a0ef1116cf6c",
+          "Name": "Camera",
+          "FieldOfView": 40,
+          "Axis": "Horizontal",
+          "Position": "-46.8844,-497.7094,1085.486",
+          "Enabled": true,
+          "IsMainCamera": true,
+          "Priority": 1,
+          "Orthographic": false,
+          "CustomSize": null,
+          "Angles": "Pitch = 5.63, Yaw = -179.76, Roll = -0.00"
+        },
+        {
+          "Id": "c489b366-c949-4967-88f3-73c7ec4e0b36",
+          "Name": "editor_camera",
+          "FieldOfView": 80,
+          "Axis": "Horizontal",
+          "Position": "-150,260,180",
+          "Enabled": true,
+          "IsMainCamera": false,
+          "Priority": 1,
+          "Orthographic": false,
+          "CustomSize": "1101,455",
+          "Angles": "Pitch = 17.40, Yaw = -174.60, Roll = 0.00"
+        }
+      ],
+      "Actors": []
+    }
+  ],
+  "restore_required": false,
+  "cleanup": {
+    "recorded_utc": "2026-10-20T19:48:35.345167+00:00",
+    "audit_play_stopped": true,
+    "original_menu_selection_restored_at_cleanup": true,
+    "audit_boxyard_edit_tab_closed": true,
+    "original_restore_receipt": "close-audit-tab/close_scene.json",
+    "latest_observed_editor_state": {
+      "Playing": false,
+      "Active": "scenes/maps/belltower/belltower.scene",
+      "HasUnsavedChanges": false,
+      "OpenDocuments": [
+        "scenes/menu.scene",
+        "scenes/maps/belltower/belltower.scene"
+      ],
+      "FieldOfView": 85,
+      "IndependentAdsFov": false,
+      "Restored": false
+    },
+    "later_external_belltower_selection_preserved": true,
+    "note": "Cleanup restored the original menu and closed the audit's Boxyard document. Belltower was opened subsequently by another editor user or chat. The archived strict menu-only verification therefore returned Restored=false; this is a later selection change, not unfinished audit cleanup. No action was taken to overwrite that selection.",
+    "fov_ads_and_god_mode_restoration": {
+      "FovRestored": true,
+      "AdsRestored": true,
+      "GodModeRestored": true,
+      "SceneIsAuditMatch": true
+    }
+  }
+}

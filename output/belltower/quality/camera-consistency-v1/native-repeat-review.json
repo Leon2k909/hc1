@@ -1,0 +1,119 @@
+{
+  "status": "camera-pin-restoration-passed-offscreen-exposure-response-still-unverified",
+  "effective_gpu_exposure_verified": false,
+  "pairs": {
+    "low-a_vs_high-a": {
+      "frame": {
+        "mean_rgb8": 2.0687010288238525,
+        "signed_rgb8": 1.0290294885635376,
+        "fraction_any_over3": 0.053939043209876546
+      },
+      "sky": {
+        "mean_rgb8": 1.0888046026229858,
+        "signed_rgb8": 1.0888046026229858,
+        "fraction_any_over3": 1.2239902080783353e-05
+      },
+      "forest": {
+        "mean_rgb8": 1.1525431871414185,
+        "signed_rgb8": 1.1332839727401733,
+        "fraction_any_over3": 0.0044444444444444444
+      },
+      "stone": {
+        "mean_rgb8": 1.1328104734420776,
+        "signed_rgb8": 1.1328104734420776,
+        "fraction_any_over3": 0.0
+      },
+      "plaster": {
+        "mean_rgb8": 1.097733974456787,
+        "signed_rgb8": 1.097733974456787,
+        "fraction_any_over3": 0.0
+      }
+    },
+    "high-a_vs_high-b": {
+      "frame": {
+        "mean_rgb8": 1.2252168655395508,
+        "signed_rgb8": -0.1435910165309906,
+        "fraction_any_over3": 0.05379243827160494
+      },
+      "sky": {
+        "mean_rgb8": 0.1172623410820961,
+        "signed_rgb8": -0.1172623410820961,
+        "fraction_any_over3": 0.0
+      },
+      "forest": {
+        "mean_rgb8": 0.16027159988880157,
+        "signed_rgb8": -0.12940740585327148,
+        "fraction_any_over3": 0.004888888888888889
+      },
+      "stone": {
+        "mean_rgb8": 0.12406100332736969,
+        "signed_rgb8": -0.12406100332736969,
+        "fraction_any_over3": 0.0
+      },
+      "plaster": {
+        "mean_rgb8": 0.11756978929042816,
+        "signed_rgb8": -0.11756978929042816,
+        "fraction_any_over3": 0.0
+      }
+    },
+    "low-a_vs_low-b": {
+      "frame": {
+        "mean_rgb8": 0.8815245628356934,
+        "signed_rgb8": -0.457831472158432,
+        "fraction_any_over3": 0.02907744984567901
+      },
+      "sky": {
+        "mean_rgb8": 0.5148347616195679,
+        "signed_rgb8": -0.5148347616195679,
+        "fraction_any_over3": 0.0
+      },
+      "forest": {
+        "mean_rgb8": 0.5668395161628723,
+        "signed_rgb8": -0.5248641967773438,
+        "fraction_any_over3": 0.005851851851851852
+      },
+      "stone": {
+        "mean_rgb8": 0.5355294346809387,
+        "signed_rgb8": -0.5355294346809387,
+        "fraction_any_over3": 0.0
+      },
+      "plaster": {
+        "mean_rgb8": 0.515763521194458,
+        "signed_rgb8": -0.515763521194458,
+        "fraction_any_over3": 0.0
+      }
+    }
+  },
+  "regions": {
+    "frame": [
+      0,
+      0,
+      1920,
+      1080
+    ],
+    "sky": [
+      820,
+      60,
+      1250,
+      250
+    ],
+    "forest": [
+      855,
+      375,
+      1080,
+      435
+    ],
+    "stone": [
+      835,
+      525,
+      1060,
+      610
+    ],
+    "plaster": [
+      145,
+      75,
+      290,
+      145
+    ]
+  }
+}

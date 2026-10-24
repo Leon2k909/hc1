@@ -1,0 +1,92 @@
+{
+  "status": "effective-exposure-response-verified-with-active-viewport-settling",
+  "requested_exposures": [
+    0.35,
+    2.0
+  ],
+  "settle_ms": 2000,
+  "pairs": {
+    "low-a_vs_high-a": {
+      "sky": {
+        "mean_rgb8": 90.31963280293758,
+        "fraction_any_over3": 0.9999755201958385
+      },
+      "forest": {
+        "mean_rgb8": 71.37125925925926,
+        "fraction_any_over3": 1.0
+      },
+      "stone": {
+        "mean_rgb8": 78.24629193899783,
+        "fraction_any_over3": 1.0
+      },
+      "plaster": {
+        "mean_rgb8": 65.32673234811166,
+        "fraction_any_over3": 1.0
+      }
+    },
+    "high-a_vs_high-b": {
+      "sky": {
+        "mean_rgb8": 2.787160342717258,
+        "fraction_any_over3": 0.47342717258261935
+      },
+      "forest": {
+        "mean_rgb8": 2.982074074074074,
+        "fraction_any_over3": 0.36866666666666664
+      },
+      "stone": {
+        "mean_rgb8": 2.9506056644880174,
+        "fraction_any_over3": 0.35048366013071897
+      },
+      "plaster": {
+        "mean_rgb8": 2.869622331691297,
+        "fraction_any_over3": 0.49527093596059113
+      }
+    },
+    "low-a_vs_low-b": {
+      "sky": {
+        "mean_rgb8": 0.14000815993472052,
+        "fraction_any_over3": 0.0
+      },
+      "forest": {
+        "mean_rgb8": 0.10785185185185185,
+        "fraction_any_over3": 0.0035555555555555557
+      },
+      "stone": {
+        "mean_rgb8": 0.1040871459694989,
+        "fraction_any_over3": 0.0
+      },
+      "plaster": {
+        "mean_rgb8": 0.07678160919540229,
+        "fraction_any_over3": 0.0
+      }
+    }
+  },
+  "regions": {
+    "sky": [
+      820,
+      60,
+      1250,
+      250
+    ],
+    "forest": [
+      855,
+      375,
+      1080,
+      435
+    ],
+    "stone": [
+      835,
+      525,
+      1060,
+      610
+    ],
+    "plaster": [
+      145,
+      75,
+      290,
+      145
+    ]
+  },
+  "restoration": "All four captures passed every restoration assertion.",
+  "scope": "Active, stopped Belltower viewport only; no hidden-document settling or gameplay claim."
+}

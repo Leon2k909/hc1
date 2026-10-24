@@ -1,0 +1,5 @@
+var session=Editor.SceneEditorSession.Active;
+return new {Game.IsPlaying,Runtime=Game.ActiveScene?.Name,RuntimeId=Game.ActiveScene?.Id,
+    Active=session?.Scene.Name,Source=session?.Scene.Source?.ResourcePath,Dirty=session?.HasUnsavedChanges,
+    Open=Editor.SceneEditorSession.All.Select(s=>new {s.Scene.Name,Path=s.Scene.Source?.ResourcePath,s.HasUnsavedChanges}).ToArray(),
+    RuntimeCentre=Game.ActiveScene?.GetAllComponents<ModelRenderer>().Any(r=>r.Model?.ResourcePath=="models/maps/belltower/belltower_centre.vmdl")};

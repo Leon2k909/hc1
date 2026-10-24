@@ -1,0 +1,360 @@
+{
+  "revision": "veridant-lantern-roof-v1",
+  "files": {
+    "Assets/models/maps/veridant/veridant_buildings.obj": {
+      "before": "ce8e61e91071cbd508f552339ca4ecc217709b75a17633aeb5521a85da6f78b5",
+      "after": "f85ae00d829dcc6d7a96194e7a9fca27ce06a788e0d4a0070cfba70030cd8ab2",
+      "backup": "output/veridant/lantern-roof-v1/before/veridant_buildings.obj",
+      "stage": "output/veridant/lantern-roof-v1/stage/veridant_buildings.obj",
+      "removed_triangles": 160,
+      "added_triangles": 304,
+      "retained_lines_sha256": "14324af44bb60a8f2d0255249debb4290b0d4801ad34d39954a3924240c307f0",
+      "lamps": 8
+    },
+    "Assets/models/maps/veridant/veridant_dress.obj": {
+      "before": "f8a5fae30a3b51360d84649a3c8d917280020e6cc874d0580b03c92c64585916",
+      "after": "01c3b21000c52cfaeea231d9fdf850bb45dd2c456d2d6ccb0564f871ed0a40c0",
+      "backup": "output/veridant/lantern-roof-v1/before/veridant_dress.obj",
+      "stage": "output/veridant/lantern-roof-v1/stage/veridant_dress.obj",
+      "removed_triangles": 480,
+      "added_triangles": 912,
+      "retained_lines_sha256": "aa29462e4c84213b51b75af2d211c12ff86582fec2524908b23e2e1460e536a3",
+      "lamps": 24
+    }
+  },
+  "protected": {
+    "Assets/models/maps/veridant/veridant_buildings.mtl": "4a54bd3b1967a726f3d91d9cab19609f0a4f43750e381bb5ba351f5ae12da4e0",
+    "Assets/models/maps/veridant/veridant_buildings.vmdl": "0cc565629cedab734cd72e5b9a7fd7816e14aeb5c8f6c4b9798b1d1ba6663395",
+    "Assets/models/maps/veridant/veridant_buildings_hulls_default.obj": "07d0712c8bc999ea15661b872511932d1140093c489f167f206e8afa2080a982",
+    "Assets/models/maps/veridant/veridant_buildings_hulls_metal.obj": "eab46b35ecf6a05b599d033370f2f45fb2b51ed5af12eb88327a8f6e2ef9891c",
+    "Assets/models/maps/veridant/veridant_dress.mtl": "cb5ba90331b267b14a087b9dbbb38b3b0829a493ccaed5747ae4e8db9cfeb635",
+    "Assets/models/maps/veridant/veridant_dress.vmdl": "e6d13319157a9546acafee2800c83c51c5e2951769c3a7b603b0f853fa261a98",
+    "Assets/models/maps/veridant/veridant_dress_hulls_default.obj": "731a685d0bf5beb747e07cfc75ae93239e2d7bfba2749c1ed1db0425c1aac05f",
+    "Assets/models/maps/veridant/veridant_dress_hulls_metal.obj": "59a5740615b24a1211d5799cdecc9ce8826711127eef6d91569b68c3452750bc",
+    "Assets/scenes/maps/Veridant/veridant.scene": "20874a86e6dd78918e496a421350861ea3f291ccbf4f337a0bc3bc3cbf7c264d",
+    "Tools/veridant_parts.py": "a85b6c852dc42746617fc68449a5a5d62e29f0f8e153f9d01d211c78cff40cef",
+    "Tools/veridant_map.py": "7217a17bce5d6add2cd88f76cd7ff1b9f07769c1206cf8f1b90b077fbfa61edb"
+  },
+  "lamps": [
+    {
+      "name": "North terrace lantern 0",
+      "base": [
+        -20,
+        300,
+        128.0
+      ],
+      "h": 96,
+      "model": "veridant_buildings"
+    },
+    {
+      "name": "North terrace lantern 1",
+      "base": [
+        130,
+        650,
+        128.0
+      ],
+      "h": 96,
+      "model": "veridant_buildings"
+    },
+    {
+      "name": "North terrace lantern 2",
+      "base": [
+        300,
+        520,
+        128.0
+      ],
+      "h": 96,
+      "model": "veridant_buildings"
+    },
+    {
+      "name": "East terrace lantern 0",
+      "base": [
+        1140,
+        -200,
+        192.0
+      ],
+      "h": 96,
+      "model": "veridant_buildings"
+    },
+    {
+      "name": "East terrace lantern 1",
+      "base": [
+        1140,
+        300,
+        192.0
+      ],
+      "h": 96,
+      "model": "veridant_buildings"
+    },
+    {
+      "name": "East terrace lantern 2",
+      "base": [
+        820,
+        500,
+        192.0
+      ],
+      "h": 96,
+      "model": "veridant_buildings"
+    },
+    {
+      "name": "East terrace lantern 3",
+      "base": [
+        1000,
+        700,
+        192.0
+      ],
+      "h": 96,
+      "model": "veridant_buildings"
+    },
+    {
+      "name": "East terrace lantern near",
+      "base": [
+        930.0,
+        -150.0,
+        192.0
+      ],
+      "h": 96,
+      "model": "veridant_buildings"
+    },
+    {
+      "name": "Garden lantern 0",
+      "base": [
+        -600,
+        260,
+        128.0
+      ],
+      "h": 96,
+      "model": "veridant_dress"
+    },
+    {
+      "name": "Garden lantern 1",
+      "base": [
+        -320,
+        600,
+        128.0
+      ],
+      "h": 96,
+      "model": "veridant_dress"
+    },
+    {
+      "name": "Garden lantern 2",
+      "base": [
+        -600,
+        960,
+        128.0
+      ],
+      "h": 96,
+      "model": "veridant_dress"
+    },
+    {
+      "name": "Promenade lamp 0",
+      "base": [
+        -1690.0,
+        -1080.0,
+        0
+      ],
+      "h": 140,
+      "model": "veridant_dress"
+    },
+    {
+      "name": "Promenade lamp 1",
+      "base": [
+        -1690.0,
+        -780.0,
+        0
+      ],
+      "h": 140,
+      "model": "veridant_dress"
+    },
+    {
+      "name": "Promenade lamp 2",
+      "base": [
+        -1690.0,
+        -480.0,
+        0
+      ],
+      "h": 140,
+      "model": "veridant_dress"
+    },
+    {
+      "name": "Promenade lamp 3",
+      "base": [
+        -1690.0,
+        -180.0,
+        0
+      ],
+      "h": 140,
+      "model": "veridant_dress"
+    },
+    {
+      "name": "Promenade lamp 4",
+      "base": [
+        -1690.0,
+        120.0,
+        0
+      ],
+      "h": 140,
+      "model": "veridant_dress"
+    },
+    {
+      "name": "Promenade lamp 5",
+      "base": [
+        -1690.0,
+        420.0,
+        0
+      ],
+      "h": 140,
+      "model": "veridant_dress"
+    },
+    {
+      "name": "Promenade lamp 6",
+      "base": [
+        -1690.0,
+        720.0,
+        0
+      ],
+      "h": 140,
+      "model": "veridant_dress"
+    },
+    {
+      "name": "Promenade lamp 7",
+      "base": [
+        -1690.0,
+        1020.0,
+        0
+      ],
+      "h": 140,
+      "model": "veridant_dress"
+    },
+    {
+      "name": "Garden lamp 0",
+      "base": [
+        -300,
+        -760,
+        0
+      ],
+      "h": 120,
+      "model": "veridant_dress"
+    },
+    {
+      "name": "Garden lamp 1",
+      "base": [
+        300,
+        -760,
+        0
+      ],
+      "h": 120,
+      "model": "veridant_dress"
+    },
+    {
+      "name": "Garden lamp 2",
+      "base": [
+        900,
+        -760,
+        0
+      ],
+      "h": 120,
+      "model": "veridant_dress"
+    },
+    {
+      "name": "Garden lamp 3",
+      "base": [
+        1500,
+        -800,
+        0
+      ],
+      "h": 120,
+      "model": "veridant_dress"
+    },
+    {
+      "name": "Garden lamp 4",
+      "base": [
+        -600,
+        -1300,
+        0
+      ],
+      "h": 120,
+      "model": "veridant_dress"
+    },
+    {
+      "name": "Garden lamp 5",
+      "base": [
+        1100,
+        -1300,
+        0
+      ],
+      "h": 120,
+      "model": "veridant_dress"
+    },
+    {
+      "name": "Gate lamp -300.0 -1",
+      "base": [
+        1894.0,
+        -400.0,
+        150
+      ],
+      "h": 30,
+      "model": "veridant_dress"
+    },
+    {
+      "name": "Gate lamp -300.0 1",
+      "base": [
+        1894.0,
+        -200.0,
+        150
+      ],
+      "h": 30,
+      "model": "veridant_dress"
+    },
+    {
+      "name": "Gate lamp 500.0 -1",
+      "base": [
+        1894.0,
+        400.0,
+        150
+      ],
+      "h": 30,
+      "model": "veridant_dress"
+    },
+    {
+      "name": "Gate lamp 500.0 1",
+      "base": [
+        1894.0,
+        600.0,
+        150
+      ],
+      "h": 30,
+      "model": "veridant_dress"
+    },
+    {
+      "name": "Forecourt lamp 0",
+      "base": [
+        1500,
+        -640,
+        0
+      ],
+      "h": 140,
+      "model": "veridant_dress"
+    },
+    {
+      "name": "Forecourt lamp 1",
+      "base": [
+        1500,
+        950,
+        0
+      ],
+      "h": 140,
+      "model": "veridant_dress"
+    },
+    {
+      "name": "Forecourt lamp 2",
+      "base": [
+        1820,
+        150,
+        0
+      ],
+      "h": 140,
+      "model": "veridant_dress"
+    }
+  ]
+}

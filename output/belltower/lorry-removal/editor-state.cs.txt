@@ -1,0 +1,2 @@
+return new { Game.IsPlaying, Active = Editor.SceneEditorSession.Active?.Scene?.Source?.ResourcePath,
+	Open = Editor.SceneEditorSession.All.Select( s => s.Scene?.Source?.ResourcePath ) };

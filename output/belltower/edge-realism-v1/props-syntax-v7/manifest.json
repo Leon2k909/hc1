@@ -1,0 +1,119 @@
+{
+  "revision": "belltower-stone-wear-v1",
+  "models": {
+    "west": {
+      "removed_triangles": 932,
+      "unrelated_obj_bytes_exact": true,
+      "retained_bytes_sha256": "9aa57c61aa2253031012a43066ffb1397acdab83a078d48e6053998d4960f6d0",
+      "new_triangles": 18603,
+      "bounded_parts_patched": 4,
+      "new_import": "models/maps/belltower/edge-realism-v1/west.obj",
+      "physics_exact": true,
+      "all_prior_render_imports_retained": true
+    },
+    "east": {
+      "removed_triangles": 932,
+      "unrelated_obj_bytes_exact": true,
+      "retained_bytes_sha256": "aa333aea95b8876d7b1995261853ea1decfb6465a5a299b0f0014acbca232bf9",
+      "new_triangles": 18603,
+      "bounded_parts_patched": 4,
+      "new_import": "models/maps/belltower/edge-realism-v1/east.obj",
+      "physics_exact": true,
+      "all_prior_render_imports_retained": true
+    },
+    "centre": {
+      "removed_triangles": 342,
+      "unrelated_obj_bytes_exact": true,
+      "retained_bytes_sha256": "22e992fd604c19234a7e62c5ebfcf50f3893c907cecdae0650d807d2d3836d46",
+      "new_triangles": 12564,
+      "bounded_parts_patched": 3,
+      "new_import": "models/maps/belltower/edge-realism-v1/centre.obj",
+      "physics_exact": true,
+      "all_prior_render_imports_retained": true
+    }
+  },
+  "files": {
+    "Assets/models/maps/belltower/belltower_west.vmdl": {
+      "before": "48a651cf5e95c5b8f1883eba3f1ebcd440cdbaedd5047e2129d8a9fbb9debc2e",
+      "after": "c4e2d307ce25c8f09b63379df98afd659b3b4ba89cb9c765da65c0f30a8819db",
+      "source": "output/belltower/edge-realism-v1/props-syntax-v7/Assets/models/maps/belltower/belltower_west.vmdl",
+      "backup": "output/belltower/edge-realism-v1/props-syntax-v7/before/Assets/models/maps/belltower/belltower_west.vmdl"
+    },
+    "Assets/models/maps/belltower/belltower_east.vmdl": {
+      "before": "71534df8b94b57653e2fa9af3fca99d9d540d1ce4e5ac5555587d1afd9befbe3",
+      "after": "1923c327fa9422c9de124346839a756d17add1226761a11352e9e1e192a13ffa",
+      "source": "output/belltower/edge-realism-v1/props-syntax-v7/Assets/models/maps/belltower/belltower_east.vmdl",
+      "backup": "output/belltower/edge-realism-v1/props-syntax-v7/before/Assets/models/maps/belltower/belltower_east.vmdl"
+    },
+    "Assets/models/maps/belltower/belltower_centre.vmdl": {
+      "before": "d6bcc58970f56bbd056a1565f023fa1b0f6ed4a9205c7fc192dc1b3c5c6ca698",
+      "after": "c2a05c6234d1ef36ddce12a6e357223894b70bb0e042b782e3195a86025bcbde",
+      "source": "output/belltower/edge-realism-v1/props-syntax-v7/Assets/models/maps/belltower/belltower_centre.vmdl",
+      "backup": "output/belltower/edge-realism-v1/props-syntax-v7/before/Assets/models/maps/belltower/belltower_centre.vmdl"
+    }
+  },
+  "source_sha256": {
+    "Tools/belltower_stone_wear.py": "c5e08676bcb7ecead2d1989a665136fa9e9d7eb16f16f03e7d634acd27fce345",
+    "Tools/belltower_stage_stone_wear.py": "6494af947af5ab6660cf26dcb98d38bfc536767d0c9a59a59d7eb4dbe5e78b3c",
+    "Tools/belltower_fountain.py": "779b630b7a5440dede51a69f4e89b8b8b306693f3feda591918055ff477f1ec2",
+    "Tools/belltower_fountain_ornaments.py": "a18ee092e6f2b683c777cb457c4c83d4e2dd5b1d7ee8c656bbc611b1d918c963",
+    "Tools/belltower_planters.py": "f4bc0b07e3aca2f2f53451081585ea2219b01be144cd90d8d01329ebf9b2a8b0",
+    "Tools/belltower_furniture.py": "123696982d9a74015c3976138408e5af70649b3c5b6c988a6b6cc673d0289a3e",
+    "Tools/belltower_wall_edges.py": "11f511a1aab661713212892fec59117fd03d8949f1e429e1ccd349c123b92072",
+    "Tools/belltower_wall_cleanup.py": "f93a40b4c03a9aa50633bd4c6b62a08e4e9ed494aa42dbf34eb9dc17c4d2b668",
+    "Tools/belltower_detail.py": "664dd4f4aec1dea27c8096f36d7f6da031eeaa90e35150afd990f8ebbe7aeedd",
+    "Tools/map_kit.py": "cc60204c747d064cb1fecdb666b24c847ae89dc863c2533d3811a0445f22020d",
+    "Tools/belltower_rebase_stone_wear.py": "e23249d021cdd5721dab2075115c7215c37dd33d740eb66a86bff65da3b185d2",
+    "Tools/belltower_repair_stone_modeldoc.py": "b9b083f659c8602636993cfc24cd4160fed5a690651468fda90a782d55b2d9d9"
+  },
+  "protected_sha256": {
+    "Assets/scenes/maps/Belltower/belltower.scene": "35b19f224d30a22bc7fa3639861f5586ca90be5b6f872a7aafbf2a9ec2421bea",
+    "Assets/materials/belltower/fountain_limestone.vmat": "4182dfac04c107e1ed46e6cfa02f5a214a4afc9adf0d104101cbaddafe486520",
+    "Assets/materials/belltower/planters-v1/cut_stone.vmat": "eb1bc4cf1e0367093d8667e74caa9b1547664569ac009e714de896510d9838c3",
+    "Assets/materials/belltower/well-v1/well_damp_stone.vmat": "446c71841b90602170c2db41cdb930013a8537b00c111df2114c95a225787e07",
+    "Assets/materials/belltower/fountain_water.vmat": "2c2639d43d8012cda39040abed5270e3f2f68947e093acb663b2ef6566336707",
+    "Sources/Belltower/props/fountain-ornaments-v2/lion-c04fcf8f4061.npz": "1e9311bc3cf6d6abd8b4eba1fd8f7d326a0b2f2a4e43c0f8eeb8d68265151438",
+    "Sources/Belltower/props/fountain-ornaments-v2/lion-d6d3738f2be0.npz": "6db111d432564730f3719c7159737dbe98a58043b9df8043bd664004c9ce4880",
+    "Sources/Belltower/props/fountain-ornaments-v2/lion-eb7a855e4b09.npz": "adb1b1dcd53496e866c60904d97f1e5cf5b7e0a25067945429b6908b2c21f9a7"
+  },
+  "scope": {
+    "troughs": 4,
+    "raised_tombs": 4,
+    "fountain_basins": 1,
+    "fountain_tiers": 10,
+    "market_cross_bases": 1,
+    "gate_towers": 4,
+    "merlons": 134
+  },
+  "map_writer_sha256_at_stage": "96580c036c721b5c8e0caa64330f1723058a979d5ce89738704dc5b395c1907c",
+  "map_writer_is_shared": true,
+  "scene_unchanged": true,
+  "collision_unchanged": true,
+  "fountain_ornaments_preserved": true,
+  "water_shaders_and_texture_pixels_unchanged": true,
+  "trough_water_recess_inches": 2.7,
+  "max_new_triangles_per_import": 18603,
+  "rebase": {
+    "from": "props-stage-v5",
+    "authoring_files": [
+      {
+        "path": "Assets/models/maps/belltower/belltower_west.obj",
+        "previous_before": "06f62589dcbc6ec3e8476ef1db76054de36113b570f7f5d5a153980e4922aac6",
+        "rebased_before": "c1e9a59ea03210649d2ecd6ef4491ca9c55a92bed47ae6de220487c27a3b0ff4",
+        "removed_triangles": 932,
+        "unrelated_obj_bytes_exact": true,
+        "retained_bytes_sha256": "9aa57c61aa2253031012a43066ffb1397acdab83a078d48e6053998d4960f6d0"
+      },
+      {
+        "path": "Assets/models/maps/belltower/belltower_east.obj",
+        "previous_before": "18b705f83eab386d2b7c6a8d83207eaa62dd522a5f342e9a509c4a11d8f0e0b3",
+        "rebased_before": "2db331884bf0ea8a3531bdc711683d8ff929b06f1ecf864541e589ac6838dc07",
+        "removed_triangles": 932,
+        "unrelated_obj_bytes_exact": true,
+        "retained_bytes_sha256": "aa333aea95b8876d7b1995261853ea1decfb6465a5a299b0f0014acbca232bf9"
+      }
+    ]
+  },
+  "repair_of": "props-rebase-v6",
+  "repair": "Remove one duplicate comma immediately preceding each stone_wear render import."
+}

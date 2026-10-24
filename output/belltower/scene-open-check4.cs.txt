@@ -1,0 +1,25 @@
+var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
+var asm = AppDomain.CurrentDomain.GetAssemblies().First( a => a.GetName().Name.Contains( "toolbase" ) );
+var mainType = asm.GetTypes().First( t => t.Name == "MainAssetBrowser" );
+var main = mainType.GetField( "_instance", flags ).GetValue( null );
+string Describe( object o )
+{
+	if ( o is null ) return "null";
+	var props = o.GetType().GetProperties( flags ).Where( p => p.GetIndexParameters().Length == 0 )
+		.Select( p => { try { var v = p.GetValue( o ); return v is string || v is bool || v is System.Enum || v is int ? p.Name + "=" + v : null; } catch { return null; } } )
+		.Where( s => s is not null );
+	return o.GetType().FullName + " {" + string.Join( ", ", props ) + "}";
+}
+var lines = new System.Collections.Generic.List<string>();
+for ( var t = main.GetType(); t is not null && t != typeof( object ); t = t.BaseType )
+	foreach ( var f in t.GetFields( flags | System.Reflection.BindingFlags.DeclaredOnly ).Where( f => !f.IsStatic ) )
+	{
+		object v; try { v = f.GetValue( main ); } catch { continue; }
+		if ( v is null ) continue;
+		var n = v.GetType().Name;
+		if ( n.Contains( "Location" ) || n.Contains( "Browser" ) || f.Name.Contains( "ocation" ) || n.Contains( "AssetList" ) )
+			lines.Add( t.Name + "." + f.Name + ": " + Describe( v ) );
+	}
+var cur = main.GetType().GetProperty( "CurrentLocation", flags )?.GetValue( main );
+lines.Add( "CurrentLocation: " + Describe( cur ) );
+return lines;

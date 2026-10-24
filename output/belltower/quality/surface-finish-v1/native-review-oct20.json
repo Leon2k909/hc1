@@ -1,0 +1,110 @@
+{
+  "decision": "accept for publication",
+  "scope": "Matched active stopped native editor captures at three current mesh views. Plaster peeling is more localized; masonry retains variation and warmer colour. No geometry/texture/shader changes.",
+  "captures": [
+    {
+      "metadata": "output/belltower/quality/oct20-art-finish-baseline/west-ridge-camera.json",
+      "image_sha256": "9b872decaeb1c9259cd8bdec525d918467aa56a1f1901a5110bf94e37f93a92a",
+      "restoration_verified": true
+    },
+    {
+      "metadata": "output/belltower/quality/oct20-art-finish-candidate/west-ridge-camera.json",
+      "image_sha256": "ed45fb1df841c6333d146b2e068ceedf014ae45176fc1fe991c5adbc939d0691",
+      "restoration_verified": true
+    },
+    {
+      "metadata": "output/belltower/quality/oct20-art-finish-baseline/east-street-camera.json",
+      "image_sha256": "62c1190c7ce0fd6d7d315b6930c3f852fb269fa76c7f592c3bbfc53564f50293",
+      "restoration_verified": true
+    },
+    {
+      "metadata": "output/belltower/quality/oct20-art-finish-candidate/east-street-camera.json",
+      "image_sha256": "eba81443c788d044d3029be6701f9ec9b8111710cb8aefc8a79d8311bf1179a1",
+      "restoration_verified": true
+    },
+    {
+      "metadata": "output/belltower/quality/oct20-art-finish-baseline/terrace-camera.json",
+      "image_sha256": "23895948db24c3dbc56c7e633f0607a1ddb5724873ad47d3109f32c5bb4e1cdc",
+      "restoration_verified": true
+    },
+    {
+      "metadata": "output/belltower/quality/oct20-art-finish-candidate/terrace-camera.json",
+      "image_sha256": "8472fbdae809abff496455b40a85488b6e34366ad95bb5f43405be0a9450ec2e",
+      "restoration_verified": true
+    }
+  ],
+  "published": true,
+  "performance_measured": false,
+  "regions": {
+    "west-ridge": {
+      "sky": [
+        650,
+        20,
+        1250,
+        180
+      ],
+      "forest": [
+        1075,
+        380,
+        1115,
+        410
+      ]
+    },
+    "east-street": {
+      "sky": [
+        750,
+        20,
+        1100,
+        180
+      ],
+      "forest": [
+        920,
+        410,
+        1000,
+        450
+      ]
+    },
+    "terrace": {
+      "sky": [
+        1010,
+        30,
+        1350,
+        190
+      ],
+      "forest": [
+        930,
+        400,
+        1000,
+        460
+      ]
+    }
+  },
+  "unaffected_region_mean_absolute_rgb8": {
+    "west-ridge": {
+      "sky": 0.009527777321636677,
+      "forest": 0.0555555559694767
+    },
+    "east-street": {
+      "sky": 0.0007916666800156236,
+      "forest": 0.01822916604578495
+    },
+    "terrace": {
+      "sky": 0.0006678921636193991,
+      "forest": 0.0015079365111887455
+    }
+  },
+  "comparison_control_gate": 0.1,
+  "comparison_controls_passed": true,
+  "excluded_control_region": {
+    "region": [
+      920,
+      400,
+      1040,
+      460
+    ],
+    "mean_absolute_rgb8": 0.6324074268341064,
+    "reason": "The lower part of the original west forest rectangle includes gate battlements whose rubble material intentionally changes. It is not an unaffected control."
+  },
+  "published_visual_limitation": "The later saved-scene image differs by about 1 RGB8 in static regions from the temporary candidate; its strict cross-session photometric gate failed. It confirms installed appearance qualitatively only. Earlier matched baseline/candidate captures support the material choice.",
+  "publication_evidence": "output/belltower/quality/surface-finish-v1/native-publication.json"
+}

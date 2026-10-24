@@ -1,0 +1,29 @@
+// The cloud oaks' trunk flare where it meets the paving: every triangle cut by the planes z = 0.5 and 1.5, the
+// furthest cut point from the trunk's axis (read only).
+var result = new System.Collections.Generic.List<object>();
+foreach (var path in new[] { "models/sbox_props/trees/oak/tree_oak_medium_a.vmdl", "models/sbox_props/trees/oak/tree_oak_small_a.vmdl" })
+{
+    var model = Model.Load(path);
+    var vertices = model.GetVertices();
+    var indices = model.GetIndices();
+    var rows = new System.Collections.Generic.List<object>();
+    foreach (var h in new[] { 0.5f, 1.5f, 4f })
+    {
+        float maxR = 0; int cuts = 0; float minX = 1e9f, maxX = -1e9f, minY = 1e9f, maxY = -1e9f;
+        for (int t = 0; t + 2 < indices.Length; t += 3)
+        {
+            var a = vertices[indices[t]].Position; var b = vertices[indices[t + 1]].Position; var c = vertices[indices[t + 2]].Position;
+            foreach (var (p, q) in new[] { (a, b), (b, c), (c, a) })
+            {
+                if ((p.z - h) * (q.z - h) > 0 || p.z == q.z) continue;
+                var x = p + (q - p) * ((h - p.z) / (q.z - p.z));
+                cuts++;
+                maxR = MathF.Max(maxR, MathF.Sqrt(x.x * x.x + x.y * x.y));
+                minX = MathF.Min(minX, x.x); maxX = MathF.Max(maxX, x.x); minY = MathF.Min(minY, x.y); maxY = MathF.Max(maxY, x.y);
+            }
+        }
+        rows.Add(new { h, cuts, maxR, minX, maxX, minY, maxY });
+    }
+    result.Add(new { path, triangles = indices.Length / 3, rows });
+}
+return System.Text.Json.JsonSerializer.Serialize(result);

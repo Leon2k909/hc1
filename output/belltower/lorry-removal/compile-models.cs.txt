@@ -1,0 +1,12 @@
+// Compile the two town halves after the lorry removal and report each compiled model's physics and size.
+var results = new System.Collections.Generic.List<object>();
+foreach ( var path in new[] { "models/maps/belltower/belltower_west.vmdl", "models/maps/belltower/belltower_east.vmdl" } )
+{
+	var asset = Editor.AssetSystem.FindByPath( path );
+	var started = DateTime.UtcNow;
+	var ok = asset is not null && asset.Compile( true );
+	var model = Model.Load( path );
+	results.Add( new { path, ok, Seconds = (DateTime.UtcNow - started).TotalSeconds, Error = model?.IsError,
+		Bounds = model?.Bounds.Size.ToString(), Parts = model?.Physics?.Parts.Count } );
+}
+return results;

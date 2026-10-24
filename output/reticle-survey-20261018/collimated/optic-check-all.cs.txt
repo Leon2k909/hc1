@@ -1,0 +1,22 @@
+// Run hc1_m16_optic_check on each of the M16A4's 13 MWII 1x optics in turn, waiting for each report.
+var folder = System.IO.Path.Combine( Project.Current.GetRootPath(), "output", "m16-gunsmith" );
+var optics = new[] { "att_vm_2x_west02_holo", "att_vm_holo_east01", "att_vm_holo_west01", "att_vm_holo_west02", "att_vm_minireddot01_tall",
+	"att_vm_minireddot02_tall", "att_vm_minireddot03_tall", "att_vm_reflex_02", "att_vm_reflex_east01", "att_vm_reflex_east02_tall",
+	"att_vm_reflex_west02_tall", "att_vm_reflex_west03", "att_vm_reflex_west04" };
+var summary = new System.Collections.Generic.List<string>();
+foreach ( var optic in optics )
+{
+	cancellationToken.ThrowIfCancellationRequested();
+	var file = System.IO.Path.Combine( folder, $"optic-{optic}-risers.txt" );
+	if ( System.IO.File.Exists( file ) ) System.IO.File.Delete( file );
+	ConsoleSystem.Run( $"hc1_m16_optic_check {optic} risers" );
+	var waited = 0;
+	while ( !System.IO.File.Exists( file ) && waited < 180000 ) { await Task.Delay( 500 ); waited += 500; }
+	await Task.Delay( 300 );
+	if ( !System.IO.File.Exists( file ) ) { summary.Add( $"{optic}: no report after {waited} ms" ); continue; }
+	var lines = System.IO.File.ReadAllLines( file );
+	summary.Add( $"{optic}: {lines.Last()}" );
+	foreach ( var line in lines.Where( l => l.StartsWith( "FAIL" ) || l.Contains( "degrees from" ) || l.Contains( "under the dot" ) ) )
+		summary.Add( "  " + line );
+}
+return string.Join( "\n", summary );

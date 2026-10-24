@@ -1,0 +1,147 @@
+// Native-engine regression checks. Copy into the sbox-cli exchange directory and run with run_csharp.
+// Uses the production input/movement methods in an isolated scene; restores input, time and sprint settings.
+var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
+var type = typeof(Facepunch.PlayerPawn);
+var inputType = typeof(Input).GetNestedType("Context", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
+var input = Activator.CreateInstance(inputType, flags, null, new object[] { "JumpSlideQA" }, null);
+var names = Input.ActionNames.ToList();
+var timeMethod = typeof(Time).GetMethod("Scope", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+var inputScope = (IDisposable)inputType.GetMethod("Push", flags).Invoke(input, null);
+var scene = new Scene();
+var settings = Facepunch.GameSettingsSystem.Current;
+var savedToggleSprint = settings.ToggleSprint;
+var checks = 0;
+var simulations = 0;
+ulong previousButtons = 0;
+void Check(bool condition, string label) { if (!condition) throw new Exception(label); checks++; }
+IDisposable At(double now, double delta) => (IDisposable)timeMethod.Invoke(null, new object[] { now, delta });
+ulong Mask(params string[] actions) => actions.Aggregate(0UL, (mask, action) => {
+    var index = names.FindIndex(x => string.Equals(x, action, StringComparison.OrdinalIgnoreCase));
+    if (index < 0) throw new Exception("Missing input action: " + action);
+    return mask | (1UL << index);
+});
+void Buttons(params string[] actions) {
+    var current = Mask(actions);
+    inputType.GetProperty("ActionsCurrent", flags).SetValue(input, current);
+    inputType.GetProperty("ActionsPrevious", flags).SetValue(input, previousButtons);
+    previousButtons = current;
+}
+void Call(Facepunch.PlayerPawn pawn, string method, params object[] args) => type.GetMethod(method, flags).Invoke(pawn, args);
+bool Pending(Facepunch.PlayerPawn pawn) => (bool)type.GetField("_slideOnLanding", flags).GetValue(pawn);
+void Field(Facepunch.PlayerPawn pawn, string name, object value) => type.GetField(name, flags).SetValue(pawn, value);
+Facepunch.PlayerPawn NewPawn(float fatigue = 0f) {
+    previousButtons = 0;
+    Buttons();
+    var go = new GameObject(false, "Jump slide regression");
+    go.Flags |= GameObjectFlags.NotSaved | GameObjectFlags.NotNetworked;
+    var pawn = go.AddComponent<Facepunch.PlayerPawn>();
+    pawn.Enabled = false;
+    pawn.HealthComponent = go.AddComponent<Facepunch.HealthComponent>();
+    pawn.HealthComponent.Enabled = false;
+    pawn.CharacterController = go.GetComponent<Facepunch.CharacterController>() ?? go.AddComponent<Facepunch.CharacterController>();
+    pawn.CharacterController.Enabled = false;
+    pawn.CharacterController.Velocity = Vector3.Zero;
+    pawn.CharacterController.IsOnGround = true;
+    // Leave the controller's collision skin above the floor, as a real grounded controller does.
+    pawn.WorldPosition = Vector3.Up * 2f;
+    pawn.WishMove = Vector3.Forward;
+    pawn.IsSprinting = true;
+    pawn.Body = go.AddComponent<Facepunch.PlayerBody>();
+    pawn.Body.Enabled = false;
+    pawn.Head = new GameObject(go, false, "Head");
+    pawn.Head.LocalPosition = Vector3.Up * 60f;
+    pawn.CameraController = go.GetComponent<Facepunch.CameraController>() ?? go.AddComponent<Facepunch.CameraController>();
+    pawn.CameraController.Enabled = false;
+    pawn.CameraController.Player = pawn;
+    type.GetProperty("JumpFatigue", flags).SetValue(pawn, fatigue);
+    type.GetProperty("WantsToggleSprint", flags).SetValue(pawn, settings.ToggleSprint);
+    pawn.CharacterController.Radius = 12f;
+    pawn.CharacterController.StepHeight = 15.46f;
+    pawn.CharacterController.Height = 64f;
+    pawn.CharacterController.Acceleration = 14f;
+    return pawn;
+}
+void Step(Facepunch.PlayerPawn pawn, int tick, float delta, params string[] actions) {
+    using (At(1000d + tick * (double)delta, delta)) {
+        Buttons(actions);
+        Call(pawn, "BuildWishVelocity");
+        if (pawn.IsMantling) { Call(pawn, "UpdateMantle"); return; }
+        Call(pawn, "BuildInput");
+        Call(pawn, "ApplyAcceleration");
+        Call(pawn, "ApplyMovement");
+    }
+}
+var results = new System.Collections.Generic.List<object>();
+if ( typeof(Facepunch.CharacterController).GetField("_timeSincePunch", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic) is null ) throw new Exception("HasFix: the loaded controller is the old one");
+try {
+    using (scene.Push()) {
+        var floor = new GameObject(false, "Ramp floor");
+        floor.WorldPosition = new Vector3(0f, 0f, -10f);
+        floor.AddComponent<BoxCollider>().Scale = new Vector3(6000f, 6000f, 20f);
+        floor.Enabled = true;
+        var built = new System.Collections.Generic.List<GameObject>();
+        void Clear() { foreach (var g in built) g.Destroy(); built.Clear(); scene.ProcessDeletes(); }
+        // A stair's collision as a solid wedge from x 0 (z 0) rising to x run (z 256), then a landing.
+        void Ramp(float degrees) {
+            var run = 256f / MathF.Tan(degrees * MathF.PI / 180f);
+            var g = new GameObject(false, "ramp");
+            var h = g.Components.Create<HullCollider>(false);
+            h.Type = HullCollider.PrimitiveType.Points;
+            h.Points = new System.Collections.Generic.List<Vector3> {
+                new(0, -100, 0), new(0, 100, 0), new(run, -100, 0), new(run, 100, 0), new(run, -100, 256), new(run, 100, 256) };
+            h.Static = true; h.Enabled = true; g.Enabled = true; built.Add(g);
+            var top = new GameObject(false, "landing");
+            top.WorldPosition = new Vector3(run + 200f, 0f, 128f);
+            var b = top.AddComponent<BoxCollider>(); b.Scale = new Vector3(400f, 200f, 256f); b.Static = true;
+            top.Enabled = true; built.Add(top);
+        }
+        object Run(string label, Vector3 start, Vector3 dir, float speed, Func<int, string[]> buttons, float seconds, Vector3? place = null) {
+            settings.ToggleSprint = false;
+            var pawn = NewPawn();
+            var at = place ?? start;
+            var down = scene.Trace.Ray(at + Vector3.Up * 300f, at + Vector3.Down * 400f).Size(new BBox(new Vector3(-12f, -12f, 0f), new Vector3(12f, 12f, 64f))).Run();
+            pawn.WorldPosition = down.EndPosition + Vector3.Up * 1f;
+            pawn.EyeAngles = new Angles(0f, dir.EulerAngles.yaw, 0f);
+            pawn.CharacterController.Velocity = dir * speed;
+            pawn.IsSprinting = speed > 260f;
+            var hz = 50; var delta = 1f / hz;
+            var mantles = new System.Collections.Generic.List<string>();
+            var was = false; var resting = 0; var longest = 0; var run = 0; var hover = 0f;
+            var trace = new System.Collections.Generic.List<string>();
+            for (var tick = 0; tick < seconds * hz; tick++) {
+                Step(pawn, tick, delta, buttons(tick));
+                var p0 = pawn.WorldPosition; var cc = pawn.CharacterController;
+                if (pawn.IsMantling && !was) mantles.Add($"t={tick * delta:F2} at {p0.x:F0},{p0.y:F0},{p0.z:F0}");
+                was = pawn.IsMantling;
+                var under = scene.Trace.Ray(p0 + Vector3.Up * 4f, p0 + Vector3.Down * 60f).Size(new BBox(new Vector3(-12f, -12f, 0f), new Vector3(12f, 12f, 1f))).Run();
+                var gap = under.Hit ? p0.z - under.EndPosition.z : 99f;
+                var rest = !cc.IsOnGround && !pawn.IsMantling && gap < 1.5f && cc.Velocity.z > -60f;
+                if (rest) { resting++; run++; longest = Math.Max(longest, run); } else run = 0;
+                if (cc.IsOnGround) hover = MathF.Max(hover, gap);
+                if (tick % 3 == 0 || rest || pawn.IsMantling) trace.Add($"{tick}:{p0.x:F0},{p0.y:F0},{p0.z:F1} g{(cc.IsOnGround ? 1 : 0)}{(pawn.IsMantling ? "M" : "")} vz{cc.Velocity.z:F0} h{cc.Velocity.WithZ(0).Length:F0} gap{gap:F1} n{(under.Hit ? under.Normal.z : 0f):F2}");
+            }
+            var end = pawn.WorldPosition;
+            pawn.GameObject.Destroy(); scene.ProcessDeletes();
+            return new { label, mantles = mantles.Count, at = mantles, end = $"{end.x:F0},{end.y:F0},{end.z:F0}", resting, longest, hover = MathF.Round(hover, 1), trace };
+        }
+        foreach (var deg in new[] { 23f, 32f, 40f }) {
+            Clear(); Ramp(deg);
+            var run = 256f / MathF.Tan(deg * MathF.PI / 180f);
+            var dir = new Vector3(1f, 0f, 0f);
+            var start = new Vector3(-150f, 0f, 0f);
+            var mid = new Vector3(run * 0.35f, 0f, 0f);
+            var name = $"ramp {deg} deg";
+            results.Add(Run(name + ": sprint up, no jump", start, dir, 285f, t => new[] { "Run" }, 3f));
+            results.Add(Run(name + ": sprint, jump just before the foot", start, dir, 285f, t => t == 18 ? new[] { "Run", "Jump" } : new[] { "Run" }, 3f));
+            results.Add(Run(name + ": sprint, jump a step after the foot", start, dir, 285f, t => t == 26 ? new[] { "Run", "Jump" } : new[] { "Run" }, 3f));
+            results.Add(Run(name + ": walking up, jump a third of the way", start, dir, 215f, t => t == 0 ? new[] { "Jump" } : new string[0], 3f, mid));
+            results.Add(Run(name + ": sprinting up, jump a third of the way", start, dir, 300f, t => t == 0 ? new[] { "Run", "Jump" } : new[] { "Run" }, 3f, mid));
+        }
+        Clear();
+    }
+} finally {
+    settings.ToggleSprint = savedToggleSprint;
+    inputScope.Dispose();
+    scene.Destroy();
+}
+return results;

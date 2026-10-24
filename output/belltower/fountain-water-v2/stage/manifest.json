@@ -1,0 +1,67 @@
+{
+  "revision": "fountain-water-v2",
+  "files": {
+    "Assets/models/maps/belltower/belltower_centre.obj": {
+      "before": "c569c5d0378e3eb9f92b1337b9a2a4f6c5eaf2cb0e3f81a1221a7272bdd1e548",
+      "after": "a37036711632b976c071499c32d43009626fa16e7a1041db858a38e6208c62ea",
+      "source": "output/belltower/fountain-water-v2/stage/Assets/models/maps/belltower/belltower_centre.obj",
+      "backup": "output/belltower/fountain-water-v2/before/Assets/models/maps/belltower/belltower_centre.obj"
+    },
+    "Assets/materials/belltower/fountain_water.vmat": {
+      "before": "7975e988f0cfe051ad3b84a6ce7b620d0257b4c7e6746f538a996a36ad28fd6f",
+      "after": "9f9e85228ecfded73cc8585886fe98390bdaee99977ffc061285f965fed74a38",
+      "source": "output/belltower/fountain-water-v2/stage/Assets/materials/belltower/fountain_water.vmat",
+      "backup": "output/belltower/fountain-water-v2/before-depth-review/Assets/materials/belltower/fountain_water.vmat",
+      "initial_before": "356f0eb1896a4ee7690e222bc844e4edfad8c9fcfd98fd9ce4ea6371bfef2e96"
+    },
+    "Assets/materials/belltower/fountain_jet.vmat": {
+      "before": "e520a970950ef016a8ed21aab4315d30af06edbb5e0bf1b37b57fadd5d75cb46",
+      "after": "243cfa5c2ccc156db5bd6c6cba8f799770b8dbe681481ec576891a21964c4715",
+      "source": "output/belltower/fountain-water-v2/stage/Assets/materials/belltower/fountain_jet.vmat",
+      "backup": "output/belltower/fountain-water-v2/before/Assets/materials/belltower/fountain_jet.vmat"
+    },
+    "Assets/shaders/belltower_fountain_surface_v2.shader": {
+      "before": "060364f4521875fcda9ce0107e65b222393c6ffb797dcb06e1fb9879b768dd81",
+      "after": "1ff88dc46f92ff76b7df3e69a05390f049822acf4c4d1a43a54dab2f12f67fa7",
+      "source": "output/belltower/fountain-water-v2/stage/Assets/shaders/belltower_fountain_surface_v2.shader",
+      "backup": "output/belltower/fountain-water-v2/before-depth-review/Assets/shaders/belltower_fountain_surface_v2.shader",
+      "initial_before": null
+    },
+    "Assets/shaders/belltower_fountain_stream_v2.shader": {
+      "before": "c45ce991e508b41a22efc63aa934a7280e19923180248db9a2766a22915be1a6",
+      "after": "d333a5bf331067e65d49a33aad63a4bd0f9f4f3ee0e70bddff3d66dfb70e6da7",
+      "source": "output/belltower/fountain-water-v2/stage/Assets/shaders/belltower_fountain_stream_v2.shader",
+      "backup": "output/belltower/fountain-water-v2/before-droplet-timing/Assets/shaders/belltower_fountain_stream_v2.shader",
+      "initial_before": null
+    }
+  },
+  "source_sha256": {
+    "Tools/belltower_fountain.py": "3f85743d388bb4b6c8512d9f575d824b8b13c4181bd3bfed4271484e19e05da5",
+    "Tools/belltower_fountain_water.py": "e6d75e2a1123a779d4a0675d2df6a372a13672440d7328ba70fc25334eac3c8b",
+    "Sources/Belltower/shaders/belltower_fountain_surface_v2.shader": "6dbd51c7fae95aad151751fd04ed84917121b4f370254bedef29ca09864132d3",
+    "Sources/Belltower/shaders/belltower_fountain_stream_v2.shader": "d333a5bf331067e65d49a33aad63a4bd0f9f4f3ee0e70bddff3d66dfb70e6da7"
+  },
+  "protected_sha256": {
+    "Assets/models/maps/belltower/belltower_centre.vmdl": "39d898f77e27c01c51dc9e73324faaf9a3863e45b678827137bf8d65906877df",
+    "Assets/models/maps/belltower/belltower_centre.mtl": "ada9ca1d680e5b1e9a8d7347278766be04c39b3567313b63e9025f24e209187d",
+    "Assets/shaders/belltower_fountain_water.shader": "fe34437cdcb27760aee5ea138ab0d1028e8e4646ec1392f3c0446da15d6c11af",
+    "Assets/materials/belltower/fountain_water_normal.png": "b0257a07942ca34481c14c50a33e987a37519c6cd49fc21e2366545f4fa44ed4",
+    "Assets/materials/belltower/fountain_jet_normal.png": "3cf5cae18d32bb751af002e174571f514787211bda85313e3bfdc2c1c98b024e"
+  },
+  "removed_triangles": {
+    "fountain_jet": 5692,
+    "fountain_water": 6
+  },
+  "added_triangles": 2950,
+  "all_non_water_source_bytes_preserved": true,
+  "physics_unchanged": true,
+  "scene_unchanged": true,
+  "fixed_ripple_hoops_removed": 12,
+  "streams": 4,
+  "animated_droplets": 48,
+  "scene_sha256": "7c81362d419176d9bb98caf5287e1949f19b1d867a8c2cb030971b5ecac865cd",
+  "flow_direction": "Positive texture V follows the spout downstream; animated phase advances downstream.",
+  "depth_review": "Added bounded screen refraction and per-channel absorption; basin floor remains visible.",
+  "droplet_flight_seconds": 0.2597402597402597,
+  "droplet_peak_height_inches": 3.25
+}

@@ -1,0 +1,154 @@
+{
+  "verified_at_utc": "2026-10-20T19:37:24.460359+00:00",
+  "native_compilation_verified": true,
+  "native_map_visual_review_verified": true,
+  "native_model": {
+    "Model": "models/maps/belltower/shop-display-v2/shop_displays.vmdl",
+    "IsError": false,
+    "MeshCount": 1,
+    "Triangles": 402832,
+    "DrawCalls": [
+      {
+        "Index": 0,
+        "Material": "materials/belltower/shop-display-v2/amber.vmat",
+        "Triangles": 15288
+      },
+      {
+        "Index": 1,
+        "Material": "materials/belltower/shop-display-v2/blue.vmat",
+        "Triangles": 15660
+      },
+      {
+        "Index": 2,
+        "Material": "materials/belltower/shop-display-v2/ceramic.vmat",
+        "Triangles": 50172
+      },
+      {
+        "Index": 3,
+        "Material": "materials/belltower/shop-display-v2/green.vmat",
+        "Triangles": 39136
+      },
+      {
+        "Index": 4,
+        "Material": "materials/belltower/shop-display-v2/iron.vmat",
+        "Triangles": 14232
+      },
+      {
+        "Index": 5,
+        "Material": "materials/belltower/shop-display-v2/labels.vmat",
+        "Triangles": 8960
+      },
+      {
+        "Index": 6,
+        "Material": "materials/belltower/shop-display-v2/onion.vmat",
+        "Triangles": 15120
+      },
+      {
+        "Index": 7,
+        "Material": "materials/belltower/shop-display-v2/paper.vmat",
+        "Triangles": 70792
+      },
+      {
+        "Index": 8,
+        "Material": "materials/belltower/shop-display-v2/prices.vmat",
+        "Triangles": 1008
+      },
+      {
+        "Index": 9,
+        "Material": "materials/belltower/shop-display-v2/rope.vmat",
+        "Triangles": 74912
+      },
+      {
+        "Index": 10,
+        "Material": "materials/belltower/shop-display-v2/tin.vmat",
+        "Triangles": 42016
+      },
+      {
+        "Index": 11,
+        "Material": "materials/belltower/shop-display-v2/wood.vmat",
+        "Triangles": 55536
+      }
+    ],
+    "NativeMaterialGeometryMatches": true,
+    "SourceSha256": "29540fd43c99251bc166eddc62968c3f58fb97fafad420a6b5e28251dce98b79",
+    "ExpectedTriangles": 402832,
+    "Materials": [
+      {
+        "Name": "materials/belltower/shop-display-v2/amber.vmat",
+        "IsError": false
+      },
+      {
+        "Name": "materials/belltower/shop-display-v2/blue.vmat",
+        "IsError": false
+      },
+      {
+        "Name": "materials/belltower/shop-display-v2/ceramic.vmat",
+        "IsError": false
+      },
+      {
+        "Name": "materials/belltower/shop-display-v2/green.vmat",
+        "IsError": false
+      },
+      {
+        "Name": "materials/belltower/shop-display-v2/iron.vmat",
+        "IsError": false
+      },
+      {
+        "Name": "materials/belltower/shop-display-v2/labels.vmat",
+        "IsError": false
+      },
+      {
+        "Name": "materials/belltower/shop-display-v2/onion.vmat",
+        "IsError": false
+      },
+      {
+        "Name": "materials/belltower/shop-display-v2/paper.vmat",
+        "IsError": false
+      },
+      {
+        "Name": "materials/belltower/shop-display-v2/prices.vmat",
+        "IsError": false
+      },
+      {
+        "Name": "materials/belltower/shop-display-v2/rope.vmat",
+        "IsError": false
+      },
+      {
+        "Name": "materials/belltower/shop-display-v2/tin.vmat",
+        "IsError": false
+      },
+      {
+        "Name": "materials/belltower/shop-display-v2/wood.vmat",
+        "IsError": false
+      }
+    ],
+    "ShaderSha256": "2ed6e581815ddb8b99dc7210dbd9905390603a12b3f85a4a60371a6d023304a5",
+    "LabelPixelsSha256": "4d65d15a761f3802ef7a0a74a113c6779d6a26b08a4b86176b3a3a5b52644c50",
+    "EditorStatePreserved": true,
+    "Playing": true,
+    "ActiveScenePath": "scenes/maps/spillway/spillway.scene",
+    "IsVisualReview": false
+  },
+  "model_is_compiled_and_up_to_date": true,
+  "shop_materials_compiled_and_up_to_date": 14,
+  "loaded_model_materials_without_errors": 12,
+  "all_material_geometry_matches_source": true,
+  "project_compile_errors": 0,
+  "active_scene_camera_and_play_state_preserved": true,
+  "shader_fix": {
+    "problem": "AlphaWeighted mip filtering rejected the original 1254x1254 label artwork.",
+    "solution": "Use Box colour filtering inside CommonInputs for this fully opaque shader.",
+    "paths": [
+      "Assets/shaders/belltower_shop_display_v2.shader",
+      "Sources/Belltower/shop-displays/shop_display_v2.shader"
+    ],
+    "before_sha256": "b4b9462d66881454639c3e7d21a52cab91a70c559fa805a829f46fa01b8eae52",
+    "after_sha256": "2ed6e581815ddb8b99dc7210dbd9905390603a12b3f85a4a60371a6d023304a5",
+    "texture_pixels_changed": false,
+    "label_pixels_sha256": "4d65d15a761f3802ef7a0a74a113c6779d6a26b08a4b86176b3a3a5b52644c50",
+    "originals": "output/belltower/prop-edge-audit/native-check-20261020/before"
+  },
+  "remaining": [],
+  "thumbnail_scope": "Native overview thumbnail only; insufficient for close-up acceptance.",
+  "native_visual_review": "output/belltower/prop-edge-audit/native-check-20261020/native-visual-review.json"
+}

@@ -1,0 +1,8 @@
+// Run hc1_mw22_optic_check (each MWII optic on the M4 at its OpticAimOffset: its tag_reticle_attach must sit at the eye) and wait for its report.
+var file = System.IO.Path.Combine( Project.Current.GetRootPath(), "Sources", "MW2022", "qa", "optic-alignment.json" );
+var before = System.IO.File.GetLastWriteTimeUtc( file );
+ConsoleSystem.Run( "hc1_mw22_optic_check" );
+var waited = 0;
+while ( System.IO.File.GetLastWriteTimeUtc( file ) == before && waited < 300000 ) { await Task.Delay( 500 ); waited += 500; }
+await Task.Delay( 500 );
+return System.IO.File.GetLastWriteTimeUtc( file ) == before ? $"no new report after {waited} ms" : System.IO.File.ReadAllText( file );
