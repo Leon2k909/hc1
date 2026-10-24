@@ -1,0 +1,141 @@
+{
+  "revision": "belltower-coopered-casks-v3-nudge",
+  "files": {
+    "Assets/models/maps/belltower/barrels-v3/east_0.obj": {
+      "source": "output/belltower/barrels-v3/r2/stage/Assets/models/maps/belltower/barrels-v3/east_0.obj",
+      "before": "495ce9305745b6fce75df8736380f870756947d46da1a68232f7856893884493",
+      "after": "a499bfe369c52a4bc04cd5462d387fd1dd43116a5d64ed3e2f6ff71940913960",
+      "backup": "output/belltower/barrels-v3/r2/before/Assets/models/maps/belltower/barrels-v3/east_0.obj"
+    },
+    "Assets/models/maps/belltower/barrels-v3/west_0.obj": {
+      "source": "output/belltower/barrels-v3/r2/stage/Assets/models/maps/belltower/barrels-v3/west_0.obj",
+      "before": "3ad6dd97b3b6f2b142b779ec6b0a23646dafacf6359db7fae373811821a814ee",
+      "after": "1682fb23cdea2a9d3b91f31ecb667ddf92588ca06fd5c1790bc76504fad05144",
+      "backup": "output/belltower/barrels-v3/r2/before/Assets/models/maps/belltower/barrels-v3/west_0.obj"
+    },
+    "Assets/models/maps/belltower/belltower_east.obj": {
+      "source": "output/belltower/barrels-v3/r2/stage/Assets/models/maps/belltower/belltower_east.obj",
+      "before": "dbe99e4062dc58ba5fe4abf372a50fcfc200f5eacbc972b3a825cadc020c3f03",
+      "after": "89e705791ccf0aa5be7865c5ecfc7587f3aa3a364ce3ed066fb55728bdf9aa92",
+      "backup": "output/belltower/barrels-v3/r2/before/Assets/models/maps/belltower/belltower_east.obj"
+    },
+    "Assets/models/maps/belltower/belltower_east_hulls_wood.obj": {
+      "source": "output/belltower/barrels-v3/r2/stage/Assets/models/maps/belltower/belltower_east_hulls_wood.obj",
+      "before": "093ccc7e9c93941cb674b23af487903fc75edc3afde7384ddb246f54b13d5f54",
+      "after": "aa6994804381294ca1081f866956bc27730c1a9edad717ae245933efc631368b",
+      "backup": "output/belltower/barrels-v3/r2/before/Assets/models/maps/belltower/belltower_east_hulls_wood.obj"
+    },
+    "Assets/models/maps/belltower/belltower_west.obj": {
+      "source": "output/belltower/barrels-v3/r2/stage/Assets/models/maps/belltower/belltower_west.obj",
+      "before": "ff968e072b847ea75812b219e58dcf807982168368503b7855e17be7d80d14ee",
+      "after": "24ab2d7a2e497cdd855eac836f299f48589ade56684d212c400ece9e4285e8e9",
+      "backup": "output/belltower/barrels-v3/r2/before/Assets/models/maps/belltower/belltower_west.obj"
+    },
+    "Assets/models/maps/belltower/belltower_west_hulls_wood.obj": {
+      "source": "output/belltower/barrels-v3/r2/stage/Assets/models/maps/belltower/belltower_west_hulls_wood.obj",
+      "before": "47de84ae7163e9a451800698be6e6038de9f3dbf4fdc750704773fb3f7ec8023",
+      "after": "fe484e31c2e088e76c22d6ebd82f460a0f1839ca3f25beb5641887b2516cd6bd",
+      "backup": "output/belltower/barrels-v3/r2/before/Assets/models/maps/belltower/belltower_west_hulls_wood.obj"
+    }
+  },
+  "models": {
+    "west": {
+      "moves": [
+        {
+          "old": [
+            -1033.096,
+            -486.016
+          ],
+          "new": [
+            -1032.1,
+            -479.6
+          ]
+        },
+        {
+          "old": [
+            -1269.11,
+            -582.337
+          ],
+          "new": [
+            -1266.9,
+            -584.7
+          ]
+        }
+      ],
+      "files": [
+        {
+          "path": "Assets/models/maps/belltower/belltower_west.obj",
+          "removed_triangles": 10654,
+          "added_triangles": 11530,
+          "kept_lines_sha256": "8f65c349bd5e718fa2087623b535db89adb08566d6a8a107c44c32491d930aff",
+          "unrelated_lines_exact": true
+        },
+        {
+          "path": "Assets/models/maps/belltower/barrels-v3/west_0.obj",
+          "removed_triangles": 10654,
+          "added_triangles": 11530,
+          "kept_lines_sha256": "a4c11cf62384549e799d055a2b0f71be654be900c7f4dea56bc14fe55b8587d1",
+          "unrelated_lines_exact": true
+        }
+      ],
+      "hull_vertices_moved": 40,
+      "all_other_hull_bytes_exact": true
+    },
+    "east": {
+      "moves": [
+        {
+          "old": [
+            1033.096,
+            -486.016
+          ],
+          "new": [
+            1032.1,
+            -479.6
+          ]
+        },
+        {
+          "old": [
+            1269.11,
+            -582.337
+          ],
+          "new": [
+            1266.9,
+            -584.7
+          ]
+        }
+      ],
+      "files": [
+        {
+          "path": "Assets/models/maps/belltower/belltower_east.obj",
+          "removed_triangles": 10654,
+          "added_triangles": 11530,
+          "kept_lines_sha256": "db8692d727fefb39904d5f2ef16c209bc293e64d0277e84f2f7496eb128e8ef0",
+          "unrelated_lines_exact": true
+        },
+        {
+          "path": "Assets/models/maps/belltower/barrels-v3/east_0.obj",
+          "removed_triangles": 10654,
+          "added_triangles": 11530,
+          "kept_lines_sha256": "654cfc72e98b89b0a877022aabe41ee375895d31f827d7a61b51a3532f1a79a8",
+          "unrelated_lines_exact": true
+        }
+      ],
+      "hull_vertices_moved": 40,
+      "all_other_hull_bytes_exact": true
+    }
+  },
+  "source_sha256": {
+    "Tools/belltower_barrels_v3.py": "05a3860a37fe2e3a2fd94bb6c082a0facf6f17b5ecb1378f04ef08ce735749e0",
+    "Tools/belltower_stage_barrels_v3.py": "8bf62702ee39646e1c78bff4e27aff2948cde4676de429fd4b7a5ceb4e76af26",
+    "Tools/belltower_stage_barrels_v3_nudge.py": "4a9f5116d28961e0bc1f81b51038ffabe26f5e11bf7b0791599370419e26c41e",
+    "Tools/belltower_furniture.py": "123696982d9a74015c3976138408e5af70649b3c5b6c988a6b6cc673d0289a3e",
+    "Tools/map_kit.py": "cc60204c747d064cb1fecdb666b24c847ae89dc863c2533d3811a0445f22020d"
+  },
+  "protected_sha256": {
+    "Assets/models/maps/belltower/belltower_west.vmdl": "b4918ccf27b457496d6effe8383b02e71dee1043730a960afd12b99447ab2e71",
+    "Assets/models/maps/belltower/belltower_east.vmdl": "57eec32f278ade855a5c5ec1563b4377bb30669536fc6a31f71127db27da0bc6",
+    "Assets/scenes/maps/Belltower/belltower.scene": "71afb01cb51453a9aae31cdaeb392dd8dccd6b18420bf0c1930e59d65a5f7748"
+  },
+  "scene_unchanged": true,
+  "only_nudged_casks_changed": true
+}

@@ -1,0 +1,85 @@
+// Publish Belltower's coopered casks (v3): Tools/belltower_stage_barrels_v3.py's stage, checked file by file.
+// Checksums prevent overwriting concurrent work in this shared checkout. Asset files only: no scene or play change.
+var root = Sandbox.Project.Current.GetRootPath();
+if (!System.IO.Path.GetFullPath(root).TrimEnd('\\','/').Equals(@"C:\sbox-projects\hc1\forked-shooter-main",StringComparison.OrdinalIgnoreCase))
+    throw new InvalidOperationException("Wrong project.");
+var directory = System.IO.Path.Combine(root,"output/belltower/barrels-v3/r1");
+var manifest = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(directory,"manifest.json")));
+var session = Editor.SceneEditorSession.Active;
+var playing = Game.IsPlaying;
+var dirty = session?.HasUnsavedChanges;
+var game = Game.ActiveScene?.Id;
+string Hash(string path) { using var stream=System.IO.File.OpenRead(path);return Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(stream)).ToLowerInvariant(); }
+foreach (var group in new[]{"source_sha256","protected_sha256"})
+    foreach (var pair in manifest[group].AsObject())
+        if (Hash(System.IO.Path.Combine(root,pair.Key))!=pair.Value.GetValue<string>())
+            throw new InvalidOperationException("Shared input changed: "+pair.Key);
+if (manifest["files"].AsObject().Count!=31 || !manifest["only_barrel_faces_removed"].GetValue<bool>() || !manifest["collision_unchanged"].GetValue<bool>())
+    throw new InvalidOperationException("Unexpected publication scope.");
+foreach (var side in new[]{"west","east"})
+{
+    var model=manifest["models"][side];
+    if (model["casks"].AsArray().Count!=23 || model["canonical"]["removed_triangles"].GetValue<int>()!=51450 ||
+        !model["canonical"]["unrelated_lines_exact"].GetValue<bool>() || model["new_imports"].AsArray().Count!=3)
+        throw new InvalidOperationException("Missing preservation proof.");
+    foreach (var bounded in model["bounded"].AsArray())
+        if (!bounded["unrelated_lines_exact"].GetValue<bool>()) throw new InvalidOperationException("Missing preservation proof.");
+}
+var plan=new System.Collections.Generic.List<(string Relative,string Source,string Target,string Backup,string Before,string After)>();
+foreach (var pair in manifest["files"].AsObject())
+{
+    var relative=pair.Key;
+    var allowed=System.Text.RegularExpressions.Regex.IsMatch(relative,@"^Assets/(models/maps/belltower/(belltower_(west|east)\.(obj|vmdl)|barrels-v3/(west|east)_[0-9]\.(obj|mtl)|compiler-safe/(west|east)/(west|east)_[0-9]+_(iron_black|planks|planks_dark)\.obj)|materials/belltower/barrels-v3/barrel_[a-z_]+\.vmat)$");
+    if (!allowed || relative.Contains("..")) throw new InvalidOperationException("Unexpected target: "+relative);
+    var source=System.IO.Path.Combine(root,pair.Value["source"].GetValue<string>());
+    var target=System.IO.Path.Combine(root,relative);
+    var before=pair.Value["before"]?.GetValue<string>();
+    var after=pair.Value["after"].GetValue<string>();
+    var backup=pair.Value["backup"] is null ? null : System.IO.Path.Combine(root,pair.Value["backup"].GetValue<string>());
+    if (Hash(source)!=after || (backup is not null && Hash(backup)!=before)) throw new InvalidOperationException("Stage or backup changed.");
+    var current=System.IO.File.Exists(target)?Hash(target):null;
+    if (current==after)continue;
+    if (current!=before)throw new InvalidOperationException("Shared resource changed: "+relative);
+    plan.Add((relative,source,target,backup,before,after));
+}
+// Materials, then the new imports, then the trimmed imports and the record; the model descriptions last.
+int Order(string r) => r.Contains("/materials/")?0 : r.Contains("/barrels-v3/")?1 : r.EndsWith(".vmdl")?3 : 2;
+var changed=new System.Collections.Generic.List<(string Target,string Backup,string After)>();
+try
+{
+    foreach (var item in plan.OrderBy(p=>Order(p.Relative)))
+    {
+        var current=System.IO.File.Exists(item.Target)?Hash(item.Target):null;
+        if (current!=item.Before)throw new InvalidOperationException("Concurrent asset edit: "+item.Relative);
+        System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(item.Target));
+        var incoming=item.Target+".barrels-v3-incoming";
+        try
+        {
+            System.IO.File.Copy(item.Source,incoming,true);
+            if (Hash(incoming)!=item.After)throw new InvalidOperationException("Incoming checksum failed.");
+            System.IO.File.Move(incoming,item.Target,true);
+            changed.Add((item.Target,item.Backup,item.After));
+        }
+        finally {if(System.IO.File.Exists(incoming))System.IO.File.Delete(incoming);}
+    }
+}
+catch
+{
+    foreach(var item in changed.AsEnumerable().Reverse())
+        if(System.IO.File.Exists(item.Target) && Hash(item.Target)==item.After)
+        {
+            if(item.Backup is null)System.IO.File.Delete(item.Target);
+            else System.IO.File.Copy(item.Backup,item.Target,true);
+        }
+    throw;
+}
+foreach(var item in plan.OrderBy(p=>Order(p.Relative)))Editor.AssetSystem.RegisterFile(item.Target);
+var preserved=Game.IsPlaying==playing && Game.ActiveScene?.Id==game && ReferenceEquals(session,Editor.SceneEditorSession.Active) &&
+    session?.HasUnsavedChanges==dirty;
+foreach(var pair in manifest["protected_sha256"].AsObject())
+    preserved &= Hash(System.IO.Path.Combine(root,pair.Key))==pair.Value.GetValue<string>();
+var result=new {Imported=plan.Count,CasksRebuilt=46,CollisionUnchanged=true,AllOtherMapGeometryPreserved=true,
+    EditorStatePreserved=preserved,SceneUnchanged=true,ForcedFullCompile=false};
+System.IO.File.WriteAllText(System.IO.Path.Combine(directory,"native-import.json"),System.Text.Json.JsonSerializer.Serialize(result));
+if(!preserved)throw new InvalidOperationException("Editor state changed during publication; inspect the receipt.");
+return result;

@@ -3663,6 +3663,28 @@
     in cool colours (`EAST_PAINTS`), so each side reads as its team's.
 - Houses nobody enters are one collision box each. The open buildings have doorways and no doors, because bots can't
   open doors. Roofs are 42 degrees, over the navmesh's 40, and every attic is filled with its roof's hull.
+- Coopered casks (v3, 2026-10-25, the user: the barrels looked "too perfect/round"). The old `Detail.barrel` was a
+  48-sided tube curving in like a pill at both ends, its lid flush with the rim, thick black bands, every stave one shade
+  and every barrel identical; v2's clock-frontage pair still had twenty equal staves. All 23 casks a side are now
+  `Tools/belltower_barrels_v3.py`'s, as a cooper builds one:
+  - staves of real widths (2.6-4.4 in) on one gentle arc, each its own shade (four tints of the furniture's oak scan),
+    with V joints, standing ~1.6 in proud of a recessed head of 4-6 boards, their end grain and inside bevel showing;
+  - 4 or 6 thin flat steel hoops (`sh_hoop`) with a riveted lap, rusted at the bottom or all over on some (a darkened
+    `sh_rust`), a bung in one stave;
+  - each cask slightly oval, slightly leaning and seeded by where it stands (`seed_for`), so no two match.
+  - Its seven materials (`materials/belltower/barrels-v3/`) are existing pictures in their own tints: no new textures.
+  - Drawn only: the ten-sided wood hulls stay. ~5.5k triangles a cask against the old 1,870 (127k a side), in three
+    bounded imports a side (`models/maps/belltower/barrels-v3/<side>_<n>.obj`); the v2 import node is gone.
+  - `Tools/belltower_stage_barrels_v3.py` took the old casks out of every import by matching their faces against each
+    generator's template at the hull's centre (24,192 iron, 966 lid and 14,112 stave triangles from the bounded
+    imports, 51,450 from the canonical record, a side), keeping every other line byte for byte. Two groups had casks
+    standing into each other (centres 20.6 and 23.9 in apart): `V3.NUDGED` moves the third cask of each until they're
+    27 apart, hull and all (`belltower_stage_barrels_v3_nudge.py`), both spots checked clear of the map's collision and
+    every neighbouring pair ~1 in apart. `belltower_map.barrel` draws the same casks (checked against the published).
+  - Published with `Sources/Belltower/editor/import-barrels-v3.cs.txt` and `-nudge.cs.txt` (hash-guarded, no scene or
+    play change); the file watcher compiled the halves. Checked in isolated native renders
+    (`capture-barrels-v3.cs.txt`, views in `output/belltower/barrels-v3/captures/config.json`): the market trio, the
+    clock pair, the yard and tavern groups and the east market. Not yet seen in a match.
 - It's in `GameUtils.MainMenuMapOrder` and `IsMatchReadyMap`. So the menus, Quick Play, the map vote and Ranked offer it
   with every mode but battle royale. Ranked plays it as Defuse, because the scene lists `bomb_defusal`.
   - Team spawns: 12 a side on the spawn roads. Deathmatch and Gun Game spawn players at any active spawn point,
