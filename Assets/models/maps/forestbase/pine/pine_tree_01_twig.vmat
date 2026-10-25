@@ -1,0 +1,14 @@
+"Layer0"
+{
+ shader "shaders/complex.shader"
+ F_SPECULAR "1"
+ F_RENDER_BACKFACES "1"
+ F_ALPHA_TEST "1"
+ TextureTranslucency "models/maps/forestbase/pine/textures/twig_alpha.png"
+ g_flAlphaTestReference "0.25"
+ TextureColor "models/maps/forestbase/pine/textures/pine_tree_01_twig_diff_1k.jpg"
+ TextureNormal "models/maps/forestbase/pine/textures/pine_tree_01_twig_nor_gl_1k.jpg"
+ TextureRoughness "models/maps/forestbase/pine/textures/twig_rough.png"
+ TextureAmbientOcclusion "models/maps/forestbase/pine/textures/twig_ao.png"
+}
+

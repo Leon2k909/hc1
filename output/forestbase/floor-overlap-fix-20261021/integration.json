@@ -1,0 +1,140 @@
+{
+  "date": "2026-10-21",
+  "reason": "User screenshots showed rectangular ground artifacts. Mesh audit confirmed asphalt and concrete floors both rendered at z=0 in three playable areas.",
+  "changes": [
+    "Exclude covered concrete aprons from the visible asphalt top while retaining continuous collision slab",
+    "Remove fully buried lower-floor visual boxes in Barracks and Command while retaining their collision boxes",
+    "Restore SSR after its temporary isolation test"
+  ],
+  "geometry": {
+    "ground": {
+      "trianglesBefore": 10052,
+      "trianglesAfter": 10070,
+      "removedTriangles": 2,
+      "addedTriangles": 20,
+      "changedOnlyAsphaltTop": true,
+      "physicsAndImportUnchanged": true,
+      "materialSlotsUnchanged": true,
+      "boxes": 14,
+      "hulls": 6,
+      "overlapChecks": [
+        {
+          "name": "Motor Pool",
+          "point": [
+            -1100.25,
+            -760.5
+          ],
+          "before": [
+            "asphalt",
+            "concrete"
+          ],
+          "after": [
+            "concrete"
+          ]
+        },
+        {
+          "name": "Workshop",
+          "point": [
+            1200.25,
+            400.5
+          ],
+          "before": [
+            "asphalt",
+            "concrete"
+          ],
+          "after": [
+            "concrete"
+          ]
+        },
+        {
+          "name": "Logistics",
+          "point": [
+            -50.25,
+            180.5
+          ],
+          "before": [
+            "asphalt",
+            "concrete"
+          ],
+          "after": [
+            "concrete"
+          ]
+        }
+      ]
+    },
+    "barracks": {
+      "trianglesBefore": 65078,
+      "trianglesAfter": 65066,
+      "removedHiddenTriangles": 12,
+      "allOtherTrianglesUnchanged": true,
+      "physicsAndImportUnchanged": true,
+      "materialSlotsUnchanged": true
+    },
+    "command": {
+      "trianglesBefore": 39790,
+      "trianglesAfter": 39778,
+      "removedHiddenTriangles": 12,
+      "allOtherTrianglesUnchanged": true,
+      "physicsAndImportUnchanged": true,
+      "materialSlotsUnchanged": true
+    }
+  },
+  "areas": {
+    "footprints": [
+      {
+        "name": "Motor Pool",
+        "overlapAreaAfter": 0,
+        "overlapAreaBefore": 332880
+      },
+      {
+        "name": "Workshop",
+        "overlapAreaAfter": 0,
+        "overlapAreaBefore": 425600
+      },
+      {
+        "name": "Logistics",
+        "overlapAreaAfter": 2.7284841053187847e-12,
+        "overlapAreaBefore": 273350
+      }
+    ],
+    "visibleAsphaltArea": 7958170,
+    "concreteArea": 1031830,
+    "totalGroundArea": 8990000,
+    "coverageComplete": true
+  },
+  "physicsAndImportSha256": {
+    "ground": "bb007e256285b2e6290877655e04b8e4c061ceb1220adf62d1a678a2c2b423d9",
+    "barracks": "ab1f3a625ae0337f30bde7f470a4931430f681e6c55594d16a7f82cef1efd9a9",
+    "command": "3944dd01117a109399da1b3f90e4d59163a0f220afcf1f49d980e9081e2cfa7c"
+  },
+  "native": {
+    "Scene": "scenes/maps/forestbase/forestbase.scene",
+    "Models": 629,
+    "ModelErrors": 0,
+    "SsrEnabled": true,
+    "Unsaved": false
+  },
+  "compile": [
+    {
+      "Success": true,
+      "Path": "models/maps/forestbase/ground.vmdl",
+      "CompiledFile": "c:/users/mimi-/documents/s&box projects/hc1/assets/models/maps/forestbase/ground.vmdl_c",
+      "Hint": null
+    },
+    {
+      "Success": true,
+      "Path": "models/maps/forestbase/barracks.vmdl",
+      "CompiledFile": "c:/users/mimi-/documents/s&box projects/hc1/assets/models/maps/forestbase/barracks.vmdl_c",
+      "Hint": null
+    },
+    {
+      "Success": true,
+      "Path": "models/maps/forestbase/command.vmdl",
+      "CompiledFile": "c:/users/mimi-/documents/s&box projects/hc1/assets/models/maps/forestbase/command.vmdl_c",
+      "Hint": null
+    }
+  ],
+  "limitations": [
+    "Verified elimination of the geometric floor overlaps; user confirmation of complete flicker resolution is still pending."
+  ]
+}

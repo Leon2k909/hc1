@@ -1,0 +1,43 @@
+{
+  "roiPixels": [
+    715,
+    375,
+    925,
+    680
+  ],
+  "meanAbsoluteChannelChange": 16.259984387197502,
+  "pixelsChangedByAtLeast8": 29234,
+  "roiPixelCount": 64050,
+  "captureSize": [
+    1600,
+    900
+  ],
+  "files": [
+    "live-waterfall-t0.png",
+    "live-waterfall-t1.png"
+  ],
+  "context": {
+    "utc": "2026-10-08T19:05:08.7224021Z",
+    "scene": "forestbase",
+    "mode": "tdm",
+    "screen": "1140,446",
+    "modelRenderers": 502,
+    "modelErrors": 0,
+    "ssrVolumes": 1,
+    "cameras": [
+      {
+        "name": "Camera",
+        "IsMainCamera": false,
+        "Priority": 8,
+        "position": "1399.111,-1178.199,60.0412"
+      },
+      {
+        "name": "Forest Base performance camera",
+        "IsMainCamera": true,
+        "Priority": 100,
+        "position": "1080,-500,448"
+      }
+    ]
+  },
+  "scope": "Fixed camera on the accessible command roof looking north. Pixel difference verifies visual motion in the falling-water region; it does not establish physical water simulation or multiplayer performance."
+}

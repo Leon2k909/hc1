@@ -1,0 +1,13 @@
+"Layer0"
+{
+ shader "shaders/forestbase_coating.shader"
+ F_SPECULAR "1"
+ g_flCoatingMetalness "0"
+ CoatingDesaturation ".92"
+ CoatingTint "[0.58 0.6 0.57]"
+ TextureColor "materials/forestbase/scans/container_side_diff.jpg"
+ TextureNormal "materials/forestbase/scans/container_side_nor_gl.jpg"
+ TextureRoughness "materials/forestbase/scans/container_side_rough.jpg"
+ TextureAmbientOcclusion "materials/forestbase/scans/container_side_ao.jpg"
+ TextureMetalness "[0 0 0 0]"
+}

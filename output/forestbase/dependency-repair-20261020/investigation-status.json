@@ -1,0 +1,65 @@
+{
+  "utc": "2026-10-20T04:21:48.109Z",
+  "sampledShaderMismatchResolvedAfterWarmStart": true,
+  "originalMaterialSourcesUnchanged": true,
+  "forcedShaderRebuildDidNotResolveInSameProcess": true,
+  "identicalFreshShaderNameMaterialWasCurrent": true,
+  "restarts": [
+    {
+      "started": "2026-10-20T04:05:48.890Z",
+      "done": true,
+      "pid": 4844,
+      "code": 3221225477,
+      "signal": null,
+      "exited": "2026-10-20T04:08:47.416Z"
+    },
+    {
+      "started": "2026-10-20T04:09:06.782Z",
+      "done": true,
+      "pid": 36188,
+      "code": 3221225477,
+      "signal": null,
+      "exited": "2026-10-20T04:11:44.780Z"
+    },
+    {
+      "started": "2026-10-20T04:13:54.605Z",
+      "done": true,
+      "emptyTabs": true,
+      "pid": 28584,
+      "code": 3221225477,
+      "signal": null,
+      "exited": "2026-10-20T04:16:23.078Z"
+    },
+    {
+      "started": "2026-10-20T04:17:55.590Z",
+      "done": true,
+      "forestBaseOnly": true,
+      "pipelineCacheDisabled": true,
+      "pid": 3936,
+      "code": 3221225477,
+      "signal": null,
+      "exited": "2026-10-20T04:20:45.907Z"
+    }
+  ],
+  "rendererCrashCauseUnproven": true,
+  "crash": {
+    "module": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\sbox\\bin\\win64\\rendersystemvulkan.dll",
+    "offset": "25c6ab",
+    "code": "c0000005"
+  },
+  "pipelineCacheBypassDidNotPreventCrash": true,
+  "emptyTabsDidNotPreventCrash": true,
+  "forestBaseOnlyDidNotPreventCrash": true,
+  "editorTabPreferencesRestored": true,
+  "temporaryProbeAssetsArchived": "probe-control-assets",
+  "waterfallCandidateInstalled": false,
+  "waterfallCandidate": "output/forestbase/native-waterfall-ribbons-20261020/candidate.shader",
+  "sourceSceneSha": "1b102b227cb555d661aa7adac7e5d7b962040147e4ac80022ecaad1da869c2b5",
+  "lastLogShaderMismatchCount": 0,
+  "needs": "Engine renderer stability before fresh runtime FPS and native waterfall comparison",
+  "officialSources": [
+    "https://sbox.game/release-notes/",
+    "https://github.com/Facepunch/sbox-public/blob/master/engine/Sandbox.Tools/StartupLoadProject.cs",
+    "https://github.com/Facepunch/sbox-public/blob/master/engine/Sandbox.Tools/Utility/Utility.cs"
+  ]
+}

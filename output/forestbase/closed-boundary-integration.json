@@ -1,0 +1,129 @@
+{
+  "date": "2026-10-20",
+  "projectRoot": "C:/Users/mimi-/Documents/S&box Projects/hc1",
+  "sceneSha256": "c50bc70cbf3154287b6e5ee821bb719672c16ff0286573536bb6a70591c0d3d2",
+  "changes": {
+    "boundary": "Eight existing side clips extended from -200 down to -1088in; two overlapping lower caps [-1120,-1024] added. Ceiling, horizontal footprint, original nine object/component identities preserved.",
+    "controller": "Unstuck free-candidate acceptance now rejects a playerclip crossing from the last known clear root, using the controller collision rules/ignore tags. Ordinary props remain escapable."
+  },
+  "sceneAudit": {
+    "differences": 18,
+    "onlyExpectedChanges": true,
+    "serializedObjectsBefore": 752,
+    "serializedObjectsAfter": 754,
+    "renderers": 629,
+    "spawnTransformsUnchanged": true,
+    "visualGeometryUnchanged": true
+  },
+  "native": {
+    "boundaryMovement": {
+      "Tests": 7392,
+      "StartedSolid": 0,
+      "Escapes": 0,
+      "Failures": [],
+      "Radius": 16,
+      "Height": 64,
+      "Scope": "Actual HC1 MoveTo with and without step, 11 XY origins including corners and entrance joins, seven heights, 16 directions and three vertical slopes in the saved boundary-only scene. Does not cover spawn reachability, unstuck recovery or network corrections."
+    },
+    "savedMapMovement": {
+      "Spawns": 32,
+      "BlockedStarts": [],
+      "SpawnFloorHits": 32,
+      "Tests": 3072,
+      "Escapes": 0,
+      "Failures": [],
+      "Models": 9,
+      "ModelErrors": 0,
+      "Scope": "Actual HC1 MoveTo from all 32 saved standard spawns against the saved Military Outpost model colliders and boundary. Sixteen directions, three vertical slopes, step on/off. Not an exhaustive mantle/unstuck/explosion/network audit."
+    },
+    "forcedOverlapBefore": {
+      "Cases": [
+        {
+          "Case": "wall",
+          "Trials": 32,
+          "Escapes": 11,
+          "Unresolved": 0,
+          "MaximumCalls": 57
+        },
+        {
+          "Case": "ceiling",
+          "Trials": 32,
+          "Escapes": 32,
+          "Unresolved": 0,
+          "MaximumCalls": 24
+        },
+        {
+          "Case": "floor",
+          "Trials": 32,
+          "Escapes": 0,
+          "Unresolved": 0,
+          "MaximumCalls": 103
+        }
+      ],
+      "Scope": "Forced overlaps after a known valid interior position, using the actual controller recovery. Does not claim these penetrations can be reached from ordinary play."
+    },
+    "forcedOverlapAfter": {
+      "Cases": [
+        {
+          "Case": "wall",
+          "Trials": 32,
+          "Escapes": 0,
+          "Unresolved": 0,
+          "MaximumCalls": 60
+        },
+        {
+          "Case": "ceiling",
+          "Trials": 32,
+          "Escapes": 0,
+          "Unresolved": 0,
+          "MaximumCalls": 161
+        },
+        {
+          "Case": "floor",
+          "Trials": 32,
+          "Escapes": 0,
+          "Unresolved": 0,
+          "MaximumCalls": 102
+        }
+      ],
+      "Scope": "Forced overlaps after a known valid interior position, using the actual controller recovery. Does not claim these penetrations can be reached from ordinary play."
+    },
+    "regressions": {
+      "Cases": [
+        {
+          "Case": "stance-growth-under-cap",
+          "Trials": 32,
+          "Escapes": 0,
+          "Unresolved": 0,
+          "MaximumCalls": 33
+        },
+        {
+          "Case": "ordinary-prop-without-history",
+          "Trials": 32,
+          "Escapes": 0,
+          "Unresolved": 0,
+          "MaximumCalls": 103
+        },
+        {
+          "Case": "ordinary-prop-with-history",
+          "Trials": 32,
+          "Escapes": 0,
+          "Unresolved": 0,
+          "MaximumCalls": 103
+        }
+      ],
+      "ExplicitClipIgnorePreserved": true,
+      "IgnoreProbeStartSolid": false,
+      "IgnoreProbeEnd": "2400,0,0",
+      "Scope": "Regression checks: increased hull height under the cap, ordinary-prop recovery with/without known history, and explicit playerclip ignore. Isolated native controller checks, not a remote-client match."
+    },
+    "compileAllSucceeded": true
+  },
+  "limitations": [
+    "Initial forced overlaps test recovery; they do not prove a normal spawn could reach the old leak.",
+    "Arbitrary external teleports/network corrections, exhaustive mantle/perch/explosion cases and remote-client play remain unverified.",
+    "Shared controller change affects all maps; regression probes cover ordinary props, stance height growth and explicit clip ignore, not every gameplay mode.",
+    "No new FPS acceptance. Reference/AAA visual target remains incomplete."
+  ],
+  "evidence": "closed-boundary-stage-20261020/"
+}

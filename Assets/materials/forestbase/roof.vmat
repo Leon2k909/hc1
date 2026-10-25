@@ -1,0 +1,12 @@
+// Tools/forestbase_materials.py
+"Layer0"
+{
+ shader "shaders/complex.shader"
+ F_SPECULAR "1"
+ g_flMetalness "0.72"
+ TextureColor "materials/forestbase/roof_color.png"
+ TextureNormal "materials/forestbase/roof_normal.png"
+ TextureRoughness "materials/forestbase/roof_rough.png"
+ TextureAmbientOcclusion "materials/default/default_ao.tga"
+ g_flModelTintAmount "1"
+}

@@ -1,0 +1,168 @@
+{
+  "scope": "Offline serialized collision parity and conservative 8-inch source-grid reachability. No native controller, navmesh, bullet, roof-perch or multiplayer performance acceptance.",
+  "existingSceneObjectsPreserved": 752,
+  "newSceneObjects": 0,
+  "movedFfaSpawns": [
+    {
+      "name": "DM 5",
+      "before": "850,1180,98",
+      "after": "770,1050,98",
+      "twoInchLiftPreserved": true,
+      "facingRegenerated": true
+    },
+    {
+      "name": "DM 12",
+      "before": "410,-1400,2",
+      "after": "350,-1310,2",
+      "twoInchLiftPreserved": true,
+      "facingRegenerated": true
+    }
+  ],
+  "sceneUnchangedOutsideTwoFfaPoses": true,
+  "serializedCollisionParity": {
+    "ground": true,
+    "motor": true,
+    "barracks": true,
+    "command": true,
+    "workshop": true,
+    "yard": true,
+    "logistics": true,
+    "links": true,
+    "vista": true
+  },
+  "geometry": {
+    "yard": {
+      "boxesBefore": 24,
+      "boxesAfter": 40,
+      "oldBoxesAndHullFilesPreserved": true,
+      "mesh": {
+        "vertices": 153928,
+        "normals": 62554,
+        "triangles": 75692,
+        "materials": [
+          "cargo_0",
+          "cargo_1",
+          "cargo_3",
+          "case_0",
+          "case_1",
+          "case_2",
+          "case_hardware",
+          "concrete",
+          "container_2",
+          "fence",
+          "lamp",
+          "olive",
+          "rubber",
+          "steel",
+          "timber",
+          "vehicle_canvas",
+          "vehicle_glass",
+          "vehicle_metal",
+          "vehicle_paint",
+          "vehicle_rubber",
+          "vehicle_stencil_0",
+          "vehicle_stencil_1",
+          "yellow"
+        ],
+        "minimumDoubleTriangleArea": 0.0019291617350500358
+      }
+    },
+    "logistics": {
+      "boxesBefore": 72,
+      "boxesAfter": 96,
+      "oldBoxesAndHullFilesPreserved": true,
+      "mesh": {
+        "vertices": 177520,
+        "normals": 52390,
+        "triangles": 84068,
+        "materials": [
+          "camonet",
+          "cargo_0",
+          "cargo_1",
+          "cargo_2",
+          "cargo_3",
+          "case_0",
+          "case_1",
+          "case_2",
+          "case_hardware",
+          "concrete",
+          "container_0",
+          "container_1",
+          "container_2",
+          "olive",
+          "rubber",
+          "sign_D",
+          "steel",
+          "timber",
+          "yellow"
+        ],
+        "minimumDoubleTriangleArea": 0.0019291617350560841
+      }
+    }
+  },
+  "loadingIslands": 6,
+  "cases": 30,
+  "palletProxies": 6,
+  "serviceCanProxies": 4,
+  "newBoxColliders": 40,
+  "routeChecks": 91,
+  "routeProblems": [],
+  "grid": 8,
+  "radius": 24,
+  "height": 72,
+  "step": 18,
+  "baselineProblems": [
+    {
+      "name": "DM 4",
+      "position": [
+        -1180,
+        850,
+        96
+      ],
+      "clear": false,
+      "reachable": false
+    },
+    {
+      "name": "DM 11",
+      "position": [
+        1400,
+        410,
+        0
+      ],
+      "clear": false,
+      "reachable": false
+    },
+    {
+      "name": "Barracks east lower room",
+      "position": [
+        -850,
+        990,
+        96
+      ],
+      "clear": false,
+      "reachable": false
+    },
+    {
+      "name": "Barracks east upper room",
+      "position": [
+        -850,
+        990,
+        240
+      ],
+      "clear": false,
+      "reachable": false
+    }
+  ],
+  "sourceHashes": {
+    "Tools\\forestbase_map.py": "05ee217f1a3addbb5caa5bdffa3358d1261ae59da0328b62f4c394d6c8da9435",
+    "Tools\\forestbase_cargo.py": "afd9cfb983168b3f8bbf7734d9469207537c44aed60ea7196fb784ce5da578f8",
+    "Tools\\forestbase_validate.py": "57fd8fcd1749f4eaa7a1b1b926bc3d9d759c6c47b92bf13e5e2581e475a0fe65",
+    "Tools\\forestbase_cargo_audit.py": "8e934c2519f937a455618f0d473da99878804158bcbb5cf1d9a8790db04c6686"
+  },
+  "limitations": [
+    "New cargo changes gameplay collision and potential climbing/perches. Native movement, jumps, sightlines, navigation and balance must be checked again.",
+    "Radius 24 is a conservative audit clearance, not a claim about the live controller radius.",
+    "Old east-room probes were near expanded shelf bounds; replacement standing points are inside the same rooms between the partition and shelves.",
+    "Two FFA spawn positions move to free floor areas. Team spawns and objectives are unchanged."
+  ]
+}

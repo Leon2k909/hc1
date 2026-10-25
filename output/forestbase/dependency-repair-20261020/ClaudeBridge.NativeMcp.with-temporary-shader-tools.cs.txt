@@ -1,0 +1,258 @@
+using Editor;
+using Editor.Mcp;
+using Sandbox;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.Json.Nodes;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+
+// Keep the specialised helpers available over the engine's native connection.
+// Dispatch through ProcessRequest so both transports use the same checks and errors.
+[McpToolset( "bridge_helpers", "Claude Bridge convenience helpers over native MCP. Prefer the engine's scene, asset, Hammer and UI tools for ordinary editor work." )]
+public static partial class ClaudeBridge
+{
+	private static bool _nativeShaderBuildRunning;
+	private static string _nativeShaderBuildPath;
+	private static string _nativeShaderBuildStarted;
+	private static string _nativeShaderBuildFinished;
+	private static object _nativeShaderBuildResult;
+	private static string _nativeShaderBuildError;
+
+	/// <summary>State of the last native shader build. Poll after a client timeout; do not submit a duplicate build.</summary>
+	[McpTool.ReadOnly( "bridge_shader_compile_status" )]
+	public static object NativeShaderCompileStatus() => new
+	{
+		Running = _nativeShaderBuildRunning, Path = _nativeShaderBuildPath,
+		StartedUtc = _nativeShaderBuildStarted, FinishedUtc = _nativeShaderBuildFinished,
+		Result = _nativeShaderBuildResult, Error = _nativeShaderBuildError
+	};
+
+	/// <summary>Check that a shader is loaded without the error fallback and exposes a usable editor schema.</summary>
+	/// <param name="path">Asset-relative shader path.</param>
+	[McpTool.ReadOnly( "bridge_shader_diagnostics" )]
+	public static object NativeShaderDiagnostics( string path )
+	{
+		var shader = Shader.Load( path );
+		var schema = shader?.Schema;
+		return new
+		{
+			Path = path, shader?.IsValid, shader?.IsError, shader?.ResourcePath,
+			VariableCount = schema?.Variables?.Count,
+			ComboCount = schema?.Combos?.Count
+		};
+	}
+
+	/// <summary>
+	/// Build a project shader through EditorUtility.CompileShader. Unlike asset_compile,
+	/// this uses the engine's shader compiler and reports asynchronous completion.
+	/// Requires stopped play. Poll bridge_shader_compile_status after an observation timeout.
+	/// </summary>
+	/// <param name="path">Project asset-relative shader path, starting with shaders/ and ending in .shader.</param>
+	/// <param name="force">Bypass the shader compiler's incremental cache.</param>
+	[McpTool( "bridge_compile_shader" )]
+	public static async Task<object> NativeCompileShader( string path, bool force = true )
+	{
+		if ( Game.IsPlaying ) throw new InvalidOperationException( "Stop play before compiling project shaders." );
+		if ( _nativeShaderBuildRunning ) throw new InvalidOperationException( "A shader build is already running; inspect bridge_shader_compile_status." );
+		path = (path ?? "").Replace( '\\', '/' );
+		if ( !path.StartsWith( "shaders/", StringComparison.OrdinalIgnoreCase ) || !path.EndsWith( ".shader", StringComparison.OrdinalIgnoreCase ) )
+			throw new ArgumentException( "Expected a project asset-relative shaders/*.shader path." );
+		var assets = Path.GetFullPath( Project.Current.GetAssetsPath() );
+		var source = Path.GetFullPath( Path.Combine( assets, path ) );
+		if ( !source.StartsWith( assets.TrimEnd( '/', '\\' ) + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase ) || !File.Exists( source ) )
+			throw new ArgumentException( "Shader source must exist inside the current project's Assets directory." );
+		_nativeShaderBuildPath = path;
+		_nativeShaderBuildStarted = DateTime.UtcNow.ToString( "O" );
+		_nativeShaderBuildFinished = _nativeShaderBuildError = null;
+		_nativeShaderBuildResult = null;
+		_nativeShaderBuildRunning = true;
+		try
+		{
+			var result = await EditorUtility.CompileShader( path,
+				new() { ForceRecompile = force, SingleThreaded = true, ConsoleOutput = true }, default );
+			_nativeShaderBuildResult = new { result.Success, result.Skipped, ByteCount = result.CompiledShader?.Length, ProgramCount = result.Programs?.Count };
+		}
+		catch ( Exception error )
+		{
+			_nativeShaderBuildError = error.ToString();
+			throw;
+		}
+		finally
+		{
+			_nativeShaderBuildRunning = false;
+			_nativeShaderBuildFinished = DateTime.UtcNow.ToString( "O" );
+		}
+		return NativeShaderCompileStatus();
+	}
+
+	private static readonly HashSet<string> NativeReadOnlyCommands = new( StringComparer.Ordinal )
+	{
+		"get_project_info", "list_project_files", "read_file", "list_scenes",
+		"get_scene_hierarchy", "get_selected_objects", "get_property",
+		"get_all_properties", "list_available_components", "is_playing",
+		"get_runtime_property", "search_assets", "get_asset_info", "list_sounds",
+		"list_prefabs", "get_prefab_info", "get_network_status",
+		"get_project_config", "get_package_details", "list_asset_library",
+		"list_component_buttons", "raycast", "raycast_terrain", "get_navmesh_path",
+		"physics_overlap", "describe_type", "search_types", "get_method_signature",
+		"find_in_project", "get_bounds", "list_animations", "get_tags"
+	};
+
+	/// <summary>
+	/// List the live Bridge helpers, their read-only status and their play-mode restrictions.
+	/// Use bridge_describe_handler to inspect arguments, then bridge_read or bridge_call.
+	/// </summary>
+	[McpTool.ReadOnly( "bridge_list_handlers" )]
+	public static object NativeListHandlers()
+	{
+		return new
+		{
+			Count = _handlers.Count,
+			Handlers = _handlers.OrderBy( x => x.Key ).Select( x => new
+			{
+				Command = x.Key,
+				HandlerClass = x.Value.GetType().Name,
+				ReadOnly = NativeReadOnlyCommands.Contains( x.Key ),
+				BlockedDuringPlay = IsSceneMutating( x.Key )
+			} ).ToArray()
+		};
+	}
+
+	/// <summary>
+	/// Read a Bridge handler's C# implementation to learn its parameters, defaults and behaviour.
+	/// Searches every source file in this project's Bridge editor addon, including NPC and scaffold helpers.
+	/// </summary>
+	/// <param name="command">Exact command from bridge_list_handlers.</param>
+	[McpTool.ReadOnly( "bridge_describe_handler" )]
+	public static object NativeDescribeHandler( string command )
+	{
+		if ( !_handlers.TryGetValue( command, out var handler ) )
+			throw new ArgumentException( $"Unknown Bridge command '{command}'. Use bridge_list_handlers." );
+
+		var handlerClass = handler.GetType().Name;
+		var directory = Path.Combine( Project.Current.GetRootPath(), "Libraries", "sboxskinsgg.claudebridge", "Editor" );
+		foreach ( var file in Directory.EnumerateFiles( directory, "*.cs", SearchOption.AllDirectories ) )
+		{
+			var source = File.ReadAllText( file );
+			var match = Regex.Match( source, @"\bclass\s+" + Regex.Escape( handlerClass ) + @"\b" );
+			if ( !match.Success ) continue;
+
+			var remainder = source.Substring( match.Index );
+			var nextClass = Regex.Match( remainder.Substring( match.Length ), @"\n(?:public|internal)\s+(?:(?:sealed|abstract|static|partial)\s+)*class\s+" );
+			var length = nextClass.Success ? match.Length + nextClass.Index : remainder.Length;
+			return new
+			{
+				Command = command,
+				HandlerClass = handlerClass,
+				SourceFile = Path.GetRelativePath( Project.Current.GetRootPath(), file ),
+				ReadOnly = NativeReadOnlyCommands.Contains( command ),
+				BlockedDuringPlay = IsSceneMutating( command ),
+				Source = remainder.Substring( 0, Math.Min( length, 16000 ) ).Trim(),
+				Truncated = length > 16000
+			};
+		}
+
+		throw new FileNotFoundException( $"Source for {handlerClass} is unavailable in {directory}." );
+	}
+
+	/// <summary>
+	/// Run an allowlisted read-only Bridge helper directly inside the editor, without file IPC.
+	/// Use bridge_describe_handler for parameters. Mutating commands are rejected.
+	/// </summary>
+	/// <param name="command">Read-only command from bridge_list_handlers.</param>
+	/// <param name="parameters">The helper's JSON parameters; omit for helpers with no arguments.</param>
+	[McpTool.ReadOnly( "bridge_read" )]
+	public static Task<JsonNode> NativeRead( string command, JsonObject parameters = null )
+	{
+		if ( !NativeReadOnlyCommands.Contains( command ) )
+			throw new ArgumentException( $"'{command}' is not an allowlisted read-only helper. Use bridge_call for mutations." );
+		return NativeExecute( command, parameters );
+	}
+
+	/// <summary>
+	/// Run any registered Bridge helper through the native connection. Use bridge_describe_handler first.
+	/// Preserves the original play-mode guards and undo behaviour. Prefer dedicated native tools where available.
+	/// </summary>
+	/// <param name="command">Exact command from bridge_list_handlers.</param>
+	/// <param name="parameters">The helper's JSON parameters; omit for helpers with no arguments.</param>
+	[McpTool( "bridge_call" )]
+	public static Task<JsonNode> NativeCall( string command, JsonObject parameters = null )
+	{
+		return NativeExecute( command, parameters );
+	}
+
+	/// <summary>
+	/// Simulate a named input action during play. Press lasts one frame; hold is reapplied every frame;
+	/// release ends a hold. A zero-duration hold continues until released. Requires play mode.
+	/// </summary>
+	/// <param name="action">Input action name, for example jump, attack1 or attack2.</param>
+	/// <param name="state">press, hold or release.</param>
+	/// <param name="durationMs">Nonnegative hold duration in milliseconds; zero holds until release.</param>
+	[McpTool( "bridge_simulate_input" )]
+	public static Task<JsonNode> NativeSimulateInput( string action, string state = "press", float durationMs = 0 )
+	{
+		if ( string.IsNullOrWhiteSpace( action ) ) throw new ArgumentException( "action is required." );
+		if ( state != "press" && state != "hold" && state != "release" )
+			throw new ArgumentException( "state must be press, hold or release." );
+		if ( !float.IsFinite( durationMs ) || durationMs < 0 ) throw new ArgumentException( "durationMs must be finite and nonnegative." );
+		return NativeExecute( "simulate_input", new JsonObject
+		{
+			["action"] = action, ["state"] = state, ["durationMs"] = durationMs
+		} );
+	}
+
+	/// <summary>
+	/// Scatter model props with a repeatable seed, optional ground snapping, rotation, scaling and grouping.
+	/// Requires stopped play mode. Uses the existing Bridge helper's scene and undo behaviour.
+	/// </summary>
+	/// <param name="model">Project-relative model path, as returned by asset_search.</param>
+	/// <param name="center">World-space centre as x,y,z, in Source units.</param>
+	/// <param name="radius">Finite, nonnegative scatter radius in Source units.</param>
+	/// <param name="count">Number of props, from 1 to 300.</param>
+	/// <param name="seed">Nonnegative seed for repeatable placement.</param>
+	/// <param name="snapToGround">Trace downward to place each prop on the ground.</param>
+	/// <param name="randomYaw">Randomise each prop's yaw.</param>
+	/// <param name="scaleMin">Positive minimum scale.</param>
+	/// <param name="scaleMax">Maximum scale, at least scaleMin.</param>
+	/// <param name="group">Parent the props under a new group object.</param>
+	/// <param name="name">Name prefix for the created objects.</param>
+	[McpTool( "bridge_scatter_props" )]
+	public static Task<JsonNode> NativeScatterProps( string model, Vector3 center, float radius = 256,
+		int count = 10, int seed = 1, bool snapToGround = true, bool randomYaw = true,
+		float scaleMin = 1, float scaleMax = 1, bool group = true, string name = "Prop" )
+	{
+		if ( string.IsNullOrWhiteSpace( model ) ) throw new ArgumentException( "model is required." );
+		if ( count < 1 || count > 300 ) throw new ArgumentException( "count must be from 1 to 300." );
+		if ( !float.IsFinite( radius ) || radius < 0 || seed < 0 ) throw new ArgumentException( "radius and seed must be nonnegative, and radius finite." );
+		if ( !float.IsFinite( scaleMin ) || !float.IsFinite( scaleMax ) || scaleMin <= 0 || scaleMax < scaleMin )
+			throw new ArgumentException( "Scales must be finite, with 0 < scaleMin <= scaleMax." );
+		if ( !float.IsFinite( center.x ) || !float.IsFinite( center.y ) || !float.IsFinite( center.z ) )
+			throw new ArgumentException( "center must be finite." );
+		return NativeExecute( "scatter_props", new JsonObject
+		{
+			["model"] = model,
+			["center"] = new JsonObject { ["x"] = center.x, ["y"] = center.y, ["z"] = center.z },
+			["radius"] = radius, ["count"] = count, ["seed"] = seed,
+			["snapToGround"] = snapToGround, ["randomYaw"] = randomYaw,
+			["scaleMin"] = scaleMin, ["scaleMax"] = scaleMax, ["group"] = group, ["name"] = name
+		} );
+	}
+
+	private static async Task<JsonNode> NativeExecute( string command, JsonObject parameters )
+	{
+		if ( string.IsNullOrWhiteSpace( command ) ) throw new ArgumentException( "command is required." );
+		var request = new JsonObject
+		{
+			["id"] = "native-" + Guid.NewGuid().ToString( "N" ),
+			["command"] = command,
+			["params"] = parameters?.DeepClone() ?? new JsonObject()
+		};
+		var response = JsonNode.Parse( await ProcessRequest( request.ToJsonString() ) );
+		if ( response?["success"]?.GetValue<bool>() != true )
+			throw new InvalidOperationException( response?["error"]?.GetValue<string>() ?? "Bridge helper failed." );
+		return response["data"]?.DeepClone();
+	}
+}

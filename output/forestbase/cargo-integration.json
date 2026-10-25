@@ -1,0 +1,265 @@
+{
+  "status": "installed_offline_native_pending",
+  "scope": "Six reference-oriented loading islands and two FFA spawn clearance improvements; existing team spawns/objectives preserved.",
+  "installedFiles": [
+    {
+      "from": "models/maps/forestbase/logistics.mtl",
+      "to": "Assets/models/maps/forestbase/logistics.mtl",
+      "beforeSha256": "9bc41f5691f130b04aa0061f432bc5ee1f2d90bbd9640ccf5e6e45799ce1f917",
+      "sha256": "e31f7251f805c572df6011ee21e8069747d7803a192cb6780a253b0e6f189ee0"
+    },
+    {
+      "from": "models/maps/forestbase/logistics.obj",
+      "to": "Assets/models/maps/forestbase/logistics.obj",
+      "beforeSha256": "4821de222d2d19c7624d6b167c5d1dbe6e320c093df11bcd6fb4bf20f4572127",
+      "sha256": "b6b2a6c2a5f901acb515ae6e7dad2e61701a32a4ec1f174dbb5ea7e1bc9d3f43"
+    },
+    {
+      "from": "models/maps/forestbase/logistics.vmdl",
+      "to": "Assets/models/maps/forestbase/logistics.vmdl",
+      "beforeSha256": "238d23edfcc76960214ece1ab694afe68d6e0534d51d591dc1110fbf41de1d54",
+      "sha256": "8a45b37a32620544e1dd314422a4e0163b504efe43b076d3578e89b5328933a5"
+    },
+    {
+      "from": "models/maps/forestbase/yard.mtl",
+      "to": "Assets/models/maps/forestbase/yard.mtl",
+      "beforeSha256": "0c31f977747057b4658c97b64b645af07a69f916e3405611202f6157f54d9104",
+      "sha256": "dbc8ed1a96d81365efe0198b64bc3405b7c4e02607a5e8949f6cafadf6d7c70d"
+    },
+    {
+      "from": "models/maps/forestbase/yard.obj",
+      "to": "Assets/models/maps/forestbase/yard.obj",
+      "beforeSha256": "c771e9d9888b68601a80e1205cd6fef0211f2fa57afa9088c119b7ab3923f001",
+      "sha256": "e1ab048c6afce6cb55f07f49fc93510ee3b13e125daf4e2b894fa0b2d00e09fe"
+    },
+    {
+      "from": "models/maps/forestbase/yard.vmdl",
+      "to": "Assets/models/maps/forestbase/yard.vmdl",
+      "beforeSha256": "ae59eb39c30fb1eecd76f7277bd4664996c2d6eee23bc506f47b4d63c3c9fa54",
+      "sha256": "b09e107f209a28489d77451baa1e3919616b42c7f3ad00a6b6a9f08b4074f72f"
+    },
+    {
+      "from": "forestbase.scene",
+      "to": "Assets/scenes/maps/ForestBase/forestbase.scene",
+      "beforeSha256": "30f9ed3ef41ba0872f591f8a24a7a528edf5eb1eb5859339cc804c1e47abdc7b",
+      "sha256": "9ad87e61c61cd52b23331ba92b030ca1bbcff6eadbcb4bb793d397d9ad8eb8c4"
+    },
+    {
+      "from": "layout.json",
+      "to": "output/forestbase/layout.json",
+      "beforeSha256": "e601f62765f6c3ba140e8e819d351004e5af1a98478c99ccf395a0f8b7ccc46f",
+      "sha256": "e0fae0d7f03b6dd17701eae1ad64839230e5dd88376ebc90732e12a74c425028"
+    }
+  ],
+  "geometryAudit": {
+    "scope": "Offline serialized collision parity and conservative 8-inch source-grid reachability. No native controller, navmesh, bullet, roof-perch or multiplayer performance acceptance.",
+    "existingSceneObjectsPreserved": 752,
+    "newSceneObjects": 0,
+    "movedFfaSpawns": [
+      {
+        "name": "DM 5",
+        "before": "850,1180,98",
+        "after": "770,1050,98",
+        "twoInchLiftPreserved": true,
+        "facingRegenerated": true
+      },
+      {
+        "name": "DM 12",
+        "before": "410,-1400,2",
+        "after": "350,-1310,2",
+        "twoInchLiftPreserved": true,
+        "facingRegenerated": true
+      }
+    ],
+    "sceneUnchangedOutsideTwoFfaPoses": true,
+    "serializedCollisionParity": {
+      "ground": true,
+      "motor": true,
+      "barracks": true,
+      "command": true,
+      "workshop": true,
+      "yard": true,
+      "logistics": true,
+      "links": true,
+      "vista": true
+    },
+    "geometry": {
+      "yard": {
+        "boxesBefore": 24,
+        "boxesAfter": 40,
+        "oldBoxesAndHullFilesPreserved": true,
+        "mesh": {
+          "vertices": 153928,
+          "normals": 62554,
+          "triangles": 75692,
+          "materials": [
+            "cargo_0",
+            "cargo_1",
+            "cargo_3",
+            "case_0",
+            "case_1",
+            "case_2",
+            "case_hardware",
+            "concrete",
+            "container_2",
+            "fence",
+            "lamp",
+            "olive",
+            "rubber",
+            "steel",
+            "timber",
+            "vehicle_canvas",
+            "vehicle_glass",
+            "vehicle_metal",
+            "vehicle_paint",
+            "vehicle_rubber",
+            "vehicle_stencil_0",
+            "vehicle_stencil_1",
+            "yellow"
+          ],
+          "minimumDoubleTriangleArea": 0.0019291617350500358
+        }
+      },
+      "logistics": {
+        "boxesBefore": 72,
+        "boxesAfter": 96,
+        "oldBoxesAndHullFilesPreserved": true,
+        "mesh": {
+          "vertices": 177520,
+          "normals": 52390,
+          "triangles": 84068,
+          "materials": [
+            "camonet",
+            "cargo_0",
+            "cargo_1",
+            "cargo_2",
+            "cargo_3",
+            "case_0",
+            "case_1",
+            "case_2",
+            "case_hardware",
+            "concrete",
+            "container_0",
+            "container_1",
+            "container_2",
+            "olive",
+            "rubber",
+            "sign_D",
+            "steel",
+            "timber",
+            "yellow"
+          ],
+          "minimumDoubleTriangleArea": 0.0019291617350560841
+        }
+      }
+    },
+    "loadingIslands": 6,
+    "cases": 30,
+    "palletProxies": 6,
+    "serviceCanProxies": 4,
+    "newBoxColliders": 40,
+    "routeChecks": 91,
+    "routeProblems": [],
+    "grid": 8,
+    "radius": 24,
+    "height": 72,
+    "step": 18,
+    "baselineProblems": [
+      {
+        "name": "DM 4",
+        "position": [
+          -1180,
+          850,
+          96
+        ],
+        "clear": false,
+        "reachable": false
+      },
+      {
+        "name": "DM 11",
+        "position": [
+          1400,
+          410,
+          0
+        ],
+        "clear": false,
+        "reachable": false
+      },
+      {
+        "name": "Barracks east lower room",
+        "position": [
+          -850,
+          990,
+          96
+        ],
+        "clear": false,
+        "reachable": false
+      },
+      {
+        "name": "Barracks east upper room",
+        "position": [
+          -850,
+          990,
+          240
+        ],
+        "clear": false,
+        "reachable": false
+      }
+    ],
+    "sourceHashes": {
+      "Tools\\forestbase_map.py": "05ee217f1a3addbb5caa5bdffa3358d1261ae59da0328b62f4c394d6c8da9435",
+      "Tools\\forestbase_cargo.py": "afd9cfb983168b3f8bbf7734d9469207537c44aed60ea7196fb784ce5da578f8",
+      "Tools\\forestbase_validate.py": "57fd8fcd1749f4eaa7a1b1b926bc3d9d759c6c47b92bf13e5e2581e475a0fe65",
+      "Tools\\forestbase_cargo_audit.py": "8e934c2519f937a455618f0d473da99878804158bcbb5cf1d9a8790db04c6686"
+    },
+    "limitations": [
+      "New cargo changes gameplay collision and potential climbing/perches. Native movement, jumps, sightlines, navigation and balance must be checked again.",
+      "Radius 24 is a conservative audit clearance, not a claim about the live controller radius.",
+      "Old east-room probes were near expanded shelf bounds; replacement standing points are inside the same rooms between the partition and shelves.",
+      "Two FFA spawn positions move to free floor areas. Team spawns and objectives are unchanged."
+    ]
+  },
+  "sourceGridAudit": "output/forestbase/cargo-stage/routes/route-audit.json",
+  "baselineGridAudit": "output/forestbase/cargo-before/routes/route-audit.json",
+  "previews": [
+    {
+      "image": "output/forestbase/cargo-before-compound.png",
+      "sha256": "ed8a7097c196adb7a8875bce4851cb65e623d165bcb31cedb5edd901c57200b4",
+      "metadata": "output/forestbase/cargo-before-compound.json",
+      "renderInputArchive": "output/forestbase/cargo-before/Assets/scenes/maps/ForestBase/forestbase.scene",
+      "scope": "Saved explicit model-renderer nodes and practical-light placements, forced LOD1, independent Blender energy/shading/tone approximations. No prefab expansion, live characters, native fog/exposure/animation/performance validation."
+    },
+    {
+      "image": "output/forestbase/cargo-after-compound.png",
+      "sha256": "4d1f1ded750b2da2880e386d0fd57faaa5839f180510589cefd987d975d58306",
+      "metadata": "output/forestbase/cargo-after-compound.json",
+      "renderInputArchive": "output/forestbase/cargo-stage/render-input-before-spawn-pose.scene",
+      "scope": "Saved explicit model-renderer nodes and practical-light placements, forced LOD1, independent Blender energy/shading/tone approximations. No prefab expansion, live characters, native fog/exposure/animation/performance validation."
+    }
+  ],
+  "renderInputAndFinalSceneHaveIdenticalModelAndLightNodes": true,
+  "existingSceneObjectsPreserved": 752,
+  "addedSceneObjects": 0,
+  "newBoxColliders": 40,
+  "additionalDeclaredTriangles": 20984,
+  "additionalBitmapTextures": 0,
+  "sourceHashes": {
+    "Tools/forestbase_map.py": "05ee217f1a3addbb5caa5bdffa3358d1261ae59da0328b62f4c394d6c8da9435",
+    "Tools/forestbase_cargo.py": "afd9cfb983168b3f8bbf7734d9469207537c44aed60ea7196fb784ce5da578f8",
+    "Tools/forestbase_cargo_audit.py": "8e934c2519f937a455618f0d473da99878804158bcbb5cf1d9a8790db04c6686",
+    "Tools/forestbase_validate.py": "57fd8fcd1749f4eaa7a1b1b926bc3d9d759c6c47b92bf13e5e2581e475a0fe65",
+    "Tools/FORESTBASE.md": "51f41af81f57329ed0919cc1412defffc283beb0d4674df6c9a9128098a93eca"
+  },
+  "nativePhysicsVerified": false,
+  "nativeNavigationVerified": false,
+  "nativeJumpPerchSightlineBalanceVerified": false,
+  "nativePerformanceVerified": false,
+  "editorAccessed": false,
+  "limitations": [
+    "New collision changes player routes and climbing possibilities; native movement, jumps, navmesh, spawn visibility and multiplayer balance remain unverified.",
+    "The source-grid audit is conservative and samples authored boxes/hull AABBs, with radius 24 and 18-inch steps. It does not reproduce the live controller.",
+    "The two room probe corrections select free standing areas in the same rooms and do not establish failure of the previous points in native play.",
+    "Matched render input is archived before spawn-lift/facing correction; final model/light nodes are identical, and no live characters are rendered.",
+    "Reference-wide visual finish, wider forest coverage, native shader/import checks and measured stable performance remain unfinished."
+  ]
+}

@@ -1,0 +1,11 @@
+"Layer0"
+{
+ shader "shaders/complex.shader"
+ F_SPECULAR "1"
+ g_vColorTint "[.67 .74 .70 1]"
+ g_flRoughnessScaleFactor "1.4"
+ TextureColor "models/maps/forestbase/cliff/diff.jpg"
+ TextureNormal "models/maps/forestbase/cliff/nor_gl.jpg"
+ TextureRoughness "models/maps/forestbase/cliff/rough.png"
+ TextureAmbientOcclusion "models/maps/forestbase/cliff/ao.png"
+}

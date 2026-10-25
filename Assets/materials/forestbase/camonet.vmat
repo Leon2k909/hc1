@@ -1,0 +1,17 @@
+// Tools/forestbase_materials.py
+"Layer0"
+{
+ shader "shaders/complex.shader"
+ F_SPECULAR "1"
+ g_flMetalness "0"
+ TextureMetalness "[0 0 0 0]"
+ TextureColor "materials/forestbase/camonet_color.png"
+ TextureNormal "materials/forestbase/camonet_normal.png"
+ TextureRoughness "materials/forestbase/camonet_rough.png"
+ TextureAmbientOcclusion "materials/default/default_ao.tga"
+ g_flModelTintAmount "1"
+ F_ALPHA_TEST "1"
+ F_RENDER_BACKFACES "1"
+ TextureTranslucency "materials/forestbase/camonet_alpha.png"
+ g_flAlphaTestReference "0.35"
+}

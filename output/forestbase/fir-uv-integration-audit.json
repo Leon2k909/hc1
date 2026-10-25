@@ -1,0 +1,56 @@
+{
+  "issue": "Fir Geometry Nodes corner UVMap was FLOAT_VECTOR, absent from Blender uv_layers and exported OBJ files. Engine sampled uniform atlas values and rendered opaque triangular needles.",
+  "repair": "Copy authored XY corner values into an actual Blender UV layer before bake/decimation/export. Export rejects missing vt data and untextured faces. Rebuilt both mesh LODs and all six transparent far-crown bakes.",
+  "geometry": "Triangle counts, bounds, placement and collisions unchanged.",
+  "hashes": {
+    "Tools/forestbase_fir_blender.py": "505bf1542ea3a853a8f53728c0953c7405d37d79d6d017cf676d850384ffa8d2",
+    "Assets/models/maps/forestbase/fir/fir_a_lod0.obj": "2a8564c6725da0744a7017de6a171c7b19b72ef1c887c85e2ed2cdc1739c2337",
+    "Assets/models/maps/forestbase/fir/fir_a_lod1.obj": "44341b6b7df8f72d0a49798bad5e67f57c3c530dcab91cf7750fd13cc0f837bc",
+    "Assets/models/maps/forestbase/fir/fir_a_lod2.obj": "74004d8adabedf8a5cce7156ff3ba8107aafeb458d51af3bde77666eadf30cc0",
+    "Assets/models/maps/forestbase/fir/fir_b_lod0.obj": "2ab80b2d6502d854467df2d563422edba0d3d91d416e3f01fb0c3c9e95aa5a47",
+    "Assets/models/maps/forestbase/fir/fir_b_lod1.obj": "f587573ec7e2df5bbb5183e1648b55004c14d161eff78ecef0fd304e3d365798",
+    "Assets/models/maps/forestbase/fir/fir_b_lod2.obj": "36dd8bccb58c7d355366d112f034c219e8f554bd739adfd4b14615439add7c23",
+    "Assets/models/maps/forestbase/fir/fir_c_lod0.obj": "5b88c3641e4becd2b9dbcfd6f29a4fdd63da2764beb85b8131c13377bbab511b",
+    "Assets/models/maps/forestbase/fir/fir_c_lod1.obj": "b2d6e358cadbb81df979001f29118b16eaee058f73cb5e4621dc0971e27fb813",
+    "Assets/models/maps/forestbase/fir/fir_c_lod2.obj": "489623150e7cc8720f82bb26a46d9f04a49fb307d1be76902e893fc19082f45f"
+  },
+  "exportEvidence": "fir-uv-export-audit.json",
+  "engineEvidence": [
+    {
+      "kind": "fir",
+      "variant": "a",
+      "bounds": "mins -155.2066,-196.0165,-18.0847, maxs 180.8953,192.0805,758.1094",
+      "error": false
+    },
+    {
+      "kind": "fir",
+      "variant": "b",
+      "bounds": "mins -140.3165,-176.2168,-60.8752, maxs 149.4347,158.3591,608.2767",
+      "error": false
+    },
+    {
+      "kind": "fir",
+      "variant": "c",
+      "bounds": "mins -151.9059,-192.6207,-69.925, maxs 153.536,160.0732,635.4629",
+      "error": false
+    }
+  ],
+  "mapQA": {
+    "spawns": 32,
+    "blockedBoundaryRays": 6,
+    "blockedSpawnRays": 112,
+    "errors": []
+  },
+  "renders": [
+    "fir-a.png",
+    "fir-b.png",
+    "fir-c.png",
+    "aerial.png",
+    "waterfall.png"
+  ],
+  "limitations": [
+    "Not a proof of complete AAA vegetation or objective completion",
+    "Previous fir performance sample predates corrected alpha-tested UVs",
+    "Remote human multiplayer remains unverified"
+  ]
+}

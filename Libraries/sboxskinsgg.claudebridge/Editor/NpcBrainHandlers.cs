@@ -25,7 +25,7 @@ using System.Threading.Tasks;
 //  generators: Component, [Property], [Sync], GetOrAddComponent<NavMeshAgent>(),
 //  NavMeshAgent.MoveTo(Vector3), IsProxy, TimeSince, Vector3.Dot/.Normal/
 //  .DistanceBetween, Scene.GetAllComponents<T>(), scene.Trace.Ray(a,b).Run(),
-//  MathX.Clamp. NO System.Math / System.MathF in generated code.
+//  MathX.Clamp. MathX preferred in generated code; System.Math/MathF also compile on the current SDK (verified 2026-06-09). Array.Clone() still blocked.
 //
 //  Tools in this file:
 //    create_npc_brain        (code-gen; scene-mutating)
@@ -418,7 +418,7 @@ using System.Linq;
 	[Property] public float CosFovThreshold {{ get; set; }} = {F( cosFov )};
 	[Property] public float EyeHeight     {{ get; set; }} = {F( eyeHeight )};
 	[Property] public float HearingRadius {{ get; set; }} = {F( hearingRadius )};
-	[Property] public string TargetTag    {{ get; set; }} = ""{targetTagLiteral}"";
+	[Property] public string TargetTag    {{ get; set; }} = @""{targetTagLiteral}"";
 
 	// Memory / timing
 	[Property] public float GiveUpTime   {{ get; set; }} = {F( giveUpTime )};

@@ -1,0 +1,214 @@
+{
+  "utc": "2026-10-08T18:23:14.922623+00:00",
+  "backdropCounts": {
+    "boulder": 82,
+    "pine": 38,
+    "fir": 143,
+    "sapling": 81
+  },
+  "missingAssets": [],
+  "modelErrors": [],
+  "spawnSamples": 32,
+  "boundarySamples": 6,
+  "exposureSamples": 112,
+  "firLods": [
+    {
+      "name": "fir_a_lod0",
+      "triangles": 54999,
+      "sourceTriangles": 70661
+    },
+    {
+      "name": "fir_a_lod1",
+      "triangles": 22000,
+      "sourceTriangles": 70661
+    },
+    {
+      "name": "fir_a_lod2",
+      "triangles": 6,
+      "cardCenter": [
+        0.04998779296875,
+        0.32624661922454834,
+        9.398313522338867
+      ],
+      "cardHeight": 19.7153287178278,
+      "cardWidth": 9.8576643589139
+    },
+    {
+      "name": "fir_b_lod0",
+      "triangles": 54927,
+      "sourceTriangles": 54927
+    },
+    {
+      "name": "fir_b_lod1",
+      "triangles": 22000,
+      "sourceTriangles": 54927
+    },
+    {
+      "name": "fir_b_lod2",
+      "triangles": 6,
+      "cardCenter": [
+        0.2267930507659912,
+        0.11580145359039307,
+        6.951998710632324
+      ],
+      "cardHeight": 16.996455405474645,
+      "cardWidth": 8.498227702737323
+    },
+    {
+      "name": "fir_c_lod0",
+      "triangles": 31512,
+      "sourceTriangles": 31512
+    },
+    {
+      "name": "fir_c_lod1",
+      "triangles": 21999,
+      "sourceTriangles": 31512
+    },
+    {
+      "name": "fir_c_lod2",
+      "triangles": 6,
+      "cardCenter": [
+        0.41335344314575195,
+        0.020702481269836426,
+        7.182331562042236
+      ],
+      "cardHeight": 17.916850569409608,
+      "cardWidth": 8.958425284704804
+    }
+  ],
+  "saplingLods": [
+    {
+      "name": "sapling_a_lod0",
+      "triangles": 10000,
+      "sourceTriangles": 157402
+    },
+    {
+      "name": "sapling_a_lod1",
+      "triangles": 4000,
+      "sourceTriangles": 157402
+    },
+    {
+      "name": "sapling_a_lod2",
+      "triangles": 6,
+      "cardCenter": [
+        -0.006383612751960754,
+        0.015087604522705078,
+        0.642467200756073
+      ],
+      "cardHeight": 2.440830959654903,
+      "cardWidth": 1.2204154798274516
+    },
+    {
+      "name": "sapling_b_lod0",
+      "triangles": 9999,
+      "sourceTriangles": 150876
+    },
+    {
+      "name": "sapling_b_lod1",
+      "triangles": 4000,
+      "sourceTriangles": 150876
+    },
+    {
+      "name": "sapling_b_lod2",
+      "triangles": 6,
+      "cardCenter": [
+        -0.005804508924484253,
+        0.02160245180130005,
+        0.47578680515289307
+      ],
+      "cardHeight": 2.128341318803805,
+      "cardWidth": 1.0641706594019025
+    },
+    {
+      "name": "sapling_c_lod0",
+      "triangles": 10000,
+      "sourceTriangles": 124743
+    },
+    {
+      "name": "sapling_c_lod1",
+      "triangles": 4000,
+      "sourceTriangles": 124743
+    },
+    {
+      "name": "sapling_c_lod2",
+      "triangles": 6,
+      "cardCenter": [
+        -0.005323588848114014,
+        0.0029308348894119263,
+        0.3677772879600525
+      ],
+      "cardHeight": 1.8210211607639297,
+      "cardWidth": 0.9105105803819649
+    }
+  ],
+  "runtimePerformance": {
+    "localTime": "2026-10-08 20:29:05",
+    "frames": 600,
+    "livingBotsRange": [
+      6,
+      9
+    ],
+    "livingPlayersAtFinalInstant": 0,
+    "frameMs": {
+      "average": 20.83,
+      "p50": 20,
+      "p95": 25.03,
+      "p99": 35.17,
+      "maximum": 107.32
+    },
+    "renderLast200Ms": {
+      "average": 10.209,
+      "maximum": 24.127
+    },
+    "viewport": [
+      316,
+      1302
+    ],
+    "mode": "tdm",
+    "modelErrors": 0,
+    "ssrVolumes": 1
+  },
+  "limitations": [
+    "No AAA finish proof",
+    "Far-crown transitions require further runtime inspection",
+    "Timing not comparable to a normal game viewport"
+  ],
+  "isolatedModels": [
+    {
+      "kind": "fir",
+      "variant": "a",
+      "bounds": "mins -155.2066,-196.0165,-18.0847, maxs 180.8953,192.0805,758.1094",
+      "error": false
+    },
+    {
+      "kind": "fir",
+      "variant": "b",
+      "bounds": "mins -140.3165,-176.2168,-60.8752, maxs 149.4347,158.3591,608.2767",
+      "error": false
+    },
+    {
+      "kind": "fir",
+      "variant": "c",
+      "bounds": "mins -151.9059,-192.6207,-69.925, maxs 153.536,160.0732,635.4629",
+      "error": false
+    },
+    {
+      "kind": "sapling",
+      "variant": "a",
+      "bounds": "mins -20.2113,-23.7726,-22.7539, maxs 21.3993,24.2753,73.3418",
+      "error": false
+    },
+    {
+      "kind": "sapling",
+      "variant": "b",
+      "bounds": "mins -17.2912,-20.7197,-23.1647, maxs 18.9922,21.1768,60.6283",
+      "error": false
+    },
+    {
+      "kind": "sapling",
+      "variant": "c",
+      "bounds": "mins -15.4068,-17.7139,-21.3675, maxs 15.6375,18.133,50.3263",
+      "error": false
+    }
+  ]
+}

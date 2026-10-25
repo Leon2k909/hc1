@@ -1,0 +1,68 @@
+{
+  "Scene": "forestbase",
+  "Models": 741,
+  "Cameras": [
+    {
+      "Name": "editor_camera",
+      "IsMainCamera": false,
+      "Priority": 1,
+      "Position": "0,0,0",
+      "Auto": {
+        "Enabled": true,
+        "Compensation": 0.15,
+        "MinimumExposure": 1.5,
+        "MaximumExposure": 1.5,
+        "Rate": 1
+      },
+      "Native": {
+        "Enabled": true,
+        "Rate": 1,
+        "Fade": 1,
+        "MinExposure": 1.5,
+        "MaxExposure": 1.5,
+        "ExposureCompensation": 0.14999995,
+        "PercentTarget": -1,
+        "PercentBrightPixels": -1,
+        "MinAverageLuminance": -1
+      }
+    },
+    {
+      "Name": "Camera",
+      "IsMainCamera": true,
+      "Priority": 8,
+      "Position": "1399.111,-1178.199,60.0412",
+      "Auto": {
+        "Enabled": true,
+        "Compensation": 0.15,
+        "MinimumExposure": 1.5,
+        "MaximumExposure": 1.5,
+        "Rate": 1
+      },
+      "Native": {
+        "Enabled": true,
+        "Rate": 1,
+        "Fade": 1,
+        "MinExposure": 1.5,
+        "MaxExposure": 1.5,
+        "ExposureCompensation": 0.14999995,
+        "PercentTarget": -1,
+        "PercentBrightPixels": -1,
+        "MinAverageLuminance": -1
+      }
+    }
+  ],
+  "Tones": [
+    {
+      "Name": "Rain Reflections",
+      "MinimumExposure": 1.5,
+      "MaximumExposure": 1.5,
+      "AutoExposureEnabled": true
+    },
+    {
+      "Name": "Camera",
+      "MinimumExposure": 1,
+      "MaximumExposure": 2,
+      "AutoExposureEnabled": true
+    }
+  ]
+}

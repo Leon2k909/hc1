@@ -1,0 +1,186 @@
+{
+  "date": "2026-10-09",
+  "fromUtc": "2026-10-09T05:51:13.415000+00:00",
+  "toUtc": "2026-10-09T05:51:30.416300+00:00",
+  "frames": 600,
+  "botsAlive": [
+    10,
+    14
+  ],
+  "playersAlive": 1,
+  "botLod": "on",
+  "frameMs": {
+    "average": 28.36,
+    "p50": 28.3,
+    "p95": 35.83,
+    "p99": 38.22,
+    "max": 49.78
+  },
+  "engineTimings": {
+    "Update": {
+      "averageMs": 2.274,
+      "maxMs": 14.964
+    },
+    "Animation": {
+      "averageMs": 1.102,
+      "maxMs": 4.899
+    },
+    "Physics": {
+      "averageMs": 2.761,
+      "maxMs": 5.191
+    },
+    "NavMesh": {
+      "averageMs": 0.207,
+      "maxMs": 0.454
+    },
+    "Network": {
+      "averageMs": 0.469,
+      "maxMs": 2.549
+    },
+    "Particles": {
+      "averageMs": 0.118,
+      "maxMs": 0.474
+    },
+    "Audio": {
+      "averageMs": 0.486,
+      "maxMs": 2.362
+    },
+    "UI": {
+      "averageMs": 2.391,
+      "maxMs": 7.236
+    },
+    "Render": {
+      "averageMs": 15.344,
+      "maxMs": 24.253
+    },
+    "Async": {
+      "averageMs": 0.099,
+      "maxMs": 3.41
+    },
+    "Editor": {
+      "averageMs": 1.526,
+      "maxMs": 8.775
+    },
+    "GcPause": {
+      "averageMs": 0.257,
+      "maxMs": 21.949
+    }
+  },
+  "resolution": [
+    1920,
+    1080
+  ],
+  "camera": {
+    "name": "Forest Base performance camera",
+    "IsMainCamera": true,
+    "Priority": 100,
+    "position": "-1180,200,68"
+  },
+  "modelRenderersBefore": 825,
+  "modelRenderersAfter": 777,
+  "modelErrors": 0,
+  "ssrVolumes": 1,
+  "gpuOverlap": [
+    {
+      "process": "SteelSeriesCaptureSvc",
+      "processId": 12524,
+      "engine": "pid_12524_luid_0x00000000_0x000118F7_phys_0_eng_0_engtype_3D",
+      "samples": 14,
+      "minPercent": 1,
+      "maxPercent": 1
+    },
+    {
+      "process": "Discord",
+      "processId": 15952,
+      "engine": "pid_15952_luid_0x00000000_0x00012F49_phys_0_eng_0_engtype_3D",
+      "samples": 14,
+      "minPercent": 3,
+      "maxPercent": 5
+    },
+    {
+      "process": "discord_clips",
+      "processId": 16928,
+      "engine": "pid_16928_luid_0x00000000_0x00012F49_phys_0_eng_0_engtype_3D",
+      "samples": 14,
+      "minPercent": 2,
+      "maxPercent": 3
+    },
+    {
+      "process": "sbox-dev",
+      "processId": 25116,
+      "engine": "pid_25116_luid_0x00000000_0x000118F7_phys_0_eng_0_engtype_3D",
+      "samples": 14,
+      "minPercent": 87,
+      "maxPercent": 93
+    },
+    {
+      "process": "sbox-dev",
+      "processId": 25116,
+      "engine": "pid_25116_luid_0x00000000_0x00012F49_phys_0_eng_0_engtype_3D",
+      "samples": 14,
+      "minPercent": 2,
+      "maxPercent": 5
+    },
+    {
+      "process": "dwm",
+      "processId": 36624,
+      "engine": "pid_36624_luid_0x00000000_0x000118F7_phys_0_eng_0_engtype_3D",
+      "samples": 14,
+      "minPercent": 4,
+      "maxPercent": 6
+    },
+    {
+      "process": "dwm",
+      "processId": 36624,
+      "engine": "pid_36624_luid_0x00000000_0x00012F49_phys_0_eng_0_engtype_3D",
+      "samples": 14,
+      "minPercent": 18,
+      "maxPercent": 25
+    },
+    {
+      "process": "AVCore",
+      "processId": 37812,
+      "engine": "pid_37812_luid_0x00000000_0x000118F7_phys_0_eng_0_engtype_3D",
+      "samples": 12,
+      "minPercent": 1,
+      "maxPercent": 1
+    },
+    {
+      "process": "AVCore",
+      "processId": 37812,
+      "engine": "pid_37812_luid_0x00000000_0x00012F49_phys_0_eng_0_engtype_3D",
+      "samples": 14,
+      "minPercent": 2,
+      "maxPercent": 3
+    },
+    {
+      "process": "chrome",
+      "processId": 8344,
+      "engine": "pid_8344_luid_0x00000000_0x00012ED3_phys_0_eng_7_engtype_3D",
+      "samples": 14,
+      "minPercent": 1,
+      "maxPercent": 3
+    },
+    {
+      "process": "csrss",
+      "processId": 32640,
+      "engine": "pid_32640_luid_0x00000000_0x00012F49_phys_0_eng_0_engtype_3D",
+      "samples": 1,
+      "minPercent": 1,
+      "maxPercent": 1
+    }
+  ],
+  "logEvidence": "bed-1080-performance-log.txt",
+  "contextEvidence": [
+    "bed-1080-runtime-context-before.json",
+    "bed-1080-runtime-context-after.json"
+  ],
+  "gpuEvidence": "bed-1080-runtime-gpu.json",
+  "imageEvidence": "bed-1080-runtime-view.png",
+  "limitations": [
+    "Local bots and one local player; not 10\u201315 remote clients.",
+    "Other processes including SteelSeries and desktop compositor use GPU engines during this sample; not an unloaded baseline.",
+    "Single fixed yard view, editor runtime, aged match with dynamic model count; not a fresh-load multi-view comparison.",
+    "No GPU-isolated attribution of all frame cost to the map; current average remains below a 60 FPS target."
+  ]
+}

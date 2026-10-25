@@ -1,0 +1,36 @@
+{
+  "revision": "2026-10-08 water/banks refinement",
+  "hashes": {
+    "Tools/forestbase_map.py": "03eccf6d0ac2caf32cc19b2a8b794cfc295abb6244161b57f4272a15dca62935",
+    "Tools/forestbase_water.py": "1ec9dc3ceab00382f5c8caf46c583675786c8d8d69517cae6247069dc9a5ea22",
+    "Assets/shaders/forestbase_waterfall.shader": "072c7e7f14c9864c7d217292b12bcca0c24177b53e740b185df4c9b9d64885df",
+    "Assets/shaders/forestbase_foam.shader": "ca11d70d1157f0c968f52b19bc1cb9bb6d4193d032e007f9410be096de9c48fb",
+    "Assets/shaders/forestbase_river.shader": "df5b1ca77037c0785f85c87e185e154995a50dd498b4b229e00e826748df16a2",
+    "Assets/models/maps/forestbase/vista.obj": "ee42a5e00a0d6112ea523b49a4f7b7f3ef62a75807d6dc8dc3b9615694929b0e"
+  },
+  "vista": {
+    "triangles": 5368,
+    "boxes": 0,
+    "hulls": 0
+  },
+  "qa": {
+    "spawnClearances": 32,
+    "blockedBoundaryRays": 6,
+    "blockedSpawnExposureRays": 112,
+    "errors": [],
+    "views": 14
+  },
+  "renders": [
+    "waterfall.png",
+    "waterfall-foot.png",
+    "gorge.png"
+  ],
+  "motionEvidence": "waterfall-uv-motion-audit.json",
+  "performanceEvidence": "waterfall-uv-performance-log.txt",
+  "limitations": [
+    "Current 600-frame runtime is poor under documented overlapping GPU workload; no unloaded attribution",
+    "Background only: no collision changes",
+    "Further water/cliff naturalism required",
+    "Full objective visual quality and remote 10-15 client validation remain outstanding"
+  ]
+}

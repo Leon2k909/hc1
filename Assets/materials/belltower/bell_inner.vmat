@@ -1,0 +1,14 @@
+// Tools/belltower_materials.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    g_flRoughnessScaleFactor "1"
+    g_flMetalness "0.72"
+    TextureColor "materials/belltower/bronze_bell_color.png"
+    TextureNormal "materials/belltower/bronze_bell_normal.png"
+    TextureRoughness "materials/belltower/bronze_bell_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[0.26 0.28 0.26 1.0]"
+    g_flModelTintAmount "1.0"
+}

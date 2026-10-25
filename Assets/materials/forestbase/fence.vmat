@@ -1,0 +1,16 @@
+// Tools/forestbase_materials.py
+"Layer0"
+{
+ shader "shaders/complex.shader"
+ F_SPECULAR "1"
+ g_flMetalness "0.8"
+ TextureColor "materials/forestbase/fence_color.png"
+ TextureNormal "materials/forestbase/fence_normal.png"
+ TextureRoughness "materials/forestbase/fence_rough.png"
+ TextureAmbientOcclusion "materials/default/default_ao.tga"
+ g_flModelTintAmount "1"
+ F_ALPHA_TEST "1"
+ F_RENDER_BACKFACES "1"
+ TextureTranslucency "materials/forestbase/fence_alpha.png"
+ g_flAlphaTestReference "0.35"
+}

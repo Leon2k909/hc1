@@ -1,0 +1,11 @@
+"Layer0"
+{
+ shader "shaders/complex.shader"
+ F_SPECULAR "1"
+ F_RENDER_BACKFACES "1"
+ TextureMetalness "[0 0 0 0]"
+ TextureColor "models/maps/forestbase/fir/textures/trunk_b_diff_1k.jpg"
+ TextureNormal "models/maps/forestbase/fir/textures/trunk_b_nor_gl_1k.jpg"
+ TextureRoughness "models/maps/forestbase/fir/textures/trunk_b_rough.png"
+ TextureAmbientOcclusion "models/maps/forestbase/fir/textures/trunk_b_ao.png"
+}

@@ -1,0 +1,14 @@
+"Layer0"
+{
+ shader "shaders/forestbase_coating.shader"
+ F_SPECULAR "1"
+ CoatingTint "[0.72 0.72 0.72]"
+ g_flMetalness "0.08"
+ TextureMetalness "[0.08 0.08 0.08 0]"
+ g_flCoatingMetalness "0.08"
+ TextureColor "materials/forestbase/transit/front_color.png"
+ TextureNormal "materials/forestbase/transit/front_normal.png"
+ TextureRoughness "materials/forestbase/transit/front_rough.png"
+ TextureAmbientOcclusion "materials/default/default_ao.tga"
+ g_flModelTintAmount "1"
+}

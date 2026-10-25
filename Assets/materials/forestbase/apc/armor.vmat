@@ -1,0 +1,14 @@
+"Layer0"
+{
+ shader "shaders/forestbase_coating.shader"
+ F_SPECULAR "1"
+ CoatingTint "[.60 .66 .53]"
+ CoatingDesaturation ".08"
+ g_flCoatingMetalness "0.05"
+ TextureMetalness "[0.05 0.05 0.05 0]"
+ TextureColor "materials/forestbase/apc/armor_color.png"
+ TextureNormal "materials/forestbase/apc/armor_normal.png"
+ TextureRoughness "materials/forestbase/apc/armor_rough.png"
+ TextureAmbientOcclusion "materials/default/default_ao.tga"
+ g_flModelTintAmount "1"
+}

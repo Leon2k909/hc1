@@ -1,0 +1,12 @@
+// Tools/forestbase_materials.py
+"Layer0"
+{
+ shader "shaders/complex.shader"
+ F_SPECULAR "1"
+ g_flMetalness "0"
+ TextureColor "materials/forestbase/vehicle_glass_color.png"
+ TextureNormal "materials/forestbase/vehicle_glass_normal.png"
+ TextureRoughness "materials/forestbase/vehicle_glass_rough.png"
+ TextureAmbientOcclusion "materials/default/default_ao.tga"
+ g_flModelTintAmount "1"
+}

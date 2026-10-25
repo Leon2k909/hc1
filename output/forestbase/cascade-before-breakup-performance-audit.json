@@ -1,0 +1,141 @@
+{
+  "fromUtc": "2026-10-09T08:36:02.786800+00:00",
+  "toUtc": "2026-10-09T08:36:20.475800+00:00",
+  "frames": 600,
+  "resolution": [
+    1920,
+    1080
+  ],
+  "botsAlive": [
+    10,
+    14
+  ],
+  "playersAlive": 1,
+  "botLod": "on",
+  "frameMs": {
+    "average": 29.52,
+    "p50": 29.46,
+    "p95": 33.35,
+    "p99": 38.03,
+    "max": 63.21
+  },
+  "averageFpsApprox": 33.88,
+  "engineTimings": {
+    "Update": {
+      "averageMs": 2.515,
+      "maxMs": 6.334
+    },
+    "Animation": {
+      "averageMs": 1.32,
+      "maxMs": 9.518
+    },
+    "Physics": {
+      "averageMs": 3.107,
+      "maxMs": 7.599
+    },
+    "NavMesh": {
+      "averageMs": 0.216,
+      "maxMs": 0.916
+    },
+    "Network": {
+      "averageMs": 0.232,
+      "maxMs": 2.452
+    },
+    "Particles": {
+      "averageMs": 0.11,
+      "maxMs": 0.56
+    },
+    "Audio": {
+      "averageMs": 0.392,
+      "maxMs": 1.221
+    },
+    "UI": {
+      "averageMs": 1.561,
+      "maxMs": 3.033
+    },
+    "Render": {
+      "averageMs": 17.995,
+      "maxMs": 29.086
+    },
+    "Async": {
+      "averageMs": 0.078,
+      "maxMs": 0.269
+    },
+    "Editor": {
+      "averageMs": 1.012,
+      "maxMs": 4.732
+    },
+    "GcPause": {
+      "averageMs": 0.198,
+      "maxMs": 17.408
+    }
+  },
+  "modelRenderersBefore": 654,
+  "modelRenderersAfter": 760,
+  "modelErrors": 0,
+  "ssrVolumes": 1,
+  "singleVisibleGameView": true,
+  "gpuOverlap": [
+    {
+      "process": "sbox-dev",
+      "processId": 25116,
+      "engine": "pid_25116_luid_0x00000000_0x000118F7_phys_0_eng_0_engtype_3D",
+      "samples": 14,
+      "minPercent": 89,
+      "maxPercent": 93
+    },
+    {
+      "process": "SteelSeriesCaptureSvc",
+      "processId": 27428,
+      "engine": "pid_27428_luid_0x00000000_0x000118F7_phys_0_eng_0_engtype_3D",
+      "samples": 14,
+      "minPercent": 1,
+      "maxPercent": 1
+    },
+    {
+      "process": "dwm",
+      "processId": 36624,
+      "engine": "pid_36624_luid_0x00000000_0x000118F7_phys_0_eng_0_engtype_3D",
+      "samples": 14,
+      "minPercent": 2,
+      "maxPercent": 4
+    },
+    {
+      "process": "dwm",
+      "processId": 36624,
+      "engine": "pid_36624_luid_0x00000000_0x00012F49_phys_0_eng_0_engtype_3D",
+      "samples": 14,
+      "minPercent": 14,
+      "maxPercent": 27
+    },
+    {
+      "process": "AVCore",
+      "processId": 37812,
+      "engine": "pid_37812_luid_0x00000000_0x00012F49_phys_0_eng_0_engtype_3D",
+      "samples": 14,
+      "minPercent": 1,
+      "maxPercent": 4
+    },
+    {
+      "process": "brave",
+      "processId": 9820,
+      "engine": "pid_9820_luid_0x00000000_0x000118F7_phys_0_eng_0_engtype_3D",
+      "samples": 4,
+      "minPercent": 1,
+      "maxPercent": 1
+    }
+  ],
+  "contextEvidence": [
+    "cascade-1080-runtime-context-before.json",
+    "cascade-1080-runtime-context-after.json"
+  ],
+  "viewportEvidence": "cascade-1080-viewport-state.json",
+  "gpuEvidence": "cascade-1080-runtime-gpu.json",
+  "imageEvidence": "cascade-1080-runtime-yard.png",
+  "limitations": [
+    "One fixed yard view in the editor; not an unloaded multi-view standalone benchmark.",
+    "Local bots and one local player; no remote-client test.",
+    "Other GPU processes are recorded, not assumed absent.",
+    "The earlier two-visible-view diagnostic is excluded from this sample."
+  ]
+}

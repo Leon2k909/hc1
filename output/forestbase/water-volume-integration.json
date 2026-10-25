@@ -1,0 +1,74 @@
+{
+  "date": "2026-10-20",
+  "projectRoot": "C:/Users/mimi-/Documents/S&box Projects/hc1",
+  "installed": true,
+  "sceneSha256": "1c92c90503530224d3af848159a218d473e777a197d6d96cd1f6bdd4f06b6347",
+  "waterfallShaderSha256": "de1591b5736b80abf9a7e559b872e72686967a176dcf5d688e8f13364b18fc6e",
+  "previousShaderSha256": "4a234f051858bcd9fb7c486e192a117b16fe0faa4b9cc63ac656344c676bed46",
+  "changes": [
+    "Existing water grid now has world-normal relief bounded by 5.2 inches and an updated clip-space position.",
+    "Unequal flowing channels vary width and centre, with advected edge breakup; smaller main/secondary froth patterns and denser aerated core.",
+    "No source mesh, texture, material path, collider or renderer added."
+  ],
+  "native": {
+    "editor": {
+      "EngineVersion": "26.10.13a",
+      "Project": "razedtest",
+      "ProjectTitle": "RazedTest",
+      "ActiveScene": "forestbase",
+      "ActiveScenePath": "scenes/maps/forestbase/forestbase.scene",
+      "SceneHasUnsavedChanges": false,
+      "IsPlaying": false,
+      "IsPaused": false,
+      "ToolCount": 401,
+      "IsCompiling": false,
+      "LastCompileSucceeded": true,
+      "LastCompileErrors": 0,
+      "Paths": {
+        "Engine": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\sbox",
+        "Logs": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\sbox\\logs",
+        "ProjectRoot": "C:\\Users\\mimi-\\Documents\\S&box Projects\\hc1",
+        "ProjectSettings": "C:\\Users\\mimi-\\Documents\\S&box Projects\\hc1\\ProjectSettings"
+      }
+    },
+    "compile": {
+      "Success": true,
+      "Path": "materials/forestbase/waterfall_0.vmat",
+      "CompiledFile": "c:/users/mimi-/documents/s&box projects/hc1/assets/materials/forestbase/waterfall_0.vmat_c",
+      "Hint": null
+    },
+    "material": {
+      "MaterialError": false,
+      "ShaderError": false,
+      "Shader": "shaders/forestbase_waterfall.shader",
+      "UnstuckGuardLoaded": true
+    },
+    "installedViews": {
+      "Models": 629,
+      "ModelErrors": 0,
+      "Views": [
+        {
+          "View": "front",
+          "File": "C:\\Users\\mimi-\\AppData\\Local\\Temp\\sbox-cli\\7751bfe156d740d7ada3f1d6cd94736d\\water-volume-installed-hd-front.png",
+          "Position": "1080,-500,448",
+          "Fov": 90
+        },
+        {
+          "View": "basin",
+          "File": "C:\\Users\\mimi-\\AppData\\Local\\Temp\\sbox-cli\\7751bfe156d740d7ada3f1d6cd94736d\\water-volume-installed-hd-basin.png",
+          "Position": "2200,-430,680",
+          "Fov": 72
+        },
+        {
+          "View": "side",
+          "File": "C:\\Users\\mimi-\\AppData\\Local\\Temp\\sbox-cli\\7751bfe156d740d7ada3f1d6cd94736d\\water-volume-installed-hd-side.png",
+          "Position": "2950,-430,320",
+          "Fov": 75
+        }
+      ]
+    },
+    "motionAudit": "water-volume-stage-20261020/final-motion-audit.json"
+  },
+  "evidenceScope": "Actual 1920x1080 engine captures from the saved visual scene with the real camera profile and no material/transform previews. Three additional fixed-camera timed 1280x720 captures change in all three unobstructed jet regions. Editor Time.Now is zero in this scope. Pixel differences do not independently prove downward direction or fluid simulation. Surface remains visibly below the reference/AAA target.",
+  "performance": "No new full-match acceptance. Reopened editor has nonzero performance windows, but the current diagnostic is stopped editor rendering with two scene tabs and no controlled player viewport. Do not label it match FPS."
+}

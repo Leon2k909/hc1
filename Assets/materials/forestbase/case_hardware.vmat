@@ -1,0 +1,14 @@
+// Tools/forestbase_materials.py
+"Layer0"
+{
+ shader "shaders/forestbase_coating.shader"
+ F_SPECULAR "1"
+ g_flMetalness "0.72"
+ TextureMetalness "[0.72 0.72 0.72 0]"
+ TextureColor "materials/forestbase/case_hardware_color.png"
+ TextureNormal "materials/forestbase/case_hardware_normal.png"
+ TextureRoughness "materials/forestbase/case_hardware_rough.png"
+ TextureAmbientOcclusion "materials/default/default_ao.tga"
+ g_flModelTintAmount "1"
+ g_flCoatingMetalness "0.72"
+}

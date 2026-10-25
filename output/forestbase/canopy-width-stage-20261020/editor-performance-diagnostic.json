@@ -1,0 +1,149 @@
+{
+  "context": "Stopped editor on Forest Base, two scene tabs, no controlled player viewport. Not a match-performance acceptance or width before/after benchmark.",
+  "data": {
+    "Window": {
+      "Frames": 37,
+      "Seconds": 2.02
+    },
+    "Fps": 18.3,
+    "TargetFps": 90,
+    "TargetSource": "fps_max_inactive",
+    "LimitedBy": "CPU",
+    "MeetingTarget": false,
+    "Rating": "Bad",
+    "Frame": {
+      "AvgMs": 54.72,
+      "P50Ms": 55.49,
+      "P99Ms": 73.72,
+      "MaxMs": 73.72
+    },
+    "CpuWork": {
+      "AvgMs": 54.72,
+      "P50Ms": 55.49,
+      "P99Ms": 73.72,
+      "MaxMs": 73.72
+    },
+    "Gpu": null,
+    "CapWait": {
+      "AvgMs": 0,
+      "P50Ms": 0,
+      "P99Ms": 0,
+      "MaxMs": 0
+    },
+    "PerfHubWindow": null,
+    "Hitches": {
+      "Count": 0,
+      "OverMs": 111,
+      "WorstMs": 0
+    },
+    "Issues": [],
+    "MainThread": [
+      {
+        "Name": "Render",
+        "AvgMs": 50.65,
+        "MaxMs": 116.87
+      },
+      {
+        "Name": "Editor",
+        "AvgMs": 3.25,
+        "MaxMs": 14.52
+      },
+      {
+        "Name": "UI",
+        "AvgMs": 0.62,
+        "MaxMs": 3.26
+      },
+      {
+        "Name": "Animation",
+        "AvgMs": 0.15,
+        "MaxMs": 5.86
+      },
+      {
+        "Name": "Async",
+        "AvgMs": 0.06,
+        "MaxMs": 2.9
+      },
+      {
+        "Name": "Input",
+        "AvgMs": 0.04,
+        "MaxMs": 0.46
+      },
+      {
+        "Name": "GcPause",
+        "AvgMs": 0.03,
+        "MaxMs": 3.24
+      },
+      {
+        "Name": "Update",
+        "AvgMs": 0.02,
+        "MaxMs": 0.12
+      }
+    ],
+    "GpuPasses": [
+      {
+        "Name": "Dynamic Opaque Forward",
+        "AvgMs": 32.43,
+        "MaxMs": 43.28,
+        "Path": "RenderToSwapChain / Dynamic Opaque Forward"
+      },
+      {
+        "Name": "Depth Normal Prepass (Small)",
+        "AvgMs": 10.66,
+        "MaxMs": 17.65,
+        "Path": "RenderToSwapChain / Depth Normal Prepass (Small)"
+      },
+      {
+        "Name": "VolumetricFog",
+        "AvgMs": 2.19,
+        "MaxMs": 11.18,
+        "Path": "RenderToSwapChain / VolumetricFog"
+      },
+      {
+        "Name": "DrawDepthOpaque",
+        "AvgMs": 0.89,
+        "MaxMs": 1.04,
+        "Path": "Sandbox.SceneSpotLight_Shadow / DrawDepthOpaque"
+      },
+      {
+        "Name": "DrawDepthFade",
+        "AvgMs": 0.63,
+        "MaxMs": 10.9,
+        "Path": "Sandbox.SceneSpotLight_Shadow / DrawDepthFade"
+      },
+      {
+        "Name": "DrawDepthOpaque",
+        "AvgMs": 0.61,
+        "MaxMs": 1.15,
+        "Path": "CSM Cascade 2 / DrawDepthOpaque"
+      },
+      {
+        "Name": "ScreenSpaceReflections",
+        "AvgMs": 0.53,
+        "MaxMs": 4.87,
+        "Path": "Managed: AfterDepthPrepass / ScreenSpaceReflections"
+      },
+      {
+        "Name": "Static World Overlays",
+        "AvgMs": 0.48,
+        "MaxMs": 10.27,
+        "Path": "RenderToSwapChain / Static World Overlays"
+      }
+    ],
+    "Memory": {
+      "ProcessMiB": 5271.8,
+      "VideoMemory": {
+        "UsedMiB": 2828.9,
+        "BudgetMiB": 5286.7
+      },
+      "AllocatedMiBPerSecond": 5.7,
+      "GcPauseMsLastSecond": 0,
+      "GcLastSecond": {
+        "Gen0": 0,
+        "Gen1": 0,
+        "Gen2": 0
+      }
+    },
+    "DrawCalls": 4316,
+    "Triangles": 31284281
+  }
+}

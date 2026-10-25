@@ -1,0 +1,247 @@
+{
+  "scope": "Offline serialized scene/model checks and numerical surface-profile sampling; no native gameplay/render/performance acceptance.",
+  "existingObjectsPreserved": 752,
+  "newObjects": 0,
+  "materialRemaps": 49,
+  "loweredRocks": [
+    {
+      "name": "Rock 80",
+      "before": 444.536,
+      "after": 282.878
+    },
+    {
+      "name": "Rock 81",
+      "before": 481.012,
+      "after": 442.424
+    },
+    {
+      "name": "Rock 82",
+      "before": 766.999,
+      "after": 349.336
+    },
+    {
+      "name": "Rock 83",
+      "before": 561.633,
+      "after": 431.003
+    },
+    {
+      "name": "Rock 84",
+      "before": 737.782,
+      "after": 417.57
+    },
+    {
+      "name": "Rock 85",
+      "before": 709.874,
+      "after": 380.97
+    },
+    {
+      "name": "Rock 92",
+      "before": 667.858,
+      "after": 349.756
+    },
+    {
+      "name": "Rock 94",
+      "before": 699.602,
+      "after": 310.681
+    },
+    {
+      "name": "Rock 95",
+      "before": 406.757,
+      "after": 402.933
+    },
+    {
+      "name": "Rock 96",
+      "before": 738.962,
+      "after": 430.898
+    },
+    {
+      "name": "Rock 97",
+      "before": 511.35,
+      "after": 394.295
+    },
+    {
+      "name": "Rock 98",
+      "before": 706.896,
+      "after": 429.667
+    },
+    {
+      "name": "Rock 99",
+      "before": 660.984,
+      "after": 291.54
+    },
+    {
+      "name": "Rock 100",
+      "before": 678.913,
+      "after": 394.47
+    },
+    {
+      "name": "Rock 102",
+      "before": 571.599,
+      "after": 371.48
+    },
+    {
+      "name": "Rock 103",
+      "before": 421.442,
+      "after": 339.309
+    },
+    {
+      "name": "Rock 104",
+      "before": 445.726,
+      "after": 389.013
+    },
+    {
+      "name": "Rock 105",
+      "before": 525.014,
+      "after": 365.698
+    },
+    {
+      "name": "Rock 106",
+      "before": 618.528,
+      "after": 375.431
+    },
+    {
+      "name": "Rock 107",
+      "before": 704.085,
+      "after": 264.72
+    },
+    {
+      "name": "Rock 108",
+      "before": 583.391,
+      "after": 348.321
+    },
+    {
+      "name": "Rock 109",
+      "before": 316.58,
+      "after": 286.112
+    },
+    {
+      "name": "Rock 110",
+      "before": 717.838,
+      "after": 403.732
+    },
+    {
+      "name": "Rock 111",
+      "before": 427.135,
+      "after": 347.267
+    },
+    {
+      "name": "Rock 112",
+      "before": 701.089,
+      "after": 358.758
+    },
+    {
+      "name": "Rock 113",
+      "before": 406.434,
+      "after": 333.866
+    },
+    {
+      "name": "Rock 114",
+      "before": 401.939,
+      "after": 282.503
+    },
+    {
+      "name": "Rock 115",
+      "before": 656.963,
+      "after": 263.616
+    },
+    {
+      "name": "Rock 116",
+      "before": 525.621,
+      "after": 357.051
+    },
+    {
+      "name": "Rock 117",
+      "before": 540.6,
+      "after": 338.023
+    }
+  ],
+  "existingPositionsRotationsAndHorizontalScalesUnchanged": true,
+  "nonRockObjectsAndScenePropertiesUnchanged": true,
+  "coreMapModelDocsUnchanged": {
+    "ground": true,
+    "motor": true,
+    "barracks": true,
+    "command": true,
+    "workshop": true,
+    "yard": true,
+    "logistics": true,
+    "links": true,
+    "vista": true
+  },
+  "originalScanModelAndMaterialUnchanged": true,
+  "wrapperChangesOnlyMaterial": true,
+  "physicalShapesAdded": 0,
+  "maximumRimTopHeightMetresBefore": 13.6564509990576,
+  "maximumRimTopHeightMetresAfter": 5.405188959577599,
+  "profile": {
+    "samplesPerSlope": 8192,
+    "slopeCases": [
+      {
+        "up": 0,
+        "mossMean": 0.0,
+        "mossRange": [
+          0.0,
+          0.0
+        ],
+        "roughnessRange": [
+          0.3257583164702343,
+          0.7581588752462949
+        ]
+      },
+      {
+        "up": 0.22,
+        "mossMean": 0.0,
+        "mossRange": [
+          0.0,
+          0.0
+        ],
+        "roughnessRange": [
+          0.3257583164702343,
+          0.7581588752462949
+        ]
+      },
+      {
+        "up": 0.5,
+        "mossMean": 0.2608824732344826,
+        "mossRange": [
+          0.0,
+          0.4
+        ],
+        "roughnessRange": [
+          0.3461725656183148,
+          0.7783096853758256
+        ]
+      },
+      {
+        "up": 1,
+        "mossMean": 0.5217649464689652,
+        "mossRange": [
+          0.0,
+          0.8
+        ],
+        "roughnessRange": [
+          0.34687603284365404,
+          0.8126276846799658
+        ]
+      }
+    ],
+    "wetnessRange": [
+      0.43043608020204777,
+      0.9590787150241351
+    ],
+    "scope": "CPU numeric evaluation of the shader formulas in double precision; GPU/compiler equivalence is not asserted."
+  },
+  "additionalTextures": 0,
+  "additionalDeclaredTriangles": 0,
+  "sourceHashes": {
+    "Tools\\forestbase_rocks.py": "b6e13ee79af83c95b399f5e51c421eae2cfb04e921c602b59df916b1ffed8f62",
+    "Tools\\forestbase_map.py": "8f0829d69020d1b1109364b0bee239fbc6401311fc4c6822d2596d21925af4bc",
+    "Tools\\forestbase_rocks_audit.py": "1af09b9e6ed24ef2bdc66444b4ea78bb06b7f49613a4ba49959a8ef2fbf8d99c",
+    "Assets\\shaders\\forestbase_rock.shader": "9ed1a6ddabb50cd558b3c6e3d9820af5d18963e34bf75f428268c6cf80ecedde"
+  },
+  "limitations": [
+    "Shader complexity changes although texture and geometry counts do not. Current native performance is unmeasured.",
+    "Lower rocks reveal more forest/ground; complete dense-forest coverage and full reference composition remain unfinished.",
+    "No engine movement, roof-access, spawn visibility or escape verification is supplied by this audit."
+  ]
+}

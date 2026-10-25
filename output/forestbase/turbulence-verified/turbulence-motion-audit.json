@@ -1,0 +1,101 @@
+{
+  "captures": [
+    {
+      "file": "turbulence-runtime-waterfall-0.png",
+      "utc": "2026-10-09T10:42:22.3779684Z",
+      "cameraPosition": "1080,-500,448"
+    },
+    {
+      "file": "turbulence-runtime-waterfall-1.png",
+      "utc": "2026-10-09T10:42:24.8101485Z",
+      "cameraPosition": "1080,-500,448"
+    },
+    {
+      "file": "turbulence-runtime-waterfall-2.png",
+      "utc": "2026-10-09T10:42:26.7835822Z",
+      "cameraPosition": "1080,-500,448"
+    }
+  ],
+  "pairs": [
+    {
+      "frames": [
+        0,
+        1
+      ],
+      "elapsedSeconds": 2.43218,
+      "regions": [
+        {
+          "roi": [
+            711,
+            410,
+            730,
+            660
+          ],
+          "pixelsChangedOver8": 3218,
+          "meanAbsoluteRgbDelta": 19.768842105263158
+        },
+        {
+          "roi": [
+            770,
+            445,
+            790,
+            760
+          ],
+          "pixelsChangedOver8": 4861,
+          "meanAbsoluteRgbDelta": 24.22089947089947
+        },
+        {
+          "roi": [
+            837,
+            480,
+            852,
+            720
+          ],
+          "pixelsChangedOver8": 2679,
+          "meanAbsoluteRgbDelta": 20.644537037037036
+        }
+      ]
+    },
+    {
+      "frames": [
+        1,
+        2
+      ],
+      "elapsedSeconds": 1.973434,
+      "regions": [
+        {
+          "roi": [
+            711,
+            410,
+            730,
+            660
+          ],
+          "pixelsChangedOver8": 3239,
+          "meanAbsoluteRgbDelta": 20.259087719298247
+        },
+        {
+          "roi": [
+            770,
+            445,
+            790,
+            760
+          ],
+          "pixelsChangedOver8": 4984,
+          "meanAbsoluteRgbDelta": 26.037936507936507
+        },
+        {
+          "roi": [
+            837,
+            480,
+            852,
+            720
+          ],
+          "pixelsChangedOver8": 2689,
+          "meanAbsoluteRgbDelta": 21.16953703703704
+        }
+      ]
+    }
+  ],
+  "waterShaderSha256": "781f5b2ed40a3b1387d3aecae42ec4b656bab2d859ef2cd010a32e10f5d5cf79",
+  "evidenceScope": "Animated appearance in three unobstructed jet regions at a fixed native runtime camera; pixel differences do not establish physical fluid simulation or independently measure the flow direction."
+}

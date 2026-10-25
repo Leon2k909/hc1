@@ -1,0 +1,11 @@
+"Layer0"
+{
+ shader "shaders/complex.shader"
+ F_SPECULAR "1"
+ TextureColor "materials/forestbase/scans/mud_forest_diff.jpg"
+ TextureNormal "materials/forestbase/scans/mud_forest_nor_gl.jpg"
+ TextureRoughness "materials/forestbase/scans/mud_forest_rough.jpg"
+ TextureAmbientOcclusion "materials/forestbase/scans/mud_forest_ao.jpg"
+ TextureMetalness "[0 0 0 0]"
+ g_flTintColor "[0.58 0.65 0.52 1]"
+}

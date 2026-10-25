@@ -1,0 +1,29 @@
+{
+  "Cases": [
+    {
+      "Case": "stance-growth-under-cap",
+      "Trials": 32,
+      "Escapes": 0,
+      "Unresolved": 0,
+      "MaximumCalls": 33
+    },
+    {
+      "Case": "ordinary-prop-without-history",
+      "Trials": 32,
+      "Escapes": 0,
+      "Unresolved": 0,
+      "MaximumCalls": 103
+    },
+    {
+      "Case": "ordinary-prop-with-history",
+      "Trials": 32,
+      "Escapes": 0,
+      "Unresolved": 0,
+      "MaximumCalls": 103
+    }
+  ],
+  "ExplicitClipIgnorePreserved": true,
+  "IgnoreProbeStartSolid": false,
+  "IgnoreProbeEnd": "2400,0,0",
+  "Scope": "Regression checks: increased hull height under the cap, ordinary-prop recovery with/without known history, and explicit playerclip ignore. Isolated native controller checks, not a remote-client match."
+}

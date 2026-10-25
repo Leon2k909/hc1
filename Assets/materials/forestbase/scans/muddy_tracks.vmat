@@ -1,0 +1,11 @@
+"Layer0"
+{
+ shader "shaders/forestbase_mud.shader"
+ F_SPECULAR "1"
+ TextureColor "materials/forestbase/scans/muddy_tracks_diff.jpg"
+ TextureNormal "materials/forestbase/scans/muddy_tracks_nor_gl.jpg"
+ TextureRoughness "materials/forestbase/scans/muddy_tracks_rough.jpg"
+ TextureAmbientOcclusion "materials/forestbase/scans/muddy_tracks_ao.jpg"
+ TextureMetalness "[0 0 0 0]"
+ g_flTintColor "[.60 .65 .65]"
+}

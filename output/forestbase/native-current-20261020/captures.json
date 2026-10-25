@@ -1,0 +1,18 @@
+{
+  "profile": "Instantiated actual default_player_camera prefab with ACES, disabled extra ColorAdjustments and authored map effects. Overview FOV 72; entrance/waterfall/stair FOV 90. The temporary camera was removed and the saved scene remains identical.",
+  "images": [
+    "native-compound-initial.png",
+    "native-compound-reloaded.png",
+    "native-entrance-initial.png",
+    "native-waterfall-player.png",
+    "native-command-stair-after.png",
+    "runtime-yard-player.png",
+    "native-compound-final.png"
+  ],
+  "limits": [
+    "Initial compound contains the diagnosed red error rock shader, fixed by native shader reload and material recompile in the reloaded view.",
+    "Runtime yard retains equipment shader errors.",
+    "Legacy QA command captures use its older independent camera setup; the named native captures use the actual prefab profile.",
+    "The final compound capture includes the later cargo-stair correction; earlier compound captures predate that move."
+  ]
+}

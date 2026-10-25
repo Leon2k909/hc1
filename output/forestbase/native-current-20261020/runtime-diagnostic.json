@@ -1,0 +1,58 @@
+{
+  "utc": "2026-10-20T03:39:40.560Z",
+  "scope": "Offline TDM diagnostic; instantaneous frame/GPU counters plus 60-frame category averages. Not a clean performance acceptance or 600-frame benchmark.",
+  "profiler": {
+    "fps": 1.6,
+    "frameMs": 618.577,
+    "gpuMs": 30.488,
+    "gpuFrameNumber": 938,
+    "bytesAllocated": 47385728,
+    "processMemoryBytes": 10187726848,
+    "exceptions": 0,
+    "avgFrames": 60,
+    "timingsMs": {
+      "update": 7.603,
+      "physics": 0.82,
+      "ui": 1.486,
+      "render": 4.729,
+      "network": 0.001,
+      "gcPause": 2.005
+    }
+  },
+  "context": {
+    "utc": "2026-10-20T03:39:39.9112438Z",
+    "scene": "forestbase",
+    "mode": "tdm",
+    "screen": "1920,1080",
+    "modelRenderers": 764,
+    "modelErrors": 0,
+    "ssrVolumes": 1,
+    "cameras": [
+      {
+        "name": "Camera",
+        "IsMainCamera": true,
+        "Priority": 8,
+        "position": "-1174.204,193.1065,60.0412"
+      }
+    ]
+  },
+  "bots": 13,
+  "networkActive": false,
+  "controls": {
+    "dev_no_damage": true,
+    "extraBotsRequested": 4,
+    "playerTeleportedToPlan": [
+      -200,
+      -1180,
+      2
+    ],
+    "eyeAngles": "-3.5,-12.2,0"
+  },
+  "limitations": [
+    "Repeated special-dependency recompiles remain active in unrelated equipment/grass resources.",
+    "Visible equipment shader errors remain in runtime capture.",
+    "GPU-process overlap was not sampled.",
+    "No remote clients; local bot count is not a multiplayer networking test.",
+    "Stable 60 FPS has not been achieved."
+  ]
+}

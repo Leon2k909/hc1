@@ -1,0 +1,12 @@
+"Layer0"
+{
+ shader "shaders/forestbase_coating.shader"
+ F_SPECULAR "1"
+ g_flCoatingMetalness "0.68"
+ TextureMetalness "[0.68 0.68 0.68 0]"
+ TextureColor "materials/forestbase/apc/metal_color.png"
+ TextureNormal "materials/forestbase/apc/metal_normal.png"
+ TextureRoughness "materials/forestbase/apc/metal_rough.png"
+ TextureAmbientOcclusion "materials/default/default_ao.tga"
+ g_flModelTintAmount "1"
+}

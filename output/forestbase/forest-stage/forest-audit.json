@@ -1,0 +1,809 @@
+{
+  "scope": "Offline scene/asset checks; maximum declared LOD triangle sum is not active GPU cost or FPS.",
+  "existingObjects": 656,
+  "removedObjects": 0,
+  "changedExistingTrees": 356,
+  "nonForestObjectsUnchanged": true,
+  "existingRootsRotationsParentsAndOrderUnchanged": true,
+  "addedRenderOnlyObjects": 88,
+  "addedUnderstory": 24,
+  "forestTreeCounts": {
+    "before": 437,
+    "after": 525
+  },
+  "maximumDeclaredLodTriangleSum": {
+    "before": 12346229,
+    "after": 12185295
+  },
+  "declaredTriangleReduction": 160934,
+  "matureMedianWidthHeightRatio": {
+    "before": 0.43221341748658165,
+    "after": 0.3097528900596119
+  },
+  "horizonTrees": 139,
+  "regularFirLod2UsesDimensionalBranches": true,
+  "minimumHorizonRootDistanceMetres": 92.464382,
+  "treeAssets": [
+    {
+      "model": "models/maps/forestbase/fir/fir_a_horizon.vmdl",
+      "staged": true,
+      "triangles": 4998,
+      "meshes": [
+        {
+          "file": "models/maps/forestbase/fir/fir_a_horizon.obj",
+          "triangles": 4998,
+          "mins": [
+            -108.10154,
+            -127.443047,
+            -3.100181
+          ],
+          "maxs": [
+            133.238647,
+            124.447456,
+            743.955872
+          ]
+        }
+      ]
+    },
+    {
+      "model": "models/maps/forestbase/fir/fir_b_horizon.vmdl",
+      "staged": true,
+      "triangles": 5000,
+      "meshes": [
+        {
+          "file": "models/maps/forestbase/fir/fir_b_horizon.obj",
+          "triangles": 5000,
+          "mins": [
+            -115.214424,
+            -119.793961,
+            -3.454681
+          ],
+          "maxs": [
+            124.332649,
+            101.936241,
+            550.817383
+          ]
+        }
+      ]
+    },
+    {
+      "model": "models/maps/forestbase/fir/fir_c_horizon.vmdl",
+      "staged": true,
+      "triangles": 5000,
+      "meshes": [
+        {
+          "file": "models/maps/forestbase/fir/fir_c_horizon.obj",
+          "triangles": 5000,
+          "mins": [
+            -117.401825,
+            -141.271866,
+            -3.632465
+          ],
+          "maxs": [
+            119.031944,
+            108.724358,
+            569.23175
+          ]
+        }
+      ]
+    },
+    {
+      "model": "models/maps/forestbase/fir/fir_a_far.vmdl",
+      "staged": true,
+      "triangles": 20443,
+      "meshes": [
+        {
+          "file": "models/maps/forestbase/fir/fir_a_distant.obj",
+          "triangles": 20443,
+          "mins": [
+            -114.4664,
+            -131.155731,
+            -3.100181
+          ],
+          "maxs": [
+            139.721664,
+            127.033791,
+            743.955872
+          ]
+        }
+      ]
+    },
+    {
+      "model": "models/maps/forestbase/fir/fir_b_far.vmdl",
+      "staged": true,
+      "triangles": 21347,
+      "meshes": [
+        {
+          "file": "models/maps/forestbase/fir/fir_b_distant.obj",
+          "triangles": 21347,
+          "mins": [
+            -115.214424,
+            -119.793961,
+            -3.454681
+          ],
+          "maxs": [
+            124.332649,
+            101.936241,
+            550.817383
+          ]
+        }
+      ]
+    },
+    {
+      "model": "models/maps/forestbase/fir/fir_c_far.vmdl",
+      "staged": true,
+      "triangles": 9900,
+      "meshes": [
+        {
+          "file": "models/maps/forestbase/fir/fir_c_distant.obj",
+          "triangles": 9900,
+          "mins": [
+            -117.401825,
+            -141.271866,
+            -3.632465
+          ],
+          "maxs": [
+            119.031944,
+            108.724358,
+            569.23175
+          ]
+        }
+      ]
+    },
+    {
+      "model": "models/maps/forestbase/fir/fir_a.vmdl",
+      "staged": false,
+      "triangles": 54999,
+      "meshes": [
+        {
+          "file": "models/maps/forestbase/fir/fir_a_lod0.obj",
+          "triangles": 54999,
+          "mins": [
+            -114.466713,
+            -131.556488,
+            -3.157877
+          ],
+          "maxs": [
+            140.155426,
+            127.620445,
+            743.182556
+          ]
+        },
+        {
+          "file": "models/maps/forestbase/fir/fir_a_lod2.obj",
+          "triangles": 6,
+          "mins": [
+            -155.206573,
+            -196.016525,
+            -18.084669
+          ],
+          "maxs": [
+            180.895294,
+            192.08049,
+            758.109375
+          ]
+        },
+        {
+          "file": "models/maps/forestbase/fir/fir_a_lod1.obj",
+          "triangles": 22000,
+          "mins": [
+            -114.4664,
+            -131.155731,
+            -3.100181
+          ],
+          "maxs": [
+            139.721664,
+            127.033791,
+            743.955872
+          ]
+        }
+      ]
+    },
+    {
+      "model": "models/maps/forestbase/fir/fir_b.vmdl",
+      "staged": false,
+      "triangles": 54927,
+      "meshes": [
+        {
+          "file": "models/maps/forestbase/fir/fir_b_lod1.obj",
+          "triangles": 22000,
+          "mins": [
+            -115.214424,
+            -119.793961,
+            -3.454681
+          ],
+          "maxs": [
+            124.332649,
+            101.936241,
+            550.817383
+          ]
+        },
+        {
+          "file": "models/maps/forestbase/fir/fir_b_lod2.obj",
+          "triangles": 6,
+          "mins": [
+            -140.316513,
+            -176.216827,
+            -60.875172
+          ],
+          "maxs": [
+            149.434723,
+            158.359085,
+            608.276672
+          ]
+        },
+        {
+          "file": "models/maps/forestbase/fir/fir_b_lod0.obj",
+          "triangles": 54927,
+          "mins": [
+            -115.214424,
+            -119.793961,
+            -3.415927
+          ],
+          "maxs": [
+            124.332649,
+            101.936241,
+            550.817383
+          ]
+        }
+      ]
+    },
+    {
+      "model": "models/maps/forestbase/fir/fir_c.vmdl",
+      "staged": false,
+      "triangles": 31512,
+      "meshes": [
+        {
+          "file": "models/maps/forestbase/fir/fir_c_lod0.obj",
+          "triangles": 31512,
+          "mins": [
+            -117.401825,
+            -141.271866,
+            -3.693812
+          ],
+          "maxs": [
+            119.031944,
+            108.724358,
+            569.23175
+          ]
+        },
+        {
+          "file": "models/maps/forestbase/fir/fir_c_lod1.obj",
+          "triangles": 21999,
+          "mins": [
+            -117.401825,
+            -141.271866,
+            -3.693812
+          ],
+          "maxs": [
+            119.031944,
+            108.724358,
+            569.23175
+          ]
+        },
+        {
+          "file": "models/maps/forestbase/fir/fir_c_lod2.obj",
+          "triangles": 6,
+          "mins": [
+            -151.905884,
+            -192.620712,
+            -69.924957
+          ],
+          "maxs": [
+            153.536011,
+            160.073196,
+            635.462891
+          ]
+        }
+      ]
+    },
+    {
+      "model": "models/maps/forestbase/sapling/sapling_a.vmdl",
+      "staged": false,
+      "triangles": 10000,
+      "meshes": [
+        {
+          "file": "models/maps/forestbase/sapling/sapling_a_lod2.obj",
+          "triangles": 6,
+          "mins": [
+            -20.21133,
+            -23.772604,
+            -22.75387
+          ],
+          "maxs": [
+            21.39933,
+            24.275249,
+            73.341835
+          ]
+        },
+        {
+          "file": "models/maps/forestbase/sapling/sapling_a_lod1.obj",
+          "triangles": 4000,
+          "mins": [
+            -15.577207,
+            -16.693876,
+            -0.331167
+          ],
+          "maxs": [
+            16.779551,
+            17.207851,
+            50.90662
+          ]
+        },
+        {
+          "file": "models/maps/forestbase/sapling/sapling_a_lod0.obj",
+          "triangles": 10000,
+          "mins": [
+            -15.577207,
+            -16.693876,
+            -0.331167
+          ],
+          "maxs": [
+            16.779551,
+            17.207851,
+            50.90662
+          ]
+        }
+      ]
+    },
+    {
+      "model": "models/maps/forestbase/sapling/sapling_b.vmdl",
+      "staged": false,
+      "triangles": 9999,
+      "meshes": [
+        {
+          "file": "models/maps/forestbase/sapling/sapling_b_lod1.obj",
+          "triangles": 4000,
+          "mins": [
+            -15.228694,
+            -12.371734,
+            -0.017338
+          ],
+          "maxs": [
+            16.948444,
+            12.812771,
+            37.448322
+          ]
+        },
+        {
+          "file": "models/maps/forestbase/sapling/sapling_b_lod0.obj",
+          "triangles": 9999,
+          "mins": [
+            -15.228694,
+            -12.371734,
+            -0.017338
+          ],
+          "maxs": [
+            16.948444,
+            12.812771,
+            37.448322
+          ]
+        },
+        {
+          "file": "models/maps/forestbase/sapling/sapling_b_lod2.obj",
+          "triangles": 6,
+          "mins": [
+            -17.29122,
+            -20.719719,
+            -23.164721
+          ],
+          "maxs": [
+            18.992201,
+            21.176765,
+            60.62825
+          ]
+        }
+      ]
+    },
+    {
+      "model": "models/maps/forestbase/sapling/sapling_c.vmdl",
+      "staged": false,
+      "triangles": 10000,
+      "meshes": [
+        {
+          "file": "models/maps/forestbase/sapling/sapling_c_lod0.obj",
+          "triangles": 10000,
+          "mins": [
+            -12.362426,
+            -12.042028,
+            -0.035116
+          ],
+          "maxs": [
+            12.59855,
+            12.466611,
+            28.966797
+          ]
+        },
+        {
+          "file": "models/maps/forestbase/sapling/sapling_c_lod1.obj",
+          "triangles": 4000,
+          "mins": [
+            -12.362426,
+            -12.042028,
+            -0.035116
+          ],
+          "maxs": [
+            12.59855,
+            12.466611,
+            28.966797
+          ]
+        },
+        {
+          "file": "models/maps/forestbase/sapling/sapling_c_lod2.obj",
+          "triangles": 6,
+          "mins": [
+            -15.406764,
+            -17.713846,
+            -21.367453
+          ],
+          "maxs": [
+            15.637539,
+            18.133028,
+            50.326294
+          ]
+        }
+      ]
+    },
+    {
+      "model": "models/maps/forestbase/fir/fir_b_far.vmdl",
+      "staged": false,
+      "triangles": 21347,
+      "meshes": [
+        {
+          "file": "models/maps/forestbase/fir/fir_b_distant.obj",
+          "triangles": 21347,
+          "mins": [
+            -115.214424,
+            -119.793961,
+            -3.454681
+          ],
+          "maxs": [
+            124.332649,
+            101.936241,
+            550.817383
+          ]
+        }
+      ]
+    },
+    {
+      "model": "models/maps/forestbase/fir/fir_c_far.vmdl",
+      "staged": false,
+      "triangles": 9900,
+      "meshes": [
+        {
+          "file": "models/maps/forestbase/fir/fir_c_distant.obj",
+          "triangles": 9900,
+          "mins": [
+            -117.401825,
+            -141.271866,
+            -3.632465
+          ],
+          "maxs": [
+            119.031944,
+            108.724358,
+            569.23175
+          ]
+        }
+      ]
+    },
+    {
+      "model": "models/maps/forestbase/fir/fir_a_far.vmdl",
+      "staged": false,
+      "triangles": 20443,
+      "meshes": [
+        {
+          "file": "models/maps/forestbase/fir/fir_a_distant.obj",
+          "triangles": 20443,
+          "mins": [
+            -114.4664,
+            -131.155731,
+            -3.100181
+          ],
+          "maxs": [
+            139.721664,
+            127.033791,
+            743.955872
+          ]
+        }
+      ]
+    },
+    {
+      "model": "models/maps/forestbase/fir/fir_a.vmdl",
+      "staged": true,
+      "triangles": 54999,
+      "meshes": [
+        {
+          "file": "models/maps/forestbase/fir/fir_a_horizon.obj",
+          "triangles": 4998,
+          "mins": [
+            -108.10154,
+            -127.443047,
+            -3.100181
+          ],
+          "maxs": [
+            133.238647,
+            124.447456,
+            743.955872
+          ]
+        },
+        {
+          "file": "models/maps/forestbase/fir/fir_a_lod0.obj",
+          "triangles": 54999,
+          "mins": [
+            -114.466713,
+            -131.556488,
+            -3.157877
+          ],
+          "maxs": [
+            140.155426,
+            127.620445,
+            743.182556
+          ]
+        },
+        {
+          "file": "models/maps/forestbase/fir/fir_a_lod1.obj",
+          "triangles": 22000,
+          "mins": [
+            -114.4664,
+            -131.155731,
+            -3.100181
+          ],
+          "maxs": [
+            139.721664,
+            127.033791,
+            743.955872
+          ]
+        }
+      ]
+    },
+    {
+      "model": "models/maps/forestbase/fir/fir_b.vmdl",
+      "staged": true,
+      "triangles": 54927,
+      "meshes": [
+        {
+          "file": "models/maps/forestbase/fir/fir_b_lod1.obj",
+          "triangles": 22000,
+          "mins": [
+            -115.214424,
+            -119.793961,
+            -3.454681
+          ],
+          "maxs": [
+            124.332649,
+            101.936241,
+            550.817383
+          ]
+        },
+        {
+          "file": "models/maps/forestbase/fir/fir_b_lod0.obj",
+          "triangles": 54927,
+          "mins": [
+            -115.214424,
+            -119.793961,
+            -3.415927
+          ],
+          "maxs": [
+            124.332649,
+            101.936241,
+            550.817383
+          ]
+        },
+        {
+          "file": "models/maps/forestbase/fir/fir_b_horizon.obj",
+          "triangles": 5000,
+          "mins": [
+            -115.214424,
+            -119.793961,
+            -3.454681
+          ],
+          "maxs": [
+            124.332649,
+            101.936241,
+            550.817383
+          ]
+        }
+      ]
+    },
+    {
+      "model": "models/maps/forestbase/fir/fir_c.vmdl",
+      "staged": true,
+      "triangles": 31512,
+      "meshes": [
+        {
+          "file": "models/maps/forestbase/fir/fir_c_lod0.obj",
+          "triangles": 31512,
+          "mins": [
+            -117.401825,
+            -141.271866,
+            -3.693812
+          ],
+          "maxs": [
+            119.031944,
+            108.724358,
+            569.23175
+          ]
+        },
+        {
+          "file": "models/maps/forestbase/fir/fir_c_lod1.obj",
+          "triangles": 21999,
+          "mins": [
+            -117.401825,
+            -141.271866,
+            -3.693812
+          ],
+          "maxs": [
+            119.031944,
+            108.724358,
+            569.23175
+          ]
+        },
+        {
+          "file": "models/maps/forestbase/fir/fir_c_horizon.obj",
+          "triangles": 5000,
+          "mins": [
+            -117.401825,
+            -141.271866,
+            -3.632465
+          ],
+          "maxs": [
+            119.031944,
+            108.724358,
+            569.23175
+          ]
+        }
+      ]
+    },
+    {
+      "model": "models/maps/forestbase/sapling/sapling_a.vmdl",
+      "staged": true,
+      "triangles": 10000,
+      "meshes": [
+        {
+          "file": "models/maps/forestbase/sapling/sapling_a_lod2.obj",
+          "triangles": 6,
+          "mins": [
+            -20.21133,
+            -23.772604,
+            -22.75387
+          ],
+          "maxs": [
+            21.39933,
+            24.275249,
+            73.341835
+          ]
+        },
+        {
+          "file": "models/maps/forestbase/sapling/sapling_a_lod1.obj",
+          "triangles": 4000,
+          "mins": [
+            -15.577207,
+            -16.693876,
+            -0.331167
+          ],
+          "maxs": [
+            16.779551,
+            17.207851,
+            50.90662
+          ]
+        },
+        {
+          "file": "models/maps/forestbase/sapling/sapling_a_lod0.obj",
+          "triangles": 10000,
+          "mins": [
+            -15.577207,
+            -16.693876,
+            -0.331167
+          ],
+          "maxs": [
+            16.779551,
+            17.207851,
+            50.90662
+          ]
+        }
+      ]
+    },
+    {
+      "model": "models/maps/forestbase/sapling/sapling_b.vmdl",
+      "staged": true,
+      "triangles": 9999,
+      "meshes": [
+        {
+          "file": "models/maps/forestbase/sapling/sapling_b_lod1.obj",
+          "triangles": 4000,
+          "mins": [
+            -15.228694,
+            -12.371734,
+            -0.017338
+          ],
+          "maxs": [
+            16.948444,
+            12.812771,
+            37.448322
+          ]
+        },
+        {
+          "file": "models/maps/forestbase/sapling/sapling_b_lod0.obj",
+          "triangles": 9999,
+          "mins": [
+            -15.228694,
+            -12.371734,
+            -0.017338
+          ],
+          "maxs": [
+            16.948444,
+            12.812771,
+            37.448322
+          ]
+        },
+        {
+          "file": "models/maps/forestbase/sapling/sapling_b_lod2.obj",
+          "triangles": 6,
+          "mins": [
+            -17.29122,
+            -20.719719,
+            -23.164721
+          ],
+          "maxs": [
+            18.992201,
+            21.176765,
+            60.62825
+          ]
+        }
+      ]
+    },
+    {
+      "model": "models/maps/forestbase/sapling/sapling_c.vmdl",
+      "staged": true,
+      "triangles": 10000,
+      "meshes": [
+        {
+          "file": "models/maps/forestbase/sapling/sapling_c_lod0.obj",
+          "triangles": 10000,
+          "mins": [
+            -12.362426,
+            -12.042028,
+            -0.035116
+          ],
+          "maxs": [
+            12.59855,
+            12.466611,
+            28.966797
+          ]
+        },
+        {
+          "file": "models/maps/forestbase/sapling/sapling_c_lod1.obj",
+          "triangles": 4000,
+          "mins": [
+            -12.362426,
+            -12.042028,
+            -0.035116
+          ],
+          "maxs": [
+            12.59855,
+            12.466611,
+            28.966797
+          ]
+        },
+        {
+          "file": "models/maps/forestbase/sapling/sapling_c_lod2.obj",
+          "triangles": 6,
+          "mins": [
+            -15.406764,
+            -17.713846,
+            -21.367453
+          ],
+          "maxs": [
+            15.637539,
+            18.133028,
+            50.326294
+          ]
+        }
+      ]
+    }
+  ],
+  "sceneSha256": "b948935a0a685e34b4307dc3913cba4c77405d4b00a4123be629f134f0956eb8",
+  "limitations": [
+    "Native model compilation, alpha/LOD transitions, shadows, camera motion and performance remain unverified."
+  ]
+}
