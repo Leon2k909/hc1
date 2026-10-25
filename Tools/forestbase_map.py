@@ -1279,14 +1279,7 @@ def build(visual_chunks=None):
     for east in (865,1225):
         container(logistics,east,1230,length=350,height=114)
         container(logistics,east,1230,z=114,length=350,height=114)
-    # Industrial forklift rebuilt from the user's close reference.
-    import forestbase_forklift
-    f=model('logistics' in visuals)
-    forestbase_forklift.build(f,globals())
-    placed=transform(f,(1130,-860,0),-25)
-    placed.material_overrides.update(f.material_overrides)
-    placed.tile_overrides.update(f.tile_overrides)
-    logistics.extend(placed)
+    # The forklift is Lowtide's model, placed in the scene (FORKLIFT, write_scene).
     # Elevated route between upper floors. Third landing and workshop stair provide a south/east return.
     bridge(links,(-530,850,240),(-125,920,240),100)
     bridge(links,(655,920,240),(1070,920,240),104,rail_gaps={1:(0,52)})
@@ -1488,6 +1481,17 @@ def boundary_boxes():
             ((-1570,-1470,-1120),(1570,1470,-1024)),
             ((-200,-1730,-1120),(200,-1450,-1024))]
 
+# Lowtide's forklift (Tools/lowtide_forklift.py) in the loading yard, where Forest Base's own
+# (Tools/forestbase_forklift.py) stood: plan position and yaw. Its forks are the model's +y,
+# so -115 points them where the old one's +x pointed at -25.
+FORKLIFT=((1130,-860,0),-115)
+
+def forklift():
+    pos,yaw=FORKLIFT; path='models/props/lowtide/forklift.vmdl'
+    return K.game_object(IDS,'Forklift','forklift',K.to_world(pos),K.yaw_rotation(yaw),components=[
+        component('Sandbox.ModelRenderer','forklift/renderer',Model=path,RenderType='On',Tint='1,1,1,1'),
+        component('Sandbox.ModelCollider','forklift/collider',Model=path,Static=True,IsTrigger=False)])
+
 def write_scene(models):
     sceneobjects=[]
     sceneobjects.append(go('Scene Information','info',comps=[
@@ -1500,6 +1504,7 @@ def write_scene(models):
         comps=[component('Sandbox.ModelRenderer',name+'/renderer',Model=path,RenderType='On',Tint='1,1,1,1')]
         if m.boxes or m.hulls: comps += [component('Sandbox.ModelCollider',name+'/collider',Model=path,Static=True,IsTrigger=False)]
         chunks.append(go(name.title(),name,comps=comps))
+    chunks.append(forklift())
     sceneobjects.append(go('Military Outpost','geometry',children=chunks))
     forest=[]
     for i,(name,path,pos,yaw,scale) in enumerate(INSTANCES):

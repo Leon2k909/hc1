@@ -19,14 +19,6 @@
 							{ from = "container_0.vmat" to = "materials/forestbase/container_0.vmat" },
 							{ from = "container_1.vmat" to = "materials/forestbase/container_1.vmat" },
 							{ from = "container_2.vmat" to = "materials/forestbase/container_2.vmat" },
-							{ from = "forklift_amber.vmat" to = "materials/forestbase/forklift/amber.vmat" },
-							{ from = "forklift_headlamp.vmat" to = "materials/forestbase/forklift/headlamp.vmat" },
-							{ from = "forklift_labels.vmat" to = "materials/forestbase/forklift/labels.vmat" },
-							{ from = "forklift_metal.vmat" to = "materials/forestbase/forklift/metal.vmat" },
-							{ from = "forklift_paint.vmat" to = "materials/forestbase/forklift/paint.vmat" },
-							{ from = "forklift_tail.vmat" to = "materials/forestbase/forklift/tail.vmat" },
-							{ from = "forklift_tread.vmat" to = "materials/forestbase/forklift/tread.vmat" },
-							{ from = "forklift_vent.vmat" to = "materials/forestbase/forklift/vent.vmat" },
 							{ from = "olive.vmat" to = "materials/forestbase/olive.vmat" },
 							{ from = "sign_D.vmat" to = "materials/forestbase/sign_D.vmat" },
 							{ from = "steel.vmat" to = "materials/forestbase/scans/metal_plate_02.vmat" },
@@ -34,7 +26,6 @@
 							{ from = "transit_front.vmat" to = "materials/forestbase/transit/front.vmat" },
 							{ from = "transit_hardware.vmat" to = "materials/forestbase/transit/hardware.vmat" },
 							{ from = "transit_shell.vmat" to = "materials/forestbase/transit/shell.vmat" },
-							{ from = "vehicle_rubber.vmat" to = "materials/forestbase/vehicle_rubber.vmat" },
 							{ from = "yellow.vmat" to = "materials/forestbase/yellow.vmat" }
 						]
 						use_global_default = false
@@ -707,15 +698,6 @@
 					{
 						_class = "PhysicsShapeBox"
 						parent_bone = ""
-						surface_prop = "metal"
-						collision_tags = "solid"
-						origin = [ -860.0000, -1130.0000, 32.0000 ]
-						angles = [ -0.0000, -115.0000, 0.0000 ]
-						dimensions = [ 104.0000, 56.0000, 28.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
 						surface_prop = "wood"
 						collision_tags = "solid"
 						origin = [ 500.0000, 250.0000, 4.5000 ]
@@ -928,26 +910,6 @@
 						origin = [ -443.5342, -788.7838, 81.0000 ]
 						angles = [ -0.0000, -97.0000, 0.0000 ]
 						dimensions = [ 56.0000, 42.5600, 48.0000 ]
-					},
-					{
-						_class = "PhysicsHullFile"
-						name = "logistics_hulls_rubber"
-						parent_bone = ""
-						surface_prop = "rubber"
-						collision_tags = "solid"
-						recenter_on_parent_bone = false
-						offset_origin = [ 0.0, 0.0, 0.0 ]
-						offset_angles = [ 0.0, 0.0, 0.0 ]
-						align_origin_x_type = "None"
-						align_origin_y_type = "None"
-						align_origin_z_type = "None"
-						filename = "models/maps/forestbase/logistics_hulls_rubber.obj"
-						import_scale = 1.0
-						faceMergeAngle = 10.0
-						maxHullVertices = 0
-						import_mode = "HullPerElement"
-						optimization_algorithm = "QEM"
-						import_filter = { exclude_by_default = false exception_list = [ ] }
 					},
 				]
 			},
