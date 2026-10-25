@@ -48,7 +48,8 @@ def main():
                          ('waterfall_current', current),
                          ('waterfall_spray', edge*broken*.35*np.exp(-radius*radius*1.3))]:
         Image.fromarray((np.clip(values,0,1)*255).astype('uint8')).save(OUT/f'{name}_mask.png')
-        shader='forestbase_mist' if name=='waterfall_spray' else 'forestbase_foam'
+        shader=('forestbase_mist' if name=='waterfall_spray' else
+                'forestbase_current' if name=='waterfall_current' else 'forestbase_foam')
         footprint=' EllipticalFootprint "1"\n' if name=='waterfall_foam' else ''
         basin=' ConstrainPlungeBasin "1"\n' if name in ('waterfall_spray','waterfall_foam') else ''
         K.write_text(OUT/f'{name}.vmat', f'''"Layer0"
