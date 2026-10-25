@@ -1,0 +1,77 @@
+// Publish only the checked palm correction; preserve the user's scene, play state and other shared work.
+var root = Sandbox.Project.Current.GetRootPath();
+var folder = System.IO.Path.Combine(root, "output/veridant/palm-terrace-v1");
+var manifest = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder, "stage-v1/manifest.json")));
+if (manifest["revision"].GetValue<string>() != "veridant-palm-terrace-v1") throw new InvalidOperationException("Wrong stage.");
+var selected = Editor.SceneEditorSession.Active;
+var playing = Game.IsPlaying;
+var gameScene = Game.ActiveScene?.Id;
+var dirty = selected?.HasUnsavedChanges;
+if (playing) throw new InvalidOperationException("A play session started; inspect it before replacing its models.");
+string Hash(string path) => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+foreach (var group in new[] { "source_sha256", "protected_sha256" })
+    foreach (var pair in manifest[group].AsObject())
+        if (Hash(System.IO.Path.Combine(root, pair.Key)) != pair.Value.GetValue<string>())
+            throw new InvalidOperationException("Shared input changed: " + pair.Key);
+var allowed = new System.Collections.Generic.HashSet<string> {
+    "Assets/models/maps/veridant/veridant_foliage.obj", "Assets/models/maps/veridant/veridant_dress.obj",
+    "Assets/models/maps/veridant/veridant_dress.mtl", "Assets/models/maps/veridant/veridant_dress.vmdl",
+    "Assets/materials/veridant/vr_palm_bark_color.jpg", "Assets/materials/veridant/vr_palm_bark_normal.jpg",
+    "Assets/materials/veridant/vr_palm_bark_rough.png", "Assets/materials/veridant/vr_palm_bark.vmat",
+    "Assets/materials/veridant/vr_palm_mulch.vmat"
+};
+var plans = new System.Collections.Generic.List<(string Source, string Target, string Backup, string Before, string After)>();
+foreach (var pair in manifest["files"].AsObject())
+{
+    if (!allowed.Contains(pair.Key)) throw new InvalidOperationException("Unexpected target: " + pair.Key);
+    var source = System.IO.Path.Combine(root, pair.Value["source"].GetValue<string>());
+    var target = System.IO.Path.Combine(root, pair.Key);
+    var before = pair.Value["before"]?.GetValue<string>();
+    var after = pair.Value["after"].GetValue<string>();
+    var backup = before is null ? null : System.IO.Path.Combine(root, pair.Value["backup"].GetValue<string>());
+    if (Hash(source) != after || (backup is not null && Hash(backup) != before))
+        throw new InvalidOperationException("Stage or backup changed.");
+    if (System.IO.File.Exists(target) && Hash(target) == after) continue;
+    if (before is null ? System.IO.File.Exists(target) : !System.IO.File.Exists(target) || Hash(target) != before)
+        throw new InvalidOperationException("Shared target changed: " + pair.Key);
+    plans.Add((source, target, backup, before, after));
+}
+var changed = new System.Collections.Generic.List<(string Target, string Backup)>();
+try
+{
+    foreach (var item in plans.OrderBy(p => p.Target.EndsWith(".vmdl") ? 2 : p.Target.EndsWith(".vmat") ? 1 : 0))
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        if (item.Before is null ? System.IO.File.Exists(item.Target) : !System.IO.File.Exists(item.Target) || Hash(item.Target) != item.Before)
+            throw new InvalidOperationException("Shared target changed during import: " + item.Target);
+        System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(item.Target));
+        var incoming = item.Target + ".palm-terrace-v1-incoming";
+        try
+        {
+            System.IO.File.Copy(item.Source, incoming, true);
+            if (Hash(incoming) != item.After) throw new InvalidOperationException("Incoming checksum differs.");
+            System.IO.File.Move(incoming, item.Target, true);
+            changed.Add((item.Target, item.Backup));
+        }
+        finally { if (System.IO.File.Exists(incoming)) System.IO.File.Delete(incoming); }
+    }
+}
+catch
+{
+    foreach (var item in changed.AsEnumerable().Reverse())
+        if (item.Backup is not null) System.IO.File.Copy(item.Backup, item.Target, true);
+        else if (System.IO.File.Exists(item.Target)) System.IO.File.Delete(item.Target);
+    throw;
+}
+foreach (var item in plans) Editor.AssetSystem.RegisterFile(item.Target);
+foreach (var pair in manifest["protected_sha256"].AsObject())
+    if (Hash(System.IO.Path.Combine(root, pair.Key)) != pair.Value.GetValue<string>())
+        throw new InvalidOperationException("Protected file changed during import: " + pair.Key);
+var preserved = ReferenceEquals(selected, Editor.SceneEditorSession.Active) && playing == Game.IsPlaying
+    && gameScene == Game.ActiveScene?.Id && dirty == selected?.HasUnsavedChanges;
+var result = new { Imported = plans.Count, EditorStatePreserved = preserved, SceneChanged = false,
+    TrunksRebuilt = manifest["trunks_rebuilt"].GetValue<int>(), PitsAdded = manifest["pits_added"].GetValue<int>(),
+    TreesRemoved = 2, MatchingCollidersRemoved = 2 };
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder, "native-import.json"), System.Text.Json.JsonSerializer.Serialize(result));
+if (!preserved) throw new InvalidOperationException("Editor state changed during import; inspect its completed result.");
+return result;

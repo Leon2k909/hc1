@@ -1293,6 +1293,9 @@ public static partial class GameText
 		["Affected"] = "연동",
 		["Independent"] = "독립",
 		["Third Person Field Of View"] = "3인칭 시야각",
+		["Weapon Distance"] = "무기 거리",
+		["Weapon Horizontal Position"] = "무기 수평 위치",
+		["Weapon Vertical Position"] = "무기 수직 위치",
 		["Picture-In-Picture Scopes"] = "화면 속 화면 조준경",
 		["s&box Settings"] = "s&box 설정",
 		["Resolution, window mode and graphics quality are set in s&box itself and apply to every game."] =

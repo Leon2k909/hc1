@@ -1,0 +1,4 @@
+var paths = new[] { "attachments/mw2022/models/att_vm_2x_west02_holo/att_vm_2x_west02_holo_reticle.vmat",
+	"attachments/mw2022/models/att_vm_4x_west01_tall/att_vm_4x_west01_tall_reticle.vmat",
+	"attachments/mw2022/models/att_vm_holo_west01/att_vm_holo_west01_reticle.vmat" };
+return paths.Select( p => new { p, Shader = Material.Load( p )?.ShaderName } );

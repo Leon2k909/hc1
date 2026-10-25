@@ -1,0 +1,34 @@
+// Publish the town halves without the Market Street lorries (output/belltower/lorry-removal/stage, written by
+// stage_lorry_removal.py from the installed files). Each target must still be the file the stage was made from; the
+// originals are kept in the stage's before/ folder. Refuses while a match is playing. Then registers both vmdls.
+var root = Sandbox.Project.Current.GetRootPath();
+var stage = System.IO.Path.Combine( root, "output/belltower/lorry-removal/stage" );
+var assets = System.IO.Path.Combine( root, "Assets/models/maps/belltower" );
+var manifest = System.Text.Json.Nodes.JsonNode.Parse( System.IO.File.ReadAllText( System.IO.Path.Combine( stage, "manifest.json" ) ) );
+if ( Game.IsPlaying ) throw new InvalidOperationException( "A match is playing" );
+string Hash( string path ) => Convert.ToHexString( System.Security.Cryptography.SHA256.HashData( System.IO.File.ReadAllBytes( path ) ) ).ToLowerInvariant();
+var plan = new System.Collections.Generic.List<(string Source, string Target, string Backup)>();
+foreach ( var pair in manifest["files"].AsObject() )
+{
+	var source = System.IO.Path.Combine( stage, pair.Key );
+	var target = System.IO.Path.Combine( assets, pair.Key );
+	var current = Hash( target );
+	if ( current == pair.Value["after"].GetValue<string>() ) continue;
+	if ( current != pair.Value["before"].GetValue<string>() ) throw new InvalidOperationException( "Changed since staging: " + pair.Key );
+	if ( Hash( source ) != pair.Value["after"].GetValue<string>() ) throw new InvalidOperationException( "Stage differs: " + pair.Key );
+	plan.Add( (source, target, System.IO.Path.Combine( stage, "before", pair.Key )) );
+}
+// The OBJs first, so each vmdl compiles against its new mesh.
+plan.Sort( ( a, b ) => a.Target.EndsWith( ".vmdl" ).CompareTo( b.Target.EndsWith( ".vmdl" ) ) );
+foreach ( var item in plan )
+{
+	System.IO.Directory.CreateDirectory( System.IO.Path.GetDirectoryName( item.Backup ) );
+	if ( !System.IO.File.Exists( item.Backup ) ) System.IO.File.Copy( item.Target, item.Backup );
+	var incoming = item.Target + ".lorry-incoming";
+	System.IO.File.Copy( item.Source, incoming, true );
+	if ( Hash( incoming ) != Hash( item.Source ) ) throw new InvalidOperationException( "Incoming copy differs" );
+	System.IO.File.Move( incoming, item.Target, true );
+}
+foreach ( var name in new[] { "belltower_west.obj", "belltower_east.obj", "belltower_west.vmdl", "belltower_east.vmdl" } )
+	Editor.AssetSystem.RegisterFile( System.IO.Path.Combine( assets, name ) );
+return new { Imported = plan.Count, Files = plan.Select( p => System.IO.Path.GetFileName( p.Target ) ) };

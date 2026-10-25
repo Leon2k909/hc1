@@ -1,0 +1,98 @@
+var oldCoating = new System.Collections.Generic.Dictionary<string, float> { { "attachments/m4a1/optics/reflex_reticle.vmat", 0.0f }, { "attachments/m4a1/optics/tube_reticle.vmat", 0.0f }, { "attachments/mw2022/models/att_vm_holo_east01/att_vm_holo_east01_reticle.vmat", 0.0f }, { "attachments/mw2022/models/att_vm_holo_west01/att_vm_holo_west01_reticle.vmat", 0.055f }, { "attachments/mw2022/models/att_vm_holo_west02/att_vm_holo_west02_reticle.vmat", 0.055f }, { "attachments/mw2022/models/att_vm_minireddot01_tall/att_vm_minireddot01_tall_reticle.vmat", 0.0f }, { "attachments/mw2022/models/att_vm_minireddot02_tall/att_vm_minireddot02_tall_reticle.vmat", 0.0f }, { "attachments/mw2022/models/att_vm_minireddot03_tall/att_vm_minireddot03_tall_reticle.vmat", 0.0f }, { "attachments/mw2022/models/att_vm_reflex_02/att_vm_reflex_02_reticle.vmat", 0.065f }, { "attachments/mw2022/models/att_vm_reflex_east01/att_vm_reflex_east01_reticle.vmat", 0.0f }, { "attachments/mw2022/models/att_vm_reflex_east02_tall/att_vm_reflex_east02_tall_reticle.vmat", 0.0f }, { "attachments/mw2022/models/att_vm_reflex_west02_tall/att_vm_reflex_west02_tall_reticle.vmat", 0.0f }, { "attachments/mw2022/models/att_vm_reflex_west03/att_vm_reflex_west03_reticle.vmat", 0.0f }, { "attachments/mw2022/models/att_vm_reflex_west04/att_vm_reflex_west04_reticle.vmat", 0.0f } };
+// Sight glass before/after: the M4's 1x optics aimed (the red-dot survey's rig), in a scene of its own with a lit brick
+// wall and a bright patch behind, each rendered with its window as it was (dot only, no glass) and as it is now. Writes
+// <optic>.png (left before, right after) to output/sight-glass/. The editor's own scenes and play state are untouched.
+var root = Sandbox.Project.Current.GetRootPath();
+var outDir = System.IO.Path.Combine( root, "output/sight-glass" );
+const int W = 1600, H = 900; const float Fov = 40f;
+var optics = ResourceLibrary.GetAll<Facepunch.Gunsmith.GunsmithPart>()
+	.Where( p => p.Category == Facepunch.Gunsmith.GunsmithPartType.Optic
+		&& (p.ResourcePath.StartsWith( "gunsmith/m4a1/mw2022/" ) || p.ResourcePath.StartsWith( "gunsmith/m4a1/optics/" ))
+		&& p.OpticMagnification <= 1f && !p.HasAlternateSight )
+	.OrderBy( p => p.ResourcePath ).ToArray();
+var resource = ResourceLibrary.Get<EquipmentResource>( "weapons/m4a1/m4a1.equip" );
+var manual = SceneUtility.GetPrefabScene( ResourceLibrary.Get<PrefabFile>( "weapons/m4a1/weapon_m4a1.prefab" ) )
+	.Components.GetAll<Facepunch.ManualOffset>( FindMode.EverythingInSelfAndDescendants ).First();
+var done = new System.Collections.Generic.List<object>();
+var log = new System.Collections.Generic.List<string>();
+var scene = new Scene();
+try
+{
+	using var scope = scene.Push();
+	var gun = SceneUtility.GetPrefabScene( ResourceLibrary.Get<PrefabFile>( "weapons/m4a1/vm_m4a1.prefab" ) ).Clone( new CloneConfig { StartEnabled = false } );
+	gun.Components.GetOrCreate<Facepunch.GunsmithWeapon>().Resource = resource;
+	foreach ( var c in gun.Components.GetAll<Component>( FindMode.EverythingInSelfAndDescendants ) ) c.Enabled = c is ModelRenderer || c is Facepunch.Gunsmith.GunsmithAttachmentPoint;
+	var renderer = gun.Components.Get<SkinnedModelRenderer>( FindMode.EverythingInSelf );
+	renderer.RenderOptions.Game = false; renderer.RenderOptions.Overlay = true;
+	renderer.UseAnimGraph = true; renderer.PlaybackRate = 1; renderer.PlayAnimationsInEditorScene = true;
+	Facepunch.AnimBools.SetBool( renderer, "b_grounded", true );
+	Facepunch.AnimBools.SetBool( renderer, "b_sprint", false );
+	renderer.Set( "ironsights", 1 ); renderer.Set( "ironsights_weight", 1f ); renderer.Set( "speed_ironsights", 1f ); renderer.Set( "hand_ik_weight", 0f );
+	var point = gun.Components.GetAll<Facepunch.Gunsmith.GunsmithAttachmentPoint>( FindMode.EverythingInSelfAndDescendants ).First( p => p.Category == Facepunch.Gunsmith.GunsmithPartType.Optic );
+	gun.Enabled = true; renderer.SceneModel.Transform = renderer.WorldTransform;
+	for ( int i = 0; i < 200; i++ ) { scene.EditorTick( .02f, .02f ); renderer.SceneModel.Transform = renderer.WorldTransform; renderer.SceneModel.Update( .02f ); }
+	var camera = new GameObject( true, "camera" ).Components.Create<CameraComponent>();
+	camera.FieldOfView = Fov; camera.ZNear = 0.3f; camera.BackgroundColor = new Color( 0.55f, 0.62f, 0.72f );
+	var light = new GameObject( true, "sun" ).Components.Create<DirectionalLight>();
+	light.WorldRotation = Rotation.From( new Angles( 50, 160, 0 ) ); light.LightColor = new Color( 1.0f, 0.95f, 0.88f ) * 2.2f; light.SkyColor = new Color( 0.45f, 0.55f, 0.7f ) * 0.8f;
+	// The wall: Belltower's brick, 12 m off, and a pale render panel on its left for a bright background.
+	var wall = new GameObject( true, "wall" );
+	wall.WorldPosition = new Vector3( 480, 0, 0 );
+	var wallModel = wall.Components.Create<ModelRenderer>(); wallModel.Model = Model.Load( "models/dev/box.vmdl" );
+	wallModel.MaterialOverride = Material.Load( "materials/belltower/rubble.vmat" );
+	wall.WorldScale = new Vector3( 0.2f, 20f, 12f );
+	var panel = new GameObject( true, "panel" );
+	panel.WorldPosition = new Vector3( 470, 70, 30 );
+	var panelModel = panel.Components.Create<ModelRenderer>(); panelModel.Model = Model.Load( "models/dev/box.vmdl" );
+	panelModel.Tint = new Color( 0.92f, 0.92f, 0.9f );
+	panel.WorldScale = new Vector3( 0.05f, 1.6f, 3.2f );
+	foreach ( var optic in optics.Where( o => o.ResourcePath.Contains( "reflex_west04" ) || o.ResourcePath.Contains( "holo_west01" ) ) )
+	{
+		var previous = point.CurrentGameObject;
+		point.SetPart( optic ); previous?.DestroyImmediate();
+		var line = manual.OpticSightLines?.FirstOrDefault( l => l is not null && l.Optic == optic );
+		var position = optic.OpticAimOffset + manual.OpticAimCorrection + (line?.Position ?? Vector3.Zero);
+		var turn = (optic.OpticAimAngles + manual.OpticAngleCorrection( optic.OpticMagnification ) + (line?.Angles ?? Angles.Zero)).ToRotation();
+		gun.WorldRotation = turn; gun.WorldPosition = turn * position;
+		for ( int i = 0; i < 10; i++ ) { scene.EditorTick( .02f, .02f ); renderer.SceneModel.Transform = renderer.WorldTransform; renderer.SceneModel.Update( .02f ); }
+		foreach ( var mount in gun.Components.GetAll<Facepunch.Gunsmith.GunsmithMw22Attachment>( FindMode.EverythingInSelfAndDescendants ) ) mount.RefreshMount();
+		scene.EditorTick( .01f, .01f );
+		var bone = renderer.SceneModel.GetBoneLocalTransform( "camera" );
+		camera.WorldPosition = bone.Position; camera.WorldRotation = bone.Rotation;
+		var name = System.IO.Path.GetFileNameWithoutExtension( optic.ResourcePath );
+		var renderers = gun.Components.GetAll<ModelRenderer>( FindMode.EverythingInSelfAndDescendants ).ToArray();
+		foreach ( var r in renderers )
+			if ( r.Model is not null )
+				log.Add( name + " | " + r.GameObject.Name + " | " + string.Join( ", ", r.Model.Materials.Select( m => m?.ResourcePath ) ) );
+		var variants = new (string Tag, float? Coating, Vector3? Tint, float? Dust)[] {
+			("asis", null, null, null), ("notint", null, new Vector3( 1, 1, 1 ), null), ("nodust", null, null, 0f),
+			("neither", null, new Vector3( 1, 1, 1 ), 0f), ("clear", 0f, null, null) };
+		foreach ( var v in variants )
+		{
+			var matched = 0;
+			foreach ( var r in renderers )
+			{
+				if ( r.Model is null ) continue;
+				var mats = r.Model.Materials.ToArray();
+				for ( int m = 0; m < mats.Length; m++ )
+				{
+					r.Materials.SetOverride( m, null );
+					if ( mats[m] is null || !(mats[m].ResourcePath ?? "").Contains( "reticle" ) ) continue;
+					var copy = mats[m].CreateCopy();
+					if ( v.Coating is { } c ) copy.Set( "g_flLensCoatingOpacity", c );
+					if ( v.Tint is { } t ) copy.Set( "g_vWindowTint", t );
+					if ( v.Dust is { } d ) copy.Set( "g_flDust", d );
+					r.Materials.SetOverride( m, copy );
+					matched++;
+				}
+			}
+			scene.EditorTick( .01f, .01f );
+			using var bmp = new Bitmap( W, H );
+			camera.RenderToBitmap( bmp ); camera.RenderToBitmap( bmp );
+			await System.IO.File.WriteAllBytesAsync( System.IO.Path.Combine( outDir, "diag_" + name + "_" + v.Tag + ".png" ), bmp.ToPng() );
+			log.Add( name + " " + v.Tag + " matched " + matched );
+		}
+	}
+}
+finally { scene.Destroy(); }
+return log;

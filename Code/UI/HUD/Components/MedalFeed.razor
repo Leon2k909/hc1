@@ -31,7 +31,12 @@
                     {
                         <div class="medal-ember @($"e{i}")" style="@EmberStyle( eyes[i % eyes.Length] )"></div>
                     }
-                    @if ( medal.Family != "multikill" )
+                    @if ( medal.Family == "training" )
+                    {
+                        @* The skill's new level, in the badge's diamond. *@
+                        <div class="medal-level @(medal.Rank.Length > 1 ? "two-digit" : "")"><label>@medal.Rank</label></div>
+                    }
+                    else if ( medal.Family != "multikill" )
                     {
                         <div class="medal-rank"><label>@medal.Rank</label></div>
                     }
@@ -136,6 +141,9 @@
     private int LifeKillStreak;
     private int NextMedalId;
     private int Revision;
+    // The soldier training level-up last shown. Null until the first tick (a hotload leaves it null too), which takes
+    // the current one, so a feed built after a level-up doesn't show it again.
+    private int? SeenLevelUp;
 
     public override void Tick()
     {
@@ -143,6 +151,14 @@
 
         if ( TimeSinceLastKill > 3.0f )
             RapidKillCount = 0;
+
+        if ( SeenLevelUp != SoldierTraining.LevelUpRevision )
+        {
+            var announce = SeenLevelUp.HasValue && MainHUD.IsHudEnabled;
+            SeenLevelUp = SoldierTraining.LevelUpRevision;
+            if ( announce )
+                AddTrainingMedal( SoldierTraining.LastImprovedSkill );
+        }
 
         var changed = false;
         if ( Medals.Count > 0 )
@@ -292,11 +308,25 @@
         return damageInfo.Damage >= maxHealth - 0.01f;
     }
 
-    /// <summary>Queue a medal locally for previews: oneshot, headshot, streak, double, triple, fury or frenzy.</summary>
+    /// <summary>
+    /// A soldier training skill went up a level: its badge with the new level in it, queued with the kill medals.
+    /// </summary>
+    private void AddTrainingMedal( SoldierSkill skill, float lifetime = TrainingLifetime )
+    {
+        var title = skill == SoldierSkill.Endurance ? "ENDURANCE" : "WEAPON HANDLING";
+        AddMedal( title, "SKILL IMPROVED", "training", SoldierTraining.GetLevel( skill ).ToString(), "training", lifetime );
+    }
+
+    // Up a little longer than a kill medal: it isn't tied to a kill the player just saw.
+    private const float TrainingLifetime = 2.4f;
+
+    /// <summary>Queue a medal locally for previews: oneshot, headshot, streak, double, triple, fury, frenzy, handling or endurance.</summary>
     public void Preview( string kind, float lifetime = 1.6f )
     {
         switch ( kind )
         {
+            case "handling": AddTrainingMedal( SoldierSkill.Handling, lifetime ); break;
+            case "endurance": AddTrainingMedal( SoldierSkill.Endurance, lifetime ); break;
             case "headshot": AddMedal( "HEADSHOT", "PRECISION KILL", "precision", "HS", lifetime: lifetime ); break;
             case "streak": AddMedal( "BLOODTHIRSTY", "KILL STREAK", "streak", "5", lifetime: lifetime ); break;
             case "double": AddMedal( "DOUBLE KILL", "RAPID ELIMINATIONS", "multikill", "2", "double-kill", lifetime ); break;

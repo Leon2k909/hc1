@@ -1,0 +1,38 @@
+// Publish Belltower without the square's oaks (output/belltower/square-tree-removal/stage, written by
+// stage_square_tree.py from the installed files): the scene without the two "Oak tree" objects, and the two wood hull
+// OBJs without their trunks' hulls. Each target must still be the file the stage was made from; the originals are kept
+// in the stage's before/ folder. Refuses while Belltower is open in an editor tab (edited or playing), so it never
+// replaces a scene the editor holds. Another map playing is left alone. The watcher compiles the town halves: don't
+// force-compile them.
+var root = Sandbox.Project.Current.GetRootPath();
+var stage = System.IO.Path.Combine( root, "output/belltower/square-tree-removal/stage" );
+var assets = System.IO.Path.Combine( root, "Assets" );
+var manifest = System.Text.Json.Nodes.JsonNode.Parse( System.IO.File.ReadAllText( System.IO.Path.Combine( stage, "manifest.json" ) ) );
+var open = Editor.SceneEditorSession.All.Select( s => s.Scene?.Source?.ResourcePath ?? "" ).ToArray();
+if ( open.Any( p => p.Contains( "belltower", StringComparison.OrdinalIgnoreCase ) ) )
+	throw new InvalidOperationException( "Belltower is open in the editor: " + string.Join( ", ", open ) );
+string Hash( string path ) => Convert.ToHexString( System.Security.Cryptography.SHA256.HashData( System.IO.File.ReadAllBytes( path ) ) ).ToLowerInvariant();
+var plan = new System.Collections.Generic.List<(string Source, string Target, string Backup)>();
+foreach ( var pair in manifest["files"].AsObject() )
+{
+	var source = System.IO.Path.Combine( stage, System.IO.Path.GetFileName( pair.Key ) );
+	var target = System.IO.Path.Combine( assets, pair.Key );
+	var current = Hash( target );
+	if ( current == pair.Value["after"].GetValue<string>() ) continue;
+	if ( current != pair.Value["before"].GetValue<string>() ) throw new InvalidOperationException( "Changed since staging: " + pair.Key );
+	if ( Hash( source ) != pair.Value["after"].GetValue<string>() ) throw new InvalidOperationException( "Stage differs: " + pair.Key );
+	plan.Add( (source, target, System.IO.Path.Combine( stage, "before", System.IO.Path.GetFileName( pair.Key ) )) );
+}
+foreach ( var item in plan )
+{
+	System.IO.Directory.CreateDirectory( System.IO.Path.GetDirectoryName( item.Backup ) );
+	if ( !System.IO.File.Exists( item.Backup ) ) System.IO.File.Copy( item.Target, item.Backup );
+	var incoming = item.Target + ".tree-incoming";
+	System.IO.File.Copy( item.Source, incoming, true );
+	if ( Hash( incoming ) != Hash( item.Source ) ) throw new InvalidOperationException( "Incoming copy differs" );
+	System.IO.File.Move( incoming, item.Target, true );
+}
+foreach ( var name in new[] { "models/maps/belltower/belltower_west_hulls_wood.obj", "models/maps/belltower/belltower_east_hulls_wood.obj",
+	"models/maps/belltower/belltower_west.vmdl", "models/maps/belltower/belltower_east.vmdl", "scenes/maps/Belltower/belltower.scene" } )
+	Editor.AssetSystem.RegisterFile( System.IO.Path.Combine( assets, name ) );
+return new { Imported = plan.Count, Files = plan.Select( p => System.IO.Path.GetFileName( p.Target ) ), Open = open, Game.IsPlaying };

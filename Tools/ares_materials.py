@@ -27,10 +27,12 @@ Atlases (ares_map maps faces onto their regions with region_uv):
     ar_signs        posters and banners: SIGN regions
     ar_signs_lit    lit door signs: LIT regions (self-lit)
     ar_screens      control-room screens: SCREEN regions (self-lit)
-    ar_plasma       the column's plasma, u round it and v up (self-lit)
+    ar_plasma       the column's plasma; slowly circulating custom shader, with dark amber pockets and a small pulse
     ar_dome         a habitat dome's lattice, u round it and v up (self-lit cells)
 
 Flat paints (PAINTED) and lights (EMISSIVE), and the glass (GLASS, glass.shader).
+`outpost` writes the private ar_ext_* thermal shells, dusty metals, glazing, shielded lamps and painted sign atlas
+for Tools/ares_outpost.py, without changing the facility's paints.
 
 The sky (`sky`): a Martian evening, a near black sky over a rust haze at the horizon, the stars and the two moons, as
 belltower_sky's panorama (EXR, its write_exr and wrapping), Assets/materials/ares/sky/ares_sky.exr and .vmat.
@@ -75,6 +77,7 @@ def px( n ):
 
 TILES = { "ar_floor": 192.0, "ar_wall": 192.0, "ar_concrete": 192.0, "ar_steel": 64.0, "ar_brass": 48.0,
           "ar_grating": 24.0, "ar_hazard": 24.0, "ar_regolith": 640.0, "ar_rock": 1024.0, "ar_tower": 256.0 }
+TILES.update( { name: 192.0 for name in ( "ar_ext_shell", "ar_ext_metal", "ar_ext_dark", "ar_ext_base", "ar_ext_ochre" ) } )
 
 # The hard case's faces, at the standard case's size (48 long, 30 high, 32 deep): pixels x, y, w, h in a 2048 atlas.
 CASE = ( 48.0, 30.0, 32.0 )
@@ -399,7 +402,7 @@ def hazard_stripes( n=None ):
 
 
 def regolith( n=None ):
-    """ Martian ground seen from far: rust dust, darker basalt grit and pebbles, drifts of brighter dust. """
+    """ Muted ochre dust, fine basalt grit and shallow wind ripples, based on Curiosity's sandy plains. """
     n = n or px( 2048 )
     tile = TILES["ar_regolith"]
     ppi = n / tile
@@ -408,15 +411,16 @@ def regolith( n=None ):
     mid = noise( rng, ( n, n ), ( ppi, ppi ), 2.2, 40, 2 )
     fine = noise( rng, ( n, n ), ( ppi, ppi ), 1.2, 4, 0.4 )
     rocks = smoothstep( 1.6, 2.4, noise( rng, ( n, n ), ( ppi, ppi ), 1.6, 12, 1.0 ) )
-    colour = lin( ( 168, 92, 56 ) )[None, None, :] * ( 0.92 + 0.1 * big + 0.05 * mid + 0.04 * fine )[..., None]
-    colour = mix( colour, lin( ( 200, 124, 78 ) ), smoothstep( 0.4, 2.0, big + 0.3 * mid ) * 0.5 )
-    colour = mix( colour, lin( ( 92, 56, 40 ) ), np.clip( rocks + smoothstep( 1.0, 2.6, -mid ) * 0.4, 0, 1 ) * 0.7 )
+    colour = lin( ( 159, 121, 93 ) )[None, None, :] * ( 0.96 + 0.055 * big + 0.025 * mid + 0.02 * fine )[..., None]
+    colour = mix( colour, lin( ( 183, 145, 112 ) ), smoothstep( 0.4, 2.0, big + 0.3 * mid ) * 0.38 )
+    colour = mix( colour, lin( ( 102, 90, 79 ) ), np.clip( rocks + smoothstep( 1.0, 2.6, -mid ) * 0.25, 0, 1 ) * 0.55 )
     # Fine wind-scoured ripples interrupt the broad volcanic dust fields.
     x, y = grid( n, tile )
     drift = smoothstep( 0.05, 1.8, big + 0.25 * mid )
-    ripple = ( 0.5 + 0.5 * np.sin( ( x + 0.22 * y + 11.0 * mid ) * ( 2 * math.pi / 22.0 ) ) ) * drift
-    colour = mix( colour, lin( ( 198, 127, 84 ) ), ripple * 0.16 )
-    height = 2.0 * rocks + 0.6 * mid + 0.15 * fine + 0.24 * ripple
+    # Integer periods in both axes keep the wind-ripple phase continuous at texture tile boundaries.
+    ripple = ( 0.5 + 0.5 * np.sin( 2 * math.pi * ( 29 * x + 6 * y ) / tile + 0.65 * mid ) ) * drift
+    colour = mix( colour, lin( ( 180, 142, 109 ) ), ripple * 0.09 )
+    height = 0.65 * rocks + 0.18 * mid + 0.04 * fine + 0.10 * ripple
     rough = 0.9 - 0.08 * rocks + 0.04 * drift
     return T.linear_to_srgb( colour ), np.clip( rough, 0.1, 1 ), normals( height, ( ppi, ppi ) )
 
@@ -434,12 +438,12 @@ def rock( n=None ):
     mid = noise( rng, ( n, n ), ( ppi, ppi ), 2.2, 60, 3 )
     fine = noise( rng, ( n, n ), ( ppi, ppi ), 1.4, 6, 0.5 )
     cracks = 1.0 - smoothstep( 0.0, 0.08, np.abs( noise( rng, ( n, n ), ( ppi, ppi ), 2.0, 80, 4 ) ) )
-    colour = mix( lin( ( 132, 72, 46 ) )[None, None, :] * np.ones( ( n, n, 3 ), np.float32 ), lin( ( 88, 50, 36 ) ),
+    colour = mix( lin( ( 139, 111, 90 ) )[None, None, :] * np.ones( ( n, n, 3 ), np.float32 ), lin( ( 108, 88, 74 ) ),
                   np.clip( layers * 0.7 + 0.3 * layers2, 0, 1 ) )
     colour *= ( 0.92 + 0.08 * mid + 0.04 * fine )[..., None]
-    colour = mix( colour, lin( ( 186, 112, 70 ) ), smoothstep( 0.6, 0.95, layers2 ) * smoothstep( 0.0, 1.5, mid ) * 0.5 )
-    colour = mix( colour, lin( ( 40, 26, 20 ) ), cracks * 0.7 )
-    height = 6 * layers + 2 * layers2 + 3 * mid + 0.5 * fine - 4 * cracks
+    colour = mix( colour, lin( ( 177, 139, 108 ) ), smoothstep( 0.6, 0.95, layers2 ) * smoothstep( 0.0, 1.5, mid ) * 0.4 )
+    colour = mix( colour, lin( ( 76, 63, 55 ) ), cracks * 0.45 )
+    height = 1.3 * layers + 0.4 * layers2 + 0.7 * mid + 0.12 * fine - 0.7 * cracks
     rough = 0.88
     return T.linear_to_srgb( colour ), np.full( ( n, n ), rough, np.float32 ), normals( height, ( ppi, ppi ) )
 
@@ -720,56 +724,18 @@ def lit_atlas():
 
 
 def screen_atlas():
-    """ Control-room screens: a map of the plain, readouts, graphs and the column's schematic, in cyan and amber on
-    deep blue. Made-up figures; no brand. """
-    W, H = px( SCREEN_ATLAS[0] ), px( SCREEN_ATLAS[1] )
-    rng = np.random.default_rng( 313 )
-    colour = np.zeros( ( H, W, 3 ), np.float32 )
-    cyan, amber, white = lin( ( 96, 214, 236 ) ), lin( ( 255, 168, 64 ) ), lin( ( 220, 236, 240 ) )
-    for k, ( x, y, w, h ) in enumerate( SCREEN.values() ):
-        x, y, w, h = px( x ), px( y ), px( w ), px( h )
-        yy, xx = np.mgrid[0:h, 0:w].astype( np.float32 )
-        c = lin( ( 8, 18, 30 ) ) * ( 1.0 + 0.4 * ( 1 - yy / h ) )[..., None] * np.ones( ( h, w, 3 ), np.float32 )
-        gridl = ( ( xx % ( w / 12 ) ) < 1.2 ) | ( ( yy % ( h / 12 ) ) < 1.2 )
-        c = mix( c, lin( ( 20, 50, 70 ) ), gridl.astype( np.float32 ) * 0.6 )
-        kind = k % 4
-        if kind == 0:
-            # A contour map of the plain with marks.
-            field = noise( rng, ( h, w ), ( 1.0, 1.0 ), 2.6, 200, 4 )
-            contour = np.abs( ( field * 4 ) % 1.0 - 0.5 ) > 0.46
-            c = mix( c, cyan, contour.astype( np.float32 ) * 0.8 )
-            for _ in range( 6 ):
-                cx, cy = rng.uniform( 0.15, 0.85 ) * w, rng.uniform( 0.15, 0.85 ) * h
-                dot = np.hypot( xx - cx, yy - cy ) < w * 0.015
-                c = np.where( dot[..., None], amber, c )
-        elif kind == 1:
-            # Bars.
-            for b in range( 10 ):
-                v = rng.uniform( 0.2, 0.9 )
-                bar = ( np.abs( xx - ( b + 0.5 ) * w / 10 ) < w * 0.03 ) & ( yy > h * ( 0.9 - 0.7 * v ) ) & ( yy < h * 0.9 )
-                c = np.where( bar[..., None], amber if v > 0.75 else cyan, c )
-        elif kind == 2:
-            # Traces.
-            for colour_, phase in ( ( cyan, 0.0 ), ( amber, 1.7 ) ):
-                t = xx / w
-                curve = h * ( 0.5 + 0.25 * np.sin( t * 9 + phase ) * np.exp( -t ) + 0.05 * np.sin( t * 37 + phase ) )
-                line = np.abs( yy - curve ) < 2.0
-                c = np.where( line[..., None], colour_, c )
-        else:
-            # The column's schematic: stacked rings.
-            for r_ in range( 6 ):
-                cy = h * ( 0.15 + r_ * 0.13 )
-                ell = np.abs( ( ( xx - w / 2 ) / ( w * 0.22 ) ) ** 2 + ( ( yy - cy ) / ( h * 0.03 ) ) ** 2 - 1 ) < 0.12
-                c = np.where( ell[..., None], cyan, c )
-            core = ( np.abs( xx - w / 2 ) < w * 0.06 ) & ( yy > h * 0.12 ) & ( yy < h * 0.85 )
-            c = mix( c, amber, core.astype( np.float32 ) * 0.7 )
-        lines = [ ( "ATMOS CORE  4870 K", FONT_TECH_MEDIUM, h * 0.04, w * 0.05, h * 0.05, "l", 0.02 ),
-                  ( f"O2 {rng.uniform( 19, 22 ):.1f}%   P {rng.uniform( 0.6, 1.1 ):.2f} KPA", FONT_TECH_MEDIUM, h * 0.035, w * 0.05, h * 0.92, "l", 0.02 ) ]
-        words = text_layer( ( h, w ), lines )
-        c = mix( c, white, words )
-        colour[y:y + h, x:x + w] = c
-    illum = np.clip( colour.max( axis=-1 ) * 1.4 + 0.1, 0, 1 )
-    return T.linear_to_srgb( colour ), illum
+    """Preserve the built-in ImageGen control displays; regenerating materials must not redraw placeholders."""
+    source = ROOT / "Sources/Ares/screens/screen-atlas.png"
+    if not source.exists():
+        raise FileNotFoundError( f"Missing generated screen atlas: {source}; see Sources/Ares/screens/screen-atlas-prompt.txt" )
+    with Image.open( source ) as image:
+        if abs( image.width / image.height - 2.0 ) > 0.01:
+            raise ValueError( "The generated screen atlas must contain four columns and two rows (2:1 canvas)" )
+        image = image.convert( "RGB" ).resize( ( px( SCREEN_ATLAS[0] ), px( SCREEN_ATLAS[1] ) ), Image.Resampling.LANCZOS )
+        # BX.save_rgb takes sRGB bytes (0..255), whereas the emission mask below takes 0..1.
+        colour = np.asarray( image, np.uint8 )
+    return colour, np.ones( colour.shape[:2], np.float32 )
+
 
 
 def plasma():
@@ -792,6 +758,16 @@ def plasma():
     base = mix( base, lin( ( 255, 244, 214 ) ), np.clip( arcs - 0.6, 0, 1 ) * 2 )
     illum = np.clip( 0.55 + 0.45 * heat + arcs, 0, 1 )
     return T.linear_to_srgb( base ), illum
+
+
+def plasma_vmat():
+    """GPU-driven circulation; keep these values when regenerating the column's material."""
+    return '\n'.join( [ '// Tools/ares_materials.py', 'Layer0', '{',
+        '    shader "shaders/hc1_ares_plasma.shader"',
+        f'    TextureColor "{RESOURCE_DIR}/ar_plasma_color.png"',
+        '    g_flBrightness "1.8"', '    g_flRiseSpeed "0.018"', '    g_flSwirlSpeed "0.008"',
+        '    g_flFlowHeight "180"', '    g_flWarp "0.055"', '    g_flDarkAreas "0.85"',
+        '    g_flPulseAmount "0.03"', '}', '' ] )
 
 
 def dome_lattice():
@@ -930,6 +906,61 @@ def write_maps( out, name, colour, rough, normal, metalness=0.0, illum=None, bri
     return colour, normal
 
 
+OUTPOST_SURFACES = {
+    # Coated thermal shells and dusty structural metal, without luminous cells or mirror-like finishes.
+    "ar_ext_shell": ( ( 166, 160, 148 ), .08, .86 ),
+    "ar_ext_metal": ( ( 94, 97, 94 ), .48, .68 ),
+    "ar_ext_dark": ( ( 43, 49, 51 ), .3, .76 ),
+    "ar_ext_base": ( ( 115, 101, 86 ), .0, .95 ),
+    "ar_ext_ochre": ( ( 155, 91, 51 ), .08, .82 ),
+}
+OUTPOST_PAINTS = list( OUTPOST_SURFACES ) + [ "ar_ext_glazing", "ar_ext_lamp", "ar_ext_signs" ]
+
+
+def build_outpost( out ):
+    results = {}
+    n, tile = px( 1024 ), 192.0
+    ppi = n / tile
+    x, y = grid( n, tile )
+    for index, ( name, ( rgb, metalness, roughness ) ) in enumerate( OUTPOST_SURFACES.items() ):
+        rng = np.random.default_rng( 420 + index )
+        broad = noise( rng, ( n, n ), ( ppi, ppi ), 2.2, 160, 12 )
+        fine = noise( rng, ( n, n ), ( ppi, ppi ), 1.1, 2, .2 )
+        ix, iy = np.floor( x / 48 ).astype( int ), np.floor( y / 48 ).astype( int )
+        edge_x, edge_y = np.minimum( x % 48, 48 - x % 48 ), np.minimum( y % 48, 48 - y % 48 )
+        seam = 1 - smoothstep( .12, .45, np.minimum( edge_x, edge_y ) )
+        variation = .98 + .025 * broad + .01 * fine
+        if name == "ar_ext_shell":
+            variation += .04 * ( periodic_hash( ix % 4, iy % 4, 59 ) - .5 )
+        colour = lin( rgb )[None, None, :] * variation[..., None]
+        if name in ( "ar_ext_shell", "ar_ext_metal" ):
+            colour *= ( 1 - .16 * seam )[..., None]
+        dust = smoothstep( .5, 2.2, broad ) * .08
+        colour = mix( colour, lin( ( 151, 117, 88 ) ), dust )
+        h = .004 * fine - .025 * seam if name != "ar_ext_base" else .04 * fine
+        normal = normals( h, ( ppi, ppi ) )
+        results[name] = write_maps( out, name, T.linear_to_srgb( colour ),
+                                   np.clip( roughness + .015 * fine, .1, 1 ), normal, metalness )
+    write_text( out / "ar_ext_glazing.vmat", vmat( "ar_ext_glazing", "materials/default/default_color.tga",
+                rough_value=.31, metalness=.12, tint=( 36 / 255, 51 / 255, 55 / 255 ) ) )
+    write_text( out / "ar_ext_lamp.vmat", vmat( "ar_ext_lamp", "materials/default/default_color.tga",
+                rough_value=.7, illum="[1 1 1 0]", brightness=.7, tint=( 1, .76, .49 ) ) )
+    # An opaque painted sign atlas: category labels, with no baked lights or alpha fringes.
+    w, h = px( 2048 ), px( 256 )
+    sign = np.ones( ( h, w, 3 ), np.float32 ) * lin( ( 38, 43, 44 ) )
+    for slot, title in enumerate( ( "HABITAT", "AIRLOCK", "ATMOS", "SERVICE" ) ):
+        width = w // 4
+        lettering = text_layer( ( h, width ), [ ( "ARES / SURFACE SYSTEMS", FONT_TECH, h * .075, width * .09, h * .15, "l", .07 ),
+                                               ( title, FONT_BOLD, h * .24, width * .09, h * .39, "l", .04 ) ] )
+        region = sign[:, slot * width:( slot + 1 ) * width]
+        region[:] = mix( region, lin( ( 192, 182, 158 ) ), lettering )
+        region[int( h * .82 ):int( h * .87 ), int( width * .09 ):int( width * .6 )] = lin( ( 157, 91, 51 ) )
+    BX.save_rgb( out / "ar_ext_signs_color.png", T.linear_to_srgb( sign ) )
+    write_text( out / "ar_ext_signs.vmat", vmat( "ar_ext_signs", f"{RESOURCE_DIR}/ar_ext_signs_color.png", rough_value=.9 ) )
+    print( "wrote outpost glazing, shielded lamps and signs" )
+    return results
+
+
 TILING = {
     "ar_floor": ( floor_plates, 0.55 ),
     "ar_wall": ( wall_panels, 0.35 ),
@@ -941,14 +972,14 @@ TILING = {
     "ar_regolith": ( regolith, 0.0 ),
     "ar_rock": ( rock, 0.0 ),
 }
-NAMES = list( TILING ) + [ "ar_tower", "ar_crate", "ar_signs", "ar_signs_lit", "ar_screens", "ar_plasma", "ar_dome",
-                           "flat", "sky" ]
+NAMES = list( TILING ) + [ "ar_terrain", "ar_tower", "ar_crate", "ar_signs", "ar_signs_lit", "ar_screens", "ar_plasma", "ar_dome",
+                           "outpost", "flat", "sky" ]
 
 
 def all_paints():
     """ Every paint name these materials give ares_map. """
-    return ( list( TILING ) + [ "ar_tower", "ar_crate", "ar_signs", "ar_signs_lit", "ar_screens", "ar_plasma", "ar_dome" ]
-             + list( PAINTED ) + list( EMISSIVE ) + list( GLASS ) )
+    return ( list( TILING ) + [ "ar_terrain", "ar_tower", "ar_crate", "ar_signs", "ar_signs_lit", "ar_screens", "ar_plasma", "ar_dome" ]
+             + OUTPOST_PAINTS + list( PAINTED ) + list( EMISSIVE ) + list( GLASS ) )
 
 
 def build( name, out ):
@@ -957,6 +988,17 @@ def build( name, out ):
         draw, metalness = TILING[name]
         c, r, n = draw()
         done[name] = write_maps( out, name, c, r, n, metalness )
+    elif name == "outpost":
+        done.update( build_outpost( out ) )
+    elif name == "ar_terrain":
+        write_text( out / "ar_terrain.vmat", '\n'.join( [ '// Tools/ares_materials.py', 'Layer0', '{',
+            '    shader "shaders/hc1_ares_land.shader"',
+            f'    DustColor "{RESOURCE_DIR}/ar_regolith_color.jpg"',
+            f'    DustNormal "{RESOURCE_DIR}/ar_regolith_normal.jpg"',
+            f'    RockColor "{RESOURCE_DIR}/ar_rock_color.jpg"',
+            f'    RockNormal "{RESOURCE_DIR}/ar_rock_normal.jpg"',
+            '    g_flDustTile "640"', '    g_flRockTile "1024"', '}', '' ] ) )
+        print( "wrote ar_terrain" )
     elif name == "ar_tower":
         c, r, n, illum = tower_cladding()
         done[name] = write_maps( out, name, c, r, n, 0.3, illum=illum, brightness=3.0 )
@@ -978,16 +1020,16 @@ def build( name, out ):
         c, illum = screen_atlas()
         BX.save_rgb( out / "ar_screens_color.png", c )
         BX.save_grey( out / "ar_screens_illum.png", illum )
-        write_text( out / "ar_screens.vmat", vmat( name, f"{RESOURCE_DIR}/ar_screens_color.png", rough_value=0.15,
-                                                   illum=f"{RESOURCE_DIR}/ar_screens_illum.png", brightness=2.5 ) )
+        write_text( out / "ar_screens.vmat", vmat( name, f"{RESOURCE_DIR}/ar_screens_color.png", rough_value=0.65,
+                                                   illum=f"{RESOURCE_DIR}/ar_screens_illum.png", brightness=0.75 )
+                    .replace( 'F_SPECULAR "1"', 'F_SPECULAR "0"' ) )
         done[name] = ( c, np.dstack( [ np.zeros_like( illum ), np.zeros_like( illum ), np.ones_like( illum ) ] ) )
         print( f"wrote {name}" )
     elif name == "ar_plasma":
         c, illum = plasma()
         BX.save_rgb( out / "ar_plasma_color.png", c )
         BX.save_grey( out / "ar_plasma_illum.png", illum )
-        write_text( out / "ar_plasma.vmat", vmat( name, f"{RESOURCE_DIR}/ar_plasma_color.png", rough_value=0.4,
-                                                  illum=f"{RESOURCE_DIR}/ar_plasma_illum.png", brightness=2.4 ) )
+        write_text( out / "ar_plasma.vmat", plasma_vmat() )
         done[name] = ( c, np.dstack( [ np.zeros_like( illum ), np.zeros_like( illum ), np.ones_like( illum ) ] ) )
         print( f"wrote {name}" )
     elif name == "ar_dome":

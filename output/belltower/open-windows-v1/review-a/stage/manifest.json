@@ -1,0 +1,2025 @@
+{
+  "revision": "open-windows-v1",
+  "stage_revision": "review-a",
+  "files": {
+    "Assets/models/maps/belltower/open-windows-v1/centre/windows.obj": {
+      "source": "output/belltower/open-windows-v1/review-a/stage/Assets/models/maps/belltower/open-windows-v1/centre/windows.obj",
+      "before": null,
+      "after": "36c4cdffa8cf1593c79386cad5cfbcfc09ae29355569386e0cef9a5212ddf380",
+      "backup": null
+    },
+    "Assets/models/maps/belltower/open-windows-v1/centre/windows.mtl": {
+      "source": "output/belltower/open-windows-v1/review-a/stage/Assets/models/maps/belltower/open-windows-v1/centre/windows.mtl",
+      "before": null,
+      "after": "1ed2bec7957cc3746c7da70e42f8fd142e1abe3b77f56f46bcf1e2eede56c44a",
+      "backup": null
+    },
+    "Assets/models/maps/belltower/belltower_centre.vmdl": {
+      "source": "output/belltower/open-windows-v1/review-a/stage/Assets/models/maps/belltower/belltower_centre.vmdl",
+      "before": "1e2ef2a5fe015d6f432047c0ae3bf8a461bc6a06911e5ce10cc914edcd1cc7b2",
+      "after": "61f612a7906603c5048c0ce2511422ce24139d0f5034ac033b71f7d85d258a7d",
+      "backup": "output/belltower/open-windows-v1/review-a/stage/backup/Assets/models/maps/belltower/belltower_centre.vmdl"
+    },
+    "Assets/models/maps/belltower/open-windows-v1/west/windows.obj": {
+      "source": "output/belltower/open-windows-v1/review-a/stage/Assets/models/maps/belltower/open-windows-v1/west/windows.obj",
+      "before": null,
+      "after": "b5795f08756c127e8297e4ba16fe233f941a40e7956758a57842c20ed1b1eacf",
+      "backup": null
+    },
+    "Assets/models/maps/belltower/open-windows-v1/west/windows.mtl": {
+      "source": "output/belltower/open-windows-v1/review-a/stage/Assets/models/maps/belltower/open-windows-v1/west/windows.mtl",
+      "before": null,
+      "after": "fa0ae72ac05a64346d7ce630781b06d0f1d0e18dfef3598ab306b9f0c80754db",
+      "backup": null
+    },
+    "Assets/models/maps/belltower/belltower_west.vmdl": {
+      "source": "output/belltower/open-windows-v1/review-a/stage/Assets/models/maps/belltower/belltower_west.vmdl",
+      "before": "3d7ba35423c4914fa322cfd90716991dff5cd6e203b328a8c344ead53acd2bda",
+      "after": "32ae251fe48c7bda70888e43bd073b30c60c140486857eec4c59c180166272a2",
+      "backup": "output/belltower/open-windows-v1/review-a/stage/backup/Assets/models/maps/belltower/belltower_west.vmdl"
+    },
+    "Assets/models/maps/belltower/open-windows-v1/east/windows.obj": {
+      "source": "output/belltower/open-windows-v1/review-a/stage/Assets/models/maps/belltower/open-windows-v1/east/windows.obj",
+      "before": null,
+      "after": "c0badc13759890769998c453bbff5fcce399db96b014ad39b22c05e647691538",
+      "backup": null
+    },
+    "Assets/models/maps/belltower/open-windows-v1/east/windows.mtl": {
+      "source": "output/belltower/open-windows-v1/review-a/stage/Assets/models/maps/belltower/open-windows-v1/east/windows.mtl",
+      "before": null,
+      "after": "fa0ae72ac05a64346d7ce630781b06d0f1d0e18dfef3598ab306b9f0c80754db",
+      "backup": null
+    },
+    "Assets/models/maps/belltower/belltower_east.vmdl": {
+      "source": "output/belltower/open-windows-v1/review-a/stage/Assets/models/maps/belltower/belltower_east.vmdl",
+      "before": "9fc9d32e9a4c3e9330c767ebc848fdd04d19516374bfafa376634aa40adad6ea",
+      "after": "7a3f0c98d53dba6ed23e3a9f932d004c92e529ddc93bb1ff0f1a3f8319bd4544",
+      "backup": "output/belltower/open-windows-v1/review-a/stage/backup/Assets/models/maps/belltower/belltower_east.vmdl"
+    }
+  },
+  "source_sha256": {
+    "Tools/belltower_open_windows.py": "ab95f807ef51c5bc803cf32ce691b61a97eec382e5577aacec6ffa5e1529f6dc",
+    "Tools/belltower_stage_open_windows.py": "8128fbd2d0670c1defaa3e5973a3d0531d772aaf301560af316bc1f88319069b",
+    "Tools/belltower_map.py": "34de2f1a25bb3c97a79ca52cf46cf9b997d316e62ebad9e1f4e076d7cd1b8759"
+  },
+  "protected_sha256": {
+    "Assets/scenes/maps/Belltower/belltower.scene": "7c81362d419176d9bb98caf5287e1949f19b1d867a8c2cb030971b5ecac865cd",
+    "Assets/materials/belltower/church-windows-v1/church_window_glass_0.vmat": "44271a922c948a02662b379ae844a3af1b702a1c444908e86dbba7f954e66e04",
+    "Assets/materials/belltower/church-windows-v1/church_window_glass_1.vmat": "70314e9e687f0ee6e89cb3e9264ceeaa5d8cdd6d545ca0db5b1072592650de4c",
+    "Assets/materials/belltower/church-windows-v1/church_window_glass_2.vmat": "0292567359fff5e8750d2172caa35b848b077d3ca5cfb527576cc8e6a4c57719"
+  },
+  "windows": 42,
+  "leaves": 84,
+  "openings": [
+    {
+      "part": "centre",
+      "building": "town_hall",
+      "face": "+n",
+      "axis": "e",
+      "across": [
+        1084.0,
+        1100.0
+      ],
+      "r0": -412.0,
+      "r1": -368.0,
+      "z0": 40,
+      "z1": 112,
+      "trim": "trim_white",
+      "leaves": [
+        {
+          "angle": 116.0,
+          "width": 18.55,
+          "height": 65.6,
+          "hinge": [
+            -408.8,
+            1102.2,
+            43.2
+          ],
+          "along": [
+            -0.4383711467890775,
+            0.8987940462991669,
+            0.0
+          ],
+          "out": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "run": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "handed": 1
+        },
+        {
+          "angle": 117.0,
+          "width": 18.55,
+          "height": 65.6,
+          "hinge": [
+            -371.2,
+            1102.2,
+            43.2
+          ],
+          "along": [
+            0.45399049973954675,
+            0.8910065241883679,
+            0.0
+          ],
+          "out": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "run": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "handed": -1
+        }
+      ]
+    },
+    {
+      "part": "centre",
+      "building": "town_hall",
+      "face": "+n",
+      "axis": "e",
+      "across": [
+        1084.0,
+        1100.0
+      ],
+      "r0": -172.0,
+      "r1": -128.0,
+      "z0": 40,
+      "z1": 112,
+      "trim": "trim_white",
+      "leaves": [
+        {
+          "angle": 118.0,
+          "width": 18.55,
+          "height": 65.6,
+          "hinge": [
+            -168.8,
+            1102.2,
+            43.2
+          ],
+          "along": [
+            -0.4694715627858909,
+            0.8829475928589269,
+            0.0
+          ],
+          "out": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "run": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "handed": 1
+        },
+        {
+          "angle": 115.0,
+          "width": 18.55,
+          "height": 65.6,
+          "hinge": [
+            -131.2,
+            1102.2,
+            43.2
+          ],
+          "along": [
+            0.42261826174069933,
+            0.90630778703665,
+            0.0
+          ],
+          "out": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "run": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "handed": -1
+        }
+      ]
+    },
+    {
+      "part": "centre",
+      "building": "town_hall",
+      "face": "+n",
+      "axis": "e",
+      "across": [
+        1084.0,
+        1100.0
+      ],
+      "r0": 128.0,
+      "r1": 172.0,
+      "z0": 40,
+      "z1": 112,
+      "trim": "trim_white",
+      "leaves": [
+        {
+          "angle": 112.0,
+          "width": 18.55,
+          "height": 65.6,
+          "hinge": [
+            131.2,
+            1102.2,
+            43.2
+          ],
+          "along": [
+            -0.37460659341591207,
+            0.9271838545667874,
+            0.0
+          ],
+          "out": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "run": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "handed": 1
+        },
+        {
+          "angle": 118.0,
+          "width": 18.55,
+          "height": 65.6,
+          "hinge": [
+            168.8,
+            1102.2,
+            43.2
+          ],
+          "along": [
+            0.4694715627858909,
+            0.8829475928589269,
+            0.0
+          ],
+          "out": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "run": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "handed": -1
+        }
+      ]
+    },
+    {
+      "part": "centre",
+      "building": "town_hall",
+      "face": "+n",
+      "axis": "e",
+      "across": [
+        1084.0,
+        1100.0
+      ],
+      "r0": 368.0,
+      "r1": 412.0,
+      "z0": 40,
+      "z1": 112,
+      "trim": "trim_white",
+      "leaves": [
+        {
+          "angle": 120.0,
+          "width": 18.55,
+          "height": 65.6,
+          "hinge": [
+            371.2,
+            1102.2,
+            43.2
+          ],
+          "along": [
+            -0.4999999999999998,
+            0.8660254037844387,
+            0.0
+          ],
+          "out": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "run": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "handed": 1
+        },
+        {
+          "angle": 120.0,
+          "width": 18.55,
+          "height": 65.6,
+          "hinge": [
+            408.8,
+            1102.2,
+            43.2
+          ],
+          "along": [
+            0.4999999999999998,
+            0.8660254037844387,
+            0.0
+          ],
+          "out": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "run": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "handed": -1
+        }
+      ]
+    },
+    {
+      "part": "centre",
+      "building": "town_hall",
+      "face": "+n",
+      "axis": "e",
+      "across": [
+        1084.0,
+        1100.0
+      ],
+      "r0": -412.0,
+      "r1": -358.0,
+      "z0": 204.0,
+      "z1": 300.0,
+      "trim": "trim_white",
+      "leaves": [
+        {
+          "angle": 119.0,
+          "width": 23.55,
+          "height": 89.6,
+          "hinge": [
+            -408.8,
+            1102.2,
+            207.2
+          ],
+          "along": [
+            -0.484809620246337,
+            0.8746197071393959,
+            0.0
+          ],
+          "out": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "run": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "handed": 1
+        },
+        {
+          "angle": 118.0,
+          "width": 23.55,
+          "height": 89.6,
+          "hinge": [
+            -361.2,
+            1102.2,
+            207.2
+          ],
+          "along": [
+            0.4694715627858909,
+            0.8829475928589269,
+            0.0
+          ],
+          "out": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "run": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "handed": -1
+        }
+      ]
+    },
+    {
+      "part": "centre",
+      "building": "town_hall",
+      "face": "+n",
+      "axis": "e",
+      "across": [
+        1084.0,
+        1100.0
+      ],
+      "r0": -302.0,
+      "r1": -248.0,
+      "z0": 204.0,
+      "z1": 300.0,
+      "trim": "trim_white",
+      "leaves": [
+        {
+          "angle": 119.0,
+          "width": 23.55,
+          "height": 89.6,
+          "hinge": [
+            -298.8,
+            1102.2,
+            207.2
+          ],
+          "along": [
+            -0.484809620246337,
+            0.8746197071393959,
+            0.0
+          ],
+          "out": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "run": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "handed": 1
+        },
+        {
+          "angle": 118.0,
+          "width": 23.55,
+          "height": 89.6,
+          "hinge": [
+            -251.2,
+            1102.2,
+            207.2
+          ],
+          "along": [
+            0.4694715627858909,
+            0.8829475928589269,
+            0.0
+          ],
+          "out": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "run": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "handed": -1
+        }
+      ]
+    },
+    {
+      "part": "centre",
+      "building": "town_hall",
+      "face": "+n",
+      "axis": "e",
+      "across": [
+        1084.0,
+        1100.0
+      ],
+      "r0": -192.0,
+      "r1": -138.0,
+      "z0": 204.0,
+      "z1": 300.0,
+      "trim": "trim_white",
+      "leaves": [
+        {
+          "angle": 114.0,
+          "width": 23.55,
+          "height": 89.6,
+          "hinge": [
+            -188.8,
+            1102.2,
+            207.2
+          ],
+          "along": [
+            -0.40673664307580026,
+            0.9135454576426009,
+            0.0
+          ],
+          "out": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "run": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "handed": 1
+        },
+        {
+          "angle": 112.0,
+          "width": 23.55,
+          "height": 89.6,
+          "hinge": [
+            -141.2,
+            1102.2,
+            207.2
+          ],
+          "along": [
+            0.37460659341591207,
+            0.9271838545667874,
+            0.0
+          ],
+          "out": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "run": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "handed": -1
+        }
+      ]
+    },
+    {
+      "part": "centre",
+      "building": "town_hall",
+      "face": "+n",
+      "axis": "e",
+      "across": [
+        1084.0,
+        1100.0
+      ],
+      "r0": -82.0,
+      "r1": -28.0,
+      "z0": 204.0,
+      "z1": 300.0,
+      "trim": "trim_white",
+      "leaves": [
+        {
+          "angle": 112.0,
+          "width": 23.55,
+          "height": 89.6,
+          "hinge": [
+            -78.8,
+            1102.2,
+            207.2
+          ],
+          "along": [
+            -0.37460659341591207,
+            0.9271838545667874,
+            0.0
+          ],
+          "out": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "run": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "handed": 1
+        },
+        {
+          "angle": 112.0,
+          "width": 23.55,
+          "height": 89.6,
+          "hinge": [
+            -31.2,
+            1102.2,
+            207.2
+          ],
+          "along": [
+            0.37460659341591207,
+            0.9271838545667874,
+            0.0
+          ],
+          "out": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "run": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "handed": -1
+        }
+      ]
+    },
+    {
+      "part": "centre",
+      "building": "town_hall",
+      "face": "+n",
+      "axis": "e",
+      "across": [
+        1084.0,
+        1100.0
+      ],
+      "r0": 28.0,
+      "r1": 82.0,
+      "z0": 204.0,
+      "z1": 300.0,
+      "trim": "trim_white",
+      "leaves": [
+        {
+          "angle": 115.0,
+          "width": 23.55,
+          "height": 89.6,
+          "hinge": [
+            31.2,
+            1102.2,
+            207.2
+          ],
+          "along": [
+            -0.42261826174069933,
+            0.90630778703665,
+            0.0
+          ],
+          "out": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "run": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "handed": 1
+        },
+        {
+          "angle": 118.0,
+          "width": 23.55,
+          "height": 89.6,
+          "hinge": [
+            78.8,
+            1102.2,
+            207.2
+          ],
+          "along": [
+            0.4694715627858909,
+            0.8829475928589269,
+            0.0
+          ],
+          "out": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "run": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "handed": -1
+        }
+      ]
+    },
+    {
+      "part": "centre",
+      "building": "town_hall",
+      "face": "+n",
+      "axis": "e",
+      "across": [
+        1084.0,
+        1100.0
+      ],
+      "r0": 138.0,
+      "r1": 192.0,
+      "z0": 204.0,
+      "z1": 300.0,
+      "trim": "trim_white",
+      "leaves": [
+        {
+          "angle": 119.0,
+          "width": 23.55,
+          "height": 89.6,
+          "hinge": [
+            141.2,
+            1102.2,
+            207.2
+          ],
+          "along": [
+            -0.484809620246337,
+            0.8746197071393959,
+            0.0
+          ],
+          "out": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "run": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "handed": 1
+        },
+        {
+          "angle": 113.0,
+          "width": 23.55,
+          "height": 89.6,
+          "hinge": [
+            188.8,
+            1102.2,
+            207.2
+          ],
+          "along": [
+            0.3907311284892738,
+            0.9205048534524403,
+            0.0
+          ],
+          "out": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "run": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "handed": -1
+        }
+      ]
+    },
+    {
+      "part": "centre",
+      "building": "town_hall",
+      "face": "+n",
+      "axis": "e",
+      "across": [
+        1084.0,
+        1100.0
+      ],
+      "r0": 248.0,
+      "r1": 302.0,
+      "z0": 204.0,
+      "z1": 300.0,
+      "trim": "trim_white",
+      "leaves": [
+        {
+          "angle": 118.0,
+          "width": 23.55,
+          "height": 89.6,
+          "hinge": [
+            251.2,
+            1102.2,
+            207.2
+          ],
+          "along": [
+            -0.4694715627858909,
+            0.8829475928589269,
+            0.0
+          ],
+          "out": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "run": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "handed": 1
+        },
+        {
+          "angle": 120.0,
+          "width": 23.55,
+          "height": 89.6,
+          "hinge": [
+            298.8,
+            1102.2,
+            207.2
+          ],
+          "along": [
+            0.4999999999999998,
+            0.8660254037844387,
+            0.0
+          ],
+          "out": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "run": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "handed": -1
+        }
+      ]
+    },
+    {
+      "part": "centre",
+      "building": "town_hall",
+      "face": "+n",
+      "axis": "e",
+      "across": [
+        1084.0,
+        1100.0
+      ],
+      "r0": 358.0,
+      "r1": 412.0,
+      "z0": 204.0,
+      "z1": 300.0,
+      "trim": "trim_white",
+      "leaves": [
+        {
+          "angle": 115.0,
+          "width": 23.55,
+          "height": 89.6,
+          "hinge": [
+            361.2,
+            1102.2,
+            207.2
+          ],
+          "along": [
+            -0.42261826174069933,
+            0.90630778703665,
+            0.0
+          ],
+          "out": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "run": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "handed": 1
+        },
+        {
+          "angle": 112.0,
+          "width": 23.55,
+          "height": 89.6,
+          "hinge": [
+            408.8,
+            1102.2,
+            207.2
+          ],
+          "along": [
+            0.37460659341591207,
+            0.9271838545667874,
+            0.0
+          ],
+          "out": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "run": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "handed": -1
+        }
+      ]
+    },
+    {
+      "part": "centre",
+      "building": "town_hall",
+      "face": "-n",
+      "axis": "e",
+      "across": [
+        550.0,
+        566.0
+      ],
+      "r0": -360.0,
+      "r1": -300.0,
+      "z0": 204.0,
+      "z1": 300.0,
+      "trim": "trim_white",
+      "leaves": [
+        {
+          "angle": 116.0,
+          "width": 26.55,
+          "height": 89.6,
+          "hinge": [
+            -356.8,
+            547.8,
+            207.2
+          ],
+          "along": [
+            -0.4383711467890775,
+            -0.8987940462991669,
+            0.0
+          ],
+          "out": [
+            0.0,
+            -1.0,
+            0.0
+          ],
+          "run": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "handed": 1
+        },
+        {
+          "angle": 112.0,
+          "width": 26.55,
+          "height": 89.6,
+          "hinge": [
+            -303.2,
+            547.8,
+            207.2
+          ],
+          "along": [
+            0.37460659341591207,
+            -0.9271838545667874,
+            0.0
+          ],
+          "out": [
+            0.0,
+            -1.0,
+            0.0
+          ],
+          "run": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "handed": -1
+        }
+      ]
+    },
+    {
+      "part": "centre",
+      "building": "town_hall",
+      "face": "-n",
+      "axis": "e",
+      "across": [
+        550.0,
+        566.0
+      ],
+      "r0": 300.0,
+      "r1": 360.0,
+      "z0": 204.0,
+      "z1": 300.0,
+      "trim": "trim_white",
+      "leaves": [
+        {
+          "angle": 112.0,
+          "width": 26.55,
+          "height": 89.6,
+          "hinge": [
+            303.2,
+            547.8,
+            207.2
+          ],
+          "along": [
+            -0.37460659341591207,
+            -0.9271838545667874,
+            0.0
+          ],
+          "out": [
+            0.0,
+            -1.0,
+            0.0
+          ],
+          "run": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "handed": 1
+        },
+        {
+          "angle": 117.0,
+          "width": 26.55,
+          "height": 89.6,
+          "hinge": [
+            356.8,
+            547.8,
+            207.2
+          ],
+          "along": [
+            0.45399049973954675,
+            -0.8910065241883679,
+            0.0
+          ],
+          "out": [
+            0.0,
+            -1.0,
+            0.0
+          ],
+          "run": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "handed": -1
+        }
+      ]
+    },
+    {
+      "part": "west",
+      "building": "bakery",
+      "face": "+n",
+      "axis": "e",
+      "across": [
+        1088.0,
+        1100.0
+      ],
+      "r0": -1218.0,
+      "r1": -1122.0,
+      "z0": 30,
+      "z1": 112,
+      "trim": "trim_brown",
+      "leaves": [
+        {
+          "angle": 117.0,
+          "width": 44.55,
+          "height": 75.6,
+          "hinge": [
+            -1214.8,
+            1102.2,
+            33.2
+          ],
+          "along": [
+            -0.45399049973954675,
+            0.8910065241883679,
+            0.0
+          ],
+          "out": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "run": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "handed": 1
+        },
+        {
+          "angle": 114.0,
+          "width": 44.55,
+          "height": 75.6,
+          "hinge": [
+            -1125.2,
+            1102.2,
+            33.2
+          ],
+          "along": [
+            0.40673664307580026,
+            0.9135454576426009,
+            0.0
+          ],
+          "out": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "run": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "handed": -1
+        }
+      ]
+    },
+    {
+      "part": "west",
+      "building": "bakery",
+      "face": "+n",
+      "axis": "e",
+      "across": [
+        1088.0,
+        1100.0
+      ],
+      "r0": -978.0,
+      "r1": -882.0,
+      "z0": 30,
+      "z1": 112,
+      "trim": "trim_brown",
+      "leaves": [
+        {
+          "angle": 115.0,
+          "width": 44.55,
+          "height": 75.6,
+          "hinge": [
+            -974.8,
+            1102.2,
+            33.2
+          ],
+          "along": [
+            -0.42261826174069933,
+            0.90630778703665,
+            0.0
+          ],
+          "out": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "run": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "handed": 1
+        },
+        {
+          "angle": 113.0,
+          "width": 44.55,
+          "height": 75.6,
+          "hinge": [
+            -885.2,
+            1102.2,
+            33.2
+          ],
+          "along": [
+            0.3907311284892738,
+            0.9205048534524403,
+            0.0
+          ],
+          "out": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "run": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "handed": -1
+        }
+      ]
+    },
+    {
+      "part": "west",
+      "building": "bakery",
+      "face": "-n",
+      "axis": "e",
+      "across": [
+        700.0,
+        712.0
+      ],
+      "r0": -1195.0,
+      "r1": -1145.0,
+      "z0": 40,
+      "z1": 112,
+      "trim": "trim_brown",
+      "leaves": [
+        {
+          "angle": 113.0,
+          "width": 21.55,
+          "height": 65.6,
+          "hinge": [
+            -1191.8,
+            697.8,
+            43.2
+          ],
+          "along": [
+            -0.3907311284892738,
+            -0.9205048534524403,
+            0.0
+          ],
+          "out": [
+            0.0,
+            -1.0,
+            0.0
+          ],
+          "run": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "handed": 1
+        },
+        {
+          "angle": 116.0,
+          "width": 21.55,
+          "height": 65.6,
+          "hinge": [
+            -1148.2,
+            697.8,
+            43.2
+          ],
+          "along": [
+            0.4383711467890775,
+            -0.8987940462991669,
+            0.0
+          ],
+          "out": [
+            0.0,
+            -1.0,
+            0.0
+          ],
+          "run": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "handed": -1
+        }
+      ]
+    },
+    {
+      "part": "west",
+      "building": "bakery",
+      "face": "-e",
+      "axis": "n",
+      "across": [
+        -1250.0,
+        -1238.0
+      ],
+      "r0": 975.0,
+      "r1": 1025.0,
+      "z0": 40,
+      "z1": 112,
+      "trim": "trim_brown",
+      "leaves": [
+        {
+          "angle": 117.0,
+          "width": 21.55,
+          "height": 65.6,
+          "hinge": [
+            -1252.2,
+            978.2,
+            43.2
+          ],
+          "along": [
+            -0.8910065241883679,
+            -0.45399049973954675,
+            0.0
+          ],
+          "out": [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          "run": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "handed": 1
+        },
+        {
+          "angle": 113.0,
+          "width": 21.55,
+          "height": 65.6,
+          "hinge": [
+            -1252.2,
+            1021.8,
+            43.2
+          ],
+          "along": [
+            -0.9205048534524403,
+            0.3907311284892738,
+            0.0
+          ],
+          "out": [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          "run": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "handed": -1
+        }
+      ]
+    },
+    {
+      "part": "west",
+      "building": "inn",
+      "face": "+n",
+      "axis": "e",
+      "across": [
+        -112.0,
+        -100.0
+      ],
+      "r0": -1200.0,
+      "r1": -1140.0,
+      "z0": 36,
+      "z1": 106,
+      "trim": "trim_brown",
+      "leaves": [
+        {
+          "angle": 113.0,
+          "width": 26.55,
+          "height": 63.6,
+          "hinge": [
+            -1196.8,
+            -97.8,
+            39.2
+          ],
+          "along": [
+            -0.3907311284892738,
+            0.9205048534524403,
+            0.0
+          ],
+          "out": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "run": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "handed": 1
+        },
+        {
+          "angle": 115.0,
+          "width": 26.55,
+          "height": 63.6,
+          "hinge": [
+            -1143.2,
+            -97.8,
+            39.2
+          ],
+          "along": [
+            0.42261826174069933,
+            0.90630778703665,
+            0.0
+          ],
+          "out": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "run": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "handed": -1
+        }
+      ]
+    },
+    {
+      "part": "west",
+      "building": "inn",
+      "face": "+n",
+      "axis": "e",
+      "across": [
+        -112.0,
+        -100.0
+      ],
+      "r0": -910.0,
+      "r1": -850.0,
+      "z0": 36,
+      "z1": 106,
+      "trim": "trim_brown",
+      "leaves": [
+        {
+          "angle": 117.0,
+          "width": 26.55,
+          "height": 63.6,
+          "hinge": [
+            -906.8,
+            -97.8,
+            39.2
+          ],
+          "along": [
+            -0.45399049973954675,
+            0.8910065241883679,
+            0.0
+          ],
+          "out": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "run": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "handed": 1
+        },
+        {
+          "angle": 117.0,
+          "width": 26.55,
+          "height": 63.6,
+          "hinge": [
+            -853.2,
+            -97.8,
+            39.2
+          ],
+          "along": [
+            0.45399049973954675,
+            0.8910065241883679,
+            0.0
+          ],
+          "out": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "run": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "handed": -1
+        }
+      ]
+    },
+    {
+      "part": "west",
+      "building": "inn",
+      "face": "+n",
+      "axis": "e",
+      "across": [
+        -112.0,
+        -100.0
+      ],
+      "r0": -1195.0,
+      "r1": -1145.0,
+      "z0": 184.0,
+      "z1": 254.0,
+      "trim": "trim_brown",
+      "leaves": [
+        {
+          "angle": 120.0,
+          "width": 21.55,
+          "height": 63.6,
+          "hinge": [
+            -1191.8,
+            -97.8,
+            187.2
+          ],
+          "along": [
+            -0.4999999999999998,
+            0.8660254037844387,
+            0.0
+          ],
+          "out": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "run": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "handed": 1
+        },
+        {
+          "angle": 115.0,
+          "width": 21.55,
+          "height": 63.6,
+          "hinge": [
+            -1148.2,
+            -97.8,
+            187.2
+          ],
+          "along": [
+            0.42261826174069933,
+            0.90630778703665,
+            0.0
+          ],
+          "out": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "run": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "handed": -1
+        }
+      ]
+    },
+    {
+      "part": "west",
+      "building": "inn",
+      "face": "+n",
+      "axis": "e",
+      "across": [
+        -112.0,
+        -100.0
+      ],
+      "r0": -1045.0,
+      "r1": -995.0,
+      "z0": 184.0,
+      "z1": 254.0,
+      "trim": "trim_brown",
+      "leaves": [
+        {
+          "angle": 116.0,
+          "width": 21.55,
+          "height": 63.6,
+          "hinge": [
+            -1041.8,
+            -97.8,
+            187.2
+          ],
+          "along": [
+            -0.4383711467890775,
+            0.8987940462991669,
+            0.0
+          ],
+          "out": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "run": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "handed": 1
+        },
+        {
+          "angle": 120.0,
+          "width": 21.55,
+          "height": 63.6,
+          "hinge": [
+            -998.2,
+            -97.8,
+            187.2
+          ],
+          "along": [
+            0.4999999999999998,
+            0.8660254037844387,
+            0.0
+          ],
+          "out": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "run": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "handed": -1
+        }
+      ]
+    },
+    {
+      "part": "west",
+      "building": "inn",
+      "face": "+n",
+      "axis": "e",
+      "across": [
+        -112.0,
+        -100.0
+      ],
+      "r0": -905.0,
+      "r1": -855.0,
+      "z0": 184.0,
+      "z1": 254.0,
+      "trim": "trim_brown",
+      "leaves": [
+        {
+          "angle": 119.0,
+          "width": 21.55,
+          "height": 63.6,
+          "hinge": [
+            -901.8,
+            -97.8,
+            187.2
+          ],
+          "along": [
+            -0.484809620246337,
+            0.8746197071393959,
+            0.0
+          ],
+          "out": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "run": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "handed": 1
+        },
+        {
+          "angle": 119.0,
+          "width": 21.55,
+          "height": 63.6,
+          "hinge": [
+            -858.2,
+            -97.8,
+            187.2
+          ],
+          "along": [
+            0.484809620246337,
+            0.8746197071393959,
+            0.0
+          ],
+          "out": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "run": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "handed": -1
+        }
+      ]
+    },
+    {
+      "part": "west",
+      "building": "inn",
+      "face": "-n",
+      "axis": "e",
+      "across": [
+        -450.0,
+        -438.0
+      ],
+      "r0": -985.0,
+      "r1": -935.0,
+      "z0": 36,
+      "z1": 106,
+      "trim": "trim_brown",
+      "leaves": [
+        {
+          "angle": 118.0,
+          "width": 21.55,
+          "height": 63.6,
+          "hinge": [
+            -981.8,
+            -452.2,
+            39.2
+          ],
+          "along": [
+            -0.4694715627858909,
+            -0.8829475928589269,
+            0.0
+          ],
+          "out": [
+            0.0,
+            -1.0,
+            0.0
+          ],
+          "run": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "handed": 1
+        },
+        {
+          "angle": 116.0,
+          "width": 21.55,
+          "height": 63.6,
+          "hinge": [
+            -938.2,
+            -452.2,
+            39.2
+          ],
+          "along": [
+            0.4383711467890775,
+            -0.8987940462991669,
+            0.0
+          ],
+          "out": [
+            0.0,
+            -1.0,
+            0.0
+          ],
+          "run": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "handed": -1
+        }
+      ]
+    },
+    {
+      "part": "west",
+      "building": "inn",
+      "face": "-n",
+      "axis": "e",
+      "across": [
+        -450.0,
+        -438.0
+      ],
+      "r0": -1195.0,
+      "r1": -1145.0,
+      "z0": 184.0,
+      "z1": 254.0,
+      "trim": "trim_brown",
+      "leaves": [
+        {
+          "angle": 118.0,
+          "width": 21.55,
+          "height": 63.6,
+          "hinge": [
+            -1191.8,
+            -452.2,
+            187.2
+          ],
+          "along": [
+            -0.4694715627858909,
+            -0.8829475928589269,
+            0.0
+          ],
+          "out": [
+            0.0,
+            -1.0,
+            0.0
+          ],
+          "run": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "handed": 1
+        },
+        {
+          "angle": 115.0,
+          "width": 21.55,
+          "height": 63.6,
+          "hinge": [
+            -1148.2,
+            -452.2,
+            187.2
+          ],
+          "along": [
+            0.42261826174069933,
+            -0.90630778703665,
+            0.0
+          ],
+          "out": [
+            0.0,
+            -1.0,
+            0.0
+          ],
+          "run": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "handed": -1
+        }
+      ]
+    },
+    {
+      "part": "west",
+      "building": "inn",
+      "face": "-n",
+      "axis": "e",
+      "across": [
+        -450.0,
+        -438.0
+      ],
+      "r0": -985.0,
+      "r1": -935.0,
+      "z0": 184.0,
+      "z1": 254.0,
+      "trim": "trim_brown",
+      "leaves": [
+        {
+          "angle": 116.0,
+          "width": 21.55,
+          "height": 63.6,
+          "hinge": [
+            -981.8,
+            -452.2,
+            187.2
+          ],
+          "along": [
+            -0.4383711467890775,
+            -0.8987940462991669,
+            0.0
+          ],
+          "out": [
+            0.0,
+            -1.0,
+            0.0
+          ],
+          "run": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "handed": 1
+        },
+        {
+          "angle": 113.0,
+          "width": 21.55,
+          "height": 63.6,
+          "hinge": [
+            -938.2,
+            -452.2,
+            187.2
+          ],
+          "along": [
+            0.3907311284892738,
+            -0.9205048534524403,
+            0.0
+          ],
+          "out": [
+            0.0,
+            -1.0,
+            0.0
+          ],
+          "run": [
+            1.0,
+            0.0,
+            0.0
+          ],
+          "handed": -1
+        }
+      ]
+    },
+    {
+      "part": "west",
+      "building": "inn",
+      "face": "-e",
+      "axis": "n",
+      "across": [
+        -1250.0,
+        -1238.0
+      ],
+      "r0": -222.0,
+      "r1": -178.0,
+      "z0": 40,
+      "z1": 106,
+      "trim": "trim_brown",
+      "leaves": [
+        {
+          "angle": 115.0,
+          "width": 18.55,
+          "height": 59.6,
+          "hinge": [
+            -1252.2,
+            -218.8,
+            43.2
+          ],
+          "along": [
+            -0.90630778703665,
+            -0.42261826174069933,
+            0.0
+          ],
+          "out": [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          "run": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "handed": 1
+        },
+        {
+          "angle": 112.0,
+          "width": 18.55,
+          "height": 59.6,
+          "hinge": [
+            -1252.2,
+            -181.2,
+            43.2
+          ],
+          "along": [
+            -0.9271838545667874,
+            0.37460659341591207,
+            0.0
+          ],
+          "out": [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          "run": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "handed": -1
+        }
+      ]
+    },
+    {
+      "part": "west",
+      "building": "inn",
+      "face": "-e",
+      "axis": "n",
+      "across": [
+        -1250.0,
+        -1238.0
+      ],
+      "r0": -297.0,
+      "r1": -253.0,
+      "z0": 184.0,
+      "z1": 254.0,
+      "trim": "trim_brown",
+      "leaves": [
+        {
+          "angle": 112.0,
+          "width": 18.55,
+          "height": 63.6,
+          "hinge": [
+            -1252.2,
+            -293.8,
+            187.2
+          ],
+          "along": [
+            -0.9271838545667874,
+            -0.37460659341591207,
+            0.0
+          ],
+          "out": [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          "run": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "handed": 1
+        },
+        {
+          "angle": 113.0,
+          "width": 18.55,
+          "height": 63.6,
+          "hinge": [
+            -1252.2,
+            -256.2,
+            187.2
+          ],
+          "along": [
+            -0.9205048534524403,
+            0.3907311284892738,
+            0.0
+          ],
+          "out": [
+            -1.0,
+            0.0,
+            0.0
+          ],
+          "run": [
+            0.0,
+            1.0,
+            0.0
+          ],
+          "handed": -1
+        }
+      ]
+    }
+  ],
+  "geometry": {
+    "centre": {
+      "triangles": 42072,
+      "minimum_triangle_area": 0.0010957303500413972,
+      "collision_shapes": 0
+    },
+    "west": {
+      "triangles": 33992,
+      "minimum_triangle_area": 0.0010957303500398815,
+      "collision_shapes": 0
+    },
+    "east": {
+      "triangles": 33992,
+      "minimum_triangle_area": 0.0010957303500398815,
+      "collision_shapes": 0
+    }
+  },
+  "previous_imports_and_physics_preserved": true
+}

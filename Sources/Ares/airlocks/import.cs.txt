@@ -1,0 +1,40 @@
+// Copy into the CLI exchange directory. Refreshes only the hall OBJ, MTL and material remaps; compile its VMDL next.
+var project = Sandbox.Project.Current.GetRootPath();
+var directory = System.IO.Path.Combine( project, "output/ares/airlocks-20261020" );
+var sourceScene = Editor.SceneEditorSession.Active?.Scene;
+var wasPlaying = Game.IsPlaying;
+string Hash( string path ) => Convert.ToHexString( System.Security.Cryptography.SHA256.HashData(
+    System.IO.File.ReadAllBytes( path ) ) ).ToLowerInvariant();
+var installedPath = System.IO.Path.Combine( directory, "installed.json" );
+var expected = System.Text.Json.Nodes.JsonNode.Parse( System.IO.File.ReadAllText( System.IO.File.Exists( installedPath )
+    ? installedPath : System.IO.Path.Combine( directory, "before/manifest.json" ) ) ).AsObject();
+var names = new[] { "models/maps/ares/ares_hall.obj", "models/maps/ares/ares_hall.mtl", "models/maps/ares/ares_hall.vmdl" };
+foreach ( var name in names )
+{
+    var relative = "Assets/" + name;
+    var target = System.IO.Path.Combine( project, relative );
+    var stage = System.IO.Path.Combine( directory, "stage", name );
+    if ( Hash( target ) != Hash( stage ) && Hash( target ) != expected[relative].GetValue<string>() )
+        throw new InvalidOperationException( "Asset changed since staging: " + name );
+}
+string Physics( string path )
+{
+    var text = System.IO.File.ReadAllText( path ).Replace( "\r\n", "\n" );
+    return text.Substring( text.IndexOf( "_class = \"PhysicsShapeList\"", StringComparison.Ordinal ) );
+}
+if ( Physics( System.IO.Path.Combine( directory, "stage", names[2] ) )
+    != Physics( System.IO.Path.Combine( directory, "before/Assets", names[2] ) ) )
+    throw new InvalidOperationException( "Staged airlocks must preserve all collision definitions" );
+foreach ( var name in names )
+{
+    var target = System.IO.Path.Combine( project, "Assets", name );
+    System.IO.File.Copy( System.IO.Path.Combine( directory, "stage", name ), target, true );
+    Editor.AssetSystem.RegisterFile( target );
+}
+var installed = names.ToDictionary( name => "Assets/" + name, name => Hash( System.IO.Path.Combine( project, "Assets", name ) ) );
+var options = new System.Text.Json.JsonSerializerOptions { WriteIndented = true };
+System.IO.File.WriteAllText( installedPath, System.Text.Json.JsonSerializer.Serialize( installed, options ) );
+var report = new { Imported = installed.Keys, PhysicsDefinitionsUnchanged = true,
+    SceneUnchanged = sourceScene == Editor.SceneEditorSession.Active?.Scene, WasPlaying = wasPlaying, Game.IsPlaying };
+System.IO.File.WriteAllText( System.IO.Path.Combine( directory, "import.json" ), System.Text.Json.JsonSerializer.Serialize( report, options ) );
+return report;

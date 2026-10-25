@@ -1,0 +1,42 @@
+// Read only: no selection, rendering, camera initialization or scene changes.
+var root = Sandbox.Project.Current.GetRootPath();
+var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
+var previous = Editor.SceneEditorSession.Active;
+var gameId = Game.ActiveScene?.Id;
+var playing = Game.IsPlaying;
+var session = Editor.SceneEditorSession.All.SingleOrDefault(s => s.Scene.IsEditor && s.Scene.Source?.ResourcePath?.Equals("scenes/maps/belltower/belltower.scene", StringComparison.OrdinalIgnoreCase) == true);
+object ReadCamera(CameraComponent camera)
+{
+    if (!camera.IsValid()) return null;
+    var native = typeof(CameraComponent).GetField("sceneCamera", flags)?.GetValue(camera);
+    var tone = native?.GetType().GetProperty("Tonemap", flags)?.GetValue(native);
+    object ToneValue(string property) => tone?.GetType().GetProperty(property, flags)?.GetValue(tone);
+    return new {
+        camera.Id, Name = camera.GameObject.Name, Parent = camera.GameObject.Parent?.Name,
+        camera.Enabled, camera.IsMainCamera, camera.Priority, camera.Orthographic,
+        Position = camera.WorldPosition.ToString(),
+        EditorCamera = typeof(CameraComponent).GetField("IsSceneEditorCamera", flags)?.GetValue(camera),
+        camera.EnablePostProcessing,
+        Requested = new { camera.AutoExposure.Enabled, camera.AutoExposure.MinimumExposure, camera.AutoExposure.MaximumExposure, camera.AutoExposure.Compensation, camera.AutoExposure.Rate },
+        Native = tone is null ? null : new {
+            Enabled = ToneValue("Enabled"), MinimumExposure = ToneValue("MinExposure"), MaximumExposure = ToneValue("MaxExposure"),
+            Compensation = ToneValue("ExposureCompensation"), Rate = ToneValue("Rate")
+        }
+    };
+}
+var scene = session?.Scene;
+var result = new {
+    ScenePresent = scene is not null,
+    Scene = scene?.Source?.ResourcePath,
+    ActiveDocument = previous?.Scene.Source?.ResourcePath,
+    Playing = playing,
+    OpenDocuments = Editor.SceneEditorSession.All.Select(s => s.Scene.Source?.ResourcePath).ToArray(),
+    MainCamera = scene is null ? null : ReadCamera(scene.Camera),
+    Cameras = scene is null ? null : scene.GetAllComponents<CameraComponent>().Select(ReadCamera).ToArray(),
+    GamePreserved = Game.ActiveScene?.Id == gameId && Game.IsPlaying == playing,
+    SelectedDocumentPreserved = ReferenceEquals(previous, Editor.SceneEditorSession.Active)
+};
+var output = System.IO.Path.Combine(root, "output/belltower/quality/camera-consistency-v1/native-camera-state-oct19.json");
+System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(output));
+System.IO.File.WriteAllText(output, System.Text.Json.JsonSerializer.Serialize(result));
+return result;

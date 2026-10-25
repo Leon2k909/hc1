@@ -148,6 +148,9 @@
   keeping its own turn). The L85A2's rig had `tag_brass` in the handguard, under the bore, so cases came out of it.
 - `Weapon.part_mounts` places a part's model on a rig bone (bone and offset along it), as the MW base draws a
   VElement, for a part whose vertices don't sit where it fits: the HK416's Tarkov stocks.
+- `Weapon.part_moves` moves a piece of a part's mesh that stands where the real gun's doesn't (mesh path -> boxes and
+  offsets: each connected piece whose bounds lie inside a box moves, `port_kastov.move_pieces`). The M16A4's front sight
+  post screws down 0.104 into its base this way (see M16A4).
 - A ported gun's viewmodel prefab plays its model's own graph (`AnimationGraph` null; the vmdl names
   `v_<gun>.vanmgrph`). `kastov_prefabs.viewmodel_prefab` copies `vm_m4a1.prefab`, which is pinned to the M4's
   decompiled graph (see s&box 26.10.02), and until 2026-10-09 it kept that pin. So the L85A2, HK416, AK-12, AK-15 and
@@ -428,13 +431,23 @@
 - The iron sights were checked in a render (ads_in's last frame), not in-game. The addon's aim put the sight line 0.113
   above the camera, with the front post 0.32 deg over the aim point and low in the rear aperture. `kastov_weapons.M16.aim`
   lowers the gun onto the line through the aperture's centre and the post's top.
+- The front sight post stood 1.514" over the flat-top's rail, 0.104" taller than an AR's iron sight line: 1.41" over
+  the rail is the absolute co-witness height red dot mounts are made to (SIG's ROMEO8T manual; Scalarworks' LEAP/01 and
+  fixed front sight, 1.42). Since 2026-10-19 it screws down into its sight base (`Weapon.part_moves` on `sighton.smd`),
+  its tip 1.418" over the rail, and the base's ears stand over it as on a real A2 base.
+  - The aim turns the gun 0.293 degrees nose up about the rear aperture (4.2 ahead of the eye), so the lower tip is back
+    on the aim point: `aim` pitch -0.235 (was 0.058), z 0.003 (was 0.022). The arm retarget is built at that pose, so
+    every clip's arms turn with it (about 0.02" at the fingertips).
+  - Solved from the meshes, not checked in a render or in-game. The carry handle's rear aperture still sits about 0.077"
+    over the 1.41" line, as if its drum were set a click higher.
 - Its `OpticAimCorrection` `1.613,0,0.079` is derived with the Bizon's formula, NOT checked in-game. Its z is near 0
   where the Kastovs' are about -1.2, because the irons sit 1.5 above the rail on the carry handle.
 - Co-witness: each 1x optic has a sight line on top of the correction (`ManualOffset.OpticSightLines`, written from
   `kastov_prefabs` `Prefabs.optic_sight_lines`), so the dot sits against the post as a real one does. Since the
   reticles were collimated (2026-10-18, see Red dots on the bullet line), the dot only shows where the sight points: the
-  gun-level `OpticAimAngleCorrection` (`-0.0547,0.0031,0`) puts it on the screen's centre, and each line only moves the
-  eye (Angles `0,0,0`), up into the window (Position z -0.15 to -0.35) until the post's tip is at its mark. The old
+  gun-level `OpticAimAngleCorrection` (`0.2325,-0.0001,0` since the post went down: the aim's 0.293 degrees nose up put
+  the dots 0.287 high; it was `-0.0547,0.0031,0`) puts it on the screen's centre, and each line only moves the eye
+  (Angles `0,0,0`), up or down in the window (Position z -0.30 to +0.03) until the post's tip is at its mark. The old
   lines also turned the gun 0.44-2.18 degrees nose down to bring the drawn-at-depth dot onto the post; collimated,
   that put the dots up to 2 degrees low. Each optic takes its real analog's height on a flat-top:
   - Absolute (the dot on the post's tip, the optic on its own low base): the Box Collimator (`att_vm_reflex_02`, an
@@ -443,21 +456,35 @@
   - Lower 1/3 (the post's tip 0.14" under the dot, from a real optic's 1.535-1.57" line over the rail against 1.41" at
     absolute): the `_tall` risers (the three Mini Red Dots, the Ring Reflex, the Tube Red Dot), and the raised-base
     Enclosed and QD Holographic.
-  - The eye stays within the middle 60% of the window's height; past that a small window would hide the dot. So six
-    optics don't reach their mark, because the models' heights aren't the real ones (the post stands too high for
-    them): the tip sits 0.15" over the Tube Collimator's dot, level with the Tube Red Dot's (not 0.14" under), 0.08"
-    under the QD Holographic's, and 0.20-0.23" over the three Mini Red Dots', which show between the post's ears.
-  - Solved with `output/reticle-survey-20261018/collimated/m16-cowitness.cs.txt` (`m16-cowitness.jsonl`): the gun turned
-    for the dot, then the eye stepped with numerical derivatives until the post's tip (on `tag_barrel_attach`,
-    `13.872,0,1.522`) is at its mark.
+  - The eye stays within the middle 60% of the window's height; past that a small window would hide the dot. On
+    2026-10-18 six optics couldn't reach their mark inside it, because the post stood 0.104" too tall and five optics sat
+    too low. Since 2026-10-19 both are at real heights and all 13 reach it, the QD Holographic's eye nearest the limit
+    (0.258 of 0.303).
+  - The five sat 0.3-0.47" under their real analogs: the three Mini Red Dots' windows 1.08-1.10" over the rail on their
+    riser, the Tube Red Dot's 1.25 and the Tube Collimator's 1.10, against 1.516-1.57" for lower 1/3 mounts (Trijicon's
+    AC32059, Aimpoint's 39 mm, Scalarworks) and 1.41 absolute. `Tools/optic_risers.py` lengthens their mounts: the Mini
+    Red Dots and the Tube Red Dot to 1.55" (lower 1/3), the Tube Collimator to 1.41" (absolute).
+    - Each mount is cut through a plain, vertical part of it, everything over the cut goes up, and a band between the
+      halves repeats the texture's row at the cut, so the riser reads as the same block, taller, with nothing stretched.
+    - Every part made from these models (the M4's MWII parts, which the ported guns share, and the MP5's copies) lowers
+      its `OpticAimOffset` z by the same, so on every gun the eye stays where it was in the window and the collimated
+      dot where it was on the screen (the survey after it found every other gun's dots unmoved).
+    - It also lifts the tags over the cut and the bounds' top in `Sources/MW2022/models/<model>.json`, where the QA
+      tools find `tag_reticle_attach`.
+    - The rips, records and original offsets are in `Backups/optic_risers_rip/`, which every run starts from. Rerun it
+      after `Sources/MW2022/convert_models.py` rewrites these models; `--check` lists what's stale.
+  - Solved with `output/reticle-survey-20261018/collimated/m16-cowitness.cs.txt` (`m16-cowitness-risers.jsonl`,
+    2026-10-19; `m16-cowitness.jsonl` is 2026-10-18's): the gun turned for the dot by the prefab's correction, then the
+    eye stepped with numerical derivatives until the post's tip (on `tag_barrel_attach`, `14.287,0,1.418`; the old
+    `13.872,0,1.522` was 0.415 short of the tip) is at its mark.
   - The 2x-6x optics have no line, and haven't been looked at with the post up.
 - `hc1_m16_cowitness [optic|all]` (`Editor/Hc1M16OpticQa.cs`) finds the lines: it renders the aimed view, finds the red
-  dot in a 9-degree close-up and the post's tip on `tag_barrel_attach` (`13.872,0,1.522`), and steps the line (first
+  dot in a 9-degree close-up and the post's tip on `tag_barrel_attach` (`14.287,0,1.418`), and steps the line (first
   order) until both are within 0.006 degrees. It writes `output/m16-gunsmith/cowitness.txt`, with `LINE` entries ready for
   `kastov_prefabs.py`, and before/after views (`cowitness-<optic>-{before,absolute,lower-third}.png`). The lens shader
   drew the dot at a virtual depth then, so it moved with the eye: hence the steps, re-rendered each time. Since
   2026-10-18 it looks for the dot along the sight's axis, far off, as the collimated shader draws it. It doesn't keep
-  the eye inside the window, so for the six optics that need that, use the collimated solve above.
+  the eye inside the window; the collimated solve above does.
   - In its offscreen scene, a GameObject moved after its first render drew where it was first placed, so the tool moves
     the camera (the eye, at minus the aim offset, turned by the inverse aim angles) and leaves the gun still. Turning the
     optic's ModelRenderers off didn't hide it either.
@@ -469,6 +496,10 @@
   the dot along the sight's axis. On 2026-10-18 the Box Collimator passed (the dot 0.004 degrees off the centre, the
   tip 0.001" under it), and the Mini Red Dot failed as expected (the tip 0.227" over the dot): its rig, the ADS clip's
   pose with no camera bone, agrees with the collimated solve's.
+  - On 2026-10-19, with the post and the five optics at real heights, all 13 passed (`optic-<optic>-risers.*`): every
+    dot within 0.003 degrees of the centre, the post's tip 0.001" under the six absolute sights' dots and 0.140" under
+    the seven lower 1/3 ones'. `output/reticle-survey-20261018/collimated/optic-check-all.cs.txt` (run_csharp) runs it on
+    all 13 in turn.
 - The weapon prefab's sight lines reach an M16 when it spawns: one already out keeps the old aim. None of it has been
   checked in-game yet.
 
@@ -1914,6 +1945,33 @@
 - Aim sensitivity doesn't follow the zoom: irons aren't scaled at all (`ManualOffset` only divides `AimDampening` by
   a magnified optic's power). So at a high Field Of View, Independent irons feel faster than Affected ones.
 - Compiled with dotnet and hotloaded into the user's match (2026-10-08). Not yet checked in-game.
+- Weapon position (2026-10-20, the user: the gun sat "further away from my screen", and they wanted it in settings):
+  Weapon Distance (-4 to 4), Weapon Horizontal Position and Weapon Vertical Position (-3 to 3), in inches from where
+  the gun's animations hold it at the hip (`GameSettings.WeaponDistance`, `WeaponSidePosition`, `WeaponHeightPosition`;
+  0 is the default and what an old settings file reads as).
+  - `ViewModel.HipOffset` adds them in the view's space in `ApplyOffsets`, faded out by the eased `ironsights_weight`,
+    so aiming down the sights lines up exactly as before. It moves the arms and clothing with the gun.
+  - Theater's first-person gun (`TheaterViewModel`) doesn't take them yet.
+  - What had made the gun look further away wasn't found: no hip pose, viewmodel or camera change since 2026-10-15
+    moves it. A wider Field Of View shrinks it, since the viewmodel draws with the main camera's.
+  - Built with dotnet and compiled in the editor, not yet seen in a match.
+
+## Hitmarker (`HitmarkerPainter`, Settings → Crosshair's hit marker)
+- The user (2026-10-20): the kill hitmarker "isnt fully centered". It was a UI panel in `CrosshairHud`, while the HC1
+  crosshair is drawn with the camera's HUD painter at `Screen.Size * 0.5`. UI layout snaps to whole pixels, so on an odd
+  width (the editor's game view was 1905 px, centre 952.5) the two could sit a pixel apart.
+- Now `CrosshairInputSystem` (Stage.FinishUpdate) calls `HitmarkerPainter.Draw` on the main camera's HUD painter every
+  frame, at the crosshair's own centre and scale (`Screen.Height / 1080`), with the old CSS animation (in from 0.6x over
+  30%, out to 1.2x, ease-out). Same style, colour, alpha, size, thickness, outline and duration settings.
+  - The X and the diamond are `DrawLine`s, as the crosshair's arms are. `DrawRect` (and `DrawCircle`) snap their rect
+    to whole pixels, so the ring and the dot are sized to a whole number of pixels whose corner already lands on one
+    (`Aligned`).
+  - The diamond is a turned square now: the panel's animation replaced its `rotate(45deg)`, so it had shown as a square.
+  - Hidden as the panel was: HUD off, a team's win banner, the recon drone's feed. It also draws in the firing range
+    and the main menu (the settings' Preview Hit), which have a camera but no `Crosshair` component.
+- Checked offscreen in the editor (`HitmarkerPainter.Paint` into a throwaway scene's camera, beside crosshair-style
+  lines): every style's centroid within 0.001 px of the cross's centre, round a whole pixel and between pixels. Not yet
+  seen in a match.
 
 ## Quitting (`QuitPrompt`): a game can't close s&box
 - Escape on the main menu (`MainMenuRoot.HandleEscape`) closes one thing at a time: the language list, the bug report,
@@ -2277,6 +2335,19 @@
   6 s at baseline after a 1.25 s delay; exhaustion holds sprint off until 25% is recovered. Actual ground movement
   drains it, and respawn refills it. Endurance also speeds the existing jump/prone fatigue recovery. The owner drives
   stamina as it does movement; the host owns earned training totals.
+- Aimed breathing (2026-10-20): `AimBreathingRules` supplies a small vertical breathing cycle, slower hand drift and a
+  tiny smooth tremor. `CameraController.Breathing.cs` applies it to the first-person aiming camera after its per-frame
+  rotation reset; the viewmodel, scope and existing `Shootable.WeaponRay` follow the same view. Mouse input and
+  `EyeAngles` are not accumulated or rewritten. ADS transitions fade the effect; inactive/dead/frozen/drone/noclip
+  cameras reset it, and holstering, lowering, reloads, mantling and climbing fade out the aimed motion.
+  Rested novice additional bounds are 0.119 degrees pitch and 0.0555 yaw, before existing animations/effects.
+  Handling retains its continuous 15% maximum reduction, including the remaining motion at level 50. Crouching,
+  prone and mounting scale this breathing by 0.70, 0.42 and 0.22 respectively. Stamina depletion smoothly raises its
+  amplitude up to 1.8 times and rate from 13 to 24 breaths/minute; trained Endurance helps through stamina/recovery.
+  The training harness now passes 17 scenarios, including breathing bounds, all skill levels, stance/fatigue effects,
+  ADS transitions and 30/60/120/144 Hz continuity. The game project builds with 0 errors, and native compilation
+  and the loaded rules passed a read-only check in `output/aim-breathing/native-verified/`. Scene/play/document state
+  stayed unchanged. The live aimed view and feel have not been reviewed yet.
 - `Reloadable` captures its combined duration multiplier at the start of a reload, including shell continuations.
   Reload completion, sound timing and the viewmodel's existing reload-speed parameter use that captured value, so a
   skill gain midway through cannot move them apart. A cancelled reload's delayed sounds cannot bleed into a new one.
@@ -2286,10 +2357,20 @@
   progress or award career XP for an import. Dirty profiles save every 5 s, immediately on a skill improvement, and
   on Client teardown (including after its network owner is cleared). Account changes flush the old keys first.
 - `SoldierTrainingPanel` sits in Profile → Career Record between career rank and service milestones. It shows both
-  levels, XP remaining, current benefits and caps. `SoldierTrainingHud` puts career progress and stamina below Vitals;
-  its four-second skill notice sits to the right of the vitals column. It hides for spectators and drone control.
+  levels, XP remaining, current benefits and caps. `SoldierTrainingHud` puts career progress and stamina below Vitals.
+  It hides for spectators and drone control.
   All new text is in the 13 translation languages as well as English; the translation checker adds no new findings.
-- Validation: `dotnet run --project Tools/SoldierTrainingChecks/SoldierTrainingChecks.csproj` passes 12 scenarios using
+- A skill's level-up is a medal at the top centre (2026-10-19). The user found the old box beside Vitals horrible
+  ("SKILL IMPROVED / WEAPON HANDLINGLEVEL 3": Razor had dropped the "·"), and asked for it at the top middle, like
+  the one-shot-one-kill medal.
+  - `MedalFeed` watches `SoldierTraining.LevelUpRevision` and queues a `training` medal with the kill medals:
+    the skill's name, SKILL IMPROVED, and the new level in the badge's diamond (`.medal-level`), up for 2.4 s.
+  - A feed built after a level-up doesn't show it again: the first tick only takes the current revision.
+  - The badge is `ui/medals/training.png`, made by `Tools/training_emblem.py` from the plain Ranked shield
+    (`ui/ranked/unranked.png`): the steel warmed to brass and its empty diamond filled with dark gunmetal.
+  - `dev_medal handling|endurance [seconds]` shows one.
+  - Checked in a browser mockup of the flattened SCSS, beside the one-shot medal. Not yet seen in a match.
+- Original training validation (2026-10-18): `dotnet run --project Tools/SoldierTrainingChecks/SoldierTrainingChecks.csproj` passed 12 scenarios using
   the actual rules/profile files (only account, cookies and clock are stubbed), covering every level threshold, caps,
   several tick rates, recovery hysteresis, movement rejection and account/save/snapshot behavior. The C: project's
   `Code/razedtest.csproj` builds against the installed engine with 0 errors (95 existing warnings on the final build).
@@ -2501,6 +2582,14 @@
   1080p). Aimed, the M700's glass is about 1.06 screen heights across. That's ~5x the pixels for the scope's camera
   while scoped. A new size is made when the screen's changes, and the picture goes with its viewmodel (`OnDestroy`).
   Live in the user's match (1152 x 1152), not yet looked at through the scope.
+- The scope went black while strafing aimed (the user, 2026-10-19: "when i move with a and d i dont think it should go
+  completely black"). Its `OnPreRender` could run before `CameraController.OnPreRender` put the gun at the eye that
+  frame, so the eye was measured against last frame's gun: moving sideways read as the eye far off the scope's axis
+  (`ScopeEyeOffset`, which slides the shader's 0.43 window off the glass). Now the scope is worked out in
+  `ICameraSetup.LateSetup`, after the gun and its parts are placed; `OnPreRender` only does it for a scope no camera
+  sets up (Theater, test scenes). The eye box is left as it was: it goes black ~21 mm off axis, already kinder than a
+  real 10x40's 4 mm exit pupil, and with a cheek weld the eye moves with the rifle, so strafing shouldn't shade it.
+  Built with dotnet; the editor was closed, so not hotloaded or looked through yet.
 - Checked in the editor on 2026-10-17:
   - 1,800 lookups (45 weapons, 20 slots, fresh and kept) and 17,913 index checks against the old logic: no differences.
   - In a Lowtide TDM: the kept loadout, effects and suppressor check match fresh ones, and 5 shots left the version
@@ -2725,15 +2814,50 @@
   - It drops a point within 0.1 units of the one before, so the spot and glare discs are capsules at least
     `MinimumSegment` long. Before this, the old spot's two points were 0.03 apart, so it never drew.
   - Its width is a radius, and the line shader reads vertex colour as sRGB.
-- The glass (the Box Collimator and both holographic sights, the vmats with `g_flLensCoatingOpacity`):
-  - It blends premultiplied and passes the view in grey, ~94% (`g_flLensCoatingOpacity` is the loss).
+- The glass (every 1x reflex and holographic sight's window, the vmats with `g_flLensCoatingOpacity`):
+  - 2026-10-19, the user aiming a Box Collimator: "it looks like there is no glass". 11 of the 14 1x sights had no
+    `g_flLensCoatingOpacity`, so they passed the view untouched. Now all 14 have it: 0.065 for the reflex sights (one
+    coated objective, ~93% passed) and 0.11 for the holographic ones (two windows round the film, ~88%).
+  - It blends premultiplied and passes the view at the coating's share (`g_flLensCoatingOpacity` is the loss).
+  - `g_vWindowTint` passes each colour as a share of the brightest: the dot's mirror coating reflects a narrow red band
+    out of the view, so the view through a reflex sight is a little cyan ((0.88, 0.96, 1); holographic (0.90, 0.97,
+    1)). Scalar alpha can't tint, so the dimmest colour's share passes through the blend and the rest comes from the
+    scene behind (`bWantsFBCopyTexture`, `g_tFrameBufferCopyTexture`), as the engine's layered glass does. An offscreen
+    render with the tint's red at 0.4 took the window's red to 0.35-0.42 of clear glass and left green alone, so the
+    backdrop copy works on the overlay layer.
+  - `g_flDust` / `g_flDustSeed`: specks at three sizes and a smudge film, lit by the scene. It's 0 on all 14 sights
+    since 2026-10-19 (the user: "glass texture is not good"). In a match, against a dark background in sunlight, the
+    specks showed as hundreds of white dots (150 cells across the window, about 300 specks), and the film's value noise
+    as blurry grey rectangles. Real dust on a sight's window doesn't show: a 50 µm speck 10 cm from a 4 mm pupil is
+    blurred to a disc with ~1/6000 of its contrast. Leave it off; the shader code is still there, unused.
+    `output/sight-glass/clean/` has the dust on/off renders against a dark wall (`cmp_*.png`) and their script.
   - It adds only reflected scene light: the engine's reflection times the coatings' (0.035, 0.012, 0.014) at normal
     incidence, the red band's being the dot mirror, rising to 1 at grazing.
-  - Within ~35 degrees of the line back to the eye, the reflection is cut to 0.08: that's the shooter's own face in
-    the hood's shade.
+  - Within ~35 degrees of the line back to the eye, the reflection is cut to `g_flFaceShade`: that's the shooter's own
+    face in the hood's shade. It was a fixed 0.08 (the shader's default), which hid every reflection looking through
+    the window, at the hip as well as aimed. With the dust off the user saw no glass at all (2026-10-20, "i dont see any
+    glass now"). Now it's 0.5 on the reflex sights and 0.3 on the four holographic-strength ones (`att_vm_reflex_02`, the
+    Box Collimator, and the three `holo_*`), whose coating scales their reflection 1.8 times: at 0.5 they went pink.
+  - `g_flHaze` (0.02 on all 14): an even share of the light on the window that its coatings scatter, lit by the scene
+    (the dust's code path with no texture), so the window lifts a little over a dark background in light and not in
+    the dark.
+  - Together over the dark wall in sunlight (aimed, offscreen), the window went from 89% of clear glass's brightness to
+    about 118%, a faint purple-grey cast; over a pale panel it reads a little cool. Trials are in
+    `output/sight-glass/visible/` (`cmp2_*.png`: the old look, then three settings; `final_cmp_*.png`: before and
+    after). The isolated scene's only reflection source is its sky, so how strong reflections look on a map with
+    probes hasn't been seen.
   - The reticle's light adds to the view.
   - The old glass laid a fixed (0.13, 0.28, 0.36) blue over the view at ~7% alpha. That wasn't relative to the scene,
     so it flooded dim scenes.
+  - Don't bump the shader's HEADER `Version` (it's 9) while the editor is open. On 2026-10-19 Version 10 stranded all
+    14 materials: the editor kept rejecting their compiled files ("special dependency mismatch"), refused to rebuild
+    them ("already tried with this fingerprint"), and every model holding them loaded `materials/error.vmat` (a lit red
+    checkerboard in the window). Putting 9 back and compiling the shader, then the materials, fixed it; a code-only
+    change recompiles cleanly. A shader compile finishes in the background, so compile materials only after its
+    `.shader_c` has been rewritten.
+  - Checked 2026-10-19 in offscreen renders of the M4 aimed through all 17 1x sights against a lit wall
+    (`output/sight-glass/render-glass.cs.txt`, old glass beside new: `sheet_before.png`, `sheet_after.png`, `zoom_*.png`).
+    Not yet seen in a match: the backdrop copy in the overlay layer at full screen.
 - Checked:
   - Offscreen renders: a lit room at 7 m and 25 m, a sunlit wall at 25 m and 50 m, haze, and a misty night.
   - The Box Collimator aimed on the M4 offscreen: through it the view is neutral, 94% of the view without the gun, dim
@@ -2762,6 +2886,8 @@
       high, the AK-12's and AK-15's 0.10° low, eight guns already on the centre and the rest within 0.06°.
     - After (`after*.jsonl`, `table.txt`): every ported gun's 13 dots within 0.004° of the centre (the M16A4's worst;
       the rest under 0.001°). The M4's average on the centre, and its idle sway carries them round a ±0.13° loop.
+    - After the M16A4's post and the five raised optics (2026-10-19, `risers-m16-b.jsonl`, `risers-all.jsonl`): the
+      M16A4's dots within 0.0007°, every other ported gun's within 0.002°, their optics' axes unchanged.
   - The Kastov-74u's Box Collimator sight line (Angles `-0.4466,-0.04,0`, solved for the old reticle) is gone: with a
     collimated dot it threw that optic 0.41° off.
   - Renders at three eye heights (`renders.png`): the dot holds still while the window, post and hands move.
@@ -3165,6 +3291,10 @@
   eleven practical lights now have wider coverage, and GI runtime intensity is 1.6 with unchanged exposure.
   Use a fresh revision for future bakes. The bake script fingerprints inputs, refuses play, cancels and drains
   its updater if the game/editor state changes, and rejects changed inputs before adopting textures.
+- The east atrium stair's bottom steps have the east server cabinet standing on them (found 2026-10-19). The cabinets are
+  placed mirror-image at plan (+-430, 80), but the stairs aren't mirrored (west n -210..-50, east n 40..200), so the
+  east cabinet covers about half the east stair's width at its foot (world x 40 to ~115, from y -406). The other half
+  (x ~120-200) is open, and the west stair is clear. Not fixed.
 - Authored setup: six team spawns per side, 20 Deathmatch/Gun Game spawns, two Defuse sites, 22 Retakes spawns,
   three Domination flags, three Hot Zones, three Cash Grab/extraction pairs, buy zones, callouts and a minimap.
   Team spawns are disabled during Deathmatch, Gun Game and Retakes. Retakes spawns use the matching site/role tags.
@@ -3360,6 +3490,102 @@
   The other local chat was stopped and the editor idle before the brief foreground comparison. Lowtide was restored,
   out of play and saved; all model/material/tone state restored. The saved Belltower scene and accepted shader remain
   unchanged. Do not revive isolated-world capture loops to bypass document availability.
+- Preview-camera investigation (2026-10-19): the current engine is resolved through `FACEPUNCH_ENGINE`, including
+  the Windows user environment; the former D: Steam installation is gone. Offline installed-engine IL in
+  `camera-consistency-v1/engine-api.json` confirms that `InitializeRendering` copies post-processing from
+  `Scene.Camera` onto editor cameras. Main-camera selection excludes editor cameras and can fall back to a
+  non-main minimap camera. `inspect-preview-cameras.cs.txt` adds camera parent, orthographic state, priority and
+  main-camera flags to a read-only probe. After the Ares chat completed, the native Belltower probe confirmed the
+  orthographic Minimap Renderer as its fallback. `capture-preview-consistent.cs.txt` pins the existing viewport only
+  during synchronous rendering and restores/checks the pointer, tone, pose, projection, exposure, objects and editor
+  state. A synchronous exposure change alone did not update GPU history. Settling the active stopped viewport across
+  normal frames produced a strong native 0.35/2.0 exposure response. Two seconds still failed repeat consistency;
+  five-second baseline/control captures passed the strict 0.1 mean RGB8 gate in sky, forest, stone and plaster regions.
+  No Scene.Push scope or camera pin crosses an await. Hidden-document settling remains unverified.
+  `Sources/Belltower/lighting/capture-consistency-v1.json` records the native evidence and current helper hash.
+  The surface-finish trial reduced broad plaster peeling and calmed the masonry. Three fresh matched native views
+  passed sky/forest controls on 2026-10-20, and the nine reviewed materials were published through the editor.
+  `Sources/Belltower/materials/surface-finish-v1.json` records the assets and generator: plaster wear coverage 0.24;
+  rubble tint [1.04,1,0.90], contrast 1.04, weather 0.12. Texture pixels and shaders are unchanged. The later saved-scene
+  image confirms appearance qualitatively; it drifts about 1 RGB8 from the earlier candidate and does not pass the
+  strict cross-session photometric gate. Do not use it for a precise before/after measurement.
+  The forest-shapes trial replaces UVs in eight sectors without moving cards: irregular outlines help, but the result
+  still reads as repeated cards, so it remains withheld. The October 20 audit matched both trials' original guards
+  before publication: gate/clock/planter town mesh edits were outside their guarded inputs. The subsequent public
+  material, generator and saved planting changes intentionally invalidate those earlier guards. Preserve the
+  historical manifests; a future comparison needs an explicit new revision, not silently refreshed hashes.
+  The new `Sources/Belltower/generated/belltower-visual-target-oct19-v1.png` and its JSON are an ImageGen art
+  reference for warmer distinct masonry, localized plaster wear, balanced sunlight and varied woodland crowns;
+  they are not native screenshots or evidence of implemented graphics.
+- Constructed town gates (2026-10-19, user: "fake/plain/flat"): `belltower_gate.py` replaces each flat slab and three
+  continuous bars with fourteen bevelled boards, two leaves with rebated backing and an overlapping centre joint,
+  six hinge straps with barrels and rivets on each face, ring pulls, a sliding bolt, rear compression braces, a curved
+  timber lining and separate stone voussoirs. Timber UVs select seam-free strips of the existing CC0 scan.
+  `belltower_stage_gate.py` matched and removed exactly 48 old triangles per half from the installed meshes, then
+  appended 13,088 new triangles. All other OBJ lines and all VMDL physics are byte-identical, preserving firewood-v2
+  and lorry removal. One gate-only forged-iron material was added. The generator retains the old collision box.
+  `import-gate-v2.cs.txt` published the correction to the first pass through the native editor, using backups and
+  hash guards. The asset watcher compiled both halves; never force-compile these large town models.
+  `belltower_check_gate.py`, `Sources/Belltower/gates/town-gate-v2.json` and `gate-v2/verification.json` record checks.
+  Native west front/oblique and sunlit east views are in `output/belltower/quality/gate-v2-after/`; every capture
+  restored editor state. The first pass's centre daylight leak and overly high hinge positions were corrected.
+  The Belltower scene file was unchanged by the gate edit. The user moved into Belltower and requested that edit
+  during the earlier comparison slot. Match performance was not measured.
+- Circular tower clocks (2026-10-19, user: "the white around the clock is weird"): `belltower_clock.py` replaces the
+  four opaque square dial images and their square stone backing patches with circular enamel meshes and a profiled
+  bronze bezel mounted directly against the tower. The existing clock artwork, hour/minute marks and hand orientation
+  are unchanged; explicit UVs retain the original 80-inch artwork scale. No raster pixels or materials were edited.
+  `belltower_stage_clock.py` removed exactly 48 old triangles and appended 8,056 to the installed centre OBJ; all other
+  mesh lines, the VMDL, material mappings and collision remain byte-identical. `import-round-clocks-v1.cs.txt` published
+  that single OBJ through the editor, with a guarded backup. The watcher compiled it successfully without a forced build.
+  Native front and oblique comparisons in `output/belltower/quality/clock-v1-after/` show the square corners gone and
+  the bezel's edge/shadow against the masonry. `belltower_check_clock.py` checked all four exported circular edges,
+  source hashes, unchanged data and capture restoration; static stone controls passed the 0.1 mean RGB8 limit.
+  `Sources/Belltower/clocks/round-clock-v1.json` records acceptance. The saved scene and both gate meshes are untouched.
+- Worn stone planters (2026-10-20, user: flat/plain, edges too perfect): `belltower_planters.py` replaces the six
+  visible boxes with individual chipped, bevelled stones, mitred projecting coping, recessed nonflat soil, clods,
+  pebbles and one thin curved root. Existing CC0 stone/soil pixels are unchanged; private stone UVs avoid painted
+  mortar seams. Two planter-only materials and a private stone shader retain restrained normals and dry roughness.
+  `belltower_stage_planters.py` preserves every non-planter OBJ byte, including gates/firewood/lorry removal, and all
+  existing VMDL physics. Each half removes 36 triangles and adds 6,682. The old 40x40x28 collision box remains;
+  there are no new scene objects or colliders. Never force-compile the large town models.
+  A temporary lowering trial showed the old shrubs floating above the soil. Native undoable scene tools lowered
+  exactly six existing shrubs by eight inches and saved the scene. `belltower_map.py` keeps that placement on
+  regeneration (planter blob centre z36). All other authored scene properties are preserved. Native Save Scene also
+  refreshed same-path resource IDs, float text, renderer defaults and five generated prefab binding entries;
+  `belltower_check_planter_scene.py` audits each category and unchanged prefab overrides, rather than concealing
+  that serialization diff. Original scene/mesh manifests remain historical.
+  `belltower_check_planters.py`, `planter-v2/scene-revision.json` and `Sources/Belltower/planters/worn-planters-v2.json`
+  record preservation, actual exported geometry, native asset compilation and final placement. Four restored native
+  views in `output/belltower/quality/planter-v2-saved/` cover close, context, low angle and the shaded mirrored planter.
+  Match performance and moving-camera aliasing were not measured; this changes physical shape, not AA settings.
+- Garden bush grounding (2026-10-20, user: "floating bushes"): the beech asset's low outer leaves reach local z
+  -19.216661, while the central stem starts at z0.845722. The old crown/bounds placement left tall hedge stems
+  20.76 inches above the lawn, low borders 5.85 above it, parterre plants 5.21 above soil, and bed plants 3.77 above
+  their raised soil. Native vertex inspection is in `output/belltower/bush-grounding/`.
+  `belltower_detail.shrub(..., ground_z=...)` now embeds the central stem half an inch into its soil and adjusts only
+  vertical scale to retain the old canopy top. `belltower_map.py` supplies the lawn/soil height for 12 tall hedge
+  shrubs, 100 low hedge shrubs, 24 parterre plants and 108 raised-bed plants. Widths, x/y positions and yaw stay;
+  pots, planters, pergola foliage and other props retain their existing placement.
+  The shared editor repeatedly exited during startup before MCP became available. With no editor running, the
+  guarded closed-editor publisher replaced only 488 Position/Scale string values in the saved scene; every other
+  scene byte stayed intact. The original f92a810e... scene is archived; the resulting scene is a7c75cfe... .
+  `belltower_check_bush_grounding.py --offline` verifies the exact saved delta, root contact, canopy tops and unchanged
+  town models. The latest shared garden generator also produces identical geometry/collision with old versus new
+  shrub placement. Newer shop/stall/scarecrow/gazebo work that appeared while waiting was preserved with an explicit
+  input revision, not overwritten. Earlier planter/gate/clock evidence remains historical; the grounding diff proves
+  their assets and scene placements were untouched by this correction.
+  `Sources/Belltower/gardens/bush-grounding-v1.json` records the saved correction. Native visual verification is
+  still pending because of the startup exits. Do not rerun `native-apply.json`: the transforms are already saved.
+  When the editor is available, open the current scene, run `check-garden-grounding-after.cs.txt`, then capture the
+  four planned views with `capture-preview-consistent.cs.txt` and the current scene hash.
+- Woodland volume prototype (2026-10-20): `belltower_forest_volume_trial.py` stages one private shader and strength
+  0/0.42 materials against the eight private forest-shapes sectors. Atlas-derived crown coordinates and a derivative
+  frame perturb diffuse normals without adding triangles or texture samples. The shader compiled and materials
+  loaded natively. Four fixed native captures restored all model/material/camera/scene state, but the forest
+  candidate/control difference (0.01733 mean RGB8) was smaller than control/repeat variation (0.01797).
+  `Sources/Belltower/landscape/forest-volume-v1.json` records the unresolved ineffective result. These assets remain
+  private and unreferenced by the saved map; do not promote them or claim rounded canopy lighting.
 - The user asked for a new multiplayer map. Belltower is a walled hill town's market square, built by script the way
   Ridgeback's buildings are (`Tools/map_kit.py`, with `Tools/building_textures.py`'s materials). The script's docstring
   has the layout, the conventions and the plan axes. It writes:
@@ -3410,6 +3636,36 @@
     street doors. Neither pass changes playable doorways or collision. Both halves now have 939,001 visual triangles;
     the centre has 246,560 after the hall joinery and deck pass. All 94 placement/reachability checks and native model compiles passed. Native material
     resource checks are in `props-v1-native-resources.json`; reviewed door captures are in `doors-v1-viewport/`.
+  - Bench arm placement v2 (2026-10-20): `belltower_furniture.bench_arm` separates the arms from the leg frames.
+    The 36 armrests on 18 benches move outward 4.9 inches; their grip centres are 1.1 inches from the ends,
+    so the grips meet the slat ends. Seats, backs, legs, braces, bolts and collision remain unchanged.
+    `belltower_stage_bench_arms.py` patches only the arm faces in both canonical OBJs and four existing bounded
+    imports. Native publication, current compiled-model checks, all 18 exported benches and native thumbnails
+    passed. The running game was preserved; no in-map screenshot was captured. See
+    `Sources/Belltower/benches/arm-placement-v2.json` and `output/belltower/bench-arms-v2/verification.json`.
+  - Bench rear-support clipping v3 (2026-10-21): `belltower_furniture.bench_back_support` replaces the old
+    steeper upright with a closed casting raked eight degrees with the slats. Its front has 0.04 inches of
+    clearance behind the back boards; its offset foot clears the last seat board and meets the seat carrier.
+    All 36 supports on 18 benches retain the old triangle count. `belltower_stage_bench_backrest.py` patches
+    only those faces in both canonical OBJs and their two existing bounded iron imports. Seats, back slats,
+    arm placement v2, bolts, collision and model descriptions are unchanged. Native publication and both
+    incremental model compiles passed. Five first-person captures from a running Belltower match reviewed
+    the rear, oblique rear, seat joint, front and mirrored rear. The test was stopped and the saved Belltower
+    editor document left open. See `Sources/Belltower/benches/backrest-v3.json` and
+    `output/belltower/bench-backrest-v3/in-game/`; these supersede v2's missing in-map bench check.
+  - Crate joinery v2 (2026-10-20, user: boxes look flat): `belltower_crates.py`, called by the furniture crate
+    helper, adds shallow physical cupping, worn chamfers, varied board depths, rebated corners, a recessed lid
+    under raised cleats, round nail heads and existing photographed end grain. The 66 shipping crates keep
+    their centres, orientation, stack height and original cover collision. No texture pixels or materials changed;
+    each half adds one mapping to the existing `bench_oak_endgrain.vmat`. `belltower_stage_crates.py` matched
+    60,456 old crate triangles per half and replaced them with 84,840; every non-crate OBJ byte and all VMDL
+    physics remain intact. Source assets were installed locally only after the editor had closed. The initial
+    prototype compiled and rendered as a native model thumbnail; final refined model compilation and map review
+    remain pending. Standalone resourcecompiler could not mount the required asset configuration; its zero-job
+    or configuration-error results do not validate these models. `Sources/Belltower/crates/joinery-v2.json` and
+    `output/belltower/crates-v2/verification.json` record this scope. The scene and all foliage were untouched.
+    This legitimate crate edit postdates the model hashes in the separate bush-grounding plan: retain it when
+    revalidating that plan, using the exact non-crate preservation proof. Do not regenerate the whole town.
   - Facade profiles v1 (2026-10-15) replaces box cornices and window heads with three profiled variants,
     bevels the surrounds, slopes the sills, varies some upper shutter angles, and divides wall coping into
     individual bevelled stones. Ground-floor shutters and original collision bounds are preserved.
@@ -3634,8 +3890,64 @@
   - South: the terrace, above the gardens (48 lower). Bomb site B is in the east gardens.
   - Between the lanes are alleys, the Bakery and Dairy, the Inn and Tavern, and the church. The east half is repainted
     in cool colours (`EAST_PAINTS`), so each side reads as its team's.
+- The church's three square-facing windows (2026-10-21) use `Tools/belltower_church_windows.py`: recessed timber
+  sashes, curved heads, individual tinted glass panes, eased stone surrounds and sloped projecting sills. The front
+  cornice stops either side of the large arch instead of cutting across it. `dress` opts into this only on the church's
+  `+n` face; opening dimensions and the original two-inch glass collision slabs are unchanged.
+  `belltower_stage_church_windows.py` replaced only 225 original visual triangles with 5,436. The centre VMDL redirects
+  three bounded imports to private copies and adds `church-windows-v1/windows.obj`; all original bounded imports,
+  including the rebuilt fountain, remain unchanged. The three private glazing materials reuse the existing coated
+  glass shader without editing it. Native compilation and exterior/interior captures succeeded. Applied-state and
+  verification records are in `Sources/Belltower/windows/church-windows-v1.json` and `output/belltower/church-windows-v1/`.
 - Houses nobody enters are one collision box each. The open buildings have doorways and no doors, because bots can't
   open doors. Roofs are 42 degrees, over the navmesh's 40, and every attic is filled with its roof's hull.
+- Market Street's two lorries (one each half, plan (-+900, 1290)) came out on 2026-10-19 (the user: "remove this truck
+  from belltower it looks awful"). `lorry()` and its call are gone from `belltower_map.py`.
+  - The installed halves weren't regenerated (the generator's other inputs have moved on since they were built).
+    `output/belltower/lorry-removal/find_lorry.py` built the lorry alone with the generator's own code and found its
+    330 triangles a half in the installed OBJs, by their written vertex positions and material. `stage_lorry_removal.py`
+    dropped those faces (the vertices stay, unused) and the lorry's 6 `PhysicsShapeBox`es a half (it had no hulls), and
+    `Sources/Belltower/editor/import-lorry-removal.cs.txt` published them, refusing any file changed since staging. The
+    originals are in that folder's `stage/before/`.
+  - No Retakes sightline crossed a lorry and no spot stood on one (`check_lorry_gameplay.py`). Market Street's north
+    lane is more open without its cover.
+  - Checked in an isolated editor scene: no collision at bed, cab or roof height where either stood, and the street's
+    view down to the market cross. Not yet seen in a match.
+  - The file watcher compiled both halves. Don't `Compile( true )` them by hand: a forced compile of `belltower_west`
+    stalled the editor and it closed (2026-10-19), as the Railhead notes warn.
+- The square's oak in each north corner (plan (-+560, 450), Facepunch's medium oak) came out on 2026-10-25 (the user's
+  screenshot: "is it out of place? remove if so"). Its trunk stood 90 from the side house's shopfront and 100 from the
+  north house's, and its crown (~336 across) went ~6 ft into both, over their shop doors and windows.
+  - Its call is gone from `street_props` (it used its own seeded RNG, so nothing else moves on a rebuild).
+  - `output/belltower/square-tree-removal/stage_square_tree.py` took the two "Oak tree" objects out of the scene and
+    each trunk's 7-sided hull out of `belltower_{west,east}_hulls_wood.obj`; nothing else in those files changed.
+    `Sources/Belltower/editor/import-square-tree-removal.cs.txt` published them (refuses while Belltower is open in
+    the editor), and the watcher recompiled both halves. Originals are in that folder's `stage/before/`.
+  - The scene's hash changed, so an older stage guarded on Belltower's scene hash refuses until it's staged again.
+  - Checked in an isolated editor scene (`check-square-tree-gone.cs.txt`): no collision at either trunk, the shopfronts
+    still hit, and a view of the cleared corner (`square-corner-after.png`). Not yet seen in a match.
+- Coopered casks (v3, 2026-10-25, the user: the barrels looked "too perfect/round"). The old `Detail.barrel` was a
+  48-sided tube curving in like a pill at both ends, its lid flush with the rim, thick black bands, every stave one shade
+  and every barrel identical; v2's clock-frontage pair still had twenty equal staves. All 23 casks a side are now
+  `Tools/belltower_barrels_v3.py`'s, as a cooper builds one:
+  - staves of real widths (2.6-4.4 in) on one gentle arc, each its own shade (four tints of the furniture's oak scan),
+    with V joints, standing ~1.6 in proud of a recessed head of 4-6 boards, their end grain and inside bevel showing;
+  - 4 or 6 thin flat steel hoops (`sh_hoop`) with a riveted lap, rusted at the bottom or all over on some (a darkened
+    `sh_rust`), a bung in one stave;
+  - each cask slightly oval, slightly leaning and seeded by where it stands (`seed_for`), so no two match.
+  - Its seven materials (`materials/belltower/barrels-v3/`) are existing pictures in their own tints: no new textures.
+  - Drawn only: the ten-sided wood hulls stay. ~5.5k triangles a cask against the old 1,870 (127k a side), in three
+    bounded imports a side (`models/maps/belltower/barrels-v3/<side>_<n>.obj`); the v2 import node is gone.
+  - `Tools/belltower_stage_barrels_v3.py` took the old casks out of every import by matching their faces against each
+    generator's template at the hull's centre (24,192 iron, 966 lid and 14,112 stave triangles from the bounded
+    imports, 51,450 from the canonical record, a side), keeping every other line byte for byte. Two groups had casks
+    standing into each other (centres 20.6 and 23.9 in apart): `V3.NUDGED` moves the third cask of each until they're
+    27 apart, hull and all (`belltower_stage_barrels_v3_nudge.py`), both spots checked clear of the map's collision and
+    every neighbouring pair ~1 in apart. `belltower_map.barrel` draws the same casks (checked against the published).
+  - Published with `Sources/Belltower/editor/import-barrels-v3.cs.txt` and `-nudge.cs.txt` (hash-guarded, no scene or
+    play change); the file watcher compiled the halves. Checked in isolated native renders
+    (`capture-barrels-v3.cs.txt`, views in `output/belltower/barrels-v3/captures/config.json`): the market trio, the
+    clock pair, the yard and tavern groups and the east market. Not yet seen in a match.
 - It's in `GameUtils.MainMenuMapOrder` and `IsMatchReadyMap`. So the menus, Quick Play, the map vote and Ranked offer it
   with every mode but battle royale. Ranked plays it as Defuse, because the scene lists `bomb_defusal`.
   - Team spawns: 12 a side on the spawn roads. Deathmatch and Gun Game spawn players at any active spawn point,
@@ -3710,6 +4022,15 @@
 - The gutters and downpipes are copper's brown oxide (`copper_brown`, a second colour of building_textures' copper
   sheet): the tower roof's verdigris read as bright teal along every eave. The market stalls' counters are two tiers
   of slatted crates on a pallet (`crate_counter`), drawn over the stall's own collision box, so the cover is the same.
+- Market-stall canvas (2026-10-20, user: red/white canopy too straight): `belltower_stall_canvas.py` supplies a shallow
+  sag between the existing posts, small corner tension folds and a soft curled valance. Continuous cloth UVs bend
+  the existing eight-inch stripes over the shape. `stall` delegates only its roof/flap to this helper; the counters,
+  produce, posts, RNG sequence and gameplay collision are identical. `belltower_stage_stall_canvas.py` surgically
+  replaced 72 old fabric triangles per half with 16,848; every unrelated OBJ byte and the VMDLs/MTLs are unchanged.
+  Both OBJs were imported through the native editor with guarded backups. The editor subsequently closed; final
+  resource compilation and after screenshots remain unverified. `Sources/Belltower/props/stall-canvas-v1.json` and
+  `output/belltower/canopy-cloth-v1/` record the pending check, native import and preservation evidence. Do not infer
+  native visual acceptance from the old, flat before images or force-compile the large town models.
 - Some street doors have terracotta pots with clipped bushes beside them (`door_pot`: building_textures' `clay_pot`,
   the beech bush scaled down). Each has a collision box the pot's size.
 - Its look (the user: it "doesn't look AAA", the textures and the low-poly plants, 2026-09-29):
@@ -3719,6 +4040,13 @@
     `g_flRoughnessScaleFactor` is an exponent, so values below 1 make the material rougher.
   - `Tools/belltower_detail.py` has the props and the material each paint uses (`MATERIALS`, `TILES`):
     - the café's bistro tables and chairs under gored parasols with scalloped valances;
+    - Blue café spacing (2026-10-21): `belltower_cafe_spacing.py` translates three eastern seating groups and
+      removes the fourth, leaving 43 inches between the closest canopy edges. The red café is unchanged.
+      The main generator and `belltower_quality_models.py` apply this after mirroring the east half. The surgical
+      import changed only the blue café's render faces and four table hulls; native physics checks found the
+      three new table tops at 29 inches and clear ground at all four former locations. Successful compilation,
+      import receipts and matching before/after captures are under `output/belltower/cafe-spacing-v1/` and
+      `output/belltower/quality/cafe-spacing-v1-{before,after}/`.
     - the stalls' crates of produce;
     - the foliage: Facepunch's cloud oaks and beech bushes, which the scene's `__references` list.
   - A crate of produce is a low, lumpy mound under a tiling picture of the heaped fruit (`produce_<kind>`: two layers
@@ -3738,6 +4066,29 @@
 - The menus' picture (`ui/maps/belltower.png`) is a native 1920x1080 capture of the tower, square and fountain.
   `import-map-art.cs.txt` validates the PNG dimensions and preserves the original before importing it in the editor.
   The generator only writes its old placeholder if no map image exists.
+- Fountain carvings (2026-10-21): `belltower_fountain_ornaments.py` supplies four solid limestone lion masks,
+  four upper lilies and eight basin lilies, following `output/belltower/fountain-ornament-concept-v1/`.
+  The old ellipsoids used a reflected frame without reversing winding, so their exterior faces were culled.
+  The replacement checks transformed winding, uses one connected, closed 18,000-triangle lion sculpt and
+  rounded leaf sections for the lilies. The bronze outlets meet the existing water spline at local `(0,10,42)`.
+  `belltower_fountain.py` delegates its ornament calls to this helper; water, masonry and collision are unchanged.
+  The sculpt source is signature-checked in `Sources/Belltower/props/fountain-ornaments-v2/lion-*.npz`.
+  After changing the sculpt, run `python Tools/belltower_bake_fountain_lion.py --prepare`, then background
+  Blender with `--factory-startup --threads 2 --python Tools/belltower_bake_fountain_lion.py -- --blender`.
+  This prepares source geometry; Blender is not a game dependency. The signature includes a bake-version tag.
+  `belltower_stage_fountain_ornaments.py` performed the one-time legacy upgrade, removing exactly 17,832
+  triangles and adding 121,164, while preserving every unrelated canonical OBJ byte and all existing materials.
+  The centre VMDL now uses 42 bounded render imports (at most 65,000 triangles each) under
+  `models/maps/belltower/fountain-ornaments-v2/centre/`, retaining its material remaps and physics nodes.
+  The guarded native import and successful incremental compile are in
+  `output/belltower/fountain-ornaments-v2/revision4/`. Native before/after views of the lion, lily and whole
+  fountain are in `output/belltower/quality/fountain-ornaments-v2-{before,after}/`; camera, exposure,
+  scene objects and editor state were restored. The first three construction revisions were not published.
+- Fountain bell quality (2026-10-21): `Tools/belltower_bell.py`, called by `belltower_fountain.py`, owns the smooth cast
+  profile, hollow inner shell, rounded crown loops and dedicated `materials/belltower/bell-v2/` bronze. A guarded native
+  import replaced only 2,394 old bell triangles with 30,564, preserving every other centre OBJ byte, the timber yoke,
+  collision, scene, water and shared bronze fittings. Materials and centre model compiled successfully; the new materials
+  were confirmed loaded and visually checked in live Belltower. `Sources/Belltower/fountain/bell-v2.json` links the receipts.
 - Theater doesn't record it: there's no MapInstance for playback to load (`MatchRecorder.CanRecord`).
 - To play it: `dev_mode team_deathmatch belltower` (any mode's prefab name or ident).
 - The 2026-10-14 pass checked native street, square, landscape and interior captures, successful asset/code compilation,
@@ -3842,6 +4193,36 @@ simulate_input.
   forever. Since 2026-10-01 the host judges every real player's pawn (`OnFixedUpdate`, bots excluded).
 - 1v1 and 2v2 Skirmish on a big map use their arena's circle instead of the map's zones (see Skirmish).
 
+## Weapon mount (`PlayerPawn.WeaponMount.cs`)
+- Aim at a ledge, a sill, a wall's top or a crate and the crosshair shows MOUNT (`CrosshairHud`); the mount key rests
+  the gun there, with less recoil and sway, until you move, jump, crouch, go prone, sprint or press it again.
+- The user (2026-10-19): "the mount system definitely doesnt work properly it hardly ever shows the mount option". The
+  probe looked for a top at one point 43 ahead of the eye. Standing against cover, a wall's or sill's top runs from
+  about 16 to 38 ahead, so it found the floor behind it, or nothing.
+- Now `FindMountTop` (static, so it can be checked in a scene of its own) traces down every 3 from 12 to 40 ahead and
+  takes the nearest flat top between `minTop` and `maxTop` (the old heights: 23-64 over your floor, within 28 under
+  the eye):
+  - A top under `minTop` is floor: a top less than `MountMinRise` (14) over the last floor is a stair or a slope going
+    up, so no mount.
+  - Starting inside something (a wall over sill height) or finding something above `maxTop` ends the search.
+  - A sloped trace hit (a bevelled edge) carries on to the flat of the top. The muzzle line must be clear to 16 past it.
+- `output/weapon-mount/mount-probe-checks.cs.txt` builds cover in an isolated scene and compares the new probe with the
+  old one, standing and crouched. On 2026-10-19 all 20 cases passed: the new one mounts on a 12-thick waist wall, an
+  8-deep sill with the wall above, a 2-deep rail, a crate and a deep wall (the old one only the last two), and neither
+  mounts on stairs, a 30-degree ramp, a tall wall, a low box or a wall 50 ahead.
+- The prompt still only shows while aiming (`CanUseWeaponMount` needs the `aiming` tag). Not yet tried in a match.
+- 2026-10-25, the user: MOUNT "shows at the wrong times and doesnt actually work", and the bind "might be on the noclip
+  one" (their screenshot: MOUNT at the hip in an empty alley).
+  - `CrosshairHud`'s BuildHash didn't hash the mount state, so the prompt stayed as it was at the last rebuild (aiming
+    in or out): MOUNT left up at the hip, and MOUNTED never shown, so a mount looked like it did nothing. It hashes
+    `MountState()` and `MainHUD.IsHudEnabled` now.
+  - The ticks that skip `UpdateWeaponMount` (dead, mantling, pipe climbing) clear the mount (`ClearWeaponMount`).
+  - A press probes for itself instead of waiting for the 0.09 s probe, and mounting plays the support's footstep at
+    0.35, heard only by the shooter (`PlayMountSound`).
+  - Mount was MOUSE5 and the editor-only Noclip MOUSE4: the hint shows both side buttons as the same mouse glyph, and
+    the back one toggled noclip, which also blocks mounting. Mount is MOUSE4 now and Noclip is N (`Input.config`).
+  - Built with dotnet and compiled in the editor (0 errors), not yet tried in a match.
+
 ## Picking up dropped guns (`PlayerPawn.Using.cs`)
 - E first tries the usual trace, then `FindDroppedEquipmentInView`: the dropped gun closest to the middle of your
   view, within `PickupReach` (96) and about 30 degrees of your aim, with a clear line of sight. A gun lying flat on the
@@ -3856,6 +4237,34 @@ simulate_input.
   off the middle, the side picked at random, so a dead-level drop still falls. Grenades, the bomb and the like keep
   the box. Checked offscreen in the engine's physics: the old box stood up in 2-6 of 12 drops per gun, the hull lay on
   a side in all of them for 8 guns. Not yet seen in a match or with a second machine.
+- Guns on the floor wear the build they were dropped with (2026-10-25, the user: "guns on the floor dont show camos and
+  attachments"). They used to be the bare `EquipmentResource.WorldModel` on the root, with no attachment points.
+  - The host sets `DroppedEquipment.Build` (synced) to the dropped gun's `Equipment.HolderBuild` (see Other players'
+    guns, below). Bots' are none, or their suppressor (`BuildCode( resource, MuzzlePart )`).
+  - Every machine clones the gun's `WorldModelPrefab` under it, not networked (`UpdateModel`), sets `sight`/`muzzle` 0 as
+    `Equipment.CreateWorldModel` does, and fits the build with `ApplyBuild`. Only the cash bag and the drone (no prefab)
+    keep the bare root model. The collider and `Center` come from that prefab's renderer (`FloorBounds`), so the
+    M700 is sized from w_m700 (its .equip's WorldModel is v_m700) and the 1911 by its renderer's child offset.
+  - Picking one up still gives the picker's own saved build (or the factory gun from a bot's), as before.
+  - Checked offscreen in the editor: an M4 dropped with the saved build got all 7 parts and the camo on all 9 renderers.
+    Not yet seen in a match, nor a client's drop over the network.
+- Other players' guns, in their hands and holstered, wear their own build (2026-10-25, the user asked after the floor
+  guns). Every machine used to fit its own saved loadout to every gun it drew (`ApplyAttachments` in
+  `Equipment.CreateWorldModel` and `MountPoint.Mount`), so everyone's guns wore the viewer's parts and camo.
+  - `Equipment.FitHolderBuild` (`Equipment.Build.cs`) fits the world model and the holstered copy. The local player's
+    own gun (`IsOwnBuild`: its owner's Client is `Client.Local`) still gets this machine's saved loadout. Anyone else's
+    gets `HolderBuild`: the build its holder shares for its slot (`Client.SharedPrimaryBuild` / `SharedSecondaryBuild`,
+    sent from the gun in their hands each second), if it's for that gun, else the factory gun. Bots (player-pawn ones
+    too) and knives share nothing, so they show the factory gun.
+  - A shared build can arrive after the gun is drawn (a new spawn's class, a part changed mid-match), so the Client's
+    `OnSharedBuildChanged` (a `Change` on both properties) fits that player's world models and holstered copies again
+    in place (`RefitHolderBuild`, `EquipmentMountPoints.RefitHolderBuilds`). An empty build refits to the factory gun.
+  - Only what's drawn changed. A gun's gameplay effects (recoil, rate, magazine, suppressed sound) still read the
+    loadout of the machine that works them out, as before. A first-person spectator still sees the spectated player's
+    viewmodel in their own build: its sight alignment (`ManualOffset`) reads the local optic.
+  - Checked offscreen in the editor: a fake other player sharing an M4 with only a suppressor had only that fitted
+    (the viewer's own M4 has 7 parts and a camo); sharing nothing took it back to the factory gun, and sharing it again
+    put the suppressor back. Not yet seen in a match with a second player.
 
 ## Movement speeds (`PlayerGlobals`, `PlayerPawn.GetWishSpeed`)
 - The user asked for faster movement that feels like Black Ops Cold War's (2026-10-13: "make the sprint/movement speeds
@@ -3886,6 +4295,25 @@ simulate_input.
   again as you land goes 100%, 85%, 72%, 61%, 55% of full speed (about 50, 36, 26, 19, 15 units high), never below
   55% (`MaxJumpFatigue`). It wears off only on the ground, at 0.375/s: a full jump again ~0.4 s after one jump,
   ~1.2 s after many. Owner-side only (the pawn moves itself); bots don't jump.
+
+## Landing on slopes and stairs (`CharacterController.CategorizePosition`)
+- The user (2026-10-19): "when i jump onto stairs i end up like levitating/gliding". Most maps' stairs collide as a slope
+  (a wedge hull or an inclined deck under the steps). Landing on one while moving uphill, the controller's slide turns
+  the fall into motion along the slope, which rises. The rule "rising faster than 40 u/s never lands" then kept the
+  player airborne: no ground friction or stepping, held by air control at a steady float up the stairs (on a 32° ramp,
+  44 u/s up and 70 along).
+- Now rising only counts as leaving the ground if it's away from the surface touched (`Velocity · normal > 40`), which on
+  level ground is the same test. For `JumpLandingGrace` (0.2 s) after a `Punch` (a jump) the old rule stands, so a jump
+  straight into a steep slope still leaves it.
+- `output/stairs-mantle/` has the trials (in an isolated editor scene, driving the real input and movement code):
+  - `ramp-glide.cs.txt`: 23°, 32° and 40° stair ramps. Before, jumping onto the 32° and 40° ones at a sprint left the
+    player airborne against them for 84-124 ticks (1.7-2.5 s); after, 0-11 (the grace).
+  - `collider-stairs.cs.txt`: Collider's four flights on its own collision models (5 ticks to 0).
+  - `stairs-mantle-checks.cs.txt`: stepped (per-step box) stairs and two real ledges. The mantle never starts on stairs
+    and still does on the ledges. Its "on the 4th step" rows start the player inside a step; their airborne ticks are
+    that, not a glide.
+  - `Tools/SlideChecks/JumpLandingChecks.cs.txt` still passes (7287 checks, 189 simulations).
+  - Not yet tried in a match.
 
 ## Prone stamina (`PlayerPawn.Movement.cs`)
 - The user could spam prone ("like there's no stamina"). It now works like CS's crouch speed: each drop costs 0.2
@@ -3924,14 +4352,16 @@ simulate_input.
 ## Mantling (`PlayerPawn.Mantle.cs`)
 - The user (2026-10-01): "currently i just sort of hop over larger objects". Jump while moving forward at a ledge 28-84
   over the floor you're on (mid-thigh to ~2.1 m) and you climb onto it, in place of the jump. Lower than 28 is a step or a
-  jump. Holding Jump in the air catches a ledge the jump brings into reach, up to 10 higher (`AirMantleBonus`), unless
-  you're falling faster than 250 u/s.
+  jump. Holding Jump in the air catches a ledge within 84 of the current feet, capped at 112 above the floor
+  (`MaxJumpMantleHeight`), unless you're falling faster than 250 u/s. The actual jump must bring the hands into reach;
+  the former floor + 94 ceiling rejected Lowtide's 102-inch containers even at the jump's apex.
 - `PlanMantle` finds the ledge: a body box traced `MantleReach` (20) ahead finds a wall facing you within ~53 degrees,
   then a thin probe climbs its face in 6-unit steps for solid with free space above it (so a rail or an overhang works),
   and a trace down finds the top, which must be level enough to stand on (normal z 0.7).
   - A top no deeper than 24 (`VaultMaxDepth`: walls, fences, sandbags, rails) with a floor within 160 below on the other
     side (`VaultMaxDrop`, ~4 m) is vaulted over. A deeper top, or a parapet over a long drop, is climbed onto, and the
-    crouched body has to fit there.
+    crouched body has to fit there. A jumping grab above the standing reach always climbs onto the top and requires
+    that room; it cannot become a fast vault over a high wall.
   - The body goes over tucked: 36 high for a vault (the eye 28 down), so a vault goes through a window-sized gap, and
     48 for a climb (the eye 16 down, `MantleEyeOffset`, synced).
   - Before it starts, the whole path (up, then over, overlapping) is traced with the tucked box at 16 points. If that's
@@ -3941,6 +4371,8 @@ simulate_input.
   - Timing: the rise takes 0.12 + 0.004h + 0.0001h^2 s for h units: 0.33 s for the lowest ledge, 0.46 s waist high,
     0.69 s chest high, 1.2 s for 84. A vault goes over at your speed, 150-310 u/s, and you carry on at that speed; a climb
     at 150, leaving at half that. A waist-high vault takes about 0.55 s, an 84 climb about 1.35 s.
+    High jumping grabs use the full floor-to-ledge height for the rise's effort, bring the legs over only after the
+    rise, and move over at 90. The native 102-inch container check completes its pull-up in about two seconds.
 - Never climbed: people (`player`, the bots' `movement` and zombies' `enemy` boxes), doors (`MapMover.DoorTag`), glass,
   player clips (a window's), and the Ridgeback's trees and hedges (clutter bodies, by the shape's `clutter` tag).
 - While mantling: no shooting or aiming (the `no_shooting` / `no_aiming` tags, and an aim already held is cancelled),
@@ -3950,8 +4382,13 @@ simulate_input.
   the eye offset): there's no climbing clip.
 - Sounds (`PlayMantleSound`, broadcast): a hand on the ledge at the start (the surface's footstep at 0.6), the feet on
   the top at the end of a climb, and a vault's landing is always heard, even off a drop too short for a fall's sound.
-- Compiled offline on 2026-10-01, not yet checked in-game. To try it: walk at a crate or a low wall and press Jump, or
-  look at one and run `dev_mantle`.
+- Native validation (2026-10-20) is in `output/mantle-reach/`: 13 collision cases and a production movement simulation
+  reproduce the old failure and complete a jump onto a 102-inch container after the fix. Standing grabs, insufficient
+  jumps, 114-inch high cubes, taller walls, blocked roofs, distant cover and player clips are rejected. Low cover and
+  vault timings match the baseline. All 27 stair approaches still avoid mantling; both real low-ledge controls climb.
+  These isolated physics checks match Lowtide's closed-container collision dimensions and preserve the editor's
+  scene/play state; a first-person Lowtide playthrough is not recorded. Hold forward and Jump to try a jumping grab,
+  or look at a low ledge and run `dev_mantle` for a standing check.
 
 ## Sliding (`PlayerPawn.Slide.cs`)
 - The user asked for sliding (2026-10-13), after the Cold War speeds (see Movement speeds). Press Duck while sprinting
@@ -4290,6 +4727,16 @@ simulate_input.
   with players, and the cost of the 394 lights and the tanks' ~1.1 million triangles on a slower machine.
 
 ## Railhead (multiplayer map, `Tools/railhead_map.py`)
+- Reference-led fire extinguishers (2026-10-25): `Tools/realistic_extinguisher.py`, delegated by
+  `railhead_dress_detail.extinguisher`, supplies the smooth tank, rolled base seam, curved printed label, two levers,
+  valve/gauge, safety pin/seal, rubber hose/nozzle, mounting bracket and pictogram sign. The approved image and
+  image-generated UV atlas are recorded in `Sources/Railhead/props/extinguisher-v2/`. Six complete legacy assemblies
+  were replaced in the published east/west dressing meshes; the generator also upgrades its unpublished wing placements.
+  Each is 7,430 triangles. `models/props/extinguisher-v2/extinguisher.vmdl` is the reusable wall assembly, foot at Z=0.
+  The guarded native import retained every unrelated OBJ byte and the exact physics nodes; the saved scene and user's
+  camera/play state were preserved. Both dressing models and the standalone prop compiled, and all nine materials loaded.
+  `railhead_check_extinguisher.py` and `output/railhead/extinguisher-v2/validation.json` record the checks; native matched
+  before/after and close views are in `output/railhead/quality/extinguisher-v2-{before,after}/`.
 - The user asked for a new AAA map, made without the editor or MCP (2026-10-03). Railhead is Hohenwald Hauptbahnhof
   (Hohenwald Hbf, a made-up city), a German terminus at 14:03 on 3 October. It's built by script like Belltower and
   Reef Hall (`Tools/map_kit.py`), from these scripts:
@@ -4539,6 +4986,14 @@ simulate_input.
     - Two Retakes spawns at site A moved, so `check_retakes_sight` is 0 (it was 2).
     - Small props collide, as everything drawn on the map does: benches, 1 m bins, bollards, lamp posts, a skip,
       tyres, drums, the info pillars, and the bins beside the footbridge's stair openings.
+    - The cab roads' cycle stands (`railhead_dress_detail.cycle_stand`, four a side at n 1335) are one swept tube
+      now (`tube`: mitred rings, carried along without twist, smooth normals, u along it), in `rw_stainless`, with a
+      rosette at each foot (2026-10-25). They were 15 separate open rods in `rw_steel`, and the wedge each joint left
+      round the bend showed the paving through as white bands (the user's screenshot). Use `tube`, not a chain of
+      `rod`s, for anything bent. `Tools/railhead_stage_cycle_stands.py` swapped just their triangles in the
+      installed dress OBJs (it finds the old stands by vertex and refuses if any are missing). Checked in offscreen
+      editor captures (`output/railhead/cycle-stands-v2/after/`), where the probes don't render, so the metal reads
+      darker than it will in a match. Not yet seen in a match.
   - Backdrop (`railhead_backdrop.py`, `railhead_backdrop_art.py`): the tenements' balconies, awnings and fascias,
     the near shops, and a far city in place of grey boxes. The Rotunde card is rebaked in Cycles by
     `railhead_rotunda_rebake.py` (one GPU render at a time, `output/railhead/stage/.gpu-lock`).
@@ -4583,6 +5038,71 @@ simulate_input.
   - a match played on it, its bots, and the modes' objects in play;
   - the indirect light rebake.
   Still open from the critique: the road vehicles' plain bodies, the EMU's flat red paint, and the yard's skip.
+- The cab roads' cars are off (2026-10-25, `railhead_map.ROAD_VEHICLES_ENABLED = False`): the user will rework them, so
+  their code and placements (`cab_road_vehicles`; `railhead_props.car`, `suv`, `van`) are kept. Set it True to bring
+  them back. Their collision was in the dressing models, not the scene, and the spot, reach and Retakes checks pass
+  without them (the taxi rank's lettering, posts and oil stains stay).
+- The head building wings' City-Light poster (Alpen east, Fahrrad west) and extinguisher are on the wing's inner wall,
+  the hall's side wall at e ±640.5 (`railhead_map.wing_wall_kit`, n 1540 and 1400), facing the cab road's door. They
+  were on the outer wall, which has no run wide enough between its door (`WING_DOOR`, 1430..1530) and windows: the
+  poster hung in the doorway (the user: "floating sign") and the extinguisher's sign in front of the window at 1380.
+  - Published on 2026-10-25 by a splice, not a rebuild: `output/railhead/wing-poster/stage_wing_poster.py` builds the
+    old and new pieces with the generator's own code, finds the old triangles in the installed dressing OBJs by
+    material and each corner's v/vt/vn text, drops them and appends the new ones, and its `--apply` refuses a file
+    that changed since staging. That day several sessions spliced the same dressing OBJs (the cycle stands, the
+    footbridge's signs, the cars), so stage from the files on disk, never HEAD or a copy read earlier.
+  - Checked in isolated-scene renders of both wings (`output/railhead/wing-poster/after/`), not yet in a match.
+- The platform bench (`Tools/railhead_bench.py`, 2026-10-25, the user: the armrest "looks quite low poly/blocky" and
+  the slat ends looked broken):
+  - The slats are eased boards (`slat`: 7 mm round edges, square-cut ends). rw_wood is a scan of planks with dark gaps,
+    so each face maps onto one plank of it (`PLANKS`: the picture's columns between the gaps), and the ends show end
+    grain (`rw_wood_end`, `railhead_prop_materials.write_bench`: the gunsmith range's oak end grain, tinted). Mapped by
+    world projection, every slat had a black line along it and across its end.
+  - The middle armrest is one swept casting (`armrest`): a rounded-square section along a spline from a foot plate on
+    the front slat, widening over the hand rest, into the backrest. It was four square bars with a gap at the bend.
+    `railhead_furniture.bench_details` draws it when the bench passes its backrest, else the old bars.
+- `railhead_buffer.bevel_box`'s eight corner triangles were drawn at points on the box's edges b from its corner, which
+  stood out past the bevels as shards and left the corners open (the user saw them on the slat ends). They now join
+  the broad faces' corners, so the box is closed. It's used all over Railhead's props (bins, cases, plates, the
+  vehicles' and trains' kit), which changed with it. The luggage trolleys' and the signal frame's own models
+  (`railhead_luggage`, `railhead_signal_frame`, written only when missing) still have the old corners.
+- The footbridge's ceiling battens hang from the undersides of the two purlins they cross
+  (`railhead_architecture.BRIDGE_PURLIN_D`); flush with the roof they ran through them. The platform canopies' battens
+  are one in each bay between the cantilevers (`railhead_station.CANOPY_BATTENS_N`, still over the canopy lights'
+  n), where they ran through the cantilevers, and the outer canopy's west line, which lay inside a purlin, hangs under
+  it (`railhead_architecture.canopy_purlins`).
+- The footbridge's notice frames are A3 on the steel panel under the handrail (deck + 11 to 28.5, under the brackets'
+  wall plates at 30.5). As A1 frames from deck + 22 they ran past the handrail onto the glass.
+- `railhead_map.py --stage DIR` also draws the radar picture into the stage.
+- Several sessions edit Railhead's generator and its installed OBJs at once, so publish a change as a splice, not a
+  rebuild: a rebuild would publish everyone's half-finished generator edits and drop their spliced faces.
+  `output/railhead/cars-bench-20261025/splice.py` builds the affected models twice from one code snapshot ("new", and
+  "old" with the change patched back at run time), takes the faces only one of them has, and applies just those to the
+  files on disk: every face, remap and collision box it removes must be there. `Sources/Railhead/editor/
+  import-staged.cs.txt` copies a publish list (`output/<folder>/publish.json`, the folder named in
+  `output/publish-target.txt`) into Assets, refusing any file changed since it was staged.
+  - Since 2026-10-25's extinguisher-v2 import, `railhead_dress_<side>.vmdl` renders
+    `extinguisher-v2/<side>-base.obj` plus `extinguisher-v2/<side>.obj`; `railhead_dress_<side>.obj` is the base plus
+    the extinguishers and isn't rendered. Splice into both.
+  - Never import every Tools module to freeze the snapshot: `railhead_rotunda_padding.py` pads
+    `Assets/materials/railhead/rotunda_impostor.png` at import (it happened on 2026-10-25 and was put back from git),
+    and `railhead_civic_asset.py` and `railhead_rotunda_bake.py` do work at import too.
+- Published on 2026-10-25 by that splice: the cars off (and off the radar picture), the bench, the corner fix, the
+  battens and the footbridge's frames. The six footbridge bins were left to the "Bridge sign overlap" session's own
+  splice. Checked in offscreen editor renders before and after (`output/railhead/cars-bench-20261025/captures/`), not
+  yet in a match.
+- The footbridge's bins (`railhead_map.footbridge_kit`, 2026-10-25, the user: "a lot of overlapping of signs and stuff
+  on railhead bridge"). The bin is railhead_props' double one, 40.2 wide (`BIN_HALF_WIDTH`), not the ~28 the code had
+  allowed for: the two centre-stair bins (e ±8) stood inside each other mid-bridge and 4 into both stair openings, the
+  outer stairs' bins stood in their stair's handrails, and every lid went 0.35 into the bridge's handrail.
+  - Now each stands 4 past its stair's parapet (the centre stairs' beyond their Gleis plate, e ±179.6) and 13.5 off
+    the panel, its back 1.15 in front of the handrail. Their `taken` entries are unchanged, so the notice frames are
+    the same 7 a side.
+  - Published by `output/railhead/bridge-bins/stage_bridge_bins.py` (both OBJs a side, and the bins' collision boxes in
+    the vmdls). `check_installed.py` there finds no dressing piece on the bridge cutting into its structure. Checked
+    in isolated-scene renders before and after (`output/railhead/bridge-bins/{before,after}/`), not yet in a match.
+  - From the bridge's north end a platform bracket clock (`outer_wall`, n -140, z 252, 90 past the glass) shows right
+    behind the Gleis 6 plate. It's a sightline, not an intersection, and was left as it is.
 
 ## Lowtide (multiplayer map, `Tools/lowtide_map.py`)
 - Structural materials installed (2026-10-18): `Sources/Lowtide/structure/material-status.json`.
@@ -5395,7 +5915,14 @@ simulate_input.
       - wall lights by the doors, the façade lettering, and blinds behind half the upper windows;
       - wayfinding totems, agaves in pots and pole lights on the promenade (with collision);
       - cameras, downpipes and the roofs' plant;
-      - bike hoops and three flags on the forecourt.
+      - bike stands and three flags on the forecourt.
+    - The bike stands (`bike_stand`, 2026-10-25; the user saw seams at every bend) are Sheffield stands at their real
+      size: one 48 mm stainless tube swept in a piece (`P.sweep`), 700 mm long and 800 mm tall with 150 mm bends,
+      root-fixed into the paving, a metre apart in a row ending at e 1040. They were ten six-sided bars each, 18 wide.
+      Base plates were tried: the paving's relief (`cerroblanco_stone.shader`) buries anything within about 0.4 of
+      the ground, so plates showed only as slivers. Drawn only, as before. Published by splicing just their faces into
+      the installed `cerroblanco_fitout_fine.obj` (`output/cerroblanco/bike-stands-20261025/stage_stands.py`), and
+      checked in offscreen editor renders there, not yet in a match.
     - Two models: `cerroblanco_fitout` (with collision) and `cerroblanco_fitout_fine` (drawn only).
     - The façade banners (`banners()`) are drawn in the fine model. The glass install (`cerroblanco_glass.install`)
       had rebuilt the buildings' model without them. The quality pass overrides the buildings' materials by slot, so
@@ -5446,6 +5973,54 @@ simulate_input.
     pin exposure (4 outdoors, 5 indoors), above the game's; nothing of this pass has been seen in a match yet. The
     critique's other findings are still open: doorways' black reveals, the art's look, sparse rooms and roofs, the
     indirect light not covering the spawns or site B, the sierra's colour, and the perimeter wall.
+- Tree pits (2026-10-25, the user's screenshot of a black square under a tree). `cerroblanco_parts.tree` drew each
+  paved tree's "steel grate" as a flat `cb_black` 60-inch square, while the medium oak's trunk flare is 79 across where
+  it meets the paving (`TRUNK_FLARE`, cut from the models' triangles in the editor), so the roots spilled over it.
+  - Now `tree_pit`: soil (`soil`, 0.4 over the paving) inside a 4-wide honed travertine kerb 1.0 over it, its inside a
+    foot clear of the flare, rounded up to 6: 108 square for the full-size medium oaks, 96 at scale 0.9, 60 for the
+    small oaks. No collision (a 1-inch step). All 20 paved trees have one, with nothing else within 5 feet of them.
+  - Published by `Tools/cerroblanco_tree_pits.py`, a splice of `quality-v1/cerroblanco_dressing_v2.obj` only, as the
+    bollards' was: it removes exactly the 20 old squares and appends the pits; the vmdl (which already remaps `soil`
+    and `cb_honed`) and both colliders are unchanged. The base dressing OBJ, which only collides, still has the
+    squares. Checked in isolated-scene renders (`output/cerroblanco/tree-pits/after/`), not yet in a match.
+- The garden circle's lawns (bomb site B, `cerroblanco_map.lawn_quarter`, 2026-10-24): each quarter's grass runs up to
+  the two cross paths, its straight sides parallel to them, in a honed kerb (8 wide, 3 high) on all four sides. They
+  were annulus sectors with radial sides, so a wedge of gravel, widening outwards and with no kerb, lay between each
+  lawn and its path (the user: "the grass shouldnt stop where it is"). The gravel is now only the walk round under the
+  hedge (474-540). Drawn only, like the old lawns. `Tools/cerroblanco_stage_garden_lawns.py` swapped just those
+  triangles in the installed `cerroblanco_grounds.obj` (it finds the old lawns by vertex and refuses if any are
+  missing); its materials and slots are unchanged. Checked in isolated-scene captures
+  (`output/cerroblanco/garden-lawns/{before,after}/`), not yet in a match.
+- The bronze spheres (2026-10-24, the user's screenshot: "this looks bad"): the garden circle's (r 58) and the South
+  Gallery's (r 40) were near black and faceted. `cb_bronze` was a flat paint at metalness 0.9 tinted (92, 66, 40): as a
+  metal its colour is its reflectance, about a tenth, so it mirrored the garden dimly and had no lit side, and the
+  sphere was 24 x 12.
+  - `Tools/cerroblanco_bronze.py` makes it patinated outdoor bronze: a tiling 2048 x 1024 texture set (umber to tobacco
+    browns, soft grey-green run-off down it, a few rubbed spots; metalness 0.55 in the patina, 0.92 where worn,
+    roughness ~0.44) on complex.shader with `F_METALNESS_TEXTURE`, and `sphere()`, 64 x 32 with UVs once round and once
+    pole to pole. `bronze_sphere` calls it, and `cerroblanco_map.write_materials` writes the material through it
+    (`CB_PAINTED`'s BRONZE entry is only the previews' colour). The busts use the same material.
+  - Published by `output/cerroblanco/bronze-sphere/stage_bronze_sphere.py`, which swapped just the spheres' faces in the
+    installed `quality-v1/cerroblanco_dressing_v2.obj` (1056 out, 7936 in) and refuses a file changed since staging.
+    The hulls are unchanged. Checked in isolated captures (`output/cerroblanco/bronze-sphere/{before,after2}/`), not yet
+    in a match.
+- Ground-floor windows under an upper floor end at `GROUND_HEAD` (150), under the slab (2026-10-25, the user's
+  screenshot: "this looks a bit mad"). Twelve of them (the West and North Galleries', and the East Hall's beside its
+  mezzanine) took `glass()`'s default head of 190, over the first floor's top (180), so a 10" strip of glass, with the
+  ground outside seen through it, ran along the foot of the upper rooms' walls. Give a new one there `z1=GROUND_HEAD`.
+  - The fit-out took each strip for a door out of the upper room and hung an exit sign over it. A wall face lists every
+    opening up the wall, so every ground-floor door and window also got a sign and a room plate from the room over it:
+    stray signs at 159 over the 150-high windows, one over the cafe's inside door to the North Gallery, and a second sign
+    on each ground-floor door out. `door_fittings` now takes only openings that start at the room's floor: 30 exit signs
+    and 34 plates, from 57 and 51.
+  - Published by `Tools/cerroblanco_stage_window_heads.py` and `Sources/CerroBlanco/editor/import-window-heads.cs.txt`:
+    the buildings model (and its collision boxes), the three detail models, two new pane models and the scene's
+    Breakable Glass group (359 panes from 392; the panes renumber, so their ids shift) from a fresh build, each checked
+    to be the old build's before; the stray signs and plates taken out of the installed `cerroblanco_fitout_fine.obj`,
+    every other line kept. The import puts the same glass group into an open, unchanged Cerro Blanco document. Its
+    panes asked for the two new models before they had compiled and got error models until those were compiled again.
+  - Checked in isolated renders (`output/cerroblanco/glass-strip/after/`): the upper walls meet the floor along an
+    unbroken skirting, the façades' ground windows end under a stone band like their neighbours. Not yet in a match.
 - To play it: `dev_mode team_deathmatch cerroblanco` (or `dev_mode bomb_defusal cerroblanco`).
 
 ## Riverdale (multiplayer map, `Tools/riverdale_map.py`)
@@ -5667,6 +6242,89 @@ simulate_input.
     (8 shadowed) and 15 fires.
 
 ## Ares (multiplayer map, `Tools/ares_map.py`)
+- Pressure-door rebuild (2026-10-20): `Tools/ares_airlock.py` replaces the six-box wing/cargo hatches with chamfered
+  pressure frames, rubber seals, two recessed coated-metal leaves, six locking dogs, hex pivots, kick plates, a
+  three-spoke release wheel, inspection port and pressure/control display. Warning stripes are confined to the
+  threshold. The wheel is at z 58 and controls at z 39..80, providing human scale within the large cargo-size doors.
+  - `wing()` and `concourse()` call `pressure_door()`; all three assemblies remain inside their original collision
+    envelopes. Existing `ar_ext_*`, `ar_rubber`, `ar_rover_white` and screen materials are reused without changing
+    any material source. Painted light hardware keeps the wheel and clamps readable in the dim rooms.
+  - `Tools/ares_airlock_refresh.py` removes only the 216 old hatch triangles and appends 3,954 new triangles to the
+    installed hall OBJ, preserving all previous stair/console edits. It adds eight existing-material aliases to the
+    hall's MTL/ModelDoc remaps and leaves the complete physics definition unchanged. The hall is now 27,654 triangles.
+    Reproduce the migration from `--source-root output/ares/airlocks-20261020/before`, not the installed new hatches.
+  - `Sources/Ares/airlocks/import.cs.txt` publishes only the hall OBJ/MTL/VMDL through the editor, followed by native
+    VMDL compilation. `output/ares/airlocks-20261020/` contains backups, scope hashes, staged sources and native
+    captures of both wings, the cargo door and an angled view. This is a visual rebuild of the existing sealed doors;
+    the scene, collision, lights and active editor/play state are preserved by the workflow.
+- Stair surface fix (2026-10-20): all four 28-step flights had yellow nosing fronts coplanar with the steel tread
+  fronts, and yellow ends on the stringers. These different materials fought for the same pixels as the camera
+  moved. `stair()` now omits the hidden steel front and yellow end/bottom faces. The grating stops two inches
+  behind the front edge, where the nosing ends; the nosing meets the riser at top-1.5 and finishes at top+0.125.
+  - `Tools/ares_stair_refresh.py` stages those edits in the installed hall OBJ, preserving earlier console UVs,
+    all unrelated geometry and every collision source. It is a migration of the original stair geometry; reproduce
+    from `--source-root output/ares/stairs-20261020/before`, not from the already repaired installed mesh.
+  - Import via `Sources/Ares/stairs/import.cs.txt` in the CLI exchange directory, then compile `ares_hall.vmdl`.
+    This only refreshes a model asset and does not switch scenes or change play state. After this pass the hall was 23,916
+    triangles (896 hidden/conflicting triangles removed). Materials, stair ramps, scene and gameplay are unchanged.
+  - `output/ares/stairs-20261020/` holds backups, source hashes, geometry counts and native moving-camera captures
+    for the hall and wing stairs. An independent planar-face audit found 672 overlapping quad pairs between
+    hazard and steel/grating within the flights before the repair, and zero afterward.
+- Animated processing core (2026-10-20): `ar_plasma.vmat` uses `shaders/hc1_ares_plasma.shader`. The existing
+  turbulence texture moves upward and around the column through a gently curling field, with broad dark amber
+  pockets and brighter moving detail. The two noise layers and curl wrap at the mesh's U=0/2 cylindrical seam.
+  - `ares_materials.plasma_vmat()` preserves the settings: brightness 1.8, rise 0.018, swirl 0.008, flow height 180,
+    warp 0.055, dark areas 0.85 and pulse 0.03. The pulse combines two slow periods and stays within +/-3 percent.
+    It runs in the GPU material using engine time, in both editor and play; no game component or network update.
+  - `Sources/Ares/plasma/` holds the staged shader, guarded two-asset import and isolated native capture scripts.
+    Import compiles the shader before replacing the material, then compile `ar_plasma.vmat` with the native tool.
+    The plasma textures, core geometry, glass, collision, scene and actual lights are unchanged. The generator
+    still writes the original turbulence textures, so material regeneration retains the animated shader.
+  - Captures and source preservation hashes are in `output/ares/plasma-20261020/`. Motion previews can constrain
+    exposure on their isolated scene copy; that comparison setting is never written to the map. The user's active
+    editor scene is never switched by the capture helper; its isolated scene is destroyed in `finally`.
+- Control displays (2026-10-20): eight built-in ImageGen panels replace the placeholder bars/noise. The original
+  atlas, full prompt and provenance are in `Sources/Ares/screens/`. `ares_materials.py ar_screens` resamples that
+  source into the existing 2048x1024, four-column/two-row atlas; it must not redraw the old placeholders. Screens
+  use roughness 0.65, no specular and self-illumination 0.75 to keep the schematics readable.
+  - Corrected the eight sloped consoles' mirrored UVs. Four pump readers now use the coolant tile on their fronts
+    and steel on the edges. Both Red Planet signs are centred at z 163: the picture spans 135..191, above the
+    monitors' top at 130; its backing stops at 191.5 below the gallery underside at 192.
+  - `Tools/ares_screen_refresh.py` stages only those OBJ vertex/UV/material edits. It is a one-time migration;
+    reproduce from `--source-root output/ares/screens-20261020/before`, not the already migrated installed meshes.
+    Import with `Sources/Ares/screens/import.cs.txt` in the CLI exchange directory, then compile the screen material
+    and three models. Backups, geometry counts, preservation hashes and native captures are in
+    `output/ares/screens-20261020/`. Both control rooms were checked in the engine. Scene and collision are unchanged.
+- Exterior colony rebuild (2026-10-19): `Tools/ares_outpost.py`, called by `ares_map.backdrop()`, replaces the
+  luminous dome atlases, window-grid spires and plain blocks outside the play area. Habitats now have matte
+  insulated shells, geometric ribs, dark observation windows, human-sized airlocks and supported pressure links.
+  The atmosphere processors are shorter pressure-vessel skids with access decks, ladders, manifolds and instrument
+  masts; service buildings have folded shoulders, rooftop exchangers and piping. Radiator banks and small shielded
+  route markers complete the exterior. Signs use an upright, independently mapped atlas.
+  - `python Tools/ares_materials.py outpost` generates eight private `ar_ext_*` materials. It does not redraw the
+    facility's shared paints. Rebuild the mesh with `ares_map.py --backdrop-only [staging-dir]`.
+  - `Sources/Ares/editor/outpost-import.cs.txt` imports the staged sources through the editor. Backups, hashes,
+    staged assets and captures are in `output/ares/outpost-20261019/`. The completed backdrop is 203,000 triangles,
+    drawn only; the terrain's 107,576 and the boulders' 11,760 triangles retain identical positions, UVs and normals.
+    Source hashes also check the scene, facility models and previous materials. No frame-time benchmark.
+    Habitat, processor and observation-window views were checked in the engine with no new compile errors. An
+    isolated capture with settled exposure refreshed `ui/maps/ares.png`; the user's scene, play state and camera
+    were restored/preserved.
+- Martian terrain pass (2026-10-19): the plain uses broad, low swales instead of metre-scale noise sampled below
+  the mesh spacing. The cliff has a wider weathered shoulder, and the far range uses smooth bounded noise instead
+  of folded noise that produced pointed peaks. Smaller, partly buried rocks replace the oversized boulders.
+  - `ar_regolith` and `ar_rock` have muted ochre/taupe colours and gentler normals. `ar_terrain.vmat`, generated by
+    `Tools/ares_materials.py ar_terrain`, uses `shaders/hc1_ares_land.shader` to blend them continuously by slope, with
+    world-space dust and triplanar bedrock. Terrain triangles all use this material; whole-face rock/dust selection
+    exposed the grid as hard zigzag borders. Boulders retain `ar_rock`.
+  - `python Tools/ares_map.py --backdrop-only [staging-dir]` rebuilds just `ares_backdrop`, preserving the facility,
+    scene and menu images. This terrain pass produced 133,646 triangles (107,576 terrain), before the colony rebuild
+    above, drawn only. No frame-time measurement.
+  - Native editor import/compile: `Sources/Ares/editor/terrain-import.cs.txt` (copy into the CLI exchange directory).
+    Backups, staged assets, hash checks and before/after captures are in `output/ares/terrain-20261019/`.
+    In the sampled plain (e -5000..5000, n 2700..7000, 80-unit samples), the 95th-percentile slope fell from 34.9 to
+    3.9 degrees. Ground, window and cliff views were checked in the editor; assets compiled with no new errors.
+    The Ares scene file and edit/play state were preserved.
 - The user asked for a map on Mars "as close to this img as possible" (2026-10-14), from a reference picture of an
   atmosphere-processing plant:
   - the ATMOS PROCESSING column glowing orange through its glass, in a dark steel hall ringed with galleries;
@@ -5727,13 +6385,111 @@ simulate_input.
     and rises there so its rim never shows.
   - `map_kit.Model.oriented_box` needs right-handed axes. Left-handed ones draw the box inside out, and its collision
     fails map_kit's angle assert.
-  - The plasma's self-illumination at 12 blew the whole view out under bloom. It's 2.4 now, with bloom 0.2 over 2.2
-    and auto exposure 1.5-4.
+  - The original plasma at self-illumination 12 blew the whole view out under bloom. It was reduced to 2.4 before
+    the animated shader above replaced it. The scene currently uses bloom 0.135 over 2.5 and auto exposure 1.7-3.35.
   - Point lights in the engine are far dimmer than Cycles shows them: the lights here are 2.5-3.2 times white.
 - Not yet checked: a match played on it (bots, every mode's objects, spawns), its frame time with 102 point lights (10
   with shadows), and any sound (it has no ambience).
 
 ## Veridant (multiplayer map, `Tools/veridant_map.py`)
+- Pergola flowers (2026-10-24): `veridant_parts.bougainvillea()` delegates to
+  `Tools/veridant_bougainvillea.py` for branching vines, folded green leaves and
+  small shaded pink bracts. The six old atlas cards (24 triangles) are removed
+  from a byte-preserved `pergola-flowers-v2/foliage-base.obj`; the foliage VMDL
+  also imports `pergola-flowers-v2/flowers.obj`. Original foliage indices, atlas,
+  scene and collision are preserved. `configure()` keeps the `vr_bv_` material
+  overrides. Final stage-v5, native compile receipts and front/angle captures
+  are documented in `Sources/Veridant/pergola-flowers-v2/README.md`.
+- Garden table planter shrub (2026-10-24): the single olive at (-470,740,148)
+  now uses `Tools/veridant_planter_shrub.py` with the installed beech shrub's
+  authored mesh/material, finer branches, embedded roots and textured soil.
+  The canonical foliage OBJ and active `pergola-flowers-v2/foliage-base.obj`
+  both replace precisely 466 old triangles with 2,972; retained bytes and index
+  mappings are preserved. Scene and physics stay unchanged. Native compilation,
+  live material checks and matched captures passed. See
+  `Sources/Veridant/planter-shrub-v1/README.md` and its installed receipt.
+- Lounger upholstery realism (2026-10-24): `Tools/veridant_lounger_soft.py` adds
+  crowned and compressed foam, irregular cloth outlines, smooth seam pulls,
+  piping/stitches and rounded, subtly varied teak sections. The existing lounger
+  generator delegates to it, and all eight dedicated lounger imports plus the
+  reusable prop are updated through their existing `lounger-v2` resource paths.
+  Model documents, physics, scene, shared map OBJs and other prop imports retain
+  their hashes. Final publication: `output/veridant/lounger-v3/stage-v3/manifest.json`.
+  Seven materials and three models compiled; garden and rooftop captures were
+  reviewed. See `Sources/Veridant/lounger-v3/README.md` and the validation receipt.
+- Bistro tables (2026-10-24): `Tools/veridant_table.py` supplies the 128-segment honed stone top with a 3 mm eased
+  edge, a 64-segment bevelled pedestal base and a 32-segment stem. All 11 published tables retain their 30-inch
+  diameter, 29.5-inch height, 1.5-inch slab thickness, placements and collision. The tabletop's own material uses
+  restrained relief and UVs inside one limestone panel; OBJ import flips V, so source V=.75 becomes engine V=.25.
+  Scoped imports and native mesh/UV/rim checks are in `output/veridant/table-v2/`; the reviewed final view is
+  `output/veridant/quality/table-v2-complete/angled.png`. Resolve current VMDL render imports when patching: the
+  dressing now uses `chair-v2/dress-base.obj`. These OBJs contain interleaved vertex tables; append new tables
+  after all retained bytes so existing vertex, UV and normal indices keep their original meaning.
+- West bar doorway clearance (2026-10-24): `shelves_beside_doors()` keeps shelving
+  outside the cafe entrances at N=-80 and N=100 and lounge entrance at N=-390,
+  using the wall's shared 60x96 inch doorway definitions plus 4 inch jamb margins.
+  The active buildings render import is `lounger-v2/veridant_buildings-base.obj`;
+  its shelf correction and the canonical OBJ retain subsequent lounger work.
+  `stage-v5-index-repair` restores the original OBJ index allocation while keeping
+  face/material records unchanged. Sparse patches must append new tables after
+  all original tables, including declarations after faces. Native compile and
+  27 doorway collision rays passed; final evidence is in
+  `output/veridant/door-obstruction/validation.json` and
+  `output/veridant/quality/door-obstruction-after-repaired/cafe-south.png`.
+- Bistro chair clearance correction (2026-10-24): `Tools/veridant_chair.py` now
+  routes the rear uprights behind the backrest and around the seat. Rear mounting
+  spacers replace the collars that pierced the wicker. All 12 instances use the
+  two `models/maps/veridant/chair-v3/chairs-*.obj` imports, at 4,480 triangles each.
+  The chair-v2 base and current lounger import remain. See
+  `Sources/Veridant/chair-v3/README.md` and `output/veridant/chair-v3/after/` for
+  front, rear and side close-ups. Scene placement, materials and physics are preserved.
+- Bistro chair rebuild (2026-10-24): `Tools/veridant_parts.chair()` delegates to
+  `Tools/veridant_chair.py`; all 12 published chairs now have curved wicker panels,
+  rounded bound edges and smooth tapered steel legs. `veridant_materials` generates
+  the 1024px wicker PBR maps. The dressing model references two six-chair imports
+  and `models/maps/veridant/chair-v2/dress-base.obj`; physics and scene placements
+  are preserved. See `Sources/Veridant/chair-v2/README.md` and the final stage-v8
+  manifest. Existing Veridant OBJs interleave tables and faces: append new table
+  declarations after all old data, since inserting before the first `usemtl`
+  shifts indices in later declarations. Final editor captures are under
+  `output/veridant/chair-v2/final/`.
+- Inland hillside image backdrop (2026-10-24): `Tools/veridant_inland_vista.py` removes the remaining box villas and
+  polygon trees after the bay-impostor pass. Three distinct photographic sectors from one RGBA atlas (288 triangles total,
+  radius 14000) replace the earlier enlarged picture. Each keeps equal world scale per image pixel; uniform vertical
+  translations match the ridge heights. `mainland_arc()` derives the bearings from the actual coast at that radius
+  (currently -140.945 to 73.831 degrees), preventing scenery from being placed offshore. The horizon shader blends
+  adjacent image samples in texture space, preserving full interior coverage; only the two outer ends fade into haze.
+  ModelDoc flips the OBJ's V coordinates, so shader atlas samples use top-down PNG row order directly.
+  `Tools/veridant_vista_ground.py` builds a closed rolling mainland outside the play rectangle with separate cliff faces,
+  smoothly shaded normals, a continuous grass/soil material and 180 photographic scrub clumps (720 triangles). A coarse
+  backing extends to radius 60000 so elevated inland views cannot expose the sea behind low photographic valleys.
+  Clipped triangles interpolate their original plane, and scrub bases sample those actual triangles. There is no photo
+  projected on the ground. The two backdrop meshes total 32,438 triangles, down from 164,312 (80.3% fewer); FPS is unmeasured.
+  The near sea wall/riprap and original bay/boat cards remain byte-for-byte. No scene, physics, water, camera, lighting,
+  probe or gameplay changes were made. `veridant_backdrop.build()` applies the replacement; the material generator's
+  `impostors` command writes its five materials and two exact generated PNGs. Active shaders are
+  `hc1_veridant_horizon_v4.shader` and `hc1_veridant_scrub_v3.shader`. Sources, both built-in imagegen prompts, alpha
+  measurements and native scripts are in `Sources/Veridant/inland-vista-v1/distance-fix/`; published textures are
+  `materials/veridant/vista/inland-v1.png` and `inland-scrub.png`. The guarded native import atomically replaces existing
+  sources to avoid overwriting files mapped by the model compiler. Final stage: `output/veridant/inland-vista-v1/distance-fix/stage-v26/`;
+  original meshes remain in the parent run's `before-assets/`. Native shader/material/model compiles and 13 isolated
+  captures passed (`distance-fix/after-v26/`). Verification measured less than 0.05% per-sector pixel-scale variation
+  and zero internal cracks across 766 ground boundary edges; the source scene and stopped play state were preserved.
+- West bar door clearance (2026-10-24): the cafe's two west entrances and the lounge's west entrance were hidden
+  behind the continuous wooden backs of `counter_shelves`. `shelves_beside_doors` splits complete shelf units,
+  bottles and LED strips around the shared wall-opening definitions, with 4 in of jamb clearance. Only those two
+  assemblies were patched in `veridant_buildings.obj` (3,432 triangles replaced by 1,926); all unrelated OBJ bytes,
+  materials and physics sources were retained at publication. This task did not write the scene or physics sources.
+  Native compilation and 27 collision rays across the three openings passed; a matched screenshot verifies the
+  doorway in the user's picture. An optional player-box sweep timed out and is not claimed as passed. Other capture
+  attempts overlapped unrelated shared asset recompiles. `Sources/Veridant/door-clearance-v1/installed.json` and
+  `output/veridant/door-obstruction/validation.json` record the import and verification.
+- Pine planter bushes (2026-10-24): the north terrace's leaning stone pine now has 12 grounded beech bushes
+  (`facepunch.beech_bush_small#145429`, also used on Belltower), replacing its 15 crossed grass clumps. Only the
+  exact 120 old grass triangles were removed from `veridant_foliage.obj`; the tree and collision stay.
+  `Tools/veridant_planter_bushes.py` defines the varied placement and root embed, and `veridant_map.py` retains
+  the instances and package reference on regeneration. Saved native scene group: `Veridant/Pine planter beech bushes`.
+  Before/after captures and the scoped verification are in `output/veridant/planter-bushes-v1/`.
 - Distant bay image impostors (2026-10-18): `Tools/veridant_impostors.py` replaces the headland, castle/town and
   anchored boats with two generated RGBA textures in `Assets/materials/veridant/vista/` (`headland.png`, `boats.png`).
   The headland is a fixed curved strip (96 triangles); the yacht and nine sailboats have separate fixed quads at
@@ -5816,6 +6572,13 @@ simulate_input.
     instances load with valid materials, and the generator's 97 spot, route and Retakes checks pass.
   - `output/veridant/cerroblanco-bushes/` holds the pre-change sources, staging manifest and reviewed native
     tall-hedge, low-border and garden overview captures. The scene was saved through the editor.
+- Terrace stone pine: `veridant_parts.stone_pine` delegates to `Tools/veridant_stone_pine.py`. The old flat dark disc
+  and oversized foliage planes are replaced with branching limbs and 13 separate mountain-pine sprays from
+  `facepunch.pine_shrub_wide#145484`; their exported mesh/provenance is in `Sources/Veridant/stone-pine-v2/`.
+  `veridant_map.configure` preserves its cloud material override and `write_scene` pins that dependency. The scoped
+  splice (`Tools/veridant_stage_stone_pine.py`) replaced 606 triangles with 30,310 and retained the other 41,946 foliage
+  triangles exactly; no collision or scene transforms changed. Native import/verification scripts are under
+  `Sources/Veridant/editor/*stone-pine-v2*`; reviewed map captures and checks are in `output/veridant/stone-pine-v2/`.
 - Player clips: a clip's BoxCollider turned to its rail's heading (`K.yaw_rotation( yaw - 90 )`) lies along its local
   x, so its Scale is ( length, thickness, height ). Checked in the engine: with the length on y every path through the
   terraces came back Partial. Riverdale and Riverside write ( size[1], size[0], size[2] ), which lays each of their
@@ -6321,8 +7084,8 @@ simulate_input.
   the Ridgeback's breakable panes 0.5. Codex's 1 stopped every shot at the church windows (fixed 2026-09-29). A
   `BreakableGlass` pane still breaks and lets the round on, and that isn't a wallbang.
 - A thin partition authored as `default` stops rounds too, since its surface can't tell it from brick. A solid box
-  with a light surface is measured whole: Belltower's lorry tilt (`fabric`, 96 across) and cab (`metal.sheet`) stop
-  rounds.
+  with a light surface is measured whole, so a thick prop box of fabric or sheet metal stops rounds (Belltower's lorry
+  tilt and cab did, before the lorries came out).
 - Codex reported it passing an offscreen engine test. Not checked in a match.
 
 ## Incendiary grenade (thermite, `Code/Weapons/Grenades/Fire/`)
@@ -6636,9 +7399,52 @@ simulate_input.
 - Impacts: masonry, tile, metal, sheet metal, glass, wood, plastic, dirt, grass, fabric and flesh. Footsteps: concrete,
   tile, wood, metal, dirt and grass. The script's octave spectra were compared with s&box's own recordings, which
   showed the first version had almost no low end.
+- The metal impacts were redone on 2026-10-19, after the user played Ares (decks, galleries and the column are the
+  `metal` surface): "sounds like im playing table tennis". They rang like a steel target hung on chains: a pitched
+  ~1.4 kHz "ping" 0.25 s long over plate modes decaying in up to 0.28 s, 64-72% of the sound after the first 50 ms,
+  only 20 dB down after 0.55-0.78 s.
+  - Now steelwork built into a structure (`structural_modes`): 64 dense, pitchless bending modes, each dying in
+    T60 = 2.2 / (f x loss) with a built-up structure's loss factor of 1-2.5%, weak under the plating's coincidence
+    frequency (~1 kHz). A bright crack and a short clank, the frame's brief thud and lead splashing. One take in five
+    ricochets (it was two), quieter.
+  - Sheet metal the same way, with a panel's loss of 2-6%: a short "pank".
+  - The non-ricochet takes are 20 dB down after 80-100 ms, with 6-11% of the sound after 50 ms. In an 800 rpm burst
+    the level drops 17 dB between rounds, where it dropped 4.6 dB. Metal sits at -13 dB, 2 dB over masonry (it was -11).
+  - Only the metal and sheet metal WAVs and their events' volumes were replaced (`--out` to a scratch folder, then
+    copied in), so the other sets' files weren't touched. Compiled in the editor, not yet heard in a match.
+- The metal footsteps and grenade bounces were redone on 2026-10-20 (the user, on Ares: "running on the floor ... just
+  constant pinging ... maybe too loud"). Ares's whole floor, the ground slab and the decks, is the `metal` surface.
+  - Each step rang a hung plate on 16 sparse modes for up to a second (half its sound after the first 50 ms, a pitched
+    line 28 dB over the spectrum round it). A sprint steps every 0.25 s (`PlayerFootsteps`), so the rings overlapped
+    and the level only dropped 13 dB between steps.
+  - Now a boot on a deck (`soft_strike_modes`): a rubber heel's few ms of contact barely reach the plate's upper modes,
+    and a plate on its frame or slab, with the boot on it, damps the rest (loss 2.5-5%). A hollow clank, 3-4 dB more
+    than concrete at 250-500 Hz, 20 dB down there by 60-100 ms. Its pitched line is 10-14 dB (concrete's 10.5), and a
+    sprint goes quiet between steps.
+  - A steel deck is now 2 dB over concrete (it was 4): walk -34, run -28, land -24.
+  - Grenades on metal had the same ringing plate, 0.4-0.65 s long. They now use `structural_modes` (loss 1.5-3%): a
+    bright clank, 20 dB down in ~80 ms.
+  - Only the step, run, land, frag and can metal WAVs and their events' volumes were replaced, the same way. The old
+    files are in this session's scratch only. Compiled in the editor, not yet heard in a match.
+- Ricochets were redone the same day (the user, on Ares: "in the distance i hear pews like im in an action movie").
+  - One masonry take and one metal take in five had a whine mixed in: a tonal glide from 2.6-4.3 kHz down an octave
+    over half a second, the movie "pyeeow". It played on any hit, at any angle, as far as impacts carry (~76 m).
+  - A real round only skips off a hard face struck at a grazing angle, and breaks up on the rest. It leaves at
+    250-500 m/s away from where it struck, so it's Doppler-shifted down from the start. The gliding scream needs it to
+    come at you and pass close.
+  - The impacts have no whine now. `bullet_ricochet` (its own set, -30 dB, heard to 1500 units) is a tumbling slug's
+    buzzing wake. It's shifted down, falls 10-20% as it slows, and is audible ~150-190 ms (the old one 570 ms).
+    Its tonal line is 10-12 dB over the spectrum round it (the old 16-21).
+  - `WorldSounds.BulletRicochet` plays it beside the impact (`Shootable.CreateImpactEffects` for your own rounds,
+    `BulletFlyby.PlayImpact` for everyone else's and bots'). It needs a grazing hit: under 15 degrees on metal and
+    10 on masonry or tile. The chance is 0.6 times (1 - angle / critical). The dice are a hash of where it struck, to
+    the nearest 4 units, so every machine mostly agrees.
+  - Checked in the editor on Ares's edited scene (`run_csharp`, real traces): on the steel floor 25-36% ricochet at
+    2-8 degrees, 11% at 12, 4% at 14 and none from 20 up. The editor compiled the code (0 errors) and the sounds.
+    Not yet heard in a match.
 - Levels are real ones against each other, by K-weighted loudness:
   - Masonry impacts stay at s&box's generic impact; the rest are set relative to it.
-  - Walking on concrete stays at s&box's; the other floors follow real footfalls: a steel deck 4 dB over concrete,
+  - Walking on concrete stays at s&box's; the other floors follow real footfalls: a steel deck 2 dB over concrete,
     grass 10 dB under it. s&box had grass 21 dB under.
   - A run is 6 dB over a walk, and a jump's landing 4 dB over a run.
   - The press sits with `ui_nav_tab`, and the hover 2 dB over s&box's. They're on the UI mixer, so the UI slider
@@ -7009,12 +7815,19 @@ simulate_input.
     `Distance`;
   - air absorption, which takes the top off a far shot, and occlusion, which muffles it through a wall;
   - the blast's directivity: 6 dB quieter straight behind the muzzle, 2.5 dB off to the side.
-- The shooter's own shot is unchanged: flat (2D) at full level.
+- The shooter's own shot plays at full level, nearly flat (`SpacialBlend` 0.15).
 - Compiled on 2026-09-29, not yet heard in a match.
 - Since 2026-09-30 anyone else's shot is heard when its sound gets there, at 340 m/s (`GunshotAudio.PlayDelayed`: 0.3 s
   from 100 m). `PlayDelayed` plays an event as `Sound.Play` does, with `Sound.PlayFile`'s delay. The engine delays a
   sound by holding back its samples, which it can only do once the file has loaded: a file played for the first time
   that hasn't loaded yet plays at once.
+- Indoors (a roof within 1200 over the muzzle and walls within 800 round it, `RoomEnclosure`) every shot gets more of the
+  engine's own reverb (`Reverb` up to 1). A session on 2026-10-19 also played each shot again 65 ms and 145 ms later as
+  "room reflections" (`PlayRoomReflections`). The user, on Ares that day: "sounds like im playing table tennis, the
+  shots are so common". Copies that late are past the ear's echo threshold for a bang (~30 ms), so each was heard as
+  another shot: at 800 rpm (75 ms a round) the copies fell between the rounds, about three bangs a round. They were
+  taken out the same day. A real room's reflections come from every surface at once and blur into its reverb. Compiled
+  in the editor, not yet heard in a match.
 
 ## Bullet cracks (`BulletFlyby`, `Code/Weapons/BulletFlyby.cs`)
 - The user asked for "hyper realistic supersonic cracks at the right distances and everything" (2026-09-30). A round
@@ -7197,7 +8010,7 @@ simulate_input.
 - Suppressors (the user asked for some bots to have them): about one soldier in four is issued one of the gunsmith's
   Muzzle-slot suppressors for their gun (`RollMuzzle`, `SuppressorShare`, kept all match in `BotIdentity.Muzzle`). It's
   fitted on the bot's world model, its shots use the gun's suppressed sound, and the flash comes from the gun's
-  `DischargeMuzzle`. A bot's gun picked up off the floor has no suppressor (`DropWeaponModel` doesn't fit parts).
+  `DischargeMuzzle`. A bot's gun keeps its suppressor on the floor (`DroppedEquipment.Build`), but picked up it has none.
   - A flash shows on some shots only, by the gun's `MuzzleFlashChance` (through a suppressor, its suppressed one), as
     for a player's gun. Bots used to flash on every round.
   - A suppressed shot is heard only within `SuppressedHearingRange` (800, ~20 m), players' included
@@ -7273,6 +8086,15 @@ simulate_input.
   - Moving costs aim: at a 180 walk, 1.7x the error for a recruit and 1.4x for a veteran (`AimError`). That's why the
     holders plant.
   - `dev_bot_styles` logs every living bot's style, habits, gun and current move.
+  - Crouching (2026-10-19, the user: bots "crouch spam erratically" and snap between standing and crouching):
+    - A plant used to roll its own crouch and last 0.15-1.3 s, so bots bobbed down and up every second or two (a
+      rusher's 0.15-0.35 s plants had a 35-70% crouch). Now a crouched plant lasts at least the drop plus 1-1.6 s (rusher),
+      1.3-2.4 s (rifleman, flanker) or 1.8-3.2 s (anchor, marksman), and after getting up a bot waits 3.5-7 s before it
+      crouches again (`Plant`, `_crouchRest`). A rusher crouches on 8-20% of plants. Being hit still ends the plant.
+    - Every machine eases the stance from the synced `IsCrouching` (`CrouchBlend`, `UpdateStance`): down in 0.35 s, up
+      in 0.45 s, smoothstepped. The graph's `duck`, the eye (`BotPronePose.EyeOffset( float, ... )`) and so the
+      shouldered gun follow it. The movement box still changes at once. A slide doesn't sink it (its own pose does).
+    - Compiled with dotnet and in the editor (0 errors). Not yet watched in a match.
   - Compiled and hotloaded into the user's match on 2026-09-29, not yet watched.
 
 ## Skirmish (1v1 / 2v2): bot fill and the arena (`SkirmishArena`)
@@ -7568,16 +8390,63 @@ simulate_input.
   to the gun's renderers, or for the sleeves and gloves posed by `ViewModelClothing` (`Follow`, kept out of its
   cloth-material swap). Every slot wears `materials/effects/hc1_grime.vmat` (`shaders/hc1_grime.shader`) but lenses,
   reticles, see-through and hidden pieces (`CamoMaterialRules`). The shader pushes the skin 0.012 out along its normals,
-  draws drops of three sizes, smears, dust patches and grains in the model's own space, and is see-through elsewhere.
+  draws splashes, pooled stains, dust patches and grains in the model's own space, and is see-through elsewhere.
   The gunsmith's camo and hidden-piece passes skip `GrimeSkin` renderers.
 - `dev_grime [blood] [dirt] [ground] [dry]` sets it on the local hands and gun in hand.
-- Made with the editor closed: the C# builds with dotnet, but the shader and material have never compiled, and none of
-  it has been seen. To check: compile the shader (`EditorUtility.CompileShader`), then the vmat; `dev_grime 0.7 0.6
-  soil` and `dev_grime 0 0.8 mud` in a match, at the hip and aimed, on several guns (attachments, optics' lenses
-  clear), the sleeves and gloves following the hands, no z-fighting or lag when turning; the third-person gun stays
-  clean.
+- Blood appearance revision (2026-10-21, user: circular spots look terrible): `Splashes` replaces opaque spherical
+  spots with randomly oriented lobed shapes, tails, satellites, noisy edges and varied thickness. Three scales add
+  clustered spray; accumulated stains have broken coverage. Wet blood is darker crimson with restrained gloss,
+  drying to brown. Dirt, gameplay accumulation/drying/washing, material exclusions and clothing materials are unchanged.
+  The canonical shader was published through the native editor, compiled with `EditorUtility.CompileShader`, then
+  `materials/effects/hc1_grime.vmat` compiled successfully. Authoring/QA: `Sources/Effects/firstperson-grime/`.
+  Native before/final Kastov74u renders (same camera and seed, light/heavy/dry/clean/dirt) and receipts are in
+  `output/firstperson-grime-fix-20261021/`; clean/dirt-only RGB RMS differences are below 0.02/255. Disposable QA
+  scenes were destroyed and Belltower's selection, saved state and stopped play state preserved. The independent
+  shirt-model render does not exercise `ViewModelClothing.Follow`; do not treat it as a posed clothing integration test.
+  Live match checks remain: hip/ADS on several guns, optics staying clear, sleeves/gloves following the hands,
+  no z-fighting or lag when turning, third-person gun clean (`dev_grime 0.7 0.6 soil`, `dev_grime 0 0.8 mud`).
 
 ## First-person clothing (`ViewModelClothing`, `Code/Weapons/ViewModelClothing.cs`)
+- Clothing surface revision 4 (2026-10-21, user: material still looks wrong): first-person army-shirt slots use
+  `materials/operators/first_person/v4/shirt.vmat`; gloves retain v2. V3's coarse weave was baked into the
+  albedo and read as pebbled leather even with its normal layers disabled. Four cleaned colour regions retain
+  the camo print/stitches while removing that relief; the right sleeve's false painted highlight was removed.
+  The v4 shader uses filtered fold normals and a separate 256-square analytic cotton height map. Fine threads
+  sample model coordinates captured before standard vertex processing, with triplanar height and surface-gradient
+  bump shading so their scale is independent of the narrow cuff UV islands. Texture streaming includes this map.
+  `Sources/Clothing/firstperson-v4/imagegen-prompts.json` records exact built-in edit prompts and raw sources.
+  Clean/fibre builders and guarded native imports preserve the rejected colour-filter experiment; do not replay
+  earlier one-shot stages over the final profile. `output/firstperson-clothing-v4-20261021/applied-report.json`
+  records final hashes and checks. Native bright/dim close-ups and the production Field Operator `Dress` check
+  passed (v4 shirt, v2 gloves, body tint retained, bare arms hidden). The shared editor stayed stopped/saved;
+  these are private engine previews, not a live-match check of this revision. Geometry/animation are unchanged.
+- Clothing surface revision 3 (2026-10-21, user: sleeve still pixelated): army-shirt first-person slots now use
+  `materials/operators/first_person/v3/shirt.vmat` and `shaders/viewmodel_fabric_v3.shader`; gloves retain v2.
+  Four separately authored, registered UV regions give sleeves approximately 2.45x the native linear pixel
+  density of the v2 whole-atlas crop; cuff regions gain 3.13x and 4.94x. Generated source sizes and exact prompts
+  are recorded under `Sources/Clothing/firstperson-v3/` and `output/firstperson-clothing-v3-20261021/`.
+  `Tools/build_firstperson_clothing_v3.py` stages these sources and filtered fold normals; native publication
+  resamples only for compiler dimensions and does not count that conversion as new detail. Region sampling
+  uses remapped UV gradients and feathered boundaries. Streaming requests include all four region textures.
+  Fixed-camera native v2/v3 comparisons cover both sleeves and the cuff; a read-only check of the actual live
+  Belltower `ViewModelClothing` confirms the v3 material, shader and all nine valid loaded texture bindings.
+  `live-after/camera_screenshot.png` is an actual in-game capture. No scene/play/camera edits were required.
+- Clothing surface revision 2 (2026-10-21, user: blurry sleeves still not improved):
+  `ViewModelClothing.Materials.cs` assigns authored `materials/operators/first_person/v2/shirt.vmat` and
+  `gloves.vmat` to the army-shirt and fingerless-glove slots. The renderer retains its outfit tint and skin slots.
+  `shaders/viewmodel_fabric_v2.shader` adds independently repeating fine normals/roughness variation, 16x
+  anisotropic filtering and explicit cutout clipping. Active first-person clothing renews its texture-streaming
+  requests in `LateSetup`, including when the materials are already cached.
+  - `Tools/build_firstperson_clothing_v2.py` and `Sources/Clothing/firstperson-v2/` record the sources and native
+    publication/QA. Imagegen's base atlases were natively 1254 square, converted to 2048 for compiler mip filtering;
+    this conversion is not a claim of newly resolved 2K detail. Fine weave is a separate repeating texture.
+    Original coverage and tint masks are retained. Reconstruct the exported packed normal's Z from XY; treating
+    all three exported channels as an RGB source normal exaggerates the surface. The engine's single-channel AO
+    readback returned black; the new material uses a neutral AO fallback, not that unreadable black map.
+  - Native shader/material and C# compilation passed. Native close-ups and the actual production `Dress` routine
+    on an isolated Field Operator verified both v2 material bindings, tint/skin preservation and hidden bare arms.
+    Evidence: `output/firstperson-clothing-v2-20261021/native-r5/` and `dressing-proof.json`. This did not run a live
+    match or alter the shared Belltower scene/play state; do not label these captures live gameplay.
 - The user (2026-10-08): "when holding a gun i dont see my clothes on my arms". Every viewmodel's arms are
   `v_first_person_arms_human.vmdl`, bare skin whatever the outfit.
 - `Equipment.CreateViewModel` adds a `ViewModelClothing` to the viewmodel (`Fit`). Once the body wears a uniform
@@ -7837,8 +8706,9 @@ simulate_input.
     (`MatchRecorder.NoteShot`, from `Shootable.DoShootEffects`, `Melee.DoEffects` and the bot's `DoShootEffects`),
     with whether they were suppressed. None of it is in the clip: the viewmodel isn't a soldier's renderer, and the
     body graph's `b_attack` and `b_reload` triggers are spent by the end of the frame.
-  - A player's world gun wears the recording machine's saved build, whoever holds it (`Equipment.CreateWorldModel`),
-    so the recorded build is that one too. Bots' guns have none.
+  - The recorded build is the one the gun is drawn with on the recording machine (`Equipment.FitHolderBuild`): its own
+    player's saved build, anyone else's shared one (`HolderBuild`), as it was when they drew the gun. Bots' guns have
+    none. Before 2026-10-25 every player's gun wore the recording machine's saved build, and so did the replay's.
 - Files (`TheaterReplays`), in the data folder: `replays/<yyyyMMdd_HHmmss>.movie` (the MovieMaker clip), `.json` (the
   sidecar: maps, mode, date, length, who recorded it, and each life's track, name, team and spawn, death and removal
   times) and `.actions` (the actions, by life track, with the builds listed once). The newest 20 from the last 7 days

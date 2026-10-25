@@ -1,0 +1,2 @@
+var shader = Editor.AssetSystem.FindByPath( "shaders/m4_optic_lens.shader" );
+return new { ok = shader?.Compile( true ) ?? false };

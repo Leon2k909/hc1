@@ -1,0 +1,48 @@
+{
+  "state": "Applied to both current town models; native technical and visual checks completed; awaiting user feedback on realism.",
+  "revision": "ivy-realism-v3",
+  "replaces": "Sources/Belltower/ivy/branching-ivy-v1.json",
+  "user_feedback_on_previous_revision": "not realistic enough",
+  "verification": "output/belltower/ivy-realism-v3/verification.json",
+  "manifest": "output/belltower/ivy-realism-v3/publication/stage/manifest.json",
+  "preview_manifest": "output/belltower/ivy-realism-v3/preview/stage/manifest.json",
+  "generation": "Sources/Belltower/ivy/generation-v3.json",
+  "generator": "Tools/belltower_ivy_realism.py",
+  "canonical_hook": "Tools/belltower_ivy.py forwards the existing belltower_map.ivy helper to this revision",
+  "geometry": {
+    "patches": 50,
+    "leaf_variants": 8,
+    "leaves": 26788,
+    "triangles_per_half": 271300,
+    "max_import_triangles": 45000
+  },
+  "changes": [
+    "Curved climbing runners with irregularly spaced diagonal shoots and overlapping pockets of foliage.",
+    "Smaller cupped blades with varied three-dimensional orientation; smaller leaves at growing tips.",
+    "Eight leaf shapes with subdued veins, separate green shoots and woody stem materials.",
+    "A private two-sided leaf shader with distinct upper/under surface roughness and light transmission."
+  ],
+  "native_views": [
+    "output/belltower/quality/ivy-realism-v3-preview/front.png",
+    "output/belltower/quality/ivy-realism-v3-preview/oblique.png",
+    "output/belltower/quality/ivy-realism-v3-preview/sunlit.png",
+    "output/belltower/quality/ivy-realism-v3-preview/hanging.png",
+    "output/belltower/quality/ivy-realism-v3-installed/front.png",
+    "output/belltower/quality/ivy-realism-v3-installed/oblique.png"
+  ],
+  "native_compilation_passed": true,
+  "canonical_generator_matches_reviewed_geometry": true,
+  "non_ivy_town_geometry_and_collision_preserved": true,
+  "saved_scene_unchanged": true,
+  "temporary_render_scenes_destroyed": true,
+  "other_editor_and_game_sessions_preserved": true,
+  "runtime_performance_measured": false,
+  "visual_acceptance": "Awaiting user feedback; technical checks do not establish a subjective realism target.",
+  "capture_scope": "Native rendering of saved visual roots in temporary editor scenes; gameplay objects and planting props omitted. No user tab or camera changes.",
+  "effective_gpu_exposure_equivalence_verified": false,
+  "maintenance": [
+    "Keep the forty-five-thousand triangle bounded imports. Do not force-compile the town models.",
+    "The preview source revision is archived separately; publication records its later staging-script revision.",
+    "Previous manifests and native captures are historical evidence. Do not refresh their hashes over newer shared assets."
+  ]
+}

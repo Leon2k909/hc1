@@ -46,47 +46,19 @@
     }
 }
 
-@if ( MainHUD.IsHudEnabled && Client.Viewer.PlayerPawn is { } pawn && pawn.IsValid() && pawn.CanMountWeapon )
+@{ var mount = MountState(); }
+@if ( mount != 0 )
 {
     <div class="mount-indicator">
-        <span>@(pawn.IsWeaponMounted ? "MOUNTED" : "MOUNT")</span>
-        @if ( !pawn.IsWeaponMounted )
+        <span>@(mount == 2 ? "MOUNTED" : "MOUNT")</span>
+        @if ( mount == 1 )
         {
             <InputHint class="small" Action="WeaponMount" />
         }
     </div>
 }
 
-@if ( CrosshairManager.HitFlash > 0 && cfg.HitStyle != "none" )
-{
-    var hrgb = HexToRgb( cfg.HitColor );
-    var hcol = $"rgba({hrgb.r},{hrgb.g},{hrgb.b},{cfg.HitAlpha.ToString( "F2", System.Globalization.CultureInfo.InvariantCulture )})";
-    var hout = cfg.HitOutline ? $"0 0 0 {cfg.HitOutlineThickness}px rgba(0,0,0,{cfg.HitOutlineAlpha.ToString( "F2", System.Globalization.CultureInfo.InvariantCulture )})" : "none";
-    var hsz = cfg.HitSize;
-    var hth = cfg.HitThickness;
-
-    @if ( cfg.HitStyle == "x" )
-    {
-        <div class="hit-marker x" style="width:@(hsz)px;height:@(hsz)px;animation-duration:@(cfg.HitDuration)ms;">
-            <div style="position:absolute;left:50%;top:50%;width:@(hth)px;height:@(hsz)px;background-color:@hcol;box-shadow:@hout;transform-origin:center;transform:translate(-50%,-50%) rotate(45deg);"></div>
-            <div style="position:absolute;left:50%;top:50%;width:@(hth)px;height:@(hsz)px;background-color:@hcol;box-shadow:@hout;transform-origin:center;transform:translate(-50%,-50%) rotate(-45deg);"></div>
-        </div>
-    }
-    else if ( cfg.HitStyle == "ring" )
-    {
-        <div class="hit-marker ring" style="width:@(hsz)px;height:@(hsz)px;border:@(hth)px solid @hcol;box-shadow:@hout;animation-duration:@(cfg.HitDuration)ms;"></div>
-    }
-    else if ( cfg.HitStyle == "dot" )
-    {
-        var dsz = hsz / 3;
-        <div class="hit-marker dot" style="width:@(dsz)px;height:@(dsz)px;background-color:@hcol;box-shadow:@hout;animation-duration:@(cfg.HitDuration)ms;"></div>
-    }
-    else if ( cfg.HitStyle == "diamond" )
-    {
-        var dsz = hsz / 2;
-        <div class="hit-marker" style="width:@(dsz)px;height:@(dsz)px;background-color:@hcol;box-shadow:@hout;transform:translate(-50%,-50%) rotate(45deg);animation-duration:@(cfg.HitDuration)ms;"></div>
-    }
-}
+@* The hitmarker is drawn with the crosshair's own painter, on its exact centre: HitmarkerPainter. *@
 
 @code
 {
@@ -100,6 +72,16 @@
             return true;
 
         return false;
+    }
+
+    /// <summary> 0 nothing, 1 a mount is in reach, 2 mounted. </summary>
+    static int MountState()
+    {
+        if ( !MainHUD.IsHudEnabled ) return 0;
+        var pawn = Client.Viewer.PlayerPawn;
+        if ( !pawn.IsValid() ) return 0;
+        if ( pawn.IsWeaponMounted ) return 2;
+        return pawn.CanMountWeapon ? 1 : 0;
     }
 
     static (int r, int g, int b) HexToRgb( string hex )
@@ -141,8 +123,11 @@
         h.Add( c.HitOutline );
         h.Add( c.HitOutlineThickness );
         h.Add( c.HitOutlineAlpha );
-        h.Add( CrosshairManager.HitFlash > 0 );
         h.Add( IsAimingDownSights() );
+        // The mount prompt wasn't in the hash, so it stayed as it was at the last rebuild: up at the hip, gone when
+        // mounted (the user's report, 2026-10-25).
+        h.Add( MainHUD.IsHudEnabled );
+        h.Add( MountState() );
         return h.ToHashCode();
     }
 }

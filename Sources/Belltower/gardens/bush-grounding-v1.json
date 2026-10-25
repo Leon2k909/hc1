@@ -1,0 +1,46 @@
+{
+  "revision": "garden-bush-grounding-v1",
+  "state": "saved while editor closed; exact scene delta, root contact, canopy heights and generator/collision preservation verified; native visual check pending",
+  "updated_utc": "2026-10-20T12:02:02.255195+00:00",
+  "plan": "output/belltower/bush-grounding/plan.json",
+  "before_scene_sha256": "f92a810e80e3cced2ae9ede667d692c712207a58637a927673a7be7eced5af1f",
+  "root_anchor_local_z": 0.845722,
+  "model_top_local_z": 55.370075,
+  "root_embed_inches": 0.5,
+  "changed_garden_plants": 244,
+  "classes": {
+    "tall-hedge": 12,
+    "low-hedge": 100,
+    "parterre-plant": 24,
+    "raised-bed-plant": 108
+  },
+  "generator_validation": "output/belltower/bush-grounding/generator-check.json",
+  "native_calibration": "output/belltower/bush-grounding/native-mesh-inspection-fixed/run_csharp.json",
+  "source_sha256": {
+    "Tools/belltower_map.py": "c7a9c6501230335f284aa7240780d6016984975bf55366668f9fb3deff7bc92d",
+    "Tools/belltower_detail.py": "664dd4f4aec1dea27c8096f36d7f6da031eeaa90e35150afd990f8ebbe7aeedd"
+  },
+  "native_scene_saved": false,
+  "native_visual_review_verified": false,
+  "overall_map_quality_goal_complete": false,
+  "scene_saved_closed_editor": true,
+  "scene_sha256": "a7c75cfe021f556a9ed195e238b66ab200f832e3d09e27e4a62567fcf5a9e502",
+  "verification": "output/belltower/bush-grounding/offline-scene-check.json",
+  "publication": "output/belltower/bush-grounding/closed-editor-publication.json",
+  "external_input_revision": "output/belltower/bush-grounding/external-input-revision.json",
+  "no_new_scene_objects_or_colliders": true,
+  "next_native_action": "Do not reapply transforms. Open current saved Belltower, run check-garden-grounding-after.cs.txt, then capture four views at the current scene hash.",
+  "editor_status": {
+    "last_launched_pid": 25712,
+    "result": "Exited during startup before native MCP became available",
+    "read_only_logs_inspected": true,
+    "startup_exit_cause_unconfirmed": true
+  },
+  "prior_editor_wait": {
+    "user_preference": "Keep waiting; do not message the other chat",
+    "threadId": "01a15547-eb49-7920-8b06-675298d7ce63",
+    "title": "Improve Ares terrain realism",
+    "turnId": "01a15910-341d-74f3-bc91-5fd439e88290",
+    "cursor": "1489c1c9-67f9-41c5-ba1b-8d3fefccf7bf:18"
+  }
+}

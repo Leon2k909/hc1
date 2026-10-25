@@ -1,0 +1,14 @@
+// Read-only: the paving's height under each Cerro Blanco bike stand foot (plan e, n -> world n, -e).
+var scene = Editor.SceneEditorSession.Active?.Scene ?? throw new InvalidOperationException("No scene");
+var results = new System.Collections.Generic.List<object>();
+using (scene.Push())
+{
+    foreach (var e in new[] { 843.0f, 1040.0f, 960.0f })
+        foreach (var n in new[] { 1635.2f, 1649.0f, 1662.8f, 1600.0f })
+        {
+            var start = new Vector3(n, -e, 60f);
+            var tr = scene.Trace.Ray(start, start + Vector3.Down * 120f).Run();
+            results.Add(new { e, n, Hit = tr.Hit, Z = tr.Hit ? tr.HitPosition.z : float.NaN, Object = tr.GameObject?.Name });
+        }
+}
+return results;

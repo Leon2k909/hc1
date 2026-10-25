@@ -1,0 +1,63 @@
+// Read-only character, camera and settings measurements. No scene or asset edits.
+var root = Sandbox.Project.Current.GetRootPath();
+var previous = Editor.SceneEditorSession.Active;
+var gameId = Game.ActiveScene?.Id;
+var playing = Game.IsPlaying;
+var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
+object Read(object target, string property) => target?.GetType().GetProperty(property, flags)?.GetValue(target);
+object Box(BBox bounds) => new { Min = bounds.Mins.ToString(), Max = bounds.Maxs.ToString(), Size = bounds.Size.ToString(), HeightMetres = bounds.Size.z * .0254f };
+var paths = new[] {
+    "models/citizen_human/citizen_human_male.vmdl", "models/citizen_human/citizen_human_female.vmdl",
+    "models/player/ct_side/ct_side_player_01/ct_side_player_01_v2.vmdl",
+    "models/campaign/robot/combat_robot.vmdl"
+};
+var models = paths.Select(path => {
+    var model = Model.Load(path);
+    var vertices = new System.Collections.Generic.List<Vector3>();
+    if (!model.IsError)
+        vertices.AddRange(model.GetVertices().Select(v => v.Position));
+    var minimum = vertices.Count == 0 ? Vector3.Zero : new Vector3(vertices.Min(v => v.x), vertices.Min(v => v.y), vertices.Min(v => v.z));
+    var maximum = vertices.Count == 0 ? Vector3.Zero : new Vector3(vertices.Max(v => v.x), vertices.Max(v => v.y), vertices.Max(v => v.z));
+    return new {
+        Path = path, model.IsError, Bounds = Box(model.Bounds), RenderBounds = Box(model.RenderBounds),
+        BindMesh = new { Vertices = vertices.Count, Bounds = Box(new BBox(minimum, maximum)) },
+        Bones = model.Bones.AllBones.Where(b => new[] { "head", "eyes", "eye_L", "eye_R", "foot_L", "foot_R", "ankle_L", "ankle_R", "neck", "spine_2" }.Contains(b.Name))
+            .Select(b => new { b.Name, Position = b.LocalTransform.Position.ToString(), Scale = b.LocalTransform.Scale.ToString() }).ToArray(),
+        EyesAttachment = model.GetAttachment("eyes")?.Position.ToString()
+    };
+}).ToArray();
+var actor = Editor.SceneEditorSession.All.Where(s => !s.Scene.IsEditor).SelectMany(s => s.Scene.GetAllObjects(true))
+    .SelectMany(o => o.Components.GetAll<Component>()).FirstOrDefault(c => c.GetType().Name == "PlayerPawn");
+var settingsType = actor?.GetType().Assembly.GetType("Facepunch.GameSettingsSystem")
+    ?? AppDomain.CurrentDomain.GetAssemblies().Where(a => a.GetType("Facepunch.GameSettingsSystem") is not null)
+        .OrderByDescending(a => a.GetName().Version).First().GetType("Facepunch.GameSettingsSystem");
+var settings = settingsType?.GetProperty("Current", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public)?.GetValue(null);
+var settingNames = new[] { "FieldOfView", "ThirdPersonFieldOfView", "IndependentAdsFov", "WeaponDistance", "WeaponSidePosition", "WeaponHeightPosition", "ViewBob" };
+var sessions = Editor.SceneEditorSession.All.Select(s => new {
+    s.Scene.Id, s.Scene.Name, s.Scene.IsEditor, Path = s.Scene.Source?.ResourcePath, s.HasUnsavedChanges,
+    Active = ReferenceEquals(s, previous),
+    Cameras = s.Scene.GetAllComponents<CameraComponent>().Select(c => new {
+        c.Id, Name = c.GameObject.Name, c.FieldOfView, Axis = c.FovAxis.ToString(), Position = c.WorldPosition.ToString(),
+        c.Enabled, c.IsMainCamera, c.Priority, c.Orthographic, c.CustomSize,
+        Angles = c.WorldRotation.Angles().ToString()
+    }).ToArray(),
+    Actors = s.Scene.GetAllObjects(true).SelectMany(o => o.Components.GetAll<Component>()).Where(c => c.GetType().Name is "PlayerPawn" or "LightweightCombatBot")
+        .Take(12).Select(c => new {
+            Name = c.GameObject.Name, Type = c.GetType().Name, Position = c.WorldPosition.ToString(), Scale = c.WorldScale.ToString(),
+            Height = Read(c, "Height"), EyePosition = Read(c, "EyePosition")?.ToString(),
+            Head = Read(c, "Head") is GameObject head ? head.WorldPosition.ToString() : null,
+            Camera = Read(Read(c, "CameraController"), "Camera") is CameraComponent camera ? new {
+                camera.FieldOfView, Axis = camera.FovAxis.ToString(), Position = camera.WorldPosition.ToString()
+            } : null
+        }).ToArray()
+}).ToArray();
+var result = new {
+    Models = models, SettingsType = settingsType?.FullName,
+    Settings = settingNames.ToDictionary(name => name, name => Read(settings, name)),
+    DataFilePresent = FileSystem.Data.FileExists("gamesettings.json"), Screen = Screen.Size.ToString(),
+    Playing = playing, GameScene = Game.ActiveScene?.Name, Sessions = sessions,
+    EditorStatePreserved = ReferenceEquals(previous, Editor.SceneEditorSession.Active) && Game.ActiveScene?.Id == gameId && Game.IsPlaying == playing
+};
+var destination = System.IO.Path.Combine(root, "output/player-scale-audit-20261020/native-measurements.json");
+System.IO.File.WriteAllText(destination, System.Text.Json.JsonSerializer.Serialize(result, new System.Text.Json.JsonSerializerOptions { WriteIndented = true }));
+return result;

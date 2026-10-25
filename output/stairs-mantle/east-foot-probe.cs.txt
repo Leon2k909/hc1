@@ -1,0 +1,30 @@
+var scene = new Scene();
+var lines = new System.Collections.Generic.List<string>();
+try
+{
+	using ( scene.Push() )
+	{
+		foreach ( var name in new[] { "collider_structure", "collider_detail" } )
+		{
+			var g = new GameObject( false, name );
+			var mc = g.AddComponent<ModelCollider>(); mc.Model = Model.Load( $"models/maps/collider/{name}.vmdl" ); mc.Static = true;
+			g.Enabled = true;
+		}
+		var box = new BBox( new Vector3( -12, -12, 0 ), new Vector3( 12, 12, 64 ) );
+		foreach ( var x in new[] { 60f, 90f, 120f, 150f, 180f } )
+		{
+			var from = new Vector3( x, -393, 6.5f );
+			var tr = scene.Trace.Ray( from, from + new Vector3( 0, -60, 25 ) ).Size( box ).Run();
+			lines.Add( $"box from x{x}: hit {tr.Hit} at {tr.EndPosition} normal {tr.Normal} body {tr.Body?.GetGameObject()?.Name} shape {tr.Shape?.IsHullShape}/{tr.Shape?.IsMeshShape}" );
+		}
+		// Thin rays at several heights across the stair's foot, looking for what's there.
+		foreach ( var z in new[] { 8f, 20f, 40f, 62f } )
+			foreach ( var x in new[] { 60f, 120f, 180f } )
+			{
+				var r = scene.Trace.Ray( new Vector3( x, -380, z ), new Vector3( x, -470, z ) ).Run();
+				lines.Add( $"ray x{x} z{z}: hit {r.Hit} at {r.HitPosition} normal {r.Normal}" );
+			}
+	}
+}
+finally { scene.Destroy(); }
+return lines;

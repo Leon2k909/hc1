@@ -8,6 +8,8 @@ import zlib
 import numpy as np
 
 import belltower_furniture as F
+import belltower_padlock as Padlock
+import belltower_shed_wood as ShedWood
 from map_kit import normalise
 
 END_GRAIN = 'garden_endgrain'
@@ -75,17 +77,22 @@ def shed(model, e0, e1, n0, n1, z, door, small=False):
             upper = min(wall_top(a),wall_top(b))-.1
             if upper<=lower:
                 continue
-            F.bevel_box(model,at((a+b)/2,-.575,(lower+upper)/2),(run,outward,vertical),
-                        (b-a-.12,.65,upper-lower),F.WOOD,.08,seed+i+len(side))
+            if i < 2 or i >= len(cuts)-3:
+                ShedWood.board(model,at((a+b)/2,-.575,(lower+upper)/2),(run,outward,vertical),
+                               (b-a-.12,.65,upper-lower),F.WOOD,seed+i+len(side))
+            else:
+                F.bevel_box(model,at((a+b)/2,-.575,(lower+upper)/2),(run,outward,vertical),
+                            (b-a-.12,.65,upper-lower),F.WOOD,.08,seed+i+len(side))
         # A bottom rail and corner stiles visually tie the cladding together.
         intervals = ((start,centre-20.5),(centre+20.5,end)) if side==door else ((start,end),)
         for a,b in intervals:
-            F.bevel_box(model,at((a+b)/2,-.32,z+2),(run,outward,vertical),
-                        (b-a,.64,3.8),F.DARK,.1,seed+73)
+            ShedWood.board(model,at((a+b)/2,-.32,z+2),(run,outward,vertical),
+                           (b-a,.64,3.8),F.DARK,seed+73,trim=True)
         for r in (start+1.8,end-1.8):
             upper = wall_top(r)-.4
-            F.bevel_box(model,at(r,-.22,(z+upper)/2),(run,outward,vertical),
-                        (3.5,.44,upper-z),F.DARK,.11,seed+80)
+            # A real corner board needs thickness for a worn, rounded arris.
+            ShedWood.board(model,at(r,-.30,(z+upper)/2),(run,outward,vertical),
+                           (3.5,1.10,upper-z),F.DARK,seed+80+round(r),trim=True)
         # Fascia overlaps the cut board ends under the sloping eaves.
         F.beam(model,at(start,-.2,wall_top(start)-1.8),at(end,-.2,wall_top(end)-1.8),
                (1.0,3.4),F.DARK,.14,seed+91,up=vertical)
@@ -95,8 +102,8 @@ def shed(model, e0, e1, n0, n1, z, door, small=False):
         # Closed, separately boarded door in the former leaf's footprint.
         for k in range(8):
             a=centre-19.7+k*4.925
-            F.bevel_box(model,at(a+2.40,.66,z+38),(run,outward,vertical),
-                        (4.77,1.08,75.6),F.DARK,.09,seed+110+k)
+            ShedWood.board(model,at(a+2.40,.66,z+38),(run,outward,vertical),
+                           (4.77,1.08,75.6),F.DARK,seed+110+k)
         for h in (12,40,66):
             F.bevel_box(model,at(centre,1.50,z+h),(run,outward,vertical),
                         (38,1.0,3.5),F.WOOD,.16,seed+140+h)
@@ -108,14 +115,11 @@ def shed(model, e0, e1, n0, n1, z, door, small=False):
             for r in (centre-18,centre-8):
                 F.bolt(model,at(r,2.18,z+h),outward,.23,False)
         for r in (centre-21,centre+21):
-            F.bevel_box(model,at(r,.62,z+38.5),(run,outward,vertical),
-                        (2.0,1.24,77),F.WOOD,.14,seed+200)
-        F.bevel_box(model,at(centre,.62,z+78),(run,outward,vertical),
-                    (44,1.24,2.6),F.WOOD,.15,seed+202)
-        F.bevel_box(model,at(centre+14,1.63,z+38),(run,outward,vertical),
-                    (3.3,.30,7.0),F.IRON,.2,seed+206)
-        F.beam(model,at(centre+14,2.20,z+35.8),at(centre+14,2.20,z+40.2),
-               (.65,.65),F.IRON,.19,seed+208,up=outward)
+            ShedWood.board(model,at(r,.62,z+38.5),(run,outward,vertical),
+                           (2.0,1.24,77),F.WOOD,seed+200+round(r),trim=True)
+        ShedWood.board(model,at(centre,.62,z+78),(run,outward,vertical),
+                       (44,1.24,2.6),F.WOOD,seed+202,trim=True)
+        Padlock.build(model,at(centre+14,0,z+38),(run,outward,vertical),seed+206)
 
     # Fitted sheathing and exposed rafter tails replace the floating flat slab.
     F.bevel_box(model,roof_centre-up*1.0,(across,down,up),(width-4,length-4,.9),F.DARK,.10,seed+220)

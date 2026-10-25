@@ -1,0 +1,985 @@
+{
+  "task": "Whole-game character scale, camera height, FOV and environment proportion audit",
+  "canonical_project": "C:\\sbox-projects\\hc1\\forked-shooter-main",
+  "native_models": [
+    {
+      "Path": "models/citizen_human/citizen_human_male.vmdl",
+      "IsError": false,
+      "Bounds": {
+        "Min": "-5.7833,-23.933,-0.0696",
+        "Max": "6.3864,23.933,68.9154",
+        "Size": "12.1697,47.8659,68.985",
+        "HeightMetres": 1.7522179
+      },
+      "RenderBounds": {
+        "Min": "-5.7833,-23.933,-0.0696",
+        "Max": "6.3864,23.933,68.9154",
+        "Size": "12.1697,47.8659,68.985",
+        "HeightMetres": 1.7522179
+      },
+      "BindMesh": {
+        "Vertices": 38655,
+        "Bounds": {
+          "Min": "-5.5835,-23.933,-0.0335",
+          "Max": "6.3864,23.933,68.9154",
+          "Size": "11.9699,47.8659,68.9488",
+          "HeightMetres": 1.7513001
+        }
+      },
+      "Bones": [
+        {
+          "Name": "spine_2",
+          "Position": "0.4922,0,48.622",
+          "Scale": "1,1,1"
+        },
+        {
+          "Name": "head",
+          "Position": "0.9055,0.0001,60.4198",
+          "Scale": "1,1,1"
+        },
+        {
+          "Name": "eye_L",
+          "Position": "4.0147,1.2927,64.5624",
+          "Scale": "1,1,1"
+        },
+        {
+          "Name": "eye_R",
+          "Position": "4.0919,-1.4512,64.5185",
+          "Scale": "1,1,1"
+        },
+        {
+          "Name": "ankle_R",
+          "Position": "-1.926,-7.4323,3.6096",
+          "Scale": "1,1,1"
+        },
+        {
+          "Name": "ankle_L",
+          "Position": "-1.927,7.4324,3.6097",
+          "Scale": "1,1,1"
+        }
+      ],
+      "EyesAttachment": "4.0355,2.9921,-0"
+    },
+    {
+      "Path": "models/citizen_human/citizen_human_female.vmdl",
+      "IsError": false,
+      "Bounds": {
+        "Min": "-5.5159,-23.9043,-0.0696",
+        "Max": "6.3864,23.9598,68.8125",
+        "Size": "11.9023,47.8641,68.8821",
+        "HeightMetres": 1.7496055
+      },
+      "RenderBounds": {
+        "Min": "-5.5159,-23.9043,-0.0696",
+        "Max": "6.3864,23.9598,68.8125",
+        "Size": "11.9023,47.8641,68.8821",
+        "HeightMetres": 1.7496055
+      },
+      "BindMesh": {
+        "Vertices": 20452,
+        "Bounds": {
+          "Min": "-5.5159,-23.8971,-0.0335",
+          "Max": "6.3864,23.9598,68.8125",
+          "Size": "11.9023,47.8568,68.846",
+          "HeightMetres": 1.7486879
+        }
+      },
+      "Bones": [
+        {
+          "Name": "spine_2",
+          "Position": "0.4922,0,48.622",
+          "Scale": "1,1,1"
+        },
+        {
+          "Name": "head",
+          "Position": "0.9055,0.0001,60.4198",
+          "Scale": "1,1,1"
+        },
+        {
+          "Name": "eye_L",
+          "Position": "4.0116,1.3215,64.5619",
+          "Scale": "1,1,1"
+        },
+        {
+          "Name": "eye_R",
+          "Position": "4.105,-1.4259,64.5182",
+          "Scale": "1,1,1"
+        },
+        {
+          "Name": "ankle_R",
+          "Position": "-1.926,-7.4323,3.6096",
+          "Scale": "1,1,1"
+        },
+        {
+          "Name": "ankle_L",
+          "Position": "-1.927,7.4324,3.6097",
+          "Scale": "1,1,1"
+        }
+      ],
+      "EyesAttachment": "4.0355,2.9921,-0"
+    },
+    {
+      "Path": "models/player/ct_side/ct_side_player_01/ct_side_player_01_v2.vmdl",
+      "IsError": false,
+      "Bounds": {
+        "Min": "-6.8676,-23.9046,-0.0857",
+        "Max": "8.4747,23.9046,69.2329",
+        "Size": "15.3422,47.8093,69.3186",
+        "HeightMetres": 1.7606934
+      },
+      "RenderBounds": {
+        "Min": "-6.8676,-23.9046,-0.0857",
+        "Max": "8.4747,23.9046,69.2329",
+        "Size": "15.3422,47.8093,69.3186",
+        "HeightMetres": 1.7606934
+      },
+      "BindMesh": {
+        "Vertices": 25842,
+        "Bounds": {
+          "Min": "-6.8676,-23.9046,-0.0857",
+          "Max": "8.4747,23.9046,69.2329",
+          "Size": "15.3422,47.8093,69.3186",
+          "HeightMetres": 1.7606934
+        }
+      },
+      "Bones": [
+        {
+          "Name": "neck",
+          "Position": "-0.764,0.0046,56.9599",
+          "Scale": "1,1,1"
+        },
+        {
+          "Name": "head",
+          "Position": "0.7811,0.0045,62.2205",
+          "Scale": "1,1,1"
+        }
+      ],
+      "EyesAttachment": "1.8098,6.0041,0.0378"
+    },
+    {
+      "Path": "models/campaign/robot/combat_robot.vmdl",
+      "IsError": false,
+      "Bounds": {
+        "Min": "-7.7953,-23.9657,-0",
+        "Max": "6.8409,23.9651,68.7007",
+        "Size": "14.6362,47.9307,68.7007",
+        "HeightMetres": 1.7449964
+      },
+      "RenderBounds": {
+        "Min": "-7.7953,-23.9657,-0",
+        "Max": "6.8409,23.9651,68.7007",
+        "Size": "14.6362,47.9307,68.7007",
+        "HeightMetres": 1.7449964
+      },
+      "BindMesh": {
+        "Vertices": 40593,
+        "Bounds": {
+          "Min": "-7.7953,-23.9657,-0",
+          "Max": "6.8409,23.9651,68.7007",
+          "Size": "14.6362,47.9307,68.7007",
+          "HeightMetres": 1.7449964
+        }
+      },
+      "Bones": [
+        {
+          "Name": "neck",
+          "Position": "-0.764,0.0046,56.9598",
+          "Scale": "1,1,1"
+        },
+        {
+          "Name": "head",
+          "Position": "0.7811,0.0046,62.2205",
+          "Scale": "1,1,1"
+        }
+      ],
+      "EyesAttachment": "1.8098,6.0041,0.0378"
+    }
+  ],
+  "maps": [
+    {
+      "scene": "Assets/scenes/maps/Ares/ares.scene",
+      "sha256": "fb5f5eb035ac5517b104d08f71e8e974ce653bafc81e2b1163efdad6bf5b18a9",
+      "map_renderers": 5,
+      "non_unit_scale": []
+    },
+    {
+      "scene": "Assets/scenes/maps/Belltower/belltower.scene",
+      "sha256": "7c81362d419176d9bb98caf5287e1949f19b1d867a8c2cb030971b5ecac865cd",
+      "map_renderers": 94,
+      "non_unit_scale": []
+    },
+    {
+      "scene": "Assets/scenes/maps/Boxyard/boxyard.scene",
+      "sha256": "03e8db0091fa7504b7bd13eb48175249d62c477d1c0bd92b8e66f80f775cb26e",
+      "map_renderers": 4,
+      "non_unit_scale": []
+    },
+    {
+      "scene": "Assets/scenes/maps/CerroBlanco/cerroblanco.scene",
+      "sha256": "45766f81db0f879df61b0ee1a9a39963ebf1a28714a198d02ad72a72c9df1c5f",
+      "map_renderers": 403,
+      "non_unit_scale": []
+    },
+    {
+      "scene": "Assets/scenes/maps/Collider/collider.scene",
+      "sha256": "b45ae8848a9d8581e87c4d2369ac4829d9f6afbc8956350dc1b8d2aed304b27c",
+      "map_renderers": 4,
+      "non_unit_scale": []
+    },
+    {
+      "scene": "Assets/scenes/maps/Lowtide/lowtide.scene",
+      "sha256": "695adb5f9af33df3c463161c7b68cd5cb22358929e762f1743de4550b8af9e40",
+      "map_renderers": 11,
+      "non_unit_scale": []
+    },
+    {
+      "scene": "Assets/scenes/maps/Orion/orion.scene",
+      "sha256": "1583b2433a82d6ecd12bc017ce938c9898b60191813ac7395c543390381b0951",
+      "map_renderers": 10,
+      "non_unit_scale": []
+    },
+    {
+      "scene": "Assets/scenes/maps/Railhead/railhead.scene",
+      "sha256": "895caa9744c23b4a8b6985c2402550ff0f95978600b1bf5e36a38e68aca17f5a",
+      "map_renderers": 104,
+      "non_unit_scale": []
+    },
+    {
+      "scene": "Assets/scenes/maps/ReefHall/reefhall.scene",
+      "sha256": "04b34fe4f61ec1c2fd05451dbbf4fbccb50a85d3aed47a99bcf5f8dca7bc1a79",
+      "map_renderers": 15,
+      "non_unit_scale": []
+    },
+    {
+      "scene": "Assets/scenes/maps/Ridgeback/ridgeback.scene",
+      "sha256": "f7624a11ea2913f8b080e2058349ba5d0892dfde00df5c5990c2745b67044f75",
+      "map_renderers": 21,
+      "non_unit_scale": []
+    },
+    {
+      "scene": "Assets/scenes/maps/Riverdale/riverdale.scene",
+      "sha256": "aa26887e51814f2ca8c5c34a09ea3cbfe49e73a12f7b3bfcc7d350f1cbfa3734",
+      "map_renderers": 21,
+      "non_unit_scale": []
+    },
+    {
+      "scene": "Assets/scenes/maps/Riverside/riverside.scene",
+      "sha256": "d2ba70e1788285e609b867dbda603d7094acf4c52e288bb403d3ea21dcf73e09",
+      "map_renderers": 12,
+      "non_unit_scale": []
+    },
+    {
+      "scene": "Assets/scenes/maps/sewage/sewage.scene",
+      "sha256": "96c85c0a6e57cea97c1a617e23dbc4f06d650481e8eb1f95898a33c3eea73b54",
+      "map_renderers": 8,
+      "non_unit_scale": []
+    },
+    {
+      "scene": "Assets/scenes/maps/spillway/spillway.scene",
+      "sha256": "c6faa140223bc1b4a5820a17e727689b0cff389fc76605c91974b81159b3dba9",
+      "map_renderers": 11,
+      "non_unit_scale": []
+    },
+    {
+      "scene": "Assets/scenes/maps/Veridant/veridant.scene",
+      "sha256": "20874a86e6dd78918e496a421350861ea3f291ccbf4f337a0bc3bc3cbf7c264d",
+      "map_renderers": 9,
+      "non_unit_scale": []
+    }
+  ],
+  "map_count": 15,
+  "map_renderers_checked": 732,
+  "global_map_scale_multiplier_found": false,
+  "live_camera_samples": [
+    {
+      "Requested": 60,
+      "Actual": 60.00008,
+      "Axis": "Horizontal",
+      "Mode": "FirstPerson",
+      "LifeState": "Alive",
+      "CameraHeight": 60,
+      "PlayerScale": "1,1,1",
+      "BodyScale": "1,1,1",
+      "EyeBones": [
+        {
+          "Name": "eye_L",
+          "Height": 61.49321,
+          "Position": "-1159.343,-2294.395,189.5345"
+        },
+        {
+          "Name": "eye_R",
+          "Height": 60.680237,
+          "Position": "-1156.753,-2294.804,188.7215"
+        },
+        {
+          "Name": "head",
+          "Height": 57.15419,
+          "Position": "-1159.843,-2297.464,185.1954"
+        },
+        {
+          "Name": "ankle_L",
+          "Height": 3.5858917,
+          "Position": "-1165.627,-2290.415,131.6271"
+        },
+        {
+          "Name": "ankle_R",
+          "Height": 4.9704895,
+          "Position": "-1157.044,-2312.331,133.0117"
+        }
+      ],
+      "Screen": "1138,455",
+      "ReferenceTarget": {
+        "Height": 68.9488,
+        "Distance": 393.701,
+        "Bottom": "0.5,0.69",
+        "Top": "0.5,0.31",
+        "FractionOfViewportHeight": 0.37933338,
+        "Behind": false
+      },
+      "Image": "output/player-scale-audit-20261020/live-fov/fov-60.png"
+    },
+    {
+      "Requested": 85,
+      "Actual": 85,
+      "Axis": "Horizontal",
+      "Mode": "FirstPerson",
+      "LifeState": "Alive",
+      "CameraHeight": 60,
+      "PlayerScale": "1,1,1",
+      "BodyScale": "1,1,1",
+      "EyeBones": [
+        {
+          "Name": "eye_L",
+          "Height": 61.49321,
+          "Position": "-1159.343,-2294.395,189.5345"
+        },
+        {
+          "Name": "eye_R",
+          "Height": 60.680237,
+          "Position": "-1156.753,-2294.804,188.7215"
+        },
+        {
+          "Name": "head",
+          "Height": 57.15419,
+          "Position": "-1159.843,-2297.464,185.1954"
+        },
+        {
+          "Name": "ankle_L",
+          "Height": 3.5858917,
+          "Position": "-1165.627,-2290.415,131.6271"
+        },
+        {
+          "Name": "ankle_R",
+          "Height": 4.9704895,
+          "Position": "-1157.044,-2312.331,133.0117"
+        }
+      ],
+      "Screen": "1138,455",
+      "ReferenceTarget": {
+        "Height": 68.9488,
+        "Distance": 393.701,
+        "Bottom": "0.5,0.62",
+        "Top": "0.5,0.38",
+        "FractionOfViewportHeight": 0.23900586,
+        "Behind": false
+      },
+      "Image": "output/player-scale-audit-20261020/live-fov/fov-85.png"
+    },
+    {
+      "Requested": 120,
+      "Actual": 120,
+      "Axis": "Horizontal",
+      "Mode": "FirstPerson",
+      "LifeState": "Alive",
+      "CameraHeight": 60,
+      "PlayerScale": "1,1,1",
+      "BodyScale": "1,1,1",
+      "EyeBones": [
+        {
+          "Name": "eye_L",
+          "Height": 61.49321,
+          "Position": "-1159.343,-2294.395,189.5345"
+        },
+        {
+          "Name": "eye_R",
+          "Height": 60.680237,
+          "Position": "-1156.753,-2294.804,188.7215"
+        },
+        {
+          "Name": "head",
+          "Height": 57.15419,
+          "Position": "-1159.843,-2297.464,185.1954"
+        },
+        {
+          "Name": "ankle_L",
+          "Height": 3.5858917,
+          "Position": "-1165.627,-2290.415,131.6271"
+        },
+        {
+          "Name": "ankle_R",
+          "Height": 4.9704895,
+          "Position": "-1157.044,-2312.331,133.0117"
+        }
+      ],
+      "Screen": "1138,455",
+      "ReferenceTarget": {
+        "Height": 68.9488,
+        "Distance": 393.701,
+        "Bottom": "0.5,0.563",
+        "Top": "0.5,0.437",
+        "FractionOfViewportHeight": 0.12644461,
+        "Behind": false
+      },
+      "Image": "output/player-scale-audit-20261020/live-fov/fov-120.png"
+    }
+  ],
+  "fov_85_to_60_size_ratio": {
+    "native_projection": 1.5871300394057284,
+    "perspective_prediction": 1.5871321499574156,
+    "passed": true
+  },
+  "standing_camera_inches": 60,
+  "animated_eye_mean_inches": 61.0867235,
+  "ads_samples": [
+    {
+      "Independent": false,
+      "Hip": 60,
+      "ActualAds": 55.729855
+    },
+    {
+      "Independent": false,
+      "Hip": 85,
+      "ActualAds": 80
+    },
+    {
+      "Independent": false,
+      "Hip": 120,
+      "ActualAds": 115.53795
+    },
+    {
+      "Independent": true,
+      "Hip": 60,
+      "ActualAds": 80
+    },
+    {
+      "Independent": true,
+      "Hip": 85,
+      "ActualAds": 80
+    },
+    {
+      "Independent": true,
+      "Hip": 120,
+      "ActualAds": 80
+    }
+  ],
+  "independent_ads_at_60_shrinks_targets_relative_to_hip": 0.6880592574919707,
+  "normal_iron_sight_zoom_85_to_80": 1.0920409686413346,
+  "architectural_reference_openings": [
+    {
+      "source": "Tools/ares_map.py",
+      "line": 101,
+      "constant": "DOOR_H",
+      "height_inches": 176.0,
+      "height_metres": 4.4704
+    },
+    {
+      "source": "Tools/ares_map.py",
+      "line": 102,
+      "constant": "UPPER_DOOR_H",
+      "height_inches": 144.0,
+      "height_metres": 3.6576
+    },
+    {
+      "source": "Tools/belltower_map.py",
+      "line": 1213,
+      "kind": "door",
+      "width_inches": 56.0,
+      "height_inches": 100.0,
+      "width_metres": 1.4223999999999999,
+      "height_metres": 2.54
+    },
+    {
+      "source": "Tools/belltower_map.py",
+      "line": 1213,
+      "kind": "door",
+      "width_inches": 56.0,
+      "height_inches": 100.0,
+      "width_metres": 1.4223999999999999,
+      "height_metres": 2.54
+    },
+    {
+      "source": "Tools/belltower_map.py",
+      "line": 1247,
+      "kind": "door",
+      "width_inches": 56.0,
+      "height_inches": 100.0,
+      "width_metres": 1.4223999999999999,
+      "height_metres": 2.54
+    },
+    {
+      "source": "Tools/belltower_map.py",
+      "line": 1247,
+      "kind": "door",
+      "width_inches": 56.0,
+      "height_inches": 100.0,
+      "width_metres": 1.4223999999999999,
+      "height_metres": 2.54
+    },
+    {
+      "source": "Tools/belltower_map.py",
+      "line": 1754,
+      "kind": "door",
+      "width_inches": 60.0,
+      "height_inches": 104.0,
+      "width_metres": 1.524,
+      "height_metres": 2.6416
+    },
+    {
+      "source": "Tools/belltower_map.py",
+      "line": 1756,
+      "kind": "door",
+      "width_inches": 60.0,
+      "height_inches": 104.0,
+      "width_metres": 1.524,
+      "height_metres": 2.6416
+    },
+    {
+      "source": "Tools/belltower_map.py",
+      "line": 1758,
+      "kind": "door",
+      "width_inches": 56.0,
+      "height_inches": 104.0,
+      "width_metres": 1.4223999999999999,
+      "height_metres": 2.6416
+    },
+    {
+      "source": "Tools/belltower_map.py",
+      "line": 1778,
+      "kind": "door",
+      "width_inches": 64.0,
+      "height_inches": 104.0,
+      "width_metres": 1.6256,
+      "height_metres": 2.6416
+    },
+    {
+      "source": "Tools/belltower_map.py",
+      "line": 1817,
+      "kind": "door",
+      "width_inches": 60.0,
+      "height_inches": 104.0,
+      "width_metres": 1.524,
+      "height_metres": 2.6416
+    },
+    {
+      "source": "Tools/belltower_map.py",
+      "line": 1820,
+      "kind": "door",
+      "width_inches": 60.0,
+      "height_inches": 104.0,
+      "width_metres": 1.524,
+      "height_metres": 2.6416
+    },
+    {
+      "source": "Tools/belltower_map.py",
+      "line": 1822,
+      "kind": "door",
+      "width_inches": 56.0,
+      "height_inches": 104.0,
+      "width_metres": 1.4223999999999999,
+      "height_metres": 2.6416
+    },
+    {
+      "source": "Tools/belltower_map.py",
+      "line": 1250,
+      "kind": "door",
+      "width_inches": 56.0,
+      "height_inches": 100.0,
+      "width_metres": 1.4223999999999999,
+      "height_metres": 2.54
+    },
+    {
+      "source": "Tools/cerroblanco_map.py",
+      "line": 83,
+      "constant": "DOOR_H",
+      "height_inches": 124.0,
+      "height_metres": 3.1496
+    },
+    {
+      "source": "Tools/lowtide_map.py",
+      "line": 825,
+      "kind": "door",
+      "width_inches": 80.0,
+      "height_inches": 114.0,
+      "width_metres": 2.032,
+      "height_metres": 2.8956
+    }
+  ],
+  "all_statically_resolved_openings": [
+    {
+      "source": "Tools/ares_map.py",
+      "line": 101,
+      "constant": "DOOR_H",
+      "height_inches": 176.0,
+      "height_metres": 4.4704
+    },
+    {
+      "source": "Tools/ares_map.py",
+      "line": 102,
+      "constant": "UPPER_DOOR_H",
+      "height_inches": 144.0,
+      "height_metres": 3.6576
+    },
+    {
+      "source": "Tools/belltower_map.py",
+      "line": 2050,
+      "kind": "arch",
+      "width_inches": 160.0,
+      "height_inches": 200.0,
+      "width_metres": 4.064,
+      "height_metres": 5.08
+    },
+    {
+      "source": "Tools/belltower_map.py",
+      "line": 1210,
+      "kind": "arch",
+      "width_inches": 110.0,
+      "height_inches": 150.0,
+      "width_metres": 2.794,
+      "height_metres": 3.81
+    },
+    {
+      "source": "Tools/belltower_map.py",
+      "line": 1213,
+      "kind": "arch",
+      "width_inches": 140.0,
+      "height_inches": 150.0,
+      "width_metres": 3.556,
+      "height_metres": 3.81
+    },
+    {
+      "source": "Tools/belltower_map.py",
+      "line": 1213,
+      "kind": "door",
+      "width_inches": 56.0,
+      "height_inches": 100.0,
+      "width_metres": 1.4223999999999999,
+      "height_metres": 2.54
+    },
+    {
+      "source": "Tools/belltower_map.py",
+      "line": 1213,
+      "kind": "door",
+      "width_inches": 56.0,
+      "height_inches": 100.0,
+      "width_metres": 1.4223999999999999,
+      "height_metres": 2.54
+    },
+    {
+      "source": "Tools/belltower_map.py",
+      "line": 1314,
+      "kind": "arch",
+      "width_inches": 120.0,
+      "height_inches": 82.0,
+      "width_metres": 3.048,
+      "height_metres": 2.0827999999999998
+    },
+    {
+      "source": "Tools/belltower_map.py",
+      "line": 1247,
+      "kind": "arch",
+      "width_inches": 140.0,
+      "height_inches": 150.0,
+      "width_metres": 3.556,
+      "height_metres": 3.81
+    },
+    {
+      "source": "Tools/belltower_map.py",
+      "line": 1247,
+      "kind": "door",
+      "width_inches": 56.0,
+      "height_inches": 100.0,
+      "width_metres": 1.4223999999999999,
+      "height_metres": 2.54
+    },
+    {
+      "source": "Tools/belltower_map.py",
+      "line": 1247,
+      "kind": "door",
+      "width_inches": 56.0,
+      "height_inches": 100.0,
+      "width_metres": 1.4223999999999999,
+      "height_metres": 2.54
+    },
+    {
+      "source": "Tools/belltower_map.py",
+      "line": 1344,
+      "kind": "arch",
+      "width_inches": 96.0,
+      "height_inches": 160.0,
+      "width_metres": 2.4383999999999997,
+      "height_metres": 4.064
+    },
+    {
+      "source": "Tools/belltower_map.py",
+      "line": 1346,
+      "kind": "arch",
+      "width_inches": 60.0,
+      "height_inches": 120.0,
+      "width_metres": 1.524,
+      "height_metres": 3.048
+    },
+    {
+      "source": "Tools/belltower_map.py",
+      "line": 1346,
+      "kind": "arch",
+      "width_inches": 60.0,
+      "height_inches": 120.0,
+      "width_metres": 1.524,
+      "height_metres": 3.048
+    },
+    {
+      "source": "Tools/belltower_map.py",
+      "line": 1754,
+      "kind": "door",
+      "width_inches": 60.0,
+      "height_inches": 104.0,
+      "width_metres": 1.524,
+      "height_metres": 2.6416
+    },
+    {
+      "source": "Tools/belltower_map.py",
+      "line": 1756,
+      "kind": "door",
+      "width_inches": 60.0,
+      "height_inches": 104.0,
+      "width_metres": 1.524,
+      "height_metres": 2.6416
+    },
+    {
+      "source": "Tools/belltower_map.py",
+      "line": 1758,
+      "kind": "door",
+      "width_inches": 56.0,
+      "height_inches": 104.0,
+      "width_metres": 1.4223999999999999,
+      "height_metres": 2.6416
+    },
+    {
+      "source": "Tools/belltower_map.py",
+      "line": 1778,
+      "kind": "door",
+      "width_inches": 64.0,
+      "height_inches": 104.0,
+      "width_metres": 1.6256,
+      "height_metres": 2.6416
+    },
+    {
+      "source": "Tools/belltower_map.py",
+      "line": 1817,
+      "kind": "door",
+      "width_inches": 60.0,
+      "height_inches": 104.0,
+      "width_metres": 1.524,
+      "height_metres": 2.6416
+    },
+    {
+      "source": "Tools/belltower_map.py",
+      "line": 1820,
+      "kind": "door",
+      "width_inches": 60.0,
+      "height_inches": 104.0,
+      "width_metres": 1.524,
+      "height_metres": 2.6416
+    },
+    {
+      "source": "Tools/belltower_map.py",
+      "line": 1822,
+      "kind": "door",
+      "width_inches": 56.0,
+      "height_inches": 104.0,
+      "width_metres": 1.4223999999999999,
+      "height_metres": 2.6416
+    },
+    {
+      "source": "Tools/belltower_map.py",
+      "line": 1250,
+      "kind": "door",
+      "width_inches": 56.0,
+      "height_inches": 100.0,
+      "width_metres": 1.4223999999999999,
+      "height_metres": 2.54
+    },
+    {
+      "source": "Tools/belltower_map.py",
+      "line": 1347,
+      "kind": "arch",
+      "width_inches": 60.0,
+      "height_inches": 120.0,
+      "width_metres": 1.524,
+      "height_metres": 3.048
+    },
+    {
+      "source": "Tools/belltower_map.py",
+      "line": 1348,
+      "kind": "arch",
+      "width_inches": 60.0,
+      "height_inches": 120.0,
+      "width_metres": 1.524,
+      "height_metres": 3.048
+    },
+    {
+      "source": "Tools/belltower_map.py",
+      "line": 1019,
+      "kind": "shut",
+      "width_inches": 48.0,
+      "height_inches": 94.0,
+      "width_metres": 1.2191999999999998,
+      "height_metres": 2.3876
+    },
+    {
+      "source": "Tools/cerroblanco_map.py",
+      "line": 83,
+      "constant": "DOOR_H",
+      "height_inches": 124.0,
+      "height_metres": 3.1496
+    },
+    {
+      "source": "Tools/lowtide_map.py",
+      "line": 1833,
+      "kind": "arch",
+      "width_inches": 300.0,
+      "height_inches": 192.0,
+      "width_metres": 7.62,
+      "height_metres": 4.876799999999999
+    },
+    {
+      "source": "Tools/lowtide_map.py",
+      "line": 825,
+      "kind": "door",
+      "width_inches": 80.0,
+      "height_inches": 114.0,
+      "width_metres": 2.032,
+      "height_metres": 2.8956
+    },
+    {
+      "source": "Tools/lowtide_map.py",
+      "line": 1479,
+      "kind": "shut",
+      "width_inches": 80.0,
+      "height_inches": 112.0,
+      "width_metres": 2.032,
+      "height_metres": 2.8447999999999998
+    },
+    {
+      "source": "Tools/lowtide_map.py",
+      "line": 832,
+      "kind": "shut",
+      "width_inches": 80.0,
+      "height_inches": 114.0,
+      "width_metres": 2.032,
+      "height_metres": 2.8956
+    }
+  ],
+  "architecture_audit_limit": "Only statically resolved wall apertures/constants; cargo portals, arches and shop fronts must not be treated as ordinary single-person doors.",
+  "images": [
+    {
+      "Requested": 60,
+      "Actual": 60.00008,
+      "Image": "output/player-scale-audit-20261020/live-fov/fov-60.png",
+      "sha256": "c37b003542012bc3677c03cc62d367bc7628c1142d1cfbe3cddb9a7ad4b58732",
+      "bitmap_size": [
+        1280,
+        720
+      ],
+      "live_viewport_size": "1138,455",
+      "purpose": "Qualitative framing check; HUD coordinates use the live viewport and are not a centering test."
+    },
+    {
+      "Requested": 85,
+      "Actual": 85,
+      "Image": "output/player-scale-audit-20261020/live-fov/fov-85.png",
+      "sha256": "037886ead910649d98d2dcab76d55d7f37e4d130ebad09088d7e39f00c920f0c",
+      "bitmap_size": [
+        1280,
+        720
+      ],
+      "live_viewport_size": "1138,455",
+      "purpose": "Qualitative framing check; HUD coordinates use the live viewport and are not a centering test."
+    },
+    {
+      "Requested": 120,
+      "Actual": 120,
+      "Image": "output/player-scale-audit-20261020/live-fov/fov-120.png",
+      "sha256": "419f6385944375b41a29e37b865da4c222e807ca9a13f9ee4df2a4ed031d6966",
+      "bitmap_size": [
+        1280,
+        720
+      ],
+      "live_viewport_size": "1138,455",
+      "purpose": "Qualitative framing check; HUD coordinates use the live viewport and are not a centering test."
+    }
+  ],
+  "findings": [
+    "Loaded adult reference meshes are about 1.75 m tall; player and bot roots and bodies are at unit scale.",
+    "Live first-person FOV follows the setting exactly at 60, 85 and 120 degrees horizontally.",
+    "The live camera is close to the animated combat-pose eye height; bind-pose eye height overstates this gap.",
+    "The measured editor game viewport was 1138 by 455 pixels. A smaller displayed game pane can reduce physical on-screen target size relative to full-screen play; internal render resolution alone does not.",
+    "Several architectural apertures are deliberately much larger than human dimensions. This changes perceived person-to-building scale.",
+    "The first-person weapon shares world FOV; it does not have an independent viewmodel FOV.",
+    "Independent ADS ignores hip FOV and can widen a 60-degree hip view to 80-degree iron-sight view. The tested current setting was Affected.",
+    "Editor viewport, first-person, third-person/deathcam and Independent ADS use different FOV paths."
+  ],
+  "limits": [
+    "No specific CoD title, matching-distance screenshot or display size was provided; this is an internal scale/projection audit, not a numerical CoD model-height comparison.",
+    "Character vertex measurements are reference-pose geometry, while live eye bones were sampled from the actual animated player.",
+    "Map transform checks cover authored map model references, not the physical dimensions of every individual scenery prop."
+  ],
+  "gameplay_source_or_assets_changed_by_this_audit": false,
+  "temporary_fov_and_god_mode_restoration": {
+    "FovRestored": true,
+    "AdsRestored": true,
+    "GodModeRestored": true,
+    "SceneIsAuditMatch": true
+  },
+  "sources": [
+    "https://sbox.game/dev/doc/assets/ready-to-use-assets/citizen-characters",
+    "https://www.callofduty.com/blog/2020/11/Black-Ops-Cold-War-Controls-and-Settings-PC",
+    "https://www.callofduty.com/au/en/blog/2026/08/call-of-duty-modern-warfare-4-next-highlights-multiplayer-gameplay-systems"
+  ],
+  "editor_cleanup": {
+    "recorded_utc": "2026-10-20T19:48:35.345167+00:00",
+    "audit_play_stopped": true,
+    "original_menu_selection_restored_at_cleanup": true,
+    "audit_boxyard_edit_tab_closed": true,
+    "original_restore_receipt": "close-audit-tab/close_scene.json",
+    "latest_observed_editor_state": {
+      "Playing": false,
+      "Active": "scenes/maps/belltower/belltower.scene",
+      "HasUnsavedChanges": false,
+      "OpenDocuments": [
+        "scenes/menu.scene",
+        "scenes/maps/belltower/belltower.scene"
+      ],
+      "FieldOfView": 85,
+      "IndependentAdsFov": false,
+      "Restored": false
+    },
+    "later_external_belltower_selection_preserved": true,
+    "note": "Cleanup restored the original menu and closed the audit's Boxyard document. Belltower was opened subsequently by another editor user or chat. The archived strict menu-only verification therefore returned Restored=false; this is a later selection change, not unfinished audit cleanup. No action was taken to overwrite that selection.",
+    "fov_ads_and_god_mode_restoration": {
+      "FovRestored": true,
+      "AdsRestored": true,
+      "GodModeRestored": true,
+      "SceneIsAuditMatch": true
+    }
+  },
+  "illustrative_display_size_comparison": {
+    "reference_target_height_metres": 1.7513001,
+    "reference_distance_metres": 10,
+    "measured_editor_width_pixels": 1138,
+    "target_pixels_at_editor_width_and_60_degrees": 172.59708881727593,
+    "hypothetical_fullscreen_width_pixels": 1920,
+    "target_pixels_at_hypothetical_width_and_85_degrees": 183.47603395713267,
+    "limit": "The 1920-pixel fullscreen example is hypothetical, not a measured CoD setup. This compares displayed widths on the same pixel-density screen. Internal render resolution or upscaling alone does not change an object's displayed size."
+  }
+}

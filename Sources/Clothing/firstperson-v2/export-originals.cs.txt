@@ -1,0 +1,27 @@
+// Export source maps only. No camera, scene, material or play-state edits.
+var root = Sandbox.Project.Current.GetRootPath();
+var folder = System.IO.Path.Combine(root, "output/firstperson-clothing-v2-20261021/originals");
+System.IO.Directory.CreateDirectory(folder);
+var paths = new[] {
+    (Name: "shirt", Path: "models/citizen_clothes/shirt/army_shirt/textures/army_shirt.vmat"),
+    (Name: "gloves", Path: "models/citizen_clothes/gloves/fingerless_gloves/textures/fingerless_gloves.vmat")
+};
+var records = new System.Collections.Generic.List<object>();
+foreach(var item in paths)
+{
+    var material = Material.Load(item.Path);
+    if(material is null || material.IsError) throw new InvalidOperationException("Missing garment " + item.Path);
+    foreach(var key in new[] { "g_tColor", "g_tNormal", "g_tAmbientOcclusion" })
+    {
+        var texture = material.GetTexture(key);
+        if(texture is null || texture.IsError || !texture.IsValid) throw new InvalidOperationException("Missing source map: " + key);
+        using var bitmap = texture.GetBitmap(0);
+        var target = System.IO.Path.Combine(folder, item.Name + "-" + key + ".png");
+        if(System.IO.File.Exists(target)) throw new InvalidOperationException("Preserve the original export: " + target);
+        System.IO.File.WriteAllBytes(target, bitmap.ToPng());
+        records.Add(new { Material=item.Path, Key=key, texture.Width, texture.Height, Output=target });
+    }
+}
+var result = new { Records=records, SceneChanged=false, MaterialChanged=false, PlayStateChanged=false };
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"export.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

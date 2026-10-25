@@ -1,0 +1,14 @@
+var c = @"C:\sbox-projects\hc1\forked-shooter-main\Assets\scenes\maps\Belltower\belltower.scene";
+var browsers = new System.Collections.Generic.List<string>();
+var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
+foreach ( var asm in AppDomain.CurrentDomain.GetAssemblies().Where( a => a.GetName().Name.Contains( "toolbase" ) ) )
+	foreach ( var t in asm.GetTypes().Where( t => t.Name.Contains( "AssetBrowser" ) ) )
+		foreach ( var f in t.GetFields( flags ).Where( f => f.IsStatic ) )
+		{
+			object v; try { v = f.GetValue( null ); } catch { continue; }
+			if ( v is null ) continue;
+			var loc = v.GetType().GetProperty( "CurrentLocation", flags )?.GetValue( v );
+			browsers.Add( t.Name + "." + f.Name + " = " + v.GetType().Name + " | location " + loc?.GetType().Name + " " + loc );
+		}
+return new { C = Editor.AssetSystem.FindByPath( c )?.Path, CForward = Editor.AssetSystem.FindByPath( "C:/sbox-projects/hc1/forked-shooter-main/Assets/scenes/maps/Belltower/belltower.scene" )?.Path,
+	Rel = Editor.AssetSystem.FindByPath( "scenes/maps/belltower/belltower.scene" )?.AbsolutePath, Browsers = browsers };

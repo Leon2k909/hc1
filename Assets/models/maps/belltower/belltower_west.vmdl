@@ -13,6 +13,23 @@
 						_class = "DefaultMaterialGroup"
 						remaps =
 						[
+							{ from = "barrel_endgrain.vmat" to = "materials/belltower/barrels-v3/barrel_endgrain.vmat" },
+							{ from = "barrel_head.vmat" to = "materials/belltower/barrels-v3/barrel_head.vmat" },
+							{ from = "barrel_hoop_rust.vmat" to = "materials/belltower/barrels-v3/barrel_hoop_rust.vmat" },
+							{ from = "barrel_stave_a.vmat" to = "materials/belltower/barrels-v3/barrel_stave_a.vmat" },
+							{ from = "barrel_stave_b.vmat" to = "materials/belltower/barrels-v3/barrel_stave_b.vmat" },
+							{ from = "barrel_stave_c.vmat" to = "materials/belltower/barrels-v3/barrel_stave_c.vmat" },
+							{ from = "barrel_stave_d.vmat" to = "materials/belltower/barrels-v3/barrel_stave_d.vmat" },
+							{ from = "sh_hoop.vmat" to = "materials/stillhouse/sh_hoop.vmat" },
+{ from = "edge_trough_damp.vmat" to = "materials/belltower/well-v1/well_damp_stone.vmat" },
+{ from = "fountain_water.vmat" to = "materials/belltower/fountain_water.vmat" },
+{ from = "fountain_limestone.vmat" to = "materials/belltower/fountain_limestone.vmat" },
+
+							{ from = "barrel_rust.vmat" to = "materials/stillhouse/sh_rust.vmat" },
+{ from = "open_window_glass_0.vmat" to = "materials/belltower/church-windows-v1/church_window_glass_0.vmat" },
+{ from = "open_window_glass_1.vmat" to = "materials/belltower/church-windows-v1/church_window_glass_1.vmat" },
+{ from = "open_window_glass_2.vmat" to = "materials/belltower/church-windows-v1/church_window_glass_2.vmat" },
+{ from = "open_window_trim_brown.vmat" to = "materials/buildings/trim_brown.vmat" },
 							{ from = "ashlar.vmat" to = "materials/belltower/ashlar.vmat" },
 							{ from = "ashlar_grey.vmat" to = "materials/belltower/ashlar_grey.vmat" },
 							{ from = "awning_green.vmat" to = "materials/belltower/awning_green.vmat" },
@@ -39,6 +56,7 @@
 							{ from = "firewood_split_trial.vmat" to = "materials/belltower/firewood-v2/split.vmat" },
 							{ from = "flagstones.vmat" to = "materials/belltower/flagstones.vmat" },
 							{ from = "floorboards.vmat" to = "materials/buildings/floorboards.vmat" },
+							{ from = "garden_endgrain.vmat" to = "materials/gunsmith_range/bench_oak_endgrain.vmat" },
 							{ from = "furniture_wood.vmat" to = "materials/belltower/furniture_wood.vmat" },
 							{ from = "furniture_wood_dark.vmat" to = "materials/belltower/furniture_wood_dark.vmat" },
 							{ from = "ghost_0.vmat" to = "materials/belltower/ghost_0.vmat" },
@@ -46,8 +64,21 @@
 							{ from = "glass.vmat" to = "materials/buildings/glass.vmat" },
 							{ from = "gravel.vmat" to = "materials/buildings/gravel.vmat" },
 							{ from = "insegna_0.vmat" to = "materials/belltower/insegna_0.vmat" },
+							{ from = "belltower_gate_iron.vmat" to = "materials/belltower/gate/forged_iron.vmat" },
+							{ from = "gazebo_copper.vmat" to = "materials/belltower/gazebo-v1/gazebo_copper.vmat" },
+							{ from = "gazebo_copper_seam.vmat" to = "materials/belltower/gazebo-v1/gazebo_copper_seam.vmat" },
+							{ from = "shed_lock_steel.vmat" to = "materials/belltower/shed_lock_steel.vmat" },
+							{ from = "scarecrow_sack.vmat" to = "materials/stillhouse/sh_sack.vmat" },
+							{ from = "scarecrow_shirt.vmat" to = "materials/stillhouse/sh_canvas.vmat" },
+							{ from = "scarecrow_hat.vmat" to = "materials/belltower/scarecrow-v1/hat.vmat" },
+							{ from = "scarecrow_twine.vmat" to = "materials/stillhouse/sh_rope.vmat" },
+							{ from = "scarecrow_stitch.vmat" to = "materials/belltower/scarecrow-v1/stitch.vmat" },
+							{ from = "scarecrow_patch.vmat" to = "materials/belltower/scarecrow-v1/patch.vmat" },
 							{ from = "iron_black.vmat" to = "materials/buildings/iron_black.vmat" },
 							{ from = "iron_green.vmat" to = "materials/buildings/iron_green.vmat" },
+							{ from = "ivy_shoot3d.vmat" to = "materials/belltower/ivy-realism-v3/shoots.vmat" },
+							{ from = "ivy_leaf3d.vmat" to = "materials/belltower/ivy-realism-v3/leaves.vmat" },
+							{ from = "ivy_stem3d.vmat" to = "materials/belltower/ivy-realism-v3/stems.vmat" },
 							{ from = "ivy_climb.vmat" to = "materials/belltower/ivy_climb.vmat" },
 							{ from = "ivy_hang.vmat" to = "materials/belltower/ivy_hang.vmat" },
 							{ from = "lamp_bulb.vmat" to = "materials/belltower/lamp_bulb.vmat" },
@@ -106,6 +137,8 @@
 							{ from = "sign_3.vmat" to = "materials/belltower/sign_3.vmat" },
 							{ from = "sign_4.vmat" to = "materials/belltower/sign_4.vmat" },
 							{ from = "sign_7.vmat" to = "materials/belltower/sign_7.vmat" },
+							{ from = "planter_cut_stone.vmat" to = "materials/belltower/planters-v1/cut_stone.vmat" },
+							{ from = "planter_compost.vmat" to = "materials/belltower/planters-v1/compost.vmat" },
 							{ from = "soil.vmat" to = "materials/buildings/soil.vmat" },
 							{ from = "trim_brown.vmat" to = "materials/buildings/trim_brown.vmat" },
 							{ from = "trim_green.vmat" to = "materials/buildings/trim_green.vmat" },
@@ -130,10 +163,24 @@
 				_class = "RenderMeshList"
 				children =
 				[
+{
+    _class = "RenderMeshFile"
+    name = "open_casements_west"
+    filename = "models/maps/belltower/open-windows-v1/west/windows.obj"
+    import_translation = [ 0.0, 0.0, 0.0 ]
+    import_rotation = [ 0.0, 0.0, 0.0 ]
+    import_scale = 1.0
+    align_origin_x_type = "None"
+    align_origin_y_type = "None"
+    align_origin_z_type = "None"
+    parent_bone = ""
+    import_filter = { exclude_by_default = false exception_list = [ ] }
+},
+
 					{
 						_class = "RenderMeshFile"
-						name = "belltower_west"
-						filename = "models/maps/belltower/belltower_west.obj"
+						name = "west_000_ashlar"
+						filename = "models/maps/belltower/compiler-safe/west/west_000_ashlar.obj"
 						import_translation = [ 0.0, 0.0, 0.0 ]
 						import_rotation = [ 0.0, 0.0, 0.0 ]
 						import_scale = 1.0
@@ -143,7 +190,1696 @@
 						parent_bone = ""
 						import_filter = { exclude_by_default = false exception_list = [ ] }
 					},
-				]
+					{
+						_class = "RenderMeshFile"
+						name = "west_001_ashlar_grey"
+						filename = "models/maps/belltower/compiler-safe/west/west_001_ashlar_grey.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					
+					
+					{
+						_class = "RenderMeshFile"
+						name = "west_004_banner_red"
+						filename = "models/maps/belltower/compiler-safe/west/west_004_banner_red.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_005_brick"
+						filename = "models/maps/belltower/compiler-safe/west/west_005_brick.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_006_canvas_green"
+						filename = "models/maps/belltower/compiler-safe/west/west_006_canvas_green.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_007_canvas_plain"
+						filename = "models/maps/belltower/compiler-safe/west/west_007_canvas_plain.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_008_canvas_red"
+						filename = "models/maps/belltower/compiler-safe/west/west_008_canvas_red.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_009_chalkboard_a"
+						filename = "models/maps/belltower/compiler-safe/west/west_009_chalkboard_a.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_010_chalkboard_b"
+						filename = "models/maps/belltower/compiler-safe/west/west_010_chalkboard_b.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_011_clay_pot"
+						filename = "models/maps/belltower/compiler-safe/west/west_011_clay_pot.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					
+					{
+						_class = "RenderMeshFile"
+						name = "west_013_copper_brown"
+						filename = "models/maps/belltower/compiler-safe/west/west_013_copper_brown.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_014_corrugated"
+						filename = "models/maps/belltower/compiler-safe/west/west_014_corrugated.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_015_door_a"
+						filename = "models/maps/belltower/compiler-safe/west/west_015_door_a.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_016_door_b"
+						filename = "models/maps/belltower/compiler-safe/west/west_016_door_b.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_017_door_brass"
+						filename = "models/maps/belltower/compiler-safe/west/west_017_door_brass.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_018_door_c"
+						filename = "models/maps/belltower/compiler-safe/west/west_018_door_c.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_019_door_d"
+						filename = "models/maps/belltower/compiler-safe/west/west_019_door_d.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_020_door_e"
+						filename = "models/maps/belltower/compiler-safe/west/west_020_door_e.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_021_firewood_bark_trial"
+						filename = "models/maps/belltower/compiler-safe/west/west_021_firewood_bark_trial.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_022_firewood_cut_trial"
+						filename = "models/maps/belltower/compiler-safe/west/west_022_firewood_cut_trial.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_023_firewood_split_trial"
+						filename = "models/maps/belltower/compiler-safe/west/west_023_firewood_split_trial.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_024_flagstones"
+						filename = "models/maps/belltower/compiler-safe/west/west_024_flagstones.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_025_floorboards"
+						filename = "models/maps/belltower/compiler-safe/west/west_025_floorboards.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_026_furniture_wood"
+						filename = "models/maps/belltower/compiler-safe/west/west_026_furniture_wood.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_027_furniture_wood_dark"
+						filename = "models/maps/belltower/compiler-safe/west/west_027_furniture_wood_dark.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_028_ghost_0"
+						filename = "models/maps/belltower/compiler-safe/west/west_028_ghost_0.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_029_ghost_1"
+						filename = "models/maps/belltower/compiler-safe/west/west_029_ghost_1.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_030_glass"
+						filename = "models/maps/belltower/compiler-safe/west/west_030_glass.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_031_gravel"
+						filename = "models/maps/belltower/compiler-safe/west/west_031_gravel.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_032_insegna_0"
+						filename = "models/maps/belltower/compiler-safe/west/west_032_insegna_0.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_033_iron_black"
+						filename = "models/maps/belltower/compiler-safe/west/west_033_iron_black.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_034_iron_black"
+						filename = "models/maps/belltower/compiler-safe/west/west_034_iron_black.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_035_iron_green"
+						filename = "models/maps/belltower/compiler-safe/west/west_035_iron_green.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_036_ivy_climb"
+						filename = "models/maps/belltower/compiler-safe/west/west_036_ivy_climb.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "west_realism_ivy_climb_001"
+						filename = "models/maps/belltower/compiler-safe/west/west_realism_ivy_climb_001.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "west_realism_ivy_climb_002"
+						filename = "models/maps/belltower/compiler-safe/west/west_realism_ivy_climb_002.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "west_realism_ivy_climb_003"
+						filename = "models/maps/belltower/compiler-safe/west/west_realism_ivy_climb_003.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_037_ivy_hang"
+						filename = "models/maps/belltower/compiler-safe/west/west_037_ivy_hang.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "west_realism_ivy_hang_001"
+						filename = "models/maps/belltower/compiler-safe/west/west_realism_ivy_hang_001.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "west_realism_ivy_hang_002"
+						filename = "models/maps/belltower/compiler-safe/west/west_realism_ivy_hang_002.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_038_lamp_bulb"
+						filename = "models/maps/belltower/compiler-safe/west/west_038_lamp_bulb.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_039_lamp_reflector"
+						filename = "models/maps/belltower/compiler-safe/west/west_039_lamp_reflector.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_040_lantern_glass"
+						filename = "models/maps/belltower/compiler-safe/west/west_040_lantern_glass.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_041_lawn"
+						filename = "models/maps/belltower/compiler-safe/west/west_041_lawn.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					
+					
+					
+					
+					
+					
+					{
+						_class = "RenderMeshFile"
+						name = "west_048_metal"
+						filename = "models/maps/belltower/compiler-safe/west/west_048_metal.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_049_parasol_cream"
+						filename = "models/maps/belltower/compiler-safe/west/west_049_parasol_cream.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_050_parasol_red"
+						filename = "models/maps/belltower/compiler-safe/west/west_050_parasol_red.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_051_planks"
+						filename = "models/maps/belltower/compiler-safe/west/west_051_planks.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_052_planks_dark"
+						filename = "models/maps/belltower/compiler-safe/west/west_052_planks_dark.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_053_plaque_0"
+						filename = "models/maps/belltower/compiler-safe/west/west_053_plaque_0.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_054_plaque_1"
+						filename = "models/maps/belltower/compiler-safe/west/west_054_plaque_1.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_055_plaque_2"
+						filename = "models/maps/belltower/compiler-safe/west/west_055_plaque_2.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_056_plaque_6"
+						filename = "models/maps/belltower/compiler-safe/west/west_056_plaque_6.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_057_plaque_7"
+						filename = "models/maps/belltower/compiler-safe/west/west_057_plaque_7.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_058_plaque_8"
+						filename = "models/maps/belltower/compiler-safe/west/west_058_plaque_8.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_059_plaque_9"
+						filename = "models/maps/belltower/compiler-safe/west/west_059_plaque_9.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_060_produce_apple_green"
+						filename = "models/maps/belltower/compiler-safe/west/west_060_produce_apple_green.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_061_produce_apple_red"
+						filename = "models/maps/belltower/compiler-safe/west/west_061_produce_apple_red.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_062_produce_cabbage"
+						filename = "models/maps/belltower/compiler-safe/west/west_062_produce_cabbage.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_063_produce_lemon"
+						filename = "models/maps/belltower/compiler-safe/west/west_063_produce_lemon.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_064_produce_onion"
+						filename = "models/maps/belltower/compiler-safe/west/west_064_produce_onion.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_065_produce_orange"
+						filename = "models/maps/belltower/compiler-safe/west/west_065_produce_orange.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_066_produce_potato"
+						filename = "models/maps/belltower/compiler-safe/west/west_066_produce_potato.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_067_produce_skin"
+						filename = "models/maps/belltower/compiler-safe/west/west_067_produce_skin.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_068_produce_tomato"
+						filename = "models/maps/belltower/compiler-safe/west/west_068_produce_tomato.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_069_quarry_tiles"
+						filename = "models/maps/belltower/compiler-safe/west/west_069_quarry_tiles.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_070_railing"
+						filename = "models/maps/belltower/compiler-safe/west/west_070_railing.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_071_render_cream"
+						filename = "models/maps/belltower/compiler-safe/west/west_071_render_cream.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_072_render_ochre"
+						filename = "models/maps/belltower/compiler-safe/west/west_072_render_ochre.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_073_render_rose"
+						filename = "models/maps/belltower/compiler-safe/west/west_073_render_rose.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_074_render_terracotta"
+						filename = "models/maps/belltower/compiler-safe/west/west_074_render_terracotta.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_075_render_white"
+						filename = "models/maps/belltower/compiler-safe/west/west_075_render_white.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_076_roller_grey"
+						filename = "models/maps/belltower/compiler-safe/west/west_076_roller_grey.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_077_roof_clay_0"
+						filename = "models/maps/belltower/compiler-safe/west/west_077_roof_clay_0.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_078_roof_clay_1"
+						filename = "models/maps/belltower/compiler-safe/west/west_078_roof_clay_1.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_079_roof_clay_2"
+						filename = "models/maps/belltower/compiler-safe/west/west_079_roof_clay_2.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_080_roof_tiles"
+						filename = "models/maps/belltower/compiler-safe/west/west_080_roof_tiles.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_081_roof_tiles"
+						filename = "models/maps/belltower/compiler-safe/west/west_081_roof_tiles.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_082_roof_tiles"
+						filename = "models/maps/belltower/compiler-safe/west/west_082_roof_tiles.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_083_roof_tiles"
+						filename = "models/maps/belltower/compiler-safe/west/west_083_roof_tiles.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_084_roof_tiles"
+						filename = "models/maps/belltower/compiler-safe/west/west_084_roof_tiles.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_085_roof_tiles"
+						filename = "models/maps/belltower/compiler-safe/west/west_085_roof_tiles.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_086_rubble"
+						filename = "models/maps/belltower/compiler-safe/west/west_086_rubble.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_087_setts"
+						filename = "models/maps/belltower/compiler-safe/west/west_087_setts.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_088_shopfront_a"
+						filename = "models/maps/belltower/compiler-safe/west/west_088_shopfront_a.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_089_shopfront_b"
+						filename = "models/maps/belltower/compiler-safe/west/west_089_shopfront_b.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_090_shopfront_c"
+						filename = "models/maps/belltower/compiler-safe/west/west_090_shopfront_c.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_091_shutter_brown"
+						filename = "models/maps/belltower/compiler-safe/west/west_091_shutter_brown.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_092_shutter_green"
+						filename = "models/maps/belltower/compiler-safe/west/west_092_shutter_green.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_093_shutter_red"
+						filename = "models/maps/belltower/compiler-safe/west/west_093_shutter_red.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_094_sign_1"
+						filename = "models/maps/belltower/compiler-safe/west/west_094_sign_1.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_095_sign_2"
+						filename = "models/maps/belltower/compiler-safe/west/west_095_sign_2.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_096_sign_3"
+						filename = "models/maps/belltower/compiler-safe/west/west_096_sign_3.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_097_sign_4"
+						filename = "models/maps/belltower/compiler-safe/west/west_097_sign_4.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_098_sign_7"
+						filename = "models/maps/belltower/compiler-safe/west/west_098_sign_7.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_099_soil"
+						filename = "models/maps/belltower/compiler-safe/west/west_099_soil.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_100_trim_brown"
+						filename = "models/maps/belltower/compiler-safe/west/west_100_trim_brown.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_101_trim_green"
+						filename = "models/maps/belltower/compiler-safe/west/west_101_trim_green.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_102_trim_red"
+						filename = "models/maps/belltower/compiler-safe/west/west_102_trim_red.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_103_trim_white"
+						filename = "models/maps/belltower/compiler-safe/west/west_103_trim_white.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					
+					
+					{
+						_class = "RenderMeshFile"
+						name = "west_106_water"
+						filename = "models/maps/belltower/compiler-safe/west/west_106_water.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_107_whitewash"
+						filename = "models/maps/belltower/compiler-safe/west/west_107_whitewash.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_108_window_a"
+						filename = "models/maps/belltower/compiler-safe/west/west_108_window_a.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_109_window_b"
+						filename = "models/maps/belltower/compiler-safe/west/west_109_window_b.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_110_window_c"
+						filename = "models/maps/belltower/compiler-safe/west/west_110_window_c.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_111_window_d"
+						filename = "models/maps/belltower/compiler-safe/west/west_111_window_d.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_112_window_plants"
+						filename = "models/maps/belltower/compiler-safe/west/west_112_window_plants.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_113_ashlar"
+						filename = "models/maps/belltower/compiler-safe/west/west_113_ashlar.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_114_belltower_gate_iron"
+						filename = "models/maps/belltower/compiler-safe/west/west_114_belltower_gate_iron.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_115_furniture_wood"
+						filename = "models/maps/belltower/compiler-safe/west/west_115_furniture_wood.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_116_furniture_wood_dark"
+						filename = "models/maps/belltower/compiler-safe/west/west_116_furniture_wood_dark.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_117_furniture_wood_dark"
+						filename = "models/maps/belltower/compiler-safe/west/west_117_furniture_wood_dark.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_118_planter_compost"
+						filename = "models/maps/belltower/compiler-safe/west/west_118_planter_compost.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_119_planter_cut_stone"
+						filename = "models/maps/belltower/compiler-safe/west/west_119_planter_cut_stone.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_120_canvas_green"
+						filename = "models/maps/belltower/compiler-safe/west/west_120_canvas_green.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_121_canvas_plain"
+						filename = "models/maps/belltower/compiler-safe/west/west_121_canvas_plain.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_122_canvas_red"
+						filename = "models/maps/belltower/compiler-safe/west/west_122_canvas_red.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_123_furniture_wood"
+						filename = "models/maps/belltower/compiler-safe/west/west_123_furniture_wood.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_124_furniture_wood_dark"
+						filename = "models/maps/belltower/compiler-safe/west/west_124_furniture_wood_dark.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_125_garden_endgrain"
+						filename = "models/maps/belltower/compiler-safe/west/west_125_garden_endgrain.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "west_126_iron_black"
+						filename = "models/maps/belltower/compiler-safe/west/west_126_iron_black.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "belltower_west_roof_replacement"
+						filename = "models/maps/belltower/pending-garden-v1/west/belltower_west-roof.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "belltower_west_locks_replacement"
+						filename = "models/maps/belltower/pending-garden-v1/west/belltower_west-locks.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "belltower_west_scarecrow_replacement"
+						filename = "models/maps/belltower/pending-garden-v1/west/belltower_west-scarecrow.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+				{
+						_class = "RenderMeshFile"
+						name = "shop_awnings_west"
+						filename = "models/maps/belltower/shop-awning-cloth-v1/west.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+    _class = "RenderMeshFile"
+    name = "barrels_v3_west_0"
+    filename = "models/maps/belltower/barrels-v3/west_0.obj"
+    import_translation = [ 0.0, 0.0, 0.0 ]
+    import_rotation = [ 0.0, 0.0, 0.0 ]
+    import_scale = 1.0
+    align_origin_x_type = "None"
+    align_origin_y_type = "None"
+    align_origin_z_type = "None"
+    parent_bone = ""
+    import_filter = { exclude_by_default = false exception_list = [ ] }
+},
+{
+    _class = "RenderMeshFile"
+    name = "barrels_v3_west_1"
+    filename = "models/maps/belltower/barrels-v3/west_1.obj"
+    import_translation = [ 0.0, 0.0, 0.0 ]
+    import_rotation = [ 0.0, 0.0, 0.0 ]
+    import_scale = 1.0
+    align_origin_x_type = "None"
+    align_origin_y_type = "None"
+    align_origin_z_type = "None"
+    parent_bone = ""
+    import_filter = { exclude_by_default = false exception_list = [ ] }
+},
+{
+    _class = "RenderMeshFile"
+    name = "barrels_v3_west_2"
+    filename = "models/maps/belltower/barrels-v3/west_2.obj"
+    import_translation = [ 0.0, 0.0, 0.0 ]
+    import_rotation = [ 0.0, 0.0, 0.0 ]
+    import_scale = 1.0
+    align_origin_x_type = "None"
+    align_origin_y_type = "None"
+    align_origin_z_type = "None"
+    parent_bone = ""
+    import_filter = { exclude_by_default = false exception_list = [ ] }
+},
+
+{
+    _class = "RenderMeshFile"
+    name = "market_crates_v3_west"
+    filename = "models/maps/belltower/market-crates-v3/west.obj"
+    import_translation = [ 0.0, 0.0, 0.0 ]
+    import_rotation = [ 0.0, 0.0, 0.0 ]
+    import_scale = 1.0
+    align_origin_x_type = "None"
+    align_origin_y_type = "None"
+    align_origin_z_type = "None"
+    parent_bone = ""
+    import_filter = { exclude_by_default = false exception_list = [ ] }
+},
+{
+    _class = "RenderMeshFile"
+    name = "stone_wear_west"
+    filename = "models/maps/belltower/edge-realism-v1/west.obj"
+    import_translation = [ 0.0, 0.0, 0.0 ]
+    import_rotation = [ 0.0, 0.0, 0.0 ]
+    import_scale = 1.0
+    align_origin_x_type = "None"
+    align_origin_y_type = "None"
+    align_origin_z_type = "None"
+    parent_bone = ""
+    import_filter = { exclude_by_default = false exception_list = [ ] }
+}
+]
 			},
 			{
 				_class = "PhysicsShapeList"
@@ -3896,64 +5632,10 @@
 					{
 						_class = "PhysicsShapeBox"
 						parent_bone = ""
-						surface_prop = "metal"
-						collision_tags = "solid"
-						origin = [ 1283.0413, 949.5134, 40.0000 ]
-						angles = [ -0.0000, -82.0000, 0.0000 ]
-						dimensions = [ 200.0000, 96.0000, 20.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "fabric"
-						collision_tags = "solid"
-						origin = [ 1283.0413, 949.5134, 89.0000 ]
-						angles = [ -0.0000, -82.0000, 0.0000 ]
-						dimensions = [ 200.0000, 96.0000, 78.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "metal.sheet"
-						collision_tags = "solid"
-						origin = [ 1304.4740, 797.0121, 55.0000 ]
-						angles = [ -0.0000, -82.0000, 0.0000 ]
-						dimensions = [ 92.0000, 88.0000, 50.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "metal.sheet"
-						collision_tags = "solid"
-						origin = [ 1302.2472, 812.8564, 96.0000 ]
-						angles = [ -0.0000, -82.0000, 0.0000 ]
-						dimensions = [ 60.0000, 84.0000, 32.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "metal"
-						collision_tags = "solid"
-						origin = [ 1283.0413, 949.5134, 10.0000 ]
-						angles = [ -0.0000, -82.0000, 0.0000 ]
-						dimensions = [ 200.0000, 96.0000, 20.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "metal"
-						collision_tags = "solid"
-						origin = [ 1304.4740, 797.0121, 15.0000 ]
-						angles = [ -0.0000, -82.0000, 0.0000 ]
-						dimensions = [ 92.0000, 92.0000, 30.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
 						surface_prop = "wood"
 						collision_tags = "solid"
-						origin = [ 1182.8048, 1370.4946, 18.0000 ]
-						angles = [ -0.0000, -72.8326, 0.0000 ]
+						origin = [ 1127.0000, 1514.0000, 18.0000 ]
+						angles = [ -0.0000, -87.4914, 0.0000 ]
 						dimensions = [ 36.0000, 36.0000, 36.0000 ]
 					},
 					{
@@ -3961,8 +5643,8 @@
 						parent_bone = ""
 						surface_prop = "wood"
 						collision_tags = "solid"
-						origin = [ 1186.6402, 1324.4612, 22.0000 ]
-						angles = [ -0.0000, -74.7158, 0.0000 ]
+						origin = [ 1174.0000, 1476.0000, 22.0000 ]
+						angles = [ -0.0000, -88.1505, 0.0000 ]
 						dimensions = [ 44.0000, 44.0000, 44.0000 ]
 					},
 					{
@@ -3970,8 +5652,8 @@
 						parent_bone = ""
 						surface_prop = "wood"
 						collision_tags = "solid"
-						origin = [ 1192.6092, 1278.8041, 20.0000 ]
-						angles = [ -0.0000, -78.1967, 0.0000 ]
+						origin = [ 1174.0000, 1476.0000, 64.0000 ]
+						angles = [ -0.0000, -89.3688, 0.0000 ]
 						dimensions = [ 40.0000, 40.0000, 40.0000 ]
 					},
 					{

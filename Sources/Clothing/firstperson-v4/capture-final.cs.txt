@@ -1,0 +1,86 @@
+// Fixed-camera v3/v4 comparison in a disposable editor scene. Existing game untouched.
+var root=Sandbox.Project.Current.GetRootPath();
+var folder=System.IO.Path.Combine(root,"output/firstperson-clothing-v4-20261021/native-final");
+System.IO.Directory.CreateDirectory(folder);
+var selected=Editor.SceneEditorSession.Active;
+var playing=Game.IsPlaying;
+var dirty=Editor.SceneEditorSession.All.ToDictionary(s=>s,s=>s.HasUnsavedChanges);
+var scene=Scene.CreateEditorScene();
+var rows=new System.Collections.Generic.List<object>();
+var keys=new[]{"g_tColor","g_tNormal","g_tRma","g_tFineNormal","g_tFineData","g_tSleeveLeft","g_tSleeveRight","g_tCuffMain","g_tCuffStrip","g_tFabricHeight"};
+CameraComponent camera=null;
+DirectionalLight light=null;
+SkinnedModelRenderer renderer=null;
+Model model=null;
+try
+{
+    using(scene.Push())
+    {
+        light=new GameObject(true,"Clothing comparison light").Components.Create<DirectionalLight>();
+        light.WorldRotation=Rotation.From(new Angles(35,25,0));
+        light.LightColor=Color.White*2.2f;
+        light.SkyColor=new Color(.72f,.78f,.85f)*.65f;
+        camera=new GameObject(true,"Clothing comparison camera").Components.Create<CameraComponent>();
+        camera.BackgroundColor=new Color(.075f,.09f,.11f);
+        camera.FieldOfView=44;camera.FovAxis=CameraComponent.Axis.Horizontal;
+        camera.CustomSize=new Vector2(1600,1100);camera.ZNear=.15f;camera.ZFar=500;
+        camera.EnablePostProcessing=false;camera.AutoExposure.Enabled=false;camera.IsMainCamera=true;
+        typeof(Scene).GetProperty("Camera",System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic).SetValue(scene,camera);
+        model=Model.Load("models/citizen_clothes/shirt/army_shirt/model/army_shirt_m_human.vmdl");
+        renderer=new GameObject(true,"Comparison shirt").Components.Create<SkinnedModelRenderer>();
+        renderer.Model=model;renderer.UseAnimGraph=false;renderer.Tint=new Color(.76f,.86f,.66f);
+    }
+    foreach(var view in new[]{"cuff","cuff-dim"})
+    {
+        using(scene.Push())
+        {
+            light.LightColor=Color.White*(view=="cuff-dim"?.3f:2.2f);
+            light.SkyColor=new Color(.72f,.78f,.85f)*(view=="cuff-dim"?.15f:.65f);
+            var side=view=="left"?"L":"R";
+            var a=model.Bones.GetBone(view.StartsWith("cuff")?"arm_lower_R_twist1":"arm_lower_"+side+"_twist0").LocalTransform.Position;
+            var b=model.Bones.GetBone("hand_"+side).LocalTransform.Position;
+            var target=(a+b)*.5f;
+            camera.WorldPosition=target+(view.StartsWith("cuff")?new Vector3(7,-7,5):new Vector3(11,side=="R"?-16:16,9));
+            camera.WorldRotation=Rotation.LookAt(target-camera.WorldPosition);
+        }
+        foreach(var version in new[]{"v3","v4"})
+        {
+            Material material=null;
+            using(scene.Push())
+            {
+                material=Material.Load("materials/operators/first_person/"+version+"/shirt.vmat");
+                if(material is null||material.IsError)throw new InvalidOperationException("Missing material "+version);
+                for(var slot=0;slot<model.Materials.Length;slot++)
+                    if(model.Materials[slot].Name.Contains("/army_shirt/"))renderer.Materials.SetOverride(slot,material);
+            }
+            using var bitmap=new Bitmap(1600,1100);
+            for(var frame=0;frame<14;frame++)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                using(scene.Push())
+                {
+                    foreach(var key in keys)
+                    {
+                        var t=material.GetTexture(key);
+                        if(t is not null&&t.IsValid&&!t.IsError)t.MarkUsed(Math.Max(t.Width,t.Height));
+                    }
+                    scene.EditorTick(.016f,.016f);
+                    camera.RenderToBitmap(bitmap,false);
+                }
+                await Task.Delay(80,cancellationToken);
+            }
+            var path=System.IO.Path.Combine(folder,view+"-"+version+".png");
+            if(System.IO.File.Exists(path))throw new InvalidOperationException("Preserve prior capture");
+            System.IO.File.WriteAllBytes(path,bitmap.ToPng());
+            rows.Add(new{View=view,Version=version,Material=material.ResourcePath,Shader=material.ShaderName,
+                Captured=path,Frames=14,Textures=keys.Select(key=>{var t=material.GetTexture(key);return new{Key=key,t?.Width,t?.Height,Valid=t?.IsValid,Error=t?.IsError};}).ToArray()});
+        }
+    }
+}
+finally{scene.Destroy();}
+var preserved=ReferenceEquals(selected,Editor.SceneEditorSession.Active)&&playing==Game.IsPlaying
+    &&dirty.All(p=>Editor.SceneEditorSession.All.Contains(p.Key)&&p.Key.HasUnsavedChanges==p.Value);
+var result=new{Captures=rows,SharedEditorStatePreserved=preserved,TemporarySceneDestroyed=true,LiveMatchCapture=false};
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"proof.json"),System.Text.Json.JsonSerializer.Serialize(result));
+if(!preserved)throw new InvalidOperationException("Shared editor state changed externally during capture; inspect");
+return new{Images=rows.Count,SharedEditorStatePreserved=preserved,TemporarySceneDestroyed=true};

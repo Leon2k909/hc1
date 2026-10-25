@@ -5,11 +5,12 @@ galleries, a leaning window wall looking out over the red plain to habitat domes
 and banners of the facility's slogans, and black hard cases stencilled MARS / BIGGER / CLEANER / BRIGHTER.
 
     python Tools/ares_map.py [--preview <dir>] [--no-scene] [--scene-only] [--art]
+    python Tools/ares_map.py --backdrop-only [<staging-dir>]
 
 Built by script like Boxyard, Lowtide and Railhead out of map_kit's boxes and polygons, painted with
 Tools/ares_materials.py's drawn materials (run that first: `python Tools/ares_materials.py`). Writes:
 - the models, to Assets/models/maps/ares/: the structure (ares_hall), the column (ares_reactor), the dressing
-  (ares_dressing), the glass (ares_glass, drawn only) and the land outside (ares_backdrop, drawn only);
+  (ares_dressing), the glass (ares_glass, drawn only) and the land/colony outside (ares_backdrop, drawn only);
 - the scene, Assets/scenes/maps/Ares/ares.scene, rewritten whole on every run (change the layout here, not in the
   editor);
 - the radar picture, ui/minimaps/minimap_ares.png, and with --art a stand-in menu picture, ui/maps/ares.png.
@@ -54,6 +55,7 @@ import railhead_map as R
 import boxyard_map as BY
 import ares_materials as AM
 import ares_sky as SKY
+from ares_airlock import pressure_door
 
 TITLE = "Ares"
 OUT_DIR = K.ASSETS / "models/maps/ares"
@@ -263,15 +265,22 @@ def stair( m, axis, c0, c1, s0, s1, z0, z1, rails=( True, True ) ):
     def P( c, s, z ):
         return np.array( ( s, c, z ) if axis == "e" else ( c, s, z ), float )
 
+    front_face = ( "-" if sgn > 0 else "+" ) + axis
+    end_faces = ( "+n", "-n" ) if axis == "e" else ( "+e", "-e" )
     for k in range( count ):
         sa, sb = s0 + run * k, s0 + run * ( k + 1 )
         top = z0 + r * ( k + 1 )
         lo, hi = P( c0, min( sa, sb ), top - 1.5 ), P( c1, max( sa, sb ), top )
-        m.box( lo, hi, { "+z": "ar_grating", "default": "ar_steel" } )
+        # The yellow nosing owns the front face. Drawing steel here too causes coplanar flicker.
+        m.box( lo, hi, { "+z": None, "default": "ar_steel" }, skip=( front_face, ) )
+        # Stop the grating at the nosing's back edge: the two top surfaces must not overlap either.
+        start = sa + sgn * 2.0
+        m.box( P( c0, min( start, sb ), top - 1.5 ), P( c1, max( start, sb ), top ), { "+z": "ar_grating" } )
         # The nosing at the tread's front edge (its low s end), and the riser under it.
         front = sa
-        nlo, nhi = P( c0, front - sgn * 0.0, top - 1.6 ), P( c1, front + sgn * 2.0, top + 0.05 )
-        m.box( np.minimum( nlo, nhi ), np.maximum( nlo, nhi ), "ar_hazard" )
+        nlo, nhi = P( c0, front, top - 1.5 ), P( c1, front + sgn * 2.0, top + 0.125 )
+        # Ends are enclosed by the stringers; the steel tread already owns the underside.
+        m.box( np.minimum( nlo, nhi ), np.maximum( nlo, nhi ), "ar_hazard", skip=end_faces + ( "-z", ) )
         rlo, rhi = P( c0, front, z0 + r * k ), P( c1, front + sgn * 0.8, top - 1.5 )
         m.box( np.minimum( rlo, rhi ), np.maximum( rlo, rhi ), "ar_steel" )
     # The solid sides: a trapezoid each, the stringer's top 3 over the nosings' line.
@@ -421,7 +430,11 @@ def pump_unit( m, e, n, heading ):
     F = Frame( e, n, heading )
     F.box( m, -36, 36, -28, 28, 0, 64, { "default": "ar_steel", "+z": "ar_grating" }, METAL )
     F.box( m, -36.3, 36.3, -28.3, 28.3, 52, 58, "ar_hazard" )
-    F.box( m, -30, -10, -28.5, -28, 20, 44, "ar_screens" )
+    F.box( m, -30, -10, -28.5, -28, 20, 44, { "default": "ar_steel", "-y": None } )
+    uv = [ AM.region_uv( AM.SCREEN, AM.SCREEN_ATLAS, "screen6", s, t )
+           for s, t in ( ( 0, 0 ), ( 1, 0 ), ( 1, 1 ), ( 0, 1 ) ) ]
+    F.quad( m, "ar_screens", [ ( -30, -28.5, 20 ), ( -10, -28.5, 20 ),
+                              ( -10, -28.5, 44 ), ( -30, -28.5, 44 ) ], ( 0, -1, 0 ), uv=uv )
     for k, x in enumerate( ( -20.0, 20.0 ) ):
         a = F.p( x, 0, 64 )
         b = F.p( x, 0, 150 )
@@ -442,7 +455,8 @@ def console( m, e, n, heading, screen=0, z=0.0 ):
     a, b = F.p( 4, -26, 36 ), F.p( 4, 26, 36 )
     c, d = F.p( 14, 26, 64 ), F.p( 14, -26, 64 )
     name = f"screen{screen % 8}"
-    uv = [ AM.region_uv( AM.SCREEN, AM.SCREEN_ATLAS, name, s, t ) for s, t in ( ( 0, 0 ), ( 1, 0 ), ( 1, 1 ), ( 0, 1 ) ) ]
+    # The operator looks along +x: their right is -y. Keep the lettering upright and unmirrored.
+    uv = [ AM.region_uv( AM.SCREEN, AM.SCREEN_ATLAS, name, s, t ) for s, t in ( ( 1, 0 ), ( 0, 0 ), ( 0, 1 ), ( 1, 1 ) ) ]
     card( m, "ar_screens", [ a, b, c, d ], F.v( -1, 0, 0.36 ), uv=uv )
     F.box( m, 6, 18, -28, 28, 30, 36, "ar_bezel" )
     back = F.v( 1.2, 0, -0.43 )
@@ -873,11 +887,7 @@ def wing( m, glass, s ):
     # The airlock hatch on the outer wall: a big sealed door, hazard frame, its sign.
     face = outer - s * 0.5
     hx0, hx1 = -150.0, 30.0
-    m.box( ( min( face, face - s * 6 ), hx0 - 16, 0 ), ( max( face, face - s * 6 ), hx1 + 16, 196 ), "ar_hazard" )
-    m.box( ( min( face - s * 6, face - s * 9 ), hx0, 0 ), ( max( face - s * 6, face - s * 9 ), hx1, 180 ), "ar_gunmetal" )
-    m.box( ( min( face - s * 9, face - s * 10 ), ( hx0 + hx1 ) / 2 - 1, 0 ), ( max( face - s * 9, face - s * 10 ), ( hx0 + hx1 ) / 2 + 1, 180 ), "ar_dark" )
-    for z in ( 40.0, 90.0, 140.0 ):
-        m.box( ( min( face - s * 9, face - s * 12 ), hx0 + 20, z ), ( max( face - s * 9, face - s * 12 ), hx1 - 20, z + 6 ), "ar_steel" )
+    pressure_door( m, ( face, ( hx0 + hx1 ) / 2, 0 ), ( -s, 0 ), width=180, height=180, border=16 )
     lit_sign( m, "airlock03" if s < 0 else "airlock07", ( face - s * 1.0, ( hx0 + hx1 ) / 2, 220.0 ), ( -s, 0 ), 120.0, 30.0 )
     m.collision_box( ( min( face, face - s * 12 ), hx0 - 16, 0 ), ( max( face, face - s * 12 ), hx1 + 16, 196 ), METAL )
     # The blast screen inside the middle door: a steel partition up to the mezzanine, so nobody sees straight through
@@ -950,11 +960,7 @@ def concourse( m, glass ):
             pipe_run( m, ( s * WING_E, HALL_N0 - WALL - 14 - 20 * k, z ), ( s * 1150.0, HALL_N0 - WALL - 14 - 20 * k, z ), r, paint )
     # The airlock in the south wall's middle.
     face = CON_N0 + 0.5
-    m.box( ( -180, face - 0.5, 0 ), ( 180, face + 6, 220 ), "ar_hazard" )
-    m.box( ( -160, face + 6, 0 ), ( 160, face + 9, 200 ), "ar_gunmetal" )
-    m.box( ( -1, face + 9, 0 ), ( 1, face + 10, 200 ), "ar_dark" )
-    for z in ( 50.0, 100.0, 150.0 ):
-        m.box( ( -140, face + 9, z ), ( 140, face + 12, z + 6 ), "ar_steel" )
+    pressure_door( m, ( 0, face, 0 ), ( 0, 1 ), width=320, height=200, border=20 )
     m.collision_box( ( -180, face - 0.5, 0 ), ( 180, face + 12, 220 ), METAL )
     lit_sign( m, "airlock07", ( 0.0, face + 1.0, 250.0 ), ( 0, 1 ), 128.0, 32.0 )
     # Signs over the doors into the hall, from the concourse side.
@@ -1017,8 +1023,9 @@ def dressing( m ):
     # Posters, banners and signs (the picture's).
     sign_panel( m, "poster_ares", ( -HALL_E + 1.0, sum( SECTOR_DOOR ) / 2, G + UPPER_DOOR_H + 200 ), ( 1, 0 ), 220.0, 275.0 )
     sign_panel( m, "poster_ares", ( HALL_E - 1.0, 420.0, G + 250 ), ( -1, 0 ), 180.0, 225.0 )
-    sign_panel( m, "poster_redplanet", ( HALL_E - 1.0, -330.0, 120.0 ), ( -1, 0 ), 150.0, 56.0 )
-    sign_panel( m, "poster_redplanet", ( -HALL_E + 1.0, 330.0, 130.0 ), ( 1, 0 ), 150.0, 56.0 )
+    # Above the wall monitors (top 130), just below the gallery's underside (192).
+    sign_panel( m, "poster_redplanet", ( HALL_E - 1.0, -330.0, 163.0 ), ( -1, 0 ), 150.0, 56.0 )
+    sign_panel( m, "poster_redplanet", ( -HALL_E + 1.0, 330.0, 163.0 ), ( 1, 0 ), 150.0, 56.0 )
     sign_panel( m, "poster_mars", ( 0.0, HALL_N0 + 1.0, G + 200 ), ( 0, 1 ), 200.0, 160.0 )
     banner( m, "banner_humanity", ( -150.0, 620.0, 690.0 ), ( 0, -1 ), 80.0, 240.0 )
     banner( m, "banner_habitat", ( 900.0, 640.0, 690.0 ), ( 0, -1 ), 90.0, 270.0 )
@@ -1077,32 +1084,39 @@ def terrain_height( e, n ):
     rng = np.random.default_rng( 77 )
     g1, g2, g3, g4 = ( value_noise( rng ) for _ in range( 4 ) )
     e, n = np.asarray( e, float ), np.asarray( n, float )
-    fbm = ( 0.55 * sample( g1, e, n, 1400.0 ) + 0.3 * sample( g2, e, n, 500.0 ) + 0.15 * sample( g3, e, n, 180.0 ) )
-    plateau = -60.0 + 12.0 * fbm
+    # Metre-scale white-noise displacement made the plain look like crumpled foil. Keep the geometry's shortest
+    # wavelength well above the mesh spacing; small ripples and gravel belong in the regolith normal map.
+    fbm = ( 0.70 * sample( g1, e, n, 2200.0 ) + 0.24 * sample( g2, e, n, 900.0 ) + 0.06 * sample( g3, e, n, 400.0 ) )
+    plateau = -60.0 + 8.0 * fbm
 
     def plain_at( e_, n_ ):
         return -1150.0 - 250.0 * K_smooth( 2000.0, 16000.0, n_ )
 
-    plain = plain_at( e, n ) + 90.0 * fbm + 30.0 * sample( g4, e, n, 90.0 )
+    # Low, wind-shaped swales between the outcrops, rather than equally rough ground everywhere. Their relief is
+    # only a few inches across tens of metres, with the ripples fading away on the facility's plateau.
+    wind = ( 0.92 * e + 0.38 * n ) / 1050.0 + 0.25 * sample( g2, e, n, 2600.0 )
+    drifts = 7.0 * np.sin( wind * 2.0 * math.pi ) * K_smooth( 2100.0, 3400.0, n )
+    plain = plain_at( e, n ) + 30.0 * fbm + 2.0 * sample( g4, e, n, 320.0 ) + drifts
     # The plateau's edge: a cliff north of the window, slopes elsewhere.
     dx = np.maximum( np.abs( e ) - 3200.0, 0.0 )
     ds = np.maximum( -2600.0 - n, 0.0 )
     dn = np.maximum( n - 900.0, 0.0 )
-    t = np.maximum( K_smooth( 0.0, 900.0, dn + 160.0 * sample( g2, e, n, 600.0 ) ),
+    t = np.maximum( K_smooth( 0.0, 1500.0, dn + 65.0 * sample( g2, e, n, 1200.0 ) ),
                     K_smooth( 0.0, 5000.0, np.hypot( dx, ds ) ) * 0.8 )
     h = plateau * ( 1 - t ) + plain * t
     # Mesas: flat tops over scarps, the scarp a third of the radius wide, a little talus at the foot.
     for me, mn, r, top in MESAS:
-        d = np.hypot( e - me, n - mn ) + 0.12 * r * sample( g2, e, n, r * 0.35 )
+        d = np.hypot( e - me, n - mn ) + 0.065 * r * sample( g2, e, n, r * 0.45 )
         rise = 1.0 - K_smooth( r * 0.66, r, d )
         talus = np.exp( -( ( d - r ) / ( 0.12 * r ) ) ** 2 ) * 0.08
-        h = np.maximum( h, plain + top * np.clip( rise + talus, 0, 1 ) + 20.0 * fbm * rise )
+        h = np.maximum( h, plain + top * np.clip( rise + talus, 0, 1 ) + 8.0 * fbm * rise )
     # A crater.
     d = np.hypot( e + 3500.0, n - 12000.0 ) / 1600.0
     h += np.where( d < 1.0, -300.0 * ( 1 - d * d ), 0.0 ) + 180.0 * np.exp( -( ( d - 1.0 ) / 0.22 ) ** 2 )
-    # The mountains on the horizon: a low, broad range.
-    ridge = np.clip( 1.0 - np.abs( sample( g4, e, n, 9000.0 ) ), 0.0, 1.0 )
-    mountains = K_smooth( 22000.0, 40000.0, n ) * ( 1200.0 + 3400.0 * ridge ** 1.6 + 500.0 * sample( g1, e, n, 2500.0 ) )
+    # Low, worn ranges on the horizon. Folding noise with abs() produced pointed, pyramidal ridges wherever the
+    # field crossed zero, especially on distant coarse cells. A bounded smooth field keeps rounded shoulders.
+    ridge = 0.5 + 0.35 * np.tanh( 0.8 * sample( g4, e, n, 9000.0 ) )
+    mountains = K_smooth( 22000.0, 40000.0, n ) * ( 1000.0 + 2100.0 * ridge + 150.0 * sample( g1, e, n, 4500.0 ) )
     # The land rises at the world's edge, so its rim is never seen against the sky.
     rim = 3500.0 * K_smooth( WORLD_EDGE * 0.7, WORLD_EDGE, np.maximum( np.abs( e ), n ) )
     return h + np.maximum( mountains, 0.0 ) + rim
@@ -1130,12 +1144,11 @@ def axis_values( lo, hi, fine, near0, near1, growth=1.08, cap=6000.0 ):
 
 
 def terrain( m ):
-    """ The land as a grid, fine where the window looks and coarser further out, shaded smooth (a normal per point
-    from the heights' slopes), dust on the gentle ground and rock on the steep. """
+    """ Smooth land with a finer foreground and bounded distant cells. The terrain material blends dust into exposed
+    bedrock per pixel, avoiding a hard material border along each triangle's edges. """
     # Within 60000 of the middle: the engine leaves out a mesh with a point at 90000 ("ignoring mesh").
-    # More detail near the observation wall keeps the exposed Martian cliff from reading as broad facets.
-    es = axis_values( -WORLD_EDGE, WORLD_EDGE, 160.0, -8000.0, 8000.0, growth=1.06 )
-    ns = axis_values( -40000.0, WORLD_EDGE, 160.0, -3000.0, 14000.0, growth=1.06 )
+    es = axis_values( -WORLD_EDGE, WORLD_EDGE, 96.0, -6048.0, 6048.0, growth=1.09, cap=1536.0 )
+    ns = axis_values( -40000.0, WORLD_EDGE, 96.0, -2016.0, 10080.0, growth=1.09, cap=1536.0 )
     E, N = np.meshgrid( es, ns )
     Z = terrain_height( E, N )
     # Under the building, keep the ground below the floor.
@@ -1151,32 +1164,32 @@ def terrain( m ):
     for i in range( rows - 1 ):
         for j in range( cols - 1 ):
             quad = ( ( i, j ), ( i, j + 1 ), ( i + 1, j + 1 ), ( i + 1, j ) )
-            # Use the smoothed quad slope for the dust/bedrock decision. Material boundaries should follow
-            # escarpments instead of revealing each triangulation diagonal against the window.
-            up = sum( float( normals[a][2] ) for a in quad ) / 4.0
-            paint = "ar_regolith" if up > 0.76 else "ar_rock"
+            paint = "ar_terrain"
             for tri in ( ( quad[0], quad[1], quad[2] ), ( quad[0], quad[2], quad[3] ) ):
                 pts = [ P[a] for a in tri ]
                 nrm = np.cross( pts[1] - pts[0], pts[2] - pts[0] )
                 ln = np.linalg.norm( nrm )
                 if ln < 1e-6:
                     continue
-                m.polygon( paint, pts, nrm, normals=[ normals[a] for a in tri ] )
+                # Keep authored UVs continuous too, though the terrain shader samples in world space.
+                uv = [ ( float( E[a] / 640.0 ), float( -N[a] / 640.0 ) ) for a in tri ]
+                m.polygon( paint, pts, nrm, uv=uv, normals=[ normals[a] for a in tri ] )
                 count += 1
     return count
 
 
 def boulders( m, count=70 ):
-    """ Rocks on the plain below the cliff: lumpy, flattened balls of rock. """
+    """ Scattered, partly buried rock fragments on the plain below the cliff. """
     rng = np.random.default_rng( 91 )
     made = 0
     while made < count:
         e, n = rng.uniform( -6000, 6000 ), rng.uniform( 1500, 7000 )
         z = float( terrain_height( np.array( [ e ] ), np.array( [ n ] ) )[0] )
-        r = rng.uniform( 40, 160 ) * ( 1.0 + ( n - 1500 ) / 6000 )
+        r = rng.uniform( 16, 78 ) if made % 7 else rng.uniform( 85, 125 )
+        z -= r * 0.18
         rings, sides = 7, 12
-        squash = rng.uniform( 0.5, 0.8 )
-        bumps = rng.uniform( 0.82, 1.16, ( rings + 1, sides ) )
+        squash = rng.uniform( 0.35, 0.62 )
+        bumps = rng.uniform( 0.88, 1.12, ( rings + 1, sides ) )
         pts = []
         for a in range( rings + 1 ):
             el = -0.25 * math.pi + 0.75 * math.pi * a / rings
@@ -1196,103 +1209,13 @@ def boulders( m, count=70 ):
         made += 1
 
 
-def dome( m, e, n, z, r, squash=0.72, lit=True ):
-    """ A habitat dome: a concrete footing ring, the lattice dome on it, a crown ring. """
-    base = np.array( ( e, n, z ) )
-    lathe_uv( m, base, [ ( r * 1.04, -200.0 ), ( r * 1.04, 60.0 ), ( r, 60.0 ) ], "ar_concrete_dark", sides=40, u_repeat=8 )
-    steps = 9
-    profile = [ ( r * math.cos( math.radians( 90 * k / steps ) ), 60.0 + r * squash * math.sin( math.radians( 90 * k / steps ) ) )
-                for k in range( steps + 1 ) ]
-    profile[-1] = ( r * 0.08, profile[-1][1] )
-    lathe_uv( m, base, profile, "ar_dome" if lit else "ar_dome_frame", sides=40, u_repeat=1.0 )
-    lathe_uv( m, base, [ ( r * 0.08, profile[-1][1] ), ( r * 0.08, profile[-1][1] + 20 ) ], "ar_dome_frame", sides=12, cap="ar_dome_frame" )
-    for k in range( 8 ):
-        a = 2 * math.pi * k / 8
-        p = base + np.array( ( r * 1.06 * math.cos( a ), r * 1.06 * math.sin( a ), 64 ) )
-        m.box( p - np.array( ( 20, 20, 4 ) ), p + np.array( ( 20, 20, 4 ) ), "ar_far_light" )
-
-
-def tube( m, a, b, r=70.0 ):
-    a, b = np.asarray( a, float ), np.asarray( b, float )
-    rod( m, a, b, r, "ar_dome_frame", sides=12 )
-    length = np.linalg.norm( b - a )
-    for k in range( 1, int( length // 400 ) + 1 ):
-        p = a + ( b - a ) * k * 400 / length
-        m.box( p - np.array( ( 8, 8, r + 4 ) ), p + np.array( ( 8, 8, r + 8 ) ), "ar_far_light" )
-
-
-def spire_tower( m, e, n, z, scale=1.0, pinnacles=8 ):
-    """ A terraforming tower, the picture's spired kind: a podium, a tapering lit shaft with ribs, a flared gallery,
-    a narrower upper shaft, a crown of pinnacles round a tall central spire, buttress fins at its foot. """
-    k = scale
-    base = np.array( ( e, n, z ) )
-    lathe_uv( m, base, [ ( 640 * k, -300 ), ( 640 * k, 150 * k ), ( 520 * k, 170 * k ) ], "ar_tower_dark", sides=24, u_repeat=6 )
-    m.polygon( "ar_tower_dark", [ base + np.array( ( 520 * k * math.cos( 2 * math.pi * j / 24 ), 520 * k * math.sin( 2 * math.pi * j / 24 ), 170 * k ) ) for j in range( 24 ) ], UP )
-    lathe_uv( m, base, [ ( 400 * k, 170 * k ), ( 300 * k, 1700 * k ) ], "ar_tower", sides=20, u_repeat=10, v_span=1700 * k / 6 )
-    lathe_uv( m, base, [ ( 300 * k, 1700 * k ), ( 460 * k, 1760 * k ), ( 460 * k, 1800 * k ), ( 250 * k, 1860 * k ) ], "ar_spire", sides=24, u_repeat=8 )
-    lathe_uv( m, base, [ ( 250 * k, 1860 * k ), ( 170 * k, 2800 * k ) ], "ar_tower", sides=16, u_repeat=6, v_span=900 * k / 4 )
-    lathe_uv( m, base, [ ( 170 * k, 2800 * k ), ( 260 * k, 2860 * k ), ( 200 * k, 2900 * k ) ], "ar_spire", sides=16, u_repeat=6 )
-    lathe_uv( m, base, [ ( 150 * k, 2900 * k ), ( 0.0, 4200 * k ) ], "ar_spire", sides=12, u_repeat=4 )
-    for j in range( pinnacles ):
-        a = 2 * math.pi * j / pinnacles
-        p = base + np.array( ( 220 * k * math.cos( a ), 220 * k * math.sin( a ), 0.0 ) )
-        lathe_uv( m, p, [ ( 40 * k, 2880 * k ), ( 0.0, 3350 * k ) ], "ar_spire", sides=6, u_repeat=1 )
-        m.box( p + np.array( ( -10 * k, -10 * k, 3330 * k ) ), p + np.array( ( 10 * k, 10 * k, 3370 * k ) ), "ar_far_light" )
-        q = base + np.array( ( 360 * k * math.cos( a ), 360 * k * math.sin( a ), 0.0 ) )
-        lathe_uv( m, q, [ ( 30 * k, 1790 * k ), ( 0.0, 2200 * k ) ], "ar_spire", sides=6, u_repeat=1 )
-    # Buttress fins.
-    for j in range( 8 ):
-        a = 2 * math.pi * ( j + 0.5 ) / 8
-        d = np.array( ( math.cos( a ), math.sin( a ), 0.0 ) )
-        side = np.array( ( -math.sin( a ), math.cos( a ), 0.0 ) )
-        pts = [ base + d * 300 * k, base + d * 700 * k, base + d * 330 * k + UP * 1300 * k ]
-        for sgn in ( -1, 1 ):
-            card( m, "ar_tower_dark", [ p + side * sgn * 18 * k for p in pts ], side * sgn )
-        card( m, "ar_tower_dark", [ pts[1] - side * 18 * k, pts[2] - side * 18 * k, pts[2] + side * 18 * k, pts[1] + side * 18 * k ],
-              d + UP * 0.3 )
-    m.box( base + np.array( ( -14 * k, -14 * k, 4180 * k ) ), base + np.array( ( 14 * k, 14 * k, 4260 * k ) ), "ar_led_red" )
-
-
-def block( m, e, n, z, w, d, h, heading=0.0 ):
-    """ A plant building: lit cladding, a dark roof with a vent. """
-    F = Frame( e, n, heading, z - 200 )
-    F.box( m, -w / 2, w / 2, -d / 2, d / 2, 0, h + 200, { "default": "ar_tower", "+z": "ar_tower_dark" } )
-    F.box( m, -w / 6, w / 6, -d / 6, d / 6, h + 200, h + 260, "ar_tower_dark" )
-
-
 def backdrop():
+    from ares_outpost import populate
     m = Model()
     count = terrain( m )
     boulders( m )
+    populate( m, terrain_height )
     print( f"backdrop: {count} terrain triangles" )
-    th = lambda e, n: float( terrain_height( np.array( [ e ] ), np.array( [ n ] ) )[0] )
-    # The domes, as the picture has them below the window: a big one with three small, joined by tubes; another group
-    # to the west.
-    groups = [ ( 2600.0, 5600.0, 900.0, [ ( 1500.0, 4600.0, 380.0 ), ( 3700.0, 4700.0, 420.0 ), ( 3300.0, 6900.0, 360.0 ) ] ),
-               ( -2700.0, 4600.0, 560.0, [ ( -1800.0, 3900.0, 260.0 ), ( -3600.0, 5400.0, 300.0 ) ] ),
-               ( 600.0, 9200.0, 650.0, [ ( -200.0, 8600.0, 280.0 ) ] ) ]
-    for e, n, r, small in groups:
-        z = th( e, n )
-        dome( m, e, n, z, r )
-        for se, sn, sr in small:
-            sz = th( se, sn )
-            dome( m, se, sn, sz, sr )
-            tube( m, ( e, n, z + 80 ), ( se, sn, sz + 80 ) )
-    # Spired towers.
-    for e, n, scale, pins in ( ( 4700.0, 8400.0, 1.0, 8 ), ( 3400.0, 9800.0, 0.7, 6 ), ( -900.0, 11500.0, 0.85, 8 ),
-                               ( 8200.0, 12500.0, 1.4, 10 ), ( -5200.0, 9000.0, 0.6, 6 ), ( 1500.0, 7400.0, 0.5, 6 ) ):
-        spire_tower( m, e, n, th( e, n ), scale, pins )
-    # Plant buildings round them.
-    for e, n, w, d, h, hd in ( ( 4200.0, 7300.0, 900.0, 500.0, 420.0, 10.0 ), ( 5600.0, 9300.0, 700.0, 700.0, 600.0, -15.0 ),
-                               ( 1800.0, 6600.0, 500.0, 300.0, 260.0, 30.0 ), ( -1500.0, 10500.0, 800.0, 400.0, 500.0, 0.0 ),
-                               ( 7000.0, 11000.0, 1200.0, 600.0, 800.0, 20.0 ), ( -4200.0, 6200.0, 600.0, 400.0, 300.0, -10.0 ) ):
-        block( m, e, n, th( e, n ), w, d, h, hd )
-    # A road of lights from the cliff's foot to the domes.
-    for k in range( 30 ):
-        t = k / 29
-        e, n = 400.0 + ( 2200.0 - 400.0 ) * t, 1800.0 + ( 4700.0 - 1800.0 ) * t
-        z = th( e, n ) + 10
-        m.box( ( e - 12, n - 12, z ), ( e + 12, n + 12, z + 16 ), "ar_far_light" )
     return m
 
 
@@ -1785,8 +1708,18 @@ def main():
     parser.add_argument( "--preview", metavar="DIR", help="also write the reach grid's picture to this folder" )
     parser.add_argument( "--no-scene", action="store_true", help="write the models only, not the scene or the radar picture" )
     parser.add_argument( "--scene-only", action="store_true", help="update lighting and postprocessing using existing models, for fast visual iteration" )
+    parser.add_argument( "--backdrop-only", nargs="?", const=str( OUT_DIR ), metavar="DIR",
+                         help="rebuild only the drawn Mars backdrop, optionally into a staging directory" )
     parser.add_argument( "--art", action="store_true", help="write the menus' stand-in picture (flat-shaded)" )
     args = parser.parse_args()
+
+    if args.backdrop_only:
+        if args.scene_only or args.preview or args.art:
+            parser.error( "--backdrop-only cannot be combined with --scene-only, --preview or --art" )
+        model = configure( backdrop() )
+        count = K.write_model( Path( args.backdrop_only ), RESOURCE_DIR, "ares_backdrop", model )
+        print( f"ares_backdrop: {count} triangles; scene, collision models and menu pictures preserved" )
+        return
 
     if args.scene_only:
         if args.no_scene or args.preview or args.art:

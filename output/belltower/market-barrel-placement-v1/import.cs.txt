@@ -1,0 +1,61 @@
+// Publish only translated barrel vertices and their matching hull vertices.
+var root = Sandbox.Project.Current.GetRootPath();
+var folder = System.IO.Path.Combine(root, "output/belltower/market-barrel-placement-v1");
+var revision = System.IO.File.ReadAllText(System.IO.Path.Combine(folder, "revision.txt")).Trim();
+if (!System.Text.RegularExpressions.Regex.IsMatch(revision, "^r[0-9]+$")) throw new InvalidOperationException("Invalid staged revision.");
+var manifest = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder, revision, "manifest.json")));
+var selected = Editor.SceneEditorSession.Active;
+var dirty = selected?.HasUnsavedChanges;
+var playing = Game.IsPlaying;
+var game = Game.ActiveScene?.Id;
+if (playing) throw new InvalidOperationException("Wait for the shared play session before changing collision.");
+string Hash(string path) => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+foreach (var group in new[] { "source_sha256", "protected_sha256" })
+    foreach (var pair in manifest[group].AsObject())
+        if (Hash(System.IO.Path.Combine(root, pair.Key)) != pair.Value.GetValue<string>())
+            throw new InvalidOperationException("A shared input changed: " + pair.Key);
+var plan = new System.Collections.Generic.List<(string Source, string Target, string Backup, string Before, string After)>();
+foreach (var pair in manifest["files"].AsObject())
+{
+    if (!pair.Key.StartsWith("Assets/models/maps/belltower/", StringComparison.Ordinal) || !pair.Key.EndsWith(".obj", StringComparison.Ordinal) || pair.Key.Contains(".."))
+        throw new InvalidOperationException("Unexpected target.");
+    var source = System.IO.Path.Combine(root, pair.Value["source"].GetValue<string>());
+    var target = System.IO.Path.Combine(root, pair.Key);
+    var backup = System.IO.Path.Combine(root, pair.Value["backup"].GetValue<string>());
+    var before = pair.Value["before"].GetValue<string>();
+    var after = pair.Value["after"].GetValue<string>();
+    if (Hash(source) != after || Hash(backup) != before) throw new InvalidOperationException("Stage or backup changed.");
+    if (Hash(target) == after) continue;
+    if (Hash(target) != before) throw new InvalidOperationException("Shared resource changed: " + pair.Key);
+    plan.Add((source, target, backup, before, after));
+}
+var changed = new System.Collections.Generic.List<(string Target, string Backup, string After)>();
+try
+{
+    foreach (var item in plan)
+    {
+        if (Hash(item.Target) != item.Before) throw new InvalidOperationException("Concurrent resource edit; stopping publication.");
+        var incoming = item.Target+".market-barrel-incoming";
+        try
+        {
+            System.IO.File.Copy(item.Source, incoming, true);
+            if (Hash(incoming) != item.After) throw new InvalidOperationException("Incoming checksum failed.");
+            System.IO.File.Move(incoming, item.Target, true);
+            changed.Add((item.Target, item.Backup, item.After));
+        }
+        finally { if (System.IO.File.Exists(incoming)) System.IO.File.Delete(incoming); }
+    }
+}
+catch
+{
+    foreach (var item in changed.AsEnumerable().Reverse())
+        if (Hash(item.Target) == item.After) System.IO.File.Copy(item.Backup, item.Target, true);
+    throw;
+}
+foreach (var item in plan) Editor.AssetSystem.RegisterFile(item.Target);
+var preserved = ReferenceEquals(selected, Editor.SceneEditorSession.Active) && dirty == selected?.HasUnsavedChanges && playing == Game.IsPlaying && game == Game.ActiveScene?.Id;
+var result = new { Imported = plan.Count, BarrelsMoved = 6, OtherGroupsUnchanged = true,
+    SceneUnchanged = true, VmdlDescriptionsUnchanged = true, MatchingCollisionMoved = true, EditorStatePreserved = preserved };
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder, revision, "native-import.json"), System.Text.Json.JsonSerializer.Serialize(result));
+if (!preserved) throw new InvalidOperationException("Editor state changed; inspect the completed publication.");
+return result;

@@ -22,8 +22,13 @@ The windows go up by the same amount on every gun, so every part made from these
 ported guns share, and the MP5's) lowers its OpticAimOffset z by it: the eye stays where it was in the window, and since
 the reticles are collimated the dots stay where they were on the screen.
 
-The ripped OBJs and the parts' original offsets are in Backups/optic_risers_rip/, which every run starts from, so a
-rerun writes the same files. --check lists the files a run would change.
+Sources/MW2022/convert_models.py's record of each model (Sources/MW2022/models/<model>.json) moves with it: the tags
+over the cut (tag_reticle_attach, the lens tags) and the bounds' top go up by the same, so the QA tools that find the
+reticle by its tag (Hc1Mw22Qa, Hc1M16OpticQa, Hc1FamasQa) still find it on the window.
+
+The ripped OBJs, records and the parts' original offsets are in Backups/optic_risers_rip/, which every run starts from,
+so a rerun writes the same files. After convert_models.py rewrites these models, run this again. --check lists the files
+a run would change.
 """
 import argparse
 import json
@@ -35,6 +40,7 @@ ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT / "Assets"
 MODELS = ASSETS / "attachments/mw2022/models"
 BACKUP = ROOT / "Backups/optic_risers_rip"
+RECORDS = ROOT / "Sources/MW2022/models"
 
 ABSOLUTE = 1.41  # the iron sight line over the rail
 LOWER_THIRD = 1.55  # 0.14 over it: kastov_prefabs' and Hc1M16OpticQa's lower 1/3 drop at the post
@@ -165,6 +171,18 @@ def raise_mount(lines, positions, uvs, normals, cut: float, lift: float) -> list
     return lines[:first] + body + faces
 
 
+def raise_record(raw: bytes, cut: float, lift: float) -> bytes:
+    """convert_models.py's record of a model with its tags over the cut, and its bounds' top, lifted. Its JSON is
+    json.dumps( indent=2 ) with CRLF line endings, which a load and dump gives back byte for byte."""
+    record = json.loads(raw)
+    for bone in record["bones"]:
+        if bone["head"][2] > cut:
+            bone["head"][2] += lift
+            bone["matrix"][2][3] += lift
+    record["bounds"][1][2] += lift
+    return (json.dumps(record, indent=2) + "\n").replace("\n", "\r\n").encode("utf-8")
+
+
 def parts_using(model: str) -> list[Path]:
     """Every gunsmith part whose prefab draws the model."""
     found = []
@@ -209,6 +227,16 @@ def main() -> None:
             print(f"  {'stale' if args.check else 'wrote'} {obj_path(model).relative_to(ROOT)}")
             if not args.check:
                 obj_path(model).write_bytes(out.encode("utf-8"))
+        record, record_rip = RECORDS / f"{model}.json", BACKUP / f"{model}.json"
+        if not record_rip.is_file():
+            assert not args.check, f"{record_rip} missing: run without --check first"
+            shutil.copyfile(record, record_rip)
+        raised = raise_record(record_rip.read_bytes(), cut, lift)
+        if record.read_bytes() != raised:
+            stale += 1
+            print(f"  {'stale' if args.check else 'wrote'} {record.relative_to(ROOT)}")
+            if not args.check:
+                record.write_bytes(raised)
         for part in parts_using(model):
             key = part.relative_to(ASSETS).as_posix()
             text = part.read_bytes().decode("utf-8")  # as it is, line endings and all

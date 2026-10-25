@@ -1,0 +1,8 @@
+return new {
+    Playing=Game.IsPlaying,Active=Editor.SceneEditorSession.Active?.Scene.Source?.ResourcePath,
+    GameScene=Game.ActiveScene?.Name,
+    Sessions=Editor.SceneEditorSession.All.Select(s=>new {
+        Path=s.Scene.Source?.ResourcePath,s.Scene.IsEditor,s.HasUnsavedChanges,
+        Active=ReferenceEquals(s,Editor.SceneEditorSession.Active)
+    }).ToArray()
+};

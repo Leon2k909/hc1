@@ -1,0 +1,7 @@
+var model=Model.Load("models/sbox_props/shrubs/beech/beech_shrub_tall_medium.vmdl");
+var info=model.MeshInfo;
+return new{MeshCount=model.MeshCount,Materials=model.Materials.Select(m=>m.ResourcePath).ToArray(),
+    Ranges=Enumerable.Range(0,model.MeshCount).Select(i=>new{Mesh=i,Start=model.GetIndexStart(i),Count=model.GetIndexCount(i),Base=model.GetBaseVertex(i)}).ToArray(),
+    InfoProperties=info.GetType().GetProperties().Select(p=>p.ToString()).ToArray(),
+    InfoFields=info.GetType().GetFields().Select(p=>p.ToString()).ToArray(),
+    MaterialApi=typeof(Model).GetMethods().Where(m=>m.Name.Contains("Material")).Select(m=>m.ToString()).ToArray()};

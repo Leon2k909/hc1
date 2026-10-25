@@ -1,0 +1,103 @@
+// Use the production clothing material method on the actual garment models.
+// All renderers/cameras are in a disposable private scene, never a shared tab.
+var root = Sandbox.Project.Current.GetRootPath();
+var folder = System.IO.Path.Combine(root,"output/firstperson-clothing-v2-20261021/native-r2");
+System.IO.Directory.CreateDirectory(folder);
+var selected = Editor.SceneEditorSession.Active;
+var playing = Game.IsPlaying;
+var documents = Editor.SceneEditorSession.All.ToDictionary(s=>s,s=>s.HasUnsavedChanges);
+var flags = System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.NonPublic;
+var apply = typeof(Facepunch.ViewModelClothing).GetMethod("ApplyDetailedMaterials",flags);
+if(apply is null) throw new InvalidOperationException("The production material binding method is unavailable");
+foreach(var path in new[]{"materials/operators/first_person/v2/shirt.vmat","materials/operators/first_person/v2/gloves.vmat"})
+{
+    var material=Material.Load(path);
+    foreach(var key in new[]{"g_tColor","g_tNormal","g_tRma","g_tFineNormal","g_tFineData"})
+    {
+        var texture=material.GetTexture(key);
+        if(texture is not null && texture.IsValid && !texture.IsError) texture.MarkUsed(Math.Max(texture.Width,texture.Height));
+    }
+}
+await Task.Delay(2000,cancellationToken);
+if(playing!=Game.IsPlaying || !ReferenceEquals(selected,Editor.SceneEditorSession.Active))
+    throw new InvalidOperationException("Editor state changed while textures streamed; nothing was created");
+var scene = Scene.CreateEditorScene();
+var rows = new System.Collections.Generic.List<object>();
+try
+{
+    using(scene.Push())
+    {
+        var light = new GameObject(true,"Clothing inspection light").Components.Create<DirectionalLight>();
+        light.WorldRotation = Rotation.From(new Angles(35,25,0));
+        light.LightColor = Color.White*2.2f;
+        light.SkyColor = new Color(.72f,.78f,.85f)*.65f;
+        var camera = new GameObject(true,"Clothing inspection camera").Components.Create<CameraComponent>();
+        camera.BackgroundColor = new Color(.075f,.09f,.11f);
+        camera.FieldOfView = 44;
+        camera.FovAxis = CameraComponent.Axis.Horizontal;
+        camera.CustomSize = new Vector2(1600,1100);
+        camera.ZNear = .15f;
+        camera.ZFar = 500;
+        camera.EnablePostProcessing = false;
+        camera.AutoExposure.Enabled = false;
+        camera.IsMainCamera = true;
+        var cameraFlags = System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic;
+        typeof(Scene).GetProperty("Camera",cameraFlags).SetValue(scene,camera);
+        foreach(var name in new[]{"shirt","gloves"})
+        {
+            var modelPath = name=="shirt" ? "models/citizen_clothes/shirt/army_shirt/model/army_shirt_m_human.vmdl"
+                : "models/citizen_clothes/gloves/fingerless_gloves/models/fingerless_gloves_m_human.vmdl";
+            var model = Model.Load(modelPath);
+            if(model is null || model.IsError) throw new InvalidOperationException("Garment model missing: "+modelPath);
+            var holder = new GameObject(true,"Clothing proof "+name);
+            var renderer = holder.Components.Create<SkinnedModelRenderer>();
+            renderer.Model = model;
+            renderer.UseAnimGraph = false;
+            renderer.Tint = name=="shirt" ? new Color(.76f,.86f,.66f) : Color.White;
+            var originalTint = renderer.Tint;
+            var boneA = model.Bones.GetBone(name=="shirt"?"arm_lower_R":"hand_R");
+            var boneB = model.Bones.GetBone("hand_R");
+            var target = boneA is null ? model.Bounds.Center : boneB is null ? boneA.LocalTransform.Position
+                : (boneA.LocalTransform.Position+boneB.LocalTransform.Position)*.5f;
+            camera.WorldPosition = target + (name=="shirt" ? new Vector3(23,-27,15) : new Vector3(12,-16,10));
+            camera.WorldRotation = Rotation.LookAt(target-camera.WorldPosition);
+            var legacy = model.Materials.Select((m,i)=>new{Material=m,Slot=i}).ToArray();
+            foreach(var item in legacy)
+            {
+                var material = item.Material.CreateCopy("clothing-proof-before-"+name+item.Slot);
+                material.Set("g_tColor",Texture.Load(name=="shirt"?"materials/operators/first_person/fp_army_shirt_color.png":"materials/operators/first_person/fp_fingerless_gloves_albedo.png"));
+                material.Set("g_tNormal",Texture.Load(name=="shirt"?"materials/operators/first_person/fp_army_shirt_normal.png":"materials/operators/first_person/fp_fingerless_gloves_normal.png"));
+                renderer.Materials.SetOverride(item.Slot,material);
+            }
+            foreach(var phase in new[]{"before","after"})
+            {
+                if(phase=="after") apply.Invoke(null,new object[]{renderer});
+                scene.EditorTick(.016f,.016f);
+                using var bitmap = new Bitmap(1600,1100);
+                for(var frame=0;frame<3;frame++) camera.RenderToBitmap(bitmap,false);
+                var output=System.IO.Path.Combine(folder,name+"-"+phase+".png");
+                if(System.IO.File.Exists(output)) throw new InvalidOperationException("Preserve previous visual evidence");
+                System.IO.File.WriteAllBytes(output,bitmap.ToPng());
+            }
+            var expected="materials/operators/first_person/v2/"+name+".vmat";
+            var actual=Enumerable.Range(0,model.Materials.Length).Select(i=>renderer.Materials.GetOverride(i)).ToArray();
+            if(actual.Any(m=>m is null||m.IsError||m.ResourcePath!=expected))
+                throw new InvalidOperationException("Production material binding did not select "+expected);
+            if(renderer.Tint!=originalTint) throw new InvalidOperationException("The outfit tint changed");
+            var materialAfter=actual[0];
+            rows.Add(new {Name=name,Model=modelPath,ExpectedMaterial=expected,ActualMaterials=actual.Select(m=>m.ResourcePath).ToArray(),
+                Shader=materialAfter.ShaderName,AlphaTest=materialAfter.GetFeature("F_ALPHA_TEST"),
+                BaseWidth=materialAfter.GetTexture("g_tColor")?.Width,FineWidth=materialAfter.GetTexture("g_tFineNormal")?.Width,
+                OutfitTintPreserved=true,Target=target.ToString(),ModelBounds=model.Bounds.ToString()});
+            holder.DestroyImmediate();
+        }
+    }
+}
+finally { scene.Destroy(); }
+var preserved=ReferenceEquals(selected,Editor.SceneEditorSession.Active)&&playing==Game.IsPlaying
+    && documents.All(p=>Editor.SceneEditorSession.All.Contains(p.Key)&&p.Key.HasUnsavedChanges==p.Value);
+var result = new { Garments=rows, ProductionMaterialBindingVerified=true, NativeGarmentRenders=true,
+    EditorStatePreserved=preserved, TemporarySceneDestroyed=true, LiveMatchCapture=false };
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"proof.json"),System.Text.Json.JsonSerializer.Serialize(result));
+if(!preserved) throw new InvalidOperationException("Editor state changed during capture; inspect before continuing");
+return result;

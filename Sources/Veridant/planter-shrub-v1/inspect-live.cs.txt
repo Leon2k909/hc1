@@ -1,0 +1,5 @@
+var scene=Editor.SceneEditorSession.Active.Scene;
+return scene.GetAllComponents<ModelRenderer>().Where(r=>r.Model is not null&&r.Model.ResourcePath.Contains("foliage",StringComparison.OrdinalIgnoreCase))
+    .Select(r=>new{Name=r.GameObject.Name,Path=r.Model.ResourcePath,Error=r.Model.IsError,
+        Materials=r.Model.Materials.Select(m=>new{Path=m.ResourcePath,Error=m.IsError}).ToArray(),
+        Position=r.WorldPosition.ToString(),Scale=r.WorldScale.ToString()}).ToArray();

@@ -1,0 +1,106 @@
+// Publish only the four pinned OBJ patches for the garden/ramp divider gap.
+var root = Sandbox.Project.Current.GetRootPath();
+if (!System.IO.Path.GetFullPath(root).TrimEnd('\\', '/').Equals(@"C:\sbox-projects\hc1\forked-shooter-main", StringComparison.OrdinalIgnoreCase))
+    throw new InvalidOperationException("Wrong project.");
+var directory = System.IO.Path.Combine(root, "output/belltower/ramp-wall-gap-v1/publication2");
+var manifest = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(directory, "stage/manifest.json")));
+var session = Editor.SceneEditorSession.Active;
+if (Game.IsPlaying || session is null || !session.Scene.IsEditor || session.HasUnsavedChanges ||
+    !session.Scene.Source.ResourcePath.Equals("scenes/maps/belltower/belltower.scene", StringComparison.OrdinalIgnoreCase))
+    throw new InvalidOperationException("Requires the active, stopped, saved Belltower document.");
+string Hash(string path)
+{
+    using var stream = System.IO.File.OpenRead(path);
+    return Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(stream)).ToLowerInvariant();
+}
+var scenePath = System.IO.Path.Combine(root, "Assets/scenes/maps/Belltower/belltower.scene");
+var sceneHash = Hash(scenePath);
+// Unrelated scene and model-definition updates do not alter these pinned OBJ
+// faces. Preserve their current bytes instead of requiring old snapshots.
+var modelHashes = new System.Collections.Generic.Dictionary<string, string>();
+foreach (var side in new[] { "west", "east" })
+{
+    var modelPath = System.IO.Path.Combine(root, "Assets/models/maps/belltower/belltower_" + side + ".vmdl");
+    var piece = manifest["models"][side]["runtime_piece"].GetValue<string>();
+    var imports = System.Text.RegularExpressions.Regex.Matches(System.IO.File.ReadAllText(modelPath), "filename\\s*=\\s*\"([^\"]+\\.obj)\"")
+        .Select(m => m.Groups[1].Value).ToHashSet(StringComparer.Ordinal);
+    if (!imports.Contains(piece)) throw new InvalidOperationException("Runtime wall mesh is no longer referenced: " + side);
+    modelHashes[modelPath] = Hash(modelPath);
+}
+foreach (var group in new[] { "source_sha256", "protected_sha256" })
+    foreach (var pair in manifest[group].AsObject())
+    {
+        if (group == "protected_sha256")
+        {
+            var protectedPath = System.IO.Path.Combine(root, pair.Key);
+            modelHashes[protectedPath] = Hash(protectedPath);
+            continue;
+        }
+        if (pair.Key == "Tools/belltower_map.py") continue;
+        if (Hash(System.IO.Path.Combine(root, pair.Key)) != pair.Value.GetValue<string>())
+            throw new InvalidOperationException("Input changed: " + pair.Key);
+    }
+var ids = session.Scene.GetAllObjects(true).Select(o => o.Id).ToHashSet();
+var allowed = new[] {
+    "Assets/models/maps/belltower/belltower_west.obj",
+    "Assets/models/maps/belltower/belltower_east.obj",
+    "Assets/models/maps/belltower/compiler-safe/west/west_086_rubble.obj",
+    "Assets/models/maps/belltower/compiler-safe/east/east_084_rubble.obj"
+}.ToHashSet(StringComparer.Ordinal);
+if (!allowed.SetEquals(manifest["files"].AsObject().Select(p => p.Key)))
+    throw new InvalidOperationException("Unexpected asset set.");
+var plan = new System.Collections.Generic.List<(string Source, string Target, string Backup, string Before, string After)>();
+foreach (var pair in manifest["files"].AsObject())
+{
+    var sourceRelative = pair.Value["source"].GetValue<string>();
+    var backupRelative = pair.Value["backup"].GetValue<string>();
+    if (!sourceRelative.StartsWith("output/belltower/ramp-wall-gap-v1/publication2/stage/", StringComparison.Ordinal)
+        || !backupRelative.StartsWith("output/belltower/ramp-wall-gap-v1/publication2/before/", StringComparison.Ordinal)
+        || sourceRelative.Contains("..") || backupRelative.Contains(".."))
+        throw new InvalidOperationException("Unexpected staged path.");
+    var source = System.IO.Path.Combine(root, sourceRelative);
+    var target = System.IO.Path.Combine(root, pair.Key);
+    var backup = System.IO.Path.Combine(root, backupRelative);
+    var before = pair.Value["before"].GetValue<string>();
+    var after = pair.Value["after"].GetValue<string>();
+    if (Hash(source) != after || Hash(backup) != before) throw new InvalidOperationException("Stage or backup changed.");
+    var current = Hash(target);
+    if (current == after) continue;
+    if (current != before) throw new InvalidOperationException("Shared asset changed: " + pair.Key);
+    plan.Add((source, target, backup, before, after));
+}
+if (!manifest["original_collision_exact"].GetValue<bool>() || !manifest["all_other_town_wall_geometry_exact"].GetValue<bool>())
+    throw new InvalidOperationException("Missing preservation proof.");
+var changed = new System.Collections.Generic.List<(string Target, string Backup)>();
+try
+{
+    foreach (var item in plan)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        var incoming = item.Target + ".ramp-gap-incoming";
+        try
+        {
+            System.IO.File.Copy(item.Source, incoming, true);
+            if (Hash(incoming) != item.After || Hash(item.Target) != item.Before)
+                throw new InvalidOperationException("Checksum changed before replacement.");
+            System.IO.File.Move(incoming, item.Target, true);
+            changed.Add((item.Target, item.Backup));
+        }
+        finally { if (System.IO.File.Exists(incoming)) System.IO.File.Delete(incoming); }
+    }
+}
+catch
+{
+    foreach (var item in changed.AsEnumerable().Reverse()) System.IO.File.Copy(item.Backup, item.Target, true);
+    throw;
+}
+foreach (var item in plan) Editor.AssetSystem.RegisterFile(item.Target);
+if (Hash(scenePath) != sceneHash || modelHashes.Any(p => Hash(p.Key) != p.Value)
+    || session.HasUnsavedChanges || Game.IsPlaying || !ReferenceEquals(session, Editor.SceneEditorSession.Active)
+    || !session.Scene.GetAllObjects(true).Select(o => o.Id).ToHashSet().SetEquals(ids))
+    throw new InvalidOperationException("Editor state changed during import; inspect before further edits.");
+var result = new { Imported = plan.Count, GardenFacesRepaired = 2, SceneUnchanged = true,
+    CollisionAndModelDescriptionsUnchanged = true, NewSceneObjects = 0, ForcedFullCompile = false,
+    PreservedCurrentSceneSha256 = sceneHash, PreservedCurrentModelDefinitions = modelHashes };
+System.IO.File.WriteAllText(System.IO.Path.Combine(directory, "native-import.json"), System.Text.Json.JsonSerializer.Serialize(result));
+return result;

@@ -27,6 +27,10 @@ import belltower_furniture as Furniture
 OAK = "models/sbox_props/trees/oak/tree_oak_small_a.vmdl"
 OAK_BIG = "models/sbox_props/trees/oak/tree_oak_medium_a.vmdl"
 BUSH = "models/sbox_props/shrubs/beech/beech_bush_small.vmdl"
+# Native mesh inspection: the central stem starts at z .845722; low outer
+# twigs reach -19.216661 and cannot serve as the planting anchor.
+BUSH_ROOT_Z = .845722
+BUSH_TOP_Z = 55.370075
 
 
 OWN = Materials.RESOURCE_DIR
@@ -110,12 +114,20 @@ def instance(model, path, position, yaw, scale, name="Foliage"):
     model.props.append(dict(path=path, position=tuple(position), yaw=float(yaw), scale=tuple(scale), name=name))
 
 
-def shrub(model, centre, radius, squash=0.8, seed=0):
-    # Source bounds ~144 x 137 x 75; plant its roots in the bed, not on the crown's centre.
+def shrub(model, centre, radius, squash=0.8, seed=0, *, ground_z=None):
+    # Preserve the existing crown envelope unless the caller supplies a soil
+    # surface. Grounded shrubs keep their top and width, with the stem embedded.
     rng = np.random.default_rng(seed)
     sx = radius * 2 / 144
     sz = radius * 2 * squash / 75
     p = np.asarray(centre, float) - (0, 0, radius * squash - 19.2 * sz)
+    if ground_z is not None:
+        top = p[2] + BUSH_TOP_Z * sz
+        root = float(ground_z) - .5
+        sz = (top - root) / (BUSH_TOP_Z - BUSH_ROOT_Z)
+        if sz <= 0:
+            raise ValueError("Shrub canopy must be above its soil surface")
+        p[2] = root - BUSH_ROOT_Z * sz
     instance(model, BUSH, p, rng.uniform(0, 360), (sx, sx, sz), "Beech shrub")
 
 

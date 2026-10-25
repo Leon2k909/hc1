@@ -1,0 +1,42 @@
+// Belltower without the lorries: in a scene of its own (the editor's scenes and play state are untouched), the two town
+// halves and the centre with their collision. Traces through where each lorry stood (world (1290, +-900): plan
+// (-+900, 1290)) at bed and cab height, then one view down Market Street from the west, as the user's screenshot.
+var root = Sandbox.Project.Current.GetRootPath();
+var outDir = System.IO.Path.Combine( root, "output/belltower/lorry-removal" );
+var scene = new Scene();
+var traces = new System.Collections.Generic.List<object>();
+try
+{
+	using ( scene.Push() )
+	{
+		foreach ( var name in new[] { "belltower_west", "belltower_east", "belltower_centre" } )
+		{
+			var go = new GameObject( true, name );
+			go.Components.Create<ModelRenderer>().Model = Model.Load( $"models/maps/belltower/{name}.vmdl" );
+			var col = go.Components.Create<ModelCollider>(); col.Model = Model.Load( $"models/maps/belltower/{name}.vmdl" ); col.Static = true;
+		}
+		var sun = new GameObject( true, "sun" ).Components.Create<DirectionalLight>();
+		sun.WorldRotation = Rotation.From( new Angles( 34, -63, 0 ) ); sun.LightColor = new Color( 1f, 0.92f, 0.8f ) * 2.5f; sun.SkyColor = new Color( 0.5f, 0.6f, 0.75f ) * 0.9f;
+		scene.EditorTick( .02f, .02f );
+		foreach ( var side in new[] { 1f, -1f } )
+			foreach ( var z in new[] { 25f, 60f, 100f } )
+			{
+				var across = scene.Trace.Ray( new Vector3( 1150, 900 * side, z ), new Vector3( 1430, 900 * side, z ) ).Run();
+				var along = scene.Trace.Ray( new Vector3( 1290, 1080 * side, z ), new Vector3( 1290, 720 * side, z ) ).Run();
+				traces.Add( new { side = side > 0 ? "west" : "east", z, acrossHit = across.Hit, acrossAt = across.Hit ? across.HitPosition.ToString() : null,
+					alongHit = along.Hit, alongAt = along.Hit ? along.HitPosition.ToString() : null } );
+			}
+		// A control: the same kind of trace into a house front must still hit.
+		var control = scene.Trace.Ray( new Vector3( 1290, 900, 60 ), new Vector3( 2400, 900, 60 ) ).Run();
+		traces.Add( new { side = "control north", z = 60f, acrossHit = control.Hit, acrossAt = control.Hit ? control.HitPosition.ToString() : null, alongHit = false, alongAt = (string)null } );
+		var camera = new GameObject( true, "camera" ).Components.Create<CameraComponent>();
+		camera.WorldPosition = new Vector3( 1290, 1500, 72 ); camera.WorldRotation = Rotation.LookAt( new Vector3( 1290, 900, 60 ) - camera.WorldPosition );
+		camera.FieldOfView = 75; camera.ZFar = 60000; camera.BackgroundColor = new Color( 0.62f, 0.72f, 0.85f );
+		for ( int i = 0; i < 6; i++ ) scene.EditorTick( .02f, .02f );
+		using var bmp = new Bitmap( 1280, 720 );
+		camera.RenderToBitmap( bmp ); camera.RenderToBitmap( bmp );
+		System.IO.File.WriteAllBytes( System.IO.Path.Combine( outDir, "market-street-after.png" ), bmp.ToPng() );
+	}
+}
+finally { scene.Destroy(); }
+return traces;

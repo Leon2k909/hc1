@@ -1,0 +1,22 @@
+var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
+var asm = AppDomain.CurrentDomain.GetAssemblies().First( a => a.GetName().Name.Contains( "toolbase" ) );
+var main = asm.GetTypes().First( t => t.Name == "MainAssetBrowser" ).GetField( "_instance", flags ).GetValue( null );
+object local = null;
+for ( var t = main.GetType(); t is not null && local is null; t = t.BaseType )
+	local = t.GetField( "<Local>k__BackingField", flags | System.Reflection.BindingFlags.DeclaredOnly )?.GetValue( main );
+object loc = null;
+for ( var t = local.GetType(); t is not null && loc is null; t = t.BaseType )
+	loc = t.GetProperty( "CurrentLocation", flags | System.Reflection.BindingFlags.DeclaredOnly )?.GetValue( local );
+var lines = new System.Collections.Generic.List<string> { "type " + loc?.GetType().FullName };
+if ( loc is not null )
+	for ( var t = loc.GetType(); t is not null && t != typeof( object ); t = t.BaseType )
+		foreach ( var p in t.GetProperties( flags | System.Reflection.BindingFlags.DeclaredOnly ).Where( p => p.GetIndexParameters().Length == 0 ) )
+		{
+			try { var v = p.GetValue( loc ); lines.Add( t.Name + "." + p.Name + " = " + v ); } catch { }
+		}
+// A file from that folder, as the browser would see it: path through the location's own enumeration, if it has one.
+var dirs = loc?.GetType().GetMethod( "GetFiles", flags, System.Type.EmptyTypes );
+if ( dirs is not null )
+	foreach ( var f in ((System.Collections.IEnumerable)dirs.Invoke( loc, null )).Cast<object>().Take( 4 ) )
+		lines.Add( "file " + f + " -> asset " + Editor.AssetSystem.FindByPath( f.ToString() )?.Path );
+return lines;

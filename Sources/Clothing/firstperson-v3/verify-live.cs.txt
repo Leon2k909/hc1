@@ -1,0 +1,50 @@
+// Inspect the production viewmodel after its own normal refresh. Do not force a dress,
+// override, respawn, camera move or play-state change to make this check pass.
+var selected=Editor.SceneEditorSession.Active;var playing=Game.IsPlaying;var dirty=selected.HasUnsavedChanges;
+var rows=new System.Collections.Generic.List<object>();
+var instance=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic;
+var staticFlags=System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic;
+var shirtCount=0;
+foreach(var scene in Scene.All.ToArray())
+{
+    var components=scene.GetAllObjects(true).SelectMany(o=>o.Components.GetAll<Component>()).Distinct()
+        .Where(c=>c.GetType().Name=="ViewModelClothing"&&c.Active&&c.Enabled).ToArray();
+    foreach(var c in components)
+    {
+        var type=c.GetType();
+        var clothing=type.GetField("_root",instance)?.GetValue(c) as GameObject;
+        if(!clothing.IsValid()||!clothing.Active)continue;
+        foreach(var renderer in clothing.GetComponentsInChildren<SkinnedModelRenderer>(true).Distinct())
+        {
+            if(!renderer.Active||!renderer.Enabled||renderer.Model is null)continue;
+            for(var slot=0;slot<renderer.Model.Materials.Length;slot++)
+            {
+                var original=renderer.Model.Materials[slot];
+                if(original is null||!original.Name.Contains("/army_shirt/"))continue;
+                var material=renderer.Materials.GetOverride(slot);
+                if(material is null||material.IsError||material.ResourcePath!="materials/operators/first_person/v3/shirt.vmat")
+                    throw new InvalidOperationException("Running first-person shirt is not using v3");
+                var textures=new System.Collections.Generic.List<object>();
+                foreach(var key in new[]{"g_tColor","g_tNormal","g_tRma","g_tFineNormal","g_tFineData","g_tSleeveLeft","g_tSleeveRight","g_tCuffMain","g_tCuffStrip"})
+                {
+                    var texture=material.GetTexture(key);
+                    if(texture is null||!texture.IsValid||texture.IsError||!texture.IsLoaded)throw new InvalidOperationException("Missing live texture "+key);
+                    textures.Add(new{Key=key,texture.Width,texture.Height,texture.Mips,texture.IsLoaded});
+                }
+                if((string)type.GetField("ShirtMaterial",staticFlags).GetRawConstantValue()!=material.ResourcePath)
+                    throw new InvalidOperationException("Live component assembly has stale clothing binding");
+                shirtCount++;
+                rows.Add(new{Scene=scene.Name,Object=c.GameObject.Name,Assembly=type.Assembly.FullName,
+                    Model=renderer.Model.ResourcePath,Material=material.ResourcePath,Shader=material.ShaderName,
+                    renderer.Tint,Textures=textures,Camera=scene.Camera?.WorldTransform,CameraFov=scene.Camera?.FieldOfView});
+            }
+        }
+    }
+}
+if(shirtCount==0)throw new InvalidOperationException("No active live first-person shirt; do not start or reset the game for this check");
+var preserved=ReferenceEquals(selected,Editor.SceneEditorSession.Active)&&playing==Game.IsPlaying&&dirty==selected.HasUnsavedChanges;
+var result=new{LiveProductionBindingVerified=true,Shirts=shirtCount,Garments=rows,SharedEditorStatePreserved=preserved,GameOrCameraChanged=false};
+var folder=System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(),"output/firstperson-clothing-v3-20261021");
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"live-proof.json"),System.Text.Json.JsonSerializer.Serialize(result));
+if(!preserved)throw new InvalidOperationException("Shared editor state changed externally during verification; inspect");
+return result;

@@ -1,0 +1,50 @@
+// Belltower without the square's oaks: in a scene of its own (the editor's scenes and play state are untouched), the
+// two town halves and the centre with their collision. Traces through where each trunk stood (world (450, +-560):
+// plan (-+560, 450)) at two heights, and controls into the shopfronts either side, which must still hit. Then one view
+// of the west corner from the square, without foliage.
+var root = Sandbox.Project.Current.GetRootPath();
+var outDir = System.IO.Path.Combine( root, "output/belltower/square-tree-removal" );
+var scene = new Scene();
+var traces = new System.Collections.Generic.List<object>();
+try
+{
+	using ( scene.Push() )
+	{
+		foreach ( var name in new[] { "belltower_west", "belltower_east", "belltower_centre" } )
+		{
+			var go = new GameObject( true, name );
+			var model = Model.Load( $"models/maps/belltower/{name}.vmdl" );
+			go.Components.Create<ModelRenderer>().Model = model;
+			var col = go.Components.Create<ModelCollider>(); col.Model = model; col.Static = true;
+		}
+		var sun = new GameObject( true, "sun" ).Components.Create<DirectionalLight>();
+		sun.WorldRotation = Rotation.From( new Angles( 34, -63, 0 ) ); sun.LightColor = new Color( 1f, 0.92f, 0.8f ) * 2.5f; sun.SkyColor = new Color( 0.5f, 0.6f, 0.75f ) * 0.9f;
+		scene.EditorTick( .02f, .02f );
+		object Trace( string label, Vector3 a, Vector3 b )
+		{
+			var tr = scene.Trace.Ray( a, b ).Run();
+			return new { label, hit = tr.Hit, at = tr.Hit ? tr.HitPosition.ToString() : null };
+		}
+		foreach ( var side in new[] { 1f, -1f } )
+		{
+			var s = side > 0 ? "west" : "east";
+			foreach ( var z in new[] { 40f, 150f } )
+			{
+				traces.Add( Trace( $"{s} trunk across z{z}", new Vector3( 410, 560 * side, z ), new Vector3( 490, 560 * side, z ) ) );
+				traces.Add( Trace( $"{s} trunk along z{z}", new Vector3( 450, 520 * side, z ), new Vector3( 450, 600 * side, z ) ) );
+			}
+			// Controls: the side house's shopfront (world y 650) and the north house's (world x 550).
+			traces.Add( Trace( $"{s} control side front", new Vector3( 450, 560 * side, 60 ), new Vector3( 450, 760 * side, 60 ) ) );
+			traces.Add( Trace( $"{s} control north front", new Vector3( 450, 560 * side, 60 ), new Vector3( 700, 560 * side, 60 ) ) );
+		}
+		var camera = new GameObject( true, "camera" ).Components.Create<CameraComponent>();
+		camera.WorldPosition = new Vector3( 120, 250, 72 ); camera.WorldRotation = Rotation.LookAt( new Vector3( 470, 600, 120 ) - camera.WorldPosition );
+		camera.FieldOfView = 75; camera.ZFar = 60000; camera.BackgroundColor = new Color( 0.62f, 0.72f, 0.85f );
+		for ( int i = 0; i < 6; i++ ) scene.EditorTick( .02f, .02f );
+		using var bmp = new Bitmap( 1280, 720 );
+		camera.RenderToBitmap( bmp ); camera.RenderToBitmap( bmp );
+		System.IO.File.WriteAllBytes( System.IO.Path.Combine( outDir, "square-corner-after.png" ), bmp.ToPng() );
+	}
+}
+finally { scene.Destroy(); }
+return traces;

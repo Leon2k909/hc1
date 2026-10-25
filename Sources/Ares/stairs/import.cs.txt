@@ -1,0 +1,26 @@
+// Run a copy in sbox-cli's exchange directory. Imports only the scoped stair OBJ edits; then compile ares_hall.vmdl.
+var project = Sandbox.Project.Current.GetRootPath();
+var directory = System.IO.Path.Combine( project, "output/ares/stairs-20261020" );
+var relative = "Assets/models/maps/ares/ares_hall.obj";
+var source = System.IO.Path.Combine( directory, "stage/models/maps/ares/ares_hall.obj" );
+var target = System.IO.Path.Combine( project, relative );
+var scene = Editor.SceneEditorSession.Active?.Scene;
+var wasPlaying = Game.IsPlaying;
+// This is an asset-only refresh. Collision inputs are unchanged, so the active play session can stay running.
+string Hash( string path ) => Convert.ToHexString( System.Security.Cryptography.SHA256.HashData(
+    System.IO.File.ReadAllBytes( path ) ) ).ToLowerInvariant();
+var installedPath = System.IO.Path.Combine( directory, "installed.json" );
+var expected = System.Text.Json.Nodes.JsonNode.Parse( System.IO.File.ReadAllText( System.IO.File.Exists( installedPath )
+    ? installedPath : System.IO.Path.Combine( directory, "before/manifest.json" ) ) ).AsObject();
+if ( Hash( target ) != Hash( source ) && Hash( target ) != expected[relative].GetValue<string>() )
+    throw new InvalidOperationException( "Hall source changed since staging" );
+System.IO.File.Copy( source, target, true );
+Editor.AssetSystem.RegisterFile( target );
+Editor.AssetSystem.RegisterFile( System.IO.Path.Combine( project, "Assets/models/maps/ares/ares_hall.vmdl" ) );
+var installed = new System.Collections.Generic.Dictionary<string, string> { [relative] = Hash( target ) };
+var options = new System.Text.Json.JsonSerializerOptions { WriteIndented = true };
+System.IO.File.WriteAllText( installedPath, System.Text.Json.JsonSerializer.Serialize( installed, options ) );
+var report = new { Imported = relative, SourceHash = installed[relative],
+    SceneUnchanged = scene == Editor.SceneEditorSession.Active?.Scene, WasPlaying = wasPlaying, Game.IsPlaying };
+System.IO.File.WriteAllText( System.IO.Path.Combine( directory, "import.json" ), System.Text.Json.JsonSerializer.Serialize( report, options ) );
+return report;

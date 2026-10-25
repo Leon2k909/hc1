@@ -60,6 +60,11 @@ public static partial class GameText
 		["Independent"] = ("Indépendant", "Unabhängig", "Independiente", "Independente"),
 		["Third Person Field Of View"] = ("Champ de vision à la troisième personne", "Sichtfeld in der Verfolgerperspektive",
 			"Campo de visión en tercera persona", "Campo de visão em terceira pessoa"),
+		["Weapon Distance"] = ("Distance de l'arme", "Waffenabstand", "Distancia del arma", "Distância da arma"),
+		["Weapon Horizontal Position"] = ("Position horizontale de l'arme", "Horizontale Waffenposition",
+			"Posición horizontal del arma", "Posição horizontal da arma"),
+		["Weapon Vertical Position"] = ("Position verticale de l'arme", "Vertikale Waffenposition",
+			"Posición vertical del arma", "Posição vertical da arma"),
 		["Picture-In-Picture Scopes"] = ("Lunettes en incrustation d'image", "Bild-in-Bild-Zielfernrohre",
 			"Miras con imagen en imagen", "Lunetas com imagem na imagem"),
 

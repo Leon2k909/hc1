@@ -33,7 +33,7 @@ CB_PAINTED = {
     WHITE: ( ( 236, 231, 220 ), 0.1, 0.32 ),         # painted steel: columns, canopies, pergolas, railings, sunshades
     FRAME: ( ( 54, 57, 60 ), 0.55, 0.38 ),           # the curtain walls' anodised mullions and door frames
     RED: ( ( 176, 30, 24 ), 0.05, 0.45 ),            # the sculptures' lacquered steel: a signal red, as in the pictures
-    BRONZE: ( ( 92, 66, 40 ), 0.9, 0.34 ),           # the garden's sphere
+    BRONZE: ( ( 116, 82, 52 ), 0.55, 0.44 ),         # the spheres and busts: drawn by cerroblanco_bronze (previews' colour)
     PIANO: ( ( 12, 12, 13 ), 0.0, 0.06 ),            # a concert grand's lacquer
     CURTAIN: ( ( 36, 36, 40 ), 0.0, 0.95 ),          # speaker cloth
     DRAPE: ( ( 150, 148, 146 ), 0.0, 0.92 ),         # the stage's grey velour drapes
@@ -534,13 +534,37 @@ def hedge_box( m, e0, e1, n0, n1, height=34.0, z0=0.0, planter=None ):
         m.props.append( { "path": HEDGE_MODEL, "position": ( e, n, z0 ), "yaw": 0.0 if along_e else 90.0, "scale": scale } )
 
 
+# How far each cloud oak's trunk flare reaches from its axis where it meets the paving (z 0.5, at scale 1), measured
+# from the models' triangles in the editor on 2026-10-25: the medium oak's roots spread to 39.5, the small oak's 15.2.
+TRUNK_FLARE = { "tree_oak_medium_a": 39.5, "tree_oak_small_a": 15.2 }
+PIT_KERB = 4.0              # the tree pit's honed travertine kerb: its width,
+PIT_KERB_TOP = 1.0          # its top over the paving,
+PIT_SOIL_TOP = 0.4          # and the soil's, 0.6 under it
+
+
 def tree( m, e, n, path=f"{OAK}/tree_oak_medium_a.vmdl", scale=1.0, z=0.0, grate=True, trunk=9.0 ):
-    """ A Facepunch cloud tree, in a square steel grate, with a collision box for its trunk. """
+    """ A Facepunch cloud tree, with a collision box for its trunk. In paving (grate) it stands in a square tree pit:
+    soil inside a honed travertine kerb, at least a foot clear of the trunk's flare. The pit was a flat black 60 square,
+    which the medium oaks' roots (79 across) spilled over. """
     m.props.append( { "path": path, "position": ( e, n, z ), "yaw": float( keyed( "tree", e, n ) % 360 ),
                       "scale": ( scale, scale, scale ) } )
     if grate:
-        m.box( ( e - 30, n - 30, z - 1 ), ( e + 30, n + 30, z + 0.4 ), { "+z": BLACK, "default": None } )
+        flare = TRUNK_FLARE.get( path.rsplit( "/", 1 )[-1].removesuffix( ".vmdl" ), 40.0 ) * scale
+        tree_pit( m, e, n, z, 6.0 * math.ceil( ( flare + 12.0 ) / 6.0 ) )
     m.collision_box( ( e - trunk * scale, n - trunk * scale, z ), ( e + trunk * scale, n + trunk * scale, z + 160 * scale ), WOOD )
+
+
+def tree_pit( m, e, n, z, half ):
+    """ A tree pit in paving, half across inside its kerb: the soil 0.4 over the paving, inside a 4-wide honed kerb 1.0
+    over it. The kerb's long sides run the pit's full width and its short ones fit between them, so no faces overlap.
+    No collision: it's a step of an inch. """
+    k, top, base = PIT_KERB, z + PIT_KERB_TOP, z - 1.0
+    m.box( ( e - half, n - half, base ), ( e + half, n + half, z + PIT_SOIL_TOP ), { "+z": SOIL, "default": None } )
+    for s in ( -1.0, 1.0 ):
+        a, b = sorted( ( n + s * half, n + s * ( half + k ) ) )
+        m.box( ( e - half - k, a, base ), ( e + half + k, b, top ), { "default": HONED, "-z": None } )
+        a, b = sorted( ( e + s * half, e + s * ( half + k ) ) )
+        m.box( ( a, n - half, base ), ( b, n + half, top ), { "default": HONED, "-z": None, "+n": None, "-n": None } )
 
 
 def bush( m, e, n, z=0.0, path=f"{BEECH}/beech_bush_small.vmdl", scale=1.0, yaw=None ):
@@ -714,22 +738,11 @@ def zigzag_sculpture( m, e, n, yaw=0.0, paint=RED, scale=1.0 ):
 
 
 def bronze_sphere( m, e, n, r=58.0, plinth=24.0 ):
-    """ The garden circle's bronze sphere on a low honed drum. """
+    """ The garden circle's bronze sphere on a low honed drum: cerroblanco_bronze's sphere and patinated bronze. """
+    import cerroblanco_bronze
     m.cylinder( ( e, n ), r * 0.55, 0, plinth, { "side": HONED, "top": HONED, "bottom": None }, sides=24, surface=STONE )
     c = np.array( ( e, n, plinth + r * 0.95 ) )
-    rings, sides = 12, 24
-    for i in range( rings ):
-        t0, t1 = math.pi * i / rings, math.pi * ( i + 1 ) / rings
-        for k in range( sides ):
-            p0, p1 = 2 * math.pi * k / sides, 2 * math.pi * ( k + 1 ) / sides
-            d = [ np.array( ( math.sin( t ) * math.cos( p ), math.sin( t ) * math.sin( p ), math.cos( t ) ) )
-                  for t, p in ( ( t0, p0 ), ( t1, p0 ), ( t1, p1 ), ( t0, p1 ) ) ]
-            pts = [ c + v * r for v in d ]
-            if i == 0:
-                pts, d = [ pts[0], pts[1], pts[2] ], [ d[0], d[1], d[2] ]
-            elif i == rings - 1:
-                pts, d = [ pts[0], pts[1], pts[3] ], [ d[0], d[1], d[3] ]
-            card( m, BRONZE, pts, sum( d ), normals=d )
+    cerroblanco_bronze.sphere( m, c, r, BRONZE )
     m.hull( [ tuple( c + r * np.array( v ) ) for v in ( ( 1, 0, 0 ), ( -1, 0, 0 ), ( 0, 1, 0 ), ( 0, -1, 0 ), ( 0, 0, 1 ), ( 0, 0, -1 ),
                                                        ( .7, .7, 0 ), ( -.7, .7, 0 ), ( .7, -.7, 0 ), ( -.7, -.7, 0 ) ) ], METAL )
 

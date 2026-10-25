@@ -1,0 +1,325 @@
+{
+  "revision": "forest-volume-v1",
+  "state": "staged; native compiler and appearance review pending",
+  "files": [
+    {
+      "path": "shaders/belltower_forest_volume_trial.shader",
+      "source": "output/belltower/quality/forest-volume-v1/Assets/shaders/belltower_forest_volume_trial.shader",
+      "sha256": "aa0f4f4f9d6a43ac30bbee58f201398fccfe6b4e2ca4d1b4a51650880cf0e1dd"
+    },
+    {
+      "path": "materials/belltower/forest/volume-v1/control.vmat",
+      "source": "output/belltower/quality/forest-volume-v1/Assets/materials/belltower/forest/volume-v1/control.vmat",
+      "sha256": "19f7c56b8196bf8dc8579bfa014490546660d7a893739e47f9429f73f666f2ba"
+    },
+    {
+      "path": "materials/belltower/forest/volume-v1/rounded.vmat",
+      "source": "output/belltower/quality/forest-volume-v1/Assets/materials/belltower/forest/volume-v1/rounded.vmat",
+      "sha256": "f9a488db0d5e10347a5a8cbfba7f8e8abbb639719d45b4a5868217f40f1f837a"
+    }
+  ],
+  "source_sha256": {
+    "Tools/belltower_forest_volume_trial.py": "60d0d3cdf8028f2d39f3ae918bb6aa9ee95e48630520558e248c6db2c045920a",
+    "Sources/Belltower/generated/forest-trees-v2.json": "8b2c72f5b87861c35d85fe3a10041dcdf41c657694640f07446a1f5944115b24",
+    "Sources/Belltower/generated/forest-trees-v2.png": "52b644492a4c7126a8090868726e084c88608f931a64cff9698f0075ca2aa835",
+    "Assets/shaders/belltower_forest_coverage_trial.shader": "d6104be7e252372dcf6a6bed8cde348ff3b8d0b42c2ac30d3661919f7dfe400b",
+    "Assets/materials/belltower/forest/shapes-v1/forest_trees.vmat": "9a5f8f53fb0838a493528b117f72688c3ca8d55223a5ae9f7686132230695c18",
+    "output/belltower/quality/forest-shapes-v1/manifest.json": "bc4383d28d6fc63be1d8cdd1649861c9a8e6e87839cac75643878e3b815b1170",
+    "Assets/scenes/maps/Belltower/belltower.scene": "5ea26d816c6b752225a5bd4ea2d761ba2791543c1ab7c89682f98d54219b373d"
+  },
+  "engine_source_sha256": {
+    "core/shaders/common/pixelinput.hlsl": "01be2364a59100645ef19812f48a3729fe650b6ec8b36ef23e5aac8d381dae88",
+    "core/shaders/common/vertexinput.hlsl": "77bb2d8b2fe55070cef352f6cb968d789768b886b4d7446c3592d75035ca0117"
+  },
+  "calibration": [
+    {
+      "variant": 0,
+      "species": "oak",
+      "local_crown_centre": [
+        0.49841772151898733,
+        0.47349823321554774
+      ],
+      "local_crown_radius": [
+        0.5248417721518988,
+        0.4858480565371025
+      ],
+      "alpha_threshold": 90,
+      "crown_rows": [
+        21,
+        277
+      ]
+    },
+    {
+      "variant": 1,
+      "species": "oak",
+      "local_crown_centre": [
+        0.49812734082397003,
+        0.4931740614334471
+      ],
+      "local_crown_radius": [
+        0.5229775280898876,
+        0.4783959044368601
+      ],
+      "alpha_threshold": 90,
+      "crown_rows": [
+        18,
+        279
+      ]
+    },
+    {
+      "variant": 2,
+      "species": "oak",
+      "local_crown_centre": [
+        0.49847560975609756,
+        0.48043478260869565
+      ],
+      "local_crown_radius": [
+        0.5252134146341464,
+        0.4745217391304348
+      ],
+      "alpha_threshold": 90,
+      "crown_rows": [
+        18,
+        221
+      ]
+    },
+    {
+      "variant": 3,
+      "species": "oak",
+      "local_crown_centre": [
+        0.498220640569395,
+        0.46743295019157083
+      ],
+      "local_crown_radius": [
+        0.5235765124555161,
+        0.47350574712643684
+      ],
+      "alpha_threshold": 90,
+      "crown_rows": [
+        24,
+        254
+      ]
+    },
+    {
+      "variant": 4,
+      "species": "holm-oak",
+      "local_crown_centre": [
+        0.49849397590361444,
+        0.4493670886075949
+      ],
+      "local_crown_radius": [
+        0.5253313253012049,
+        0.4605063291139241
+      ],
+      "alpha_threshold": 90,
+      "crown_rows": [
+        29,
+        232
+      ]
+    },
+    {
+      "variant": 5,
+      "species": "holm-oak",
+      "local_crown_centre": [
+        0.4979919678714859,
+        0.5159574468085106
+      ],
+      "local_crown_radius": [
+        0.5221084337349398,
+        0.45152482269503547
+      ],
+      "alpha_threshold": 90,
+      "crown_rows": [
+        18,
+        255
+      ]
+    },
+    {
+      "variant": 6,
+      "species": "holm-oak",
+      "local_crown_centre": [
+        0.4985507246376812,
+        0.5414847161572052
+      ],
+      "local_crown_radius": [
+        0.5256956521739131,
+        0.45089519650655024
+      ],
+      "alpha_threshold": 90,
+      "crown_rows": [
+        9,
+        201
+      ]
+    },
+    {
+      "variant": 7,
+      "species": "holm-oak",
+      "local_crown_centre": [
+        0.49809885931558934,
+        0.5277777777777778
+      ],
+      "local_crown_radius": [
+        0.5227946768060837,
+        0.41214814814814815
+      ],
+      "alpha_threshold": 90,
+      "crown_rows": [
+        24,
+        231
+      ]
+    },
+    {
+      "variant": 8,
+      "species": "beech",
+      "local_crown_centre": [
+        0.4981549815498155,
+        0.4965986394557823
+      ],
+      "local_crown_radius": [
+        0.5231549815498155,
+        0.4676700680272109
+      ],
+      "alpha_threshold": 90,
+      "crown_rows": [
+        20,
+        276
+      ]
+    },
+    {
+      "variant": 9,
+      "species": "beech",
+      "local_crown_centre": [
+        0.4985207100591716,
+        0.4779411764705882
+      ],
+      "local_crown_radius": [
+        0.5255029585798817,
+        0.4779595588235295
+      ],
+      "alpha_threshold": 90,
+      "crown_rows": [
+        21,
+        263
+      ]
+    },
+    {
+      "variant": 10,
+      "species": "beech",
+      "local_crown_centre": [
+        0.49764150943396224,
+        0.5102040816326531
+      ],
+      "local_crown_radius": [
+        0.5198584905660377,
+        0.49678571428571433
+      ],
+      "alpha_threshold": 90,
+      "crown_rows": [
+        8,
+        280
+      ]
+    },
+    {
+      "variant": 11,
+      "species": "beech",
+      "local_crown_centre": [
+        0.4984894259818731,
+        0.48913043478260865
+      ],
+      "local_crown_radius": [
+        0.5253021148036254,
+        0.5020471014492753
+      ],
+      "alpha_threshold": 90,
+      "crown_rows": [
+        12,
+        270
+      ]
+    },
+    {
+      "variant": 12,
+      "species": "willow",
+      "local_crown_centre": [
+        0.4981203007518797,
+        0.48404255319148937
+      ],
+      "local_crown_radius": [
+        0.5229323308270677,
+        0.5008510638297873
+      ],
+      "alpha_threshold": 90,
+      "crown_rows": [
+        14,
+        277
+      ]
+    },
+    {
+      "variant": 13,
+      "species": "willow",
+      "local_crown_centre": [
+        0.4984709480122324,
+        0.4653061224489796
+      ],
+      "local_crown_radius": [
+        0.5251834862385322,
+        0.47385714285714287
+      ],
+      "alpha_threshold": 90,
+      "crown_rows": [
+        23,
+        239
+      ]
+    },
+    {
+      "variant": 14,
+      "species": "willow",
+      "local_crown_centre": [
+        0.4980694980694981,
+        0.49256505576208176
+      ],
+      "local_crown_radius": [
+        0.5226061776061777,
+        0.5091449814126394
+      ],
+      "alpha_threshold": 90,
+      "crown_rows": [
+        9,
+        264
+      ]
+    },
+    {
+      "variant": 15,
+      "species": "willow",
+      "local_crown_centre": [
+        0.4984076433121019,
+        0.4876325088339223
+      ],
+      "local_crown_radius": [
+        0.5247770700636943,
+        0.5009717314487633
+      ],
+      "alpha_threshold": 90,
+      "crown_rows": [
+        13,
+        277
+      ]
+    }
+  ],
+  "atlas_corner_decoding_verified": true,
+  "maximum_half_float_local_uv_error": 0.0013727152122644526,
+  "unchanged_atlas_sha256": "52b644492a4c7126a8090868726e084c88608f931a64cff9698f0075ca2aa835",
+  "additional_texture_samples": 0,
+  "additional_texture_files": 0,
+  "additional_triangles": 0,
+  "additional_colliders": 0,
+  "control_strength": 0,
+  "candidate_strength": 0.42,
+  "canopy_mip_compensation": 0,
+  "model_source_revision": "forest-shapes-v1",
+  "bounded_model_count": 8,
+  "candidate_material": "materials/belltower/forest/volume-v1/rounded.vmat",
+  "control_material": "materials/belltower/forest/volume-v1/control.vmat",
+  "native_visual_review_verified": false,
+  "runtime_performance_verified": false,
+  "scope": "Eight existing west-sector silhouette meshes. New crown diffuse normals only; alpha, fade, palette and specular suppression remain unchanged. Unknown vertex UVs and trunks use the original normal. No scene or accepted asset edits."
+}

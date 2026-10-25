@@ -1,0 +1,36 @@
+// Read-only inspection of the actual compiled shop model. No scene or camera edits.
+var root = Sandbox.Project.Current.GetRootPath();
+var active = Editor.SceneEditorSession.Active;
+var gameId = Game.ActiveScene?.Id;
+var playing = Game.IsPlaying;
+var sessions = Editor.SceneEditorSession.All.Select(s => new { Session = s, s.HasUnsavedChanges }).ToArray();
+string Hash(string path) => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(System.IO.Path.Combine(root, path)))).ToLowerInvariant();
+var sourceHash = Hash("Assets/models/maps/belltower/shop-display-v2/shop_displays.obj");
+if (sourceHash != "29540fd43c99251bc166eddc62968c3f58fb97fafad420a6b5e28251dce98b79")
+    throw new InvalidOperationException("Shop source differs from the reviewed mesh.");
+var model = Model.Load("models/maps/belltower/shop-display-v2/shop_displays.vmdl");
+if (model is null || model.IsError) throw new InvalidOperationException("Compiled shop model could not be loaded.");
+var materialRows = model.Materials.Select(m => new { m.Name, m.IsError }).ToArray();
+var meshInfo = model.MeshInfo;
+var drawCalls = Enumerable.Range(0, meshInfo.TotalDrawCalls).Select(i => new {
+    Index = i, Material = materialRows[i].Name, Triangles = model.GetIndexCount(i) / 3
+}).ToArray();
+var sourceGeometry = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root, "output/belltower/prop-edge-audit/native-check-20261020/source-material-geometry.json")));
+var materialGeometryMatches = drawCalls.All(d => sourceGeometry["triangles_by_material"]["shop2_" + System.IO.Path.GetFileNameWithoutExtension(d.Material)].GetValue<int>() == d.Triangles);
+var statePreserved = ReferenceEquals(active, Editor.SceneEditorSession.Active) && Game.ActiveScene?.Id == gameId
+    && Game.IsPlaying == playing && sessions.All(s => Editor.SceneEditorSession.All.Contains(s.Session) && s.Session.HasUnsavedChanges == s.HasUnsavedChanges)
+    && Editor.SceneEditorSession.All.Count() == sessions.Length;
+var result = new {
+    Model = model.ResourcePath, model.IsError, model.MeshCount,
+    Triangles = meshInfo.TotalTriangles, DrawCalls = drawCalls, NativeMaterialGeometryMatches = materialGeometryMatches,
+    SourceSha256 = sourceHash, ExpectedTriangles = 402832, Materials = materialRows,
+    ShaderSha256 = Hash("Assets/shaders/belltower_shop_display_v2.shader"),
+    LabelPixelsSha256 = Hash("Assets/materials/belltower/shop-display-v2/labels-v2.png"),
+    EditorStatePreserved = statePreserved, Playing = playing,
+    ActiveScenePath = active?.Scene.Source?.ResourcePath,
+    IsVisualReview = false
+};
+System.IO.File.WriteAllText(System.IO.Path.Combine(root, "output/belltower/prop-edge-audit/native-check-20261020/compiled-model.json"), System.Text.Json.JsonSerializer.Serialize(result));
+if (!statePreserved || meshInfo.TotalTriangles != 402832 || !materialGeometryMatches || materialRows.Any(m => m.IsError))
+    throw new InvalidOperationException("Native model verification failed; inspect compiled-model.json.");
+return result;

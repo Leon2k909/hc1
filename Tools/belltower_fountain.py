@@ -12,6 +12,10 @@ from PIL import Image
 import map_kit as K
 import belltower_detail as D
 import belltower_materials as M
+import belltower_fountain_water as Water
+import belltower_fountain_ornaments as Ornaments
+import belltower_stone_wear as StoneWear
+import belltower_bell as Bell
 
 STONE = "fountain_limestone"
 RELIEF = "fountain_relief"
@@ -20,7 +24,7 @@ WATER = "fountain_water"
 JET = "fountain_jet"
 
 
-def materials():
+def materials(centre=(0., 130.)):
     """Seamless cut stone, aged bronze and rippled water, without masonry joints."""
     folder = K.ASSETS / "materials/belltower"
     folder.mkdir(parents=True, exist_ok=True)
@@ -62,32 +66,16 @@ def materials():
                       f"{M.RESOURCE_DIR}/{name}_rough.png", "materials/default/default_ao.tga")
         text = text.replace('g_flMetalness "0.00"', f'g_flMetalness "{metal:.2f}"')
         if name in (WATER, JET):
-            colour = "[0.07 0.23 0.25]" if name == WATER else "[0.42 0.63 0.66]"
-            opacity = .78 if name == WATER else .48
-            text = ('"Layer0"\n{\n    shader "shaders/belltower_fountain_water.shader"\n'
-                    f'    TextureNormalA "{M.RESOURCE_DIR}/{name}_normal.png"\n'
-                    f'    TextureNormalB "{M.RESOURCE_DIR}/{WATER}_normal.png"\n'
-                    f'    g_vWaterColor "{colour}"\n    g_flWaterOpacity "{opacity}"\n'
-                    '    g_flFlowSpeed "0.18"\n}\n')
+            text = Water.material_definitions(centre)[name]
         K.write_text(folder / f"{name}.vmat", text)
     text = (folder / f"{STONE}.vmat").read_text().replace(
         'g_vColorTint "[1.0 1.0 1.0 1.0]"', 'g_vColorTint "[0.72 0.70 0.67 1.0]"')
     K.write_text(folder / f"{RELIEF}.vmat", text)
-
-
-def ellipsoid(model, centre, axes, radii, paint):
-    """A smooth sculpted lump, transformed with its normals."""
-    temp = K.Model()
-    D.ball(temp, (0, 0, 0), 1, paint, rings=7, segments=14)
-    matrix = np.column_stack(axes) @ np.diag(radii)
-    normal_matrix = np.linalg.inv(matrix).T
-    for i, (points, _) in enumerate(temp.polygons[paint]):
-        normals = [K.normalise(normal_matrix @ n) for n in temp.polygon_normals[(paint, i)]]
-        model.polygon(paint, [np.asarray(centre) + matrix @ p for p in points], normals=normals)
+    Bell.materials()
 
 
 def build(model, centre, ring):
-    materials()
+    materials(centre)
     for paint in (STONE, RELIEF, BRONZE, WATER, JET):
         model.material_overrides[paint] = f"{M.RESOURCE_DIR}/{paint}.vmat"
         model.tile_overrides[paint] = 48 if paint in (STONE, RELIEF, BRONZE) else 96
@@ -95,7 +83,7 @@ def build(model, centre, ring):
     up = np.array((0., 0., 1.))
 
     def box(half, z0, z1, paint=STONE, solid=True):
-        model.box((e-half, n-half, z0), (e+half, n+half, z1), paint, "default" if solid else None)
+        StoneWear.fountain_block(model, centre, half, z0, z1, paint, "default" if solid else None)
 
     def face_frame(angle, radius):
         out = np.array((math.cos(angle), math.sin(angle), 0.))
@@ -107,49 +95,12 @@ def build(model, centre, ring):
         model.beam(P(x0, depth, z0), P(x1, depth, z1), (1.3, 1.3), STONE)
 
     def fleur(P, z, scale):
-        # Raised lily: separate convex petals, stem, cross-band and splayed feet.
-        petals = [((0,-2), (-3,5), (-2.5,9), (0,13), (2.5,9), (3,5)),
-                  ((-1,0), (-6,2), (-8,5), (-7,8), (-4,8), (-2.5,6), (-3,4)),
-                  ((1,0), (3,4), (2.5,6), (4,8), (7,8), (8,5), (6,2)),
-                  ((-1,-2), (-4,-5), (-2,-6), (0,-3)),
-                  ((1,-2), (0,-3), (2,-6), (4,-5))]
-        for polygon in petals:
-            pts = [P(x*scale, 2.2, z+h*scale) for x, h in polygon]
-            back = [P(x*scale, .7, z+h*scale) for x, h in polygon]
-            # Ear clipping keeps the concave side petals intact in OBJ's triangle fan.
-            indices = list(range(len(polygon)))
-            xy = np.asarray(polygon, float)
-            def cross(a, b, c):
-                ab, ac = b-a, c-a
-                return ab[0]*ac[1]-ab[1]*ac[0]
-            area = sum(cross(np.zeros(2), xy[i], xy[(i+1)%len(xy)]) for i in indices)
-            sign = 1 if area > 0 else -1
-            while len(indices) > 3:
-                for j in range(len(indices)):
-                    ia, ib, ic = indices[j-1], indices[j], indices[(j+1)%len(indices)]
-                    a, b, c = xy[[ia,ib,ic]]
-                    if cross(a,b,c)*sign <= 1e-8:
-                        continue
-                    if any(all(cross(v,w,xy[q])*sign >= -1e-8 for v,w in ((a,b),(b,c),(c,a)))
-                           for q in indices if q not in (ia,ib,ic)):
-                        continue
-                    D.outward(model, RELIEF, [pts[ia],pts[ib],pts[ic]], P(0,2,z)-P(0,0,z))
-                    indices.pop(j)
-                    break
-                else:
-                    raise ValueError("Invalid lily outline")
-            D.outward(model, RELIEF, [pts[i] for i in indices], P(0,2,z)-P(0,0,z))
-            for k in range(len(pts)):
-                j = (k+1) % len(pts)
-                model.polygon(RELIEF, [back[k], back[j], pts[j], pts[k]])
-        model.beam(P(-3*scale, 2, z-1*scale), P(3*scale, 2, z-1*scale), (1.3, 1.3), RELIEF)
+        Ornaments.lily(model, P, z, scale)
 
     # Octagonal basin, stepped plinth, projecting coping and framed carved panels.
     paints = {"outside": STONE, "inside": STONE, "top": STONE}
-    ring(model, centre, 96, 114, 3, 26, 8, paints, "default")
-    ring(model, centre, 95, 115, 0, 5, 8, paints, "default")
-    ring(model, centre, 94, 114, 26, 30, 8, paints, "default")
-    model.cylinder(centre, 96, 20, 21.5, {"top": WATER}, sides=8, turn=math.pi/8)
+    StoneWear.fountain_rings(model, centre, ring, "default")
+    Water.pool(model, centre)
     model.cylinder(centre, 96, 3, 4, {"top": STONE}, sides=8, turn=math.pi/8)
     for k in range(8):
         P, _, _ = face_frame(k*math.pi/4 + math.pi/4, 114*math.cos(math.pi/8))
@@ -170,29 +121,8 @@ def build(model, centre, ring):
         for z in (71, 105):
             trim(P, -23, 23, z, z)
         fleur(P, 83, 1.25)
-        # Lion masks with a scalloped mane, ears, brow, muzzle and dark mouth.
-        axes = (along, out, up)
-        for j in range(16):
-            a = j * 2*math.pi/16
-            ellipsoid(model, P(9*math.cos(a), 2, 47+11*math.sin(a)), axes, (2.5, 2.8, 3.6), STONE)
-        ellipsoid(model, P(0, 4, 48), axes, (7.2, 4.8, 8.5), STONE)
-        for x in (-5, 5):
-            ellipsoid(model, P(x, 4, 55), axes, (2.2, 2.2, 3), STONE)
-            ellipsoid(model, P(x*.65, 8, 50), axes, (1.0, .65, .7), BRONZE)
-            ellipsoid(model, P(x*.4, 8, 44), axes, (2.9, 2.7, 2.1), STONE)
-        ellipsoid(model, P(0, 9.4, 47), axes, (2, 1.8, 2.1), STONE)
-        ellipsoid(model, P(0, 9.5, 42), axes, (2.3, 1.0, 1.8), BRONZE)
-        # Parabolic falling stream with thin highlights, landing inside the basin.
-        points = [P(0, 11 + 34*t, 42 + 10*t - 30.5*t*t) for t in np.linspace(0, 1, 19)]
-        for j, (a, b) in enumerate(zip(points, points[1:])):
-            D.rod(model, a, b, 1.15 + j*.035, JET, sides=8)
-        splash = points[-1]
-        for radius in (5, 9, 14):
-            D.hoop(model, splash + up*.2, along, out, radius, .22, JET, segments=24)
-        for j in range(7):
-            a = j*2*math.pi/7
-            p = splash + along*(math.cos(a)*4) + out*(math.sin(a)*4)
-            D.rod(model, p, p+up*(2+j%3)+along*math.cos(a)*2, .35, JET, sides=5)
+        Ornaments.lion(model, P)
+        Water.spout(model, P, along, out, k)
 
     # Four moulded columns, fluted shafts and capitals around an open bell cage.
     for se in (-1, 1):
@@ -235,13 +165,4 @@ def build(model, centre, ring):
 
     # A hollow bronze bell on its timber yoke, with crown loops and visible clapper.
     model.beam((e-22,n,190), (e+22,n,190), (5,6), "planks_dark")
-    D.lathe(model, centre, 141, [(13,0), (13,2), (11.5,3), (9,9), (7.5,22), (6.5,28),
-                               (3,32), (1.6,33)], BRONZE, sides=32, caps=(False,True))
-    D.lathe(model, centre, 141, [(11.7,0), (10.5,3), (8,9)], BRONZE, sides=32)
-    for z,r in ((143,12), (148,10), (165,7.5)):
-        D.hoop(model, (e,n,z), (1,0,0), (0,1,0), r, .5, BRONZE, segments=32)
-    D.rod(model, (e,n,139), (e,n,169), .8, "iron_black")
-    D.ball(model, (e,n,139), 2.1, BRONZE)
-    for offset in (-3, 3):
-        D.hoop(model, (e+offset,n,179), (1,0,0), (0,0,1), 4.5, .8, BRONZE, segments=16)
-    D.rod(model, (e,n,180), (e,n,190), 1.5, "iron_black")
+    Bell.build(model, centre)

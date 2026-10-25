@@ -1,0 +1,155 @@
+{
+  "revision": "firstperson-clothing-v2",
+  "generated_with": "built-in image_gen",
+  "generated": {
+    "shirt": {
+      "path": "output/firstperson-clothing-v2-20261021/imagegen/shirt.png",
+      "sha256": "31073b96d8925caa805dad19675116b24131d51f17c3abdf2c5ed1429fe5d781",
+      "native_dimensions": [
+        1254,
+        1254
+      ],
+      "upscaled": false
+    },
+    "gloves": {
+      "path": "output/firstperson-clothing-v2-20261021/imagegen/gloves.png",
+      "sha256": "0f50dde4172064ee17e954411f53b830ec2b83d331b82fee1ae381a90f7a8b42",
+      "native_dimensions": [
+        1254,
+        1254
+      ],
+      "upscaled": false
+    },
+    "weave": {
+      "path": "output/firstperson-clothing-v2-20261021/imagegen/weave.png",
+      "sha256": "25b959b12195e678c266682be79b5408af0aa0ec00745c66431c7fcffd21040c",
+      "native_dimensions": [
+        1254,
+        1254
+      ],
+      "upscaled": false
+    }
+  },
+  "fine_maps": {
+    "shirt": {
+      "size": [
+        1254,
+        1254
+      ],
+      "normal_max_xy": 0.13173268735408783,
+      "normal_rms_xy": 0.0356452539563179
+    },
+    "gloves": {
+      "size": [
+        213,
+        214
+      ],
+      "normal_max_xy": 0.2120143622159958,
+      "normal_rms_xy": 0.02560732141137123
+    }
+  },
+  "files": {
+    "Assets/shaders/viewmodel_fabric_v2.shader": {
+      "before": null,
+      "after": "330165db601632f29ac341ad2614660e34e264ec0ed7f9108cc41ac59dd17d2a",
+      "source": "output/firstperson-clothing-v2-20261021/stage/Assets/shaders/viewmodel_fabric_v2.shader"
+    },
+    "Assets/materials/operators/first_person/v2/gloves.vmat": {
+      "before": null,
+      "after": "0dcb136cdd36f62caa14874ea960b2bc09d0eac0655312c2bf5bd13a90e6e05b",
+      "source": "output/firstperson-clothing-v2-20261021/stage/Assets/materials/operators/first_person/v2/gloves.vmat"
+    },
+    "Assets/materials/operators/first_person/v2/gloves_albedo.png": {
+      "before": null,
+      "after": "0f50dde4172064ee17e954411f53b830ec2b83d331b82fee1ae381a90f7a8b42",
+      "source": "output/firstperson-clothing-v2-20261021/stage/Assets/materials/operators/first_person/v2/gloves_albedo.png"
+    },
+    "Assets/materials/operators/first_person/v2/gloves_ao.png": {
+      "before": null,
+      "after": "a3684197d1fba631f63afa791d1505e6e412fc1c505d3136bf264b8a25fe7118",
+      "source": "output/firstperson-clothing-v2-20261021/stage/Assets/materials/operators/first_person/v2/gloves_ao.png"
+    },
+    "Assets/materials/operators/first_person/v2/gloves_coverage.png": {
+      "before": null,
+      "after": "eac4c1c915f0a2e347c020a7a9698e5a28dea925df88f842e1ab856ec53f503d",
+      "source": "output/firstperson-clothing-v2-20261021/stage/Assets/materials/operators/first_person/v2/gloves_coverage.png"
+    },
+    "Assets/materials/operators/first_person/v2/gloves_fine_data.png": {
+      "before": null,
+      "after": "2b8c577c6b0a51c3b65a9fc9b235b5cdaf21388818e4ced4bf154f4301e0edb3",
+      "source": "output/firstperson-clothing-v2-20261021/stage/Assets/materials/operators/first_person/v2/gloves_fine_data.png"
+    },
+    "Assets/materials/operators/first_person/v2/gloves_fine_normal.png": {
+      "before": null,
+      "after": "c9a2f7754149fdaf7f23cfcf42bd46cd61009230b26c8bc705d881c5308a9af4",
+      "source": "output/firstperson-clothing-v2-20261021/stage/Assets/materials/operators/first_person/v2/gloves_fine_normal.png"
+    },
+    "Assets/materials/operators/first_person/v2/gloves_macro_normal.png": {
+      "before": null,
+      "after": "c025c6668d04260f0eb771c67f519790df28b8b7fca01c4695b05da738bb01df",
+      "source": "output/firstperson-clothing-v2-20261021/stage/Assets/materials/operators/first_person/v2/gloves_macro_normal.png"
+    },
+    "Assets/materials/operators/first_person/v2/gloves_roughness.png": {
+      "before": null,
+      "after": "57020e459e20ca43ffad0a8130ae1155c509a4dd095c51f9179d4ebf572ded4d",
+      "source": "output/firstperson-clothing-v2-20261021/stage/Assets/materials/operators/first_person/v2/gloves_roughness.png"
+    },
+    "Assets/materials/operators/first_person/v2/gloves_tint.png": {
+      "before": null,
+      "after": "9dad2718702ed67ee484d97970751945c69d73ad5e3281b032e848be22f05ba5",
+      "source": "output/firstperson-clothing-v2-20261021/stage/Assets/materials/operators/first_person/v2/gloves_tint.png"
+    },
+    "Assets/materials/operators/first_person/v2/shirt.vmat": {
+      "before": null,
+      "after": "479da7755eecc3fd5232d9df49f2bf056d16b6f347ea4131541c3b88172be7a6",
+      "source": "output/firstperson-clothing-v2-20261021/stage/Assets/materials/operators/first_person/v2/shirt.vmat"
+    },
+    "Assets/materials/operators/first_person/v2/shirt_albedo.png": {
+      "before": null,
+      "after": "31073b96d8925caa805dad19675116b24131d51f17c3abdf2c5ed1429fe5d781",
+      "source": "output/firstperson-clothing-v2-20261021/stage/Assets/materials/operators/first_person/v2/shirt_albedo.png"
+    },
+    "Assets/materials/operators/first_person/v2/shirt_ao.png": {
+      "before": null,
+      "after": "d69112264db6c2c1b6f6bc930b7d7cf38c27a4fead1b5000259265c5405c66ef",
+      "source": "output/firstperson-clothing-v2-20261021/stage/Assets/materials/operators/first_person/v2/shirt_ao.png"
+    },
+    "Assets/materials/operators/first_person/v2/shirt_coverage.png": {
+      "before": null,
+      "after": "2eaf0540caf1ec7eb8fc2fe9cc9fb5bf82bfbc6f3a99aca0c8fcbef2a44b9b63",
+      "source": "output/firstperson-clothing-v2-20261021/stage/Assets/materials/operators/first_person/v2/shirt_coverage.png"
+    },
+    "Assets/materials/operators/first_person/v2/shirt_fine_data.png": {
+      "before": null,
+      "after": "ca20ef16bfaba9ddbffe60b7e3cb86e6660f4d301052407f83ecc1ed7bc6c388",
+      "source": "output/firstperson-clothing-v2-20261021/stage/Assets/materials/operators/first_person/v2/shirt_fine_data.png"
+    },
+    "Assets/materials/operators/first_person/v2/shirt_fine_normal.png": {
+      "before": null,
+      "after": "bb3935e2d212c5346dac86712086265fe43e8828197ce557b5aa59cf587f321a",
+      "source": "output/firstperson-clothing-v2-20261021/stage/Assets/materials/operators/first_person/v2/shirt_fine_normal.png"
+    },
+    "Assets/materials/operators/first_person/v2/shirt_macro_normal.png": {
+      "before": null,
+      "after": "570e66088c74d9a1371009237c65e6a863e289ec17e0c21be449d82c714530b1",
+      "source": "output/firstperson-clothing-v2-20261021/stage/Assets/materials/operators/first_person/v2/shirt_macro_normal.png"
+    },
+    "Assets/materials/operators/first_person/v2/shirt_roughness.png": {
+      "before": null,
+      "after": "61bb6456f1882bd8a9d2702969a64ff59c09afdb7f270ab4a16b13c9ca3f2af0",
+      "source": "output/firstperson-clothing-v2-20261021/stage/Assets/materials/operators/first_person/v2/shirt_roughness.png"
+    },
+    "Assets/materials/operators/first_person/v2/shirt_tint.png": {
+      "before": null,
+      "after": "76a530af024bf1f10b7a8934880e334dd62c2609a9fc59e77a750aeb84365af1",
+      "source": "output/firstperson-clothing-v2-20261021/stage/Assets/materials/operators/first_person/v2/shirt_tint.png"
+    }
+  },
+  "coverage_and_tint_masks_exact": true,
+  "original_assets_modified": false,
+  "scene_and_prefabs_are_not_targets": true,
+  "source_sha256": {
+    "Tools/build_firstperson_clothing_v2.py": "3b14c8b02147d1b7e786df3b2e8f4b785397d700fd9a9c40ba419276cc8a1e42",
+    "Sources/Clothing/firstperson-v2/viewmodel_fabric_v2.shader": "330165db601632f29ac341ad2614660e34e264ec0ed7f9108cc41ac59dd17d2a"
+  }
+}

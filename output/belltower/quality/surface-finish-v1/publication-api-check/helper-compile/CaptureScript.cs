@@ -1,0 +1,76 @@
+using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Sandbox;
+public static class BelltowerPreviewCapture {
+public static async Task<object> Run(string exchangeDirectory, CancellationToken cancellationToken) {
+// Publish the nine reviewed surface-finish materials. All source texture pixels,
+// shaders, geometry, collision and scene data remain intact. Backups are retained.
+var root=Sandbox.Project.Current.GetRootPath();
+var stage=System.IO.Path.Combine(root,"output/belltower/quality/surface-finish-v1");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(stage,"manifest.json")));
+var selected=Editor.SceneEditorSession.Active;
+if (Game.IsPlaying || selected is null || selected.HasUnsavedChanges
+    || !selected.Scene.Source.ResourcePath.Equals("scenes/maps/belltower/belltower.scene",StringComparison.OrdinalIgnoreCase))
+    throw new InvalidOperationException("Requires active, stopped, saved Belltower after native appearance review.");
+string Hash(string path)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+foreach (var input in manifest["source_sha256"].AsObject())
+    if (Hash(System.IO.Path.Combine(root,input.Key))!=input.Value.GetValue<string>())
+        throw new InvalidOperationException("Reviewed surface input changed: "+input.Key);
+var expected=new System.Collections.Generic.HashSet<string>{"rubble","plaster_rose","plaster_terracotta","plaster_ochre",
+    "plaster_cream","plaster_blue","plaster_sage","plaster_pale","plaster_whitewash"};
+if (!expected.SetEquals(manifest["records"].AsArray().Select(r=>System.IO.Path.GetFileNameWithoutExtension(r["target"].GetValue<string>()))))
+    throw new InvalidOperationException("Unexpected surface set.");
+var scenePath=System.IO.Path.Combine(root,"Assets/scenes/maps/Belltower/belltower.scene");
+var sceneHash=Hash(scenePath);var game=Game.ActiveScene?.Id;
+var ids=selected.Scene.GetAllObjects(true).Select(o=>o.Id).ToHashSet();
+var plan=new System.Collections.Generic.List<(string Source,string Target,string Backup,string After)>();
+foreach (var entry in manifest["records"].AsArray())
+{
+    var name=System.IO.Path.GetFileName(entry["target"].GetValue<string>());
+    if (entry["target"].GetValue<string>()!="materials/belltower/"+name
+        || entry["path"].GetValue<string>()!="materials/belltower/trials/surface-finish-v1/"+name)
+        throw new InvalidOperationException("Unexpected publication path.");
+    var source=System.IO.Path.Combine(root,"Assets",entry["path"].GetValue<string>());
+    var target=System.IO.Path.Combine(root,"Assets",entry["target"].GetValue<string>());
+    var before=entry["original_sha256"].GetValue<string>();var after=entry["sha256"].GetValue<string>();
+    if (Hash(source)!=after || Hash(target)!=before) throw new InvalidOperationException("A surface changed since review: "+name);
+    var backup=System.IO.Path.Combine(stage,"publication-before/Assets",entry["target"].GetValue<string>());
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(backup));
+    if (!System.IO.File.Exists(backup)) System.IO.File.Copy(target,backup);
+    if (Hash(backup)!=before) throw new InvalidOperationException("Original surface backup differs.");
+    plan.Add((source,target,backup,after));
+}
+var changed=new System.Collections.Generic.List<(string Target,string Backup)>();
+try
+{
+    foreach (var item in plan)
+    {
+        var incoming=item.Target+".surface-incoming";
+        try
+        {
+            System.IO.File.Copy(item.Source,incoming,true);
+            if (Hash(incoming)!=item.After) throw new InvalidOperationException("Incoming surface differs.");
+            changed.Add((item.Target,item.Backup));System.IO.File.Move(incoming,item.Target,true);
+        }
+        finally {if (System.IO.File.Exists(incoming)) System.IO.File.Delete(incoming);}
+    }
+}
+catch
+{
+    foreach (var item in changed.AsEnumerable().Reverse()) System.IO.File.Copy(item.Backup,item.Target,true);
+    throw;
+}
+foreach (var item in plan) Editor.AssetSystem.RegisterFile(item.Target);
+if (!ReferenceEquals(selected,Editor.SceneEditorSession.Active) || selected.HasUnsavedChanges || Game.IsPlaying
+    || Game.ActiveScene?.Id!=game || Hash(scenePath)!=sceneHash || !ids.SetEquals(selected.Scene.GetAllObjects(true).Select(o=>o.Id)))
+    throw new InvalidOperationException("Editor state changed during publication.");
+var result=new {Updated=plan.Count,SceneSha256=sceneHash,SceneUnchanged=true,EditorStatePreserved=true,
+    TexturePixelsUnchanged=true,ShadersUnchanged=true,GeometryUnchanged=true,
+    Files=plan.Select(p=>new{p.Target,Sha256=Hash(p.Target)})};
+System.IO.File.WriteAllText(System.IO.Path.Combine(stage,"native-publication.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;
+
+}
+}

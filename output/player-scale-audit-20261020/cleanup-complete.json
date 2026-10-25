@@ -1,0 +1,27 @@
+{
+  "recorded_utc": "2026-10-20T19:48:35.345167+00:00",
+  "audit_play_stopped": true,
+  "original_menu_selection_restored_at_cleanup": true,
+  "audit_boxyard_edit_tab_closed": true,
+  "original_restore_receipt": "close-audit-tab/close_scene.json",
+  "latest_observed_editor_state": {
+    "Playing": false,
+    "Active": "scenes/maps/belltower/belltower.scene",
+    "HasUnsavedChanges": false,
+    "OpenDocuments": [
+      "scenes/menu.scene",
+      "scenes/maps/belltower/belltower.scene"
+    ],
+    "FieldOfView": 85,
+    "IndependentAdsFov": false,
+    "Restored": false
+  },
+  "later_external_belltower_selection_preserved": true,
+  "note": "Cleanup restored the original menu and closed the audit's Boxyard document. Belltower was opened subsequently by another editor user or chat. The archived strict menu-only verification therefore returned Restored=false; this is a later selection change, not unfinished audit cleanup. No action was taken to overwrite that selection.",
+  "fov_ads_and_god_mode_restoration": {
+    "FovRestored": true,
+    "AdsRestored": true,
+    "GodModeRestored": true,
+    "SceneIsAuditMatch": true
+  }
+}

@@ -1,0 +1,14 @@
+// Tools/belltower_barrels_v3.py: an existing picture set in its own tint
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    TextureColor "materials/stillhouse/sh_rust_color.png"
+    TextureNormal "materials/stillhouse/rust_normal.png"
+    TextureRoughness "materials/stillhouse/rust_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[0.58 0.47 0.42 1]"
+    g_flRoughnessScaleFactor "1"
+    g_flModelTintAmount "1"
+    g_flMetalness "0"
+}

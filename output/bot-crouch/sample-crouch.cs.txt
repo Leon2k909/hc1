@@ -1,0 +1,40 @@
+// Read-only: samples every lightweight bot in the running match for 20 s (10 times a second) and reports how often each
+// one crouches and stands, how long it stays down, and the eased CrouchBlend against the host's IsCrouching. Touches
+// nothing in the scene. Run with sbox-cli's run_csharp while a match with bots is playing.
+var scene = Game.ActiveScene;
+if ( scene is null || !Game.IsPlaying ) return new { Error = "no match playing" };
+var type = AppDomain.CurrentDomain.GetAssemblies().Reverse().Select( a => a.GetType( "Facepunch.LightweightCombatBot" ) ).FirstOrDefault( t => t is not null );
+var crouchProp = type.GetProperty( "IsCrouching" );
+var blendProp = type.GetProperty( "CrouchBlend" );
+var nameProp = type.GetProperty( "BotName" );
+var aliveProp = type.GetProperty( "IsAlive" );
+var stats = new System.Collections.Generic.Dictionary<Guid, (string Name, int Downs, int Ups, float DownTime, float LastDown, bool Was, System.Collections.Generic.List<float> Holds, float MaxStep, float LastBlend)>();
+const float dt = 0.1f;
+for ( var i = 0; i < 200; i++ )
+{
+	var now = i * dt;
+	foreach ( var go in scene.GetAllObjects( true ) )
+	{
+		var bot = go.Components.GetAll().FirstOrDefault( c => c.GetType() == type );
+		if ( bot is null || !(bool)aliveProp.GetValue( bot ) ) continue;
+		var crouching = (bool)crouchProp.GetValue( bot );
+		var blend = blendProp is null ? -1f : (float)blendProp.GetValue( bot );
+		if ( !stats.TryGetValue( go.Id, out var s ) )
+			s = ((string)nameProp?.GetValue( bot ) ?? go.Name, 0, 0, 0f, -1f, crouching, new System.Collections.Generic.List<float>(), 0f, blend);
+		if ( crouching && !s.Was ) { s.Downs++; s.LastDown = now; }
+		if ( !crouching && s.Was ) { s.Ups++; if ( s.LastDown >= 0f ) s.Holds.Add( now - s.LastDown ); }
+		if ( crouching ) s.DownTime += dt;
+		s.MaxStep = MathF.Max( s.MaxStep, MathF.Abs( blend - s.LastBlend ) );
+		s.Was = crouching;
+		s.LastBlend = blend;
+		stats[go.Id] = s;
+	}
+	await Task.Delay( 100 );
+}
+return new
+{
+	HasCrouchBlend = blendProp is not null,
+	Seconds = 20,
+	Bots = stats.Values.Select( s => new { s.Name, s.Downs, s.Ups, DownSeconds = MathF.Round( s.DownTime, 1 ),
+		Holds = s.Holds.Select( h => MathF.Round( h, 1 ) ), LargestBlendStepPerSample = MathF.Round( s.MaxStep, 2 ) } )
+};

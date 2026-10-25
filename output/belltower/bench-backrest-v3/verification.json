@@ -1,0 +1,137 @@
+{
+  "revision": "bench-backrest-v3",
+  "date": "2026-10-21",
+  "problem": "Rear iron supports raked more steeply than the backrest and intersected the wooden slats.",
+  "fix": "Eight-degree closed rear castings with seat-clearing offset brackets and eased exposed edges.",
+  "installed": {
+    "files_installed": {
+      "Assets/models/maps/belltower/belltower_west.obj": true,
+      "Assets/models/maps/belltower/compiler-safe/west/west_033_iron_black.obj": true,
+      "Assets/models/maps/belltower/belltower_east.obj": true,
+      "Assets/models/maps/belltower/compiler-safe/east/east_032_iron_black.obj": true
+    },
+    "vmdl_and_collision_descriptions_unchanged": true,
+    "scene_unchanged": true,
+    "benches": 18,
+    "supports": 36,
+    "clearance": {
+      "minimum_backrest_plane_clearance_inches": 0.040000000000000036,
+      "seat_intersection_free": true,
+      "upright_top_below_top_slat": true,
+      "backrest_and_upright_rake_degrees": 8
+    }
+  },
+  "native_import": {
+    "Imported": 4,
+    "Benches": 18,
+    "RearSupports": 36,
+    "TriangleCountUnchanged": true,
+    "SeatsSlatsArmsBoltsAndCollisionPreserved": true,
+    "SceneUnchanged": true,
+    "SceneSha256": "7c81362d419176d9bb98caf5287e1949f19b1d867a8c2cb030971b5ecac865cd",
+    "ActiveDocumentPreserved": true,
+    "ModelDescriptionsUnchanged": true,
+    "ForcedFullCompile": false
+  },
+  "native_models": [
+    {
+      "Name": "belltower_west",
+      "Path": "models/maps/belltower/belltower_west.vmdl",
+      "Type": "Model",
+      "Extension": "vmdl",
+      "IsGameResource": false,
+      "SourceFile": "c:/sbox-projects/hc1/forked-shooter-main/assets/models/maps/belltower/belltower_west.vmdl",
+      "CompiledFile": "c:/sbox-projects/hc1/forked-shooter-main/assets/models/maps/belltower/belltower_west.vmdl_c",
+      "IsCompiled": true,
+      "IsCompiledAndUpToDate": true,
+      "IsCompileFailed": false,
+      "CanRecompile": true,
+      "IsCloud": false,
+      "IsTransient": false,
+      "IsProcedural": false,
+      "IsTrivialChild": false,
+      "Package": null,
+      "Tags": [],
+      "ReferenceCount": 120,
+      "DependantCount": 1,
+      "LastOpened": null
+    },
+    {
+      "Name": "belltower_east",
+      "Path": "models/maps/belltower/belltower_east.vmdl",
+      "Type": "Model",
+      "Extension": "vmdl",
+      "IsGameResource": false,
+      "SourceFile": "c:/sbox-projects/hc1/forked-shooter-main/assets/models/maps/belltower/belltower_east.vmdl",
+      "CompiledFile": "c:/sbox-projects/hc1/forked-shooter-main/assets/models/maps/belltower/belltower_east.vmdl_c",
+      "IsCompiled": true,
+      "IsCompiledAndUpToDate": true,
+      "IsCompileFailed": false,
+      "CanRecompile": true,
+      "IsCloud": false,
+      "IsTransient": false,
+      "IsProcedural": false,
+      "IsTrivialChild": false,
+      "Package": null,
+      "Tags": [],
+      "ReferenceCount": 117,
+      "DependantCount": 1,
+      "LastOpened": null
+    }
+  ],
+  "in_game_play_test_passed": true,
+  "in_game_first_person_views": {
+    "rear-close": {
+      "path": "output/belltower/bench-backrest-v3/in-game/rear-close.png",
+      "sha256": "a137ea26bafbcdb0558916040d8e91e0f10c55876f257c167b70cb1d8621018c"
+    },
+    "rear-oblique": {
+      "path": "output/belltower/bench-backrest-v3/in-game/rear-oblique.png",
+      "sha256": "27daf6f5bc9e35a5f42a4c8421702340ca16255c5c9276f152e33f4d4161f82c"
+    },
+    "seat-joint": {
+      "path": "output/belltower/bench-backrest-v3/in-game/seat-joint.png",
+      "sha256": "f91af835e778a510ca54eced1ac0387dc6c149b6a57e7eb069c98285ad73a7cf"
+    },
+    "front": {
+      "path": "output/belltower/bench-backrest-v3/in-game/front.png",
+      "sha256": "93aa9233f8709bd1baecb886c58b11ad19686610e0baa17da350fcedaefad185"
+    },
+    "mirrored-rear": {
+      "path": "output/belltower/bench-backrest-v3/in-game/mirrored-rear.png",
+      "sha256": "04d8e389eb87f604a9268b58730dabea07aaadaa45f4f08a52ad08b3d7442aee"
+    }
+  },
+  "player_test_state_restored": {
+    "LocalPlayerRestored": true,
+    "NoclipRestored": true,
+    "GodModeRestored": true,
+    "ViewBobRestored": true
+  },
+  "original_stopped_editor_state_restored": true,
+  "final_editor": {
+    "EngineVersion": "26.10.13a",
+    "Project": "razedtest",
+    "ProjectTitle": "RazedTest",
+    "ActiveScene": "belltower",
+    "ActiveScenePath": "scenes/maps/belltower/belltower.scene",
+    "SceneHasUnsavedChanges": false,
+    "IsPlaying": false,
+    "IsPaused": false,
+    "ToolCount": 128,
+    "IsCompiling": false,
+    "LastCompileSucceeded": true,
+    "LastCompileErrors": 0,
+    "Paths": {
+      "Engine": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\sbox",
+      "Logs": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\sbox\\logs",
+      "ProjectRoot": "C:\\sbox-projects\\hc1\\forked-shooter-main",
+      "ProjectSettings": "C:\\sbox-projects\\hc1\\forked-shooter-main\\ProjectSettings"
+    }
+  },
+  "only_rear_support_faces_changed": true,
+  "triangle_count_unchanged": true,
+  "source": "Tools/belltower_furniture.py",
+  "stage_manifest": "output/belltower/bench-backrest-v3/stage-r2/manifest.json",
+  "screenshots_reviewed": "Rear supports stay behind all three slats, clear the seat and terminate below the top board. Front and mirrored captures reviewed."
+}

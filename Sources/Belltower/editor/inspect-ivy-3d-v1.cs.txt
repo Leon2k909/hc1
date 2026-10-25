@@ -1,0 +1,16 @@
+var paths = new[] { "models/maps/belltower/belltower_west.vmdl", "models/maps/belltower/belltower_east.vmdl" };
+var material = Material.Load("materials/belltower/ivy-3d-v1/leaves.vmat");
+var texture = material.GetTexture("g_tPlants");
+var models = paths.Select(path => {
+    var model = Model.Load(path);
+    return new { Path=path, model.IsError, Materials=model.Materials.Select(m=>m.ResourcePath).ToArray() };
+}).ToArray();
+var result = new { Models=models, LeafMaterialError=material.IsError,
+    Texture=new { texture.IsError, texture.Width, texture.Height },
+    Game.IsPlaying, Scene=Editor.SceneEditorSession.Active?.Scene?.Source?.ResourcePath,
+    HasUnsavedChanges=Editor.SceneEditorSession.Active?.HasUnsavedChanges };
+if (models.Any(m=>m.IsError || !m.Materials.Contains("materials/belltower/ivy-3d-v1/leaves.vmat")) || material.IsError || texture.IsError)
+    throw new InvalidOperationException("The 3D ivy's native model/material/texture did not load.");
+var root = Sandbox.Project.Current.GetRootPath();
+System.IO.File.WriteAllText(System.IO.Path.Combine(root,"output/belltower/ivy-3d-v1/native-resources.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

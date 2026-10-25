@@ -1,0 +1,65 @@
+// Capture the real edited or runtime Belltower; restore camera synchronously.
+var root=Sandbox.Project.Current.GetRootPath();
+var folder=System.IO.Path.Combine(root,"output/belltower/bell-v2");
+var config=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"capture.json")));
+var name=config["name"].GetValue<string>();
+if(!System.Text.RegularExpressions.Regex.IsMatch(name,"^[a-z0-9-]+$")) throw new InvalidOperationException("Invalid capture name.");
+var runtime=config["runtime"].GetValue<bool>();
+var session=Editor.SceneEditorSession.Active;
+var scene=runtime?Game.ActiveScene:session?.Scene;
+if(scene is null || (runtime&&!Game.IsPlaying) || (!runtime&&Game.IsPlaying)) throw new InvalidOperationException("Capture scene/play guard.");
+var centre=scene.GetAllComponents<ModelRenderer>().FirstOrDefault(r=>r.Model?.ResourcePath=="models/maps/belltower/belltower_centre.vmdl");
+if(centre is null || centre.Model.IsError) throw new InvalidOperationException("Belltower centre is not loaded in this scene.");
+var camera=runtime?scene.Camera:scene.GetAllComponents<CameraComponent>().First(c=>c.GameObject.Name=="editor_camera");
+if(camera is null) throw new InvalidOperationException("No capture camera.");
+var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic;
+var cameraProperty=typeof(Scene).GetProperty("Camera",flags);
+var previousMain=scene.Camera;
+var old=new {camera.WorldPosition,camera.WorldRotation,camera.FieldOfView,camera.FovAxis,camera.CustomSize};
+var serialized=camera.Serialize().ToJsonString();
+var dirty=session.HasUnsavedChanges;
+var scenePath=System.IO.Path.Combine(root,"Assets/scenes/maps/Belltower/belltower.scene");
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+var sceneHash=Hash(scenePath);
+var materials=Enumerable.Range(0,centre.Materials.Count).Select(i=>centre.Materials.GetOverride(i)??centre.Materials.GetOriginal(i)).Where(m=>m is not null).ToArray();
+foreach(var m in materials)
+    foreach(var key in new[]{"g_tColor","g_tNormal","g_tRma"}) m.GetTexture(key)?.MarkUsed(2048);
+var output=System.IO.Path.Combine(folder,name+".png");
+if(System.IO.File.Exists(output)) throw new InvalidOperationException("Preserve existing capture evidence.");
+try
+{
+    using(scene.Push())
+    {
+        cameraProperty.SetValue(scene,camera);
+        camera.WorldPosition=Vector3.Parse(config["position"].GetValue<string>());
+        var target=Vector3.Parse(config["target"].GetValue<string>());
+        camera.WorldRotation=Rotation.LookAt(target-camera.WorldPosition,Vector3.Up);
+        camera.FieldOfView=config["fov"].GetValue<float>();
+        camera.FovAxis=CameraComponent.Axis.Horizontal;
+        camera.CustomSize=new Vector2(1280,1280);
+        typeof(Scene).GetMethod("PreRender",flags,null,Type.EmptyTypes,null).Invoke(scene,null);
+        typeof(Scene).GetMethod("PreCameraRender",flags,null,Type.EmptyTypes,null).Invoke(scene,null);
+        typeof(PostProcessSystem).GetMethod("UpdateCamera",flags).Invoke(scene.GetSystem<PostProcessSystem>(),new object[]{camera});
+        using var bitmap=new Bitmap(1280,1280);
+        camera.RenderToBitmap(bitmap,false);
+        System.IO.File.WriteAllBytes(output,bitmap.ToPng());
+    }
+}
+finally
+{
+    using(scene.Push())
+    {
+        cameraProperty.SetValue(scene,previousMain);
+        camera.WorldPosition=old.WorldPosition;camera.WorldRotation=old.WorldRotation;
+        camera.FieldOfView=old.FieldOfView;camera.FovAxis=old.FovAxis;camera.CustomSize=old.CustomSize;
+        typeof(PostProcessSystem).GetMethod("UpdateCamera",flags).Invoke(scene.GetSystem<PostProcessSystem>(),new object[]{camera});
+    }
+}
+var result=new {Runtime=runtime,Scene=scene.Name,Game.IsPlaying,Image=output,CameraRestored=camera.Serialize().ToJsonString()==serialized,
+    SceneUnchanged=sceneHash==Hash(scenePath)&&dirty==session.HasUnsavedChanges,
+    BellMaterialLoaded=materials.Any(m=>m.ResourcePath=="materials/belltower/bell-v2/bell_bronze_v2.vmat"),
+    Materials=materials.Select(m=>new {m.ResourcePath,m.IsError}).ToArray(),
+    centre.Model.IsError,Vertices=centre.Model.GetVertices().Length};
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,name+".json"),System.Text.Json.JsonSerializer.Serialize(result));
+if(!result.CameraRestored||!result.SceneUnchanged) throw new InvalidOperationException("Capture restoration check failed.");
+return result;

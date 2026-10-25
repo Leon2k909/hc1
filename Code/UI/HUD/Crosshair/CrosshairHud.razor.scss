@@ -95,26 +95,4 @@ CrosshairHud
             transform: translate(-50%, -50%);
         }
     }
-
-    .hit-marker
-    {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        animation: hm-fade 0.42s ease-out forwards;
-
-        &.ring,
-        &.dot
-        {
-            border-radius: 50%;
-        }
-    }
-
-    @keyframes hm-fade
-    {
-        0% { opacity: 0; transform: translate(-50%, -50%) scale(0.6); }
-        30% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-        100% { opacity: 0; transform: translate(-50%, -50%) scale(1.2); }
-    }
 }

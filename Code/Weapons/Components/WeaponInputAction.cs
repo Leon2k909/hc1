@@ -102,6 +102,11 @@ public abstract class WeaponInputAction : EquipmentComponent,
 		//
 	}
 
+	/// <summary>Cancel queued actions when the gunsmith takes weapon input.</summary>
+	protected virtual void OnInputSuppressed()
+	{
+	}
+
 	protected override void OnFixedUpdate()
 	{
 		if ( !Equipment.IsValid() )
@@ -117,6 +122,21 @@ public abstract class WeaponInputAction : EquipmentComponent,
 		// We only care about input actions coming from the owning object.
 		if ( !Equipment.Owner.IsLocallyControlled )
 			return;
+
+		// UI clicks must never reach OnInputUpdate (semi/burst fire reads input there).
+		// Keep the release latch set even if the UI consumes the raw mouse button.
+		if ( GameUtils.IsGunsmithStudioOpen() )
+		{
+			RunningWhileDeployed = true;
+			_heldInputChecked = true;
+			if ( isDown )
+			{
+				isDown = false;
+				OnInputUp();
+			}
+			OnInputSuppressed();
+			return;
+		}
 
 		if ( !_heldInputChecked )
 		{

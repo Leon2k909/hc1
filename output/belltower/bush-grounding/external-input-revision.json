@@ -1,0 +1,35 @@
+{
+  "reason": "Shared work updated the shop displays, stalls, scarecrow, gazebo, and door assets while this task waited. Preserve those changes and apply only the unchanged grounding transform plan.",
+  "changed_inputs": {
+    "Assets/models/maps/belltower/belltower_east.vmdl": {
+      "before": "b6cb48b5a14f3d7d7abc715f1eb2437281cc0e5b7b855eecfbb9dbd71225ba47",
+      "after": "71d1363211ed3aae4450fe11b3b7b24bbe7d1f106cef826b149210b30da15cc1"
+    },
+    "Assets/models/maps/belltower/belltower_west.vmdl": {
+      "before": "36865241f43ac7994ec54c85259eac6b9b6bea3d11a8b541acf4f229025921dc",
+      "after": "68b014eca1a9caea03c9080b316dde6c9d4d43c36114fc75abfc19eaf5e18cd1"
+    },
+    "Assets/models/maps/belltower/belltower_west.obj": {
+      "before": "24f73f648e32ffdf758eafef90f6789bb60a646eedf97a5f757771abeabfcb5a",
+      "after": "22f5e5aecec9af06d9eb7e4bda87ff5170decbdaf32a5ded1fe43b33c61f97a8"
+    },
+    "Assets/models/maps/belltower/belltower_east.obj": {
+      "before": "f7b0b95e8ecd5ff082ef78921013a319480588dcccb63d46cdce954f990113ea",
+      "after": "264e9db691f6981fd73ea2b8bc02f29764513295d6e54df6e2f9b0d6536e8ab1"
+    },
+    "Tools/belltower_map.py": {
+      "before": "0e0a3b54b1e9a3d055beedfa8012d8167f9ee0b942a7602fefdde0a8a98c26fc",
+      "after": "c7a9c6501230335f284aa7240780d6016984975bf55366668f9fb3deff7bc92d"
+    }
+  },
+  "grounding_function_asts_unchanged": [
+    "blob",
+    "hedge",
+    "planter",
+    "ground"
+  ],
+  "all_ground_z_calls_unchanged": true,
+  "scene_unchanged": true,
+  "old_plan": "output/belltower/bush-grounding/plan-before-external-edit.json",
+  "source_diff": "output/belltower/bush-grounding/external-door-source-diff.patch"
+}

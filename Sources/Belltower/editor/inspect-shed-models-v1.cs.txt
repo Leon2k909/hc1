@@ -1,0 +1,5 @@
+var session = Editor.SceneEditorSession.Active;
+return new { Scene=session?.Scene?.Name, Unsaved=session?.HasUnsavedChanges, Playing=Game.IsPlaying,
+    Models=session?.Scene?.GetAllComponents<ModelRenderer>().Where(r=>r.Model?.ResourcePath?.Contains("models/maps/belltower/")==true)
+        .Where(r=>r.Model.ResourcePath.EndsWith("belltower_west.vmdl")||r.Model.ResourcePath.EndsWith("belltower_east.vmdl"))
+        .Select(r=>new {Object=r.GameObject.Name,r.Enabled,ObjectEnabled=r.GameObject.Enabled,Resource=r.Model.ResourcePath,r.Model.IsError,Position=r.WorldPosition.ToString(),Scale=r.WorldScale.ToString()}).ToArray() };

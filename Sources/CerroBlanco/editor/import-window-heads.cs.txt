@@ -1,0 +1,103 @@
+// Publish Cerro Blanco's window-head fix (Tools/cerroblanco_stage_window_heads.py's stage), checked file by file.
+// Checksums prevent overwriting concurrent work in this shared checkout. The scene file is written as staged (only its
+// Breakable Glass group differs), and an open, unchanged Cerro Blanco document gets the same group in memory, so the
+// editor and the file agree without a native save (which rewrites the whole file). Refuses while playing, or while the
+// document has unsaved changes of its own.
+var root = Sandbox.Project.Current.GetRootPath();
+if (!System.IO.Path.GetFullPath(root).TrimEnd('\\','/').Equals(@"C:\sbox-projects\hc1\forked-shooter-main",StringComparison.OrdinalIgnoreCase))
+    throw new InvalidOperationException("Wrong project.");
+if (Game.IsPlaying) throw new InvalidOperationException("Stop play first.");
+var directory = System.IO.Path.Combine(root,"output/cerroblanco/window-heads/r1");
+var manifest = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(directory,"manifest.json")));
+string Hash(string path) { using var stream=System.IO.File.OpenRead(path);return Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(stream)).ToLowerInvariant(); }
+foreach (var pair in manifest["source_sha256"].AsObject())
+    if (Hash(System.IO.Path.Combine(root,pair.Key))!=pair.Value.GetValue<string>())
+        throw new InvalidOperationException("Generator changed since staging: "+pair.Key);
+var sceneRelative = "scenes/maps/CerroBlanco/cerroblanco.scene";
+var session = Editor.SceneEditorSession.All.SingleOrDefault(s=>s.Scene?.Source?.ResourcePath?.Equals(sceneRelative,StringComparison.OrdinalIgnoreCase)==true);
+if (session is not null && session.HasUnsavedChanges) throw new InvalidOperationException("Cerro Blanco has unsaved edits: inspect them first.");
+var active = Editor.SceneEditorSession.Active;
+var plan=new System.Collections.Generic.List<(string Relative,string Source,string Target,string Backup,string Before,string After)>();
+foreach (var pair in manifest["files"].AsObject())
+{
+    var relative=pair.Key;
+    var allowed=System.Text.RegularExpressions.Regex.IsMatch(relative,@"^(models/maps/cerroblanco/(cerroblanco_buildings\.(obj|vmdl)|cerroblanco_fitout_fine\.obj|quality-v1/cerroblanco_detail_(north|south|interior)\.obj|glass/cb_glass_[0-9a-f]{12}\.(obj|vmdl|mtl|obj\.meta|vmdl\.meta))|scenes/maps/CerroBlanco/cerroblanco\.scene)$");
+    if (!allowed || relative.Contains("..")) throw new InvalidOperationException("Unexpected target: "+relative);
+    var source=System.IO.Path.Combine(root,pair.Value["source"].GetValue<string>());
+    var target=System.IO.Path.Combine(root,"Assets",relative);
+    var before=pair.Value["before"]?.GetValue<string>();
+    var after=pair.Value["after"].GetValue<string>();
+    var backup=pair.Value["backup"] is null ? null : System.IO.Path.Combine(root,pair.Value["backup"].GetValue<string>());
+    if (Hash(source)!=after || (backup is not null && Hash(backup)!=before)) throw new InvalidOperationException("Stage or backup changed.");
+    var current=System.IO.File.Exists(target)?Hash(target):null;
+    if (current==after) continue;
+    if (current!=before) throw new InvalidOperationException("Shared resource changed: "+relative);
+    plan.Add((relative,source,target,backup,before,after));
+}
+// The new panes first, then the models, the scene last.
+int Order(string r) => r.Contains("/glass/") ? (r.EndsWith(".meta")?0:r.EndsWith(".vmdl")?2:1) : r.EndsWith(".scene") ? 5 : r.EndsWith(".vmdl") ? 4 : 3;
+var changed=new System.Collections.Generic.List<(string Target,string Backup,string After)>();
+try
+{
+    foreach (var item in plan.OrderBy(p=>Order(p.Relative)))
+    {
+        var current=System.IO.File.Exists(item.Target)?Hash(item.Target):null;
+        if (current!=item.Before) throw new InvalidOperationException("Concurrent asset edit: "+item.Relative);
+        var incoming=item.Target+".window-heads-incoming";
+        try
+        {
+            System.IO.File.Copy(item.Source,incoming,true);
+            if (Hash(incoming)!=item.After) throw new InvalidOperationException("Incoming checksum failed.");
+            System.IO.File.Move(incoming,item.Target,true);
+            changed.Add((item.Target,item.Backup,item.After));
+        }
+        finally { if (System.IO.File.Exists(incoming)) System.IO.File.Delete(incoming); }
+    }
+}
+catch
+{
+    foreach (var item in changed.AsEnumerable().Reverse())
+        if (System.IO.File.Exists(item.Target) && Hash(item.Target)==item.After)
+        {
+            if (item.Backup is null) System.IO.File.Delete(item.Target);
+            else System.IO.File.Copy(item.Backup,item.Target,true);
+        }
+    throw;
+}
+foreach (var item in plan.OrderBy(p=>Order(p.Relative)).Where(p=>!p.Relative.EndsWith(".meta") && !p.Relative.EndsWith(".scene")))
+    Editor.AssetSystem.RegisterFile(item.Target);
+// The open document: the staged group in place of its old one, nothing else touched.
+var replaced = 0;
+if (session is not null)
+{
+    var staged = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"Assets",sceneRelative))).AsObject();
+    System.Text.Json.Nodes.JsonObject Find(System.Text.Json.Nodes.JsonNode node)
+    {
+        if (node?["Name"]?.GetValue<string>()=="Breakable Glass") return node.AsObject();
+        if (node?["Children"] is System.Text.Json.Nodes.JsonArray children)
+            foreach (var child in children) { var found=Find(child); if (found is not null) return found; }
+        return null;
+    }
+    var group = staged["GameObjects"].AsArray().Select(Find).First(g=>g is not null);
+    var scene = session.Scene;
+    var old = scene.GetAllObjects(true).Single(g=>g.Name=="Breakable Glass");
+    if (old.Children.Count!=group["Children"].AsArray().Count)
+    {
+        var parent = old.Parent;
+        using (scene.Push())
+        {
+            old.Destroy();
+            scene.ProcessDeletes();
+            var replacement = new GameObject(false,"Breakable Glass");
+            replacement.Deserialize(group.DeepClone().AsObject());
+            replacement.SetParent(parent,false);
+            replacement.Enabled = true;
+            replaced = replacement.Children.Count;
+        }
+    }
+    session.HasUnsavedChanges = false;
+}
+var result=new { Imported=plan.Count, GroupChildrenInEditor=replaced, SceneOpen=session is not null,
+    SelectedDocumentPreserved=ReferenceEquals(active,Editor.SceneEditorSession.Active), Game.IsPlaying };
+System.IO.File.WriteAllText(System.IO.Path.Combine(directory,"native-import.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

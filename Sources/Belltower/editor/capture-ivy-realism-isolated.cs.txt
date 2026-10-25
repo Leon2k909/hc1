@@ -1,0 +1,98 @@
+// Render a visual-only Belltower clone without opening a tab or changing play.
+var projectRoot=Sandbox.Project.Current.GetRootPath();
+var folder=System.IO.Path.Combine(projectRoot,"output/belltower/ivy-realism-v3");
+var config=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"capture-config.json")));
+var name=config["name"].GetValue<string>();
+var directory=config["directory"].GetValue<string>();
+if (!System.Text.RegularExpressions.Regex.IsMatch(name,"^[a-z0-9-]+$") || !System.Text.RegularExpressions.Regex.IsMatch(directory,"^[a-z0-9-]+$"))
+    throw new InvalidOperationException("Invalid capture name.");
+var destination=System.IO.Path.Combine(projectRoot,"output/belltower/quality",directory);
+System.IO.Directory.CreateDirectory(destination);
+if (System.IO.File.Exists(System.IO.Path.Combine(destination,name+".png"))) throw new InvalidOperationException("Keep previous evidence.");
+string Hash(string path)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+var sourcePath=System.IO.Path.Combine(projectRoot,"Assets/scenes/maps/Belltower/belltower.scene");
+var sourceHash=Hash(sourcePath);
+var sourceSession=Editor.SceneEditorSession.Active;
+var playing=Game.IsPlaying;var gameId=Game.ActiveScene?.Id;
+var sessions=Editor.SceneEditorSession.All.ToDictionary(s=>s,s=>s.HasUnsavedChanges);
+var trialPath=config["trial_ivy_model"]?.GetValue<string>();
+var trialSide=config["trial_ivy_side"]?.GetValue<string>() ?? "west";
+var trialModel=trialPath is null ? null : Model.Load(trialPath);
+if (trialModel?.IsError==true) throw new InvalidOperationException("Invalid ivy preview model.");
+var leaf=Material.Load("materials/belltower/ivy-realism-v3/leaves.vmat");
+if (leaf.IsError) throw new InvalidOperationException("Invalid ivy material.");
+leaf.GetTexture("g_tPlants")?.MarkUsed(2048);
+// Do not retain a scene or scene scope across the streaming wait.
+await Task.Delay(1000,cancellationToken);
+cancellationToken.ThrowIfCancellationRequested();
+if (Game.IsPlaying!=playing || Game.ActiveScene?.Id!=gameId || !ReferenceEquals(sourceSession,Editor.SceneEditorSession.Active))
+    throw new InvalidOperationException("The editor changed during streaming; nothing was created.");
+var root=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(sourcePath));
+var visual=new System.Collections.Generic.HashSet<string>(new[]{"Sun","Sky","Fog","Town","Ambient","Reflections","Indirect Light","Look","Volumetric Fog"},StringComparer.OrdinalIgnoreCase);
+var objects=new System.Text.Json.Nodes.JsonArray();
+foreach(var item in root["GameObjects"].AsArray())
+    if (visual.Contains(item["Name"]?.GetValue<string>() ?? "")) objects.Add(item.DeepClone());
+root["GameObjects"]=objects;
+root["SceneProperties"]["NavMesh"]["Enabled"]=false;
+root["SceneProperties"]["WantsSystemScene"]=false;
+var scene=Scene.CreateEditorScene();
+var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic;
+try
+{
+    using(scene.Push())
+    {
+        scene.Deserialize(root.AsObject());
+        if (trialModel is not null)
+        {
+            var target=scene.GetAllComponents<ModelRenderer>().Single(r=>r.Model?.ResourcePath=="models/maps/belltower/belltower_"+trialSide+".vmdl");
+            target.Model=trialModel;
+        }
+        foreach (var tone in scene.GetAllComponents<Tonemapping>())
+        {
+            tone.MinimumExposure=tone.MaximumExposure=config["exposure"].GetValue<float>();
+            tone.ExposureCompensation=0;
+            tone.Mode=Enum.Parse<Tonemapping.TonemappingMode>("ACES");
+        }
+        foreach(var renderer in scene.GetAllComponents<ModelRenderer>().Where(r=>r.Model is not null))
+            foreach(var material in renderer.Model.Materials)
+                if (material.ResourcePath?.Contains("ivy-realism-v3")==true || material.ResourcePath?.EndsWith("rubble.vmat")==true)
+                    foreach(var key in new[]{"g_tColor","g_tNormal","g_tRma","g_tPlants","g_tHeight","g_tStoneColor","g_tStoneHeight"})
+                        material.GetTexture(key)?.MarkUsed(2048);
+        foreach(var volume in scene.GetAllComponents<IndirectLightVolume>())
+            foreach(var texture in new[]{volume.IrradianceTexture,volume.DistanceTexture,volume.RelocationTexture})
+                if (texture is not null && !texture.IsError) texture.MarkUsed(Math.Max(texture.Width,texture.Height));
+        var holder=new GameObject(false,"Ivy inspection camera");
+        var camera=holder.Components.Create<CameraComponent>();
+        camera.WorldPosition=Vector3.Parse(config["position"].GetValue<string>());
+        camera.WorldRotation=Rotation.From(Angles.Parse(config["angles"].GetValue<string>()));
+        camera.FieldOfView=config["fov"].GetValue<float>();
+        camera.FovAxis=CameraComponent.Axis.Horizontal;
+        camera.CustomSize=new Vector2(config["width"].GetValue<int>(),config["height"].GetValue<int>());
+        camera.ZNear=2;camera.ZFar=100000;camera.EnablePostProcessing=true;holder.Enabled=true;
+        typeof(Scene).GetProperty("Camera",flags).SetValue(scene,camera);
+        using var bitmap=new Bitmap(config["width"].GetValue<int>(),config["height"].GetValue<int>());
+        for(var frame=0;frame<3;frame++)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            scene.EditorTick(.016f,.016f);
+            typeof(Scene).GetMethod("PreRender",flags,null,Type.EmptyTypes,null).Invoke(scene,null);
+            typeof(Scene).GetMethod("PreCameraRender",flags,null,Type.EmptyTypes,null).Invoke(scene,null);
+            var type=typeof(Scene).Assembly.GetType("Sandbox.DDGIVolumeSystem");
+            var getter=typeof(Scene).GetMethods().Single(m=>m.Name=="GetSystem"&&m.IsGenericMethodDefinition&&m.GetParameters().Length==0);
+            var indirect=getter.MakeGenericMethod(type).Invoke(scene,null);
+            type.GetMethod("MarkDirty",flags).Invoke(indirect,null);
+            type.GetMethod("UpdateVolumes",flags).Invoke(indirect,null);
+            camera.RenderToBitmap(bitmap,false);
+        }
+        System.IO.File.WriteAllBytes(System.IO.Path.Combine(destination,name+".png"),bitmap.ToPng());
+    }
+}
+finally {scene.Destroy();}
+var preserved=Game.IsPlaying==playing && Game.ActiveScene?.Id==gameId && ReferenceEquals(sourceSession,Editor.SceneEditorSession.Active)
+    && sessions.All(p=>Editor.SceneEditorSession.All.Contains(p.Key)&&p.Key.HasUnsavedChanges==p.Value) && Hash(sourcePath)==sourceHash;
+var result=new {IsolatedNativeRender=true,TrialModel=trialPath,SourceSceneSha256=sourceHash,VisualRoots=objects.Count,
+    PlayingBefore=playing,PlayingAfter=Game.IsPlaying,ActiveGamePreserved=Game.ActiveScene?.Id==gameId,
+    EditorStatePreserved=preserved,TemporarySceneDestroyed=true,EffectiveGpuExposureVerified=false};
+System.IO.File.WriteAllText(System.IO.Path.Combine(destination,name+"-camera.json"),System.Text.Json.JsonSerializer.Serialize(result));
+if (!preserved) throw new InvalidOperationException("Shared state changed during capture; inspect before continuing.");
+return result;

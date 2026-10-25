@@ -1,0 +1,110 @@
+"""Tensioned cloth for Belltower's wall-mounted shop awnings.
+
+Keep wall attachments, projection, paints and lettering. Add shallow fabric sag,
+corner tension folds, and an uneven curled valance. No collision or scene writes.
+"""
+import math
+import zlib
+import numpy as np
+import belltower_furniture as F
+
+
+KEYS = {'canvas_red': 'red', 'canvas_green': 'green', 'canvas_blue': 'blue'}
+
+
+def build(model, wall, r0, r1, z, reach, paint, name=None):
+    depth, sign = wall.outer()
+    out = np.array((0., float(sign), 0.)) if wall.axis == 'e' else np.array((float(sign), 0., 0.))
+    key = KEYS.get(paint)
+    canvas, valance = (f'awning_{key}', f'valance_{key}') if key else (paint, paint)
+    model.tile_overrides.update({canvas: 48., valance: 48.})
+    length, drop = r1-r0, reach*.45
+    slope = math.hypot(reach, drop)
+    seed = zlib.crc32(np.round((r0, r1, depth, z), 3).tobytes())
+    phase = seed/2**32*math.tau
+    nx, ny = max(16, math.ceil(length/5.5)), 12
+    ss, ts = np.linspace(0, 1, nx+1), np.linspace(0, 1, ny+1)
+
+    def roof(s, t):
+        span = max(0., 4*s*(1-s))
+        # The unsupported span settles between its corners; the side hems
+        # also bow between the wall rail and the outer seam.
+        sag = span*(3.2*t+3.9*math.sin(math.pi*t))+1.35*math.sin(math.pi*t)
+        sag += .36*math.sin(s*math.tau*2+phase)*math.sin(math.pi*t)*span
+        folds = 0.
+        for corner in (0., 1.):
+            distance = math.hypot((s-corner)*length, t*reach)
+            folds += .80*math.sin(distance*.48)*math.exp(-distance/18)*math.sin(math.pi*t)
+        bow = .55*math.sin(math.pi*s)*math.sin(s*math.tau+phase)*t*t
+        return wall.point(r0+s*length, depth+sign*(reach*t+bow), z-drop*t-sag+folds)
+
+    def flap(s, v):
+        top = roof(s, 1.)
+        span = max(0., 4*s*(1-s))
+        x = s*length
+        hanging = 12+span*(1.35*math.sin(x*.11+phase)+.65*math.sin(x*.23+phase*.7))
+        ripple = span*(1.05*math.sin(x*.16+phase)+.40*math.sin(x*.31))*v
+        curl = .70*math.sin(v*math.pi/2)+.35*math.sin(math.pi*v)
+        return top+out*(ripple+curl)+np.array((0., 0., -hanging*v+.24*math.sin(math.pi*v)))
+
+    def normal(surface, u, v, expected):
+        step = .0002
+        a, b = surface(u+step, v)-surface(u-step, v), surface(u, v+step)-surface(u, v-step)
+        n = np.cross(a, b)
+        n /= max(np.linalg.norm(n), 1e-12)
+        return -n if np.dot(n, expected) < 0 else n
+
+    def emit(paint, points, normals, uv, both=True):
+        # Explicit triangles exclude collapsed side-panel tips at the wall.
+        for ids in ((0, 1, 2), (0, 2, 3)):
+            p, ns, tex = [points[i] for i in ids], [normals[i] for i in ids], [uv[i] for i in ids]
+            rounded = np.round(p, 3)
+            if np.linalg.norm(np.cross(rounded[1]-rounded[0], rounded[2]-rounded[0])) < 1e-8:
+                continue
+            F.face(model, paint, p, sum(ns), tex, ns)
+            if both:
+                F.face(model, paint, p, -sum(ns), tex, [-n for n in ns])
+
+    for s0, s1 in zip(ss, ss[1:]):
+        for t0, t1 in zip(ts, ts[1:]):
+            pairs = ((s0, t0), (s1, t0), (s1, t1), (s0, t1))
+            emit(canvas, [roof(s, t) for s, t in pairs],
+                 [normal(roof, s, t, (0, 0, 1)) for s, t in pairs],
+                 [(s*length/48, (1-t)*slope/48) for s, t in pairs])
+    vs = (0., .28, .62, .86, 1.)
+    for s0, s1 in zip(ss, ss[1:]):
+        for v0, v1 in zip(vs, vs[1:]):
+            pairs = ((s0, v0), (s1, v0), (s1, v1), (s0, v1))
+            emit(valance, [flap(s, v) for s, v in pairs],
+                 [normal(flap, s, v, out) for s, v in pairs],
+                 [(s*length/48, 1-v) for s, v in pairs])
+
+    for s in (0., 1.):
+        expected = np.zeros(3); expected[0 if wall.axis == 'e' else 1] = -1 if s == 0 else 1
+
+        def cheek(t, v):
+            return roof(s, t)+t*(flap(s, v)-roof(s, 1.))
+
+        for t0, t1 in zip(ts, ts[1:]):
+            pairs = ((t0, 0.), (t1, 0.), (t1, 1.), (t0, 1.))
+            ns = []
+            for t, v in pairs:
+                ns.append(expected if t == 0 else normal(cheek, t, v, expected))
+            emit(canvas, [cheek(t, v) for t, v in pairs], ns,
+                 [(t*slope/48, v*t*12/48) for t, v in pairs])
+
+    if name is not None and key:
+        model.tile_overrides[f'letters_{name}'] = 48.
+        lw = min(length-4, 117.)
+        lh = lw*10/130
+        samples = np.linspace(0, 1, max(16, math.ceil(lw/5))+1)
+
+        def letters(u, v):
+            s = ((length-lw)/2+u*lw)/length
+            h = (4.6+lh/2-v*lh)/12
+            return flap(s, h)+normal(flap, s, h, out)*.26
+
+        for u0, u1 in zip(samples, samples[1:]):
+            pairs = ((u0, 0.), (u1, 0.), (u1, 1.), (u0, 1.))
+            emit(f'letters_{name}', [letters(u, v) for u, v in pairs],
+                 [normal(letters, u, v, out) for u, v in pairs], list(pairs), both=False)

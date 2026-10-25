@@ -1,0 +1,158 @@
+{
+  "vertices": 6313,
+  "triangles": 7890,
+  "removed_degenerate": 0,
+  "materials": {
+    "m_2018de7099c2": "viper/mw/attachments/attachment_vm_holo_east_lens",
+    "m_ca66a72a4fb6": "viper/mw/attachments/attachment_vm_holo_east_body",
+    "m_853afc05898f": "viper/mw/attachments/ads_scope_lens_1",
+    "m_b8e6869a1803": "viper/mw/attachments/vm_depth_mask_end",
+    "m_83cf44e58438": "viper/mw/attachments/vm_depth_mask_start",
+    "m_500dff8192f9": "viper/mw/attachments/reticle_ui_stencil"
+  },
+  "bounds": [
+    [
+      -0.4923739433288574,
+      -0.66950923204422,
+      -0.30323028564453125
+    ],
+    [
+      3.1984288692474365,
+      0.8216227293014526,
+      1.8093740940093994
+    ]
+  ],
+  "key": "att_vm_holo_east01",
+  "name": "APX5 Holographic Sight",
+  "category": "Optic",
+  "source": "models/viper/mw/attachments/attachment_vm_holo_east.mdl",
+  "vmdl": "attachments/mw2022/models/att_vm_holo_east01/att_vm_holo_east01.vmdl",
+  "bodygroups": [
+    {
+      "name": "optic",
+      "choices": [
+        {
+          "source": "attachment_vm_holo_east.smd",
+          "mesh": "mesh_00"
+        }
+      ]
+    },
+    {
+      "name": "lens",
+      "choices": [
+        {
+          "source": "blank",
+          "mesh": ""
+        },
+        {
+          "source": "attachment_vm_holo_east_lens.smd",
+          "mesh": "mesh_01"
+        }
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "tag_holo",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tag_lense",
+      "head": [
+        -0.22917403280735016,
+        -0.01801368035376072,
+        1.1018368005752563
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -0.22917403280735016
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          -0.018013715744018555
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          1.1018368005752563
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tag_reticle_attach",
+      "head": [
+        -0.22917403280735016,
+        -0.01801368035376072,
+        1.1018368005752563
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          -0.22917403280735016
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          -0.018013715744018555
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          1.1018368005752563
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

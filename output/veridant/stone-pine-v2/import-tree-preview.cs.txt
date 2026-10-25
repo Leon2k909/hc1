@@ -1,0 +1,14 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var work=System.IO.Path.Combine(root,"output/veridant/stone-pine-v2/stage");
+var destination=System.IO.Path.Combine(root,"Assets/models/maps/veridant/stone-pine-v2");
+var obj=System.IO.File.ReadAllText(System.IO.Path.Combine(work,"new-tree.obj")).Replace("mtllib new-tree.mtl","mtllib veridant_stone_pine.mtl");
+var mtl=System.IO.File.ReadAllText(System.IO.Path.Combine(work,"new-tree.mtl"));
+var vmdl=System.IO.File.ReadAllText(System.IO.Path.Combine(work,"veridant_foliage_preview.vmdl"))
+    .Replace("models/maps/veridant/stone-pine-v2/veridant_foliage_preview.obj","models/maps/veridant/stone-pine-v2/veridant_stone_pine.obj");
+foreach(var item in new[]{("obj",obj),("mtl",mtl),("vmdl",vmdl)}) {
+    var target=System.IO.Path.Combine(destination,"veridant_stone_pine."+item.Item1);
+    if(System.IO.File.Exists(target)) throw new InvalidOperationException("Tree preview already exists.");
+    System.IO.File.WriteAllText(target,item.Item2);
+    Editor.AssetSystem.RegisterFile(target);
+}
+return "models/maps/veridant/stone-pine-v2/veridant_stone_pine.vmdl";

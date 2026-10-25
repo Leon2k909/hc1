@@ -1,0 +1,19 @@
+// Extract registered UV regions for separate detail authoring; shared assets untouched.
+var root=Sandbox.Project.Current.GetRootPath();
+var folder=System.IO.Path.Combine(root,"output/firstperson-clothing-v3-20261021/regions");
+System.IO.Directory.CreateDirectory(folder);
+var source=System.IO.Path.Combine(root,"output/firstperson-clothing-v2-20261021/imagegen/shirt.png");
+using var bitmap=Bitmap.CreateFromBytes(System.IO.File.ReadAllBytes(source));
+var rows=new System.Collections.Generic.List<object>();
+foreach(var p in new[]{(Name:"sleeve-left",X:0,Y:0,W:655,H:401),(Name:"sleeve-right",X:600,Y:0,W:654,H:401),
+    (Name:"cuff-main",X:300,Y:350,W:500,H:320),(Name:"cuff-strip",X:1080,Y:300,W:174,H:370)})
+{
+    using var crop=bitmap.Crop(new Rect(p.X,p.Y,p.W,p.H));
+    var path=System.IO.Path.Combine(folder,p.Name+".png");
+    if(System.IO.File.Exists(path))throw new InvalidOperationException("Preserve previous regions");
+    System.IO.File.WriteAllBytes(path,crop.ToPng());
+    rows.Add(new{p.Name,Pixels=new[]{p.X,p.Y,p.X+p.W,p.Y+p.H},Bounds=new[]{p.X/(float)bitmap.Width,p.Y/(float)bitmap.Height,(p.X+p.W)/(float)bitmap.Width,(p.Y+p.H)/(float)bitmap.Height},Width=crop.Width,Height=crop.Height});
+}
+var result=new{Source=source,bitmap.Width,bitmap.Height,Regions=rows,SharedStateChanged=false};
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"manifest.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

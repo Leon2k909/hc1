@@ -1,0 +1,24 @@
+{
+  "current_guard_sha256": {
+    "Assets/models/maps/belltower/belltower_west.obj": "30785c1aece23c04b5ef70f03f3ab9b374713be7314293f50fe625f4cc54415e",
+    "Assets/models/maps/belltower/belltower_west.vmdl": "c7904827dabf4ae5e2eda3d6d45255350cf2edda60e2a167ffe6dabc4b783258",
+    "Assets/models/maps/belltower/belltower_east.obj": "016c7fc94e08c42ff3fd3f14bbb8a77a20ee8a69e7695b9062df1f1c236d6b8c",
+    "Assets/models/maps/belltower/belltower_east.vmdl": "4c6cd652cdaeacb0743c593531a14c9301b31779ea90793b15bff393ba7b6697"
+  },
+  "models": {
+    "west": {
+      "bed_faces": 7810,
+      "bed_face_multiset_sha256": "fb8d62a301c3e13417fca313477ce3f09e84040f44948b7408ab618c58d426bd",
+      "physics_exact": true
+    },
+    "east": {
+      "bed_faces": 7810,
+      "bed_face_multiset_sha256": "c046402669e92b28781138850f646141dc61a4e25c9fcbcac8c8036d705b4be4",
+      "physics_exact": true
+    }
+  },
+  "all_bed_faces_and_attributes_preserved": true,
+  "physics_exact": true,
+  "bounded_bed_imports_preserved": true,
+  "reason": "Later shared gazebo, padlock and scarecrow publication changed canonical town sources/material remaps. Preserve it; verify the bed scope independently."
+}

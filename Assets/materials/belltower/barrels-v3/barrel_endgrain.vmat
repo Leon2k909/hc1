@@ -1,0 +1,14 @@
+// Tools/belltower_barrels_v3.py: an existing picture set in its own tint
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    TextureColor "materials/gunsmith_range/bench_oak_endgrain_color.png"
+    TextureNormal "materials/gunsmith_range/bench_oak_endgrain_normal.png"
+    TextureRoughness "materials/gunsmith_range/bench_oak_endgrain_roughness.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[0.74 0.67 0.60 1]"
+    g_flRoughnessScaleFactor "1"
+    g_flModelTintAmount "1"
+    g_flMetalness "0"
+}

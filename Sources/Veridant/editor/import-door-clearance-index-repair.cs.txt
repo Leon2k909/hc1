@@ -1,0 +1,45 @@
+// Restore OBJ index order without modifying subsequent scene or prop work.
+var root=Sandbox.Project.Current.GetRootPath();
+if(!string.Equals(System.IO.Path.GetFullPath(root).TrimEnd('\\','/'),@"C:\sbox-projects\hc1\forked-shooter-main",StringComparison.OrdinalIgnoreCase))throw new InvalidOperationException("Wrong project.");
+var folder=System.IO.Path.Combine(root,"output/veridant/door-obstruction");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"stage-v5-index-repair/manifest.json")));
+if(manifest["revision"].GetValue<string>()!="veridant-door-clearance-index-repair-v1")throw new InvalidOperationException("Wrong revision.");
+var session=Editor.SceneEditorSession.Active;var playing=Game.IsPlaying;var game=Game.ActiveScene?.Id;var dirty=session.HasUnsavedChanges;
+if(playing)throw new InvalidOperationException("A play session started; inspect before replacing its model.");
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+foreach(var group in new[]{"source_sha256","protected_sha256"})
+    foreach(var pair in manifest[group].AsObject())
+        if(Hash(System.IO.Path.Combine(root,pair.Key))!=pair.Value.GetValue<string>())throw new InvalidOperationException("Shared input changed: "+pair.Key);
+var allowed=new System.Collections.Generic.HashSet<string>{"Assets/models/maps/veridant/veridant_buildings.obj","Assets/models/maps/veridant/lounger-v2/veridant_buildings-base.obj"};
+var files=manifest["files"].AsObject();
+if(files.Count!=2)throw new InvalidOperationException("Unexpected file count.");
+foreach(var pair in files)
+{
+    if(!allowed.Contains(pair.Key))throw new InvalidOperationException("Unexpected target.");
+    var item=pair.Value;var target=System.IO.Path.Combine(root,pair.Key);
+    var before=item["before"].GetValue<string>();var after=item["after"].GetValue<string>();
+    if(Hash(System.IO.Path.Combine(root,item["source"].GetValue<string>()))!=after||Hash(System.IO.Path.Combine(root,item["backup"].GetValue<string>()))!=before)throw new InvalidOperationException("Staging changed.");
+    if(Hash(target)!=before&&Hash(target)!=after)throw new InvalidOperationException("Shared model changed: "+pair.Key);
+}
+var imported=new System.Collections.Generic.List<string>();
+foreach(var pair in files)
+{
+    var item=pair.Value;var target=System.IO.Path.Combine(root,pair.Key);var after=item["after"].GetValue<string>();
+    if(Hash(target)==after)continue;
+    var incoming=target+".door-clearance-incoming";
+    try
+    {
+        System.IO.File.Copy(System.IO.Path.Combine(root,item["source"].GetValue<string>()),incoming,true);
+        if(Hash(incoming)!=after)throw new InvalidOperationException("Incoming checksum differs.");
+        System.IO.File.Move(incoming,target,true);imported.Add(pair.Key);
+    }
+    finally{if(System.IO.File.Exists(incoming))System.IO.File.Delete(incoming);}
+    Editor.AssetSystem.RegisterFile(target);
+}
+foreach(var pair in manifest["protected_sha256"].AsObject())
+    if(Hash(System.IO.Path.Combine(root,pair.Key))!=pair.Value.GetValue<string>())throw new InvalidOperationException("Protected file changed.");
+var preserved=ReferenceEquals(session,Editor.SceneEditorSession.Active)&&playing==Game.IsPlaying&&game==Game.ActiveScene?.Id&&dirty==session.HasUnsavedChanges;
+var result=new{ImportedFiles=imported,DoorwaysCleared=3,EditorStatePreserved=preserved,SceneChanged=false,CollisionChanged=false,MaterialsChanged=false,OriginalIndicesRestored=true};
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"native-import-index-repair.json"),System.Text.Json.JsonSerializer.Serialize(result));
+if(!preserved)throw new InvalidOperationException("Editor state changed; inspect the completed import.");
+return result;

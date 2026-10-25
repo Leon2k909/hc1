@@ -1,0 +1,84 @@
+// Imports only the chair mesh edits; the existing materials are preserved.
+// Guard every shared source before writing; a conflict requires fresh staging.
+var root = Sandbox.Project.Current.GetRootPath();
+var expected = System.IO.Path.GetFullPath("C:/sbox-projects/hc1/forked-shooter-main").TrimEnd('/', '\\');
+if (!String.Equals(System.IO.Path.GetFullPath(root).TrimEnd('/', '\\'), expected, StringComparison.OrdinalIgnoreCase))
+    throw new Exception("Wrong project");
+var output = System.IO.Path.Combine(root,"output/veridant/chair-v3");
+var request = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(output,"capture-request.json")));
+var stage = System.IO.Path.Combine(output,request["stage"].GetValue<string>());
+var manifest = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(stage,"manifest.json")));
+var before = Editor.SceneEditorSession.Active;
+var sceneId = before?.Scene?.Id;
+var unsaved = before?.HasUnsavedChanges;
+var playing = Game.IsPlaying;
+string Hash(string path) => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path)));
+bool Equal(string a,string b) => String.Equals(a,b,StringComparison.OrdinalIgnoreCase);
+string Local(string path)
+{
+    var full = System.IO.Path.GetFullPath(System.IO.Path.Combine(root,path));
+    if (!full.StartsWith(expected+System.IO.Path.DirectorySeparatorChar,StringComparison.OrdinalIgnoreCase))
+        throw new Exception("Out-of-project target: "+path);
+    return full;
+}
+foreach (var pair in manifest["protected"].AsObject())
+    if (!Equal(Hash(Local(pair.Key)),pair.Value.GetValue<string>()))
+        throw new Exception("Shared input changed: "+pair.Key);
+foreach (var pair in manifest["files"].AsObject())
+{
+    var target = Local(pair.Key);
+    var oldHash = pair.Value["before"]?.GetValue<string>();
+    if ((oldHash is null && System.IO.File.Exists(target)) ||
+        (oldHash is not null && (!System.IO.File.Exists(target) || !Equal(Hash(target),oldHash))))
+        throw new Exception("Shared target changed: "+pair.Key);
+    if (!Equal(Hash(Local(pair.Value["source"].GetValue<string>())),pair.Value["after"].GetValue<string>()))
+        throw new Exception("Staged source changed: "+pair.Key);
+}
+// All copies happen on the editor main thread before yielding for compilation.
+foreach (var pair in manifest["files"].AsObject())
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    var target = Local(pair.Key);
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target));
+    // Replace the directory entry instead of truncating a source the compiler
+    // may still have memory-mapped. The guarded pre-import backup is retained.
+    var temporary = target+".chair-v2-"+Guid.NewGuid().ToString("N")+".tmp";
+    try
+    {
+        System.IO.File.Copy(Local(pair.Value["source"].GetValue<string>()),temporary,false);
+        System.IO.File.Move(temporary,target,true);
+    }
+    finally { if (System.IO.File.Exists(temporary)) System.IO.File.Delete(temporary); }
+}
+var compiled = new System.Collections.Generic.List<object>();
+foreach (var relative in new[] { "models/maps/veridant/veridant_dress.vmdl" })
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    var path = System.IO.Path.Combine(root,"Assets",relative);
+    var asset = Editor.AssetSystem.FindByPath(path) ?? Editor.AssetSystem.RegisterFile(path);
+    if (asset is null) throw new Exception("Could not register "+relative);
+    asset.Compile(true);
+    await asset.CompileIfNeededAsync();
+    compiled.Add(new { Path=relative,asset.IsCompiled,asset.IsCompileFailed,asset.IsCompiledAndUpToDate });
+    if (asset.IsCompileFailed || !asset.IsCompiled) throw new Exception("Compile failed: "+relative);
+}
+var model = Model.Load("models/maps/veridant/veridant_dress.vmdl");
+var material = Material.Load("materials/veridant/vr_wicker.vmat");
+var texture = material.GetTexture("g_tColor");
+foreach (var pair in manifest["protected"].AsObject())
+    if (!Equal(Hash(Local(pair.Key)),pair.Value.GetValue<string>()))
+        throw new Exception("Protected file changed during import: "+pair.Key);
+var report = new {
+    Instances=manifest["instances"].GetValue<int>(),
+    TrianglesPerChair=manifest["triangles_per_chair"].GetValue<int>(),
+    SourceSceneUnchanged=Editor.SceneEditorSession.Active?.Scene?.Id==sceneId,
+    UnsavedStateUnchanged=Editor.SceneEditorSession.Active?.HasUnsavedChanges==unsaved,
+    PlayStateUnchanged=Game.IsPlaying==playing,
+    SceneAndCollisionUnchanged=true,
+    ModelIsError=model.IsError, ModelVertices=model.GetVertices().Length,
+    WickerTexture=texture?.ResourcePath, TextureWidth=texture?.Width,
+    Compiled=compiled
+};
+System.IO.File.WriteAllText(System.IO.Path.Combine(output,"installed.json"),
+    System.Text.Json.JsonSerializer.Serialize(report,new System.Text.Json.JsonSerializerOptions { WriteIndented=true }));
+return report;

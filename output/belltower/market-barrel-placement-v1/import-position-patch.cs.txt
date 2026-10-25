@@ -1,0 +1,139 @@
+// Read current models and translate only previously verified barrel vertex rows.
+var root = Sandbox.Project.Current.GetRootPath();
+var folder = System.IO.Path.Combine(root, "output/belltower/market-barrel-placement-v1");
+var patchPath = System.IO.Path.Combine(folder, "position-patch.json");
+var patch = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(patchPath));
+var output = System.IO.Path.Combine(folder, "live-publication-v3");
+if (System.IO.Directory.Exists(output)) throw new InvalidOperationException("Choose a fresh publication folder.");
+var session = Editor.SceneEditorSession.Active;
+var dirty = session?.HasUnsavedChanges;
+var game = Game.ActiveScene?.Id;
+var playing = Game.IsPlaying;
+if (playing) throw new InvalidOperationException("Wait for the shared play session before changing collision.");
+if (!root.TrimEnd('\\','/').Equals(@"C:\sbox-projects\hc1\forked-shooter-main", StringComparison.OrdinalIgnoreCase))
+    throw new InvalidOperationException("Unexpected project.");
+string Hash(string path)
+{
+    using var stream = System.IO.File.OpenRead(path);
+    return Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(stream)).ToLowerInvariant();
+}
+var scenePath = System.IO.Path.Combine(root, "Assets/scenes/maps/Belltower/belltower.scene");
+var sceneHash = Hash(scenePath);
+// The model descriptions remain owned by the concurrent map work. Verify that
+// every material import and wood hull used by this patch is still referenced.
+foreach (var side in new[] { "west", "east" })
+{
+    var vmdl = System.IO.File.ReadAllText(System.IO.Path.Combine(root, $"Assets/models/maps/belltower/belltower_{side}.vmdl"));
+    var refs = System.Text.RegularExpressions.Regex.Matches(vmdl, "filename\\s*=\\s*\"([^\"]+\\.obj)\"")
+        .Select(m => m.Groups[1].Value).ToArray();
+    foreach (var part in patch["models"][side]["bounded_imports"].AsArray().Select(n => n.GetValue<string>())
+        .Append($"models/maps/belltower/belltower_{side}_hulls_wood.obj"))
+        if (refs.Count(r => r == part) != 1) throw new InvalidOperationException("A barrel import changed; restage it.");
+}
+System.IO.Directory.CreateDirectory(output);
+var plan = new System.Collections.Generic.List<(string Relative, string Target, string Incoming, string Backup, string Before, string After, int Count)>();
+foreach (var file in patch["files"].AsObject())
+{
+    if (!file.Key.StartsWith("Assets/models/maps/belltower/", StringComparison.Ordinal) || !file.Key.EndsWith(".obj", StringComparison.Ordinal) || file.Key.Contains(".."))
+        throw new InvalidOperationException("Unexpected target.");
+    var target = System.IO.Path.Combine(root, file.Key);
+    var incoming = System.IO.Path.Combine(output, "after", file.Key);
+    var backup = System.IO.Path.Combine(output, "before", file.Key);
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(incoming));
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(backup));
+    var before = Hash(target);
+    System.IO.File.Copy(target, backup, false);
+    if (Hash(backup) != before || Hash(target) != before) throw new InvalidOperationException("Concurrent model write; no publication.");
+    using (var stream = System.IO.File.OpenRead(backup))
+    {
+        if (stream.Length < 1 || stream.ReadByte() != (int)'#') throw new InvalidOperationException("Unexpected OBJ encoding.");
+        stream.Seek(-1, System.IO.SeekOrigin.End);
+        if (stream.ReadByte() != 10) throw new InvalidOperationException("Unexpected OBJ line ending.");
+    }
+    var mapping = file.Value["positions"].AsObject().ToDictionary(p => p.Key, p => p.Value.GetValue<string>());
+    var counts = mapping.Keys.ToDictionary(k => k, k => 0);
+    using (var reader = System.IO.File.OpenRead(backup))
+    using (var writer = System.IO.File.Create(incoming))
+    using (var pending = new System.IO.MemoryStream())
+    {
+        // Preserve each original line terminator and every unrelated byte.
+        void CopyLine(byte[] bytes, int start, int length)
+        {
+            var textLength = length;
+            if (textLength > 0 && bytes[start + textLength - 1] == 10) textLength--;
+            if (textLength > 0 && bytes[start + textLength - 1] == 13) textLength--;
+            if (textLength >= 2 && bytes[start] == (byte)'v' && bytes[start + 1] == (byte)' ')
+            {
+                var line = System.Text.Encoding.UTF8.GetString(bytes, start, textLength);
+                if (mapping.TryGetValue(line, out var replacement))
+                {
+                    writer.Write(System.Text.Encoding.UTF8.GetBytes(replacement));
+                    writer.Write(bytes, start + textLength, length - textLength);
+                    counts[line]++;
+                    return;
+                }
+            }
+            writer.Write(bytes, start, length);
+        }
+        var buffer = new byte[1024 * 1024];
+        int read;
+        while ((read = reader.Read(buffer, 0, buffer.Length)) > 0)
+        {
+            var start = 0;
+            while (start < read)
+            {
+                var end = Array.IndexOf(buffer, (byte)10, start, read - start);
+                if (end < 0) { pending.Write(buffer, start, read - start); break; }
+                var length = end + 1 - start;
+                if (pending.Length > 0)
+                {
+                    pending.Write(buffer, start, length);
+                    var complete = pending.ToArray();
+                    CopyLine(complete, 0, complete.Length);
+                    pending.SetLength(0);
+                    pending.Position = 0;
+                }
+                else CopyLine(buffer, start, length);
+                start = end + 1;
+            }
+        }
+        if (pending.Length > 0)
+        {
+            var complete = pending.ToArray();
+            CopyLine(complete, 0, complete.Length);
+        }
+    }
+    foreach (var count in counts)
+        if (count.Value != file.Value["occurrences"][count.Key].GetValue<int>())
+            throw new InvalidOperationException("The selected barrel geometry changed: " + file.Key);
+    if (Hash(target) != before) throw new InvalidOperationException("A model changed during preparation; no publication.");
+    plan.Add((file.Key, target, incoming, backup, before, Hash(incoming), counts.Values.Sum()));
+}
+if (Hash(scenePath) != sceneHash || !ReferenceEquals(session, Editor.SceneEditorSession.Active) || Game.IsPlaying != playing)
+    throw new InvalidOperationException("Shared editor state changed; no publication.");
+foreach (var item in plan)
+    if (Hash(item.Target) != item.Before) throw new InvalidOperationException("Concurrent model write; no publication.");
+var changed = new System.Collections.Generic.List<(string Target, string Backup, string After)>();
+try
+{
+    foreach (var item in plan)
+    {
+        if (Hash(item.Target) != item.Before) throw new InvalidOperationException("Concurrent model write during publication.");
+        System.IO.File.Move(item.Incoming, item.Target, true);
+        changed.Add((item.Target, item.Backup, item.After));
+    }
+}
+catch
+{
+    foreach (var item in changed.AsEnumerable().Reverse())
+        if (Hash(item.Target) == item.After) System.IO.File.Copy(item.Backup, item.Target, true);
+    throw;
+}
+foreach (var item in plan) Editor.AssetSystem.RegisterFile(item.Target);
+var preserved = ReferenceEquals(session, Editor.SceneEditorSession.Active) && dirty == session?.HasUnsavedChanges
+    && game == Game.ActiveScene?.Id && playing == Game.IsPlaying && Hash(scenePath) == sceneHash;
+var result = new { Files = plan.Select(p => new { p.Relative, p.Before, p.After, ChangedVertexRows = p.Count }),
+    BarrelsMoved = 6, MatchingCollisionMoved = true, OtherGeometryPreserved = true, EditorStatePreserved = preserved };
+System.IO.File.WriteAllText(System.IO.Path.Combine(output, "receipt.json"), System.Text.Json.JsonSerializer.Serialize(result));
+if (!preserved) throw new InvalidOperationException("Inspect the completed publication; editor state changed.");
+return result;

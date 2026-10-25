@@ -1,0 +1,29 @@
+var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.DeclaredOnly;
+var asm = AppDomain.CurrentDomain.GetAssemblies().First( a => a.GetName().Name.Contains( "toolbase" ) );
+var main = asm.GetTypes().First( t => t.Name == "MainAssetBrowser" ).GetField( "_instance", flags | System.Reflection.BindingFlags.Static ).GetValue( null );
+object local = null;
+for ( var t = main.GetType(); t is not null && local is null; t = t.BaseType ) local = t.GetField( "<Local>k__BackingField", flags )?.GetValue( main );
+var lines = new System.Collections.Generic.List<string>();
+string Loc( object o ) { var p = o.GetType().GetProperty( "Path" ); return o.GetType().Name + " " + (o.GetType().GetProperty( "Name" )?.GetValue( o )) + " = " + p?.GetValue( o ); }
+var seen = new System.Collections.Generic.HashSet<object>();
+void Walk( object o, string label, int depth )
+{
+	if ( o is null || depth > 4 || !seen.Add( o ) ) return;
+	if ( o.GetType().Name.EndsWith( "Location" ) ) { lines.Add( label + ": " + Loc( o ) ); return; }
+	if ( o is System.Collections.IEnumerable e && o is not string )
+	{
+		var k = 0; foreach ( var item in e ) { if ( item is not null && item.GetType().Name.EndsWith( "Location" ) ) lines.Add( label + "[" + k + "]: " + Loc( item ) ); if ( ++k > 40 ) break; }
+		return;
+	}
+	if ( depth == 4 ) return;
+	for ( var t = o.GetType(); t is not null && t != typeof( object ) && !t.FullName.StartsWith( "Editor.Widget" ); t = t.BaseType )
+		foreach ( var f in t.GetFields( flags ) )
+		{
+			object v; try { v = f.GetValue( o ); } catch { continue; }
+			if ( v is null || v.GetType().IsPrimitive || v is string ) continue;
+			var n = v.GetType().FullName ?? "";
+			if ( n.StartsWith( "Editor" ) || n.StartsWith( "System.Collections" ) ) Walk( v, label + "." + f.Name, depth + 1 );
+		}
+}
+Walk( local, "Local", 0 );
+return new { Project = Sandbox.Project.Current?.GetRootPath(), Lines = lines.Distinct().Take( 60 ) };

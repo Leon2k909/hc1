@@ -1,0 +1,20 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var revision=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/belltower/fountain-water-v3/import-request.json")))["revision"].GetValue<string>();
+if(!System.Text.RegularExpressions.Regex.IsMatch(revision,"^[a-z0-9-]+$")) throw new InvalidOperationException("Invalid shader revision.");
+var selected=Editor.SceneEditorSession.Active;var game=Game.ActiveScene?.Id;var playing=Game.IsPlaying;
+var dirty=selected?.HasUnsavedChanges;
+var results=new System.Collections.Generic.List<object>();
+foreach(var name in new[]{"surface","stream"})
+{
+    var shader="shaders/belltower_fountain_"+name+"_v3.shader";
+    var path=System.IO.Path.Combine(root,"Assets",shader);
+    await Editor.EditorUtility.CompileShader(shader,new(),cancellationToken);
+    var compiled=path+"_c";
+    if(!System.IO.File.Exists(compiled)||System.IO.File.GetLastWriteTimeUtc(compiled)<System.IO.File.GetLastWriteTimeUtc(path))
+        throw new InvalidOperationException("Fountain shader compilation failed: "+shader);
+    results.Add(new {Shader=shader,Compiled=true,CompiledWriteUtc=System.IO.File.GetLastWriteTimeUtc(compiled)});
+}
+var preserved=ReferenceEquals(selected,Editor.SceneEditorSession.Active)&&game==Game.ActiveScene?.Id&&playing==Game.IsPlaying&&dirty==selected?.HasUnsavedChanges;
+var result=new {Shaders=results,EditorStatePreserved=preserved};
+System.IO.File.WriteAllText(System.IO.Path.Combine(root,"output/belltower/fountain-water-v3",revision,"native-shader-compile.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

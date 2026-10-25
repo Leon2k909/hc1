@@ -1,0 +1,47 @@
+// Import only this task's three independent model sources. Shared town assets are untouched.
+var root = System.IO.Path.GetFullPath(Sandbox.Project.Current.GetRootPath());
+if (!root.TrimEnd('\\', '/').Equals(@"C:\sbox-projects\hc1\forked-shooter-main", StringComparison.OrdinalIgnoreCase))
+    throw new InvalidOperationException("Unexpected project.");
+var folder = System.IO.Path.GetFullPath(System.IO.Path.Combine(root, "output/belltower/open-doors-v1"));
+var manifest = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder, "staged.json")));
+if (manifest["collision_shapes"].GetValue<int>() != 0 || manifest["leaves"].GetValue<int>() != 4
+    || manifest["minimum_clear_width_inches"].GetValue<int>() < 54)
+    throw new InvalidOperationException("Door validation did not pass.");
+string Hash(string path) => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+var beforeSession = Editor.SceneEditorSession.Active;
+var beforeGame = Game.ActiveScene?.Id;
+var beforePlay = Game.IsPlaying;
+var files = manifest["files"].AsArray().Select(node => {
+    var relative = node["path"].GetValue<string>();
+    if (!new[] { "models/maps/belltower/belltower_open_doors.obj", "models/maps/belltower/belltower_open_doors.mtl", "models/maps/belltower/belltower_open_doors.vmdl" }.Contains(relative))
+        throw new InvalidOperationException("Unexpected asset path.");
+    var source = System.IO.Path.GetFullPath(System.IO.Path.Combine(root, node["source"].GetValue<string>()));
+    var sourceRoot = System.IO.Path.Combine(folder, "models") + System.IO.Path.DirectorySeparatorChar;
+    if (!source.StartsWith(sourceRoot, StringComparison.OrdinalIgnoreCase) || Hash(source) != node["sha256"].GetValue<string>())
+        throw new InvalidOperationException("Staged source changed.");
+    var target = System.IO.Path.Combine(root, "Assets", relative);
+    if (System.IO.File.Exists(target) && Hash(target) != Hash(source)
+        && Hash(target) != node["expected_before_sha256"]?.GetValue<string>())
+        throw new InvalidOperationException("An existing door asset differs; inspect before replacing it.");
+    if (relative.EndsWith(".vmdl") && System.IO.File.ReadAllText(source).Contains("PhysicsShapeList"))
+        throw new InvalidOperationException("Visual door model contains collision.");
+    return new { Relative = relative, Source = source, Target = target };
+}).ToArray();
+if (files.Length != 3) throw new InvalidOperationException("Expected exactly three model sources.");
+var imported = new System.Collections.Generic.List<string>();
+foreach (var file in files.OrderBy(f => f.Relative.EndsWith(".vmdl") ? 1 : 0))
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    if (System.IO.File.Exists(file.Target) && Hash(file.Target) == Hash(file.Source)) continue;
+    var incoming = file.Target + ".open-doors-import";
+    System.IO.File.Copy(file.Source, incoming, true);
+    System.IO.File.Move(incoming, file.Target, true);
+    imported.Add(file.Relative);
+}
+Editor.AssetSystem.RegisterFile(files.Single(f => f.Relative.EndsWith(".vmdl")).Target);
+var preserved = ReferenceEquals(beforeSession, Editor.SceneEditorSession.Active)
+    && beforeGame == Game.ActiveScene?.Id && beforePlay == Game.IsPlaying;
+var result = new { Imported = imported, EditorStatePreserved = preserved, CollisionShapes = 0 };
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder, "native-import.json"), System.Text.Json.JsonSerializer.Serialize(result));
+if (!preserved) throw new InvalidOperationException("Editor state changed during import.");
+return result;

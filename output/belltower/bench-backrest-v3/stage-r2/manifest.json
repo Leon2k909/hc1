@@ -1,0 +1,88 @@
+{
+  "revision": "bench-backrest-v3",
+  "stage_revision": 2,
+  "benches": 18,
+  "rear_supports": 36,
+  "clearance": {
+    "minimum_backrest_plane_clearance_inches": 0.040000000000000036,
+    "seat_intersection_free": true,
+    "upright_top_below_top_slat": true,
+    "backrest_and_upright_rake_degrees": 8
+  },
+  "only_rear_supports_changed": true,
+  "collision_unchanged": true,
+  "scene_sha256": "7c81362d419176d9bb98caf5287e1949f19b1d867a8c2cb030971b5ecac865cd",
+  "files": {
+    "Assets/models/maps/belltower/belltower_west.obj": {
+      "before": "2071aa2a6b019fed3e95d6920bef9d37fc5eb2b0bb0032df5f71f30cdc0b53d9",
+      "after": "8bc68ca1f964b4b12e00d54c8e5953c440f3678fdeb26e6163e688bc7c8a73ad",
+      "source": "output/belltower/bench-backrest-v3/stage-r2/Assets/models/maps/belltower/belltower_west.obj",
+      "backup": "output/belltower/bench-backrest-v3/before-r2/Assets/models/maps/belltower/belltower_west.obj",
+      "old_support_triangles_removed": 792,
+      "new_support_triangles": 792,
+      "triangles_before": 1367159,
+      "triangles_after": 1367159,
+      "all_unrelated_source_bytes_preserved": true,
+      "unrelated_source_bytes_sha256": "fa0c805498f3d1291fd931909636697ddf2147781f3841d7f0d265fe33c01fa3"
+    },
+    "Assets/models/maps/belltower/compiler-safe/west/west_033_iron_black.obj": {
+      "before": "a347d78c909ed6dba01bc108cf0c2fc97b2e588813d8f20357bc4ee8b2de5271",
+      "after": "716aa1a75f91353e89efdde8978ce53f1428b6c47d9e01b86cc7189011e6e847",
+      "source": "output/belltower/bench-backrest-v3/stage-r2/Assets/models/maps/belltower/compiler-safe/west/west_033_iron_black.obj",
+      "backup": "output/belltower/bench-backrest-v3/before-r2/Assets/models/maps/belltower/compiler-safe/west/west_033_iron_black.obj",
+      "old_support_triangles_removed": 792,
+      "new_support_triangles": 792,
+      "triangles_before": 99736,
+      "triangles_after": 99736,
+      "all_unrelated_source_bytes_preserved": true,
+      "unrelated_source_bytes_sha256": "464d551d22d338baed1e96f69e57c83b5693a2f9d81022621e3648384081aedc"
+    },
+    "Assets/models/maps/belltower/belltower_east.obj": {
+      "before": "c37c5921b0390ed9aab9cc9e6fde2329108248165fca79571a99188b1ca7c073",
+      "after": "27deb8d50f28a868c38bad35cd73d9bba232100d6a97599219007c050d63d594",
+      "source": "output/belltower/bench-backrest-v3/stage-r2/Assets/models/maps/belltower/belltower_east.obj",
+      "backup": "output/belltower/bench-backrest-v3/before-r2/Assets/models/maps/belltower/belltower_east.obj",
+      "old_support_triangles_removed": 792,
+      "new_support_triangles": 792,
+      "triangles_before": 1367159,
+      "triangles_after": 1367159,
+      "all_unrelated_source_bytes_preserved": true,
+      "unrelated_source_bytes_sha256": "75166ac7ef519cd8fe361e18325035b61d7cb237179895178ebceb2b3513531b"
+    },
+    "Assets/models/maps/belltower/compiler-safe/east/east_032_iron_black.obj": {
+      "before": "4745df231d84a338898e636bdbf283a0231aa3cdc5c2fc7737369318da41afa6",
+      "after": "abdac2a55a5ffc574d75bcafea02cbd9e2621be7b58b560947b25439e7ec6bd9",
+      "source": "output/belltower/bench-backrest-v3/stage-r2/Assets/models/maps/belltower/compiler-safe/east/east_032_iron_black.obj",
+      "backup": "output/belltower/bench-backrest-v3/before-r2/Assets/models/maps/belltower/compiler-safe/east/east_032_iron_black.obj",
+      "old_support_triangles_removed": 792,
+      "new_support_triangles": 792,
+      "triangles_before": 99736,
+      "triangles_after": 99736,
+      "all_unrelated_source_bytes_preserved": true,
+      "unrelated_source_bytes_sha256": "c2b3fce91c0cf536e0ee2db9851e91468841ba9da8764ccd8e834bb13944d094"
+    }
+  },
+  "models": {
+    "west": {
+      "old_support_triangles": 792,
+      "new_support_triangles": 792,
+      "bounded_import": "Assets/models/maps/belltower/compiler-safe/west/west_033_iron_black.obj",
+      "model_description_and_physics_unchanged": true
+    },
+    "east": {
+      "old_support_triangles": 792,
+      "new_support_triangles": 792,
+      "bounded_import": "Assets/models/maps/belltower/compiler-safe/east/east_032_iron_black.obj",
+      "model_description_and_physics_unchanged": true
+    }
+  },
+  "source_sha256": {
+    "Tools/belltower_furniture.py": "123696982d9a74015c3976138408e5af70649b3c5b6c988a6b6cc673d0289a3e",
+    "Tools/belltower_stage_bench_backrest.py": "fb31fb58f4dd631d2e0076485044ccb7e84ac3f03631c32e8b5190aeb2029e7b",
+    "Tools/map_kit.py": "cc60204c747d064cb1fecdb666b24c847ae89dc863c2533d3811a0445f22020d"
+  },
+  "vmdl_guards": {
+    "Assets/models/maps/belltower/belltower_west.vmdl": "3d7ba35423c4914fa322cfd90716991dff5cd6e203b328a8c344ead53acd2bda",
+    "Assets/models/maps/belltower/belltower_east.vmdl": "9fc9d32e9a4c3e9330c767ebc848fdd04d19516374bfafa376634aa40adad6ea"
+  }
+}

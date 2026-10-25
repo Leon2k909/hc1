@@ -1,0 +1,203 @@
+[
+  {
+    "tool": "editor_status",
+    "arguments": {},
+    "exit_code": 0,
+    "output": "{\n  \"EngineVersion\": \"26.10.13b\",\n  \"Project\": \"razedtest\",\n  \"ProjectTitle\": \"RazedTest\",\n  \"ActiveScene\": \"veridant\",\n  \"ActiveScenePath\": \"scenes/maps/veridant/veridant.scene\",\n  \"SceneHasUnsavedChanges\": false,\n  \"IsPlaying\": false,\n  \"IsPaused\": false,\n  \"ToolCount\": 128,\n  \"IsCompiling\": false,\n  \"LastCompileSucceeded\": true,\n  \"LastCompileErrors\": 0,\n  \"Paths\": {\n    \"Engine\": \"C:\\\\Program Files (x86)\\\\Steam\\\\steamapps\\\\common\\\\sbox\",\n    \"Logs\": \"C:\\\\Program Files (x86)\\\\Steam\\\\steamapps\\\\common\\\\sbox\\\\logs\",\n    \"ProjectRoot\": \"C:\\\\sbox-projects\\\\hc1\\\\forked-shooter-main\",\n    \"ProjectSettings\": \"C:\\\\sbox-projects\\\\hc1\\\\forked-shooter-main\\\\ProjectSettings\"\n  }\n}\n",
+    "error": ""
+  },
+  {
+    "tool": "find_game_objects",
+    "arguments": {
+      "name": "Pine planter beech bushes"
+    },
+    "exit_code": 0,
+    "output": "{\n  \"Total\": 0,\n  \"Results\": [],\n  \"Truncated\": false\n}\n",
+    "error": ""
+  },
+  {
+    "tool": "create_game_object",
+    "arguments": {
+      "name": "Pine planter beech bushes",
+      "parent": "cbaf0a94-c3f6-5f63-a4ee-0f08f0e60292"
+    },
+    "exit_code": 0,
+    "output": "{\n  \"Id\": \"bb3d51b7-4abb-48de-8adb-8d9b3df1212d\",\n  \"Name\": \"Pine planter beech bushes\",\n  \"Position\": \"0,0,0\",\n  \"Components\": []\n}\n",
+    "error": ""
+  },
+  {
+    "tool": "spawn_model",
+    "arguments": {
+      "model": "models/sbox_props/shrubs/beech/beech_bush_small.vmdl",
+      "name": "Pine planter beech 01",
+      "parent": "bb3d51b7-4abb-48de-8adb-8d9b3df1212d",
+      "position": "635,35,146.831",
+      "angles": "0,15,0",
+      "scale": "0.221814,0.221814,0.436502"
+    },
+    "exit_code": 0,
+    "output": "{\n  \"Id\": \"a3a03335-c07e-4452-af7d-8baf41b534ed\",\n  \"Name\": \"Pine planter beech 01\"\n}\n",
+    "error": ""
+  },
+  {
+    "tool": "spawn_model",
+    "arguments": {
+      "model": "models/sbox_props/shrubs/beech/beech_bush_small.vmdl",
+      "name": "Pine planter beech 02",
+      "parent": "bb3d51b7-4abb-48de-8adb-8d9b3df1212d",
+      "position": "633,8,146.877",
+      "angles": "0,137,0",
+      "scale": "0.249541,0.249541,0.381481"
+    },
+    "exit_code": 0,
+    "output": "{\n  \"Id\": \"739bbbd9-9b31-4b5e-a27c-35e28a2d6d3f\",\n  \"Name\": \"Pine planter beech 02\"\n}\n",
+    "error": ""
+  },
+  {
+    "tool": "spawn_model",
+    "arguments": {
+      "model": "models/sbox_props/shrubs/beech/beech_bush_small.vmdl",
+      "name": "Pine planter beech 03",
+      "parent": "bb3d51b7-4abb-48de-8adb-8d9b3df1212d",
+      "position": "636,-25,146.8",
+      "angles": "0,259,0",
+      "scale": "0.235678,0.235678,0.473183"
+    },
+    "exit_code": 0,
+    "output": "{\n  \"Id\": \"cb00f755-db8e-404c-873d-373191c2c60b\",\n  \"Name\": \"Pine planter beech 03\"\n}\n",
+    "error": ""
+  },
+  {
+    "tool": "spawn_model",
+    "arguments": {
+      "model": "models/sbox_props/shrubs/beech/beech_bush_small.vmdl",
+      "name": "Pine planter beech 04",
+      "parent": "bb3d51b7-4abb-48de-8adb-8d9b3df1212d",
+      "position": "662,-38,146.846",
+      "angles": "0,48,0",
+      "scale": "0.221814,0.221814,0.418162"
+    },
+    "exit_code": 0,
+    "output": "{\n  \"Id\": \"e51be960-0168-4eae-b584-063f189863bb\",\n  \"Name\": \"Pine planter beech 04\"\n}\n",
+    "error": ""
+  },
+  {
+    "tool": "spawn_model",
+    "arguments": {
+      "model": "models/sbox_props/shrubs/beech/beech_bush_small.vmdl",
+      "name": "Pine planter beech 05",
+      "parent": "bb3d51b7-4abb-48de-8adb-8d9b3df1212d",
+      "position": "692,-36,146.784",
+      "angles": "0,182,0",
+      "scale": "0.235678,0.235678,0.491523"
+    },
+    "exit_code": 0,
+    "output": "{\n  \"Id\": \"6de00bb5-1a63-465f-9a1b-8224a2ee4bde\",\n  \"Name\": \"Pine planter beech 05\"\n}\n",
+    "error": ""
+  },
+  {
+    "tool": "spawn_model",
+    "arguments": {
+      "model": "models/sbox_props/shrubs/beech/beech_bush_small.vmdl",
+      "name": "Pine planter beech 06",
+      "parent": "bb3d51b7-4abb-48de-8adb-8d9b3df1212d",
+      "position": "717,-29,146.831",
+      "angles": "0,296,0",
+      "scale": "0.235678,0.235678,0.436502"
+    },
+    "exit_code": 0,
+    "output": "{\n  \"Id\": \"ac4dfa37-af4c-4845-87c3-ad504c3c4154\",\n  \"Name\": \"Pine planter beech 06\"\n}\n",
+    "error": ""
+  },
+  {
+    "tool": "spawn_model",
+    "arguments": {
+      "model": "models/sbox_props/shrubs/beech/beech_bush_small.vmdl",
+      "name": "Pine planter beech 07",
+      "parent": "bb3d51b7-4abb-48de-8adb-8d9b3df1212d",
+      "position": "718,0,146.862",
+      "angles": "0,67,0",
+      "scale": "0.235678,0.235678,0.399821"
+    },
+    "exit_code": 0,
+    "output": "{\n  \"Id\": \"1d1cc5b6-8a69-4b8b-a987-83b1b619b144\",\n  \"Name\": \"Pine planter beech 07\"\n}\n",
+    "error": ""
+  },
+  {
+    "tool": "spawn_model",
+    "arguments": {
+      "model": "models/sbox_props/shrubs/beech/beech_bush_small.vmdl",
+      "name": "Pine planter beech 08",
+      "parent": "bb3d51b7-4abb-48de-8adb-8d9b3df1212d",
+      "position": "716,32,146.815",
+      "angles": "0,221,0",
+      "scale": "0.249541,0.249541,0.454843"
+    },
+    "exit_code": 0,
+    "output": "{\n  \"Id\": \"15770788-556f-493e-b624-a16aab9e2375\",\n  \"Name\": \"Pine planter beech 08\"\n}\n",
+    "error": ""
+  },
+  {
+    "tool": "spawn_model",
+    "arguments": {
+      "model": "models/sbox_props/shrubs/beech/beech_bush_small.vmdl",
+      "name": "Pine planter beech 09",
+      "parent": "bb3d51b7-4abb-48de-8adb-8d9b3df1212d",
+      "position": "687,38,146.877",
+      "angles": "0,331,0",
+      "scale": "0.221814,0.221814,0.381481"
+    },
+    "exit_code": 0,
+    "output": "{\n  \"Id\": \"8d64c922-7fad-46c0-9aad-4d80bb125e2f\",\n  \"Name\": \"Pine planter beech 09\"\n}\n",
+    "error": ""
+  },
+  {
+    "tool": "spawn_model",
+    "arguments": {
+      "model": "models/sbox_props/shrubs/beech/beech_bush_small.vmdl",
+      "name": "Pine planter beech 10",
+      "parent": "bb3d51b7-4abb-48de-8adb-8d9b3df1212d",
+      "position": "659,36,146.8",
+      "angles": "0,109,0",
+      "scale": "0.221814,0.221814,0.473183"
+    },
+    "exit_code": 0,
+    "output": "{\n  \"Id\": \"d638a5ab-ceb7-4171-8b17-0f0206250f96\",\n  \"Name\": \"Pine planter beech 10\"\n}\n",
+    "error": ""
+  },
+  {
+    "tool": "spawn_model",
+    "arguments": {
+      "model": "models/sbox_props/shrubs/beech/beech_bush_small.vmdl",
+      "name": "Pine planter beech 11",
+      "parent": "bb3d51b7-4abb-48de-8adb-8d9b3df1212d",
+      "position": "655,-7,146.908",
+      "angles": "0,201,0",
+      "scale": "0.194087,0.194087,0.3448"
+    },
+    "exit_code": 0,
+    "output": "{\n  \"Id\": \"f8864575-e674-424b-9e65-7068fa036920\",\n  \"Name\": \"Pine planter beech 11\"\n}\n",
+    "error": ""
+  },
+  {
+    "tool": "spawn_model",
+    "arguments": {
+      "model": "models/sbox_props/shrubs/beech/beech_bush_small.vmdl",
+      "name": "Pine planter beech 12",
+      "parent": "bb3d51b7-4abb-48de-8adb-8d9b3df1212d",
+      "position": "698,14,146.893",
+      "angles": "0,278,0",
+      "scale": "0.207951,0.207951,0.36314"
+    },
+    "exit_code": 0,
+    "output": "{\n  \"Id\": \"f2d8a98c-2572-43d4-a974-265a43d0f245\",\n  \"Name\": \"Pine planter beech 12\"\n}\n",
+    "error": ""
+  },
+  {
+    "tool": "save_scene",
+    "arguments": {},
+    "exit_code": 0,
+    "output": "{\n  \"Saved\": \"scenes/maps/veridant/veridant.scene\",\n  \"HasUnsavedChanges\": false\n}\n",
+    "error": ""
+  }
+]

@@ -1,0 +1,13 @@
+{"ExchangeDirectory": "C:\\Users\\leon2\\AppData\\Local\\Temp\\sbox-cli\\7ed5ce0fb2874435a4753a444bfab40a", "ExchangeRemoved": true}
+Traceback (most recent call last):
+  File "C:\sbox-projects\hc1\forked-shooter-main\Sources\Riverdale\editor\editor_call.py", line 111, in <module>
+    call("run_csharp", {"path": str(destination)})
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\sbox-projects\hc1\forked-shooter-main\Sources\Riverdale\editor\editor_call.py", line 72, in call
+    result = request("tools/call", params)
+  File "C:\sbox-projects\hc1\forked-shooter-main\Sources\Riverdale\editor\editor_call.py", line 63, in request
+    raise RuntimeError(errors.read())
+RuntimeError: sbox-cli: connecting to PID 9504 (attached).
+sbox-cli: connected. Send MCP initialize for tools and session instructions; close stdin to disconnect.
+sbox-cli: The instance closed its MCP connection.
+

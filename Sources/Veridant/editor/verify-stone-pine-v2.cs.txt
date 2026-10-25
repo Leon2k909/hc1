@@ -1,0 +1,20 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var work=System.IO.Path.Combine(root,"output/veridant/stone-pine-v2");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(work,"stage/manifest.json")));
+string Hash(string path)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+foreach(var row in manifest["Files"].AsArray())
+    if(Hash(System.IO.Path.Combine(root,row["Path"].GetValue<string>()))!=row["After"].GetValue<string>())
+        throw new InvalidOperationException("Installed foliage differs from the reviewed stage.");
+var path="models/maps/veridant/veridant_foliage.vmdl";
+var model=Model.Load(path);
+if(model is null||model.IsError||model.Materials.Any(m=>m is null||m.IsError)||!model.Materials.Any(m=>m.ResourcePath=="models/sbox_props/shrubs/pine/mountain_pine.vmat"))
+    throw new InvalidOperationException("The rebuilt pine or its materials did not load.");
+var session=Editor.SceneEditorSession.Active;
+var renderers=session.Scene.GetAllComponents<ModelRenderer>().Where(r=>r.Model?.ResourcePath==path).ToArray();
+var result=new{Model=path,model.IsError,Materials=model.Materials.Select(m=>new{m.ResourcePath,m.IsError}).ToArray(),
+    ActiveScene=session.Scene.Source?.ResourcePath,session.HasUnsavedChanges,Game.IsPlaying,
+    ActiveRenderers=renderers.Select(r=>new{r.GameObject.Name,Position=r.WorldPosition.ToString(),Scale=r.WorldScale.ToString(),PineMaterialPresent=r.Model.Materials.Any(m=>m.ResourcePath=="models/sbox_props/shrubs/pine/mountain_pine.vmat")}).ToArray(),
+    ReferencedCloudAssets=Editor.AssetSystem.FindByPath(path).GetReferences(true).Where(a=>a.IsCloud).Select(a=>a.Path).ToArray(),
+    InstalledChecksumsMatch=true,CollisionChanged=false};
+System.IO.File.WriteAllText(System.IO.Path.Combine(work,"native-validation.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

@@ -22,18 +22,4 @@ SoldierTrainingHud
     .stamina-value { min-width: 28px; flex-shrink: 0; font-size: 12px; font-weight: 700; text-align: right; }
     &.exhausted .stamina-fill { background-color: #ff9b45; }
     &.exhausted .stamina-value { color: #ffad68; }
-    .training-notice
-    {
-        position: absolute;
-        bottom: 0;
-        left: 324px;
-        width: 290px;
-        padding: 10px 12px;
-        background-color: rgba( 16, 18, 21, 0.94 );
-        border-left: 2px solid #ff7a1a;
-        flex-direction: column;
-        gap: 5px;
-        font-size: 12px;
-    }
-    .notice-title { color: #ffad68; font-size: 10px; font-weight: 700; letter-spacing: 1px; }
 }

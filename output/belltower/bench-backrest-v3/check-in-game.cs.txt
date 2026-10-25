@@ -1,0 +1,103 @@
+// Exercise the installed map in the play session started for this bench fix.
+var root = Sandbox.Project.Current.GetRootPath();
+var folder = System.IO.Path.Combine(root,"output/belltower/bench-backrest-v3/in-game");
+System.IO.Directory.CreateDirectory(folder);
+if (!Game.IsPlaying) throw new InvalidOperationException("Requires the bench play test.");
+var scene = Editor.SceneEditorSession.All.Single(s=>!s.Scene.IsEditor).Scene;
+var flags = System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance;
+object Read(object target,string name) => target?.GetType().GetProperty(name,flags)?.GetValue(target);
+void Write(object target,string name,object value) => target.GetType().GetProperty(name,flags).SetValue(target,value);
+Component Viewer() => scene.GetAllObjects(true).SelectMany(o=>o.Components.GetAll<Component>()).Distinct()
+    .SingleOrDefault(c=>c.IsValid() && c.GetType().Name=="PlayerPawn" && (bool?)Read(c,"IsViewer")==true);
+Component pawn = null;
+for (int i=0;i<15 && pawn is null;i++)
+{
+    pawn = Viewer();
+    if (pawn is null) await Task.Delay(500,cancellationToken);
+}
+if (pawn is null) throw new InvalidOperationException("No local player in the running map.");
+var client = Read(pawn,"Client");
+if (Read(Read(pawn,"HealthComponent"),"State")?.ToString()!="Alive")
+{
+    client.GetType().GetMethod("Respawn",new[]{typeof(bool)}).Invoke(client,new object[]{false});
+    pawn = (Component)Read(client,"PlayerPawn");
+    await Task.Delay(500,cancellationToken);
+}
+var health = Read(pawn,"HealthComponent");
+var controller = Read(pawn,"CameraController");
+var camera = (CameraComponent)Read(controller,"Camera");
+var teleport = pawn.GetType().GetMethod("Teleport",new[]{typeof(Vector3),typeof(Rotation)});
+var oldPosition = pawn.WorldPosition;
+var oldEyes = (Angles)Read(pawn,"EyeAngles");
+var oldGod = (bool)Read(health,"IsGodMode");
+var oldNoclip = (bool)Read(pawn,"IsNoclipping");
+var oldBob = (bool)Read(controller,"ShouldViewBob");
+var eyeHeight = camera.WorldPosition.z-pawn.WorldPosition.z;
+if (eyeHeight<20 || eyeHeight>80) eyeHeight=60;
+var mapModels = scene.GetAllComponents<ModelRenderer>().Where(r=>r.Model?.ResourcePath?.Contains("models/maps/belltower/",StringComparison.OrdinalIgnoreCase)==true)
+    .Select(r=>new {r.GameObject.Name,r.Model.ResourcePath,r.Model.IsError}).ToArray();
+if (mapModels.Length<2 || mapModels.Any(m=>m.IsError)) throw new InvalidOperationException("Belltower models are missing or invalid.");
+var samples = new System.Collections.Generic.List<object>();
+object restoration = null;
+try
+{
+    Write(health,"IsGodMode",true);
+    Write(pawn,"IsNoclipping",true);
+    Write(controller,"ShouldViewBob",false);
+    var views = new[] {
+        (Name:"rear-close",Eye:new Vector3(157,193,61),Target:new Vector3(157,159,26)),
+        (Name:"rear-oblique",Eye:new Vector3(190,202,65),Target:new Vector3(130,158,23)),
+        (Name:"seat-joint",Eye:new Vector3(171,181,61),Target:new Vector3(159,159,18)),
+        (Name:"front",Eye:new Vector3(137,91,65),Target:new Vector3(130,157,24)),
+        (Name:"mirrored-rear",Eye:new Vector3(157,-193,61),Target:new Vector3(157,-159,26))
+    };
+    foreach (var view in views)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        if (!Game.IsPlaying || !scene.IsValid() || !pawn.IsValid() || !ReferenceEquals(scene,Editor.SceneEditorSession.Active?.Scene))
+            throw new InvalidOperationException("The bench test's runtime scene changed.");
+        var rotation = Rotation.LookAt(view.Target-view.Eye,Vector3.Up);
+        teleport.Invoke(pawn,new object[]{view.Eye-Vector3.Up*eyeHeight,rotation});
+        await Task.Delay(450,cancellationToken);
+        camera = (CameraComponent)Read(controller,"Camera");
+        // The pawn's head also offsets the camera forward from its root.
+        var correction = view.Eye-camera.WorldPosition;
+        if (correction.Length>250) throw new InvalidOperationException("Unexpected camera displacement: "+camera.WorldPosition);
+        teleport.Invoke(pawn,new object[]{pawn.WorldPosition+correction,rotation});
+        await Task.Delay(450,cancellationToken);
+        if ((camera.WorldPosition-view.Eye).Length>20) throw new InvalidOperationException("Camera moved away from the bench test area: "+camera.WorldPosition+" expected "+view.Eye);
+        Write(pawn,"EyeAngles",Rotation.LookAt(view.Target-camera.WorldPosition,Vector3.Up).Angles());
+        await Task.Delay(300,cancellationToken);
+        var oldSize = camera.CustomSize;
+        try
+        {
+            using (scene.Push())
+            {
+                camera.CustomSize = new Vector2(1600,1000);
+                using var bitmap = new Bitmap(1600,1000);
+                camera.RenderToBitmap(bitmap,false);
+                System.IO.File.WriteAllBytes(System.IO.Path.Combine(folder,view.Name+".png"),bitmap.ToPng());
+            }
+        }
+        finally { camera.CustomSize=oldSize; }
+        samples.Add(new {view.Name,Playing=Game.IsPlaying,RuntimeScene=scene.Source?.ResourcePath,
+            Eye=camera.WorldPosition.ToString(),Angles=camera.WorldRotation.Angles().ToString(),camera.FieldOfView,
+            Mode=Read(controller,"Mode")?.ToString(),Target=view.Target.ToString(),
+            Image="output/belltower/bench-backrest-v3/in-game/"+view.Name+".png"});
+    }
+}
+finally
+{
+    if (pawn.IsValid())
+    {
+        teleport.Invoke(pawn,new object[]{oldPosition,oldEyes.ToRotation()});
+        Write(pawn,"IsNoclipping",oldNoclip);
+        Write(health,"IsGodMode",oldGod);
+        Write(controller,"ShouldViewBob",oldBob);
+    }
+    restoration = new {LocalPlayerRestored=pawn.IsValid(),NoclipRestored=!pawn.IsValid() || (bool)Read(pawn,"IsNoclipping")==oldNoclip,
+        GodModeRestored=!pawn.IsValid() || (bool)Read(health,"IsGodMode")==oldGod,
+        ViewBobRestored=!pawn.IsValid() || (bool)Read(controller,"ShouldViewBob")==oldBob};
+    System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"check.json"),System.Text.Json.JsonSerializer.Serialize(new {Playing=Game.IsPlaying,MapModels=mapModels,Samples=samples,Restoration=restoration}));
+}
+return new {Screenshots=samples,Restoration=restoration};

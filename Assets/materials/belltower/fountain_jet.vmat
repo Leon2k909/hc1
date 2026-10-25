@@ -1,9 +1,7 @@
 "Layer0"
 {
-    shader "shaders/belltower_fountain_water.shader"
+    shader "shaders/belltower_fountain_stream_v3.shader"
     TextureNormalA "materials/belltower/fountain_jet_normal.png"
-    TextureNormalB "materials/belltower/fountain_water_normal.png"
-    g_vWaterColor "[0.42 0.63 0.66]"
-    g_flWaterOpacity "0.48"
-    g_flFlowSpeed "0.18"
+    g_vBasinCentre "[130.0000 -0.0000 21.5000]"
+    g_flFlowSpeed "1.0"
 }

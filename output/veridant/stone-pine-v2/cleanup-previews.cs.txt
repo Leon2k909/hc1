@@ -1,0 +1,14 @@
+var root=System.IO.Path.GetFullPath(Sandbox.Project.Current.GetRootPath());
+var directory=System.IO.Path.GetFullPath(System.IO.Path.Combine(root,"Assets/models/maps/veridant/stone-pine-v2"));
+if(!directory.StartsWith(root+System.IO.Path.DirectorySeparatorChar,StringComparison.OrdinalIgnoreCase)) throw new InvalidOperationException("Unexpected preview directory.");
+if(Editor.SceneEditorSession.Active.Scene.GetAllComponents<ModelRenderer>().Any(r=>r.Model?.ResourcePath?.StartsWith("models/maps/veridant/stone-pine-v2/",StringComparison.OrdinalIgnoreCase)==true))
+    throw new InvalidOperationException("A preview model is being used; retained it.");
+var removed=new System.Collections.Generic.List<string>();
+foreach(var name in new[]{"veridant_foliage_preview","veridant_stone_pine"})
+    foreach(var extension in new[]{".obj",".mtl",".vmdl",".vmdl_c",".obj.meta",".vmdl.meta"}) {
+        var target=System.IO.Path.GetFullPath(System.IO.Path.Combine(directory,name+extension));
+        if(System.IO.Path.GetDirectoryName(target)!=directory) throw new InvalidOperationException("Unexpected preview target.");
+        if(System.IO.File.Exists(target)) {System.IO.File.Delete(target);removed.Add(name+extension);}
+    }
+if(System.IO.Directory.Exists(directory)&&!System.IO.Directory.EnumerateFileSystemEntries(directory).Any()) System.IO.Directory.Delete(directory,false);
+return new{Removed=removed,CanonicalTreeRetained=System.IO.File.Exists(System.IO.Path.Combine(root,"Assets/models/maps/veridant/veridant_foliage.vmdl"))};

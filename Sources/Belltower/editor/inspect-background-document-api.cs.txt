@@ -1,0 +1,10 @@
+// Read-only discovery of document save/undo APIs for the open inactive Belltower tab.
+var type=typeof(Editor.SceneEditorSession);
+return new {
+    Methods=type.GetMethods(System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.Instance)
+        .Where(m=>m.Name.Contains("Save") || m.Name.Contains("Undo") || m.Name.Contains("Serialize") || m.Name=="Scope")
+        .Select(m=>m.ToString()).ToArray(),
+    Properties=type.GetProperties(System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.Instance)
+        .Where(p=>p.Name.Contains("Undo") || p.Name.Contains("File") || p.Name.Contains("Save") || p.Name.Contains("Scene"))
+        .Select(p=>p.PropertyType.FullName+" "+p.Name).ToArray()
+};

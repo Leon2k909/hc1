@@ -1,0 +1,14 @@
+// Shed padlock shackle and hinge; existing normal/roughness pixels.
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    TextureColor "materials/default/default_color.tga"
+    TextureNormal "materials/buildings/iron_normal.png"
+    TextureRoughness "materials/buildings/iron_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[.48 .51 .54 1]"
+    g_flMetalness ".95"
+    g_flRoughnessScaleFactor ".48"
+    g_flModelTintAmount "1"
+}

@@ -1,0 +1,30 @@
+// Preflight only. Run after the editor is available and stopped on Belltower.
+var session=Editor.SceneEditorSession.Active;
+if (Game.IsPlaying || session is null || session.HasUnsavedChanges ||
+    !session.Scene.Source.ResourcePath.Equals("scenes/maps/belltower/belltower.scene",StringComparison.OrdinalIgnoreCase))
+    throw new InvalidOperationException("Requires active, stopped, saved Belltower.");
+var root=Sandbox.Project.Current.GetRootPath();
+var directory=System.IO.Path.Combine(root,"output/belltower/bush-grounding");
+var plan=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(directory,"plan.json")));
+string Hash(string path)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+if (Hash(System.IO.Path.Combine(root,"Assets/scenes/maps/Belltower/belltower.scene"))!=plan["before_scene_sha256"].GetValue<string>())
+    throw new InvalidOperationException("Saved Belltower changed since planning.");
+foreach (var property in plan["source_after"].AsObject().Concat(plan["model_guards"].AsObject()))
+    if (Hash(System.IO.Path.Combine(root,property.Key))!=property.Value.GetValue<string>())
+        throw new InvalidOperationException("Grounding input changed: "+property.Key);
+var objects=session.Scene.GetAllObjects(true).ToDictionary(o=>o.Id);
+int count=0;
+foreach (var row in plan["objects"].AsArray())
+{
+    var id=Guid.Parse(row["id"].GetValue<string>());
+    if (!objects.TryGetValue(id,out var obj) || obj.Name!="Beech shrub"
+        || Vector3.DistanceBetween(obj.WorldPosition,Vector3.Parse(row["old_position"].GetValue<string>()))>.001f
+        || Vector3.DistanceBetween(obj.WorldScale,Vector3.Parse(row["old_scale"].GetValue<string>()))>.00001f
+        || obj.Components.Get<ModelRenderer>()?.Model?.ResourcePath!="models/sbox_props/shrubs/beech/beech_bush_small.vmdl")
+        throw new InvalidOperationException("A planned shrub changed: "+id);
+    count++;
+}
+if (count!=244) throw new InvalidOperationException("Unexpected garden shrub count.");
+System.IO.File.WriteAllText(System.IO.Path.Combine(directory,"native-object-ids-before.json"),
+    System.Text.Json.JsonSerializer.Serialize(objects.Keys.OrderBy(id=>id).ToArray()));
+return new {Prepared=count,SceneUnchanged=true,EditorStatePreserved=true,SourceAndModelGuardsVerified=true};

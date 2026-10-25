@@ -1,0 +1,178 @@
+{
+  "vertices": 5258,
+  "triangles": 7036,
+  "removed_degenerate": 0,
+  "materials": {
+    "m_93405a16932a": "viper/mw/attachments/attachment_vm_reflex_west02_lens",
+    "m_ff24ba084a8d": "viper/mw/attachments/ads_scope_lens_low_eye_relief",
+    "m_0275bf238e62": "reticle_ui_stencil_no_weap_cull",
+    "m_8f1008caa646": "viper/mw/attachments/attachment_vm_riser02",
+    "m_e33b73ce0bd2": "viper/mw/attachments/attachment_vm_reflex_west02_body"
+  },
+  "bounds": [
+    [
+      -0.10400000214576721,
+      -0.6520000100135803,
+      -0.21400000154972076
+    ],
+    [
+      2.1289989948272705,
+      0.7189990282058716,
+      1.909000039100647
+    ]
+  ],
+  "key": "att_vm_reflex_west02_tall",
+  "name": "Aim-Op Reflex Sight",
+  "category": "Optic",
+  "source": "models/viper/mw/attachments/attachment_vm_reflex_west04.mdl",
+  "vmdl": "attachments/mw2022/models/att_vm_reflex_west02_tall/att_vm_reflex_west02_tall.vmdl",
+  "bodygroups": [
+    {
+      "name": "optic",
+      "choices": [
+        {
+          "source": "attachment_vm_reflex_west04.smd",
+          "mesh": "mesh_00"
+        }
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "tag_reflex",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tag_lense",
+      "head": [
+        0.012000000104308128,
+        0.0,
+        1.2549999952316284
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.012000000104308128
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          1.2549999952316284
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tag_lense_hide",
+      "head": [
+        0.012000000104308128,
+        0.0,
+        1.2549999952316284
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.012000000104308128
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          1.2549999952316284
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tag_reticle_attach",
+      "head": [
+        0.012000000104308128,
+        0.0,
+        1.2549999952316284
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.012000000104308128
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          1.2549999952316284
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

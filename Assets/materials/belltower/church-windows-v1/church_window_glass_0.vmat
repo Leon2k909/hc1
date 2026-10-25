@@ -1,0 +1,19 @@
+// Belltower church facade: translucent, gently wavy old glazing
+"Layer0"
+{
+    shader "shaders/cerroblanco_glass.shader"
+    F_GLASS_QUALITY "2"
+    F_RENDER_BACKFACES "1"
+    g_flCoatingReflection "0.16"
+    g_bFogEnabled "1"
+    g_flBlurAmount "0.018"
+    g_flRefractionStrength "1.004"
+    AlbedoAbsorption "0.60"
+    g_flTintColor "[1 1 1 0]"
+    TextureColor "[0.800 0.880 0.910 0]"
+    TextureNormal "materials/default/default_normal.tga"
+    TextureRoughness "[0.2 0.2 0.2 0]"
+    TextureMetalness "[0 0 0 0]"
+    TextureAmbientOcclusion "[1 1 1 0]"
+    F_DO_NOT_CAST_SHADOWS "1"
+}

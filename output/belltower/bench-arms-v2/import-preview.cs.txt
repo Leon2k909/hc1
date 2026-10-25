@@ -1,0 +1,24 @@
+var root = Sandbox.Project.Current.GetRootPath();
+var folder = System.IO.Path.Combine(root,"output/belltower/bench-arms-v2");
+var manifest = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"preview-stage/manifest.json")));
+string Hash(string path) => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+var session = Editor.SceneEditorSession.Active;
+var playing = Game.IsPlaying;
+var gameId = Game.ActiveScene?.Id;
+var plan = manifest.AsObject().Select(pair => {
+    if (!System.Text.RegularExpressions.Regex.IsMatch(pair.Key,"^Assets/models/maps/belltower/bench-arms-v2/preview_(before|after)\\.(obj|mtl|vmdl)$"))
+        throw new InvalidOperationException("Unexpected preview path.");
+    var source=System.IO.Path.Combine(root,pair.Value["source"].GetValue<string>());
+    var target=System.IO.Path.Combine(root,pair.Key);
+    var sha=pair.Value["sha256"].GetValue<string>();
+    if (Hash(source)!=sha || (System.IO.File.Exists(target) && Hash(target)!=sha)) throw new InvalidOperationException("Preview input changed.");
+    return (Source:source,Target:target);
+}).ToArray();
+foreach(var item in plan.OrderBy(x=>x.Target.EndsWith(".vmdl")?1:0)) {
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(item.Target));
+    if(!System.IO.File.Exists(item.Target)) System.IO.File.Copy(item.Source,item.Target);
+    Editor.AssetSystem.RegisterFile(item.Target);
+}
+if(Game.IsPlaying!=playing || Game.ActiveScene?.Id!=gameId || !ReferenceEquals(session,Editor.SceneEditorSession.Active))
+    throw new InvalidOperationException("Editor state changed.");
+return new {PrivatePreviewFiles=plan.Length,GameScenePreserved=true,PlayStatePreserved=true,SceneObjectsAdded=0};

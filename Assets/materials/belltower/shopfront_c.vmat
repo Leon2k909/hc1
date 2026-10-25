@@ -1,9 +1,15 @@
 // Tools/belltower_quality_materials.py; sources: Sources/Belltower/scans/manifest.json
 "Layer0"
 {
-    shader "shaders/belltower_window.shader"
-    TextureRoomBack "materials/belltower/generated/shop-shelves-v1.png"
-    TextureRoomWall "materials/belltower/scans/painted_plaster_wall_diffuse_4k.png"
-    g_flRoomDepth "24"
-    g_flInteriorBrightness "0.23"
+    shader "shaders/glass.shader"
+    F_GLASS_QUALITY "2"
+    F_RENDER_BACKFACES "1"
+    TextureColor "materials/buildings/glass_clear_color.png"
+    TextureNormal "materials/default/default_normal.tga"
+    TextureRoughness "materials/buildings/glass_clear_rough.png"
+    g_flTintColor "[.98 .99 1]"
+    g_flBlurAmount "0.0"
+    g_flRefractionStrength "1.001"
+    AlbedoAbsorption "0.03"
+    F_DO_NOT_CAST_SHADOWS "1"
 }

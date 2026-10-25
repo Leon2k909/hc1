@@ -13,6 +13,16 @@
 						_class = "DefaultMaterialGroup"
 						remaps =
 						[
+{ from = "ext_v2_red.vmat" to = "materials/props/extinguisher-v2/red.vmat" },
+{ from = "ext_v2_label.vmat" to = "materials/props/extinguisher-v2/label.vmat" },
+{ from = "ext_v2_sign.vmat" to = "materials/props/extinguisher-v2/sign.vmat" },
+{ from = "ext_v2_gauge.vmat" to = "materials/props/extinguisher-v2/gauge.vmat" },
+{ from = "ext_v2_rubber.vmat" to = "materials/props/extinguisher-v2/rubber.vmat" },
+{ from = "ext_v2_steel.vmat" to = "materials/props/extinguisher-v2/steel.vmat" },
+{ from = "ext_v2_brass.vmat" to = "materials/props/extinguisher-v2/brass.vmat" },
+{ from = "ext_v2_dark.vmat" to = "materials/props/extinguisher-v2/dark.vmat" },
+{ from = "ext_v2_seal.vmat" to = "materials/props/extinguisher-v2/seal.vmat" },
+
 							{ from = "copper_brown.vmat" to = "materials/buildings/copper_brown.vmat" },
 							{ from = "dress_asphalt_fresh.vmat" to = "materials/railhead/dress/dress_asphalt_fresh.vmat" },
 							{ from = "dress_asphalt_track.vmat" to = "materials/railhead/dress/dress_asphalt_track.vmat" },
@@ -33,7 +43,6 @@
 							{ from = "dress_paving_polished.vmat" to = "materials/railhead/dress/dress_paving_polished.vmat" },
 							{ from = "dress_tyre.vmat" to = "materials/railhead/dress/dress_tyre.vmat" },
 							{ from = "rw_alu_brushed.vmat" to = "materials/railhead/rw_alu_brushed.vmat" },
-							{ from = "rw_amber_lens.vmat" to = "materials/railhead/rw_amber_lens.vmat" },
 							{ from = "rw_ballast_old.vmat" to = "materials/railhead/rw_ballast_old.vmat" },
 							{ from = "rw_black.vmat" to = "materials/railhead/rw_black.vmat" },
 							{ from = "rw_bogie.vmat" to = "materials/railhead/rw_bogie.vmat" },
@@ -44,7 +53,6 @@
 							{ from = "rw_bottle_orange.vmat" to = "materials/railhead/rw_bottle_orange.vmat" },
 							{ from = "rw_bottle_tea.vmat" to = "materials/railhead/rw_bottle_tea.vmat" },
 							{ from = "rw_bottle_water.vmat" to = "materials/railhead/rw_bottle_water.vmat" },
-							{ from = "rw_brake_disc.vmat" to = "materials/railhead/rw_brake_disc.vmat" },
 							{ from = "rw_buffer_beam.vmat" to = "materials/railhead/rw_buffer_beam.vmat" },
 							{ from = "rw_buffer_beam_b.vmat" to = "materials/railhead/rw_buffer_beam_b.vmat" },
 							{ from = "rw_buffer_bolt.vmat" to = "materials/railhead/rw_buffer_bolt.vmat" },
@@ -59,17 +67,6 @@
 							{ from = "rw_buffer_plate.vmat" to = "materials/railhead/rw_buffer_plate.vmat" },
 							{ from = "rw_buffer_red.vmat" to = "materials/railhead/rw_buffer_red.vmat" },
 							{ from = "rw_buffer_white.vmat" to = "materials/railhead/rw_buffer_white.vmat" },
-							{ from = "rw_cab_screen.vmat" to = "materials/railhead/rw_cab_screen.vmat" },
-							{ from = "rw_caliper.vmat" to = "materials/railhead/rw_caliper.vmat" },
-							{ from = "rw_car_blue.vmat" to = "materials/railhead/rw_car_blue.vmat" },
-							{ from = "rw_car_chrome.vmat" to = "materials/railhead/rw_car_chrome.vmat" },
-							{ from = "rw_car_cloth.vmat" to = "materials/railhead/rw_car_cloth.vmat" },
-							{ from = "rw_car_glass.vmat" to = "materials/railhead/rw_car_glass.vmat" },
-							{ from = "rw_car_grey.vmat" to = "materials/railhead/rw_car_grey.vmat" },
-							{ from = "rw_car_headlining.vmat" to = "materials/railhead/rw_car_headlining.vmat" },
-							{ from = "rw_car_ivory.vmat" to = "materials/railhead/rw_car_ivory.vmat" },
-							{ from = "rw_car_trim.vmat" to = "materials/railhead/rw_car_trim.vmat" },
-							{ from = "rw_car_white.vmat" to = "materials/railhead/rw_car_white.vmat" },
 							{ from = "rw_card_reader.vmat" to = "materials/railhead/rw_card_reader.vmat" },
 							{ from = "rw_card_reader_metal.vmat" to = "materials/railhead/rw_card_reader_metal.vmat" },
 							{ from = "rw_card_reader_screen.vmat" to = "materials/railhead/rw_card_reader_screen.vmat" },
@@ -85,9 +82,6 @@
 							{ from = "rw_dressed_red.vmat" to = "materials/railhead/rw_dressed_red.vmat" },
 							{ from = "rw_drum_blue.vmat" to = "materials/railhead/rw_drum_blue.vmat" },
 							{ from = "rw_drum_grey.vmat" to = "materials/railhead/rw_drum_grey.vmat" },
-							{ from = "rw_estate_lens_clear.vmat" to = "materials/railhead/rw_estate_lens_clear.vmat" },
-							{ from = "rw_estate_lens_dark.vmat" to = "materials/railhead/rw_estate_lens_dark.vmat" },
-							{ from = "rw_estate_lens_red.vmat" to = "materials/railhead/rw_estate_lens_red.vmat" },
 							{ from = "rw_galvanised.vmat" to = "materials/railhead/rw_galvanised.vmat" },
 							{ from = "rw_kiosk.vmat" to = "materials/railhead/rw_kiosk.vmat" },
 							{ from = "rw_kiosk_backlit.vmat" to = "materials/railhead/rw_kiosk_backlit.vmat" },
@@ -98,9 +92,7 @@
 							{ from = "rw_kiosk_shelf.vmat" to = "materials/railhead/rw_kiosk_shelf.vmat" },
 							{ from = "rw_kiosk_stone.vmat" to = "materials/railhead/rw_kiosk_stone.vmat" },
 							{ from = "rw_kiosk_white.vmat" to = "materials/railhead/rw_kiosk_white.vmat" },
-							{ from = "rw_lamp_chrome.vmat" to = "materials/railhead/rw_lamp_chrome.vmat" },
 							{ from = "rw_lamp_cool.vmat" to = "materials/railhead/rw_lamp_cool.vmat" },
-							{ from = "rw_lamp_lens.vmat" to = "materials/railhead/rw_lamp_lens.vmat" },
 							{ from = "rw_lamp_warm.vmat" to = "materials/railhead/rw_lamp_warm.vmat" },
 							{ from = "rw_lattice.vmat" to = "materials/railhead/rw_lattice.vmat" },
 							{ from = "rw_leaf.vmat" to = "materials/railhead/rw_leaf.vmat" },
@@ -126,15 +118,11 @@
 							{ from = "rw_steel.vmat" to = "materials/railhead/rw_steel.vmat" },
 							{ from = "rw_steel_dark.vmat" to = "materials/railhead/rw_steel_dark.vmat" },
 							{ from = "rw_steel_grey.vmat" to = "materials/railhead/rw_steel_grey.vmat" },
-							{ from = "rw_taxi_sign.vmat" to = "materials/railhead/rw_taxi_sign.vmat" },
 							{ from = "rw_ticket_machine.vmat" to = "materials/railhead/rw_ticket_machine.vmat" },
 							{ from = "rw_ticket_machine_display.vmat" to = "materials/railhead/rw_ticket_machine_display.vmat" },
 							{ from = "rw_ticket_machine_metal.vmat" to = "materials/railhead/rw_ticket_machine_metal.vmat" },
 							{ from = "rw_train_blue.vmat" to = "materials/railhead/rw_train_blue.vmat" },
-							{ from = "rw_tyre.vmat" to = "materials/railhead/rw_tyre.vmat" },
 							{ from = "rw_tyre_bright.vmat" to = "materials/railhead/rw_tyre_bright.vmat" },
-							{ from = "rw_tyre_dust.vmat" to = "materials/railhead/rw_tyre_dust.vmat" },
-							{ from = "rw_tyre_mark.vmat" to = "materials/railhead/rw_tyre_mark.vmat" },
 							{ from = "rw_vend_backlight.vmat" to = "materials/railhead/rw_vend_backlight.vmat" },
 							{ from = "rw_vend_band.vmat" to = "materials/railhead/rw_vend_band.vmat" },
 							{ from = "rw_vend_cabinet.vmat" to = "materials/railhead/rw_vend_cabinet.vmat" },
@@ -142,11 +130,10 @@
 							{ from = "rw_vending_body.vmat" to = "materials/railhead/rw_vending_body.vmat" },
 							{ from = "rw_wagon_grey.vmat" to = "materials/railhead/rw_wagon_grey.vmat" },
 							{ from = "rw_wagon_rust.vmat" to = "materials/railhead/rw_wagon_rust.vmat" },
-							{ from = "rw_wheel_alloy.vmat" to = "materials/railhead/rw_wheel_alloy.vmat" },
-							{ from = "rw_wheel_alloy_dark.vmat" to = "materials/railhead/rw_wheel_alloy_dark.vmat" },
 							{ from = "rw_white_paint.vmat" to = "materials/railhead/rw_white_paint.vmat" },
 							{ from = "rw_window_dark.vmat" to = "materials/railhead/rw_window_dark.vmat" },
 							{ from = "rw_wood.vmat" to = "materials/railhead/rw_wood.vmat" },
+							{ from = "rw_wood_end.vmat" to = "materials/railhead/rw_wood_end.vmat" },
 							{ from = "rw_yellow_paint.vmat" to = "materials/railhead/rw_yellow_paint.vmat" }
 						]
 						use_global_default = false
@@ -161,7 +148,7 @@
 					{
 						_class = "RenderMeshFile"
 						name = "railhead_dress_east"
-						filename = "models/maps/railhead/railhead_dress_east.obj"
+						filename = "models/maps/railhead/extinguisher-v2/east-base.obj"
 						import_translation = [ 0.0, 0.0, 0.0 ]
 						import_rotation = [ 0.0, 0.0, 0.0 ]
 						import_scale = 1.0
@@ -171,7 +158,20 @@
 						parent_bone = ""
 						import_filter = { exclude_by_default = false exception_list = [ ] }
 					},
-				]
+{
+						_class = "RenderMeshFile"
+						name = "extinguisher_v2_east"
+						filename = "models/maps/railhead/extinguisher-v2/east.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					}
+]
 			},
 			{
 				_class = "PhysicsShapeList"
@@ -1622,7 +1622,7 @@
 						parent_bone = ""
 						surface_prop = "metal"
 						collision_tags = "solid"
-						origin = [ -246.2500, -8.0000, 231.7000 ]
+						origin = [ -247.7500, -179.6000, 231.7000 ]
 						angles = [ -0.0000, -90.0000, 0.0000 ]
 						dimensions = [ 24.4000, 13.1000, 39.4000 ]
 					},
@@ -1631,7 +1631,7 @@
 						parent_bone = ""
 						surface_prop = "metal"
 						collision_tags = "solid"
-						origin = [ -313.7500, -684.0000, 231.7000 ]
+						origin = [ -312.2500, -692.1000, 231.7000 ]
 						angles = [ -0.0000, -90.0000, 0.0000 ]
 						dimensions = [ 24.4000, 13.1000, 39.4000 ]
 					},
@@ -1640,7 +1640,7 @@
 						parent_bone = ""
 						surface_prop = "metal"
 						collision_tags = "solid"
-						origin = [ -246.2500, -1088.0000, 231.7000 ]
+						origin = [ -247.7500, -1096.1000, 231.7000 ]
 						angles = [ -0.0000, -90.0000, 0.0000 ]
 						dimensions = [ 24.4000, 13.1000, 39.4000 ]
 					},
@@ -1769,78 +1769,6 @@
 						origin = [ 1420.0000, -900.0000, 188.5000 ]
 						angles = [ -0.0000, -90.0000, 0.0000 ]
 						dimensions = [ 15.4000, 3.9000, 15.4000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "metal"
-						collision_tags = "solid"
-						origin = [ 600.0000, -1553.0000, 22.6500 ]
-						angles = [ -0.0000, -90.0000, 0.0000 ]
-						dimensions = [ 70.4000, 182.4000, 57.3000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "metal"
-						collision_tags = "solid"
-						origin = [ 820.0000, -1553.0000, 22.6500 ]
-						angles = [ -0.0000, -90.0000, 0.0000 ]
-						dimensions = [ 70.4000, 182.4000, 57.3000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "metal"
-						collision_tags = "solid"
-						origin = [ 1040.0000, -1553.0000, 22.6500 ]
-						angles = [ -0.0000, -90.0000, 0.0000 ]
-						dimensions = [ 70.4000, 182.4000, 57.3000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "metal"
-						collision_tags = "solid"
-						origin = [ -900.0000, -1553.0000, 14.2500 ]
-						angles = [ -0.0000, -90.0000, 0.0000 ]
-						dimensions = [ 71.2000, 176.0000, 40.5000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "metal"
-						collision_tags = "solid"
-						origin = [ -915.0000, -1553.0000, 45.8500 ]
-						angles = [ -0.0000, -90.0000, 0.0000 ]
-						dimensions = [ 60.0000, 104.0000, 22.7000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "metal"
-						collision_tags = "solid"
-						origin = [ 1300.0000, -1553.0000, 22.6500 ]
-						angles = [ -0.0000, -90.0000, 0.0000 ]
-						dimensions = [ 70.4000, 182.4000, 57.3000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "metal"
-						collision_tags = "solid"
-						origin = [ -900.0000, -1940.0000, 17.8000 ]
-						angles = [ -0.0000, -90.0000, 0.0000 ]
-						dimensions = [ 80.4000, 235.7000, 47.6000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "metal"
-						collision_tags = "solid"
-						origin = [ -874.0000, -1940.0000, 64.1500 ]
-						angles = [ -0.0000, -90.0000, 0.0000 ]
-						dimensions = [ 78.4000, 183.7000, 45.1000 ]
 					},
 					{
 						_class = "PhysicsShapeBox"

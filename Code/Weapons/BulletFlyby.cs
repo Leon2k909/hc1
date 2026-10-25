@@ -735,5 +735,9 @@ public static partial class BulletFlyby
 		var delay = flight.Trajectory.TimeAt( flight.Origin.Distance( tr.EndPosition ) / Metre )
 			+ tr.EndPosition.Distance( listener ) / SoundSpeed;
 		GunshotAudio.PlayDelayed( sound, tr.EndPosition, delay );
+
+		// A glancing hit on a hard face skips the round off, whirring (WorldSounds.BulletRicochet).
+		if ( WorldSounds.BulletRicochet( tr, tr.GetImpactSurface(), flight.Direction ) is { } ricochet )
+			GunshotAudio.PlayDelayed( ricochet, tr.EndPosition, delay );
 	}
 }

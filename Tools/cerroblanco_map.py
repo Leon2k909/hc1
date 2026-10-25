@@ -81,6 +81,7 @@ SLAB = 164.0
 SG_ROOF = 330.0        # the South Gallery: one tall storey
 CAFE_TOP = SLAB
 DOOR_H = 124.0
+GROUND_HEAD = 150.0    # a ground-floor window's head with a first floor behind it: under the slab (164)
 
 ROTUNDA = ( 313.0, 1200.0 )
 ROT_IN, ROT_OUT = 375.0, 393.0
@@ -120,8 +121,12 @@ def write_materials():
     MAT_DIR.mkdir( parents=True, exist_ok=True )
     import railhead_materials as RM
     for name, ( colour, metal, rough ) in P.CB_PAINTED.items():
+        if name == P.BRONZE:
+            continue
         text = RM.painted_vmat( name, colour, metal, rough ).replace( "Tools/railhead_materials.py", "Tools/cerroblanco_map.py" )
         K.write_text( MAT_DIR / f"{name}.vmat", text )
+    import cerroblanco_bronze
+    cerroblanco_bronze.write_materials( MAT_DIR )
     glass = ( K.ASSETS / "materials/railhead/rw_glass.vmat" ).read_text( encoding="utf-8" )
     lines = [ "// Tools/cerroblanco_map.py, from materials/railhead/rw_glass.vmat" if line.startswith( "//" ) else line
               for line in glass.splitlines() ]
@@ -255,19 +260,19 @@ def west_gallery( m, g, d ):
           windows=[ glass( -1030, 120, 20, 150 ), glass( -750, 120, 20, 150 ), upper( -1010 ) ], parapet=True, upper_=TRAV,
           parapet_paint=TRAV )
     wall( m, g, "n", ( -142, 1492 ), ( -1126, -1108 ), "-e", doors=[ door( 200 ), door( 1300 ) ],
-          windows=[ glass( 500, 160 ), glass( 800, 160 ), glass( 1030, 140 ),
+          windows=[ glass( 500, 160, z1=GROUND_HEAD ), glass( 800, 160, z1=GROUND_HEAD ), glass( 1030, 140, z1=GROUND_HEAD ),
                     upper( 0 ), upper( 350 ), upper( 650 ), upper( 950 ), upper( 1250 ) ], ends=False, parapet=True )
     wall( m, g, "e", ( -1126, -200 ), ( 1492, 1510 ), "+n", doors=[ door( -650 ) ],
-          windows=[ glass( -950, 200 ), glass( -400, 200 ), upper( -1000 ), upper( -800 ), upper( -500 ), upper( -330 ) ],
+          windows=[ glass( -950, 200, z1=GROUND_HEAD ), glass( -400, 200, z1=GROUND_HEAD ), upper( -1000 ), upper( -800 ), upper( -500 ), upper( -330 ) ],
           parapet=True )
     wall( m, g, "n", ( -142, 1050 ), ( -668, -650 ), "+e", doors=[ door( 100 ), door( 650 ), door( 380, 100, FLOOR1, 110 ) ],
           windows=[ glass( 380, 300, 20, 150 ), glass( 880, 200, 20, 150 ), upper( 140, 120, 200, 286 ),
                     upper( 640, 120, 200, 286 ), upper( 880, 120, 200, 286 ) ],
           ends=False, parapet=True, lower=PANEL, upper_=TRAV, split=300, parapet_paint=TRAV )
-    wall( m, g, "e", ( -650, -200 ), ( 1050, 1068 ), "-n", windows=[ glass( -300, 120 ), upper( -470 ), upper( -300 ) ],
+    wall( m, g, "e", ( -650, -200 ), ( 1050, 1068 ), "-n", windows=[ glass( -300, 120, z1=GROUND_HEAD ), upper( -470 ), upper( -300 ) ],
           parapet=True )
     wall( m, g, "n", ( 1068, 1492 ), ( -218, -200 ), "+e", doors=[ door( 1300 ) ],
-          windows=[ glass( 1150, 120 ), upper( 1150 ), upper( 1400 ) ], ends=False, parapet=True )
+          windows=[ glass( 1150, 120, z1=GROUND_HEAD ), upper( 1150 ), upper( 1400 ) ], ends=False, parapet=True )
     # The inside corner of the L, where the east wall meets the north wing's south wall.
     m.box( ( -668, 1050, 0 ), ( -650, 1068, ROOF ), { "default": None, "-e": PLASTER, "+n": PLASTER, "+z": P.ROOF }, STONE )
     parapet_on( m, "e", ( -668, -650 ), ( 1050, 1068 ), None, ROOF )
@@ -497,12 +502,12 @@ def east_block( m, g, d ):
 
     # The North Gallery.
     wall( m, g, "e", ( 1000, 2060 ), ( 697, 715 ), "+n", doors=[ door( 1300 ), door( 1800 ) ],
-          windows=[ glass( 1550, 200 ), upper( 1200 ), upper( 1550 ), upper( 1900 ) ], parapet=True )
-    wall( m, g, "n", ( 0, 697 ), ( 2042, 2060 ), "+e", doors=[ door( 200 ) ], windows=[ glass( 450, 160 ), upper( 300 ),
+          windows=[ glass( 1550, 200, z1=GROUND_HEAD ), upper( 1200 ), upper( 1550 ), upper( 1900 ) ], parapet=True )
+    wall( m, g, "n", ( 0, 697 ), ( 2042, 2060 ), "+e", doors=[ door( 200 ) ], windows=[ glass( 450, 160, z1=GROUND_HEAD ), upper( 300 ),
                                                                                        upper( 550 ) ], ends=False, parapet=True )
     wall( m, g, "e", ( 1000, 1400 ), ( -18, 0 ), None, doors=[ door( 1200 ), door( 1300, 100, FLOOR1, 120 ) ], ends=False )
     wall( m, g, "e", ( 1400, 2060 ), ( -18, 0 ), "-n", doors=[ door( 1500 ), door( 1900 ) ],
-          windows=[ glass( 1700, 200 ), upper( 1500 ), upper( 1700 ), upper( 1900 ) ], parapet=True )
+          windows=[ glass( 1700, 200, z1=GROUND_HEAD ), upper( 1500 ), upper( 1700 ), upper( 1900 ) ], parapet=True )
     parapet_on( m, "e", ( 1000, 1400 ), ( -18, 0 ), None, ROOF )
     floor( m, *NG )
     P.slab( m, 1018, 2042, 0, 697, SLAB, FLOOR1, holes=[ ( 1964, 2042, 300, 600 ) ], top=HONED )
@@ -523,11 +528,11 @@ def east_block( m, g, d ):
 
     # The East Hall: tall, open to its roof but for the mezzanine along its east side.
     wall( m, g, "e", ( 480, 1400 ), ( -1000, -982 ), "-n", doors=[ door( 640 ) ],
-          windows=[ glass( 900, 240 ), glass( 1200, 160 ), upper( 900 ), upper( 1300 ) ], parapet=True )
+          windows=[ glass( 900, 240 ), glass( 1200, 160, z1=GROUND_HEAD ), upper( 900 ), upper( 1300 ) ], parapet=True )
     wall( m, g, "n", ( -982, 0 ), ( 480, 498 ), "-e", doors=[ door( -500 ), door( -200 ) ],
           windows=[ glass( -800, 160 ), upper( -650 ), upper( -350 ) ], parapet=True )
     wall( m, g, "n", ( -982, -18 ), ( 1382, 1400 ), "+e", doors=[ door( -500 ), door( -800 ) ],
-          windows=[ glass( -250, 160 ), upper( -650 ), upper( -350 ) ], ends=False, parapet=True )
+          windows=[ glass( -250, 160, z1=GROUND_HEAD ), upper( -650 ), upper( -350 ) ], ends=False, parapet=True )
     floor( m, *EH )
     roof_slab( m, 498, 1382, -982, -18, ROOF )
     P.slab( m, 1220, 1382, -982, -18, SLAB, FLOOR1, top=HONED )
@@ -693,6 +698,74 @@ def annulus( m, centre, r0, r1, z, paint, a0=0.0, a1=360.0, step=7.5 ):
         P.card( m, paint, quad, ( 0, 0, 1 ) )
 
 
+GARDEN_PATH = 52.0                       # the cross paths' half width
+GARDEN_LAWN = ( 196.0, 466.0 )           # a lawn quarter's grass, inside its kerb
+GARDEN_KERB = 8.0                        # the honed kerb round it, 3 high
+
+
+def lawn_quarter( m, centre, a ):
+    """ The lawn in the garden circle's quarter from a to a + 90 degrees: grass running up to the two paths either side
+    and round between the paving disc and the gravel walk under the hedge, in a honed kerb on all four sides. Its
+    straight sides are parallel to the paths. They were radial (an annulus sector), which left a wedge of gravel
+    between each lawn and its path, widening outwards, with no kerb along it (the user, 2026-10-24). """
+    u = np.array( ( math.cos( math.radians( a ) ), math.sin( math.radians( a ) ) ) )
+    v = np.array( ( -u[1], u[0] ) )
+    rin, rout = GARDEN_LAWN
+    outer = ( GARDEN_PATH, rin - GARDEN_KERB, rout + GARDEN_KERB )      # the kerb's outside: path edge, disc, walk
+    grass = ( GARDEN_PATH + GARDEN_KERB, rin, rout )
+    top, lawn_z = 3.0, 1.0
+
+    def span( region, t ):
+        """ The region's radii along the ray at angle t (radians, 0 along the first path), or None. """
+        side, r0, r1 = region
+        lo = max( r0, side / max( math.sin( t ), 1e-9 ), side / max( math.cos( t ), 1e-9 ) )
+        return ( lo, r1 ) if lo <= r1 + 1e-6 else None
+
+    def at( r, t, z ):
+        p = np.asarray( centre, float ) + ( u * math.cos( t ) + v * math.sin( t ) ) * r
+        return ( p[0], p[1], z )
+
+    def face( paint, pts, towards ):
+        pts = [ p for k, p in enumerate( pts ) if np.linalg.norm( np.subtract( p, pts[k - 1] ) ) > 1e-4 ]
+        if len( pts ) >= 3:
+            P.card( m, paint, pts, towards )
+
+    # Where a boundary changes from a straight side to an arc, and where each region starts and ends.
+    breaks = set()
+    for side, r0, r1 in ( outer, grass ):
+        for r in ( r0, r1 ):
+            t = math.asin( min( 1.0, side / r ) )
+            breaks |= { t, math.pi / 2 - t }
+    t0, t1 = min( breaks ), max( breaks )
+    count = int( math.ceil( math.degrees( t1 - t0 ) / 3.0 ) )
+    ts = sorted( breaks | { t0 + ( t1 - t0 ) * k / count for k in range( count + 1 ) } )
+    for ta, tb in zip( ts, ts[1:] ):
+        oa, ob = span( outer, ta ), span( outer, tb )
+        if oa is None or ob is None:
+            continue
+        ga, gb = span( grass, ta ), span( grass, tb )
+        mid = ( ta + tb ) / 2
+        inside = at( sum( span( outer, mid ) ) / 2, mid, top )
+        if ga is not None and gb is not None:
+            face( LAWN, [ at( ga[0], ta, lawn_z ), at( ga[1], ta, lawn_z ), at( gb[1], tb, lawn_z ), at( gb[0], tb, lawn_z ) ],
+                  ( 0, 0, 1 ) )
+            strips = ( ( oa[0], ga[0], ob[0], gb[0] ), ( ga[1], oa[1], gb[1], ob[1] ) )
+            # The kerb's inside faces, down to the grass.
+            lawn_mid = at( sum( span( grass, mid ) ) / 2, mid, top )
+            for ra, rb in ( ( ga[0], gb[0] ), ( ga[1], gb[1] ) ):
+                edge = ( np.array( at( ra, ta, top ) ) + at( rb, tb, top ) ) / 2
+                face( HONED, [ at( ra, ta, lawn_z ), at( rb, tb, lawn_z ), at( rb, tb, top ), at( ra, ta, top ) ],
+                      np.subtract( lawn_mid, edge ) )
+        else:
+            strips = ( ( oa[0], oa[1], ob[0], ob[1] ), )
+        for a0, a1, b0, b1 in strips:
+            face( HONED, [ at( a0, ta, top ), at( a1, ta, top ), at( b1, tb, top ), at( b0, tb, top ) ], ( 0, 0, 1 ) )
+        # Its outside faces: to the path or the paving disc, and to the gravel walk.
+        for ra, rb in ( ( oa[0], ob[0] ), ( oa[1], ob[1] ) ):
+            edge = ( np.array( at( ra, ta, top ) ) + at( rb, tb, top ) ) / 2
+            face( HONED, [ at( ra, ta, 0 ), at( rb, tb, 0 ), at( rb, tb, top ), at( ra, ta, top ) ], np.subtract( edge, inside ) )
+
+
 def garden_circle( m, d ):
     """ Bomb site B: a hedged circle round the bronze sphere, lawns in its quarters, gravel and paths. """
     c = GARDEN
@@ -706,14 +779,12 @@ def garden_circle( m, d ):
     annulus( m, c, 0, GARDEN_R - 20, 0.0, GRAVEL, step=6.0 )
     # The lawn's quarters, between the paths.
     for k in range( 4 ):
-        a0 = 90 * k + 12.0
-        annulus( m, c, 196, 466, 1.0, LAWN, a0, a0 + 66.0, step=6.0 )
-        P.ring( m, c, 466, 474, 0, 3, outer=HONED, inner=HONED, top=HONED, a0=a0, a1=a0 + 66.0, step=6.0, surface=None )
-        P.ring( m, c, 188, 196, 0, 3, outer=HONED, inner=HONED, top=HONED, a0=a0, a1=a0 + 66.0, step=6.0, surface=None )
+        lawn_quarter( m, c, 90.0 * k )
     for a in ( 0.0, 90.0, 180.0, 270.0 ):
         u = np.array( ( math.cos( math.radians( a ) ), math.sin( math.radians( a ) ) ) )
         side = np.array( ( -u[1], u[0] ) )
-        corners = [ np.array( c ) + u * r + side * s * 52 for r, s in ( ( 180, -1 ), ( GARDEN_R - 20, -1 ), ( GARDEN_R - 20, 1 ), ( 180, 1 ) ) ]
+        corners = [ np.array( c ) + u * r + side * s * GARDEN_PATH
+                    for r, s in ( ( 180, -1 ), ( GARDEN_R - 20, -1 ), ( GARDEN_R - 20, 1 ), ( 180, 1 ) ) ]
         P.card( m, PAVE, [ ( *p, 1.4 ) for p in corners ], ( 0, 0, 1 ) )
     annulus( m, c, 0, 188, 1.6, PAVE, step=6.0 )
     P.bronze_sphere( d, c[0], c[1] )

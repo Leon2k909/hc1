@@ -1,0 +1,87 @@
+{
+  "success": true,
+  "before_triangles": 164312,
+  "after_triangles": 30111,
+  "reduction_percent": 81.67,
+  "inland_image_triangles": 144,
+  "raster_rgba_size": [
+    2172,
+    724
+  ],
+  "skirt_and_blend_triangles": 1547,
+  "ground_coverage_samples_passed": 265,
+  "bay_cards_unchanged": {
+    "veridant_backdrop": 96,
+    "veridant_backdrop_props": 20
+  },
+  "no_physics": true,
+  "native_compiles": {
+    "material": {
+      "Success": true,
+      "Path": "materials/veridant/vr_inland_vista.vmat",
+      "CompiledFile": "C:/sbox-projects/hc1/forked-shooter-main/Assets/materials/veridant/vr_inland_vista.vmat_c",
+      "Hint": null
+    },
+    "land": {
+      "Success": true,
+      "Path": "models/maps/veridant/veridant_backdrop.vmdl",
+      "CompiledFile": "C:/sbox-projects/hc1/forked-shooter-main/Assets/models/maps/veridant/veridant_backdrop.vmdl_c",
+      "Hint": null
+    },
+    "props": {
+      "Success": true,
+      "Path": "models/maps/veridant/veridant_backdrop_props.vmdl",
+      "CompiledFile": "C:/sbox-projects/hc1/forked-shooter-main/Assets/models/maps/veridant/veridant_backdrop_props.vmdl_c",
+      "Hint": null
+    },
+    "blend": {
+      "Success": true,
+      "Path": "materials/veridant/vr_inland_skirt.vmat",
+      "CompiledFile": "C:/sbox-projects/hc1/forked-shooter-main/Assets/materials/veridant/vr_inland_skirt.vmat_c",
+      "Hint": null
+    }
+  },
+  "capture": {
+    "Before": {
+      "IsPlaying": false,
+      "Scene": "veridant",
+      "SceneId": "a0b04b40-e48b-59fa-9ffd-37de518f4405",
+      "GameSceneId": null
+    },
+    "IsPlaying": false,
+    "SourceUnchanged": true,
+    "Written": [
+      "user-elevated",
+      "player-east",
+      "east",
+      "north",
+      "south",
+      "hillside-detail",
+      "bay-control",
+      "north-coast-join",
+      "south-coast-join"
+    ],
+    "Renderers": 110,
+    "ErrorModels": [],
+    "Lights": 109,
+    "Probes": 9,
+    "MarkedTextures": 237,
+    "Hidden": []
+  },
+  "source_scene_preserved": true,
+  "fps_benchmarked": false,
+  "published_sha256": {
+    "Assets/materials/veridant/vista/inland-v1.png": "c66db58ff55c6fdef2fd7e13bd11e00cef0c6c58c4cc1b849d898ad8184e2260",
+    "Assets/materials/veridant/vr_inland_skirt.vmat": "2a8be001e0c617ec66fe35251871800c35381b94fcfeea2f7027b17a89d5480c",
+    "Assets/materials/veridant/vr_inland_vista.vmat": "5a275798b071eb422ea27a2c06b066b13c3dcb521a7d7cfdf3495f123d730219",
+    "Assets/models/maps/veridant/veridant_backdrop.mtl": "fde790173c01e26c9d5bf2aa86307df5f0b896d671dac7fde90051275562da35",
+    "Assets/models/maps/veridant/veridant_backdrop.obj": "e12961f8cece27cc7e5c6ea97d098ee8949ffd2652f2196db8bd5f71388076a2",
+    "Assets/models/maps/veridant/veridant_backdrop.vmdl": "f93266ef07e9c6284ad59deabd2c852e8fc2c257ac78c7528ec8a8a736d428c8",
+    "Assets/models/maps/veridant/veridant_backdrop_props.mtl": "4fdb5b74bffa453ee044537d8e32d6f5ea58beca97bf7a174aab65d1cc1bed7f",
+    "Assets/models/maps/veridant/veridant_backdrop_props.obj": "eb7b8944246d8de7fafa75d388b67a4111e60383512d63b5d59dc924e6e609d7",
+    "Assets/models/maps/veridant/veridant_backdrop_props.vmdl": "657ae6fa4d7afd4e2338921f7829fb3208ae0e1ba81a945cfb63241a7fd7b1d8",
+    "Assets/shaders/hc1_veridant_skirt.shader": "245381b4282fded43d47390a3a75d0895e5a10ffee2e54b7e728344d270d07a7"
+  },
+  "prompt": "Sources/Veridant/inland-vista-v1/coastal-generation.json",
+  "selected_source": "Sources/Veridant/inland-vista-v1/coastal-v2.png"
+}

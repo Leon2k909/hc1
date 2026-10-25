@@ -1,0 +1,7 @@
+// Read-only inspection of the loaded centre model's facade material bindings.
+var scene = Editor.SceneEditorSession.All.Single(s => s.Scene.Source?.ResourcePath?.Equals("scenes/maps/belltower/belltower.scene", StringComparison.OrdinalIgnoreCase) == true).Scene;
+var renderer = scene.GetAllComponents<ModelRenderer>().Single(r => r.Model?.ResourcePath?.Equals("models/maps/belltower/belltower_centre.vmdl", StringComparison.OrdinalIgnoreCase) == true);
+var result = new { renderer.Model.IsError, Slots = Enumerable.Range(0, renderer.Materials.Count).Select(i => new {
+    Index = i, Original = renderer.Materials.GetOriginal(i)?.ResourcePath, Override = renderer.Materials.GetOverride(i)?.ResourcePath
+}).ToArray(), MaterialGetters = typeof(Material).GetMethods().Where(m => m.Name.StartsWith("Get") && m.GetParameters().Length <= 2).Select(m => m.ToString()).Distinct().ToArray() };
+return result;

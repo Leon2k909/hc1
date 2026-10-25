@@ -1,0 +1,8 @@
+var scene = Editor.SceneEditorSession.All.Single(s => !s.Scene.IsEditor).Scene;
+return new {
+    Components = scene.GetAllComponents<Component>().GroupBy(c => c.GetType().FullName).ToDictionary(g => g.Key, g => g.Count()),
+    Objects = scene.GetAllObjects(true).Where(o => o.Name.Contains("player", StringComparison.OrdinalIgnoreCase) || o.Name.Contains("bot", StringComparison.OrdinalIgnoreCase))
+        .Take(20).Select(o => new { o.Id, o.Name, Position = o.WorldPosition.ToString(), Scale = o.WorldScale.ToString(), Types = o.Components.GetAll<Component>().Select(c => c.GetType().FullName).ToArray() }).ToArray(),
+    GameAssemblies = AppDomain.CurrentDomain.GetAssemblies().Where(a => a.GetType("Facepunch.GameSettingsSystem") is not null)
+        .Select(a => new { a.FullName, Current = a.GetType("Facepunch.GameSettingsSystem").GetProperty("Current")?.GetValue(null)?.ToString() }).ToArray()
+};

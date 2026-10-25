@@ -1,0 +1,27 @@
+// Import only the standalone prop preview and its three private material variants.
+// Does not activate, edit or save any scene, or change the shared viewport.
+var root=Sandbox.Project.Current.GetRootPath();
+var folder=System.IO.Path.Combine(root,"output/belltower/scarecrow-v1");
+var files=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"preview-manifest.json")))["files"].AsObject();
+var session=Editor.SceneEditorSession.Active;var playing=Game.IsPlaying;var dirty=session?.HasUnsavedChanges;
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+foreach(var item in files)
+{
+    if(!item.Key.StartsWith("Assets/models/maps/belltower/scarecrow-v1/") && !item.Key.StartsWith("Assets/materials/belltower/scarecrow-v1/"))
+        throw new InvalidOperationException("Unexpected preview asset.");
+    var source=System.IO.Path.Combine(folder,"stage",item.Key);var target=System.IO.Path.Combine(root,item.Key);
+    if(Hash(source)!=item.Value.GetValue<string>() || System.IO.File.Exists(target))
+        throw new InvalidOperationException("Preview bytes differ or target already exists: "+item.Key);
+}
+foreach(var item in files.OrderBy(p=>p.Key.EndsWith(".vmat")?0:p.Key.EndsWith(".vmdl")?2:1))
+{
+    var target=System.IO.Path.Combine(root,item.Key);
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target));
+    System.IO.File.Copy(System.IO.Path.Combine(folder,"stage",item.Key),target);
+    Editor.AssetSystem.RegisterFile(target);
+}
+if(!ReferenceEquals(session,Editor.SceneEditorSession.Active) || Game.IsPlaying!=playing || session?.HasUnsavedChanges!=dirty)
+    throw new InvalidOperationException("Editor state changed during preview import.");
+var result=new {Imported=files.Count,SceneStatePreserved=true,ViewportUntouched=true,TownAssetsUntouched=true};
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"native-preview-import.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

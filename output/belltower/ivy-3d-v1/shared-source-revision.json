@@ -1,0 +1,14 @@
+{
+  "reason": "Concurrent wall-edge construction source appeared after the ivy-only source check; retained without edits. Installed non-ivy town assets and scene remain the exact guarded originals.",
+  "source_snapshot": "output/belltower/ivy-3d-v1/shared-map-source-at-review.py",
+  "source_snapshot_sha256": "a3d9f226b0495a29e4116b5fd75f53ce93eccaeb08ef9815115485ffef2bcb5f",
+  "extra_functions": {
+    "town_walls": {
+      "before_ast_sha256": "ecfcc4d5b6631a51c4ac7ac36d17496765839678e4eef0701dd64e529b1d77d8",
+      "after_ast_sha256": "a988a896ab48ce93287bc55844777dd2976347eb8172c927796914481badc1e3"
+    }
+  },
+  "extra_imports": [
+    "belltower_wall_edges as WallEdges"
+  ]
+}

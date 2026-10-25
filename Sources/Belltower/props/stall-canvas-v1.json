@@ -1,0 +1,41 @@
+{
+  "revision": "stall-canvas-v1",
+  "state": "installed through the native editor; final model compile and visual review pending because the editor closed",
+  "updated_utc": "2026-10-20T11:50:25.954437+00:00",
+  "scope": "Market-stall fabric only; no scene placement, material, texture, timber, produce or collision changes.",
+  "generator": "Tools/belltower_stall_canvas.py",
+  "generator_sha256": "086e8e9cde71cb4fe6ee29dbe96b0132773bcea770aea7cb518aa6f398175e7b",
+  "integration": "Tools/belltower_map.py: stall calls StallCanvas.build after the existing posts",
+  "canopies": 18,
+  "removed_triangles_per_half": 72,
+  "added_triangles_per_half": 16848,
+  "new_materials": 0,
+  "new_colliders": 0,
+  "new_scene_objects": 0,
+  "staging_manifest": "output/belltower/canopy-cloth-v1/stage/manifest.json",
+  "staging_manifest_sha256": "0e6cd44d95b7bc2a8a40eada72c1f6b704268ebf8491e1b4bb06b67c44ba88d1",
+  "installed_obj_sha256": {
+    "Assets/models/maps/belltower/belltower_west.obj": "c0a8e2387f629caf91f87d2dfe0e39b63140fa0e0ceadf9948c116a35ac66ba7",
+    "Assets/models/maps/belltower/belltower_east.obj": "6af32cfc5e039398cf0c0e42e1f64cc34cf870de662b060bcde7b79b3bc6d617"
+  },
+  "physics_and_mapping_guards": {
+    "Assets/models/maps/belltower/belltower_west.vmdl": "36865241f43ac7994ec54c85259eac6b9b6bea3d11a8b541acf4f229025921dc",
+    "Assets/models/maps/belltower/belltower_west.mtl": "201958d751df9e3ca3dde37971a10074280934f4b4f18d8428297effe45f98ae",
+    "Assets/models/maps/belltower/belltower_east.vmdl": "b6cb48b5a14f3d7d7abc715f1eb2437281cc0e5b7b855eecfbb9dbd71225ba47",
+    "Assets/models/maps/belltower/belltower_east.mtl": "49c44726d8adff7f4015e9ad2e9d18202c672ae46e08c0dc22d778bf069dd2f1"
+  },
+  "native_import": "output/belltower/canopy-cloth-v1/stage/native-import.json",
+  "native_asset_compilation_verified": false,
+  "native_visual_review_verified": false,
+  "before_images": [
+    "output/belltower/quality/stall-canvas-v1-before/angle.png",
+    "output/belltower/quality/stall-canvas-v1-before/front.png"
+  ],
+  "preservation_checks": [
+    "output/belltower/canopy-cloth-v1/preservation-check.json",
+    "output/belltower/canopy-cloth-v1/generator-preservation-check.json"
+  ],
+  "capture_script": "Sources/Belltower/editor/capture-stall-canvas-v1.cs.txt",
+  "private_capture_config": "output/belltower/canopy-cloth-v1/capture.json",
+  "runtime_performance_measured": false
+}

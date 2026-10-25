@@ -1,0 +1,98 @@
+{
+  "revision": "veridant-door-clearance-index-repair-v1",
+  "source_sha256": {
+    "Tools/veridant_map.py": "623cab79c00c92389ae1873627d773aa542180a5bd266c94e6abd7ed82bf4cb0",
+    "Tools/veridant_parts.py": "48ec4c7b8fe4f38f7ad38569bbe4434083c90e7a19b54097aa2066a136d6f198",
+    "Tools/veridant_stage_door_clearance.py": "8a131154c06f775f53b316e8e8741ead831dc8df9ed2e9c52ea84dd11f9861a6",
+    "Tools/veridant_repair_door_indices.py": "f320ead0fd809f3863280895f01ed6f7b059b115f84849fc2ec0a5b0df3149e0",
+    "Tools/map_kit.py": "cc60204c747d064cb1fecdb666b24c847ae89dc863c2533d3811a0445f22020d",
+    "Tools/railhead_stage_extinguisher.py": "a17f431e35356d7207da0ee399c9054caacd6fb0ba633b0a20736e0255fffa94"
+  },
+  "protected_sha256": {
+    "Assets/scenes/maps/Veridant/veridant.scene": "d63b301e5b4c9ea2873bddd80a8a3f4d5da32f6fbd1caad6818725db2329e836",
+    "Assets/models/maps/veridant/veridant_buildings.vmdl": "804f8d8726e69f298b83752adab0cc77fe367159491f3a95653d881dc4b899fd",
+    "Assets/models/maps/veridant/veridant_buildings.mtl": "df9ed9084a5e9c350f1424724a543314fb7f60e4e24e2b6335a1c2273fbcfdb9",
+    "Assets/models/maps/veridant/veridant_buildings_hulls_default.obj": "07d0712c8bc999ea15661b872511932d1140093c489f167f206e8afa2080a982",
+    "Assets/models/maps/veridant/veridant_buildings_hulls_metal.obj": "eab46b35ecf6a05b599d033370f2f45fb2b51ed5af12eb88327a8f6e2ef9891c"
+  },
+  "files": {
+    "Assets/models/maps/veridant/veridant_buildings.obj": {
+      "before": "ed3957577488a0541455fc677e1b38d23eb23fd69396c76b8ccaa479babe3ed8",
+      "after": "73de38bcc3b5675a4e9d538810343eef84181cf28f236525e8989ec8eb5a1024",
+      "source": "output/veridant/door-obstruction/stage-v5-index-repair/Assets/models/maps/veridant/veridant_buildings.obj",
+      "backup": "output/veridant/door-obstruction/stage-v5-index-repair/before/Assets/models/maps/veridant/veridant_buildings.obj"
+    },
+    "Assets/models/maps/veridant/lounger-v2/veridant_buildings-base.obj": {
+      "before": "361afda71129e6c331d53cb072ee2e4a60f19932c0eb40a9e07f6b1ab43e5b6f",
+      "after": "da00710fe2f1c46487ad9df45be38b0a26cf792aaa32109fd807aed1485d3788",
+      "source": "output/veridant/door-obstruction/stage-v5-index-repair/Assets/models/maps/veridant/lounger-v2/veridant_buildings-base.obj",
+      "backup": "output/veridant/door-obstruction/stage-v5-index-repair/before/Assets/models/maps/veridant/lounger-v2/veridant_buildings-base.obj"
+    }
+  },
+  "doorways": {
+    "lounge": [
+      -390.0,
+      60.0,
+      0.0,
+      96.0
+    ],
+    "cafe": [
+      [
+        -80.0,
+        60.0,
+        0.0,
+        96.0
+      ],
+      [
+        100.0,
+        60.0,
+        0.0,
+        96.0
+      ]
+    ]
+  },
+  "shelf_ranges": {
+    "lounge": [
+      [
+        -520.0,
+        -424.0
+      ],
+      [
+        -356.0,
+        -300.0
+      ]
+    ],
+    "cafe": [
+      [
+        -46.0,
+        66.0
+      ]
+    ]
+  },
+  "jamb_clearance_inches": 4,
+  "open_door_width_inches": 60,
+  "open_door_height_inches": 96,
+  "removed_triangles": 3432,
+  "new_triangles": 1926,
+  "unrelated_geometry_bytes_exact": false,
+  "retained_sha256": "80ec946ffd27d1748c7650882e5be9a18600104504bb97d2f6f21d0a634dde9a",
+  "collision_unchanged": true,
+  "scene_unchanged": true,
+  "materials_unchanged": true,
+  "index_repair_proof": {
+    "Assets/models/maps/veridant/veridant_buildings.obj": {
+      "face_and_material_bytes_preserved": true,
+      "original_index_mapping_restored": true,
+      "original_table_records": 127502,
+      "added_table_records": 259513
+    },
+    "Assets/models/maps/veridant/lounger-v2/veridant_buildings-base.obj": {
+      "face_and_material_bytes_preserved": true,
+      "original_index_mapping_restored": true,
+      "original_table_records": 127502,
+      "added_table_records": 109033
+    }
+  },
+  "unrelated_face_and_material_records_exact": true,
+  "original_geometry_indices_restored": true
+}

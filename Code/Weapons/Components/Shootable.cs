@@ -315,6 +315,10 @@ public partial class Shootable : WeaponInputAction,
 		// sound has come back.
 		if ( WorldSounds.BulletImpact( tr, surface ) is { } sound )
 			GunshotAudio.PlayDelayed( sound, pos, ImpactSoundDelay( pos ) );
+
+		// A round that struck a hard face at a grazing angle skips off it, whirring.
+		if ( WorldSounds.BulletRicochet( tr, surface, tr.Direction ) is { } ricochet )
+			GunshotAudio.PlayDelayed( ricochet, pos, ImpactSoundDelay( pos ) );
 	}
 
 	/// <summary>
@@ -660,6 +664,12 @@ public partial class Shootable : WeaponInputAction,
 		TimeSinceBurstFinished = 0;
 		IsBurstFiring = false;
 		BurstCount = 0;
+	}
+
+	protected override void OnInputSuppressed()
+	{
+		if ( IsBurstFiring )
+			ClearBurst();
 	}
 
 	protected override void OnInputUpdate()

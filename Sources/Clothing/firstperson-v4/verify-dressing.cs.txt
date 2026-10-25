@@ -1,0 +1,64 @@
+// Exercise the actual production dressing routine with a Field Operator body.
+var root=Sandbox.Project.Current.GetRootPath();
+var selected=Editor.SceneEditorSession.Active;
+var playing=Game.IsPlaying;
+var dirty=selected?.HasUnsavedChanges;
+var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic;
+var scene=Scene.CreateEditorScene();
+object result=null;
+try
+{
+    using(scene.Push())
+    {
+        var holder=new GameObject(true,"Private first-person clothing verification");
+        var bodyObject=new GameObject(holder,true,"Body");
+        var body=bodyObject.Components.Create<SkinnedModelRenderer>();
+        body.Model=Model.Load(Facepunch.MilitaryUniform.HumanModelPath);
+        body.UseAnimGraph=false;
+        var uniform=bodyObject.Components.Create<Facepunch.MilitaryUniform>();
+        uniform.Style=Facepunch.MilitaryUniformStyle.Field;
+        uniform.Refresh();
+        var originalTint=bodyObject.GetComponentsInChildren<SkinnedModelRenderer>(true).ToDictionary(r=>r,r=>r.Tint);
+        var armsObject=new GameObject(holder,true,"First-person arms");
+        var arms=armsObject.Components.Create<SkinnedModelRenderer>();
+        arms.Model=Model.Load("models/first_person/v_first_person_arms_human.vmdl");
+        arms.UseAnimGraph=false;
+        var clothing=armsObject.Components.Create<Facepunch.ViewModelClothing>();
+        clothing.Arms=arms;clothing.Body=body;
+        typeof(Facepunch.ViewModelClothing).GetMethod("Dress",flags).Invoke(clothing,new object[]{uniform});
+        var dressed=typeof(Facepunch.ViewModelClothing).GetField("_root",flags).GetValue(clothing) as GameObject;
+        if(!dressed.IsValid())throw new InvalidOperationException("Production dressing created no clothes");
+        var rows=new System.Collections.Generic.List<object>();
+        foreach(var renderer in dressed.GetComponentsInChildren<SkinnedModelRenderer>(true))
+        {
+            if(!renderer.Enabled||renderer.Model is null)continue;
+            for(var i=0;i<renderer.Model.Materials.Length;i++)
+            {
+                var original=renderer.Model.Materials[i];
+                var name=original.Name.Contains("/army_shirt/",StringComparison.OrdinalIgnoreCase)?"shirt"
+                    :original.Name.Contains("/fingerless_gloves/",StringComparison.OrdinalIgnoreCase)?"gloves":null;
+                if(name is null)continue;
+                var actual=renderer.Materials.GetOverride(i);
+                var expected="materials/operators/first_person/"+(name=="shirt"?"v4/":"v2/")+name+".vmat";
+                if(actual is null||actual.IsError||actual.ResourcePath!=expected)
+                    throw new InvalidOperationException("The production dressed viewmodel did not use "+expected);
+                var cotton=actual.GetTexture("g_tFabricHeight");
+                if(name=="shirt"&&(cotton is null||!cotton.IsValid||cotton.IsError||cotton.Width!=256))
+                    throw new InvalidOperationException("Production sleeve has no valid physical cotton detail");
+                rows.Add(new{Name=name,Model=renderer.Model.ResourcePath,Material=actual.ResourcePath,Tint=renderer.Tint.ToString(),CottonHeightWidth=cotton?.Width});
+            }
+        }
+        if(rows.Count!=2)throw new InvalidOperationException("Expected the dressed sleeve and glove material slots");
+        if(originalTint.Any(p=>p.Key.Tint!=p.Value))throw new InvalidOperationException("Body outfit tint changed");
+        result=new{ProductionDressVerified=true,BodyOutfitTintPreserved=true,Style=uniform.Style.ToString(),Garments=rows,
+            ArmsBodygroupHidden=arms.GetBodyGroup("arms")==arms.Model.Parts.Get("arms").Choices.Count-1,
+            ExistingGameChanged=false};
+    }
+}
+finally{scene.Destroy();}
+var preserved=ReferenceEquals(selected,Editor.SceneEditorSession.Active)&&playing==Game.IsPlaying&&dirty==selected?.HasUnsavedChanges;
+var output=new{Dressing=result,EditorStatePreserved=preserved,TemporarySceneDestroyed=true};
+System.IO.File.WriteAllText(System.IO.Path.Combine(root,"output/firstperson-clothing-v4-20261021/dressing-proof.json"),
+    System.Text.Json.JsonSerializer.Serialize(output));
+if(!preserved)throw new InvalidOperationException("Shared editor state changed externally during the dressing check");
+return output;

@@ -1,0 +1,24 @@
+// Install only two unreferenced crate previews; preserve the active editor and game.
+var root=Sandbox.Project.Current.GetRootPath();
+var folder=System.IO.Path.Combine(root,"output/belltower/crates-v2");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"preview-manifest.json")));
+var selected=Editor.SceneEditorSession.Active;var game=Game.ActiveScene;var playing=Game.IsPlaying;
+var dirty=selected?.HasUnsavedChanges;
+string Hash(string path)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+int imported=0;
+foreach(var pair in manifest["files"].AsObject())
+{
+    if(!pair.Key.StartsWith("Assets/models/maps/belltower/crates-v2/",StringComparison.Ordinal))
+        throw new InvalidOperationException("Unexpected preview path.");
+    var source=System.IO.Path.Combine(folder,"preview",pair.Key);
+    var target=System.IO.Path.Combine(root,pair.Key);var expected=pair.Value.GetValue<string>();
+    if(Hash(source)!=expected)throw new InvalidOperationException("Staged preview changed.");
+    if(System.IO.File.Exists(target))
+    {if(Hash(target)!=expected)throw new InvalidOperationException("Preview target already differs.");}
+    else {System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target));System.IO.File.Copy(source,target);imported++;}
+    Editor.AssetSystem.RegisterFile(target);
+}
+if(!ReferenceEquals(selected,Editor.SceneEditorSession.Active)||!ReferenceEquals(game,Game.ActiveScene)
+    ||playing!=Game.IsPlaying||dirty!=selected?.HasUnsavedChanges)
+    throw new InvalidOperationException("Shared editor changed during preview import.");
+return new{Imported=imported,EditorStatePreserved=true,ProductionAssetsChanged=false,SceneChanged=false};

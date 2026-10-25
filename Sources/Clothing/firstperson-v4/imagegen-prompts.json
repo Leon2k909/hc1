@@ -1,0 +1,42 @@
+{
+  "mode": "built-in imagegen edit",
+  "date": "2026-10-21",
+  "purpose": "Remove coarse baked fabric relief and false seam from registered albedo regions; surface weave remains a separate normal layer",
+  "records": [
+    {
+      "name": "sleeve-left",
+      "source": "C:\\Users\\leon2\\.codex\\generated_images\\01a15def-db47-7cc1-94ed-03eba3599cc0\\exec-760ba118-89e4-4b7f-9e4e-83a2f1301b66.png",
+      "prompt": "Use case: precise-object-edit. Asset type: PBR BASE COLOUR / ALBEDO UV map, not a fabric photograph. The input is the exact registered left-sleeve texture crop. Change only the material's baked surface relief: REMOVE ALL canvas weave, embossed yarn, bumps, pits, diagonal grain, mottling, and painted lighting from the flat cloth. Inside each camouflage shape the dye must be a smooth, nearly uniform flat diffuse colour, like an unlit screen print. There must be ZERO visible weave pattern in the colour image; the game supplies fine cotton fibres with a separate normal map. Keep the exact same camouflage shapes, seam/pocket/cuff/button locations, crisp little stitch rows, insignia, outer boundaries, UV gutters, framing and aspect ratio 1604:981. Preserve the existing muted tan, olive and brown colours and overall brightness, but remove false bright fold lines crossing flat cloth. Do not add folds, relief, shadows, highlights, wrinkles, grain, dots, or any new detail. Do not blur camouflage boundaries or stitches. It should look intentionally flat as a technical diffuse map, not like rendered canvas. Output only this cleaned registered albedo texture at the highest native landscape resolution; no photograph, labels or border.",
+      "input": "output/firstperson-clothing-v3-20261021/imagegen/sleeve-left.png",
+      "selected": true
+    },
+    {
+      "name": "sleeve-right-intermediate",
+      "source": "C:\\Users\\leon2\\.codex\\generated_images\\01a15def-db47-7cc1-94ed-03eba3599cc0\\exec-cc626376-37d1-4a77-a2e8-f214aba1146a.png",
+      "prompt": "Use case: precise-object-edit. Asset type: PBR BASE COLOUR / ALBEDO UV map, not a fabric photograph. The input is the exact registered right-sleeve texture crop. Change only the material's baked surface relief: REMOVE ALL canvas weave, embossed yarn, bumps, pits, diagonal grain, mottling, and painted lighting from the flat cloth. Inside each camouflage shape the dye must be a smooth, nearly uniform flat diffuse colour, like an unlit screen print. There must be ZERO visible weave pattern in the colour image; the game supplies fine cotton fibres with a separate normal map. Keep the exact same camouflage shapes, exact seam/pocket/cuff/button locations, the same crisp little stitch rows, the same outer boundaries, UV gutters, framing and aspect ratio 1602:982. Preserve the existing muted tan, olive and brown colours and overall brightness, but remove false bright fold lines crossing flat cloth. Do not add folds, relief, shadows, highlights, wrinkles, grain, dots, or any new detail. Do not blur camouflage boundaries or stitches. It should look intentionally flat as a technical diffuse map, not like rendered canvas. Output only this cleaned registered albedo texture at the highest native landscape resolution; no photograph, labels or border.",
+      "input": "output/firstperson-clothing-v3-20261021/imagegen/sleeve-right.png",
+      "selected": false
+    },
+    {
+      "name": "sleeve-right",
+      "source": "C:\\Users\\leon2\\.codex\\generated_images\\01a15def-db47-7cc1-94ed-03eba3599cc0\\exec-64cdff1c-eae0-412e-beaa-f95816a04780.png",
+      "prompt": "Use case: precise-object-edit. Surgical repair to this exact albedo UV texture. Remove ONLY the stray thin pale horizontal line that crosses the flat camouflage panel around 32 percent down the image, running from the vertical stitched placket at about 19 percent image width to the pocket edge at about 59 percent image width. That isolated line across the flat camouflage is an unwanted painted highlight. Replace that thin line with the uninterrupted camouflage colour shapes directly surrounding it. Preserve absolutely everything else: exact camouflage boundaries and colours, flat smooth dye without weave, all real edge stitching, pockets, buttons, gutters, image size, framing, positions and aspect ratio. Do not remove any true stitched edge or the pocket or placket. Do not add grain, texture, shading, lighting, folds or any other detail. Image only.",
+      "input": "C:\\Users\\leon2\\.codex\\generated_images\\01a15def-db47-7cc1-94ed-03eba3599cc0\\exec-cc626376-37d1-4a77-a2e8-f214aba1146a.png",
+      "selected": true
+    },
+    {
+      "name": "cuff-main",
+      "source": "C:\\Users\\leon2\\.codex\\generated_images\\01a15def-db47-7cc1-94ed-03eba3599cc0\\exec-f2aa42b4-5077-4195-879b-cd070e68fe5c.png",
+      "prompt": "Use case: precise-object-edit. Asset type: PBR BASE COLOUR / ALBEDO UV map. Input is the exact registered central cuff texture crop. Remove ALL baked canvas weave, diagonal yarn, coarse fibres, bumps, pits, grain, mottling and shaded fabric relief from the cloth interiors, replacing those interiors with smooth flat camouflage dye colours. ZERO visible fabric-weave pattern should remain in this colour image; fine cotton thread will be rendered with a separate normal map. Preserve precisely the same camouflage shape outlines, the horizontal band/seam positions, small stitch rows, buttons and button holes, tab outline, atlas gutters, partial edge objects, framing and aspect ratio 1568:1003. Keep the muted tan/olive/brown palette and original brightness. Retain sharp little stitch loops and button details, but flat unlit colour inside the broad camo shapes. Do not add a single new element, fold, shadow or highlight. No coarse canvas texture, no new wrinkles, no grain, no dots and no blur at camouflage edges or stitching. Output only the cleaned registered diffuse texture, highest native landscape resolution, no labels or border.",
+      "input": "output/firstperson-clothing-v3-20261021/imagegen/cuff-main.png",
+      "selected": true
+    },
+    {
+      "name": "cuff-strip",
+      "source": "C:\\Users\\leon2\\.codex\\generated_images\\01a15def-db47-7cc1-94ed-03eba3599cc0\\exec-8a941864-b798-443d-9900-851c0e66c305.png",
+      "prompt": "Use case: precise-object-edit. Asset type: PBR BASE COLOUR / ALBEDO UV map. Input is the exact registered narrow cuff/button texture strip. Remove ALL coarse canvas weave, diagonal yarn, bumps, pits, grain, mottling and shaded fabric relief from cloth interiors. Replace those interiors with smooth nearly uniform flat camouflage dye colours. ZERO fabric-weave pattern should remain in this colour image; a separate normal texture supplies fine cotton fibres in the game. Preserve precisely every camouflage outline, seam line, small stitch row, the exact number and positions of buttons and button holes, tab outlines, atlas gutters, partial edge objects, framing and portrait aspect ratio 860:1828. Keep tan/olive/brown colours and overall brightness. Retain sharp little stitch loops and crisp button details, but flat unlit colour inside cloth camo shapes. Do not add new folds, lighting, shadows, wrinkles, grain, dots or any new detail. No blur at camouflage edges or stitches. Output only the cleaned registered diffuse texture at highest native portrait resolution, no labels or border.",
+      "input": "output/firstperson-clothing-v3-20261021/imagegen/cuff-strip.png",
+      "selected": true
+    }
+  ]
+}

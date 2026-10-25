@@ -1,0 +1,76 @@
+// Publish only the six pinned OBJ files containing Belltower's armrests.
+var root = Sandbox.Project.Current.GetRootPath();
+var directory = System.IO.Path.Combine(root, "output/belltower/bench-arms-v2");
+var config = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(directory, "publication-config.json")));
+var revision = config["stage_revision"].GetValue<int>();
+if (revision < 1 || revision > 20) throw new InvalidOperationException("Invalid stage revision.");
+var manifest = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(directory, "stage-r" + revision + "/manifest.json")));
+var session = Editor.SceneEditorSession.Active;
+var playing = Game.IsPlaying;
+var gameId = Game.ActiveScene?.Id;
+var dirty = session?.HasUnsavedChanges;
+if (session is null) throw new InvalidOperationException("No active editor session.");
+if (playing && (Game.ActiveScene?.Source?.ResourcePath?.Equals("scenes/maps/belltower/belltower.scene", StringComparison.OrdinalIgnoreCase) == true ||
+    Game.ActiveScene.GetAllComponents<ModelRenderer>().Any(r => r.Model?.ResourcePath?.Contains("models/maps/belltower/", StringComparison.OrdinalIgnoreCase) == true)))
+    throw new InvalidOperationException("Do not replace assets used by a running Belltower match.");
+string Hash(string path) => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+var scenePath = System.IO.Path.Combine(root, "Assets/scenes/maps/Belltower/belltower.scene");
+var sceneHash = Hash(scenePath);
+var ids = session.Scene.GetAllObjects(true).Select(o => o.Id).ToHashSet();
+foreach (var group in new[] { "source_sha256", "vmdl_guards" })
+    foreach (var pair in manifest[group].AsObject())
+        if (Hash(System.IO.Path.Combine(root, pair.Key)) != pair.Value.GetValue<string>())
+            throw new InvalidOperationException("Shared input changed: " + pair.Key);
+var plan = new System.Collections.Generic.List<(string Source, string Target, string Backup, string Before, string After)>();
+foreach (var pair in manifest["files"].AsObject())
+{
+    var relative = pair.Key;
+    bool allowed = relative == "Assets/models/maps/belltower/belltower_west.obj" || relative == "Assets/models/maps/belltower/belltower_east.obj" ||
+        (relative.StartsWith("Assets/models/maps/belltower/compiler-safe/", StringComparison.Ordinal) &&
+         (relative.EndsWith("_iron_black.obj", StringComparison.Ordinal) || relative.EndsWith("_furniture_wood_dark.obj", StringComparison.Ordinal)));
+    if (!allowed || relative.Contains("..")) throw new InvalidOperationException("Unexpected target: " + relative);
+    var source = System.IO.Path.Combine(root, pair.Value["source"].GetValue<string>());
+    var target = System.IO.Path.Combine(root, relative);
+    var backup = System.IO.Path.Combine(root, pair.Value["backup"].GetValue<string>());
+    var before = pair.Value["before"].GetValue<string>();
+    var after = pair.Value["after"].GetValue<string>();
+    if (Hash(source) != after || Hash(backup) != before) throw new InvalidOperationException("Stage or backup changed.");
+    var current = Hash(target);
+    if (current == after) continue;
+    if (current != before) throw new InvalidOperationException("Shared mesh changed: " + relative);
+    plan.Add((source, target, backup, before, after));
+}
+if (manifest["files"].AsObject().Count != 6 || !manifest["collision_unchanged"].GetValue<bool>() ||
+    !manifest["all_seats_backs_legs_braces_and_bolts_exact"].GetValue<bool>())
+    throw new InvalidOperationException("Missing bench preservation proof.");
+var changed = new System.Collections.Generic.List<(string Target, string Backup)>();
+try
+{
+    foreach (var item in plan)
+    {
+        var incoming = item.Target + ".bench-arms-incoming";
+        try
+        {
+            System.IO.File.Copy(item.Source, incoming, true);
+            if (Hash(incoming) != item.After) throw new InvalidOperationException("Incoming checksum failed.");
+            changed.Add((item.Target, item.Backup));
+            System.IO.File.Move(incoming, item.Target, true);
+        }
+        finally { if (System.IO.File.Exists(incoming)) System.IO.File.Delete(incoming); }
+    }
+}
+catch
+{
+    foreach (var item in changed.AsEnumerable().Reverse()) System.IO.File.Copy(item.Backup, item.Target, true);
+    throw;
+}
+foreach (var item in plan) Editor.AssetSystem.RegisterFile(item.Target);
+if (Hash(scenePath) != sceneHash || session.HasUnsavedChanges != dirty || Game.IsPlaying != playing || Game.ActiveScene?.Id != gameId || !ReferenceEquals(session, Editor.SceneEditorSession.Active)
+    || !session.Scene.GetAllObjects(true).Select(o => o.Id).ToHashSet().SetEquals(ids))
+    throw new InvalidOperationException("Editor state changed during publication; inspect before continuing.");
+var result = new { Imported = plan.Count, Benches = 18, Armrests = 36, StageRevision = revision,
+    SceneUnchanged = true, SceneSha256 = sceneHash, CollisionAndModelDescriptionsUnchanged = true,
+    SeatsBacksLegsAndBoltsPreserved = true, GameScenePreserved = true, PlayStatePreserved = true, ActiveDocumentPreserved = true,
+    NewTriangles = 0, NewSceneObjects = 0, ForcedFullCompile = false };
+System.IO.File.WriteAllText(System.IO.Path.Combine(directory, "native-import-r" + revision + ".json"), System.Text.Json.JsonSerializer.Serialize(result));
+return result;

@@ -208,9 +208,7 @@ public sealed class GunsmithMw22Attachment : GunsmithAttachment, ICameraSetup
 		return mount.IsValid() && !mount.unequipped ? mount : null;
 	}
 
-	/// <summary>Bone pose relative to its renderer, captured while bones and renderer agree (update phase).</summary>
-	private static readonly Dictionary<(SkinnedModelRenderer, string), Transform> boneOffsets = new();
-	/// <summary>True while re-mounting after camera setup has moved the viewmodel; bone world transforms are stale then.</summary>
+	/// <summary>True while re-mounting after camera setup; socket attachments use their cached model-space offset.</summary>
 	internal static bool FollowingCamera { get; set; }
 
 	/// <summary> Each model's bones by name: every part on every gun asks twice a frame, and a bone's name is a native call. </summary>
@@ -221,16 +219,21 @@ public sealed class GunsmithMw22Attachment : GunsmithAttachment, ICameraSetup
 		var bones = weapon.Model.Bones;
 		if ( !boneLookup.TryGetValue( (bones, bone), out var found ) )
 			boneLookup[(bones, bone)] = found = bone is null ? null : bones.GetBone( bone );
-		if ( found is null || !weapon.TryGetBoneTransform( found, out var current ) )
+		if ( found is null )
 			return weapon.WorldTransform;
 
-		var key = (weapon, bone);
-		if ( !FollowingCamera )
+		Transform current;
+		var model = weapon.SceneModel;
+		if ( model.IsValid() )
 		{
-			if ( boneOffsets.Count > 256 ) foreach ( var dead in boneOffsets.Keys.Where( k => !k.Item1.IsValid() ).ToList() ) boneOffsets.Remove( dead );
-			boneOffsets[key] = weapon.WorldTransform.ToLocal( current );
+			// Animation and camera setup can run after OnUpdate, and the SceneModel can still be in last frame's space.
+			// Read this pose in its own render space, then carry it into the gun's current space. An update-phase cache
+			// either misses the latest sprint pose or mixes the renderer's old transform with the gun's new one.
+			var local = model.Transform.ToLocal( model.GetBoneWorldTransform( found.Index ) );
+			current = weapon.WorldTransform.ToWorld( local );
 		}
-		else if ( boneOffsets.TryGetValue( key, out var offset ) ) current = weapon.WorldTransform.ToWorld( offset );
+		else if ( !weapon.TryGetBoneTransform( found, out current ) )
+			return weapon.WorldTransform;
 		var bind = weapon.Model.GetBoneTransform( found.Index );
 		return new Transform( current.PointToWorld( bind.PointToLocal( Vector3.Zero ) ), current.Rotation * bind.Rotation.Inverse, current.Scale / bind.Scale );
 	}

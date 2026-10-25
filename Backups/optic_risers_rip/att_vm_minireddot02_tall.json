@@ -1,0 +1,179 @@
+{
+  "vertices": 7813,
+  "triangles": 9076,
+  "removed_degenerate": 0,
+  "materials": {
+    "m_ae6d7bd27d67": "viper/mw/attachments/attachment_vm_minireddot02_lens",
+    "m_07524281557d": "viper/mw/attachments/attachment_vm_minireddot02_lens_ads",
+    "m_d88464ba9984": "viper/mw/attachments/stencil_outline",
+    "m_7617252bd7f3": "viper/mw/attachments/attachment_vm_minireddot_railmount",
+    "m_ad5bdfa0d50c": "viper/mw/attachments/attachment_vm_riser03",
+    "m_ebf9d90d4147": "viper/mw/attachments/attachment_vm_minireddot02_body"
+  },
+  "bounds": [
+    [
+      0.0010000000474974513,
+      -0.6309999823570251,
+      -0.2240000069141388
+    ],
+    [
+      2.7929999828338623,
+      0.6309990286827087,
+      1.4899990558624268
+    ]
+  ],
+  "key": "att_vm_minireddot02_tall",
+  "name": "Solozero Optics Mini Reflex",
+  "category": "Optic",
+  "source": "models/viper/mw/attachments/attachment_vm_minireddot02_tall.mdl",
+  "vmdl": "attachments/mw2022/models/att_vm_minireddot02_tall/att_vm_minireddot02_tall.vmdl",
+  "bodygroups": [
+    {
+      "name": "optic",
+      "choices": [
+        {
+          "source": "attachment_vm_minireddot02_tall.smd",
+          "mesh": "mesh_00"
+        }
+      ]
+    }
+  ],
+  "bones": [
+    {
+      "name": "tag_reflex",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tag_glass_ads2",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tag_glass_hip2",
+      "head": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "tag_reticle_attach",
+      "head": [
+        2.003000020980835,
+        0.0,
+        1.0779999494552612
+      ],
+      "matrix": [
+        [
+          1.0,
+          0.0,
+          0.0,
+          2.003000020980835
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          1.0779999494552612
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ]
+      ]
+    }
+  ]
+}

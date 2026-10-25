@@ -116,6 +116,56 @@ public static class WorldSounds
 	public static SoundEvent BulletImpact( in SceneTraceResult tr, Surface surface ) => Strike( tr, surface, "impacts/bullet" );
 
 	/// <summary>
+	/// The whir of a round glancing off what <paramref name="tr"/> hit, flying along <paramref name="direction"/>, or null
+	/// when it doesn't ricochet. A jacketed round only skips off a hard face struck at a grazing angle, under about 15
+	/// degrees on steel and 10 on concrete, stone or tile, and more often the flatter it comes in; it breaks up on the
+	/// rest. Played beside the impact, it's heard from tens of metres at most. The dice go by where it struck, so every
+	/// machine mostly agrees on which rounds skipped.
+	/// </summary>
+	public static SoundEvent BulletRicochet( in SceneTraceResult tr, Surface surface, Vector3 direction )
+	{
+		if ( tr.Hitbox is not null || direction.IsNearZeroLength || tr.Normal.IsNearZeroLength )
+			return null;
+
+		if ( tr.Collider is Terrain || tr.GameObject?.Components.Get<Terrain>() is not null )
+			surface = SurfaceAt( tr );
+
+		var critical = Classify( surface ) switch
+		{
+			Material.Metal => 15f,
+			Material.Masonry or Material.Tile => 10f,
+			_ => 0f,
+		};
+		if ( critical <= 0f )
+			return null;
+
+		var grazing = MathF.Asin( Math.Clamp( -Vector3.Dot( direction.Normal, tr.Normal ), 0f, 1f ) ) * 180f / MathF.PI;
+		var chance = MaxRicochetChance * (1f - grazing / critical);
+		if ( chance <= 0f || Dice( tr.HitPosition ) >= chance )
+			return null;
+
+		return Event( "sounds/world/impacts/bullet_ricochet.sound" );
+	}
+
+	/// <summary> The share of rounds that skip off whole at the flattest angle; the rest break up on the face. </summary>
+	private const float MaxRicochetChance = 0.6f;
+
+	/// <summary> 0-1 from a point, the same on every machine (to the nearest 4 units). </summary>
+	private static float Dice( Vector3 point )
+	{
+		var x = (uint)(int)MathF.Round( point.x / 4f );
+		var y = (uint)(int)MathF.Round( point.y / 4f );
+		var z = (uint)(int)MathF.Round( point.z / 4f );
+		var h = x * 73856093u ^ y * 19349663u ^ z * 83492791u;
+		h ^= h >> 15;
+		h *= 0x2c1b3c6du;
+		h ^= h >> 12;
+		h *= 0x297a2d39u;
+		h ^= h >> 15;
+		return (h & 0xFFFFFF) / 16777216f;
+	}
+
+	/// <summary>
 	/// The sound of a knife's blade striking what <paramref name="tr"/> hit, like <see cref="BulletImpact"/>: the steel
 	/// tip, the blade's ring and what the tip does to the face, far quieter than a round's strike. A living player's
 	/// body plays <see cref="KnifeFlesh"/> on every machine as it takes the stab.

@@ -7,8 +7,8 @@ Tools/veridant_materials.py's vr_ paints on them.
   every nosing, as the picture's grand stair has, drawn over one wedge hull: the slope the navmesh walks.
 - Balustrades are frameless glass (a steel shoe and a slim cap rail) or black steel bars; each run adds a player clip
   (CLIPS) the scene builds, so nobody walks off a terrace and bullets pass.
-- Trees are built from crossed alpha-tested cards on the vr_foliage atlas over trunks of tapered tubes: olives in
-  planters, the stone pine's flat umbrella crown, date palms' arching fronds.
+- Trees use alpha-tested foliage and tapered trunks: olives in planters, separate 3D needle sprays on the terrace
+  stone pine's branches, and date palms' arching fronds.
 - Lettering, the banner, the flag and the lounge's paintings are quads on the vr_letters_* / vr_print atlases, sized
   by their region's shape.
 - Light fixtures (wall washers, step lights, uplights, lanterns, downlights) draw a housing and a lit lens and add a
@@ -423,6 +423,26 @@ def uplight( m, name, at, radius=220, colour=WARM, light=True ):
         LIGHTS.append( ( name, tuple( c + UP * 24 ), colour, radius, False ) )
 
 
+def lantern_roof( m, top ):
+    """ A closed square canopy aligned with the lantern's four corner posts. """
+    top = v( *top )
+    corners = [ v( sx, sy, 0 ) for sx, sy in ( ( -1, -1 ), ( 1, -1 ), ( 1, 1 ), ( -1, 1 ) ) ]
+    # A four-sided lathe puts its points on the axes: that diamond left all four
+    # square-frame corners exposed. These eaves overhang every post instead.
+    rings = [ [ top + corner * half + UP * z for corner in corners ]
+              for half, z in ( ( 7.05, 13.9 ), ( 7.25, 14.25 ), ( 7.25, 14.65 ),
+                               ( 6.95, 14.95 ), ( 0.4, 19.2 ) ) ]
+    for lower, upper in zip( rings, rings[1:] ):
+        for k in range( 4 ):
+            k1 = ( k + 1 ) % 4
+            # Flat normals keep the folded metal faces and rolled eave distinct.
+            m.polygon( "vr_steel", [ lower[k], lower[k1], upper[k1], upper[k] ] )
+    apex = top + UP * 19.5
+    for k in range( 4 ):
+        m.polygon( "vr_steel", [ rings[-1][k], rings[-1][( k + 1 ) % 4], apex ] )
+    card( m, "vr_steel", rings[0][::-1], -UP )
+
+
 def lantern_post( m, name, base, h=132.0, light=True, radius=420 ):
     """ A promenade lamp post: a black steel column, a box lantern with lit glass. """
     b = v( *base )
@@ -433,7 +453,7 @@ def lantern_post( m, name, base, h=132.0, light=True, radius=420 ):
     for sx, sy in ( ( -1, -1 ), ( 1, -1 ), ( 1, 1 ), ( -1, 1 ) ):
         box( m, top[0] + sx * 5.2 - 0.6, top[0] + sx * 5.2 + 0.6, top[1] + sy * 5.2 - 0.6, top[1] + sy * 5.2 + 0.6, top[2] + 2, top[2] + 14, "vr_steel" )
     box( m, top[0] - 4.6, top[0] + 4.6, top[1] - 4.6, top[1] + 4.6, top[2] + 2, top[2] + 14, "vr_lamp" )
-    P.lathe( m, top, [ ( 7.5, top[2] + 14 ), ( 6.0, top[2] + 16 ), ( 0.5, top[2] + 19 ), ( 0.0, top[2] + 19.5 ) ], "vr_steel", 4 )
+    lantern_roof( m, top )
     if light:
         LIGHTS.append( ( name, tuple( top + UP * 8 ), WARM, radius, False ) )
 
@@ -514,43 +534,82 @@ def shrubs( m, lo, hi, z, seed=0, kind="shrub", h=26.0, count=None ):
 
 
 def stone_pine( m, base, h=560.0, crown_r=230.0, seed=0, lean=( 0.0, 0.0 ) ):
-    """ An Italian stone pine: a tall bare trunk with reddish plates, forking near the top into limbs, under the
-    species' flat umbrella crown: needle-tuft cards laid nearly level in a broad disc, with standing ones round its
-    rim for the silhouette and a dark underside. """
-    rng = np.random.default_rng( abs( int( seed ) ) )
+    """ A branching umbrella pine with separate 3D needle clusters and open gaps. """
+    from veridant_stone_pine import stone_pine as build_pine
+    build_pine( m, base, h, crown_r, seed, lean )
+
+
+def palm_trunk( m, base, h=380.0, seed=0, lean=( 0.0, 0.0 ) ):
+    """ Tapered, slightly uneven date-palm bark, with cylindrical grain and shallow old leaf bases. """
     b = v( *base )
-    fork = b + v( lean[0], lean[1], 0 ) + UP * ( h * 0.62 )
-    tube( m, bent( b, fork, v( lean[0] * 0.3, lean[1] * 0.3, 0 ) + v( *rng.normal( 0, 8, 2 ), 0 ), 5, rng, 2.0 ),
-          [ 11.0, 9.6, 8.6, 7.8, 7.0, 6.4 ], "vr_bark", 9 )
-    crown = b + v( lean[0] * 1.2, lean[1] * 1.2, 0 ) + UP * ( h * 0.84 )
-    limbs = []
-    for k in range( 5 ):
-        ang = 2 * math.pi * k / 5 + rng.uniform( -0.3, 0.3 )
-        tip = crown + v( math.cos( ang ), math.sin( ang ), 0 ) * ( crown_r * rng.uniform( 0.45, 0.7 ) ) - UP * ( h * 0.04 )
-        tube( m, bent( fork, tip, UP * ( h * 0.05 ), 3 ), [ 5.5, 4.4, 3.4, 2.4 ], "vr_bark", 6 )
-        limbs.append( tip )
-    # The underside: a dark ragged disc.
-    ring = [ crown + v( math.cos( a ), math.sin( a ), 0 ) * ( crown_r * ( 0.82 + 0.1 * math.sin( 3 * a + seed ) ) ) - UP * ( h * 0.03 )
-             for a in np.linspace( 0, 2 * math.pi, 18, endpoint=False ) ]
-    card( m, "vr_pine_dark", ring[::-1], -UP )
-    card( m, "vr_pine_dark", ring, UP )
-    for i in range( 54 ):
-        r = crown_r * math.sqrt( rng.uniform( 0.0, 1.0 ) )
-        a = rng.uniform( 0, 2 * math.pi )
-        c = crown + v( math.cos( a ) * r, math.sin( a ) * r, rng.uniform( -0.02, 0.06 ) * h )
-        w = crown_r * rng.uniform( 0.7, 1.1 )
-        yaw = rng.uniform( 0, 2 * math.pi )
-        right = v( math.cos( yaw ), math.sin( yaw ), 0 )
-        tilt = rng.uniform( 0.15, 0.55 )
-        side = np.cross( UP, right )
-        up = unit( side * math.cos( tilt ) + UP * math.sin( tilt ) )
-        leaves( m, "pine", c, right, up, w * 0.5, w )
-    for i in range( 22 ):
-        a = 2 * math.pi * i / 22 + rng.uniform( -0.1, 0.1 )
-        c = crown + v( math.cos( a ), math.sin( a ), 0 ) * ( crown_r * rng.uniform( 0.8, 1.02 ) ) + UP * ( h * rng.uniform( -0.01, 0.05 ) )
-        right = v( -math.sin( a ), math.cos( a ), 0 )
-        w = crown_r * rng.uniform( 0.6, 0.9 )
-        leaves( m, "pine", c, right, UP, w * 0.42, w )
+    bend = v( lean[0] * 0.25, lean[1] * 0.25, 0 )
+    drift = v( lean[0], lean[1], h )
+    rng = np.random.default_rng( 9000 + abs( int( seed ) ) )
+    phase = rng.uniform( 0, 2 * math.pi, 3 )
+    sides, levels = 20, 30
+
+    def centre( t ):
+        return b + drift * t + bend * math.sin( math.pi * t )
+
+    def radius( t, a ):
+        r = np.interp( t, [ 0, .025, .10, .32, .72, .94, 1 ], [ 14.0, 13.3, 11.6, 10.8, 9.8, 9.6, 10.6 ] )
+        return r * ( 1 + .022 * math.sin( 3 * a + phase[0] ) + .012 * math.sin( 7 * a + t * 11 + phase[1] ) )
+
+    def point( t, a, lift=0 ):
+        return centre( t ) + v( math.cos( a ), math.sin( a ), 0 ) * ( radius( t, a ) + lift )
+
+    def normal( t, a ):
+        # The cross product accounts for both the taper and the trunk's lean.
+        across = point( t, a + .001 ) - point( t, a - .001 )
+        along = point( min( 1, t + .001 ), a ) - point( max( 0, t - .001 ), a )
+        return unit( np.cross( across, along ) )
+
+    for row in range( levels ):
+        t0, t1 = row / levels, ( row + 1 ) / levels
+        for k in range( sides ):
+            a0, a1 = 2 * math.pi * k / sides, 2 * math.pi * ( k + 1 ) / sides
+            angles = ( a0, a1, a1, a0 )
+            ts = ( t0, t0, t1, t1 )
+            points = [ point( t, a ) for t, a in zip( ts, angles ) ]
+            normals = [ normal( t, a ) for t, a in zip( ts, angles ) ]
+            uv = [ ( a / math.pi + seed * .173, t * h / 48 ) for t, a in zip( ts, angles ) ]
+            m.polygon( "vr_palm_bark", points, normals=normals, uv=uv )
+
+    # Broken petiole bases interrupt the silhouette; their spacing and projection vary per tree.
+    for k in range( 32 ):
+        t = ( k + .6 ) / 33
+        a = k * 2.399963 + phase[2] + rng.uniform( -.18, .18 )
+        width = rng.uniform( .18, .29 )
+        dt = rng.uniform( 1.0, 1.7 ) / h
+        points = [ point( t - dt, a - width, .05 ), point( t - dt, a + width, .05 ),
+                   point( t + dt, a + width * .62, .10 ), point( t + dt * .20, a, rng.uniform( .45, .9 ) ),
+                   point( t + dt, a - width * .62, .10 ) ]
+        uv = [ ( ( a + da ) / math.pi + seed * .173, ( t + tz ) * h / 48 )
+               for da, tz in ( ( -width, -dt ), ( width, -dt ), ( width * .62, dt ), ( 0, dt * .2 ), ( -width * .62, dt ) ) ]
+        # Fan about the proud centre rather than making a concave polygon.
+        for indices in ( ( 0, 1, 3 ), ( 1, 2, 3 ), ( 2, 4, 3 ), ( 4, 0, 3 ) ):
+            m.polygon( "vr_palm_bark", [ points[i] for i in indices ], uv=[ uv[i] for i in indices ] )
+
+
+def palm_pit( m, base, seed=0 ):
+    """ Low, walkable limestone surround with a textured soil bed, for palms in paving. """
+    e, n, z = base
+    half, width, height = 35.0, 4.5, 3.0
+    axes = ( ( 1, 0, 0 ), ( 0, 1, 0 ), ( 0, 0, 1 ) )
+    # Separate lengths leave small masonry joints; bevels catch the grazing evening light.
+    for ce, cn, sx, sy in ( ( e, n - half + width / 2, half * 2 - .3, width ),
+                            ( e, n + half - width / 2, half * 2 - .3, width ),
+                            ( e - half + width / 2, n, width, ( half - width ) * 2 - .3 ),
+                            ( e + half - width / 2, n, width, ( half - width ) * 2 - .3 ) ):
+        P.bevel_box( m, ( ce, cn, z + height / 2 ), axes, ( sx, sy, height ), "vr_stone_light", bevel=.55 )
+    rng = np.random.default_rng( 12000 + abs( int( seed ) ) )
+    inner, cells = half - width + .2, 6
+    heights = rng.uniform( .32, .70, ( cells + 1, cells + 1 ) )
+    for i in range( cells ):
+        for j in range( cells ):
+            points = [ ( e - inner + 2 * inner * x / cells, n - inner + 2 * inner * y / cells, z + heights[x, y] )
+                       for x, y in ( ( i, j ), ( i + 1, j ), ( i + 1, j + 1 ), ( i, j + 1 ) ) ]
+            m.polygon( "vr_palm_mulch", points )
 
 
 def palm( m, base, h=380.0, seed=0, lean=( 0.0, 0.0 ), fronds=20, frond=150.0 ):
@@ -558,8 +617,7 @@ def palm( m, base, h=380.0, seed=0, lean=( 0.0, 0.0 ), fronds=20, frond=150.0 ):
     rng = np.random.default_rng( abs( int( seed ) ) )
     b = v( *base )
     top = b + v( lean[0], lean[1], 0 ) + UP * h
-    pts = bent( b, top, v( lean[0] * 0.25, lean[1] * 0.25, 0 ), 6 )
-    tube( m, pts, [ 13.0, 11.5, 10.8, 10.2, 9.8, 9.6, 10.6 ], "vr_palm_bark", 10 )
+    palm_trunk( m, base, h, seed, lean )
     P.lathe( m, top, [ ( 10.6, top[2] ), ( 13.0, top[2] + 10 ), ( 8.0, top[2] + 22 ), ( 0.0, top[2] + 26 ) ], "vr_olive_mass", 8 )
     for i in range( fronds ):
         ang = 2 * math.pi * i / fronds + rng.uniform( -0.15, 0.15 )
@@ -611,65 +669,17 @@ def ivy( m, at, right, w, h, seed=0, off=1.2 ):
 
 
 def bougainvillea( m, at, right, w, h, seed=0, off=2.0 ):
-    rng = np.random.default_rng( abs( int( seed ) ) )
-    right = unit( right )
-    out = np.cross( right, UP )
-    count = max( 1, int( w / 30 ) )
-    for i in range( count ):
-        f = ( i + 0.5 ) / count - 0.5
-        s = h * rng.uniform( 0.6, 1.0 )
-        c = v( *at ) + right * ( f * w ) - UP * ( s / 2 ) + out * ( off + rng.uniform( 0, 4 ) )
-        sheet( m, "vr_foliage", VM.FOLIAGE, VM.FOLIAGE_ATLAS, "flowers", c, right, UP, s, s, 0.0, True )
+    from veridant_bougainvillea import build_into
+    return build_into( m, at, right, w, h, seed, off )
 
 
 # ---------------------------------------------------------------------------------------------------------------------
 # Things
 
 def hard_case( m, c, size, along=( 1, 0 ), paint="vr_case_black", z0=0.0, surface=PLASTIC, seed=0 ):
-    """ A moulded military hard case: a body with chamfered corners, a lid seam with a groove, a bevelled lid with
-    ribs across it, recessed latches and folding handles, and stacking feet. size ( L, W, H ). """
-    along = unit( v( along[0], along[1], 0 ) )
-    side = np.cross( UP, along )
-    L, W, H = size
-    base = v( c[0], c[1], z0 )
-    seam = H * 0.68
-    ch = 1.6
-
-    def ring( inset ):
-        hl, hw = L / 2 - inset, W / 2 - inset
-        pts = [ ( -hl + ch, -hw ), ( hl - ch, -hw ), ( hl, -hw + ch ), ( hl, hw - ch ), ( hl - ch, hw ), ( -hl + ch, hw ), ( -hl, hw - ch ),
-                ( -hl, -hw + ch ) ]
-        return [ base + along * x + side * y for x, y in pts ]
-
-    def band( r0, r1, z_a, z_b ):
-        for k in range( len( r0 ) ):
-            a0, b0 = r0[k], r0[( k + 1 ) % len( r0 )]
-            a1, b1 = r1[k], r1[( k + 1 ) % len( r1 )]
-            mid = ( a0 + b0 ) / 2 - base
-            card( m, paint, [ a0 + UP * z_a, b0 + UP * z_a, b1 + UP * z_b, a1 + UP * z_b ], v( mid[0], mid[1], 0 ) + UP * ( 0.0 if r0 is r1 else 0.8 ) )
-
-    outer, groove, top = ring( 0.0 ), ring( 0.45 ), ring( 0.9 )
-    band( outer, outer, 0.6, seam - 0.7 )
-    band( groove, groove, seam - 0.7, seam + 0.7 )
-    band( outer, outer, seam + 0.7, H - 0.9 )
-    band( outer, top, H - 0.9, H )
-    card( m, paint, [ p + UP * H for p in top ], UP )
-    for f in ( -0.3, 0.0, 0.3 ):
-        obox( m, base + along * ( L * f ) + UP * ( H + 0.35 ), along, ( 2.2, W - 6, 0.7 ), paint )
-    for sgn in ( -1, 1 ):
-        p = base + side * ( W / 2 + 0.15 ) * sgn
-        for f in ( -0.32, 0.32 ):
-            obox( m, p + along * ( L * f ) + UP * seam + side * 0.4 * sgn, along, ( 3.4, 0.9, 4.2 ), "vr_dark" )
-        h_ = p + side * 0.9 * sgn + UP * ( seam - 5.5 )
-        rod( m, h_ - along * 4.5, h_ + along * 4.5, 0.55, "vr_dark", 6 )
-    for sgn in ( -1, 1 ):
-        p = base + along * ( L / 2 + 0.2 ) * sgn + UP * ( H * 0.5 )
-        rod( m, p - side * 3.5, p + side * 3.5, 0.55, "vr_dark", 6 )
-    for sa in ( -1, 1 ):
-        for sb in ( -1, 1 ):
-            obox( m, base + along * ( L / 2 - 4 ) * sa + side * ( W / 2 - 4 ) * sb + UP * 0.3, along, ( 4.0, 4.0, 0.6 ), "vr_black" )
-    if surface:
-        m.oriented_box( base + UP * ( H / 2 ), ( along, side, UP ), ( L, W, H ), {}, surface )
+    """Closed moulded transport case with recessed hardware, in its existing footprint."""
+    from veridant_transport_case import build_into
+    return build_into( m, c, size, along, paint, z0, surface, seed )
 
 
 def case_stack( m, c, along, paint="vr_case_black", sizes=( ( 46, 28, 24 ), ( 40, 26, 20 ) ), seed=0, z0=0.0 ):
@@ -840,9 +850,9 @@ def pylon( m, lo, hi, z0, top, face="+e", name="Pylon" ):
 def cafe_table( m, c, z0=0.0, chairs=2, seed=0, surface=METAL ):
     rng = np.random.default_rng( abs( int( seed ) ) )
     b = v( c[0], c[1], z0 )
-    P.cylinder( m, ( b[0], b[1] ), 9, z0, z0 + 1, "vr_steel", 12, top="vr_steel" )
-    P.cylinder( m, ( b[0], b[1] ), 1.2, z0 + 1, z0 + 28, "vr_steel", 8 )
-    P.cylinder( m, ( b[0], b[1] ), 15, z0 + 28, z0 + 29.5, "vr_stone_light", 16, top="vr_stone_light", bottom="vr_steel" )
+    from veridant_table import build_top_into, build_pedestal_into
+    build_pedestal_into( m, ( b[0], b[1] ), z0 )
+    build_top_into( m, ( b[0], b[1] ), z0 )
     m.collision_box( ( b[0] - 12, b[1] - 12, z0 ), ( b[0] + 12, b[1] + 12, z0 + 29.5 ), surface )
     for k in range( chairs ):
         a = 2 * math.pi * k / chairs + rng.uniform( -0.3, 0.3 )
@@ -851,16 +861,9 @@ def cafe_table( m, c, z0=0.0, chairs=2, seed=0, surface=METAL ):
 
 
 def chair( m, at, facing, z0=0.0, paint="vr_wicker" ):
-    """ A bistro chair: a woven seat and back on four steel legs, facing facing (plan). """
-    f = unit( v( facing[0], facing[1], 0 ) )
-    s = np.cross( UP, f )
-    c = v( at[0], at[1], z0 )
-    obox( m, c + UP * 17.5, f, ( 16, 16, 2 ), paint )
-    obox( m, c - f * 7.5 + UP * 26, f, ( 1.4, 15, 15 ), paint )
-    for sa in ( -1, 1 ):
-        for sb in ( -1, 1 ):
-            q = c + f * 6.5 * sa + s * 6.5 * sb
-            rod( m, q, q + UP * 16.5, 0.45, "vr_steel", 4 )
+    """ Curved woven bistro chair; same placement and floor contact as before. """
+    from veridant_chair import build_into
+    build_into( m, at, facing, z0, paint )
 
 
 def sofa( m, c, facing, length=84.0, z0=0.0, surface=FABRIC ):
@@ -880,19 +883,9 @@ def sofa( m, c, facing, length=84.0, z0=0.0, surface=FABRIC ):
 
 
 def lounger( m, c, facing, z0=0.0, surface=WOOD ):
-    """ A teak sun lounger with a white mattress, its back raised. """
-    f = unit( v( facing[0], facing[1], 0 ) )
-    s = np.cross( UP, f )
-    b = v( c[0], c[1], z0 )
-    for sg in ( -1, 1 ):
-        obox( m, b + s * 11 * sg + UP * 6, f, ( 74, 2, 4 ), "vr_timber_dark" )
-        for sa in ( -1, 1 ):
-            obox( m, b + s * 11 * sg + f * 33 * sa + UP * 2, f, ( 3, 2, 4 ), "vr_timber_dark" )
-    obox( m, b + f * 8 + UP * 9.5, f, ( 52, 24, 3 ), "vr_mattress" )
-    back = b - f * 28 + UP * 18
-    m.oriented_box( back, ( unit( f * math.cos( 0.9 ) + UP * math.sin( 0.9 ) ), s,
-                            np.cross( unit( f * math.cos( 0.9 ) + UP * math.sin( 0.9 ) ), s ) ), ( 26, 24, 3 ), "vr_mattress" )
-    m.oriented_box( b + UP * 8, ( f, s, UP ), ( 76, 26, 16 ), {}, surface )
+    """ Upholstered teak lounger, with a supported back and softened cushions. """
+    from veridant_lounger import build_into
+    build_into( m, c, facing, z0, surface )
 
 
 def bench( m, c, along, length=72.0, z0=0.0 ):
@@ -944,21 +937,6 @@ def art( m, name, centre, right, h, frame=1.4 ):
 
 
 def counter_shelves( m, lo, hi, z0, face="+e" ):
-    """ A back bar: dark shelves with lit bottles drawn as small blocks. """
-    e0, n0 = lo
-    e1, n1 = hi
-    box( m, e0, e1, n0, n1, z0, z0 + 90, "vr_timber_dark" )
-    outv = { "+e": v( 1, 0, 0 ), "-e": v( -1, 0, 0 ), "+n": v( 0, 1, 0 ), "-n": v( 0, -1, 0 ) }[face]
-    rng = np.random.default_rng( int( abs( e0 * 7 + n0 * 3 ) ) % 1000 )
-    for z in ( 40.0, 58.0, 76.0 ):
-        if face in ( "+e", "-e" ):
-            x = e1 if face == "+e" else e0
-            led( m, ( x + outv[0] * 0.2, n0 + 3, z - 0.5 ), ( x + outv[0] * 0.2, n1 - 3, z - 0.5 ), outv, 0.6, "vr_led_soft" )
-            n = n0 + 5
-            while n < n1 - 5:
-                hh = rng.uniform( 7, 12 )
-                box( m, x + outv[0] * 0.5 - 1.5, x + outv[0] * 0.5 + 1.5, n, n + 2.6, z, z + hh, "vr_brass" if rng.random() < 0.4 else "vr_yacht_glass" )
-                n += rng.uniform( 3.5, 6 )
-        else:
-            y = n1 if face == "+n" else n0
-            led( m, ( e0 + 3, y + outv[1] * 0.2, z - 0.5 ), ( e1 - 3, y + outv[1] * 0.2, z - 0.5 ), outv, 0.6, "vr_led_soft" )
+    """Walnut back-bar cabinetry with shaped, labelled bottles."""
+    from veridant_backbar import build_into
+    return build_into( m, lo, hi, z0, face )

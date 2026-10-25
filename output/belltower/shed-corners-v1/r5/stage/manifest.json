@@ -1,0 +1,134 @@
+{
+  "revision": "shed-corners-v1",
+  "stage_revision": "r5",
+  "sheds": 6,
+  "files": {
+    "Assets/models/maps/belltower/belltower_west.obj": {
+      "before": "253b6fb02ea6d7969f2527b46f0410051198a6352a7206de2d9fb22dd62dda13",
+      "after": "c1e9a59ea03210649d2ecd6ef4491ca9c55a92bed47ae6de220487c27a3b0ff4",
+      "retained_prefix_sha256": "3bcaae7b385c4b86de4f0f944071b70d19805e001ab9d43167dbaae620a782af",
+      "retained_suffix_sha256": "1fc3fd2eecfa5f9942a6729cd79ea5e225f5f9f4d80818b36c1bdfdcde624613",
+      "all_existing_indices_preserved": true
+    },
+    "Assets/models/maps/belltower/compiler-safe/west/west_115_furniture_wood.obj": {
+      "before": "31c0472cd90036780667eba5520b67469db5ba96abd80beb896765c2785dbed9",
+      "after": "0ab621c9ccd1e87c0002179d45230dfd433fdf54c7a98d82fad605ccdb851e9e",
+      "retained_prefix_sha256": "05d5c28291bc28ab23e30895c1fd83a2e7c982cf2941357a3c11214624ba7b23",
+      "retained_suffix_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "all_existing_indices_preserved": true
+    },
+    "Assets/models/maps/belltower/compiler-safe/west/west_117_furniture_wood_dark.obj": {
+      "before": "32b1f61689c08088f677fd6af3b951ab8ea1d45464fe7f848335769dbeac8d87",
+      "after": "cdd204cdf9448bdc3f766d1b1c757efe83bf5df01289788090cd0f0feb6907bd",
+      "retained_prefix_sha256": "bab156761522d7327705fc28343b99a810c4e9ffae680e306123be90de3eae1a",
+      "retained_suffix_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "all_existing_indices_preserved": true
+    },
+    "Assets/models/maps/belltower/belltower_east.obj": {
+      "before": "36fb9f544c2c9cd2e1e6b0dec0d614a443250b3f796cdffc2c86bc7e89a12ebe",
+      "after": "2db331884bf0ea8a3531bdc711683d8ff929b06f1ecf864541e589ac6838dc07",
+      "retained_prefix_sha256": "099270c1f541ea9f41dcc0ba72f9cc7e6cf6ba6913838084e4ee4eb6ba3188cc",
+      "retained_suffix_sha256": "4a9b05ed5faf0119fb552adc3448a75d30ceb0479c43ef8c0e1a89709fa8bc7d",
+      "all_existing_indices_preserved": true
+    },
+    "Assets/models/maps/belltower/compiler-safe/east/east_112_furniture_wood.obj": {
+      "before": "f9f4f54483141642139fa37cf8280d6ed8ad800e92b5000f60166218b90afe27",
+      "after": "5dbd2e32f06d14044be85d514d3ba1c87f2b1bf6f5a332b18f47fa0e04ea16b3",
+      "retained_prefix_sha256": "f1f016670e30c6bfea068d9a8cb2fbfcaa433927086963c92fc4b026ef087138",
+      "retained_suffix_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "all_existing_indices_preserved": true
+    },
+    "Assets/models/maps/belltower/compiler-safe/east/east_114_furniture_wood_dark.obj": {
+      "before": "c0ca823463903b1ed12b3126bbb3b195da561726ba8f7506369601fca093e5c1",
+      "after": "54389f6957602f62149700fa1e361ea337640d6ea645aff42ad6de78ee76d68e",
+      "retained_prefix_sha256": "e3439646aa4fc5c643289a3ee0ff47ca1c2ea5d342ffdd709574f0d8cd7c7521",
+      "retained_suffix_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "all_existing_indices_preserved": true
+    }
+  },
+  "input_guards": {
+    "Assets/models/maps/belltower/belltower_west.vmdl": "986c97361e8f48e605c574f3764141a00fcaf83beb02950c66c595f6cdd12c63",
+    "Assets/models/maps/belltower/belltower_west.mtl": "7f9fabd8b03d0b7e3a8dc7cdb90991ff55ebce377ec374ea39d086d5bf3cb2be",
+    "Assets/models/maps/belltower/belltower_east.vmdl": "207b204670728a37d3523e3ec6ab9b5dc11c4e058452232798a54ce0a664507e",
+    "Assets/models/maps/belltower/belltower_east.mtl": "1d39e353ca5a709477e7b23a76198411a6d49d1337dd4bed2bf468eef9f17e57"
+  },
+  "removed_triangles_per_half": 5280,
+  "added_triangles_per_half": 36960,
+  "scene_sha256": "35b19f224d30a22bc7fa3639861f5586ca90be5b6f872a7aafbf2a9ec2421bea",
+  "collision_unchanged": true,
+  "roof_and_hardware_unchanged": true,
+  "all_unrelated_face_bytes_preserved": true,
+  "source_sha256": {
+    "Tools/belltower_shed_wood.py": "4e40a9b61a2f9d89e59434a2efd4e748dd7d58adb9b9645a40d3b20e56c9e13c",
+    "Tools/belltower_gardens.py": "e76348748a63c08df507db4358d4251cc9492f51046446e3d6a9f2f0f81e392a",
+    "Tools/belltower_stage_shed_corners.py": "541ee2732514f63e58e47f3eb9b4525950c3955f616c91fc3474c1a633032fea",
+    "Tools/map_kit.py": "cc60204c747d064cb1fecdb666b24c847ae89dc863c2533d3811a0445f22020d",
+    "Tools/belltower_furniture.py": "123696982d9a74015c3976138408e5af70649b3c5b6c988a6b6cc673d0289a3e",
+    "output/belltower/shed-corners-v1/gardens-before.py": "be94dc7a933f869553b4449b267f09e8daeaf5ab777470346dc4e2b02508947f",
+    "Tools/belltower_refresh_shed_corners.py": "1eec601106f51a982f0e45125a0e50e2f97b15de5fdd0c831544d30c4dff46a9",
+    "Tools/belltower_refine_shed_corners.py": "ce75c164aec55ccf275f726545bff0d03a29a2ca72e0113ad528d50c003d1d68"
+  },
+  "models": {
+    "west": {
+      "imports": [
+        {
+          "asset": "Assets/models/maps/belltower/compiler-safe/west/west_026_furniture_wood.obj",
+          "triangles_after": 18444,
+          "removed": 2508,
+          "receives_new_timber": false
+        },
+        {
+          "asset": "Assets/models/maps/belltower/compiler-safe/west/west_027_furniture_wood_dark.obj",
+          "triangles_after": 5920,
+          "removed": 2772,
+          "receives_new_timber": false
+        },
+        {
+          "asset": "Assets/models/maps/belltower/compiler-safe/west/west_115_furniture_wood.obj",
+          "triangles_after": 17764,
+          "removed": 0,
+          "receives_new_timber": true
+        },
+        {
+          "asset": "Assets/models/maps/belltower/compiler-safe/west/west_117_furniture_wood_dark.obj",
+          "triangles_after": 19656,
+          "removed": 0,
+          "receives_new_timber": true
+        }
+      ],
+      "vmdl_unchanged": true,
+      "materials_unchanged": true
+    },
+    "east": {
+      "imports": [
+        {
+          "asset": "Assets/models/maps/belltower/compiler-safe/east/east_025_furniture_wood.obj",
+          "triangles_after": 18444,
+          "removed": 2508,
+          "receives_new_timber": false
+        },
+        {
+          "asset": "Assets/models/maps/belltower/compiler-safe/east/east_026_furniture_wood_dark.obj",
+          "triangles_after": 5920,
+          "removed": 2772,
+          "receives_new_timber": false
+        },
+        {
+          "asset": "Assets/models/maps/belltower/compiler-safe/east/east_112_furniture_wood.obj",
+          "triangles_after": 17764,
+          "removed": 0,
+          "receives_new_timber": true
+        },
+        {
+          "asset": "Assets/models/maps/belltower/compiler-safe/east/east_114_furniture_wood_dark.obj",
+          "triangles_after": 19656,
+          "removed": 0,
+          "receives_new_timber": true
+        }
+      ],
+      "vmdl_unchanged": true,
+      "materials_unchanged": true
+    }
+  },
+  "refinement": "Correct narrow-edge grain and soften the exposed trim arrises; topology unchanged."
+}

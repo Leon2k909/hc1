@@ -1,0 +1,45 @@
+// Publish staged files into Assets, guarded: output/<folder>/publish.json (the folder under output named in
+// output/publish-target.txt, e.g. railhead/cars-bench-20261025) lists each Assets-relative path with the staged "source" (project-relative),
+// the hash the target had when staged ("before", null for a new file) and the staged file's ("after"). A target that
+// has changed since staging stops the whole import before anything is written; one already at "after" is skipped.
+// The old files go to <folder>/before/ first. Materials, then meshes, then vmdls, so each compiles against the new
+// files; the editor's watcher compiles them (never force-compile the map's models: it stalls the editor). Refuses
+// while a match is playing.
+var root = Sandbox.Project.Current.GetRootPath();
+var folder = System.IO.File.ReadAllText( System.IO.Path.Combine( root, "output/publish-target.txt" ) ).Trim();
+if ( !System.Text.RegularExpressions.Regex.IsMatch( folder, "^[a-z0-9-]+/[a-z0-9-]+$" ) ) throw new InvalidOperationException( "Invalid folder." );
+var work = System.IO.Path.Combine( root, "output", folder );
+var manifest = System.Text.Json.Nodes.JsonNode.Parse( System.IO.File.ReadAllText( System.IO.Path.Combine( work, "publish.json" ) ) );
+if ( Game.IsPlaying ) throw new InvalidOperationException( "A match is playing" );
+var assets = System.IO.Path.GetFullPath( System.IO.Path.Combine( root, "Assets" ) );
+string Hash( string path ) => Convert.ToHexString( System.Security.Cryptography.SHA256.HashData( System.IO.File.ReadAllBytes( path ) ) ).ToLowerInvariant();
+int Rank( string path ) => path.EndsWith( ".vmdl" ) ? 2 : path.EndsWith( ".vmat" ) ? 0 : 1;
+var plan = new System.Collections.Generic.List<(string Name, string Source, string Target, string Backup)>();
+var skipped = new System.Collections.Generic.List<string>();
+foreach ( var pair in manifest["files"].AsObject() )
+{
+	var target = System.IO.Path.GetFullPath( System.IO.Path.Combine( assets, pair.Key ) );
+	if ( !target.StartsWith( assets + System.IO.Path.DirectorySeparatorChar ) ) throw new InvalidOperationException( "Outside Assets: " + pair.Key );
+	var source = System.IO.Path.GetFullPath( System.IO.Path.Combine( root, pair.Value["source"].GetValue<string>() ) );
+	var after = pair.Value["after"].GetValue<string>();
+	var before = pair.Value["before"]?.GetValue<string>();
+	var current = System.IO.File.Exists( target ) ? Hash( target ) : null;
+	if ( current == after ) { skipped.Add( pair.Key ); continue; }
+	if ( current != before ) throw new InvalidOperationException( "Changed since staging: " + pair.Key );
+	if ( Hash( source ) != after ) throw new InvalidOperationException( "Stage differs: " + pair.Key );
+	plan.Add( (pair.Key, source, target, System.IO.Path.Combine( work, "before", pair.Key )) );
+}
+plan.Sort( ( a, b ) => Rank( a.Target ).CompareTo( Rank( b.Target ) ) );
+foreach ( var item in plan )
+{
+	System.IO.Directory.CreateDirectory( System.IO.Path.GetDirectoryName( item.Backup ) );
+	if ( System.IO.File.Exists( item.Target ) && !System.IO.File.Exists( item.Backup ) ) System.IO.File.Copy( item.Target, item.Backup );
+	System.IO.Directory.CreateDirectory( System.IO.Path.GetDirectoryName( item.Target ) );
+	var incoming = item.Target + ".incoming";
+	System.IO.File.Copy( item.Source, incoming, true );
+	if ( Hash( incoming ) != Hash( item.Source ) ) throw new InvalidOperationException( "Incoming copy differs: " + item.Name );
+	System.IO.File.Move( incoming, item.Target, true );
+}
+foreach ( var item in plan )
+	Editor.AssetSystem.RegisterFile( item.Target );
+return new { Imported = plan.Select( p => p.Name ), Skipped = skipped };

@@ -1,0 +1,22 @@
+// Tools/veridant_inland_vista.py
+"Layer0"
+{
+    shader "shaders/hc1_veridant_horizon_v4.shader"
+    F_ALPHA_TEST "0"
+    TextureVista "materials/veridant/vista/inland-v1.png"
+    g_flAlphaTestReference "0.55"
+    g_flImageU0 "0.00637959"
+    g_flImageU1 "0.99362041"
+    g_flCoastSide "-1"
+    g_flSector "0"
+    g_flPixelScale "14.13025931"
+    g_flAtlasWidth "1254"
+    g_flAtlasHeight "1254"
+    g_vAtlasRect0 "[8 220 1246 427]"
+    g_flBottom0 "104.35273933"
+    g_vAtlasRect1 "[8 998 1246 1188]"
+    g_flBottom1 "302.17636967"
+    g_vAtlasRect2 "[8 649 1246 833]"
+    g_flBottom2 "457.60922207"
+    g_flVistaBrightness "1.0"
+}

@@ -81,9 +81,10 @@ def bin( model, F ):
     P.disc( model, DARK, c + F.z * 1.42, F.z, 2.1, sides=16 )
 
 
-def bench_details( model, F, posts, c, seat, frame ):
+def bench_details( model, F, posts, c, seat, frame, backrest=None ):
     """ A bench's end frames' foot plates (200 x 100 mm, four bolts each) at both feet of each post, and its middle
-    armrest if it has a middle post (x 0). posts: the frames' x; c: the footprint's centring; seat: the seat's top. """
+    armrest if it has a middle post (x 0). posts: the frames' x; c: the footprint's centring; seat: the seat's top;
+    backrest: ( y, z, tilt ) of the backrest's front face (railhead_bench.armrest's), else the old square-bar armrest. """
     import railhead_props as P
     for x in posts:
         for y in ( 6.8 + c, -8.4 + c ):
@@ -92,8 +93,11 @@ def bench_details( model, F, posts, c, seat, frame ):
                 for dy in ( -3.0, 3.0 ):
                     P.rod( model, F.p( x + dx, y + dy, 0.45 ), F.p( x + dx, y + dy, 0.75 ), 0.32, GREY, 6,
                            caps=( False, True ) )
-        if abs( x ) < 1e-6:
-            # The armrest: a cast bow from the seat's front edge back to the backrest, splitting the seat in two.
+        if abs( x ) < 1e-6 and backrest is not None:
+            # The armrest: one smooth casting from the front slat over to the backrest, splitting the seat in two.
+            import railhead_bench as RBN
+            RBN.armrest( model, F, c, seat, frame, backrest )
+        elif abs( x ) < 1e-6:
             pts = [ ( 0.0, 7.6 + c, seat ), ( 0.0, 7.8 + c, seat + 6.2 ), ( 0.0, 6.0 + c, seat + 8.6 ),
                     ( 0.0, -2.0 + c, seat + 8.8 ), ( 0.0, -7.6 + c, seat + 7.2 ) ]
             for a, b in zip( pts, pts[1:] ):

@@ -1,0 +1,79 @@
+using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Sandbox;
+public static class BelltowerPreviewCapture {
+public static async Task<object> Run(string exchangeDirectory, CancellationToken cancellationToken) {
+// Apply only after the main chat releases its current centre-model preservation check.
+// The private standalone well is already available; this replaces the old map ring.
+var root=Sandbox.Project.Current.GetRootPath();
+var stage=System.IO.Path.Combine(root,"output/belltower/well-v1/stage");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(stage,"manifest.json")));
+var sourceRevision=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/belltower/well-v1/source-integration.json")));
+var revalidation=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/belltower/well-v1/source-revalidation.json")));
+var session=Editor.SceneEditorSession.Active;
+if(Game.IsPlaying || session is null || session.HasUnsavedChanges ||
+    !session.Scene.Source.ResourcePath.Equals("scenes/maps/belltower/belltower.scene",StringComparison.OrdinalIgnoreCase))
+    throw new InvalidOperationException("Requires active, stopped, saved Belltower during an available editor slot.");
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+foreach(var section in new[]{"source_sha256","texture_sha256"})
+    foreach(var pair in manifest[section].AsObject())
+    {
+        var expected=pair.Value.GetValue<string>();
+        if(revalidation["changes"]?[pair.Key] is System.Text.Json.Nodes.JsonNode change)
+        {
+            if(change["original_sha256"].GetValue<string>()!=expected || !change["regenerated_piece_matches_original_stage"].GetValue<bool>())
+                throw new InvalidOperationException("Invalid input revalidation.");
+            expected=change["current_sha256"].GetValue<string>();
+        }
+        if(Hash(System.IO.Path.Combine(root,pair.Key))!=expected) throw new InvalidOperationException("Well input changed: "+pair.Key);
+    }
+var entries=manifest["files"].AsObject().Select(p=>(Path:p.Key,Record:p.Value)).ToList();
+entries.Add((sourceRevision["path"].GetValue<string>(),sourceRevision));
+var plan=new System.Collections.Generic.List<(string Relative,string Source,string Target,string Backup,string Before,string After)>();
+foreach(var entry in entries)
+{
+    if(!(entry.Path.StartsWith("Assets/models/maps/belltower/belltower_centre.") ||
+         entry.Path.StartsWith("Assets/materials/belltower/well-v1/") || entry.Path=="Tools/belltower_map.py") || entry.Path.Contains(".."))
+        throw new InvalidOperationException("Unexpected well path.");
+    var target=System.IO.Path.Combine(root,entry.Path);var source=System.IO.Path.Combine(stage,entry.Path);
+    var before=entry.Record["before"]?.GetValue<string>();var after=entry.Record["after"].GetValue<string>();
+    var current=System.IO.File.Exists(target)?Hash(target):null;
+    if(Hash(source)!=after || (current!=before && current!=after))
+        throw new InvalidOperationException("A reviewed well target changed: "+entry.Path);
+    var backup=System.IO.Path.Combine(stage,"before",entry.Path);
+    if(current==before && before is not null)
+    {
+        System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(backup));
+        if(!System.IO.File.Exists(backup))System.IO.File.Copy(target,backup);
+        if(Hash(backup)!=before)throw new InvalidOperationException("Well backup differs.");
+    }
+    plan.Add((entry.Path,source,target,backup,before,after));
+}
+var scenePath=System.IO.Path.Combine(root,"Assets/scenes/maps/Belltower/belltower.scene");
+var sceneHash=Hash(scenePath);var game=Game.ActiveScene?.Id;
+int imported=0;
+foreach(var item in plan.OrderBy(p=>p.Relative.EndsWith(".vmdl")?2:0))
+{
+    if(System.IO.File.Exists(item.Target) && Hash(item.Target)==item.After)continue;
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(item.Target));
+    var incoming=item.Target+".well-incoming";
+    try
+    {
+        System.IO.File.Copy(item.Source,incoming,true);
+        if(Hash(incoming)!=item.After)throw new InvalidOperationException("Incoming well resource differs.");
+        System.IO.File.Move(incoming,item.Target,true);imported++;
+    }
+    finally{if(System.IO.File.Exists(incoming))System.IO.File.Delete(incoming);}
+    if(item.Relative.StartsWith("Assets/"))Editor.AssetSystem.RegisterFile(item.Target);
+}
+if(Hash(scenePath)!=sceneHash || Game.IsPlaying || session.HasUnsavedChanges ||
+    Game.ActiveScene?.Id!=game || !ReferenceEquals(session,Editor.SceneEditorSession.Active))
+    throw new InvalidOperationException("Shared editor state changed during well publication.");
+var result=new {Imported=imported,SceneUnchanged=true,PhysicsUnchanged=true,TexturesUnchanged=true,ForcedModelCompile=false};
+System.IO.File.WriteAllText(System.IO.Path.Combine(root,"output/belltower/well-v1/native-publication.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;
+
+}
+}

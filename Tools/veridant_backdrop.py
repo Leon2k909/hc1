@@ -885,4 +885,6 @@ def build(impostors=True):
     if impostors:
         from veridant_impostors import replace
         far, props = replace(far, props, land)
+        from veridant_inland_vista import replace as replace_inland
+        far, props = replace_inland(far, props)
     return far, water, land, props

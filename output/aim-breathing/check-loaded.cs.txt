@@ -1,0 +1,31 @@
+// Read-only: exercise the loaded rules, with no scene, camera, input, profile or play-state changes.
+var playing = Game.IsPlaying;
+var sceneId = Game.ActiveScene?.Id;
+var active = Editor.SceneEditorSession.Active;
+var documents = Editor.SceneEditorSession.All.Select(s => new { Session = s, s.HasUnsavedChanges }).ToArray();
+var rows = new System.Collections.Generic.List<object>();
+foreach (var xp in new[] {0, Facepunch.SoldierTrainingRules.XPForLevel(25), Facepunch.SoldierTrainingRules.XPForLevel(50)})
+{
+    var state = default(Facepunch.AimBreathingRules.State);
+    float energy = 0f, maxPitch = 0f, maxYaw = 0f;
+    for (var i = 0; i < 3600; i++)
+    {
+        var sample = Facepunch.AimBreathingRules.Step(state, 1f/120f, 1f, 1f, xp);
+        state = sample.State;
+        energy += sample.Pitch*sample.Pitch + sample.Yaw*sample.Yaw;
+        maxPitch = Math.Max(maxPitch, Math.Abs(sample.Pitch));
+        maxYaw = Math.Max(maxYaw, Math.Abs(sample.Yaw));
+    }
+    if (energy <= 0f || maxPitch > .1191f || maxYaw > .0556f)
+        throw new InvalidOperationException("Loaded breathing rules have an invalid idle range.");
+    rows.Add(new {XP=xp, Level=Facepunch.SoldierTrainingRules.LevelForXP(xp),
+        CombinedRmsDegrees=MathF.Sqrt(energy/3600f), MaxPitchDegrees=maxPitch, MaxYawDegrees=maxYaw});
+}
+return new {
+    CameraIntegrationLoaded=typeof(Facepunch.CameraController).GetProperty("AimBreathingOffset") is not null,
+    Rules=rows,
+    SceneAndPlayPreserved=playing==Game.IsPlaying && sceneId==Game.ActiveScene?.Id,
+    DocumentPreserved=ReferenceEquals(active,Editor.SceneEditorSession.Active)
+        && documents.All(d=>Editor.SceneEditorSession.All.Contains(d.Session) && d.Session.HasUnsavedChanges==d.HasUnsavedChanges),
+    LiveAimedViewReviewed=false
+};

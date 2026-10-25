@@ -1,0 +1,12 @@
+var results = new System.Collections.Generic.List<object>();
+foreach (var name in new[] { "hc1_veridant_horizon_v4", "hc1_veridant_scrub_v3" })
+{
+    var path = "shaders/" + name + ".shader";
+    var result = await Editor.EditorUtility.CompileShader(path, new() { ForceRecompile = true }, cancellationToken);
+    if (result.Success && result.CompiledShader is { Length: > 0 })
+        System.IO.File.WriteAllBytes(System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(), "Assets", path + "_c"), result.CompiledShader);
+    results.Add(new { Name = name, result.Success, Bytes = result.CompiledShader?.Length,
+        Output = result.Programs.SelectMany(p => p.Output ?? new System.Collections.Generic.List<string>()).Take(30).ToArray() });
+    if (!result.Success) break;
+}
+return results;

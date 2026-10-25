@@ -1,0 +1,41 @@
+{
+  "status": "staged_pending_editor",
+  "checked_at_utc": "2026-10-20T12:11:15.249040+00:00",
+  "manifest": "output/belltower/shop-displays/stage-v4/manifest.json",
+  "manifest_sha256": "91cdd5770225379ee5aff747e59b55efd0ca63c7ae0ec95ac2013d8aac6a37d7",
+  "display_count": 18,
+  "triangles": 92504,
+  "new_colliders": 0,
+  "construction_preview": "output/belltower/shop-displays/construction-preview-v3.png",
+  "preview_is_native_capture": false,
+  "preview_context": "Surrounding frame and facade are a Blender context fixture; the display geometry is the final staged OBJ.",
+  "checks": {
+    "staged_asset_hashes": true,
+    "production_assets_still_original": true,
+    "source_guards": true,
+    "town_model_guards": true,
+    "scene_matches_staging_snapshot": true,
+    "preview_matches_final_geometry": true,
+    "finite_exported_attributes": true,
+    "triangle_count": true,
+    "eighteen_displays": true,
+    "seven_private_materials": true,
+    "no_physics_nodes": true,
+    "texture_dependencies_exist": true,
+    "python_syntax": true,
+    "integration_patch_check": true
+  },
+  "native_import_completed": false,
+  "scene_component_added": false,
+  "generator_wiring_applied": false,
+  "native_compilation_verified": false,
+  "in_game_verified": false,
+  "editor_launched_or_stopped_by_task": false,
+  "blocker": "Native editor discovery returns no connection; fallback Bridge heartbeat is stale. A replacement editor was observed starting.",
+  "remaining": [
+    "Publish and compile reviewed assets through native sbox tools",
+    "Add one visual-only ModelRenderer on the existing identity-transform Town and save",
+    "Apply integration.patch to keep regeneration consistent",
+    "Inspect wide and narrow windows from multiple angles in sbox"
+  ]
+}

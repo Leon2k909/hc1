@@ -1,0 +1,49 @@
+{
+  "revision": "capture-consistency-v1",
+  "prepared_utc": "2026-10-19T18:05:19.716515+00:00",
+  "status": "offline-api-compile-passed-native-render-validation-pending",
+  "project_root": "C:\\sbox-projects\\hc1\\forked-shooter-main",
+  "editor_constraint": "User requested continued waiting for the shared editor. No handoff message, document open, render or scene change was performed.",
+  "native_read_only_probe": "output/belltower/quality/camera-consistency-v1/native-camera-state-oct19.json",
+  "confirmed_installed_behavior": [
+    "Scene.Camera getter/setter directly read/write a backing field.",
+    "Scene.UpdateMainCamera excludes IsSceneEditorCamera cameras, prefers IsMainCamera, then orders by Priority; a non-main minimap can still be the fallback.",
+    "CameraComponent.InitializeRendering copies post-processing from Scene.Camera when rendering an editor camera."
+  ],
+  "belltower_fallback_camera_confirmed_this_session": false,
+  "saved_scene_sha256": "5ea26d816c6b752225a5bd4ea2d761ba2791543c1ab7c89682f98d54219b373d",
+  "accepted_forest_shader_sha256": "a8f77a1471ec0706491e383aef451b6eddccba03b18ef97915ffb92d19bb5aa0",
+  "old_viewport_helper_sha256": "613d00218c3d9039e7fe46d7fa17cbe054322799e30de024e37158d37c1fff96",
+  "source_sha256": {
+    "Sources/Belltower/editor/capture-preview-consistent.cs.txt": "2c2b9791d3bc4fea0d4970df3c9e0ae75d1200259e4e30419a863141af7b84a2",
+    "Sources/Belltower/editor/inspect-preview-cameras.cs.txt": "0898ac37d166e7ebd22036e3bf574f4fb08e2347e814438eee11e4768af75cb2",
+    "Tools/belltower_check_preview_capture.py": "0976155d246d3f976b45765947d08d4bcdc5bd0def98a0125f0c8e7e1a910223",
+    "output/belltower/quality/camera-consistency-v1/engine-api.json": "450b87a53eb7bfc8c4a2f945d17339777317590bc55f634544bd0332d510cffd",
+    "output/belltower/quality/camera-consistency-v1/helper-static-compile.json": "7909fb5e0949ba77b218f8de79b358eb4a156492400f99bf24412d521b4291e0",
+    "Sources/Belltower/generated/belltower-visual-target-oct19-v1.png": "ee1ac999fbc94eba13afbc07efd213f615a1cf4d4db9f1add1dc1dca8fd73661",
+    "Sources/Belltower/generated/belltower-visual-target-oct19-v1.json": "56504dfe21e9c6fa88d4a0862725d18d39b89ef73a620d93c33cf8ec22130be8"
+  },
+  "diagnostic_scope": "Accepted saved scene/materials only. Exposure and viewport-camera reference change temporarily and synchronously. Historical coverage/distribution baselines used private materials and are not pixel-equivalent baselines for this diagnostic.",
+  "configuration_example": {
+    "directory": "camera-consistency-v1-native-low-a",
+    "name": "west-ridge",
+    "position": "125,250,64",
+    "angles": "Pitch = -3.37, Yaw = 90.00, Roll = 0.00",
+    "fov": 80,
+    "width": 1920,
+    "height": 1080,
+    "exposure": 0.35,
+    "expected_scene_sha256": "5ea26d816c6b752225a5bd4ea2d761ba2791543c1ab7c89682f98d54219b373d"
+  },
+  "configuration_path": "output/belltower/quality/consistent-preview.json",
+  "next_native_validation": [
+    "Wait for the shared-editor slot and verify editor_status ProjectRoot, unsaved state, compilation and play before acting.",
+    "Use the existing Belltower editor document; do not create an isolated scene or bypass the requested wait to open a document.",
+    "Capture the same accepted view at fixed ACES 0.35 and 2.0, with fresh output directories, then repeat both settings.",
+    "Check actual low/high image differences and static sky/masonry repeat drift. Matching camera metadata alone does not prove effective GPU exposure.",
+    "Compare the same view with Belltower selected and hidden only in an available coordinated slot; preserve and restore the prior selected scene and play state.",
+    "Require all restoration booleans, unchanged saved scene hash and unchanged accepted assets before reusing the pipeline for art trials."
+  ],
+  "promotion": "None. Forest studies and ground decals remain unpromoted; the ImageGen target remains an art reference.",
+  "native_capture_run": false
+}

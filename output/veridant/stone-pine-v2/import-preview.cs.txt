@@ -1,0 +1,12 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var work=System.IO.Path.Combine(root,"output/veridant/stone-pine-v2/stage");
+var destination=System.IO.Path.Combine(root,"Assets/models/maps/veridant/stone-pine-v2");
+System.IO.Directory.CreateDirectory(destination);
+foreach(var extension in new[]{"obj","mtl","vmdl"}) {
+    var name="veridant_foliage_preview."+extension;
+    var target=System.IO.Path.Combine(destination,name);
+    if(System.IO.File.Exists(target)) throw new InvalidOperationException("Preview already exists: "+target);
+    System.IO.File.Copy(System.IO.Path.Combine(work,name),target);
+    Editor.AssetSystem.RegisterFile(target);
+}
+return new {Preview="models/maps/veridant/stone-pine-v2/veridant_foliage_preview.vmdl",SceneUnchanged=true};

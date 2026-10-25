@@ -30,8 +30,7 @@ public class MountPoint
 
 			if ( inst.IsValid() )
 			{
-				if ( equipment.ApplySavedAttachments )
-					Facepunch.Gunsmith.GunsmithLoadoutManager.ApplyAttachments( equipment.Resource, inst );
+				equipment.FitHolderBuild( inst );
 				inst.BreakFromPrefab();
 				Mounted.Add( equipment, inst );
 			}
@@ -66,6 +65,19 @@ public sealed class EquipmentMountPoints : Component,
 	{
 		var mount = MountPoints.FirstOrDefault( x => x.Slot == equipment.Resource.Slot );
 		return mount;
+	}
+
+	/// <summary> Fits each holstered copy again when the holder's shared build changes (<see cref="Equipment.FitHolderBuild"/>). </summary>
+	public void RefitHolderBuilds()
+	{
+		foreach ( var point in MountPoints )
+		{
+			foreach ( var (equipment, inst) in point.Mounted )
+			{
+				if ( equipment.IsValid() && inst.IsValid() )
+					equipment.FitHolderBuild( inst, refit: true );
+			}
+		}
 	}
 
 	void IGameEventHandler<EquipmentDeployedEvent>.OnGameEvent( EquipmentDeployedEvent eventArgs )

@@ -66,6 +66,63 @@ def rod( model, a, b, r, paint, sides=8, caps=( False, False ) ):
         _face( model, paint, [ b + r * d for d in dirs ], axis )
 
 
+def _transport( u, v, a, b ):
+    """ u and v turned by the rotation that takes direction a to direction b (about their cross product). """
+    axis = np.cross( a, b )
+    s = np.linalg.norm( axis )
+    if s < 1e-9:
+        return u, v
+    k, angle = axis / s, math.atan2( s, float( np.dot( a, b ) ) )
+    def turn( w ):
+        return w * math.cos( angle ) + np.cross( k, w ) * math.sin( angle ) + k * np.dot( k, w ) * ( 1 - math.cos( angle ) )
+    return turn( u ), turn( v )
+
+
+def tube( model, path, r, paint, sides=12, tile=24.0 ):
+    """ A round tube swept along path (points in order), open at its ends and closed at every joint: the ring between
+    two pieces lies in the plane halving the angle between them (a mitre), so neighbouring pieces share it and no gap
+    opens round the outside of a bend, as separate rods' square-cut ends leave. Its frame is carried along the path
+    without twisting and it's shaded smooth. The texture's u runs along it (a brushed metal's grain follows the tube),
+    tile inches a repeat, and its v goes once round. """
+    pts = [ np.asarray( path[0], float ) ]
+    for p in path[1:]:
+        if np.linalg.norm( np.asarray( p, float ) - pts[-1] ) > 1e-6:
+            pts.append( np.asarray( p, float ) )
+    if len( pts ) < 2:
+        return
+    seg = [ _unit( b - a ) for a, b in zip( pts, pts[1:] ) ]
+    frames = [ _ring_axes( seg[0] ) ]
+    for a, b in zip( seg, seg[1:] ):
+        frames.append( _transport( *frames[-1], a, b ) )
+    angles = [ 2 * math.pi * k / sides for k in range( sides ) ]
+    rings, ring_normals, along = [], [], [ 0.0 ]
+    for i, p in enumerate( pts ):
+        if i:
+            along.append( along[-1] + float( np.linalg.norm( p - pts[i - 1] ) ) )
+        incoming = max( i - 1, 0 )
+        u, v = frames[incoming]
+        radial = [ math.cos( t ) * u + math.sin( t ) * v for t in angles ]
+        if 0 < i < len( pts ) - 1:
+            d0, d1 = seg[i - 1], seg[i]
+            mitre = _unit( d0 + d1 )
+            ring = [ p + r * c - r * float( np.dot( c, mitre ) ) / float( np.dot( d0, mitre ) ) * d0 for c in radial ]
+            ou, ov = frames[i]
+            normals = [ _unit( c + math.cos( t ) * ou + math.sin( t ) * ov ) for c, t in zip( radial, angles ) ]
+        else:
+            ring = [ p + r * c for c in radial ]
+            normals = radial
+        rings.append( ring )
+        ring_normals.append( normals )
+    for i in range( len( pts ) - 1 ):
+        u0, u1 = along[i] / tile, along[i + 1] / tile
+        for k in range( sides ):
+            j = ( k + 1 ) % sides
+            v0, v1 = k / sides, ( k + 1 ) / sides
+            quad = [ rings[i][k], rings[i][j], rings[i + 1][j], rings[i + 1][k] ]
+            normals = [ ring_normals[i][k], ring_normals[i][j], ring_normals[i + 1][j], ring_normals[i + 1][k] ]
+            _face( model, paint, quad, sum( normals ), normals=normals, uv=[ ( u0, v0 ), ( u0, v1 ), ( u1, v1 ), ( u1, v0 ) ] )
+
+
 def frustum( model, a, b, r0, r1, paint, sides=16, inside=None ):
     """ A round taper, shaded smooth and open at both ends; inside paints its inner face too. """
     a, b = np.asarray( a, float ), np.asarray( b, float )
@@ -206,24 +263,9 @@ def bracket_lamp( model, e, n, z, facing, arm=16.0 ):
 
 
 def extinguisher( model, e, n, facing, z0=0.0 ):
-    """ A 6 kg powder extinguisher on its wall bracket, 1.1 m to its handle, with the red-and-white fire sign over
-    it. (e, n) on the wall's face. No collision. """
-    F = Frame( e, n, z0, facing )
-    F.box( model, -2.4, 2.4, 0.0, 0.5, 22.0, 30.0, "rw_steel_dark" )
-    c = F.p( 0.0, 3.8, 0.0 )
-    model.cylinder( ( c[0], c[1] ), 3.15, z0 + 18.0, z0 + 37.0, { "side": "rw_red_paint", "top": "rw_red_paint" },
-                    sides=14, collide=None )
-    frustum( model, c + ( 0, 0, 37.0 ), c + ( 0, 0, 39.0 ), 3.15, 1.2, "rw_red_paint", 14 )
-    rod( model, c + ( 0, 0, 39.0 ), c + ( 0, 0, 41.0 ), 0.7, "rw_steel", 8, caps=( False, True ) )
-    rod( model, c + ( 0, 0, 41.0 ), c + F.y * 3.5 + ( 0, 0, 41.5 ), 0.4, "rw_black", 6 )
-    # The hose down its side.
-    hose = [ c + F.x * 3.0 + ( 0, 0, 39.0 ), c + F.x * 3.6 + ( 0, 0, 30.0 ), c + F.x * 3.4 + ( 0, 0, 22.0 ) ]
-    for a, b in zip( hose, hose[1:] ):
-        rod( model, a, b, 0.5, "rw_black", 6 )
-    # Its label band, and the sign over it: a red square plate, white flame pictogram stood for by a white panel.
-    model.cylinder( ( c[0], c[1] ), 3.2, z0 + 24.0, z0 + 31.0, { "side": "rw_white_paint" }, sides=14, collide=None )
-    F.box( model, -4.7, 4.7, 0.0, 0.25, 52.0, 61.4, "rw_red_paint" )
-    F.quad( model, "rw_white_paint", -2.0, 2.0, 0.27, 54.5, 59.0 )
+    """ Smooth reference-led wall extinguisher and sign; original placement, no collision. """
+    import realistic_extinguisher
+    return realistic_extinguisher.build_into( model, Frame( e, n, z0, facing ) )
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -534,26 +576,36 @@ def brick_pallet( model, e, n, z0=0.0, along="n", paint="rw_dressed_red" ):
     model.collision_box( lo, hi, STONE )
 
 
+CYCLE_STAND_PAINT = "rw_stainless"
+CYCLE_STAND_TILE = 24.0           # rw_stainless's repeat (railhead_prop_materials), its brushing along u
+
+
 def cycle_stand( model, e, n, facing, z0=0.0 ):
     """ A stainless Anlehnbuegel: a 48 mm tube bent into an inverted U, 800 mm wide and 900 mm tall, set 100 mm into
     the paving, with a crossbar at 350 mm for a child's bike. facing is the way a bike stands against it (its plane
-    is across facing). No collision (it's a tube a player steps past). """
+    is across facing). No collision (it's a tube a player steps past).
+    The bow is one tube (tube), bent at a 150 mm radius. It was 15 separate rods with square-cut, open ends, and the
+    wedge each joint left round the outside of the bend showed the paving through it as bright bands; they were the
+    shed's dark iron paint too. Each leg goes into the paving through a stainless cover rosette. """
     F = Frame( e, n, z0, facing )
-    r, hw, h, bend = 0.95, 15.75, 35.4, 6.0
-    pts = [ F.p( -hw, 0.0, 0.0 ), F.p( -hw, 0.0, h - bend ) ]
-    for k in range( 1, 7 ):
-        t = math.pi / 2 * k / 6
-        pts.append( F.p( -hw + bend * ( 1 - math.cos( t ) ), 0.0, h - bend + bend * math.sin( t ) ) )
-    for k in range( 0, 7 ):
-        t = math.pi / 2 * k / 6
-        pts.append( F.p( hw - bend + bend * math.sin( t ), 0.0, h - bend * ( 1 - math.cos( t ) ) ) )
-    pts.append( F.p( hw, 0.0, 0.0 ) )
-    for a, b in zip( pts, pts[1:] ):
-        if np.linalg.norm( b - a ) > 1e-6:
-            rod( model, a, b, r, "rw_steel", 10 )
-    rod( model, F.p( -hw, 0.0, 13.8 ), F.p( hw, 0.0, 13.8 ), 0.75, "rw_steel", 8 )
+    r, hw, h, bend, steps = 0.95, 15.75, 35.4, 6.0, 9
+    paint, tile = CYCLE_STAND_PAINT, CYCLE_STAND_TILE
+    path = [ F.p( -hw, 0.0, -1.0 ), F.p( -hw, 0.0, h - bend ) ]
+    for k in range( 1, steps + 1 ):
+        t = math.pi / 2 * k / steps
+        path.append( F.p( -hw + bend * ( 1 - math.cos( t ) ), 0.0, h - bend + bend * math.sin( t ) ) )
+    for k in range( 0, steps + 1 ):
+        t = math.pi / 2 * k / steps
+        path.append( F.p( hw - bend + bend * math.sin( t ), 0.0, h - bend * ( 1 - math.cos( t ) ) ) )
+    path.append( F.p( hw, 0.0, -1.0 ) )
+    tube( model, path, r, paint, 12, tile )
+    # The crossbar's ends are inside the legs.
+    tube( model, [ F.p( -hw, 0.0, 13.8 ), F.p( hw, 0.0, 13.8 ) ], 0.75, paint, 10, tile )
+    # The rosettes: 80 mm across and 8 mm high, a low cone round the tube, its top ring under the tube's wall.
     for x in ( -hw, hw ):
-        disc( model, "rw_steel_dark", F.p( x, 0.0, 0.05 ), ( 0, 0, 1 ), 2.2, 10 )
+        frustum( model, F.p( x, 0.0, 0.0 ), F.p( x, 0.0, 0.3 ), 1.6, 1.02, paint, 16 )
+        c = F.p( x, 0.0, 0.0 )
+        annulus( model, paint, ( c[0], c[1] ), 0.8, 1.02, z0 + 0.3, 16 )
 
 
 # ---------------------------------------------------------------------------------------------------------------------

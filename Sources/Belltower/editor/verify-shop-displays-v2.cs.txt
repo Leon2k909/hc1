@@ -1,0 +1,9 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/belltower/shop-displays/stage-v10/manifest.json")));
+var paths=manifest["files"].AsObject().Select(p=>p.Key.Replace('\\','/')).Where(p=>p.EndsWith(".vmat")).Select(p=>p.Substring("Assets/".Length)).ToArray();
+var materials=paths.Select(path=>new {Path=path,IsError=Material.Load(path).IsError}).ToArray();
+var modelPath=manifest["model_path"].GetValue<string>();
+var model=Model.Load(modelPath);
+var result=new {Model=modelPath,ModelIsError=model.IsError,Bounds=model.Bounds.ToString(),Materials=materials};
+System.IO.File.WriteAllText(System.IO.Path.Combine(root,"output/belltower/shop-displays/native-v2-asset-load.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

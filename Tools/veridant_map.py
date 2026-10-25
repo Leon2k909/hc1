@@ -46,6 +46,7 @@ import railhead_map as R
 import railhead_preview as PV
 import veridant_materials as VM
 import veridant_parts as P
+import veridant_planter_bushes as PlanterBushes
 from riverdale_parts import v, unit, card, box, obox, rod, UP
 
 STONE, METAL, WOOD, PLASTIC, GLASS, FABRIC = "default", "metal", "wood", "plastic", "glass", "fabric"
@@ -81,7 +82,9 @@ SEA_WALL = -1750.0
 
 LOUNGE = ( -720.0, -200.0, -560.0, -180.0 )
 LOUNGE_TOP = 272.0
+LOUNGE_WEST_DOOR = ( -390.0, 60.0, 0.0, 96.0 )
 CAFE = ( -720.0, -200.0, -180.0, 200.0 )
+CAFE_WEST_DOORS = ( ( -80.0, 60.0, 0.0, 96.0 ), ( 100.0, 60.0, 0.0, 96.0 ) )
 CAFE_FRONT = -260.0                     # the cafe's shopfront, set back under the terrace's edge: the colonnade
 GARDEN = ( -720.0, -200.0, 200.0, 1000.0 )
 NORTH = ( -200.0, 220.0, 200.0, 760.0 )          # the north terrace (128) on its block, the reception inside it
@@ -137,6 +140,18 @@ UNKNOWN = set()
 
 def configure( model ):
     for paint in list( model.polygons ):
+        if paint.startswith( ( "vr_backbar_", "vr_transport_" ) ) and paint in model.material_overrides:
+            continue
+        if paint.startswith( "vr_bv_" ) and paint in model.material_overrides:
+            continue
+        if paint == "vr_stone_pine_needles" and paint in model.material_overrides:
+            continue
+        if paint.startswith( "vr_lounger_" ) and paint in model.material_overrides:
+            continue
+        if paint.startswith( "vr_garden_planter_" ) and paint in model.material_overrides:
+            continue
+        if paint == "vr_table_honed" and paint in model.material_overrides:
+            continue
         if paint.startswith( "vr_" ):
             model.material_overrides[paint] = f"{VM.RESOURCE_DIR}/{paint}.vmat"
             model.tile_overrides[paint] = VM.TILES.get( paint, 64.0 )
@@ -174,6 +189,32 @@ def wall( m, axis, run, across, z, outward, openings=(), outside="vr_stone", ins
         w.add( c, width, z0, z1, "door" if z0 <= z[0] + 0.5 else "window" )
     w.build( m, outside, inside, reveal, end, surface )
     return w
+
+
+def shelves_beside_doors( m, lo, hi, z0, doors, face="+e", clearance=4.0 ):
+    """ Keep complete shelf units and their bottles/LEDs out of west-wall doorways. """
+    assert face in ( "+e", "-e" )
+    e0, n0 = lo
+    e1, n1 = hi
+    spans = [ ( n0, n1 ) ]
+    for centre, width, bottom, top in doors:
+        if z0 >= top or z0 + 90 <= bottom:
+            continue
+        a, b = centre - width / 2 - clearance, centre + width / 2 + clearance
+        remaining = []
+        for low, high in spans:
+            if high <= a or low >= b:
+                remaining.append( ( low, high ) )
+            else:
+                if low < a:
+                    remaining.append( ( low, a ) )
+                if high > b:
+                    remaining.append( ( b, high ) )
+        spans = remaining
+    spans = [ ( low, high ) for low, high in spans if high - low >= 18.0 ]
+    for low, high in spans:
+        P.counter_shelves( m, ( e0, low ), ( e1, high ), z0, face=face )
+    return spans
 
 
 def glazing( m, g, axis, at, r0, r1, z0, z1, out, mullion=46.0, transom=None, frame="vr_steel", pane="vr_glass" ):
@@ -245,7 +286,7 @@ def lounge( m, g ):
     # Walls: ground floor 0..112, upper floor 128..256, the slab between 112..128, roof 256..272.
     wall( m, "n", ( n0, n1 ), ( e1 - T, e1 ), ( 0, 112 ), "+e", [ ( -250.0, 100.0, 0, 96 ), ( -490.0, 60.0, 0, 96 ) ] )
     wall( m, "n", ( n0, n1 ), ( e1 - T, e1 ), ( 112, top ), "+e", [ ( -370.0, 60.0, 128, 224 ), ( -258.0, 124.0, 136, 246 ) ] )
-    wall( m, "n", ( n0, n1 ), ( e0, e0 + T ), ( 0, top ), "-e", [ ( -390.0, 60.0, 0, 96 ), ( -270.0, 120.0, 140, 236 ), ( -470.0, 120.0, 140, 236 ) ] )
+    wall( m, "n", ( n0, n1 ), ( e0, e0 + T ), ( 0, top ), "-e", [ LOUNGE_WEST_DOOR, ( -270.0, 120.0, 140, 236 ), ( -470.0, 120.0, 140, 236 ) ] )
     wall( m, "e", ( e0, e1 ), ( n0, n0 + T ), ( 0, top ), "-n", [ ( -470.0, 60.0, 0, 96 ), ( -330.0, 140.0, 140, 236 ), ( -600.0, 140.0, 140, 236 ) ] )
     wall( m, "e", ( e0, e1 ), ( n1 - T, n1 ), ( 112, top ), "+n", [ ( -270.0, 60.0, 128, 224 ), ( -460.0, 220.0, 138, 240 ) ] )
     wall( m, "e", ( e0, e1 ), ( n1 - T, n1 ), ( 0, 112 ), None, [ ( -430.0, 60.0, 0, 96 ) ] )
@@ -272,7 +313,7 @@ def lounge( m, g ):
         glazing( m, g, axis, at, r0, r1, z0, z1, out )
     # Inside, ground floor: a bar along the west wall, sofas, low tables, warm downlights.
     P.bar_counter( m, ( e0 + 70, -520.0 ), ( e0 + 100, -300.0 ), L0, front="+e" )
-    P.counter_shelves( m, ( e0 + T, -520.0 ), ( e0 + T + 12, -300.0 ), L0, face="+e" )
+    shelves_beside_doors( m, ( e0 + T, -520.0 ), ( e0 + T + 12, -300.0 ), L0, ( LOUNGE_WEST_DOOR, ) )
     for k, ( e, n, f ) in enumerate( ( ( -480, -300, ( 0, 1 ) ), ( -480, -470, ( 0, 1 ) ), ( -330, -460, ( -1, 0 ) ) ) ):
         P.sofa( m, ( e, n ), f, 84, L0 )
     for e, n in ( ( -420, -390 ), ( -580, -390 ) ):
@@ -304,7 +345,7 @@ def cafe( m, g ):
                                                                 ( -150.0, 32.0, 8, 104 ), ( 150.0, 64.0, 8, 104 ) ] )
     for a, b in ( ( -48.0, 48.0 ), ( -166.0, -134.0 ), ( 118.0, 182.0 ) ):
         glazing( m, g, "n", f + 0.2, a, b, 8, 104, 1, mullion=48 )
-    wall( m, "n", ( n0, n1 ), ( e0, e0 + T ), ( 0, 112 ), "-e", [ ( -80.0, 60.0, 0, 96 ), ( 100.0, 60.0, 0, 96 ), ( 10.0, 80.0, 30, 96 ) ] )
+    wall( m, "n", ( n0, n1 ), ( e0, e0 + T ), ( 0, 112 ), "-e", [ *CAFE_WEST_DOORS, ( 10.0, 80.0, 30, 96 ) ] )
     glazing( m, g, "n", e0 - 0.3, -30.0, 50.0, 30, 96, -1 )
     wall( m, "e", ( e0 + T, f - T ), ( n0, n0 + T ), ( 0, 112 ), None, [ ( -430.0, 60.0, 0, 96 ) ] )
     wall( m, "e", ( e0 + T, f - T ), ( n1 - T, n1 ), ( 0, 112 ), None )
@@ -319,7 +360,7 @@ def cafe( m, g ):
     floor( m, f, e1, n0, n1, L0 + 0.1, "vr_floor" )
     # Inside: the counter and its back bar, tables, pendant lights, the olive in its planter by the glass.
     P.bar_counter( m, ( e0 + 90, -120.0 ), ( e0 + 120, 120.0 ), L0, front="+e" )
-    P.counter_shelves( m, ( e0 + T, -120.0 ), ( e0 + T + 12, 120.0 ), L0, face="+e" )
+    shelves_beside_doors( m, ( e0 + T, -120.0 ), ( e0 + T + 12, 120.0 ), L0, CAFE_WEST_DOORS )
     for k, ( e, n ) in enumerate( ( ( -520, -100 ), ( -520, 40 ), ( -400, -120 ), ( -400, 20 ), ( -400, 140 ), ( -520, 150 ) ) ):
         P.cafe_table( m, ( e, n ), L0, 2 + k % 2, seed=k )
     for k, ( e, n ) in enumerate( ( ( -560, -80 ), ( -560, 80 ), ( -400, -60 ), ( -400, 100 ) ) ):
@@ -360,7 +401,11 @@ def roof_terrace( m, g, foliage ):
     # Planters with olives, the flag, loungers, a pergola over a table.
     for k, ( e, n, h ) in enumerate( ( ( -660, 330, 90 ), ( -660, 560, 85 ), ( -470, 740, 95 ), ( -260, 940, 90 ) ) ):
         P.planter( m, ( e - 30, n - 30 ), ( e + 30, n + 30 ), L1, L1 + 24 )
-        P.olive( foliage, ( e, n, L1 + 20 ), h, seed=30 + k )
+        if k == 2:
+            from veridant_planter_shrub import build_into as planter_shrub
+            planter_shrub( foliage, ( e, n, L1 + 20 ) )
+        else:
+            P.olive( foliage, ( e, n, L1 + 20 ), h, seed=30 + k )
     P.flag( m, ( -514, 413 ), 200, z0=L1, along=( 0, 1 ) )
     for n in ( 340.0, 400.0, 460.0 ):
         P.lounger( m, ( -440, n ), ( -1, 0 ), L1 )
@@ -531,7 +576,7 @@ def north_block( m, g, foliage ):
     P.cafe_table( m, ( 110, 380 ), L1, 3, seed=51 )
     P.planter( m, ( -60.0, 610.0 ), ( 60.0, 740.0 ), L1, L1 + 24 )
     P.stone_pine( foliage, ( 0.0, 676.0, L1 + 20 ), 360, crown_r=240, seed=8, lean=( 30.0, -40.0 ) )
-    P.shrubs( foliage, ( -56, 614 ), ( 56, 736 ), L1 + 20, seed=9, kind="grass", h=24 )
+    # The pine planter uses grounded beech instances in write_scene.
     P.case_stack( m, ( 170, 540 ), ( 0, 1 ), "vr_case_olive", seed=52, z0=L1 )
     P.hard_case( m, ( 150, 290 ), ( 44, 26, 22 ), ( 1, 0.15 ), "vr_case_black", L1, seed=53 )
     for k, ( e, n ) in enumerate( ( ( -20, 300 ), ( 130, 650 ), ( 300, 520 ) ) ):
@@ -758,7 +803,9 @@ def spa( m, g ):
 # ---------------------------------------------------------------------------------------------------------------------
 # The promenade, the gardens, the forecourt, the boundaries
 
-def promenade( m, foliage ):
+def promenade( m, foliage, palm_pits=None ):
+    # A separate render model keeps the planting independent of furniture upgrades.
+    palm_pits = m if palm_pits is None else palm_pits
     e0, e1, n0, n1 = PROM
     # The sea wall's balustrade: stone posts and a capping rail, clipped high.
     for n in np.arange( n0, n1 + 1, 60.0 ):
@@ -766,10 +813,12 @@ def promenade( m, foliage ):
     box( m, SEA_WALL - 1, SEA_WALL + 9, n0, n1, 36, 41, "vr_stone_light", STONE )
     box( m, SEA_WALL, SEA_WALL + 8, n0, n1, 0, 6, "vr_stone_light", STONE )
     P.clip( "sea wall", ( SEA_WALL + 4, n0 ), ( SEA_WALL + 4, n1 ), 0, 1000, thick=8 )
-    # Palms in two rows, lamp posts between, benches.
+    # Seafront palms in low planting surrounds, with the main facade approach kept clear.
     rng = np.random.default_rng( 17 )
     for k, n in enumerate( np.arange( n0 + 120, n1, 300.0 ) ):
-        P.palm( foliage, ( -1640.0 + rng.normal( 0, 8 ), n, 0 ), rng.uniform( 270, 350 ), seed=100 + k, lean=( rng.normal( 0, 30 ), rng.normal( 0, 30 ) ) )
+        base = ( -1640.0 + rng.normal( 0, 8 ), n, 0 )
+        P.palm( foliage, base, rng.uniform( 270, 350 ), seed=100 + k, lean=( rng.normal( 0, 30 ), rng.normal( 0, 30 ) ) )
+        P.palm_pit( palm_pits, base, seed=100 + k )
         m.collision_box( ( -1652, n - 12, 0 ), ( -1628, n + 12, 300 ), WOOD )
         P.lantern_post( m, f"Promenade lamp {k}", ( -1690.0, n + 150, 0 ), 140, radius=480 )
         if k % 2 == 0:
@@ -777,7 +826,13 @@ def promenade( m, foliage ):
     for k, n in enumerate( np.arange( n0 + 270, n1, 420.0 ) ):
         if 300 < n < 700:
             continue
-        P.palm( foliage, ( -900.0, n, 0 ), rng.uniform( 290, 370 ), seed=200 + k, lean=( rng.normal( 0, 40 ), rng.normal( 0, 40 ) ) )
+        height = rng.uniform( 290, 370 )
+        lean = ( rng.normal( 0, 40 ), rng.normal( 0, 40 ) )
+        # Consume the old random values so the remaining trees and cases retain their positions.
+        if n in ( -240.0, 180.0 ):
+            continue
+        P.palm( foliage, ( -900.0, n, 0 ), height, seed=200 + k, lean=lean )
+        P.palm_pit( palm_pits, ( -900.0, n, 0 ), seed=200 + k )
         m.collision_box( ( -912, n - 12, 0 ), ( -888, n + 12, 300 ), WOOD )
     # Cover: cases, a kiosk cart, planters.
     for k, ( e, n ) in enumerate( ( ( -1300, -800 ), ( -1150, -600 ), ( -1450, 650 ), ( -1180, 560 ), ( -1000, -1100 ), ( -1450, 850 ),
@@ -1128,6 +1183,7 @@ def cash_point( name, key, cash, extract ):
 SCENE_MODELS = [
     ( "veridant_ground", "Ground", True, True ), ( "veridant_buildings", "Buildings", True, True ),
     ( "veridant_dress", "Dressing", True, True ), ( "veridant_foliage", "Foliage", False, True ),
+    ( "veridant_palm_pits", "Palm planting surrounds", False, True ),
     ( "veridant_glass", "Glass", True, False ), ( "veridant_water", "Pool Water", False, False ),
     ( "veridant_sea", "Sea", False, False ), ( "veridant_backdrop", "Backdrop", False, False ),
     ( "veridant_backdrop_props", "Backdrop Props", False, False ),
@@ -1205,7 +1261,8 @@ def write_scene( written, light_list, probe_list, hedge_props=() ):
     world = K.game_object( ids, "Veridant", "world", children=[
         model_object( title, f"world/{name}", name, collide, shadows )
         for name, title, collide, shadows in SCENE_MODELS if name in written ] + [
-        K.game_object( ids, "Beech Hedges", "hedges", children=hedge_objects( hedge_props ) ) ] )
+        K.game_object( ids, "Beech Hedges", "hedges", children=hedge_objects( hedge_props ) ),
+        PlanterBushes.scene_group( ids ) ] )
     light_objects = [
         K.game_object( ids, name, f"light/{name}", K.to_world( position ), tags="light_point,light", components=[
             K.component( ids, "Sandbox.PointLight", f"light/{name}/light", Attenuation=1, FogMode="Enabled", FogStrength=1,
@@ -1349,7 +1406,7 @@ def write_scene( written, light_list, probe_list, hedge_props=() ):
         "ResourceVersion": 3,
         "Title": TITLE,
         "Description": None,
-        "__references": [ HEDGE_PACKAGE ] if hedge_props else [],
+        "__references": ( [ HEDGE_PACKAGE ] if hedge_props else [] ) + [ PlanterBushes.PACKAGE, "facepunch.pine_shrub_wide#145484" ],
         "__version": 3,
     }
     from map_daylight import apply_profile
@@ -1367,6 +1424,8 @@ def build( backdrop=True ):
     ROOF_EXTRA.clear()
     ground_m = ground()
     buildings, dress, foliage, glass, water = K.Model(), K.Model(), K.Model(), K.Model(), K.Model()
+    palm_pits = K.Model()
+    palm_pits.uv_source_name = "veridant_dress"
     lounge( buildings, glass )
     cafe( buildings, glass )
     roof_terrace( dress, glass, foliage )
@@ -1377,11 +1436,11 @@ def build( backdrop=True ):
     resort_finish( dress, foliage )
     east_terrace( buildings, glass, foliage )
     spa( buildings, glass )
-    promenade( dress, foliage )
+    promenade( dress, foliage, palm_pits )
     gardens( dress, foliage )
     forecourt( dress, foliage )
     models = { "veridant_ground": ground_m, "veridant_buildings": buildings, "veridant_dress": dress, "veridant_foliage": foliage,
-               "veridant_glass": glass, "veridant_water": water }
+               "veridant_glass": glass, "veridant_water": water, "veridant_palm_pits": palm_pits }
     if backdrop:
         import veridant_backdrop as BD
         far, sea, _, props = BD.build()

@@ -1,0 +1,60 @@
+// Import only the two private, source-verified art studies. No scene changes.
+var root = Sandbox.Project.Current.GetRootPath();
+var selected = Editor.SceneEditorSession.Active;
+var game = Game.ActiveScene?.Id;
+var playing = Game.IsPlaying;
+if (playing || selected?.Scene.Source?.ResourcePath != "scenes/maps/belltower/belltower.scene" || selected.HasUnsavedChanges)
+    throw new InvalidOperationException("The stopped, saved Belltower document must be active for this editor slot.");
+string Hash(string path) => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+var entries = new System.Collections.Generic.List<(string Path, string Source, string Sha)>();
+var manifests = new System.Collections.Generic.Dictionary<string, string>();
+foreach (var revision in new[] { "forest-shapes-v1", "surface-finish-v1" })
+{
+    var manifestPath = System.IO.Path.Combine(root, "output/belltower/quality", revision, "manifest.json");
+    var manifest = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(manifestPath));
+    if (manifest["revision"].GetValue<string>() != revision) throw new InvalidOperationException("Wrong trial revision.");
+    foreach (var input in manifest["source_sha256"].AsObject())
+        if (Hash(System.IO.Path.Combine(root, input.Key)) != input.Value.GetValue<string>())
+            throw new InvalidOperationException("A source changed: " + input.Key);
+    var files = manifest[revision == "forest-shapes-v1" ? "files" : "records"].AsArray();
+    if (files.Count != (revision == "forest-shapes-v1" ? 27 : 9)) throw new InvalidOperationException("Wrong trial file count.");
+    foreach (var file in files)
+    {
+        var path = file["path"].GetValue<string>();
+        var source = file["source"].GetValue<string>();
+        var valid = revision == "forest-shapes-v1"
+            ? System.Text.RegularExpressions.Regex.IsMatch(path, @"^models/maps/belltower/forest/shapes-v1/belltower_forest_0[4-7]_0[7-8]\.(obj|mtl|vmdl)$|^materials/belltower/forest/shapes-v1/(forest_(control|trees)\.vmat|forest-trees-v2\.png)$")
+            : System.Text.RegularExpressions.Regex.IsMatch(path, @"^materials/belltower/trials/surface-finish-v1/(plaster_(rose|terracotta|ochre|cream|blue|sage|pale|whitewash)|rubble)\.vmat$");
+        if (!valid || source != "output/belltower/quality/" + revision + "/Assets/" + path)
+            throw new InvalidOperationException("Unexpected trial path: " + path);
+        var hash = file["sha256"].GetValue<string>();
+        if (Hash(System.IO.Path.Combine(root, source)) != hash) throw new InvalidOperationException("Staged file changed: " + path);
+        var live = System.IO.Path.Combine(root, "Assets", path);
+        if (System.IO.File.Exists(live) && Hash(live) != hash) throw new InvalidOperationException("Different private file already exists: " + path);
+        entries.Add((path, source, hash));
+    }
+    manifests.Add(revision, Hash(manifestPath));
+}
+if (entries.Count != 36 || entries.Select(e => e.Path).Distinct().Count() != 36)
+    throw new InvalidOperationException("Expected 36 distinct private files.");
+var written = 0;
+foreach (var entry in entries)
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    var target = System.IO.Path.Combine(root, "Assets", entry.Path);
+    if (!System.IO.File.Exists(target))
+    {
+        System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target));
+        System.IO.File.Copy(System.IO.Path.Combine(root, entry.Source), target, false);
+        written++;
+    }
+}
+foreach (var entry in entries.Where(e => e.Path.EndsWith(".vmat") || e.Path.EndsWith(".vmdl")))
+    Editor.AssetSystem.RegisterFile(System.IO.Path.Combine(root, "Assets", entry.Path));
+var result = new { Imported = entries.Count, NewFiles = written, Models = 8, Materials = 11, SourceAtlas = 1,
+    SceneObjectsAdded = 0, SceneSaved = false, ManifestSha256 = manifests,
+    GamePreserved = Game.ActiveScene?.Id == game && Game.IsPlaying == playing,
+    SelectedDocumentPreserved = ReferenceEquals(selected, Editor.SceneEditorSession.Active) };
+var output = System.IO.Path.Combine(root, "output/belltower/quality/oct19-editor-slot/native-import-result.json");
+System.IO.File.WriteAllText(output, System.Text.Json.JsonSerializer.Serialize(result));
+return result;

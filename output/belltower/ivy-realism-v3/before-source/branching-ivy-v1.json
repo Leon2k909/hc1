@@ -1,0 +1,33 @@
+{
+  "state": "Applied to both current Belltower town models; native compilation and four visual reviews passed.",
+  "revision": "branching-ivy-3d-v1-refined",
+  "verification": "output/belltower/ivy-3d-v1/verification.json",
+  "initial_manifest": "output/belltower/ivy-3d-v1/final/stage/manifest.json",
+  "accepted_manifest": "output/belltower/ivy-3d-v1/refined/stage/manifest.json",
+  "generation": "Sources/Belltower/ivy/generation-v1.json",
+  "generator": "Tools/belltower_ivy.py",
+  "generator_hook": "Tools/belltower_map.py:ivy",
+  "patches": 50,
+  "leaves": 16252,
+  "visual_triangles_per_half": 112928,
+  "native_views": [
+    "output/belltower/quality/ivy-3d-v2-after/wall-front.png",
+    "output/belltower/quality/ivy-3d-v2-after/wall-oblique.png",
+    "output/belltower/quality/ivy-3d-v2-after/hanging.png",
+    "output/belltower/quality/ivy-3d-v2-after/east-context.png"
+  ],
+  "scene_and_collision_unchanged": true,
+  "all_non_ivy_town_mesh_bytes_preserved": true,
+  "existing_bounded_imports_preserved": true,
+  "play_test_restarted_after_review": true,
+  "last_editor_status": "output/belltower/ivy-3d-v1/final-status/editor_status.json",
+  "last_observed_playing": false,
+  "runtime_performance_measured": false,
+  "notes": [
+    "The initial 3D pass was refined for fuller lower growth, varied branches and larger leaves. The accepted refinement uses fewer triangles than that first 3D pass.",
+    "Original texture pixels were preserved; four new sharp leaves were generated with the built-in ImageGen tool as one original transparent atlas.",
+    "The canonical ivy hook matches the installed geometry. The stage scripts preserve historical revisions and should not be blindly rerun over newer shared town assets.",
+    "Concurrent wall-edge source changes are retained and recorded separately in output/belltower/ivy-3d-v1/shared-source-revision.json.",
+    "The authorized Belltower play restart succeeded. The subsequent status check observed the editor stopped; no second restart was forced."
+  ]
+}

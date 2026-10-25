@@ -2,14 +2,35 @@ namespace Facepunch;
 
 public sealed partial class ViewModelClothing
 {
-	const string ShirtColour = "materials/operators/first_person/fp_army_shirt_color.png";
-	const string GlovesColour = "materials/operators/first_person/fp_fingerless_gloves_albedo.png";
-	const string ShirtNormal = "materials/operators/first_person/fp_army_shirt_normal.png";
-	const string GlovesNormal = "materials/operators/first_person/fp_fingerless_gloves_normal.png";
-	static readonly Dictionary<Material, Material> DetailedMaterials = new();
+	const string ShirtMaterial = "materials/operators/first_person/v4/shirt.vmat";
+	const string GlovesMaterial = "materials/operators/first_person/v2/gloves.vmat";
+	static readonly Dictionary<string, Material> SurfaceMaterials = new();
+	static readonly string[] SurfaceTextures = {
+		"g_tColor", "g_tNormal", "g_tRma", "g_tFineNormal", "g_tFineData",
+		"g_tSleeveLeft", "g_tSleeveRight", "g_tCuffMain", "g_tCuffStrip", "g_tFabricHeight"
+	};
 
-	// Copies retain the garment's normal, roughness, AO and alpha-test settings, and the renderer keeps its outfit tint.
-	// They belong to the first-person clothing only and are shared across respawns and outfit changes.
+	static void RequestDetailedTextureMips()
+	{
+		foreach ( var pair in SurfaceMaterials )
+		{
+			// Hotload may retain a previously used revision in the cache.
+			if ( pair.Key != ShirtMaterial && pair.Key != GlovesMaterial ) continue;
+			var material = pair.Value;
+			if ( material is null || material.IsError ) continue;
+			foreach ( var key in SurfaceTextures )
+			{
+				var texture = material.GetTexture( key );
+				if ( texture is null || !texture.IsValid || texture.IsError ) continue;
+				texture.MarkUsed( Math.Max( texture.Width, texture.Height ) );
+			}
+		}
+	}
+
+	// These resources keep the original coverage, tint masks and fold normals.
+	// Sleeve and cuff colour regions keep the print separate from fabric relief;
+	// fine cotton detail uses model coordinates rather than stretched cuff UVs.
+	// Loading authored materials also lets resource hotload update existing sleeves.
 	static void ApplyDetailedMaterials( SkinnedModelRenderer renderer )
 	{
 		if ( !renderer.IsValid() || renderer.Model is null ) return;
@@ -18,23 +39,23 @@ public sealed partial class ViewModelClothing
 			var original = renderer.Model.Materials[i];
 			if ( original is null || original.IsError ) continue;
 			var path = original.Name;
-			var colour = path.Contains( "/army_shirt/", StringComparison.OrdinalIgnoreCase ) ? ShirtColour
-				: path.Contains( "/fingerless_gloves/", StringComparison.OrdinalIgnoreCase ) ? GlovesColour : null;
-			if ( colour is null ) continue;
-			var normalPath = colour == ShirtColour ? ShirtNormal : GlovesNormal;
+			var surface = path.Contains( "/army_shirt/", StringComparison.OrdinalIgnoreCase ) ? ShirtMaterial
+				: path.Contains( "/fingerless_gloves/", StringComparison.OrdinalIgnoreCase ) ? GlovesMaterial : null;
+			if ( surface is null ) continue;
 
-			if ( !DetailedMaterials.TryGetValue( original, out var material ) || material is null || material.IsError )
+			if ( !SurfaceMaterials.TryGetValue( surface, out var material ) || material is null || material.IsError )
 			{
-				var texture = Texture.Load( colour );
+				material = Material.Load( surface );
+				if ( material is null || material.IsError ) continue;
+				SurfaceMaterials[surface] = material;
+			}
+			// This method already runs at the clothing's 0.5-second refresh interval.
+			// Renew the close-up mip request even when the shared material is cached.
+			foreach ( var key in SurfaceTextures )
+			{
+				var texture = material.GetTexture( key );
 				if ( texture is null || !texture.IsValid || texture.IsError ) continue;
-				var normal = Texture.Load( normalPath );
-				if ( normal is null || !normal.IsValid || normal.IsError ) continue;
 				texture.MarkUsed( Math.Max( texture.Width, texture.Height ) );
-				normal.MarkUsed( Math.Max( normal.Width, normal.Height ) );
-				material = original.CreateCopy( $"hc1-first-person-{original.Name}" );
-				material.Set( "g_tColor", texture );
-				material.Set( "g_tNormal", normal );
-				DetailedMaterials[original] = material;
 			}
 			if ( renderer.Materials.GetOverride( i ) != material ) renderer.Materials.SetOverride( i, material );
 		}

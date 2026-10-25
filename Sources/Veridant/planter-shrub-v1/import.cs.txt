@@ -1,0 +1,49 @@
+// Import the checked single-planter patch through the existing editor.
+var root=Sandbox.Project.Current.GetRootPath();
+if(!string.Equals(System.IO.Path.GetFullPath(root).TrimEnd('\\','/'),@"C:\sbox-projects\hc1\forked-shooter-main",StringComparison.OrdinalIgnoreCase))throw new InvalidOperationException("Wrong project.");
+var folder=System.IO.Path.Combine(root,"output/veridant/olive-v2");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"stage-v4-active/manifest.json")));
+if(manifest["revision"].GetValue<string>()!="veridant-garden-planter-shrub-v1")throw new InvalidOperationException("Wrong revision.");
+var session=Editor.SceneEditorSession.Active;var playing=Game.IsPlaying;var game=Game.ActiveScene?.Id;var dirty=session.HasUnsavedChanges;
+if(playing)throw new InvalidOperationException("Play started; inspect before import.");
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+var scenePath=System.IO.Path.Combine(root,"Assets/scenes/maps/Veridant/veridant.scene");var sceneHash=Hash(scenePath);
+foreach(var pair in manifest["source_sha256"].AsObject())
+    if(Hash(System.IO.Path.Combine(root,pair.Key))!=pair.Value.GetValue<string>())throw new InvalidOperationException("Shared source changed: "+pair.Key);
+var files=manifest["files"].AsObject();
+foreach(var pair in files)
+{
+    var allowed=pair.Key.StartsWith("Assets/materials/veridant/planter-shrub-v1/",StringComparison.Ordinal)
+        ||pair.Key=="Assets/models/maps/veridant/veridant_foliage.obj"
+        ||pair.Key=="Assets/models/maps/veridant/veridant_foliage.mtl"
+        ||pair.Key=="Assets/models/maps/veridant/veridant_foliage.vmdl";
+    allowed=allowed||pair.Key=="Assets/models/maps/veridant/pergola-flowers-v2/foliage-base.obj"
+        ||pair.Key=="Assets/models/maps/veridant/pergola-flowers-v2/veridant_foliage.mtl";
+    if(!allowed||pair.Key.Contains(".."))throw new InvalidOperationException("Unexpected target.");
+    var item=pair.Value;var before=item["before"]?.GetValue<string>();var after=item["after"].GetValue<string>();
+    if(Hash(System.IO.Path.Combine(root,item["source"].GetValue<string>()))!=after)throw new InvalidOperationException("Staging changed.");
+    if(before is not null&&Hash(System.IO.Path.Combine(root,item["backup"].GetValue<string>()))!=before)throw new InvalidOperationException("Backup changed.");
+    var path=System.IO.Path.Combine(root,pair.Key);var current=System.IO.File.Exists(path)?Hash(path):null;
+    if(current!=before&&current!=after)throw new InvalidOperationException("Shared target changed: "+pair.Key);
+}
+var imported=new System.Collections.Generic.List<string>();
+foreach(var pair in files)
+{
+    var item=pair.Value;var target=System.IO.Path.Combine(root,pair.Key);var after=item["after"].GetValue<string>();
+    if(System.IO.File.Exists(target)&&Hash(target)==after)continue;
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target));
+    var incoming=target+".planter-incoming";
+    try
+    {
+        System.IO.File.Copy(System.IO.Path.Combine(root,item["source"].GetValue<string>()),incoming,true);
+        if(Hash(incoming)!=after)throw new InvalidOperationException("Incoming checksum differs.");
+        System.IO.File.Move(incoming,target,true);imported.Add(pair.Key);
+    }
+    finally{if(System.IO.File.Exists(incoming))System.IO.File.Delete(incoming);}
+    Editor.AssetSystem.RegisterFile(target);
+}
+var preserved=ReferenceEquals(session,Editor.SceneEditorSession.Active)&&playing==Game.IsPlaying&&game==Game.ActiveScene?.Id&&dirty==session.HasUnsavedChanges&&Hash(scenePath)==sceneHash;
+var result=new{Imported=imported,PlantsChanged=1,EditorStatePreserved=preserved,SceneChanged=false,PhysicsChanged=false};
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"native-import.json"),System.Text.Json.JsonSerializer.Serialize(result));
+if(!preserved)throw new InvalidOperationException("Editor state changed; inspect the completed import.");
+return result;

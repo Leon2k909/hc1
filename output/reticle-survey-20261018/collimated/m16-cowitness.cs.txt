@@ -55,7 +55,7 @@ foreach ( var (name, folder) in guns )
 			void Place( Vector3 move )
 			{
 				var p = optic.OpticAimOffset + manual.OpticAimCorrection + move;
-				var t = (optic.OpticAimAngles + new Angles( -0.0547f, 0.0031f, 0f )).ToRotation();
+				var t = (optic.OpticAimAngles + manual.OpticAimAngleCorrection).ToRotation();
 				root.WorldRotation = t; root.WorldPosition = t * p;
 				for ( int i = 0; i < 10; i++ ) { scene.EditorTick( .02f, .02f ); renderer.SceneModel.Transform = renderer.WorldTransform; renderer.SceneModel.Update( .02f ); }
 				var b = renderer.SceneModel.GetBoneLocalTransform( "camera" );
@@ -88,7 +88,7 @@ foreach ( var (name, folder) in guns )
 			line = new Facepunch.OpticSightLine { Optic = optic, Position = eye, Angles = Angles.Zero };
 			foreach ( var lift in lifts ) {
 			var position = optic.OpticAimOffset + manual.OpticAimCorrection + (line?.Position ?? Vector3.Zero) + Vector3.Up * lift;
-			var angles = optic.OpticAimAngles + new Angles( -0.0547f, 0.0031f, 0f );
+			var angles = optic.OpticAimAngles + manual.OpticAimAngleCorrection;
 			var turn = angles.ToRotation();
 			root.WorldRotation = turn; root.WorldPosition = turn * position;
 			for ( int i = 0; i < 10; i++ ) { scene.EditorTick( .02f, .02f ); renderer.SceneModel.Transform = renderer.WorldTransform; renderer.SceneModel.Update( .02f ); }

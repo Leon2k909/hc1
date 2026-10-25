@@ -1,0 +1,72 @@
+// Publish the checked shop-awning patch through the existing editor connection.
+// No scene edits, camera changes, play changes, saves or full recompilation.
+var root = Sandbox.Project.Current.GetRootPath();
+var folder = System.IO.Path.Combine(root, "output/belltower/shop-awning-cloth-v1");
+var revision = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder, "import-request.json")))["revision"].GetValue<string>();
+if (!System.Text.RegularExpressions.Regex.IsMatch(revision, "^[a-z0-9-]+$")) throw new InvalidOperationException("Invalid staged revision.");
+var manifest = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder, revision, "stage/manifest.json")));
+if (manifest["revision"].GetValue<string>() != "shop-awning-cloth-v1") throw new InvalidOperationException("Unexpected manifest.");
+var selected = Editor.SceneEditorSession.Active;
+var playing = Game.IsPlaying; var game = Game.ActiveScene?.Id; var dirty = selected?.HasUnsavedChanges;
+if (playing) throw new InvalidOperationException("Do not update the town models during someone else's play session.");
+string Hash(string path) => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+var scenePath = System.IO.Path.Combine(root, "Assets/scenes/maps/Belltower/belltower.scene");
+var sceneHash = Hash(scenePath);
+var mapSource = System.IO.File.ReadAllText(System.IO.Path.Combine(root, "Tools/belltower_map.py")).Replace("\r\n", "\n");
+if (!mapSource.Contains(manifest["map_awning_hook"].GetValue<string>()) || !mapSource.Contains("import belltower_shop_awning_cloth as ShopAwning"))
+    throw new InvalidOperationException("The shop-awning generator hook changed.");
+foreach (var group in new[] { "source_sha256", "protected_sha256" })
+    foreach (var pair in manifest[group].AsObject())
+        if (Hash(System.IO.Path.Combine(root, pair.Key)) != pair.Value.GetValue<string>())
+            throw new InvalidOperationException("A checked source changed: " + pair.Key);
+var plans = new System.Collections.Generic.List<(string Source, string Target, string Backup, string After, int Order)>();
+foreach (var pair in manifest["files"].AsObject())
+{
+    var relative = pair.Key;
+    if (!relative.StartsWith("Assets/models/maps/belltower/", StringComparison.Ordinal) || relative.Contains("..")
+        || !(relative.EndsWith(".obj", StringComparison.Ordinal) || relative.EndsWith(".vmdl", StringComparison.Ordinal) || relative.EndsWith(".mtl", StringComparison.Ordinal)))
+        throw new InvalidOperationException("Unexpected publication target.");
+    var source = System.IO.Path.Combine(root, pair.Value["source"].GetValue<string>());
+    var target = System.IO.Path.Combine(root, relative);
+    var after = pair.Value["after"].GetValue<string>();
+    var before = pair.Value["before"]?.GetValue<string>();
+    var backup = before is null ? null : System.IO.Path.Combine(root, pair.Value["backup"].GetValue<string>());
+    if (Hash(source) != after || (backup is not null && Hash(backup) != before)) throw new InvalidOperationException("Staged source or backup changed.");
+    if (System.IO.File.Exists(target) && Hash(target) == after) continue;
+    if (before is null ? System.IO.File.Exists(target) : !System.IO.File.Exists(target) || Hash(target) != before)
+        throw new InvalidOperationException("A shared resource changed; restage its latest version: " + relative);
+    var order = relative.Contains("/shop-awning-cloth-v1/") ? 0 : relative.EndsWith(".vmdl", StringComparison.Ordinal) ? 2 : 1;
+    plans.Add((source, target, backup, after, order));
+}
+var changed = new System.Collections.Generic.List<(string Target, string Backup)>();
+try
+{
+    foreach (var item in plans.OrderBy(p => p.Order))
+    {
+        System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(item.Target));
+        var incoming = item.Target + ".shop-awning-cloth-v1-incoming";
+        try
+        {
+            System.IO.File.Copy(item.Source, incoming, true);
+            if (Hash(incoming) != item.After) throw new InvalidOperationException("Incoming checksum failed.");
+            System.IO.File.Move(incoming, item.Target, true); changed.Add((item.Target, item.Backup));
+        }
+        finally { if (System.IO.File.Exists(incoming)) System.IO.File.Delete(incoming); }
+    }
+}
+catch
+{
+    foreach (var item in changed.AsEnumerable().Reverse())
+        if (item.Backup is not null) System.IO.File.Copy(item.Backup, item.Target, true);
+        else if (System.IO.File.Exists(item.Target)) System.IO.File.Delete(item.Target);
+    throw;
+}
+foreach (var item in plans.OrderBy(p => p.Order)) Editor.AssetSystem.RegisterFile(item.Target);
+var preserved = ReferenceEquals(selected, Editor.SceneEditorSession.Active) && playing == Game.IsPlaying
+    && game == Game.ActiveScene?.Id && dirty == selected?.HasUnsavedChanges && Hash(scenePath) == sceneHash;
+var result = new { Revision = revision, Imported = plans.Count, Awnings = manifest["awnings_per_half"].GetValue<int>()*2,
+    EditorStatePreserved = preserved, SceneChanged = false, CollisionChanged = false, MaterialsChanged = false,
+    UnrelatedMeshBytesPreserved = true, ForcedFullCompile = false };
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder, revision, "native-import.json"), System.Text.Json.JsonSerializer.Serialize(result));
+if (!preserved) throw new InvalidOperationException("Editor state changed during publication; inspect the completed result.");
+return result;

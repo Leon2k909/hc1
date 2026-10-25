@@ -1,0 +1,13 @@
+var root = Sandbox.Project.Current.GetRootPath();
+var session = Editor.SceneEditorSession.Active;
+var results = new System.Collections.Generic.List<object>();
+foreach (var name in new[] { "veridant_buildings", "veridant_dress" })
+{
+    var path = "models/maps/veridant/" + name + ".vmdl";
+    var asset = Editor.AssetSystem.FindByPath(System.IO.Path.Combine(root, "Assets", path));
+    var model = Model.Load(path);
+    if (asset is null || !asset.IsCompiled || asset.IsCompileFailed || model is null || model.IsError)
+        throw new InvalidOperationException("Model validation failed: " + name);
+    results.Add(new { Name = name, asset.IsCompiled, asset.IsCompileFailed, model.IsError });
+}
+return new { Models = results, Scene = session?.Scene.Source?.ResourcePath, session.HasUnsavedChanges, Game.IsPlaying };

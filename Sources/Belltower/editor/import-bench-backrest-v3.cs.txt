@@ -1,0 +1,69 @@
+// Publish only the two canonical meshes and the two referenced iron imports.
+var root = Sandbox.Project.Current.GetRootPath();
+var directory = System.IO.Path.Combine(root, "output/belltower/bench-backrest-v3");
+var manifest = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(directory,"stage-r2/manifest.json")));
+if (Game.IsPlaying) throw new InvalidOperationException("Stop the bench check's play session before replacing map assets.");
+var session = Editor.SceneEditorSession.Active;
+if (session is null || session.HasUnsavedChanges || session.Scene.Source?.ResourcePath?.Equals("scenes/maps/belltower/belltower.scene",StringComparison.OrdinalIgnoreCase)!=true)
+    throw new InvalidOperationException("Requires the existing saved Belltower editor document.");
+var gameId = Game.ActiveScene?.Id;
+var ids = session.Scene.GetAllObjects(true).Select(o=>o.Id).ToHashSet();
+string Hash(string path) => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+var scenePath = System.IO.Path.Combine(root,"Assets/scenes/maps/Belltower/belltower.scene");
+var sceneHash = Hash(scenePath);
+foreach (var group in new[] {"source_sha256","vmdl_guards"})
+    foreach (var pair in manifest[group].AsObject())
+        if (Hash(System.IO.Path.Combine(root,pair.Key))!=pair.Value.GetValue<string>())
+            throw new InvalidOperationException("Shared input changed: "+pair.Key);
+if (manifest["files"].AsObject().Count!=4 || !manifest["only_rear_supports_changed"].GetValue<bool>() || !manifest["collision_unchanged"].GetValue<bool>())
+    throw new InvalidOperationException("Missing preservation proof.");
+var plan = new System.Collections.Generic.List<(string Source,string Target,string Backup,string Before,string After)>();
+foreach (var pair in manifest["files"].AsObject())
+{
+    var relative = pair.Key;
+    bool allowed = relative=="Assets/models/maps/belltower/belltower_west.obj" || relative=="Assets/models/maps/belltower/belltower_east.obj" ||
+        relative=="Assets/models/maps/belltower/compiler-safe/west/west_033_iron_black.obj" || relative=="Assets/models/maps/belltower/compiler-safe/east/east_032_iron_black.obj";
+    if (!allowed || !pair.Value["all_unrelated_source_bytes_preserved"].GetValue<bool>() ||
+        pair.Value["triangles_before"].GetValue<int>()!=pair.Value["triangles_after"].GetValue<int>())
+        throw new InvalidOperationException("Unexpected target or triangle count: "+relative);
+    var source = System.IO.Path.Combine(root,pair.Value["source"].GetValue<string>());
+    var target = System.IO.Path.Combine(root,relative);
+    var backup = System.IO.Path.Combine(root,pair.Value["backup"].GetValue<string>());
+    var before = pair.Value["before"].GetValue<string>();
+    var after = pair.Value["after"].GetValue<string>();
+    if (Hash(source)!=after || Hash(backup)!=before) throw new InvalidOperationException("Stage or backup changed.");
+    var current = Hash(target);
+    if (current==after) continue;
+    if (current!=before) throw new InvalidOperationException("Shared mesh changed: "+relative);
+    plan.Add((source,target,backup,before,after));
+}
+var changed = new System.Collections.Generic.List<(string Target,string Backup)>();
+try
+{
+    foreach (var item in plan)
+    {
+        var incoming = item.Target+".bench-backrest-v3-incoming";
+        try
+        {
+            System.IO.File.Copy(item.Source,incoming,true);
+            if (Hash(incoming)!=item.After) throw new InvalidOperationException("Incoming checksum failed.");
+            changed.Add((item.Target,item.Backup));
+            System.IO.File.Move(incoming,item.Target,true);
+        }
+        finally { if (System.IO.File.Exists(incoming)) System.IO.File.Delete(incoming); }
+    }
+}
+catch
+{
+    foreach (var item in changed.AsEnumerable().Reverse()) System.IO.File.Copy(item.Backup,item.Target,true);
+    throw;
+}
+foreach (var item in plan) Editor.AssetSystem.RegisterFile(item.Target);
+if (Hash(scenePath)!=sceneHash || session.HasUnsavedChanges || Game.IsPlaying || Game.ActiveScene?.Id!=gameId ||
+    !ReferenceEquals(session,Editor.SceneEditorSession.Active) || !session.Scene.GetAllObjects(true).Select(o=>o.Id).ToHashSet().SetEquals(ids))
+    throw new InvalidOperationException("Editor state changed during publication; inspect before further work.");
+var result = new { Imported=plan.Count, Benches=18, RearSupports=36, TriangleCountUnchanged=true,
+    SeatsSlatsArmsBoltsAndCollisionPreserved=true, SceneUnchanged=true, SceneSha256=sceneHash,
+    ActiveDocumentPreserved=true, ModelDescriptionsUnchanged=true, ForcedFullCompile=false };
+System.IO.File.WriteAllText(System.IO.Path.Combine(directory,"native-import-r2.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

@@ -71,7 +71,7 @@ public struct BotHabits
 				habits.StrafeLeg = R( 0.25f, 0.5f );
 				habits.StrafePace = R( 0.85f, 1f );
 				habits.Plant = R( 0.15f, 0.35f );
-				habits.CrouchPlant = R( 0.35f, 0.7f );
+				habits.CrouchPlant = R( 0.08f, 0.2f );
 				(habits.StrafeWeight, habits.PlantWeight, habits.PushWeight) = (R( 0.5f, 0.6f ), R( 0.1f, 0.2f ), R( 0.3f, 0.4f ));
 				habits.RelocateAfter = 99;
 				habits.Patience = R( 0.2f, 0.6f );
@@ -340,18 +340,39 @@ public sealed partial class LightweightCombatBot
 	}
 
 	/// <summary>
-	/// Stop for an aimed shot or two, often crouched for a steadier one (a rusher's quick crouch in a close fight), but
-	/// only for a moment (<see cref="BotHabits.Plant"/>).
+	/// Stop for an aimed shot or two, only for a moment (<see cref="BotHabits.Plant"/>), or crouched for a steadier one.
+	/// A soldier who gets down settles in for a few shots before getting up, and doesn't drop again straight after: every
+	/// plant used to roll its own crouch and last 0.15-1.3 s, so bots bobbed down and up every second or two (the user:
+	/// "bots crouch spam erratically").
 	/// </summary>
 	private void Plant( float distance )
 	{
 		var habits = Habits;
 		HoldPosition();
 		if ( TryPlantProne( distance ) ) return;
-		IsCrouching = _proneBlend <= 0f && Game.Random.Float() < habits.CrouchPlant && (distance > 350f || habits.Style != BotStyle.Rifleman);
+		var hold = habits.Plant * Game.Random.Float( 0.6f, 1.25f );
+		IsCrouching = _proneBlend <= 0f && _timeSinceStood > _crouchRest && Game.Random.Float() < habits.CrouchPlant
+			&& (distance > 350f || habits.Style != BotStyle.Rifleman);
+		if ( IsCrouching )
+		{
+			// Down for at least this long: the drop itself takes a third of a second.
+			hold = MathF.Max( hold, CrouchDownTime + habits.Style switch
+			{
+				BotStyle.Marksman or BotStyle.Anchor => Game.Random.Float( 1.8f, 3.2f ),
+				BotStyle.Rusher => Game.Random.Float( 1f, 1.6f ),
+				_ => Game.Random.Float( 1.3f, 2.4f )
+			} );
+			_crouchRest = Game.Random.Float( 3.5f, 7f );
+		}
+
 		_move = Move.Plant;
-		_moveEnds = habits.Plant * Game.Random.Float( 0.6f, 1.25f );
+		_moveEnds = hold;
 	}
+
+	/// <summary> Since it last got up from a crouch, and how long it waits after that before crouching again. </summary>
+	private TimeSince _timeSinceStood = 999f;
+	private float _crouchRest;
+	private bool _wasCrouching;
 
 	/// <summary> Walk in on them at an angle, firing, stopping well short of them. </summary>
 	private void Push( Vector3 away, float distance, float wanted )

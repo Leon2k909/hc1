@@ -1,0 +1,70 @@
+{
+  "revision": "town-gate-v2",
+  "accepted_utc": "2026-10-19T19:04:06.579207+00:00",
+  "request": "The arched gate looks fake/plain/flat.",
+  "project_root": "C:\\sbox-projects\\hc1\\forked-shooter-main",
+  "generator": "Tools/belltower_gate.py",
+  "sources_sha256": {
+    "Tools/belltower_gate.py": "496bd783b40a76d54335835ab4cf672c85ec987df099143a94a7f7435b55bce4",
+    "Tools/belltower_stage_gate.py": "0ac3437532070894f22ab5780cba0a8e75203c7fd1577854e0cce1e5dbb11e25",
+    "Tools/map_kit.py": "cc60204c747d064cb1fecdb666b24c847ae89dc863c2533d3811a0445f22020d",
+    "Tools/belltower_detail.py": "fa4f756709e670c3053fb9d0be3c48f01cffec87eaa39c35f01497b9bf4f50bf",
+    "Tools/belltower_furniture.py": "36c83d4883b3084b90b3ff46d9ef56e5aef7cd916f9e4c399058884105974a24",
+    "Tools/belltower_map.py": "574fb4256ac85de9a0f119705173134b13bf1f50bda0f0df437fcc4e592d5a08",
+    "Tools/belltower_check_gate.py": "83ea07a621f26f359680d0d2a7725ec58bce0331c79c3e393bbb1f6b5228cfd2",
+    "Sources/Belltower/editor/import-gate-v2.cs.txt": "3a6abb4b652ba591d6e8e030943be094a2f26e53518c7b95189faa6251b4b991",
+    "Sources/Belltower/editor/capture-preview-consistent.cs.txt": "8d2c601cfb1c36fbc9596e3fda305f95bf9227dd3893902c46805da027a37bc2"
+  },
+  "assets": {
+    "Assets/materials/belltower/gate/forged_iron.vmat": "34e36ece1e58c52bf3464312826e6743904b003dbef1fb467853d2e3f53199ad",
+    "Assets/models/maps/belltower/belltower_east.mtl": "d0f46c99dcf1d8ab6efa55169c0608d00add335a5189a8f6f8a2dde7ea0e0c2d",
+    "Assets/models/maps/belltower/belltower_east.obj": "4cbdf3b06d7e5830ed810ad00c4a8635d06c02f403f0588ba1ff5a434eca3d70",
+    "Assets/models/maps/belltower/belltower_east.vmdl": "bed50aab611f4993e5ce8481f9ac52b7357277d3a7a48a17568e493b79f0edaf",
+    "Assets/models/maps/belltower/belltower_west.mtl": "0478ed15430cf66ceb1c6f30893dd66b5a8f4421114cf58f504eae59b6025c43",
+    "Assets/models/maps/belltower/belltower_west.obj": "0c9ea1af2eb1a536bb99aeb0bfdb91be574f4cb904a4be802829632f2d02ff46",
+    "Assets/models/maps/belltower/belltower_west.vmdl": "25a3d4d7b76b596ef01481fe8d1a1a05ef6270c42977db15df7e07a336b1fd52"
+  },
+  "verification": "output/belltower/gate-v2/verification.json",
+  "native_import": "output/belltower/gate-v2/stage/native-import.json",
+  "native_asset_info": "output/belltower/gate-v2/native-asset-info/call_tools.json",
+  "native_iron_compile": "output/belltower/gate-v1/native-iron-compile/asset_compile.json",
+  "native_final_state": "output/belltower/gate-v2/final-state/call_tools.json",
+  "views": {
+    "front": {
+      "path": "output/belltower/quality/gate-v2-after/front.png",
+      "sha256": "37275c5f0006b26ebf9e5c2f930391f6c9b27c5b032009992cb1bc452d92f7b1"
+    },
+    "angle": {
+      "path": "output/belltower/quality/gate-v2-after/angle.png",
+      "sha256": "9c7848f06e3476aa52006e63497801a2d72b88008b839714c609a85c72bb0c43"
+    },
+    "east-front": {
+      "path": "output/belltower/quality/gate-v2-after/east-front.png",
+      "sha256": "3af28fc39ee4aa66669a2dd206a2d5dec308579e035182f3c0244112333f82a6"
+    }
+  },
+  "review": [
+    "West front: separate leaves, individual boards and hardware replace the continuous plank sheet and bars.",
+    "West oblique: recessed timber lining, bevelled joinery, strap thickness, barrels and ring pulls remain attached with no visible centre daylight leak.",
+    "East front: sunlit materials and projecting hardware shadows checked; mirrored geometry is intact."
+  ],
+  "native_visual_review_verified": true,
+  "physics_byte_identical": true,
+  "saved_scene_sha256": "5ea26d816c6b752225a5bd4ea2d761ba2791543c1ab7c89682f98d54219b373d",
+  "non_gate_mesh_lines_preserved": true,
+  "new_game_objects": 0,
+  "new_colliders": 0,
+  "new_materials": 1,
+  "triangles_removed_per_gate": 48,
+  "triangles_added_per_gate": 13088,
+  "native_play_test_performed": false,
+  "runtime_performance_verified": false,
+  "texture_sources": "Existing CC0 brown_planks_03 scan, existing stone scans and iron textures; no new raster editing.",
+  "generator_persistence": "belltower_map.town_walls keeps the original wood collision box and calls belltower_gate.build for visible construction.",
+  "staging_revisions": [
+    "output/belltower/gate-v1/stage/manifest.json",
+    "output/belltower/gate-v2/stage/manifest.json"
+  ],
+  "overall_map_quality_goal_complete": false,
+  "generator_integration_check": "output/belltower/gate-v2/generator-integration-check.json"
+}

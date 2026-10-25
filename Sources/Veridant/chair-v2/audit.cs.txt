@@ -1,0 +1,10 @@
+var model = Model.Load("models/maps/veridant/veridant_dress.vmdl");
+var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public;
+var methods = typeof(Model).GetMethods(flags).Where(m=>m.Name.Contains("DrawCall")).Select(m=>new {
+    m.Name, Params=m.GetParameters().Select(p=>new {p.Name,Type=p.ParameterType.ToString()}).ToArray()
+}).ToArray();
+var material = Material.Load("materials/veridant/vr_wicker.vmat");
+var texture = material.GetTexture("g_tColor");
+return new { Methods=methods, WickerTexture=texture?.ResourcePath,texture?.Width,
+    MaterialError=material.IsError,ModelError=model.IsError,DrawCalls=typeof(Model).GetMethod("GetLodDrawCallCount",flags).Invoke(model,new object[]{0}),
+    Indices=model.GetIndexCountForLod(0) };

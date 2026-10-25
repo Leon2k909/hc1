@@ -1,0 +1,3 @@
+// Read engine shader definitions; no resource or scene edits.
+var paths=new[]{"shaders/common/vertexinput.hlsl","shaders/common/pixelinput.hlsl"};
+return paths.Select(path=>new{Path=path,Source=Sandbox.FileSystem.Mounted.ReadAllText(path)}).ToArray();

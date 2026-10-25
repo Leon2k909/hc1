@@ -1,0 +1,63 @@
+// Import the guarded long-bed mesh changes through the running native editor.
+var root=Sandbox.Project.Current.GetRootPath();
+var directory=System.IO.Path.Combine(root,"output/belltower/long-bed");
+var stage=System.IO.Path.Combine(directory,"stage");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(stage,"manifest.json")));
+var session=Editor.SceneEditorSession.Active;
+if (Game.IsPlaying || session is null || session.HasUnsavedChanges ||
+    !session.Scene.Source.ResourcePath.Equals("scenes/maps/belltower/belltower.scene",StringComparison.OrdinalIgnoreCase))
+    throw new InvalidOperationException("Requires the active, stopped, saved Belltower document.");
+string Hash(string path)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+var scenePath=System.IO.Path.Combine(root,"Assets/scenes/maps/Belltower/belltower.scene");
+var sceneHash=Hash(scenePath);
+if (sceneHash!=manifest["scene_sha256"].GetValue<string>()) throw new InvalidOperationException("Saved shared scene changed since staging.");
+foreach (var group in new[]{"source_sha256","vmdl_guards"})
+    foreach (var pair in manifest[group].AsObject())
+        if (Hash(System.IO.Path.Combine(root,pair.Key))!=pair.Value.GetValue<string>())
+            throw new InvalidOperationException("Input changed: "+pair.Key);
+var plan=new System.Collections.Generic.List<(string Source,string Target,string Backup,string Before,string After)>();
+foreach (var pair in manifest["files"].AsObject())
+{
+    var relative=pair.Key;
+    bool allowed=relative=="Assets/models/maps/belltower/belltower_west.obj" || relative=="Assets/models/maps/belltower/belltower_east.obj" ||
+        (relative.StartsWith("Assets/models/maps/belltower/compiler-safe/",StringComparison.Ordinal) && relative.EndsWith(".obj",StringComparison.Ordinal));
+    if (!allowed || relative.Contains("..")) throw new InvalidOperationException("Unexpected target.");
+    var source=System.IO.Path.Combine(root,pair.Value["source"].GetValue<string>());
+    var target=System.IO.Path.Combine(root,relative);
+    var backup=System.IO.Path.Combine(root,pair.Value["backup"].GetValue<string>());
+    var before=pair.Value["before"].GetValue<string>();var after=pair.Value["after"].GetValue<string>();
+    if (Hash(source)!=after || Hash(backup)!=before) throw new InvalidOperationException("Stage or backup changed: "+relative);
+    var current=Hash(target);
+    if (current==after) continue;
+    if (current!=before) throw new InvalidOperationException("Shared asset changed: "+relative);
+    plan.Add((source,target,backup,before,after));
+}
+if (manifest["files"].AsObject().Count!=10) throw new InvalidOperationException("Expected two canonical sources and eight bounded imports.");
+var changed=new System.Collections.Generic.List<(string Target,string Backup)>();
+try
+{
+    foreach (var item in plan)
+    {
+        var incoming=item.Target+".long-bed-incoming";
+        try
+        {
+            System.IO.File.Copy(item.Source,incoming,true);
+            if (Hash(incoming)!=item.After) throw new InvalidOperationException("Incoming checksum failed.");
+            changed.Add((item.Target,item.Backup));
+            System.IO.File.Move(incoming,item.Target,true);
+        }
+        finally {if (System.IO.File.Exists(incoming)) System.IO.File.Delete(incoming);}
+    }
+}
+catch
+{
+    foreach (var item in changed.AsEnumerable().Reverse()) System.IO.File.Copy(item.Backup,item.Target,true);
+    throw;
+}
+foreach (var item in plan) Editor.AssetSystem.RegisterFile(item.Target);
+if (Hash(scenePath)!=sceneHash || session.HasUnsavedChanges || Game.IsPlaying || !ReferenceEquals(session,Editor.SceneEditorSession.Active))
+    throw new InvalidOperationException("Editor state changed during import; inspect before further edits.");
+var result=new {Imported=plan.Count,SceneUnchanged=true,OriginalCollisionPreserved=true,
+    BoundedImportsPreserved=true,NewSceneObjects=0,ForcedFullCompile=false};
+System.IO.File.WriteAllText(System.IO.Path.Combine(directory,"native-import.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

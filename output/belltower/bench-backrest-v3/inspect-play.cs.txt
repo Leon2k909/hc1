@@ -1,0 +1,17 @@
+var flags = System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance;
+object Read(object target,string name) => target?.GetType().GetProperty(name,flags)?.GetValue(target);
+var session = Editor.SceneEditorSession.All.Single(s=>!s.Scene.IsEditor);
+var scene = session.Scene;
+var components = scene.GetAllObjects(true).SelectMany(o=>o.Components.GetAll<Component>()).Distinct().ToArray();
+return new { Playing=Game.IsPlaying, Scene=scene.Source?.ResourcePath,
+    Pawns=components.Where(c=>c.GetType().Name=="PlayerPawn" && (bool?)Read(c,"IsViewer")==true).Select(c=>new {
+        c.GameObject.Name,Position=c.WorldPosition.ToString(),Eyes=Read(c,"EyeAngles")?.ToString(),
+        State=Read(Read(c,"HealthComponent"),"State")?.ToString(),Noclip=Read(c,"IsNoclipping"),
+        LocallyControlled=Read(c,"IsLocallyControlled"),Frozen=Read(c,"IsFrozen"),
+        CameraMode=Read(Read(c,"CameraController"),"Mode")?.ToString(),
+        CameraPosition=((CameraComponent)Read(Read(c,"CameraController"),"Camera"))?.WorldPosition.ToString(),
+        CameraAngles=((CameraComponent)Read(Read(c,"CameraController"),"Camera"))?.WorldRotation.Angles().ToString(),
+        Controllers=c.Components.GetAll<Component>().Select(x=>new {Type=x.GetType().FullName,x.Enabled}).ToArray()
+    }).ToArray(),
+    Cameras=scene.GetAllComponents<CameraComponent>().Select(c=>new {c.GameObject.Name,c.Enabled,c.IsMainCamera,Position=c.WorldPosition.ToString(),c.FieldOfView}).ToArray()
+};

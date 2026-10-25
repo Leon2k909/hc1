@@ -659,10 +659,27 @@ public sealed partial class MatchRecorder : Component, Component.ISceneStage
 		{
 			At = at,
 			Weapon = weapon,
-			// A player's gun here wears this machine's saved build, whoever holds it (Equipment.CreateWorldModel), so the
-			// replay's does too. A bot's gun has none.
-			Build = equipment.IsValid() && equipment.ApplySavedAttachments && resource.IsValid() ? BuildIndex( resource ) : -1
+			// The build the gun is drawn with here (Equipment.FitHolderBuild): this machine's saved one on its own player's
+			// gun, the holder's shared one on anyone else's. A bot's gun has none.
+			Build = !equipment.IsValid() || !equipment.ApplySavedAttachments || !resource.IsValid() ? -1
+				: equipment.IsOwnBuild ? BuildIndex( resource ) : CodeIndex( equipment.HolderBuild )
 		} );
+	}
+
+	/// <summary> A build code's place in the replay's list of builds, adding it the first time. -1 for none. </summary>
+	int CodeIndex( string code )
+	{
+		if ( string.IsNullOrEmpty( code ) )
+			return -1;
+
+		if ( !_builds.TryGetValue( code, out var index ) )
+		{
+			index = _actions.Builds.Count;
+			_actions.Builds.Add( code );
+			_builds[code] = index;
+		}
+
+		return index;
 	}
 
 	int BuildIndex( EquipmentResource resource )
@@ -670,16 +687,7 @@ public sealed partial class MatchRecorder : Component, Component.ISceneStage
 		if ( _buildsThisCapture.TryGetValue( resource, out var index ) )
 			return index;
 
-		var code = Facepunch.Gunsmith.GunsmithLoadoutManager.ExportWeaponBuildCode( resource );
-		if ( string.IsNullOrEmpty( code ) )
-			index = -1;
-		else if ( !_builds.TryGetValue( code, out index ) )
-		{
-			index = _actions.Builds.Count;
-			_actions.Builds.Add( code );
-			_builds[code] = index;
-		}
-
+		index = CodeIndex( Facepunch.Gunsmith.GunsmithLoadoutManager.ExportWeaponBuildCode( resource ) );
 		_buildsThisCapture[resource] = index;
 		return index;
 	}

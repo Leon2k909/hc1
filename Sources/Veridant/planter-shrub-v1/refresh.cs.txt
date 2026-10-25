@@ -1,0 +1,16 @@
+// Refresh the two render instances after adding a material slot. No saved edits.
+var session=Editor.SceneEditorSession.Active;
+if(Game.IsPlaying||session.HasUnsavedChanges)throw new InvalidOperationException("Inspect the changed editor state before refreshing.");
+var paths=new[]{"models/maps/veridant/veridant_foliage.vmdl"};
+var records=new System.Collections.Generic.List<object>();
+foreach(var path in paths)
+{
+    var renderer=session.Scene.GetAllComponents<ModelRenderer>().Single(r=>r.Model?.ResourcePath==path);
+    var model=renderer.Model;var before=renderer.Serialize().ToJsonString();
+    try{renderer.Model=null;renderer.Model=model;}
+    finally{if(renderer.Model!=model)renderer.Model=model;}
+    var same=renderer.Serialize().ToJsonString()==before;
+    records.Add(new{Path=path,SerializedStatePreserved=same});
+    if(!same)throw new InvalidOperationException("Render instance restoration differs.");
+}
+return new{Renderers=records,session.HasUnsavedChanges,Game.IsPlaying};

@@ -1,0 +1,20 @@
+// Inspect runtime ownership and non-cached hierarchy only.
+var rows=new System.Collections.Generic.List<object>();
+foreach(var scene in Scene.All.ToArray())
+{
+    var components=scene.GetAllObjects(true).SelectMany(o=>o.Components.GetAll<Component>()).Distinct().ToArray();
+    foreach(var c in components.Where(c=>c.GetType().Name=="ViewModelClothing"||c.GetType().Name=="ViewModel"))
+    {
+        var type=c.GetType();
+        var fields=new System.Collections.Generic.List<object>();
+        foreach(var field in type.GetFields(System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic))
+        {
+            if(field.Name!="_root"&&!field.Name.Contains("Arms")&&!field.Name.Contains("Body")&&field.Name!="_layers")continue;
+            var value=field.GetValue(c);
+            if(value is GameObject go)fields.Add(new{Field=field.Name,Value=go.Name,Valid=go.IsValid(),Children=go.GetComponentsInChildren<SkinnedModelRenderer>(true).Select(r=>new{Object=r.GameObject.Name,Model=r.Model?.ResourcePath,Material=r.Materials.GetOverride(0)?.ResourcePath}).ToArray()});
+            else fields.Add(new{Field=field.Name,Value=value?.ToString()});
+        }
+        rows.Add(new{Scene=scene.Name,Object=c.GameObject.Name,c.Enabled,c.Active,Type=type.FullName,Assembly=type.Assembly.FullName,Fields=fields});
+    }
+}
+return new{Playing=Game.IsPlaying,Components=rows};

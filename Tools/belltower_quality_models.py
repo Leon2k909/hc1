@@ -54,6 +54,7 @@ def main():
     centre = B.build_centre([])
     west = B.build_west([], np.random.default_rng(2024))
     east = west.mirrored(B.EAST_PAINTS)
+    B.CafeSpacing.apply_east(east, B.EAST_PAINTS)
     models = [("centre",centre),("west",west),("east",east)]
     for name,model in models:
         B.Detail.configure(model)

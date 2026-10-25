@@ -13,6 +13,18 @@
 						_class = "DefaultMaterialGroup"
 						remaps =
 						[
+{ from = "open_window_glass_0.vmat" to = "materials/belltower/church-windows-v1/church_window_glass_0.vmat" },
+{ from = "open_window_glass_1.vmat" to = "materials/belltower/church-windows-v1/church_window_glass_1.vmat" },
+{ from = "open_window_glass_2.vmat" to = "materials/belltower/church-windows-v1/church_window_glass_2.vmat" },
+{ from = "open_window_trim_white.vmat" to = "materials/buildings/trim_white.vmat" },
+{ from = "church_window_stone.vmat" to = "materials/belltower/well-v1/well_cut_stone.vmat" },
+{ from = "church_window_reveal.vmat" to = "materials/belltower/well-v1/well_damp_stone.vmat" },
+{ from = "church_window_frame.vmat" to = "materials/belltower/wood_planks_dark.vmat" },
+{ from = "church_window_lead.vmat" to = "materials/buildings/iron_black.vmat" },
+{ from = "church_window_glass_0.vmat" to = "materials/belltower/church-windows-v1/church_window_glass_0.vmat" },
+{ from = "church_window_glass_1.vmat" to = "materials/belltower/church-windows-v1/church_window_glass_1.vmat" },
+{ from = "church_window_glass_2.vmat" to = "materials/belltower/church-windows-v1/church_window_glass_2.vmat" },
+
 							{ from = "ashlar.vmat" to = "materials/belltower/ashlar.vmat" },
 							{ from = "ashlar_grey.vmat" to = "materials/belltower/ashlar_grey.vmat" },
 							{ from = "canvas_plain.vmat" to = "materials/buildings/canvas_plain.vmat" },
@@ -20,6 +32,8 @@
 							{ from = "copper.vmat" to = "materials/buildings/copper.vmat" },
 							{ from = "door_brass.vmat" to = "materials/belltower/fountain_bronze.vmat" },
 							{ from = "flagstones.vmat" to = "materials/belltower/flagstones.vmat" },
+							{ from = "bell_bronze_v2.vmat" to = "materials/belltower/bell-v2/bell_bronze_v2.vmat" },
+							{ from = "bell_inner_v2.vmat" to = "materials/belltower/bell-v2/bell_inner_v2.vmat" },
 							{ from = "fountain_bronze.vmat" to = "materials/belltower/fountain_bronze.vmat" },
 							{ from = "fountain_jet.vmat" to = "materials/belltower/fountain_jet.vmat" },
 							{ from = "fountain_limestone.vmat" to = "materials/belltower/fountain_limestone.vmat" },
@@ -43,6 +57,11 @@
 							{ from = "slate.vmat" to = "materials/buildings/slate.vmat" },
 							{ from = "trim_brown.vmat" to = "materials/buildings/trim_brown.vmat" },
 							{ from = "trim_white.vmat" to = "materials/buildings/trim_white.vmat" },
+							{ from = "well_cut_stone.vmat" to = "materials/belltower/well-v1/well_cut_stone.vmat" },
+							{ from = "well_damp_stone.vmat" to = "materials/belltower/well-v1/well_damp_stone.vmat" },
+							{ from = "well_depth.vmat" to = "materials/belltower/well-v1/well_depth.vmat" },
+							{ from = "well_mortar.vmat" to = "materials/belltower/well-v1/well_mortar.vmat" },
+							{ from = "well_water.vmat" to = "materials/belltower/well-v1/well_water.vmat" },
 							{ from = "water.vmat" to = "materials/buildings/water.vmat" },
 							{ from = "whitewash.vmat" to = "materials/belltower/plaster_interior.vmat" }
 						]
@@ -55,10 +74,24 @@
 				_class = "RenderMeshList"
 				children =
 				[
-					{
+{
+    _class = "RenderMeshFile"
+    name = "open_casements_centre"
+    filename = "models/maps/belltower/open-windows-v1/centre/windows.obj"
+    import_translation = [ 0.0, 0.0, 0.0 ]
+    import_rotation = [ 0.0, 0.0, 0.0 ]
+    import_scale = 1.0
+    align_origin_x_type = "None"
+    align_origin_y_type = "None"
+    align_origin_z_type = "None"
+    parent_bone = ""
+    import_filter = { exclude_by_default = false exception_list = [ ] }
+},
+
+{
 						_class = "RenderMeshFile"
-						name = "belltower_centre"
-						filename = "models/maps/belltower/belltower_centre.obj"
+						name = "centre_000_ashlar"
+						filename = "models/maps/belltower/fountain-ornaments-v2/centre/centre_000_ashlar.obj"
 						import_translation = [ 0.0, 0.0, 0.0 ]
 						import_rotation = [ 0.0, 0.0, 0.0 ]
 						import_scale = 1.0
@@ -68,7 +101,566 @@
 						parent_bone = ""
 						import_filter = { exclude_by_default = false exception_list = [ ] }
 					},
-				]
+{
+						_class = "RenderMeshFile"
+						name = "centre_001_ashlar_grey"
+						filename = "models/maps/belltower/church-windows-v1/centre_001_ashlar_grey.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "centre_002_canvas_plain"
+						filename = "models/maps/belltower/fountain-ornaments-v2/centre/centre_002_canvas_plain.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "centre_003_copper"
+						filename = "models/maps/belltower/fountain-ornaments-v2/centre/centre_003_copper.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "centre_004_door_brass"
+						filename = "models/maps/belltower/fountain-ornaments-v2/centre/centre_004_door_brass.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "centre_005_flagstones"
+						filename = "models/maps/belltower/fountain-ornaments-v2/centre/centre_005_flagstones.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "centre_006_fountain_limestone"
+						filename = "models/maps/belltower/fountain-ornaments-v2/centre/centre_006_fountain_limestone.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "centre_007_furniture_wood"
+						filename = "models/maps/belltower/fountain-ornaments-v2/centre/centre_007_furniture_wood.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "centre_008_furniture_wood"
+						filename = "models/maps/belltower/fountain-ornaments-v2/centre/centre_008_furniture_wood.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "centre_009_furniture_wood_dark"
+						filename = "models/maps/belltower/fountain-ornaments-v2/centre/centre_009_furniture_wood_dark.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "centre_010_glass"
+						filename = "models/maps/belltower/church-windows-v1/centre_010_glass.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "centre_011_iron_black"
+						filename = "models/maps/belltower/church-windows-v1/centre_011_iron_black.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "centre_012_ivy_climb"
+						filename = "models/maps/belltower/fountain-ornaments-v2/centre/centre_012_ivy_climb.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "centre_013_planks"
+						filename = "models/maps/belltower/fountain-ornaments-v2/centre/centre_013_planks.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "centre_014_planks_dark"
+						filename = "models/maps/belltower/fountain-ornaments-v2/centre/centre_014_planks_dark.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "centre_015_quarry_tiles"
+						filename = "models/maps/belltower/fountain-ornaments-v2/centre/centre_015_quarry_tiles.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "centre_016_render_cream"
+						filename = "models/maps/belltower/fountain-ornaments-v2/centre/centre_016_render_cream.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "centre_017_roof_clay_0"
+						filename = "models/maps/belltower/fountain-ornaments-v2/centre/centre_017_roof_clay_0.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "centre_018_roof_clay_1"
+						filename = "models/maps/belltower/fountain-ornaments-v2/centre/centre_018_roof_clay_1.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "centre_019_roof_clay_2"
+						filename = "models/maps/belltower/fountain-ornaments-v2/centre/centre_019_roof_clay_2.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "centre_020_roof_tiles"
+						filename = "models/maps/belltower/fountain-ornaments-v2/centre/centre_020_roof_tiles.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "centre_021_roof_tiles"
+						filename = "models/maps/belltower/fountain-ornaments-v2/centre/centre_021_roof_tiles.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "centre_022_setts"
+						filename = "models/maps/belltower/fountain-ornaments-v2/centre/centre_022_setts.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "centre_023_slate"
+						filename = "models/maps/belltower/fountain-ornaments-v2/centre/centre_023_slate.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "centre_024_trim_brown"
+						filename = "models/maps/belltower/fountain-ornaments-v2/centre/centre_024_trim_brown.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "centre_025_trim_white"
+						filename = "models/maps/belltower/fountain-ornaments-v2/centre/centre_025_trim_white.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "centre_026_whitewash"
+						filename = "models/maps/belltower/fountain-ornaments-v2/centre/centre_026_whitewash.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "centre_027_clock"
+						filename = "models/maps/belltower/fountain-ornaments-v2/centre/centre_027_clock.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "centre_028_door_brass"
+						filename = "models/maps/belltower/fountain-ornaments-v2/centre/centre_028_door_brass.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "centre_029_well_cut_stone"
+						filename = "models/maps/belltower/fountain-ornaments-v2/centre/centre_029_well_cut_stone.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "centre_030_well_damp_stone"
+						filename = "models/maps/belltower/fountain-ornaments-v2/centre/centre_030_well_damp_stone.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "centre_031_well_depth"
+						filename = "models/maps/belltower/fountain-ornaments-v2/centre/centre_031_well_depth.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "centre_032_well_mortar"
+						filename = "models/maps/belltower/fountain-ornaments-v2/centre/centre_032_well_mortar.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "centre_033_well_water"
+						filename = "models/maps/belltower/fountain-ornaments-v2/centre/centre_033_well_water.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "centre_034_fountain_jet"
+						filename = "models/maps/belltower/fountain-ornaments-v2/centre/centre_034_fountain_jet.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "centre_035_fountain_water"
+						filename = "models/maps/belltower/fountain-ornaments-v2/centre/centre_035_fountain_water.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "centre_036_bell_bronze_v2"
+						filename = "models/maps/belltower/fountain-ornaments-v2/centre/centre_036_bell_bronze_v2.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "centre_037_bell_inner_v2"
+						filename = "models/maps/belltower/fountain-ornaments-v2/centre/centre_037_bell_inner_v2.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "centre_038_iron_black"
+						filename = "models/maps/belltower/fountain-ornaments-v2/centre/centre_038_iron_black.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "centre_039_fountain_bronze"
+						filename = "models/maps/belltower/fountain-ornaments-v2/centre/centre_039_fountain_bronze.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "centre_040_fountain_limestone"
+						filename = "models/maps/belltower/fountain-ornaments-v2/centre/centre_040_fountain_limestone.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "centre_041_fountain_limestone"
+						filename = "models/maps/belltower/fountain-ornaments-v2/centre/centre_041_fountain_limestone.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "church_front_windows_v1"
+						filename = "models/maps/belltower/church-windows-v1/windows.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+    _class = "RenderMeshFile"
+    name = "stone_wear_centre"
+    filename = "models/maps/belltower/edge-realism-v1/centre.obj"
+    import_translation = [ 0.0, 0.0, 0.0 ]
+    import_rotation = [ 0.0, 0.0, 0.0 ]
+    import_scale = 1.0
+    align_origin_x_type = "None"
+    align_origin_y_type = "None"
+    align_origin_z_type = "None"
+    parent_bone = ""
+    import_filter = { exclude_by_default = false exception_list = [ ] }
+}
+]
 			},
 			{
 				_class = "PhysicsShapeList"

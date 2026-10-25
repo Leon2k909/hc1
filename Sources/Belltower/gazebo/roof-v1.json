@@ -1,0 +1,60 @@
+{
+  "state": "Applied to current town models through the native editor; native compilation and live material loading passed; visual review in progress",
+  "kind": "copper gazebo roof, not a fabric parasol",
+  "generator": "Tools/belltower_gazebo.py",
+  "stager": "Tools/belltower_stage_gazebo.py",
+  "current_stage": "output/belltower/gazebo-v1/final-stage",
+  "current_stage_manifest_sha256": "02b076141ab40cdaab044be90fa91909248105e8df0a385a02e7f6e05e366207",
+  "roofs": 2,
+  "triangles_per_roof": 6052,
+  "removed_triangles_per_roof": 10,
+  "texture_pixels_unchanged": true,
+  "scene_changes_by_this_task": false,
+  "collision_unchanged": true,
+  "native_import_ran": true,
+  "native_visual_review_complete": false,
+  "first_import_connection_closed": true,
+  "rebased_input_changes": {
+    "Assets/models/maps/belltower/belltower_east.obj": {
+      "first_stage": "f7b0b95e8ecd5ff082ef78921013a319480588dcccb63d46cdce954f990113ea",
+      "new_before": "6af32cfc5e039398cf0c0e42e1f64cc34cf870de662b060bcde7b79b3bc6d617"
+    },
+    "Assets/models/maps/belltower/belltower_west.obj": {
+      "first_stage": "24f73f648e32ffdf758eafef90f6789bb60a646eedf97a5f757771abeabfcb5a",
+      "new_before": "c0a8e2387f629caf91f87d2dfe0e39b63140fa0e0ceadf9948c116a35ac66ba7"
+    }
+  },
+  "native_import_script": "Sources/Belltower/editor/import-gazebo-roof-v1.cs.txt",
+  "features": [
+    "curved standing-seam copper panels",
+    "muted patina scoped to the gazebo",
+    "rolled drip edge and fascia",
+    "fitted header ring and rafters",
+    "small spun cap and finial"
+  ],
+  "source_integration": "Tools/belltower_map.py imports belltower_gazebo and replaces only the old gazebo cone call; all other current source retained.",
+  "offline_geometry_check": "output/belltower/gazebo-v1/final-stage/geometry-check.json",
+  "offline_review": {
+    "kind": "actual Blender construction render; not an in-game capture",
+    "new": "output/belltower/quality/gazebo-v1-refined-studio/roof-angle.png",
+    "before": "output/belltower/quality/gazebo-v1-refined-studio/roof-before.png",
+    "same_lighting_and_camera": true,
+    "final_adjustments": "Less flared curved profile; darker green patina and darker aged copper seams.",
+    "native_material_compile_pending": true
+  },
+  "validation": [
+    "Python syntax passed",
+    "Non-roof OBJ bytes exactly preserved",
+    "VMDL collision bytes exactly preserved",
+    "All 8 staged hashes passed",
+    "Original texture hashes passed",
+    "Installed before hashes passed"
+  ],
+  "editor_coordination": "User reports another chat is fixing editor crashes. This side conversation must leave editor recovery to that chat.",
+  "native_town_compiled": true,
+  "live_publication_stage": "output/belltower/roof-lock-apply/stage-v2",
+  "live_publication_record": "output/belltower/roof-lock-apply/stage-v2/native-import.json",
+  "live_compilation_record": "output/belltower/roof-lock-apply/native-compile/call_tools.json",
+  "live_loaded_models": "output/belltower/roof-lock-apply/native-loaded-models.json",
+  "updated_utc": "2026-10-20T12:56:34.745979+00:00"
+}

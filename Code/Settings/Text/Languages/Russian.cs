@@ -1301,6 +1301,9 @@ public static partial class GameText
 		["Affected"] = "Зависимое",
 		["Independent"] = "Независимое",
 		["Third Person Field Of View"] = "Поле зрения от третьего лица",
+		["Weapon Distance"] = "Расстояние до оружия",
+		["Weapon Horizontal Position"] = "Положение оружия по горизонтали",
+		["Weapon Vertical Position"] = "Положение оружия по вертикали",
 		["Picture-In-Picture Scopes"] = "Прицелы «картинка в картинке»",
 		["s&box Settings"] = "Настройки s&box",
 		["Resolution, window mode and graphics quality are set in s&box itself and apply to every game."] =

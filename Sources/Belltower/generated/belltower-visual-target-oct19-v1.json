@@ -1,0 +1,25 @@
+{
+  "revision": "belltower-visual-target-oct19-v1",
+  "kind": "ImageGen visual development concept",
+  "tool": "built-in image_gen",
+  "prompt": "Use case: style-transfer.\nAsset type: visual target concept for an existing multiplayer game map, NOT a finished engine screenshot.\nInput image 1 is the edit target: a current native Belltower game screenshot. Repaint its visual quality while preserving its exact street layout, camera angle, field of view, building masses, gate, ruins on the hill, paths, doorways, windows, awnings, existing props and open combat sightlines.\nPrimary request: show this same Mediterranean hill-town street with convincing high-end contemporary real-time game environment art.\nMaterials: believable warm limestone with restrained mortar depth and varied individual stones; plaster with subtle broad tonal variation and localized wear rather than large repeated peeling patches; convincing painted wood, small metal edge wear, glass reflections with dark interior depth, naturally worn paving with gentle contact dirt. Keep each material physically distinct. Existing flower boxes and trees have layered, natural foliage.\nWoodland: replace the uniform round tree-card pattern with a continuous, layered oak/holm woodland canopy, varied crown shapes and heights, dark coherent understory and restrained atmospheric depth. Retain the existing hill shape and ruin silhouette. No pale punched-out gaps, tiled green marbles or conspicuous tree rows.\nLighting: natural clear daylight, warm sun and cool soft sky fill, grounded contact shadows, balanced highlights, readable shaded doorways. Keep the street readable for a multiplayer shooter.\nComposition: same wide 16:9 framing, sharp at player-view distances, plausible in-engine rendering. Keep existing signage in its original positions; no new labels or captions.\nAvoid: cinematic depth of field, heavy bloom, lens flares, dramatic sunset, thick fog, wet reflective paving, added characters, added clutter blocking routes, changed architecture, UI overlays, painterly illustration.",
+  "original_output": "C:/Users/leon2/.codex/generated_images/01a137a3-a1f4-7cf1-a3b1-54c0f0bbf6db/exec-be57fca0-f6f1-483a-8dfa-6b13e124ce5e.png",
+  "workspace_output": "Sources/Belltower/generated/belltower-visual-target-oct19-v1.png",
+  "native_reference": "output/belltower/quality/forest-distribution-v1-native-baseline/west-ridge.png",
+  "use": "Art direction reference only; generated image is not native engine verification.",
+  "implementation_priorities": [
+    "Varied crown shapes and heights with a continuous dark woodland understory.",
+    "Warm limestone and distinct stone faces, restrained mortar depth and localized plaster wear.",
+    "Balanced sunlight and sky fill with readable shade, believable glass and contact dirt."
+  ],
+  "layout_constraints": "Preserve existing gameplay layout, route widths, doors, windows, gate and combat sightlines.",
+  "native_blocker": "No s&box instances were listed on 2026-10-19; editor validation was unavailable at creation.",
+  "native_visual_goal_verified": false,
+  "accepted_scene_changed": false,
+  "sha256": "ee1ac999fbc94eba13afbc07efd213f615a1cf4d4db9f1add1dc1dca8fd73661",
+  "dimensions": [
+    1672,
+    941
+  ],
+  "native_reference_sha256": "6eafd9ff34f6ed4d1ed98439d0f485dade0bff00235c4164efc96da9377c4248"
+}

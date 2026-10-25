@@ -1,0 +1,22 @@
+var model = Model.Load("models/maps/veridant/veridant_dress.vmdl");
+var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public;
+var read = typeof(Model).GetMethod("TryReadDrawCall", flags);
+var streamsType = read.GetParameters()[4].ParameterType.GetElementType();
+var rows = new System.Collections.Generic.List<object>();
+for (var mesh=0; mesh<4; mesh++)
+for (var draw=0; draw<40; draw++)
+{
+    var arguments = new object[] { mesh, draw, null, null, Activator.CreateInstance(streamsType) };
+    if (!(bool)read.Invoke(model,arguments)) break;
+    var vertices = (Vertex[])arguments[2];
+    var indices = (uint[])arguments[3];
+    rows.Add(new {Mesh=mesh,Draw=draw,Vertices=vertices.Length,Indices=indices.Length,MaxIndex=indices.Max()});
+    if (mesh>=2 && draw==3)
+    {
+        var data = new {Positions=vertices.Select(v=>new[]{v.Position.x,v.Position.y,v.Position.z}).ToArray(),
+            Normals=vertices.Select(v=>new[]{v.Normal.x,v.Normal.y,v.Normal.z}).ToArray(),Indices=indices};
+        System.IO.File.WriteAllText(System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(),$"output/veridant/chair-v2/native-wicker-mesh-{mesh}.json"),
+            System.Text.Json.JsonSerializer.Serialize(data));
+    }
+}
+return new {Materials=model.Materials.Select(m=>m.Name).ToArray(),Draws=rows};

@@ -5,7 +5,7 @@
 // wherever it's clean. The pattern is laid out in the model's own space (inches, and the bind pose for a skinned mesh),
 // so it sticks to the gun and the gloves as they move. FirstPersonGrime sets each skin's amounts every frame through
 // its SceneObject's attributes:
-//   GrimeBlood     how much blood is on it, 0-1: drops of three sizes first, then smears where more has run together
+//   GrimeBlood     how much blood is on it, 0-1: irregular splashes and fine spray, then pooled stains
 //   GrimeBloodDry  how far it has dried, 0 wet (a deep glossy red) to 1 dry (a matte brown-black)
 //   GrimeDirt      how much dirt, 0-1: dust in patches, more on the undersides, then caked on
 //   GrimeDirtColor the dirt's colour, linear: the ground it came from (soil, sand, grass, concrete dust)
@@ -140,20 +140,42 @@ PS
 		return sum / 0.9375;
 	}
 
-	// Drops in a grid of cells `cell` inches wide: each cell has one, of its own size and place, with a chance of
-	// `share`. A drop is a ball cut by the surface, so it reads as a round spot whichever way the surface faces. It stays
-	// inside its cell, so only that cell need be looked at.
-	float Drops( float3 p, float cell, float share, float minRadius, float maxRadius )
+	// Each cell holds a randomly oriented, lobed splash with a narrow tail and satellite droplets. Noise breaks up
+	// its outline and thickness; it is not an opaque sphere intersecting the surface. The whole stamp fits inside
+	// its cell, so no neighbour search is needed. All coordinates remain in bind-pose model space.
+	float Splashes( float3 p, float cell, float share, float minRadius, float maxRadius )
 	{
 		float3 q = p / cell;
 		float3 id = floor( q );
 		float3 h = Hash33( id );
 		float radius = lerp( minRadius, maxRadius, h.x * h.x );
-		float3 centre = radius + ( 1.0 - 2.0 * radius ) * Hash33( id + 5.31 );
-		float distance = length( frac( q ) - centre );
-		float edge = max( fwidth( distance ), 0.002 );
-		float there = step( Hash13( id * 1.71 + 2.9 ), share );
-		return there * ( 1.0 - smoothstep( radius - edge, radius + edge, distance ) );
+		float margin = min( radius * 2.5 + 0.015, 0.48 );
+		float3 centre = margin + ( 1.0 - 2.0 * margin ) * Hash33( id + 5.31 );
+		float3 axis = normalize( Hash33( id + 9.7 ) * 2.0 - 1.0 + 0.001 );
+		float3 across = normalize( cross( axis, abs( axis.z ) < 0.9 ? float3( 0, 0, 1 ) : float3( 0, 1, 0 ) ) );
+		float3 up = cross( axis, across );
+		float3 offset = ( frac( q ) - centre ) / radius;
+		float3 local = float3( dot( offset, axis ), dot( offset, across ), dot( offset, up ) );
+
+		float core = length( local / float3( 1.1, 0.6, 0.85 ) );
+		float tail = length( ( local - float3( 0.7, 0.24, 0.0 ) ) / float3( 1.15, 0.22, 0.4 ) );
+		float lobe = length( ( local - float3( -0.4, 0.65, 0.1 ) ) / float3( 0.48, 0.5, 0.52 ) );
+		float distance = min( core, min( tail, lobe ) );
+		float edgeNoise = ValueNoise( q * 19.0 + 2.7 );
+		float fineNoise = ValueNoise( q * 43.0 + 13.1 );
+		distance += ( edgeNoise - 0.5 ) * 0.9 + ( fineNoise - 0.5 ) * 0.32;
+
+		// Detached fine spray shares the same direction as the parent splash.
+		float satellite = length( ( local - float3( 1.8, -0.65, 0.15 ) ) / float3( 0.23, 0.16, 0.19 ) );
+		satellite = min( satellite, length( ( local - float3( -1.1, 1.4, -0.1 ) ) / float3( 0.13, 0.19, 0.14 ) ) );
+		distance = min( distance, satellite );
+		float edge = max( fwidth( distance ), 0.035 );
+		float mask = 1.0 - smoothstep( 1.0 - edge, 1.0 + edge, distance );
+		float thickness = ( 0.55 + 0.4 * h.z ) * lerp( 0.55, 1.0, saturate( ( 1.25 - distance ) * 1.5 ) );
+		thickness *= lerp( 0.75, 1.05, edgeNoise );
+		float cluster = lerp( 0.35, 1.2, ValueNoise( id * 0.31 + 4.8 ) );
+		float there = step( Hash13( id * 1.71 + 2.9 ), share * cluster );
+		return there * mask * thickness;
 	}
 
 	float4 MainPs( PixelInput i ) : SV_Target0
@@ -161,15 +183,20 @@ PS
 		float3 p = i.vPositionOs + g_flSeed * 17.0;
 		float3 n = normalize( i.vNormalOs );
 
-		// Blood: drops of three sizes, then smears where more has run together.
+		// Blood: clustered splashes and small spray, with thinner ragged stains as it accumulates.
 		float blood = saturate( g_flBlood );
 		float b = 0.0;
 		if ( blood > 0.001 )
 		{
-			float smear = smoothstep( 0.0, 0.08, Fbm( p * 0.45 ) - ( 0.86 - 0.42 * blood ) ) * ( 0.7 + 0.3 * ValueNoise( p * 3.0 ) );
-			float drops = Drops( p, 0.35, blood * 0.55, 0.08, 0.32 );
-			drops = max( drops, Drops( p + 3.1, 0.9, blood * 0.3, 0.06, 0.26 ) );
-			drops = max( drops, Drops( p + 7.7, 0.14, blood * 0.45, 0.12, 0.36 ) );
+			float pooling = Fbm( p * 0.85 ) + ( 0.5 - ValueNoise( p * 7.0 ) ) * 0.12;
+			float poolEdge = max( fwidth( pooling ), 0.006 );
+			float threshold = 0.83 - 0.23 * blood;
+			float smear = smoothstep( threshold - poolEdge, threshold + poolEdge, pooling );
+			smear *= smoothstep( 0.2, 0.65, ValueNoise( p * 19.0 ) ) * ( 0.2 + 0.5 * ValueNoise( p * 3.0 ) );
+			smear *= smoothstep( 0.35, 0.85, blood );
+			float drops = Splashes( p, 0.65, blood * 0.7, 0.1, 0.18 );
+			drops = max( drops, Splashes( p + 3.1, 0.26, blood * 0.85, 0.08, 0.18 ) );
+			drops = max( drops, Splashes( p + 7.7, 0.12, blood * 0.65, 0.08, 0.16 ) );
 			b = saturate( max( smear, drops ) );
 		}
 
@@ -189,8 +216,10 @@ PS
 		float bloodShare = saturate( b / max( alpha, 0.0001 ) );
 
 		float dry = saturate( g_flBloodDry );
-		float3 bloodColor = lerp( float3( 0.16, 0.004, 0.003 ), float3( 0.04, 0.012, 0.008 ), dry );
-		float bloodRoughness = lerp( 0.12, 0.65, dry );
+		float thickness = saturate( b * 0.9 + ValueNoise( p * 5.0 ) * 0.25 );
+		float3 wetBlood = lerp( float3( 0.12, 0.005, 0.003 ), float3( 0.045, 0.0016, 0.001 ), thickness );
+		float3 bloodColor = lerp( wetBlood, float3( 0.028, 0.009, 0.006 ), dry );
+		float bloodRoughness = lerp( 0.27 + 0.16 * ( 1.0 - b ), 0.78, dry );
 		float mud = saturate( g_flMud );
 		float3 dirtColor = g_vDirtColor * lerp( 0.75, 1.2, ValueNoise( p * 1.3 ) ) * lerp( 1.0, 0.6, mud );
 		float dirtRoughness = lerp( 0.92, 0.45, mud );
@@ -204,7 +233,7 @@ PS
 		m.Opacity = 1.0;
 		float3 colour = ShadingModelStandard::Shade( i, m ).rgb;
 
-		// Thin dust lets a little of the gun show through; blood and caked mud don't.
+		// The blood mask already includes its local thickness, so thinner spray reveals the underlying finish.
 		return float4( colour, alpha * lerp( lerp( 0.8, 1.0, dirt ), 1.0, bloodShare ) );
 	}
 }

@@ -1,0 +1,14 @@
+// Tools/belltower_bell.py: dedicated fountain bell only
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    g_flRoughnessScaleFactor "1"
+    g_flMetalness "1.0"
+    TextureColor "materials/belltower/bell-v2/bronze_color.png"
+    TextureNormal "materials/belltower/bell-v2/bronze_normal.png"
+    TextureRoughness "materials/belltower/bell-v2/bronze_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[1.0 1.0 1.0 1.0]"
+    g_flModelTintAmount "1.0"
+}

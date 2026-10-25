@@ -1,0 +1,25 @@
+// Register the M16A4's regenerated DMXs and recompile its models, then report the raised optics' compiled bounds.
+var root = Project.Current.GetAssetsPath();
+var report = new System.Collections.Generic.List<string>();
+var models = System.IO.Path.Combine( root, "Weapons", "M16", "models" );
+int registered = 0;
+foreach ( var file in System.IO.Directory.GetFiles( models, "*.dmx", System.IO.SearchOption.AllDirectories ) )
+{
+	Editor.AssetSystem.RegisterFile( file );
+	registered++;
+}
+report.Add( $"registered {registered} DMX" );
+foreach ( var path in new[] { "weapons/m16/w_m16.vmdl", "weapons/m16/v_m16.vmdl", "weapons/m16/v_m16.vanmgrph" } )
+{
+	cancellationToken.ThrowIfCancellationRequested();
+	var asset = Editor.AssetSystem.FindByPath( path );
+	if ( asset is null ) { report.Add( $"{path}: not found" ); continue; }
+	var ok = asset.Compile( true ); await Task.Yield();
+	report.Add( $"{path}: compiled {ok}" );
+}
+foreach ( var stem in new[] { "att_vm_minireddot01_tall", "att_vm_minireddot02_tall", "att_vm_minireddot03_tall", "att_vm_reflex_west02_tall", "att_vm_holo_east01" } )
+{
+	var model = Model.Load( $"attachments/mw2022/models/{stem}/{stem}.vmdl" );
+	report.Add( $"{stem}: error {model.IsError} bounds {model.Bounds.Mins} .. {model.Bounds.Maxs}" );
+}
+return string.Join( "\n", report );

@@ -1,0 +1,111 @@
+// Same production overlay and eligibility rules, rendered in a disposable scene.
+// No shared scene, play, pawn grime, camera, or cached material state changes.
+var root=Sandbox.Project.Current.GetRootPath();
+var folder=System.IO.Path.Combine(root,"output/firstperson-grime-fix-20261021/after");
+System.IO.Directory.CreateDirectory(folder);
+var selected=Editor.SceneEditorSession.Active;var playing=Game.IsPlaying;
+var dirty=Editor.SceneEditorSession.All.ToDictionary(s=>s,s=>s.HasUnsavedChanges);
+var flags=System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.NonPublic;
+var make=typeof(Facepunch.FirstPersonGrime).GetMethod("MakeSkin",flags);
+var eligible=typeof(Facepunch.FirstPersonGrime).GetMethod("Grimes",flags);
+var clothApply=typeof(Facepunch.ViewModelClothing).GetMethod("ApplyDetailedMaterials",flags);
+var scene=Scene.CreateEditorScene();
+var records=new System.Collections.Generic.List<object>();
+CameraComponent camera=null;
+try
+{
+    using(scene.Push())
+    {
+        var light=new GameObject(true,"Blood overlay comparison light").Components.Create<DirectionalLight>();
+        light.WorldRotation=Rotation.From(new Angles(35,25,0));light.LightColor=Color.White*2f;
+        light.SkyColor=new Color(.72f,.78f,.85f)*.7f;
+        camera=new GameObject(true,"Blood overlay comparison camera").Components.Create<CameraComponent>();
+        camera.BackgroundColor=new Color(.075f,.09f,.11f);camera.FieldOfView=44;camera.FovAxis=CameraComponent.Axis.Horizontal;
+        camera.CustomSize=new Vector2(1600,1000);camera.ZNear=.1f;camera.ZFar=1000;
+        camera.EnablePostProcessing=false;camera.AutoExposure.Enabled=false;camera.IsMainCamera=true;
+        typeof(Scene).GetProperty("Camera",System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic).SetValue(scene,camera);
+    }
+    foreach(var subject in new[]{"weapon","sleeve"})
+    {
+        GameObject holder=null;SkinnedModelRenderer source=null;ModelRenderer skin=null;
+        int covered=0,excluded=0;
+        using(scene.Push())
+        {
+            holder=new GameObject(true,"Private blood overlay "+subject);
+            source=holder.Components.Create<SkinnedModelRenderer>();source.UseAnimGraph=false;
+            source.Model=Model.Load(subject=="weapon"?"weapons/kastov74u/v_kastov74u.vmdl"
+                :"models/citizen_clothes/shirt/army_shirt/model/army_shirt_m_human.vmdl");
+            if(source.Model is null||source.Model.IsError)throw new InvalidOperationException("Missing test model");
+            if(subject=="weapon")source.BodyGroups=605028693;
+            else{source.Tint=new Color(.76f,.86f,.66f);clothApply.Invoke(null,new object[]{source});}
+            skin=(ModelRenderer)make.Invoke(null,new object[]{source,null});
+            var grime=Material.Load(Facepunch.FirstPersonGrime.MaterialPath);
+            var hidden=Material.Load("attachments/m4a1/materials/hidden.vmat");
+            if(grime is null||grime.IsError)throw new InvalidOperationException("Missing production grime material");
+            for(var slot=0;slot<source.Model.Materials.Length;slot++)
+            {
+                var material=source.Materials.GetOverride(slot)??source.Model.Materials[slot];
+                var apply=(bool)eligible.Invoke(null,new object[]{material});
+                skin.Materials.SetOverride(slot,apply?grime:hidden);
+                if(apply)covered++;else excluded++;
+            }
+            Vector3 target;
+            if(subject=="weapon")
+            {
+                var bounds=source.Model.Bounds;
+                target=bounds.Center+new Vector3(bounds.Size.x*.12f,0,bounds.Size.z*.05f);
+                camera.WorldPosition=target+new Vector3(bounds.Size.x*.12f,-bounds.Size.x*.66f,bounds.Size.x*.22f);
+            }
+            else
+            {
+                target=(source.Model.Bones.GetBone("arm_lower_R_twist1").LocalTransform.Position+source.Model.Bones.GetBone("hand_R").LocalTransform.Position)*.5f;
+                camera.WorldPosition=target+new Vector3(7,-7,5);
+            }
+            camera.WorldRotation=Rotation.LookAt(target-camera.WorldPosition);
+        }
+        var cases=subject=="weapon"?new[]{
+            (Name:"clean",Blood:0f,Dirt:0f,Dry:0f,Seed:4.7f),
+            (Name:"wet-light",Blood:.35f,Dirt:0f,Dry:0f,Seed:4.7f),
+            (Name:"wet-heavy",Blood:.8f,Dirt:0f,Dry:0f,Seed:4.7f),
+            (Name:"dry",Blood:.8f,Dirt:0f,Dry:1f,Seed:4.7f),
+            (Name:"dirt-only",Blood:0f,Dirt:.65f,Dry:0f,Seed:4.7f)
+        }:new[]{(Name:"wet",Blood:.6f,Dirt:0f,Dry:0f,Seed:4.7f)};
+        foreach(var state in cases)
+        {
+            using var bitmap=new Bitmap(1600,1000);
+            for(var frame=0;frame<24;frame++)
+            {
+                using(scene.Push())
+                {
+                    scene.EditorTick(.016f,.016f);
+                    if(!skin.SceneObject.IsValid())throw new InvalidOperationException("Overlay scene object is missing");
+                    var attributes=skin.SceneObject.Attributes;
+                    attributes.Set("GrimeBlood",state.Blood);attributes.Set("GrimeBloodDry",state.Dry);
+                    attributes.Set("GrimeDirt",state.Dirt);attributes.Set("GrimeDirtColor",Facepunch.FirstPersonGrime.SoilColor);
+                    attributes.Set("GrimeMud",0f);attributes.Set("GrimeWet",0f);attributes.Set("GrimeSeed",state.Seed);
+                    if(subject=="sleeve")
+                        foreach(var key in new[]{"g_tColor","g_tNormal","g_tRma","g_tFineNormal","g_tFineData","g_tSleeveLeft","g_tSleeveRight","g_tCuffMain","g_tCuffStrip","g_tFabricHeight"})
+                        {var t=source.Materials.GetOverride(0)?.GetTexture(key);if(t is not null&&t.IsValid&&!t.IsError)t.MarkUsed(Math.Max(t.Width,t.Height));}
+                    camera.RenderToBitmap(bitmap,false);
+                }
+                await Task.Delay(60,cancellationToken);
+            }
+            var path=System.IO.Path.Combine(folder,subject+"-"+state.Name+".png");
+            if(System.IO.File.Exists(path))throw new InvalidOperationException("Preserve prior evidence");
+            System.IO.File.WriteAllBytes(path,bitmap.ToPng());
+            records.Add(new{Subject=subject,state.Name,state.Blood,state.Dirt,state.Dry,state.Seed,
+                Model=source.Model.ResourcePath,Material=Facepunch.FirstPersonGrime.MaterialPath,
+                CoveredSlots=covered,ExcludedSlots=excluded,Camera=camera.WorldTransform,Fov=camera.FieldOfView,
+                Width=1600,Height=1000,Frames=24,Output=path});
+        }
+        using(scene.Push())holder.DestroyImmediate();
+    }
+}
+finally{scene.Destroy();}
+var preserved=ReferenceEquals(selected,Editor.SceneEditorSession.Active)&&playing==Game.IsPlaying
+    &&dirty.All(p=>Editor.SceneEditorSession.All.Contains(p.Key)&&p.Key.HasUnsavedChanges==p.Value);
+var result=new{Captures=records,ProductionOverlayConstruction=true,ProductionSlotRules=true,
+    SharedEditorStatePreserved=preserved,TemporarySceneDestroyed=true,LiveMatchCapture=false};
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"proof.json"),System.Text.Json.JsonSerializer.Serialize(result));
+if(!preserved)throw new InvalidOperationException("Shared editor state changed externally; inspect before proceeding");
+return new{Images=records.Count,SharedEditorStatePreserved=preserved,TemporarySceneDestroyed=true};

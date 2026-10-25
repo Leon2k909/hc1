@@ -1,0 +1,284 @@
+{
+  "revision": "worn-planters-v2",
+  "installed_asset_hashes_verified": 9,
+  "texture_pixels_unchanged": true,
+  "scene_and_foliage_placements_unchanged": false,
+  "scene_revision": {
+    "before_scene_sha256": "5ea26d816c6b752225a5bd4ea2d761ba2791543c1ab7c89682f98d54219b373d",
+    "after_scene_sha256": "f92a810e80e3cced2ae9ede667d692c712207a58637a927673a7be7eced5af1f",
+    "before_scene_snapshot": "output/belltower/quality/oct20-continuation/planter-scene-before.scene",
+    "plan": "output/belltower/quality/oct20-continuation/planter-position-plan.json",
+    "native_save_evidence": "output/belltower/quality/oct20-continuation/lower-plants-and-save/call_tools.json",
+    "authored_changes": [
+      {
+        "id": "97b497c5-2dc6-50d4-a50c-ca3ca063ba14",
+        "json_path": "/GameObjects/7/Children/165/Position",
+        "old": "330,1780,36.9728012",
+        "new": "330,1780,28.9728012"
+      },
+      {
+        "id": "61cbf08a-e19f-51bd-af69-3cd32a014b07",
+        "json_path": "/GameObjects/7/Children/166/Position",
+        "old": "330,1180,36.9728012",
+        "new": "330,1180,28.9728012"
+      },
+      {
+        "id": "c41e3905-081d-5f03-8520-1025aa3e2f1e",
+        "json_path": "/GameObjects/7/Children/167/Position",
+        "old": "-80,870,36.9728012",
+        "new": "-80,870,28.9728012"
+      },
+      {
+        "id": "9318cd34-d26e-5f0c-a841-a17e255345e9",
+        "json_path": "/GameObjects/7/Children/334/Position",
+        "old": "330,-1780,36.9728012",
+        "new": "330,-1780,28.9728012"
+      },
+      {
+        "id": "440d446d-4ea0-5499-a3b2-6a1c38376e97",
+        "json_path": "/GameObjects/7/Children/335/Position",
+        "old": "330,-1180,36.9728012",
+        "new": "330,-1180,28.9728012"
+      },
+      {
+        "id": "32f975d2-ed7d-53ac-8a76-2ab4af464424",
+        "json_path": "/GameObjects/7/Children/336/Position",
+        "old": "-80,-870,36.9728012",
+        "new": "-80,-870,28.9728012"
+      }
+    ],
+    "authored_positions_changed": 6,
+    "delta_world_z": -8,
+    "all_other_authored_scene_data_preserved": true,
+    "native_serialization_updates": {
+      "resource_id_refresh_same_path": 338,
+      "prefab_instance_binding_entries": 5,
+      "same_float32_transform_serialization": 4798,
+      "explicit_model_renderer_defaults": 20256,
+      "model_path_reference_expansion": 1688
+    },
+    "prefab_binding_deltas": {
+      "/GameObjects/20/__PrefabIdToInstanceId": {
+        "removed": {
+          "7313a516-7687-4997-8cfb-0aae4f61d12a": "54f8e587-d1b0-8b44-ae8a-4ba71ac6ddd4"
+        },
+        "added": {
+          "fc98b206-8a8c-4d62-9268-7890d25a5409": "4dd32d0d-82a4-8eff-9f2e-7e16f59a5f9a"
+        }
+      },
+      "/GameObjects/21/__PrefabIdToInstanceId": {
+        "removed": {
+          "3f91be8e-8abc-480a-b929-7bec0ba8be3c": "6f4201c1-4791-8958-ae0a-476621da2adc"
+        },
+        "added": {
+          "6330b2e1-f401-4f2e-a683-c4f6dff1ef53": "ae05a707-bd2c-81ce-b4d0-0c4ec07b932b"
+        }
+      },
+      "/GameObjects/22/__PrefabIdToInstanceId": {
+        "removed": {},
+        "added": {
+          "37b4fba5-67ef-81bb-866f-c8cfc5b5a492": "aad6bf84-e453-885e-a25f-78d83db2b3bf"
+        }
+      }
+    },
+    "prefab_instance_patches": [
+      {
+        "path": "Assets/prefabs/game_modes/team_deathmatch.prefab",
+        "current_source_sha256": "dc3cb397ddf7ba9a0eaeb7bfc74e9953b5d4fb47dea5ed9e44cd65dbfcc5dbcb",
+        "authored_instance_patch_unchanged": true
+      },
+      {
+        "path": "Assets/prefabs/game_modes/bomb_defusal.prefab",
+        "current_source_sha256": "31541d28e374aaba58d860573a3e4f61a941b8d40d980fb80c4d3e79920e44b5",
+        "authored_instance_patch_unchanged": true
+      },
+      {
+        "path": "Assets/scenes/maps/defusemap_01/game_setup.prefab",
+        "current_source_sha256": "3766f9daa1baca45f3047b9645811309691b54fbff2514bb4d61beb97bb70f60",
+        "authored_instance_patch_unchanged": true
+      }
+    ],
+    "limitation": "Native Save Scene refreshes generated prefab bindings; runtime game mode behaviour was not retested."
+  },
+  "models": {
+    "belltower_west": {
+      "non_planter_mesh_bytes_preserved": true,
+      "gate_and_firewood_geometry_preserved": true,
+      "physics_bytes_preserved": true,
+      "removed_triangles": 36,
+      "added_triangles": 6682,
+      "planters": [
+        {
+          "centre": [
+            -1780,
+            330
+          ],
+          "stone_bounds": [
+            [
+              -1800.0,
+              310.0,
+              0.228
+            ],
+            [
+              -1760.0,
+              350.0,
+              27.998
+            ]
+          ],
+          "visible_soil_height_range": [
+            22.282,
+            24.478
+          ],
+          "root_height_range": [
+            23.633,
+            30.123
+          ]
+        },
+        {
+          "centre": [
+            -1180,
+            330
+          ],
+          "stone_bounds": [
+            [
+              -1200.0,
+              310.0,
+              0.228
+            ],
+            [
+              -1160.0,
+              350.0,
+              27.991
+            ]
+          ],
+          "visible_soil_height_range": [
+            22.282,
+            24.478
+          ],
+          "root_height_range": [
+            23.633,
+            30.123
+          ]
+        },
+        {
+          "centre": [
+            -870,
+            -80
+          ],
+          "stone_bounds": [
+            [
+              -890.0,
+              -100.0,
+              0.223
+            ],
+            [
+              -850.0,
+              -60.0,
+              27.998
+            ]
+          ],
+          "visible_soil_height_range": [
+            22.278,
+            24.478
+          ],
+          "root_height_range": [
+            23.633,
+            30.123
+          ]
+        }
+      ]
+    },
+    "belltower_east": {
+      "non_planter_mesh_bytes_preserved": true,
+      "gate_and_firewood_geometry_preserved": true,
+      "physics_bytes_preserved": true,
+      "removed_triangles": 36,
+      "added_triangles": 6682,
+      "planters": [
+        {
+          "centre": [
+            1780,
+            330
+          ],
+          "stone_bounds": [
+            [
+              1760.0,
+              310.0,
+              0.228
+            ],
+            [
+              1800.0,
+              350.0,
+              27.998
+            ]
+          ],
+          "visible_soil_height_range": [
+            22.282,
+            24.478
+          ],
+          "root_height_range": [
+            23.633,
+            30.123
+          ]
+        },
+        {
+          "centre": [
+            1180,
+            330
+          ],
+          "stone_bounds": [
+            [
+              1160.0,
+              310.0,
+              0.228
+            ],
+            [
+              1200.0,
+              350.0,
+              27.991
+            ]
+          ],
+          "visible_soil_height_range": [
+            22.282,
+            24.478
+          ],
+          "root_height_range": [
+            23.633,
+            30.123
+          ]
+        },
+        {
+          "centre": [
+            870,
+            -80
+          ],
+          "stone_bounds": [
+            [
+              850.0,
+              -100.0,
+              0.223
+            ],
+            [
+              890.0,
+              -60.0,
+              27.998
+            ]
+          ],
+          "visible_soil_height_range": [
+            22.278,
+            24.478
+          ],
+          "root_height_range": [
+            23.633,
+            30.123
+          ]
+        }
+      ]
+    }
+  },
+  "new_game_objects": 0,
+  "new_colliders": 0,
+  "native_visual_review_verified": true,
+  "native_v2_capture_restoration_verified": true,
+  "native_review_scope": "Four native images reviewed separately; scene revision and capture restoration verified. Runtime performance unmeasured."
+}

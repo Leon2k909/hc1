@@ -1,0 +1,67 @@
+{
+  "revision": "shop-awning-cloth-v1",
+  "installed_revision": "refinement2",
+  "installed_utc": "2026-10-21T12:35:40.342038+00:00",
+  "project": "C:\\sbox-projects\\hc1\\forked-shooter-main",
+  "awning_count": 28,
+  "description": "Wall-mounted shop canvas with natural span sag, curved side panels, tension folds and uneven curled valances; existing lettering follows the cloth.",
+  "source_sha256": {
+    "Tools/belltower_shop_awning_cloth.py": "184ea1e3098c82e0a70d553b585720a3e6437fd33fab949918fef68e494fb330",
+    "Tools/belltower_stage_shop_awning_cloth.py": "8757645c435401d42f741245fcdfb351b871806c33625af56624add1187677ef",
+    "Tools/belltower_refresh_shop_awning_cloth.py": "00b07f2e23c34a5f23ed3984067e9c53eee9c4965d27a416026a6365e8286bc9",
+    "Sources/Belltower/props/shop-awning-cloth-v1/legacy-awning.py.txt": "2524b5795a3409f0ba635134d5ba1c1ff3738b2f96e9fe7503b5ba04106b2ed4"
+  },
+  "asset_sha256": {
+    "Assets/models/maps/belltower/belltower_east.obj": "18b705f83eab386d2b7c6a8d83207eaa62dd522a5f342e9a509c4a11d8f0e0b3",
+    "Assets/models/maps/belltower/belltower_west.obj": "06f62589dcbc6ec3e8476ef1db76054de36113b570f7f5d5a153980e4922aac6",
+    "Assets/models/maps/belltower/shop-awning-cloth-v1/east.obj": "21e9faf083018749f556144db285cf81bc57a0ba56f29bed233ec7efcf8a66a8",
+    "Assets/models/maps/belltower/shop-awning-cloth-v1/west.obj": "7a7d41dcb9246630690f22be4bfd152045aa53427ab98494824c6d16b86a4d62",
+    "Assets/models/maps/belltower/belltower_west.vmdl": "986c97361e8f48e605c574f3764141a00fcaf83beb02950c66c595f6cdd12c63",
+    "Assets/models/maps/belltower/belltower_east.vmdl": "207b204670728a37d3523e3ec6ab9b5dc11c4e058452232798a54ce0a664507e"
+  },
+  "native_model_compile": {
+    "west": {
+      "Success": true,
+      "Path": "models/maps/belltower/belltower_west.vmdl",
+      "CompiledFile": "c:/sbox-projects/hc1/forked-shooter-main/assets/models/maps/belltower/belltower_west.vmdl_c",
+      "Hint": null
+    },
+    "east": {
+      "Success": true,
+      "Path": "models/maps/belltower/belltower_east.vmdl",
+      "CompiledFile": "c:/sbox-projects/hc1/forked-shooter-main/assets/models/maps/belltower/belltower_east.vmdl_c",
+      "Hint": null
+    }
+  },
+  "visual_review": {
+    "views": [
+      "oblique",
+      "below",
+      "mirrored",
+      "side"
+    ],
+    "directory": "output/belltower/quality/shop-awning-cloth-v1-final",
+    "compared_with": "output/belltower/quality/shop-awning-cloth-v1-before",
+    "result": "Native render visibly shows curved roof stripes, soft side hems and uneven hanging cloth; no detached panels observed.",
+    "exposure_comparison": "Wall brightness and native capture settings match before and after."
+  },
+  "unrelated_geometry": {
+    "west": {
+      "previous_cloth_triangles_removed": 19892,
+      "unrelated_obj_bytes_exact": true,
+      "unrelated_obj_bytes_sha256": "6bc39e790c6a8d9c1209e3597317e703e016741e13eed105e2b45aa32fba0d49"
+    },
+    "east": {
+      "previous_cloth_triangles_removed": 19892,
+      "unrelated_obj_bytes_exact": true,
+      "unrelated_obj_bytes_sha256": "b0671a7935a88cad6b743ab72aff160c20a34bff45f1781e78bb0b4496ac7643"
+    }
+  },
+  "editor_state_preserved": true,
+  "scene_changed_by_task": false,
+  "collision_changed": false,
+  "material_resources_changed": false,
+  "model_import_separator_repair": "One missing comma corrected in each model; later prop nodes preserved.",
+  "failed_imports": "Play-session guard and concurrent-resource hash guard stopped two refinement1 publications before asset writes; refinement2 applied against the latest models.",
+  "evidence": "output/belltower/shop-awning-cloth-v1/refinement2"
+}

@@ -1,0 +1,75 @@
+{
+  "revision": "veridant-door-clearance-v1",
+  "source_sha256": {
+    "Tools/veridant_map.py": "1e689209ea163c5cea7aafd62bacb14fad668995dfc773271cf1d4a98cb43c89",
+    "Tools/veridant_parts.py": "62d30d2220408db9b3bd0a165a8fcc824bff7f358b93fb96a058cd9cde82f1f6",
+    "Tools/veridant_stage_door_clearance.py": "247f9460b5351fce330e6dc8a6e1f46501bffe2e53739a96e9a2cf397fb2c065",
+    "Tools/map_kit.py": "cc60204c747d064cb1fecdb666b24c847ae89dc863c2533d3811a0445f22020d",
+    "Tools/railhead_stage_extinguisher.py": "2943dbb58be097a57e181c1cda15f5d23a86867721257793f29256f938eb1ab5"
+  },
+  "protected_sha256": {
+    "Assets/scenes/maps/Veridant/veridant.scene": "aa1a2c08e80b728e4f288fbd1bab02227efed410970b3633a652af140aad653f",
+    "Assets/models/maps/veridant/veridant_buildings.vmdl": "0cc565629cedab734cd72e5b9a7fd7816e14aeb5c8f6c4b9798b1d1ba6663395",
+    "Assets/models/maps/veridant/veridant_buildings.mtl": "4a54bd3b1967a726f3d91d9cab19609f0a4f43750e381bb5ba351f5ae12da4e0",
+    "Assets/models/maps/veridant/veridant_buildings_hulls_default.obj": "07d0712c8bc999ea15661b872511932d1140093c489f167f206e8afa2080a982",
+    "Assets/models/maps/veridant/veridant_buildings_hulls_metal.obj": "eab46b35ecf6a05b599d033370f2f45fb2b51ed5af12eb88327a8f6e2ef9891c"
+  },
+  "files": {
+    "Assets/models/maps/veridant/veridant_buildings.obj": {
+      "before": "f85ae00d829dcc6d7a96194e7a9fca27ce06a788e0d4a0070cfba70030cd8ab2",
+      "after": "28eb700a2aab67ed3f3633bd635db3448e1d37e69e1fc7a3654361767442ac5e",
+      "source": "output/veridant/door-obstruction/stage-v1/Assets/models/maps/veridant/veridant_buildings.obj",
+      "backup": "output/veridant/door-obstruction/stage-v1/before/Assets/models/maps/veridant/veridant_buildings.obj"
+    }
+  },
+  "doorways": {
+    "lounge": [
+      -390.0,
+      60.0,
+      0.0,
+      96.0
+    ],
+    "cafe": [
+      [
+        -80.0,
+        60.0,
+        0.0,
+        96.0
+      ],
+      [
+        100.0,
+        60.0,
+        0.0,
+        96.0
+      ]
+    ]
+  },
+  "shelf_ranges": {
+    "lounge": [
+      [
+        -520.0,
+        -424.0
+      ],
+      [
+        -356.0,
+        -300.0
+      ]
+    ],
+    "cafe": [
+      [
+        -46.0,
+        66.0
+      ]
+    ]
+  },
+  "jamb_clearance_inches": 4,
+  "open_door_width_inches": 60,
+  "open_door_height_inches": 96,
+  "removed_triangles": 3432,
+  "new_triangles": 1926,
+  "unrelated_geometry_bytes_exact": true,
+  "retained_sha256": "80ec946ffd27d1748c7650882e5be9a18600104504bb97d2f6f21d0a634dde9a",
+  "collision_unchanged": true,
+  "scene_unchanged": true,
+  "materials_unchanged": true
+}

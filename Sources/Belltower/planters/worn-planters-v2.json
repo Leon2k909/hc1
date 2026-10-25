@@ -1,0 +1,78 @@
+{
+  "revision": "worn-planters-v2",
+  "state": "accepted; six installed planters, saved planting height, native compilation and four visual views verified",
+  "updated_utc": "2026-10-20T11:15:08.498315+00:00",
+  "generator": "Tools/belltower_planters.py",
+  "source_sha256": {
+    "Tools/belltower_planters.py": "7f808faa3ab631506a0132f1590d4bae2e46f27074dc3f13610d5771d78d52f1",
+    "Tools/belltower_stage_planters.py": "3379344f76f5196e4d045500d2b6e805c57e0b81d5717e5a02639e08726978d8",
+    "Tools/map_kit.py": "cc60204c747d064cb1fecdb666b24c847ae89dc863c2533d3811a0445f22020d",
+    "Tools/belltower_furniture.py": "36c83d4883b3084b90b3ff46d9ef56e5aef7cd916f9e4c399058884105974a24",
+    "Tools/belltower_detail.py": "fa4f756709e670c3053fb9d0be3c48f01cffec87eaa39c35f01497b9bf4f50bf",
+    "Sources/Belltower/planters/planter-stone-v1.shader": "6c337267582af83f69a304a872cc78b5b7e6e74e7127e30d669f4c036004aa3a"
+  },
+  "assets": {
+    "Assets/materials/belltower/planters-v1/compost.vmat": "72fbaa464d2f292317060b3185e57548b89ba6b4fa22a13428629d21cdd35f5b",
+    "Assets/materials/belltower/planters-v1/cut_stone.vmat": "eb1bc4cf1e0367093d8667e74caa9b1547664569ac009e714de896510d9838c3",
+    "Assets/models/maps/belltower/belltower_east.mtl": "49c44726d8adff7f4015e9ad2e9d18202c672ae46e08c0dc22d778bf069dd2f1",
+    "Assets/models/maps/belltower/belltower_east.obj": "f7b0b95e8ecd5ff082ef78921013a319480588dcccb63d46cdce954f990113ea",
+    "Assets/models/maps/belltower/belltower_east.vmdl": "b6cb48b5a14f3d7d7abc715f1eb2437281cc0e5b7b855eecfbb9dbd71225ba47",
+    "Assets/models/maps/belltower/belltower_west.mtl": "201958d751df9e3ca3dde37971a10074280934f4b4f18d8428297effe45f98ae",
+    "Assets/models/maps/belltower/belltower_west.obj": "24f73f648e32ffdf758eafef90f6789bb60a646eedf97a5f757771abeabfcb5a",
+    "Assets/models/maps/belltower/belltower_west.vmdl": "36865241f43ac7994ec54c85259eac6b9b6bea3d11a8b541acf4f229025921dc",
+    "Assets/shaders/belltower_planter_v1.shader": "6c337267582af83f69a304a872cc78b5b7e6e74e7127e30d669f4c036004aa3a"
+  },
+  "scene_sha256": "5ea26d816c6b752225a5bd4ea2d761ba2791543c1ab7c89682f98d54219b373d",
+  "planters": 6,
+  "added_triangles_per_half": 6682,
+  "removed_triangles_per_half": 36,
+  "source_geometry_verification": "output/belltower/planter-v2/verification.json",
+  "native_asset_state": "output/belltower/quality/oct20-continuation/asset-info/call_tools.json",
+  "body_identical_to_reviewed_v1": "output/belltower/quality/oct20-continuation/source-checks.json",
+  "native_visual_review_verified": true,
+  "runtime_performance_verified": false,
+  "pending_views": [],
+  "overall_map_quality_goal_complete": false,
+  "current_scene_sha256": "f92a810e80e3cced2ae9ede667d692c712207a58637a927673a7be7eced5af1f",
+  "scene_revision": "output/belltower/planter-v2/scene-revision.json",
+  "native_v2_capture_restoration_verified": true,
+  "native_views": [
+    {
+      "image": "output/belltower/quality/planter-v2-saved/context.png",
+      "sha256": "cdbc731e6248c5062864ef1517cd46c4e33f0a5d9b778287d76e4993cfae4a81",
+      "review": "Stone courses, coping thickness, recessed soil and planted root read clearly at street distance.",
+      "restoration_verified": true
+    },
+    {
+      "image": "output/belltower/quality/planter-v2-saved/close.png",
+      "sha256": "e6949d21b04ed156ec6869eafc66ef88e061e2eed622d395dd2c8c254f1f7d71",
+      "review": "Bevels, chips, mitred corners, nonflat soil and leaf overlap are visible.",
+      "restoration_verified": true
+    },
+    {
+      "image": "output/belltower/quality/planter-v2-saved/low-angle.png",
+      "sha256": "a0baad40494b73592e404cb353045d01b06af662fe8ebc813c94f3274ab288f1",
+      "review": "Coping projects beyond the wall and casts its own shadow; no block or rim gaps.",
+      "restoration_verified": true
+    },
+    {
+      "image": "output/belltower/quality/planter-v2-saved/west-context.png",
+      "sha256": "baa9ef52806ea267f8a38895b20acc70654705e270e00c53d66c9b8cfc09f8a5",
+      "review": "Shaded mirrored planter keeps readable edges and soil depth; original shrub orientation retained.",
+      "restoration_verified": true
+    }
+  ],
+  "planting_height_delta_inches": -8,
+  "source_placement": {
+    "file": "Tools/belltower_map.py",
+    "planter_blob_centre_z": 36,
+    "sha256": "34b9775844fb2ee214f929a1c09467cb670a440a3f8286b3d76ace5fa4b94b86"
+  },
+  "native_final_state": "output/belltower/quality/oct20-continuation/final-belltower-native-checks/call_tools.json",
+  "prior_editor_wait": {
+    "title": "Improve Ares terrain realism",
+    "threadId": "01a15547-eb49-7920-8b06-675298d7ce63",
+    "hostId": "local",
+    "turnId": "01a158d4-6d89-7133-a4cb-ad079ddffcc8"
+  }
+}

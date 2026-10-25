@@ -1,0 +1,126 @@
+// Exercises the production mantle planner and movement in a disposable physics scene.
+// The user's scene, play state, input context and camera are preserved.
+var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
+var type = typeof(Facepunch.PlayerPawn);
+var planMethod = type.GetMethod("PlanMantle", flags);
+var previous = Editor.SceneEditorSession.Active;
+var gameId = Game.ActiveScene?.Id;
+var playing = Game.IsPlaying;
+var documents = Editor.SceneEditorSession.All.Select(s => new { Session = s, Dirty = s.HasUnsavedChanges }).ToArray();
+var results = new System.Collections.Generic.List<object>();
+var scene = new Scene();
+var built = new System.Collections.Generic.List<GameObject>();
+Facepunch.PlayerPawn NewPawn(float foot) {
+    var go = new GameObject(false, "Mantle reach check");
+    go.Flags |= GameObjectFlags.NotSaved | GameObjectFlags.NotNetworked;
+    var pawn = go.AddComponent<Facepunch.PlayerPawn>();
+    pawn.Enabled = false;
+    pawn.HealthComponent = go.AddComponent<Facepunch.HealthComponent>();
+    pawn.HealthComponent.Enabled = false;
+    pawn.CharacterController = go.GetComponent<Facepunch.CharacterController>() ?? go.AddComponent<Facepunch.CharacterController>();
+    pawn.CharacterController.Enabled = false;
+    pawn.CharacterController.Radius = 12f;
+    pawn.CharacterController.Height = 64f;
+    pawn.CharacterController.StepHeight = 15.46f;
+    pawn.CharacterController.Acceleration = 14f;
+    pawn.CharacterController.IsOnGround = foot <= 2f;
+    pawn.CharacterController.Velocity = new Vector3(0, 0, foot > 2f ? 100f : 0f);
+    pawn.WorldPosition = new Vector3(0, 0, foot);
+    pawn.WishMove = Vector3.Forward;
+    pawn.EyeAngles = Angles.Zero;
+    pawn.Height = 64f;
+    pawn.Body = go.AddComponent<Facepunch.PlayerBody>(); pawn.Body.Enabled = false;
+    pawn.Head = new GameObject(go, false, "Head"); pawn.Head.LocalPosition = Vector3.Up * 60f;
+    pawn.CameraController = go.GetComponent<Facepunch.CameraController>() ?? go.AddComponent<Facepunch.CameraController>();
+    pawn.CameraController.Enabled = false; pawn.CameraController.Player = pawn;
+    type.GetProperty("WantsToggleSprint", flags).SetValue(pawn, false);
+    return pawn;
+}
+GameObject Box(string name, Vector3 lo, Vector3 hi) {
+    var go = new GameObject(false, name); go.WorldPosition = (lo+hi)/2f;
+    var box = go.AddComponent<BoxCollider>(); box.Scale = hi-lo; box.Static = true;
+    go.Enabled = true; built.Add(go); return go;
+}
+void Clear() {
+    foreach (var go in built) go.Destroy();
+    built.Clear(); scene.ProcessDeletes();
+}
+object Probe(string label, float height, float foot, bool airborne, bool ceiling = false, bool clip = false, float distance = 18f, float depth = 96f) {
+    Clear();
+    var obstacle = Box(label, new Vector3(distance, -119.3f, 0), new Vector3(distance+depth, 119.3f, height));
+    if (clip) obstacle.Tags.Add("playerclip");
+    if (ceiling) Box("Blocked roof", new Vector3(distance, -119.3f, height+24f), new Vector3(distance+depth, 119.3f, height+70f));
+    var pawn = NewPawn(foot);
+    try {
+        var args = new object[] { airborne, true, null, null };
+        var accepted = (bool)planMethod.Invoke(pawn, args);
+        var plan = args[2]; var planType = plan.GetType();
+        object Value(string field) => planType.GetField(field).GetValue(plan);
+        return new { Label = label, Height = height, Feet = foot, Airborne = airborne,
+            Accepted = accepted, Reason = args[3],
+            Duration = accepted ? (float)planType.GetProperty("Duration").GetValue(plan) : 0f,
+            Vault = accepted && (bool)Value("Vault"),
+            Landing = accepted ? Value("To").ToString() : null,
+            Overlap = accepted ? (float)Value("RiseTime")-(float)Value("OverStart") : 0f };
+    } finally { pawn.GameObject.Destroy(); scene.ProcessDeletes(); }
+}
+object simulation = null;
+try {
+    using (scene.Push()) {
+        var floor = new GameObject(false, "Check floor");
+        floor.WorldPosition = new Vector3(0, 0, -10);
+        floor.AddComponent<BoxCollider>().Scale = new Vector3(4000, 4000, 20);
+        floor.Enabled = true;
+        results.Add(Probe("container-standing", 102f, 2f, false));
+        results.Add(Probe("container-low-jump", 102f, 8f, true));
+        results.Add(Probe("container-jump", 102f, 24f, true));
+        results.Add(Probe("container-higher-jump", 102f, 36f, true));
+        results.Add(Probe("high-cube-container", 114f, 36f, true));
+        results.Add(Probe("tall-wall", 152f, 36f, true));
+        results.Add(Probe("blocked-roof", 102f, 24f, true, ceiling: true));
+        results.Add(Probe("player-clip", 102f, 24f, true, clip: true));
+        results.Add(Probe("out-of-reach", 102f, 24f, true, distance: 60f));
+        results.Add(Probe("waist-cover", 40f, 2f, false));
+        results.Add(Probe("chest-cover", 64f, 2f, false));
+        results.Add(Probe("thin-low-wall", 40f, 2f, false, depth: 8f));
+        results.Add(Probe("low-step", 20f, 2f, false));
+        Clear();
+        // Same closed-container collision dimensions as Lowtide's production generator.
+        Box("Lowtide size container", new Vector3(64f, -119.3f, 0), new Vector3(160f, 119.3f, 102f));
+        var pawn = NewPawn(2f); pawn.WorldPosition = new Vector3(36f, 0, 2f);
+        var inputType = typeof(Input).GetNestedType("Context", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
+        var context = Activator.CreateInstance(inputType, flags, null, new object[] { "ContainerMantleQA" }, null);
+        var timeMethod = typeof(Time).GetMethod("Scope", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+        var names = Input.ActionNames.ToList();
+        var jump = names.FindIndex(n => n.Equals("Jump", StringComparison.OrdinalIgnoreCase));
+        if (jump < 0) throw new Exception("Missing jump action.");
+        var held = 1UL << jump;
+        var started = false; var finished = false; var begin = 0f; var finish = 0f;
+        var takeoffZ = 0f; var highest = pawn.WorldPosition.z; var originalTime = Time.Now;
+        using (var inputScope = (IDisposable)inputType.GetMethod("Push", flags).Invoke(context, null)) {
+            try {
+                for (var tick = 0; tick < 200; tick++) {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    using (var timeScope = (IDisposable)timeMethod.Invoke(null, new object[] { 2000d + tick * .02d, .02d })) {
+                        inputType.GetProperty("ActionsCurrent", flags).SetValue(context, held);
+                        inputType.GetProperty("ActionsPrevious", flags).SetValue(context, tick == 0 ? 0UL : held);
+                        void Call(string method) => type.GetMethod(method, flags).Invoke(pawn, null);
+                        if (pawn.IsMantling) Call("UpdateMantle");
+                        else { Call("BuildWishVelocity"); Call("BuildInput"); Call("ApplyAcceleration"); Call("ApplyMovement"); }
+                        if (pawn.IsMantling && !started) { started = true; begin = tick * .02f; takeoffZ = pawn.WorldPosition.z; }
+                        highest = MathF.Max(highest, pawn.WorldPosition.z);
+                        if (started && !pawn.IsMantling) { finished = true; finish = tick * .02f; break; }
+                    }
+                }
+                simulation = new { Started = started, Finished = finished, GrabAtSeconds = begin, GrabFeetZ = takeoffZ,
+                    PullUpSeconds = finish-begin, End = pawn.WorldPosition.ToString(), HighestFeetZ = highest };
+            } finally { pawn.GameObject.Destroy(); scene.ProcessDeletes(); }
+        }
+        Clear();
+    }
+} finally { scene.Destroy(); }
+var preserved = ReferenceEquals(previous, Editor.SceneEditorSession.Active) && Game.ActiveScene?.Id == gameId && Game.IsPlaying == playing
+    && documents.All(d => Editor.SceneEditorSession.All.Contains(d.Session) && d.Session.HasUnsavedChanges == d.Dirty)
+    && Editor.SceneEditorSession.All.Count() == documents.Length;
+if (!preserved) throw new Exception("Editor state changed during check.");
+return new { Probes = results, JumpOntoContainer = simulation, EditorStatePreserved = preserved };

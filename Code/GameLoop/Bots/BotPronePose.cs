@@ -12,11 +12,15 @@ public sealed class BotPronePose
 	private Transform[] _pose = Array.Empty<Transform>();
 	private readonly List<SkinnedModelRenderer> _garments = new();
 
-	public static Vector3 EyeOffset( bool crouching, float blend )
+	public static Vector3 EyeOffset( bool crouching, float blend ) => EyeOffset( crouching ? 1f : 0f, blend );
+
+	/// <summary> The eye part of the way down to a crouch (<paramref name="crouch"/> 0 stood, 1 crouched) and to prone. </summary>
+	public static Vector3 EyeOffset( float crouch, float blend )
 	{
 		blend = blend.Clamp( 0f, 1f );
 		var heightBlend = (1f - MathF.Cos( (80f * blend).DegreeToRadian() )) / (1f - MathF.Cos( 80f.DegreeToRadian() ));
-		return new Vector3( ProneEye.x * blend, 0f, MathX.Lerp( crouching ? 44f : 64f, ProneEye.z, heightBlend ) );
+		var stance = MathX.Lerp( 64f, 44f, crouch.Clamp( 0f, 1f ) );
+		return new Vector3( ProneEye.x * blend, 0f, MathX.Lerp( stance, ProneEye.z, heightBlend ) );
 	}
 
 	public static BBox MovementBounds( bool crouching, float blend )

@@ -1295,6 +1295,9 @@ public static partial class GameText
 		["Affected"] = "連動",
 		["Independent"] = "独立",
 		["Third Person Field Of View"] = "三人称視点の視野角",
+		["Weapon Distance"] = "武器の距離",
+		["Weapon Horizontal Position"] = "武器の水平位置",
+		["Weapon Vertical Position"] = "武器の垂直位置",
 		["Picture-In-Picture Scopes"] = "ピクチャー・イン・ピクチャー・スコープ",
 		["s&box Settings"] = "s&boxの設定",
 		["Resolution, window mode and graphics quality are set in s&box itself and apply to every game."] =

@@ -299,6 +299,43 @@ MedalFeed
         animation: medal-sweep 0.6s linear 0.3s both;
     }
 
+    // A training medal's new level, in the badge's diamond (34.7-65.1% across, 34.9-65.2% down the art: see
+    // Tools/training_emblem.py). It stamps in once the badge has landed.
+    .medal-level
+    {
+        position: absolute;
+        z-index: 4;
+        left: 34.7%;
+        top: 34.9%;
+        width: 30.4%;
+        height: 30.3%;
+        align-items: center;
+        justify-content: center;
+
+        label
+        {
+            font-size: 27px;
+            font-weight: 800;
+            font-style: italic;
+            color: #fff1cf;
+            text-shadow: 0px 2px 2px black, 0px 0px 9px rgba( 255, 165, 50, 0.85 );
+            animation: medal-level-in 0.42s linear $ignite both;
+        }
+
+        &.two-digit label { font-size: 21px; }
+    }
+
+    // Soldier training: brass badge, warm gold light.
+    .training
+    {
+        color: #ffd48a;
+        .medal-rule { background-color: #c9a25a; }
+        .medal-impact { border-color: #ffe2a6; }
+        .medal-title { text-shadow: 0px 2px 3px black, 0px 0px 12px rgba( 255, 170, 50, 0.6 ); }
+        .medal-rays-spin { background-image-tint: #ffbd55; }
+        .medal-aura { background-image: radial-gradient( rgba( 255, 172, 60, 0.4 ), rgba( 255, 172, 60, 0 ) 68% ); }
+    }
+
     .multikill
     {
         color: #91dcf5;
@@ -355,6 +392,8 @@ MedalFeed
         .medal-subtitle { font-size: 8px; letter-spacing: 0.4px; }
         .medal-rule { width: 8px; }
         .medal-detail { gap: 3px; }
+        .medal-level label { font-size: 22px; }
+        .medal-level.two-digit label { font-size: 17px; }
     }
 
 }
@@ -468,4 +507,12 @@ MedalFeed
     0% { opacity: 0; transform: translateX(-40px) skewX(-20deg); }
     25% { opacity: 1; transform: translateX(30px) skewX(-20deg); }
     100% { opacity: 0; transform: translateX(240px) skewX(-20deg); }
+}
+
+@keyframes medal-level-in
+{
+    0% { opacity: 0; transform: scale(1.9); }
+    30% { opacity: 1; transform: scale(0.9); }
+    60% { opacity: 1; transform: scale(1.06); }
+    100% { opacity: 1; transform: scale(1); }
 }

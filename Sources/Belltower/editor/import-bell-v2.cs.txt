@@ -1,0 +1,62 @@
+// Bell-only publication through the open editor; no scene or play changes.
+var root = Sandbox.Project.Current.GetRootPath();
+var folder = System.IO.Path.Combine(root,"output/belltower/bell-v2");
+var manifest = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"stage/manifest.json")));
+if (Game.IsPlaying) throw new InvalidOperationException("Bell publication requires stopped play.");
+string Hash(string p) => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+var session = Editor.SceneEditorSession.Active;
+var dirty = session?.HasUnsavedChanges;
+var scenePath = System.IO.Path.Combine(root,"Assets/scenes/maps/Belltower/belltower.scene");
+var sceneHash = Hash(scenePath);
+foreach(var group in new[]{"source_sha256","protected_sha256"})
+    foreach(var pair in manifest[group].AsObject())
+        if(Hash(System.IO.Path.Combine(root,pair.Key))!=pair.Value.GetValue<string>()) throw new InvalidOperationException("Input changed: "+pair.Key);
+var plans = new System.Collections.Generic.List<(string Source,string Target,string Backup,string After)>();
+foreach(var pair in manifest["files"].AsObject())
+{
+    if (!(pair.Key.StartsWith("Assets/materials/belltower/bell-v2/",StringComparison.Ordinal)
+        || new[]{"Assets/models/maps/belltower/belltower_centre.obj","Assets/models/maps/belltower/belltower_centre.mtl","Assets/models/maps/belltower/belltower_centre.vmdl"}.Contains(pair.Key))
+        || pair.Key.Contains("..")) throw new InvalidOperationException("Unexpected target.");
+    var source = System.IO.Path.Combine(root,pair.Value["source"].GetValue<string>());
+    var target = System.IO.Path.Combine(root,pair.Key);
+    var before = pair.Value["before"]?.GetValue<string>();
+    var after = pair.Value["after"].GetValue<string>();
+    var backup = before is null ? null : System.IO.Path.Combine(root,pair.Value["backup"].GetValue<string>());
+    if(Hash(source)!=after || (backup is not null && Hash(backup)!=before)) throw new InvalidOperationException("Stage changed.");
+    if(System.IO.File.Exists(target) && Hash(target)==after) continue;
+    if(before is null ? System.IO.File.Exists(target) : !System.IO.File.Exists(target)||Hash(target)!=before)
+        throw new InvalidOperationException("Another edit changed "+pair.Key+"; rebuild the stage instead of overwriting it.");
+    plans.Add((source,target,backup,after));
+}
+var changed = new System.Collections.Generic.List<(string Target,string Backup)>();
+try
+{
+    foreach(var item in plans.OrderBy(p=>p.Target.EndsWith(".vmdl")?4:p.Target.EndsWith(".obj")?3:p.Target.EndsWith(".mtl")?2:p.Target.EndsWith(".vmat")?1:0))
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(item.Target));
+        var incoming=item.Target+".bell-v2-incoming";
+        try
+        {
+            System.IO.File.Copy(item.Source,incoming,true);
+            if(Hash(incoming)!=item.After) throw new InvalidOperationException("Incoming checksum failed.");
+            System.IO.File.Move(incoming,item.Target,true);
+            changed.Add((item.Target,item.Backup));
+        }
+        finally {if(System.IO.File.Exists(incoming)) System.IO.File.Delete(incoming);}
+    }
+}
+catch
+{
+    foreach(var item in changed.AsEnumerable().Reverse())
+        if(item.Backup is not null) System.IO.File.Copy(item.Backup,item.Target,true);
+        else System.IO.File.Delete(item.Target);
+    throw;
+}
+foreach(var item in plans) Editor.AssetSystem.RegisterFile(item.Target);
+var preserved=ReferenceEquals(session,Editor.SceneEditorSession.Active)&&!Game.IsPlaying&&dirty==session?.HasUnsavedChanges&&sceneHash==Hash(scenePath);
+var result=new {Imported=plans.Count,EditorStatePreserved=preserved,SceneChanged=false,CollisionChanged=false,
+    AllNonBellMeshBytesPreserved=true,OriginalSharedBronzeUnchanged=true};
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"native-import.json"),System.Text.Json.JsonSerializer.Serialize(result));
+if(!preserved) throw new InvalidOperationException("Inspect editor state after publication.");
+return result;

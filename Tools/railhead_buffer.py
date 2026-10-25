@@ -101,12 +101,15 @@ def bevel_box(model, frame, lo, hi, paint, bevel=0.15, edge=None, face_uv=False)
                 normal = np.zeros(3)
                 normal[i], normal[j] = si, sj
                 draw(points, normal, edge or paint)
+    # The corner triangles close the gaps where three bevel strips meet: each point is a broad face's corner (out on
+    # its own axis, in by b on the other two). Points b in from the box's corner along each edge stood out past the
+    # bevels as shards and left the gaps open.
     for sx in (-1, 1):
         for sy in (-1, 1):
             for sz in (-1, 1):
                 signs = np.array((sx, sy, sz))
-                corner = centre + signs * half
-                points = [corner - np.eye(3)[i] * signs[i] * b for i in range(3)]
+                inner = centre + signs * (half - b)
+                points = [inner + np.eye(3)[i] * signs[i] * b for i in range(3)]
                 draw(points, signs, edge or paint)
 
 

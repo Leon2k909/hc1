@@ -1,0 +1,64 @@
+// Publish only the staged lounger assets through the running editor. Exact
+// hashes guard every shared input and target before the first asset is changed.
+var root = Sandbox.Project.Current.GetRootPath();
+var output = System.IO.Path.Combine(root, "output/veridant/lounger-v2");
+var request = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(output, "import-request.json")));
+var stageName = request["stage"].GetValue<string>();
+if (!System.Text.RegularExpressions.Regex.IsMatch(stageName, "^stage-[a-z0-9-]+$")) throw new Exception("Unexpected stage");
+var stage = System.IO.Path.Combine(output, stageName);
+var manifest = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(stage, "manifest.json")));
+var source = Editor.SceneEditorSession.Active?.Scene;
+var before = new { Scene = source?.Name, Id = source?.Id, Game.IsPlaying };
+string Hash(string file) => System.IO.File.Exists(file) ? Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(file))).ToLowerInvariant() : null;
+string Local(string relative) {
+    var path = System.IO.Path.GetFullPath(System.IO.Path.Combine(root, relative));
+    if (!path.StartsWith(System.IO.Path.GetFullPath(root) + System.IO.Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
+        throw new Exception("Path left the project");
+    return path;
+}
+var rows = manifest["files"].AsObject().ToArray();
+var alreadyInstalled = rows.All(pair => Hash(Local(pair.Key)) == pair.Value["after"].GetValue<string>());
+// An idempotent verification pass can finish registration after a neighbour's
+// unrelated source edit; it does not republish any already installed files.
+foreach (var pair in manifest["source_sha256"].AsObject())
+    if (!alreadyInstalled && Hash(Local(pair.Key)) != pair.Value.GetValue<string>()) throw new Exception("Shared source changed: " + pair.Key);
+foreach (var pair in rows) {
+    cancellationToken.ThrowIfCancellationRequested();
+    if (Hash(Local(pair.Value["source"].GetValue<string>())) != pair.Value["after"].GetValue<string>()) throw new Exception("Staged asset changed: " + pair.Key);
+    var actual = Hash(Local(pair.Key));
+    var prior = pair.Value["before"]?.GetValue<string>();
+    if (actual != prior && actual != pair.Value["after"].GetValue<string>()) throw new Exception("Shared target changed: " + pair.Key);
+}
+// Complete dependencies before ModelDoc sources. Publish each file atomically.
+int Order(string name) => System.IO.Path.GetExtension(name).ToLowerInvariant() switch { ".png" => 0, ".vmat" => 1, ".mtl" => 2, ".obj" => 3, ".vmdl" => 4, _ => 5 };
+var installed = new System.Collections.Generic.List<string>();
+foreach (var pair in rows.OrderBy(x => Order(x.Key)).ThenBy(x => x.Key)) {
+    cancellationToken.ThrowIfCancellationRequested();
+    var target = Local(pair.Key);
+    if (Hash(target) == pair.Value["after"].GetValue<string>()) continue;
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target));
+    var temporary = target + ".lounger-writing";
+    System.IO.File.Copy(Local(pair.Value["source"].GetValue<string>()), temporary, true);
+    System.IO.File.Move(temporary, target, true);
+    installed.Add(pair.Key);
+}
+var compiled = new System.Collections.Generic.List<object>();
+foreach (var pair in rows.Where(x => Order(x.Key) == 1 || Order(x.Key) == 4).OrderBy(x => Order(x.Key)).ThenBy(x => x.Key)) {
+    cancellationToken.ThrowIfCancellationRequested();
+    var file = Local(pair.Key);
+    var asset = Editor.AssetSystem.FindByPath(file) ?? Editor.AssetSystem.RegisterFile(file);
+    if (asset is null) throw new Exception("Cannot register " + pair.Key);
+    var ok = await asset.CompileIfNeededAsync().AsTask().WaitAsync(cancellationToken);
+    compiled.Add(new { File = pair.Key, Ok = ok, asset.IsCompiled, asset.IsCompileFailed });
+    if (!asset.IsCompiled || asset.IsCompileFailed || !asset.IsCompiledAndUpToDate)
+        throw new Exception("Compile failed: " + pair.Key);
+}
+var model = Model.Load("models/props/veridant/lounger-v2/lounger.vmdl");
+var dress = Model.Load("models/maps/veridant/veridant_dress.vmdl");
+var report = new { Before = before, ScenePreserved = source?.Id == Editor.SceneEditorSession.Active?.Scene?.Id,
+    PlayStatePreserved = before.IsPlaying == Game.IsPlaying, Installed = installed, Compiled = compiled,
+    ReusableModelIsError = model.IsError, DressingIsError = dress.IsError,
+    Materials = model.Materials.Select(m => m.ResourcePath).ToArray(),
+    DressingLoungerMaterials = dress.Materials.Where(m => m.ResourcePath.Contains("lounger-v2")).Select(m => m.ResourcePath).ToArray() };
+System.IO.File.WriteAllText(System.IO.Path.Combine(stage, "installed.json"), Json.Serialize(report));
+return report;

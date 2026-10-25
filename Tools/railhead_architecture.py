@@ -246,6 +246,21 @@ def canopy_column( model, col, cn, z, sides=( -1, 1 ) ):
     downpipe( model, pe, pn, z - 0.5, 0.0, radius=2.0, paint=GREY, shoe=( 1, 0 ), wall=( -2.8, -2.3 ) )
 
 
+CANOPY_PURLIN_D = 4.0       # the canopies' purlins' depth under the sheeting
+
+
+def canopy_purlins( col, eaves ):
+    """ The e of a canopy's purlins (3 wide, along it): every 40 out from 26 off the spine, short of each eave. """
+    out = []
+    for eave in eaves:
+        s = 1.0 if eave > col else -1.0
+        r = col + s * 26.0
+        while ( r < eave - 8 ) if s > 0 else ( r > eave + 8 ):
+            out.append( r )
+            r += s * 40.0
+    return out
+
+
 def canopy_roof( model, e0, e1, col, z, n0, n1, eaves ):
     """ A canopy's cantilevers (I-sections tapering from SPINE_D deep at the spine to 6 at the eaves), purlins every 40,
     fascias with drips along the eaves and the south end, and the eave gutters behind them. """
@@ -264,12 +279,10 @@ def canopy_roof( model, e0, e1, col, z, n0, n1, eaves ):
             model.beam( ( col, nb, z - SPINE_D + 0.5 ), ( r_tip, nb, z - 5.5 ), ( 6.0, 1.0 ), IRON_DARK )
             lo, hi = sorted( ( r_tip, r_tip - s * 0.6 ) )
             model.box( ( lo, nb - 3.2, z - 6.5 ), ( hi, nb + 3.2, z ), IRON_DARK )
+    for r in canopy_purlins( col, eaves ):
+        model.box( ( r - 1.5, n0, z - CANOPY_PURLIN_D ), ( r + 1.5, n1, z - 0.04 ), IRON_DARK )
     for eave in eaves:
         s = 1.0 if eave > col else -1.0
-        r = col + s * 26.0
-        while ( r < eave - 8 ) if s > 0 else ( r > eave + 8 ):
-            model.box( ( r - 1.5, n0, z - 4.0 ), ( r + 1.5, n1, z - 0.04 ), IRON_DARK )
-            r += s * 40.0
         # The fascia along the eave with a drip, and the eave gutter behind its top.
         # It starts at n0, butting the south end's fascia, which wraps the corner (no coplanar faces there).
         lo, hi = sorted( ( eave, eave + s * 2.0 ) )
@@ -725,6 +738,9 @@ def gable_fascia( model, n, arc_point, theta0, theta1, depth0, depth1, finial=Tr
 # ---------------------------------------------------------------------------------------------------------------------
 # The footbridge (east half)
 
+BRIDGE_PURLIN_D = 4.0       # the two purlins' depth under the roof: the ceiling battens are fixed to their undersides
+
+
 def footbridge( model, n0, n1, roof_z, deck_z, wall_in, columns, stairs, rail_z ):
     """ The footbridge's roof structure (I-beams on the mullion lines, two purlins), fascias and gutters along both
     eaves with downpipes at the columns, a round handrail on brackets, and stiffeners on the side panels' inner faces. """
@@ -736,7 +752,7 @@ def footbridge( model, n0, n1, roof_z, deck_z, wall_in, columns, stairs, rail_z 
         model.box( ( e - 3.0, n0 - 5.0, roof_z - 8.0 ), ( e + 3.0, n1 + 5.0, roof_z - 7.0 ), IRON_DARK )
         e += 60.0
     for n in ( n0 + 30.0, n1 - 30.0 ):
-        model.box( ( 0.0, n - 1.5, roof_z - 4.0 ), ( wall_in, n + 1.5, roof_z - 0.05 ), IRON_DARK )
+        model.box( ( 0.0, n - 1.5, roof_z - BRIDGE_PURLIN_D ), ( wall_in, n + 1.5, roof_z - 0.05 ), IRON_DARK )
     for side_n, out in ( ( n0 - 6.0, -1.0 ), ( n1 + 6.0, 1.0 ) ):
         lo, hi = sorted( ( side_n, side_n + out * 1.5 ) )
         model.box( ( 0.0, lo, roof_z - 4.0 ), ( wall_in, hi, roof_z + 8.0 ), { "default": IRON_DARK, "-e": None } )

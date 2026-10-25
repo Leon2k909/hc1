@@ -1,0 +1,20 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/railhead/extinguisher-v2/stage-v2/manifest.json")));
+var modelPath=manifest["standalone_model"].GetValue<string>();
+var model=Model.Load(modelPath);
+if(model is null||model.IsError) throw new InvalidOperationException("Standalone model failed to load.");
+var materials=new System.Collections.Generic.List<object>();
+foreach(var name in new[]{"red","label","sign","gauge","rubber","steel","brass","dark","seal"})
+{
+    var path="materials/props/extinguisher-v2/"+name+".vmat";
+    var material=Material.Load(path);
+    if(material is null||material.IsError) throw new InvalidOperationException("Material failed to load: "+path);
+    var color=material.GetTexture("g_tColor");
+    if(color is null||color.IsError) throw new InvalidOperationException("Color texture failed to load: "+path);
+    materials.Add(new {Path=path,IsError=material.IsError,ColorWidth=color.Width,ColorHeight=color.Height});
+}
+var session=Editor.SceneEditorSession.Active;
+var result=new {StandaloneModel=modelPath,IsError=model.IsError,Vertices=model.GetVertices().Count(),Materials=materials,
+    ActiveScene=session.Scene.Source?.ResourcePath,Game.IsPlaying,SceneHasUnsavedChanges=session.HasUnsavedChanges};
+System.IO.File.WriteAllText(System.IO.Path.Combine(root,"output/railhead/extinguisher-v2/native-validation.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

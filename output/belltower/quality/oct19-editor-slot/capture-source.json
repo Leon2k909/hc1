@@ -1,0 +1,25 @@
+{
+  "base": "Sources/Belltower/editor/capture-preview-consistent.cs.txt",
+  "base_sha256": "8d2c601cfb1c36fbc9596e3fda305f95bf9227dd3893902c46805da027a37bc2",
+  "source": "Sources/Belltower/editor/capture-art-trials-oct19.cs.txt",
+  "source_sha256": "ec5a70db517b6cb59295a14a01a556d1a259f87175557666eabe923f49cb9791",
+  "native_trial_execution_pending": true,
+  "native_validation": {
+    "run": true,
+    "restoration_verified": true,
+    "active_stopped_scene_only": true,
+    "settle_ms": 5000,
+    "surface_views": [
+      "west-ridge",
+      "east-street",
+      "terrace"
+    ],
+    "forest_views": [
+      "west-ridge",
+      "west-ridge-detail"
+    ],
+    "five_second_repeat_review": "output/belltower/quality/camera-consistency-v1/native-five-second-review.json",
+    "assets_promoted": false,
+    "current_source_guards": "Historical trials predate the town-gate-v2 mesh edits; stage a fresh comparison before reuse."
+  }
+}

@@ -1,0 +1,25 @@
+// Export the default beech material group of the existing tall shrub.
+var root=Sandbox.Project.Current.GetRootPath();
+var destination=System.IO.Path.Combine(root,"Sources/Veridant/planter-shrub-v1/beech-source.json");
+var reports=new System.Collections.Generic.List<object>();
+foreach(var name in new[]{"beech_bush_small","beech_bush_regular_small","beech_shrub_tall_medium"})
+{
+    var path="models/sbox_props/shrubs/beech/"+name+".vmdl";var model=Model.Load(path);
+    if(model is null||model.IsError)throw new InvalidOperationException("Missing installed shrub: "+path);
+    var vertices=model.GetVertices();var indices=model.GetIndices();
+    reports.Add(new{Name=name,Vertices=vertices.Length,Triangles=indices.Length/3,
+        Materials=model.Materials.Select(m=>m.ResourcePath).ToArray(),
+        Min=new[]{vertices.Min(v=>v.Position.x),vertices.Min(v=>v.Position.y),vertices.Min(v=>v.Position.z)},
+        Max=new[]{vertices.Max(v=>v.Position.x),vertices.Max(v=>v.Position.y),vertices.Max(v=>v.Position.z)}});
+    if(name!="beech_shrub_tall_medium")continue;
+    var materials=model.GetMaterials(0).ToArray();
+    if(materials.Length!=1||materials[0].IsError)throw new InvalidOperationException("Expected one material in the default group.");
+    if(indices.Any(i=>i>=vertices.Length))throw new InvalidOperationException("Invalid source indices.");
+    var record=new{SourceModel=path,Material=materials[0].ResourcePath,
+        Vertices=vertices.Select(v=>new{Position=new[]{v.Position.x,v.Position.y,v.Position.z},
+            Normal=new[]{v.Normal.x,v.Normal.y,v.Normal.z},UV=new[]{v.TexCoord0.x,v.TexCoord0.y}}).ToArray(),Indices=indices};
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(destination));
+    System.IO.File.WriteAllText(destination,System.Text.Json.JsonSerializer.Serialize(record));
+}
+return new{Models=reports,Export=destination,
+    MeshApi=typeof(Model).GetMethods().Where(m=>m.Name.Contains("Vert")||m.Name.Contains("Ind")||m.Name.Contains("Mesh")).Select(m=>m.ToString()).ToArray()};
