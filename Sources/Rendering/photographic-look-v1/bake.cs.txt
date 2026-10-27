@@ -1,0 +1,150 @@
+// Stage a two-pass Ares DDGI bake. The temporary volume is always removed; adoption is separate.
+if (Game.IsPlaying) throw new Exception("Ares must be idle for this bake.");
+var root = Project.Current.GetRootPath();
+var previous = Editor.SceneEditorSession.Active;
+var session = Editor.SceneEditorSession.All.SingleOrDefault(s => string.Equals(s.Scene.Source?.ResourcePath, "scenes/maps/ares/ares.scene", StringComparison.OrdinalIgnoreCase));
+if (session is null || session.HasUnsavedChanges)
+    throw new Exception("Expected the clean Ares editor document.");
+var scene = session.Scene;
+if (scene.GetAllComponents<IndirectLightVolume>().Any()) throw new Exception("Ares already has indirect lighting; inspect it first.");
+var destination = System.IO.Path.Combine(root, "output/photographic-look-20261027/ares-gi-v1");
+var resourceDirectory = "lighting/ares/photographic-v1";
+var nativeDirectory = System.IO.Path.Combine(root, "Assets", resourceDirectory);
+if (System.IO.Directory.Exists(nativeDirectory) && System.IO.Directory.EnumerateFiles(nativeDirectory).Any())
+    throw new Exception("Existing bake output must be inspected, not overwritten.");
+System.IO.Directory.CreateDirectory(destination);
+System.IO.Directory.CreateDirectory(nativeDirectory);
+var sourcePath = System.IO.Path.Combine(root, "Assets/scenes/maps/Ares/ares.scene");
+var beforeSource = System.IO.File.ReadAllBytes(sourcePath);
+System.IO.File.WriteAllBytes(System.IO.Path.Combine(destination, "scene-before.json"), beforeSource);
+var beforeObjects = scene.GetAllObjects(true).Select(o => o.Id).ToHashSet();
+var gameId = Game.ActiveScene?.Id;
+var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
+GameObject holder;
+IndirectLightVolume volume;
+using (scene.Push())
+{
+    holder = new GameObject(false, "Ares bounced lighting");
+    volume = holder.Components.Create<IndirectLightVolume>();
+    volume.Bounds = new BBox(new Vector3(-1160, -2250, 24), new Vector3(760, 2250, 696));
+    volume.ProbeDensity = 5;
+    volume.InsideGeometry = IndirectLightVolume.InsideGeometryBehavior.Relocate;
+    volume.NormalBias = 8;
+    volume.ViewBias = 4;
+    volume.BlendDistance = 96;
+    volume.RuntimeIntensity = 1;
+    holder.Enabled = true;
+}
+var type = typeof(IndirectLightVolume);
+var probesProperty = type.GetProperty("Probes", flags);
+var generatedProperty = type.GetProperty("GeneratedRelocationTexture", flags);
+var previewField = type.GetField("_bakePreview", flags);
+var dirty = type.GetMethod("MarkDirty", flags);
+void Status(string text) => System.IO.File.WriteAllText(System.IO.Path.Combine(destination, "status.txt"), text);
+void RequireContext()
+{
+    if (!ReferenceEquals(previous, Editor.SceneEditorSession.Active) || Game.IsPlaying || Game.ActiveScene?.Id != gameId
+        || session.HasUnsavedChanges || !beforeSource.SequenceEqual(System.IO.File.ReadAllBytes(sourcePath)))
+        throw new Exception("The editor changed during the bake; the result is not adopted.");
+}
+using var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+timeout.CancelAfter(TimeSpan.FromSeconds(240));
+var token = timeout.Token;
+object updater = null;
+Texture relocation = null;
+try
+{
+    var counts = volume.ProbeCounts;
+    var spacing = (Vector3)type.GetMethod("ComputeSpacing", flags).Invoke(volume, new object[] { counts });
+    var directions = (Vector3[])type.GetMethod("GenerateSphericalDirections", flags | System.Reflection.BindingFlags.Static).Invoke(null, new object[] { 128 });
+    var trace = type.GetMethod("TraceProbeRays", flags);
+    var relocate = type.GetMethod("ComputeRelocationOffset", flags);
+    var position = type.GetMethod("GetProbeWorldPosition", flags);
+    var ratio = trace.ReturnType.GetProperty("BackfaceRatio", flags);
+    var minSpacing = MathF.Min(spacing.x, MathF.Min(spacing.y, spacing.z));
+    var probes = new IndirectLightVolume.Probe[counts.x * counts.y * counts.z];
+    for (var i = 0; i < probes.Length; i++) probes[i] = new IndirectLightVolume.Probe();
+    probesProperty.SetValue(volume, probes);
+    for (var z = 0; z < counts.z; z++)
+    for (var y = 0; y < counts.y; y++)
+    {
+        token.ThrowIfCancellationRequested();
+        RequireContext();
+        using (scene.Push())
+        for (var x = 0; x < counts.x; x++)
+        {
+            var world = (Vector3)position.Invoke(volume, new object[] { new Vector3Int(x, y, z) });
+            var offset = Vector3.Zero;
+            var active = true;
+            for (var iteration = 0; iteration < 12 && active; iteration++)
+            {
+                var hit = trace.Invoke(volume, new object[] { world + offset, spacing.Length, directions });
+                var move = ((Vector3, bool))relocate.Invoke(volume, new object[] { offset, hit, spacing, minSpacing, minSpacing * .2f, directions });
+                if (move.Item2) { active = false; break; }
+                offset = move.Item1;
+            }
+            if (active) active = (float)ratio.GetValue(trace.Invoke(volume, new object[] { world + offset, spacing.Length, directions })) < .25f;
+            probes[x + y * counts.x + z * counts.x * counts.y] = new IndirectLightVolume.Probe { Offset = offset, Active = active };
+        }
+        Status($"Relocating probes: row {z * counts.y + y + 1}/{counts.z * counts.y}; grid {counts}");
+        await Task.Yield();
+    }
+    using (scene.Push())
+    {
+        type.GetMethod("UpdateRelocationTexture", flags).Invoke(volume, null);
+        dirty.Invoke(volume, null);
+    }
+    relocation = (Texture)generatedProperty.GetValue(volume);
+    var updaterType = type.Assembly.GetType("Sandbox.DDGIProbeUpdaterCubemapper");
+    using (scene.Push()) updater = Activator.CreateInstance(updaterType, new object[] { volume });
+    var irradiance = (Texture)updaterType.GetProperty("GeneratedIrradianceTexture").GetValue(updater);
+    var distance = (Texture)updaterType.GetProperty("GeneratedDistanceTexture").GetValue(updater);
+    previewField.SetValue(volume, (irradiance, distance, relocation));
+    dirty.Invoke(volume, null);
+    Task<bool> task;
+    using (scene.Push()) task = (Task<bool>)updaterType.GetMethod("RunAsync").Invoke(updater, new object[] { token });
+    while (!task.IsCompleted)
+    {
+        await Task.WhenAny(task, Task.Delay(1000));
+        try { RequireContext(); } catch { timeout.Cancel(); }
+        if (!task.IsCompleted) Status($"Baking pass {(int)updaterType.GetField("_pass", flags).GetValue(updater) + 1}/2; probe {updaterType.GetField("_renderedIndex", flags).GetValue(updater)}; grid {counts}");
+    }
+    if (!await task) throw new Exception("The native bake did not complete.");
+    RequireContext();
+    irradiance = (Texture)updaterType.GetProperty("GeneratedIrradianceTexture").GetValue(updater);
+    distance = (Texture)updaterType.GetProperty("GeneratedDistanceTexture").GetValue(updater);
+    Graphics.FlushGPU();
+    Texture Save(Texture texture, string name, ImageFormat? format = null)
+    {
+        if (texture is null || texture.IsError) throw new Exception("Invalid baked texture: " + name);
+        System.IO.File.WriteAllBytes(System.IO.Path.Combine(nativeDirectory, name + ".vtex_c"), texture.SaveToVtex(format));
+        var saved = Texture.Load(resourceDirectory + "/" + name + ".vtex", false);
+        if (saved is null || saved.IsError) throw new Exception("Could not reload baked texture: " + name);
+        return saved;
+    }
+    volume.IrradianceTexture = Save(irradiance, "irradiance");
+    volume.DistanceTexture = Save(distance, "distance", (ImageFormat)85);
+    volume.RelocationTexture = Save(relocation, "relocation", (ImageFormat)24);
+    volume.BakeVersion = 1;
+    previewField.SetValue(volume, null);
+    dirty.Invoke(volume, null);
+    System.IO.File.WriteAllText(System.IO.Path.Combine(destination, "volume.json"), holder.Serialize().ToJsonString());
+    var result = new { Grid = counts.ToString(), TotalProbes = probes.Length, ActiveProbes = probes.Count(p => p.Active),
+        Passes = 2, SourceSceneUnchanged = true, TexturesSaved = true, Adopted = false };
+    System.IO.File.WriteAllText(System.IO.Path.Combine(destination, "result.json"), System.Text.Json.JsonSerializer.Serialize(result));
+    Status("Complete; staged for visual review.");
+    return result;
+}
+catch (Exception e) { Status("Failed: " + e); throw; }
+finally
+{
+    previewField.SetValue(volume, null);
+    (updater as IDisposable)?.Dispose();
+    relocation?.Dispose();
+    generatedProperty.SetValue(volume, null);
+    holder.Destroy();
+    // Destruction of the updater's camera and our volume completes at the end of the frame.
+    await Task.Delay(50);
+    if (!beforeObjects.SetEquals(scene.GetAllObjects(true).Select(o => o.Id))) throw new Exception("Temporary volume cleanup failed.");
+    RequireContext();
+}

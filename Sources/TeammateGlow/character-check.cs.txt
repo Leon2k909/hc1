@@ -1,0 +1,121 @@
+// Disposable dressed-character regression. Does not change the edited scene or play state.
+var root = Sandbox.Project.Current.GetRootPath();
+var request = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(
+    System.IO.Path.Combine(root, "output/teammate-glow/leak-fix/capture-request.json")));
+var tag = request["tag"].GetValue<string>();
+if (!new[] { "before", "after", "candidate" }.Contains(tag)) throw new InvalidOperationException("Invalid capture tag.");
+var folder = System.IO.Path.Combine(root, "output/teammate-glow/leak-fix", tag);
+System.IO.Directory.CreateDirectory(folder);
+var session = Editor.SceneEditorSession.Active;
+var source = session.Scene;
+var sourceId = source.Id;
+var playing = Game.IsPlaying;
+var dirty = session.HasUnsavedChanges;
+var gameId = Game.ActiveScene?.Id;
+var sourceObjects = source.GetAllObjects(true).Select(x => x.Id).ToHashSet();
+var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
+var beforeRender = typeof(Scene).GetMethod("PreRender", flags, null, Type.EmptyTypes, null);
+var beforeCamera = typeof(Scene).GetMethod("PreCameraRender", flags, null, Type.EmptyTypes, null);
+var updateCamera = typeof(PostProcessSystem).GetMethod("UpdateCamera", flags);
+var style = typeof(Facepunch.PlayerPawn).Assembly.GetType("Facepunch.TeammateOcclusionGlow")
+    .GetMethod("Apply", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
+var results = new System.Collections.Generic.List<object>();
+var scene = new Scene();
+try
+{
+    CameraComponent camera;
+    ModelRenderer wall;
+    using (scene.Push())
+    {
+        camera = new GameObject(true, "Teammate character test camera").AddComponent<CameraComponent>();
+        camera.WorldPosition = new Vector3(0, 0, 37);
+        camera.WorldRotation = Rotation.Identity;
+        camera.FieldOfView = 70;
+        camera.FovAxis = CameraComponent.Axis.Horizontal;
+        camera.CustomSize = new Vector2(960, 640);
+        camera.ZNear = 1; camera.ZFar = 4000;
+        camera.BackgroundColor = new Color(.12f, .12f, .12f);
+        camera.IsMainCamera = true;
+        camera.EnablePostProcessing = true;
+        camera.Components.Create<Highlight>();
+        var sun = new GameObject(true, "Teammate test light").AddComponent<DirectionalLight>();
+        sun.WorldRotation = Rotation.From(new Angles(35, -125, 0));
+        sun.LightColor = Color.White; sun.SkyColor = Color.White * .5f;
+        wall = new GameObject(true, "Test cover").AddComponent<ModelRenderer>();
+        wall.Model = Model.Cube;
+        wall.MaterialOverride = Material.Load("materials/ares/ar_wall.vmat");
+        wall.Tint = new Color(.32f, .32f, .32f);
+        wall.Enabled = false;
+    }
+
+    async Task Frame(float delta, string path = null)
+    {
+        using (scene.Push())
+        {
+            scene.EditorTick(delta, delta);
+            typeof(Scene).GetProperty("Camera", flags).SetValue(scene, camera);
+            beforeRender.Invoke(scene, null);
+            beforeCamera.Invoke(scene, null);
+            updateCamera.Invoke(scene.GetSystem<PostProcessSystem>(), new object[] { camera });
+            using var bitmap = new Bitmap(960, 640);
+            camera.RenderToBitmap(bitmap, false);
+            if (path is not null) System.IO.File.WriteAllBytes(path, bitmap.ToPng());
+        }
+        await Task.Delay(12, cancellationToken);
+    }
+
+    foreach (var entry in new[]
+    {
+        (Name: "male-front", Distance: 200f, Yaw: 180f, Female: false, Style: Facepunch.MilitaryUniformStyle.Standard, Duck: 0f),
+        (Name: "male-side", Distance: 350f, Yaw: 75f, Female: false, Style: Facepunch.MilitaryUniformStyle.Field, Duck: 0f),
+        (Name: "male-back", Distance: 850f, Yaw: 0f, Female: false, Style: Facepunch.MilitaryUniformStyle.Tactical, Duck: 0f),
+        (Name: "female-crouch", Distance: 240f, Yaw: 150f, Female: true, Style: Facepunch.MilitaryUniformStyle.Standard, Duck: 1f)
+    })
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        GameObject actor;
+        HighlightOutline outline;
+        SkinnedModelRenderer renderer;
+        using (scene.Push())
+        {
+            actor = new GameObject(true, "Teammate " + entry.Name);
+            actor.WorldPosition = new Vector3(entry.Distance, 0, 0);
+            actor.WorldRotation = Rotation.FromYaw(entry.Yaw);
+            renderer = actor.AddComponent<SkinnedModelRenderer>();
+            Facepunch.MilitaryUniform.SetModel(renderer, Model.Load(entry.Female
+                ? Facepunch.MilitaryUniform.FemaleHumanModelPath : Facepunch.MilitaryUniform.HumanModelPath), entry.Style);
+            renderer.Set("holdtype", 1);
+            renderer.Set("duck", entry.Duck);
+            outline = actor.AddComponent<HighlightOutline>();
+            style.Invoke(null, new object[] { outline, new Color(.1f, .62f, .92f) });
+            outline.Enabled = false;
+        }
+        wall.Enabled = false;
+        for (var frame = 0; frame < 12; ++frame) await Frame(.016f);
+        var targets = outline.GetOutlineTargets().Count();
+        if (targets < 3) throw new InvalidOperationException("Dressed-character fixture has too few renderers.");
+        foreach (var cover in new[] { "visible", "partial", "hidden" })
+        {
+            wall.Enabled = cover != "visible";
+            wall.WorldPosition = new Vector3(entry.Distance * .65f, cover == "partial" ? 14 : 0, 40);
+            wall.WorldScale = new Vector3(8, cover == "partial" ? 26 : 100, 90) / wall.Model.Bounds.Size;
+            foreach (var enabled in new[] { false, true })
+            {
+                outline.Enabled = enabled;
+                var stem = entry.Name + "-" + cover + (enabled ? "-on" : "-off");
+                for (var frame = 0; frame < 3; ++frame)
+                    await Frame(0, frame == 2 ? System.IO.Path.Combine(folder, stem + ".png") : null);
+            }
+        }
+        results.Add(new { entry.Name, entry.Distance, entry.Yaw, entry.Duck, Model = renderer.Model.Name, Targets = targets });
+        actor.Destroy();
+    }
+}
+finally { scene.Destroy(); }
+var preserved = ReferenceEquals(session, Editor.SceneEditorSession.Active) && source.Id == sourceId
+    && Game.IsPlaying == playing && Game.ActiveScene?.Id == gameId && session.HasUnsavedChanges == dirty
+    && source.GetAllObjects(true).Select(x => x.Id).ToHashSet().SetEquals(sourceObjects);
+var result = new { Tag = tag, EditorStatePreserved = preserved, Cases = results, Width = 960, Height = 640 };
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder, "native-result.json"), System.Text.Json.JsonSerializer.Serialize(result));
+if (!preserved) throw new InvalidOperationException("The editor state changed during character verification.");
+return result;

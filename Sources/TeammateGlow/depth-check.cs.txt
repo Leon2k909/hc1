@@ -1,0 +1,92 @@
+// Isolated pixel-depth fixture. Never changes the user's map, camera or play state.
+var project = Sandbox.Project.Current.GetRootPath();
+var folder = System.IO.Path.Combine(project,"output/teammate-glow/verified");
+System.IO.Directory.CreateDirectory(folder);
+var session = Editor.SceneEditorSession.Active;
+var source = session.Scene;
+var gameId = Game.ActiveScene?.Id;
+var playing = Game.IsPlaying;
+var dirty = session.HasUnsavedChanges;
+var sourceObjects = source.GetAllObjects(true).Select(x=>x.Id).ToHashSet();
+var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
+var before = typeof(Scene).GetMethod("PreRender",flags,null,Type.EmptyTypes,null);
+var preCamera = typeof(Scene).GetMethod("PreCameraRender",flags,null,Type.EmptyTypes,null);
+var helper = typeof(Facepunch.PlayerPawn).Assembly.GetType("Facepunch.TeammateOcclusionGlow");
+var apply = helper.GetMethod("Apply",System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.NonPublic);
+var scene = new Scene();
+object style = null;
+CameraComponent camera=null;
+HighlightOutline outline=null;
+ModelRenderer wall=null;
+try
+{
+    using(scene.Push())
+    {
+        camera = new GameObject(true,"Depth test camera").AddComponent<CameraComponent>();
+        camera.WorldPosition = new Vector3(0,0,40);
+        camera.WorldRotation = Rotation.Identity;
+        camera.FieldOfView = 50;
+        camera.FovAxis = CameraComponent.Axis.Horizontal;
+        camera.CustomSize = new Vector2(960,640);
+        camera.ZNear = 1; camera.ZFar = 1000;
+        camera.BackgroundColor = new Color(.12f,.12f,.12f);
+        camera.IsMainCamera = true;
+        camera.EnablePostProcessing = true;
+        camera.Components.Create<Highlight>();
+        var sun = new GameObject(true,"Depth test light").AddComponent<DirectionalLight>();
+        sun.WorldRotation = Rotation.From(new Angles(35,-125,0));
+        sun.LightColor = Color.White; sun.SkyColor = Color.White*.5f;
+        var actor = new GameObject(true,"Teammate fixture");
+        ModelRenderer Box(string name,Vector3 position,Vector3 size,Color tint,GameObject parent=null)
+        {
+            var go = new GameObject(true,name); if(parent is not null)go.Parent=parent;
+            var r = go.AddComponent<ModelRenderer>();r.Model=Model.Cube;
+            r.MaterialOverride=Material.Load("materials/ares/ar_wall.vmat");
+            r.Tint=tint;r.WorldPosition=position;r.WorldScale=size/r.Model.Bounds.Size;
+            return r;
+        }
+        var uniform = new Color(.34f,.37f,.29f);
+        Box("Torso",new(160,0,43),new(12,30,50),uniform,actor);
+        Box("Exposed arm",new(160,41,57),new(10,58,10),uniform,actor);
+        Box("Head",new(160,0,77),new(12,12,14),uniform,actor);
+        wall = Box("Cover",new(100,0,40),new(8,40,80),new Color(.32f,.32f,.32f));
+        outline=actor.AddComponent<HighlightOutline>();
+        apply.Invoke(null,new object[]{outline,new Color(.10f,.62f,.92f)});
+        if(outline.Material is null||outline.Material.IsError)throw new InvalidOperationException("Teammate shader did not load.");
+        style=new {outline.Width,VisibleEdge=outline.Color,VisibleFill=outline.InsideColor,
+            HiddenEdge=outline.ObscuredColor,HiddenFill=outline.InsideObscuredColor,Targets=outline.GetOutlineTargets().Count()};
+    }
+        async Task Render(string name,bool enabled)
+        {
+            outline.Enabled=enabled;
+            for(int i=0;i<4;i++)
+            {
+                using(scene.Push())
+                {
+                scene.EditorTick(.016f,.016f);
+                typeof(Scene).GetProperty("Camera",flags).SetValue(scene,camera);
+                before.Invoke(scene,null);preCamera.Invoke(scene,null);
+                typeof(PostProcessSystem).GetMethod("UpdateCamera",flags).Invoke(scene.GetSystem<PostProcessSystem>(),new object[]{camera});
+                using var image=new Bitmap(960,640);camera.RenderToBitmap(image,false);
+                if(i==3)System.IO.File.WriteAllBytes(System.IO.Path.Combine(folder,name+".png"),image.ToPng());
+                }
+                await Task.Delay(35,cancellationToken);
+            }
+        }
+        await Render("covered-off",false);
+        await Render("covered-on",true);
+        wall.Enabled=false;
+        await Render("visible-off",false);
+        await Render("visible-on",true);
+        outline.Color=Color.White.WithAlpha(.5f);outline.InsideColor=Color.White.WithAlpha(.5f);
+        await Render("diagnostic-visible-white",true);
+}
+finally {scene.Destroy();}
+var preserved=ReferenceEquals(session,Editor.SceneEditorSession.Active)&&Game.ActiveScene?.Id==gameId
+    &&Game.IsPlaying==playing&&session.HasUnsavedChanges==dirty
+    &&source.GetAllObjects(true).Select(x=>x.Id).ToHashSet().SetEquals(sourceObjects);
+if(!preserved)throw new InvalidOperationException("Editor state changed during depth fixture.");
+var result=new {Style=style,EditorStatePreserved=preserved,Width=960,Height=640,
+    CameraPosition="0,0,40",HorizontalFov=50,TorsoSample="480,300",ArmSample="170,210"};
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"native-result.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

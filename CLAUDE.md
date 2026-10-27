@@ -36,6 +36,23 @@
   The temporary camera was removed. Full-match exposure transitions, scope/drone behaviour and GPU frame times
   remain unmeasured. The comparison does not establish photorealism across every map.
 
+## Photographic map finish (2026-10-27)
+- `PhotographicResponse` adds restrained luminance contrast, highlight desaturation, peripheral lens softness,
+  subpixel radial colour separation and monochrome grain after native tone mapping and before the HUD. The shared
+  gameplay and Theater cameras use strength 0.65, local contrast 0.15, highlights 0.12, edge softness 0.18,
+  aberration 0.3 pixels at 1080p and grain 0.012. The central aiming region has no lens softness or separation.
+  It preserves the maps' existing ACES, exposure, white balance, bloom and fog. Strength zero skips its pass.
+- Recon feeds copy it using `CameraPostProcess.Copy`. Scope render targets do not receive another copy: the final
+  main-camera pass already covers the scope image. The shared camera prefab also serves spectators and Drone.
+- Ares now has one native DDGI volume, `Ares bounced lighting`: 11x23x5 probes, two lighting passes, intensity 0.65.
+  Its three textures are in `Assets/lighting/ares/photographic-v1/` and explicitly included by `.gitignore`.
+  `Tools/ares_lighting.py` and `Sources/Rendering/photographic-look-v1/ares-indirect-light.json` retain it on scene
+  regeneration. Rebake when facility geometry or lighting changes. No existing Ares scene object was edited.
+- `Sources/Rendering/photographic-look-v1/README.md` describes the implementation, native scripts and evidence.
+  Native comparisons cover Ares, Belltower, Lowtide, Veridant and Boxyard. Native profile loading, enabled/disabled
+  copy identity and shader/texture loading pass; game/editor compilation reports zero errors and no diagnostics in
+  the changed C# files. Full-match performance and multiplayer have not been benchmarked for this pass.
+
 ## Map daylight profiles (2026-10-17)
 - The user wants different times of day across maps, with enough light for clear play. `Tools/map_daylight.py`
   defines the saved environment profiles below. Each generator applies its profile after restoring its quality
@@ -3262,6 +3279,16 @@
   Every spawn must have a Complete navmesh path to the other team's spawns.
 
 ## Collider (accelerator laboratory, `Tools/collider_map.py`)
+- East-wing screen removal (2026-10-27): the remaining concrete screen at e 1500..1524, n -160..160, z 0..164
+  is also removed. Both screens and their box colliders are gone; the generator and minimap retain this layout.
+  All 68 positions remain supported, clear and reachable. Two Retakes A attacker/defender sightlines become
+  exposed, confirmed with native standing-eye rays; see `Sources/Collider/wall-removal-east/README.md` and
+  `installed.json`. The scoped asset import preserves the current unsaved document and concurrent door props.
+- West-wing concrete screen removal (2026-10-27): the freestanding wall at plan e -1524..-1500, n -160..160,
+  z 0..164 is removed, including its single box collider. `collider_map.wings` now only places the east screen.
+  The scoped migration removes 12 render triangles, preserves all other geometry/physics bytes and updates the
+  radar from published collision. All 68 layout positions and Retakes sight checks pass; native rays through
+  the removed wall are clear. See `Sources/Collider/wall-removal/README.md` and `installed.json`.
 - Built from the user's blue particle-accelerator reference on 2026-10-15. The playable research hall has an open
   two-level atrium, two main stairs, control/laboratory wings with their own stairs, and a ground-level service lane.
   A large observation window separates the combat space from the accelerator chamber. The upper laboratory display
@@ -3352,6 +3379,11 @@
   inspect the running operation and logs rather than starting hosting again after an observation timeout.
 
 ## Belltower (multiplayer map, `Tools/belltower_map.py`)
+- Northern plaza lamp placement (2026-10-27): the two lamps at plan `(±420,330)` now stand beside the arcade's
+  solid outer piers at `(±420,520)`, clearing the square-to-arcade walkway. Only their render positions and four
+  base/shaft collision hulls move; the map generator retains the new placement. Both town models compile, and
+  native traces confirm the old sites are clear and new sites solid. `belltower_move_square_lamps.py`,
+  `belltower_check_lamp_placement.py` and `Sources/Belltower/props/lamp-placement-v1.json` record the scoped migration.
 - Current checkout checkpoint (2026-10-18): work in `C:\sbox-projects\hc1\forked-shooter-main`.
   The live town models include the `firewood-v2` integration, not just garden v3; its six model files and twelve
   material/texture files match the staged sources. Native firewood views are in `firewood-production-v1-saved/`.
@@ -6242,6 +6274,15 @@ simulate_input.
     (8 shadowed) and 15 fires.
 
 ## Ares (multiplayer map, `Tools/ares_map.py`)
+- Pipe end closures (2026-10-27): all 16 wall-service runs now have smooth dished heads, closing the 32 missing
+  end faces. `ares_pipework.pipe_run` includes them in future generation. The installed repair appends only
+  17,472 head triangles to the active base OBJ, retaining every prior byte and the complete ModelDoc/physics.
+  See `Sources/Ares/pipe-end-fix/README.md` and `installed.json` for native captures and verification.
+- Formed pressure doors (2026-10-26): `Tools/ares_airlock.py` now exports `ares_pressure_formed.pressure_door`,
+  following `Sources/Ares/pressure-doors-v3/concept-v1.png`. All three hatches have true recessed pressings and
+  service pulls, rolled/chipped edges, cast spindle clamps, a seated gasket, recessed wheel and new private PBR maps.
+  The hall uses the unchanged v2 base import plus the three v3 door imports; its complete physics suffix is preserved.
+  See `Sources/Ares/pressure-doors-v3/README.md` and `installed.json` for scope, validation and guarded import details.
 - Pressure-door rebuild (2026-10-20): `Tools/ares_airlock.py` replaces the six-box wing/cargo hatches with chamfered
   pressure frames, rubber seals, two recessed coated-metal leaves, six locking dogs, hex pivots, kick plates, a
   three-spoke release wheel, inspection port and pressure/control display. Warning stripes are confined to the
@@ -6392,6 +6433,18 @@ simulate_input.
   with shadows), and any sound (it has no ambience).
 
 ## Veridant (multiplayer map, `Tools/veridant_map.py`)
+- Spa windows (2026-10-25): `Tools/veridant_spa_windows.py` replaces the nine
+  flat opaque/emissive spa panes with recessed masonry openings, bronze frames,
+  glass and shallow furnished rooms with folded linen curtains. The two facade
+  faces and old window/fixture faces are removed only from the active buildings
+  base OBJ; `spa-windows-v2/spa-facades.obj` supplies 43,420 replacement triangles.
+  Original OBJ indices, other imports and the complete physics suffix remain.
+  `spa()` retains the original two collision boxes and four lamp identities;
+  those lamps are now below the sills, with their native scene positions saved.
+  Only those four scene Position properties changed from the immediate backup.
+  `configure()` preserves `vr_spa_` materials. Final stage-v4, thirteen successful
+  native compiles and three reviewed captures are recorded in
+  `Sources/Veridant/spa-windows-v2/README.md` and its installed receipt.
 - Pergola flowers (2026-10-24): `veridant_parts.bougainvillea()` delegates to
   `Tools/veridant_bougainvillea.py` for branching vines, folded green leaves and
   small shaded pink bracts. The six old atlas cards (24 triangles) are removed

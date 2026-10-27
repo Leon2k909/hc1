@@ -46,9 +46,6 @@ public partial class PlayerPawn
 		if ( Team == Team.Unassigned )
 			return false;
 
-		if ( Client.IsValid() && Client.IsBot )
-			return false;
-
 		if ( SpectateSystem.Instance.IsValid() && SpectateSystem.Instance.IsSpectating )
 			return true;
 
@@ -63,36 +60,35 @@ public partial class PlayerPawn
 				return true;
 		}
 
-		var viewer = Client.Viewer;
-		if ( viewer.IsValid() )
-			return Team == viewer.Team;
-
-		return false;
+		return TeammateOcclusionGlow.IsTeammate( Team );
 	}
 
 	private void UpdateOutline()
 	{
-		// Somehow this can happen?
-		if ( !Client.Local.IsValid() )
+		if ( !Outline.IsValid() )
 			return;
 
-		if ( !IsOutlineVisible() )
+		if ( !Client.Local.IsValid() || !IsOutlineVisible() )
 		{
 			Outline.Enabled = false;
 			return;
 		}
 
 		Outline.Enabled = true;
+		Outline.Material = null;
 		Outline.Width = 0.03f;
 		Outline.Color = Color.Transparent;
 		Outline.InsideColor = HealthComponent.IsGodMode ? Color.White.WithAlpha( 0.1f ) : Color.Transparent;
+		Outline.InsideObscuredColor = Color.Transparent;
+		var spectating = SpectateSystem.Instance.IsValid() && SpectateSystem.Instance.IsSpectating;
 
-		if ( Client.Local.GetLastKiller() == this && SpectateSystem.Instance.IsValid() && SpectateSystem.Instance.IsSpectating )
+		if ( Client.Local.GetLastKiller() == this && spectating )
 			Outline.ObscuredColor = Color.Red;
-		else if ( SpectateSystem.Instance.IsSpectating )
+		else if ( spectating )
 			Outline.ObscuredColor = Team.GetColor();
+		else if ( TeammateOcclusionGlow.IsTeammate( Team ) )
+			TeammateOcclusionGlow.Apply( Outline, Client.IsValid() ? Client.PlayerColor : Team.GetColor() );
 		else
-			Outline.ObscuredColor = Client.Viewer.Team == Team
-				? Client.PlayerColor : Color.Transparent;
+			Outline.ObscuredColor = Color.Transparent;
 	}
 }

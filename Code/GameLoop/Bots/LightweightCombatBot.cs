@@ -131,6 +131,7 @@ public sealed partial class LightweightCombatBot : Component, ITeam, IDescriptio
 		AttachMovementBox();
 		UpdateStance();
 		UpdateAnimation();
+		UpdateTeammateGlow();
 
 		if ( IsProxy )
 			return;

@@ -1,0 +1,12 @@
+var root = Project.Current.GetRootPath();
+var source = System.IO.Path.Combine(root, "Sources/Rendering/photographic-look-v1/hc1_photographic_response.shader");
+var target = System.IO.Path.Combine(root, "Assets/shaders/hc1_photographic_response.shader");
+var session = Editor.SceneEditorSession.Active;
+var before = new { Game.IsPlaying, Game = Game.ActiveScene?.Id, Dirty = session.HasUnsavedChanges };
+System.IO.File.Copy(source, target, true);
+var asset = Editor.AssetSystem.RegisterFile(target);
+var compiled = await Editor.EditorUtility.CompileShader("shaders/hc1_photographic_response.shader", new() { ForceRecompile = true }, cancellationToken);
+if (!compiled.Success) throw new Exception(string.Join("\n", compiled.Programs.SelectMany(p => p.Output ?? new System.Collections.Generic.List<string>())));
+if (compiled.CompiledShader is { Length: > 0 }) System.IO.File.WriteAllBytes(target + "_c", compiled.CompiledShader);
+return new { Shader = asset?.Path, Compiled = compiled.Success, EditorPreserved = ReferenceEquals(session, Editor.SceneEditorSession.Active)
+    && Game.IsPlaying == before.IsPlaying && Game.ActiveScene?.Id == before.Game && session.HasUnsavedChanges == before.Dirty };
