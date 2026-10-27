@@ -1,0 +1,100 @@
+{
+  "date": "2026-10-27",
+  "scope": "Read-only visual and asset comparison; no game files changed.",
+  "project_root": "C:\\sbox-projects\\hc1\\forked-shooter-main",
+  "reference": "facepunch.depot",
+  "depot_native": {
+    "unique_model_resource_paths": 2277,
+    "distinct_non_error_materials": 370,
+    "distinct_decal_materials": 32,
+    "decal_materials": [
+      "materials/decals/dirt/decal_dirt_b.vmat",
+      "materials/decals/scratches/decal_scratches_a.vmat",
+      "materials/decals/decal_trim_dirt_b.vmat",
+      "materials/decals/decal_asphalt_crack_line.vmat",
+      "materials/decals/footprints/decal_footprints_a.vmat",
+      "materials/decals/brickvent/brick_vent_decal_01.vmat",
+      "materials/decals/decal_pole_hole_a.vmat",
+      "materials/decals/leaks/decal_leak_d.vmat",
+      "materials/decals/damage/decal_wall_damage_b.vmat",
+      "materials/decals/decal_sewer_plate_a.vmat",
+      "materials/decals/leaks/decal_leak_b4.vmat",
+      "materials/decals/damage/decal_wall_damage_a.vmat",
+      "materials/decals/stains/decal_stain_c.vmat",
+      "materials/decals/decal_gravel_sand_trim_a.vmat",
+      "materials/decals/stains/decal_stain_a.vmat",
+      "materials/decals/leaks/decal_leak_b1.vmat",
+      "materials/decals/stains/decal_stain_b.vmat",
+      "materials/decals/decal_asphalt_cut_line.vmat",
+      "materials/decals/dirt/decal_dirt_a.vmat",
+      "materials/decals/leaks/decal_leak_b3.vmat",
+      "materials/decals/damage/decal_brick_damage_a.vmat",
+      "materials/decals/damage/decal_brick_damage_b.vmat",
+      "materials/decals/leaks/decal_leak_b5.vmat",
+      "materials/decals/leaks/decal_leak_b2.vmat",
+      "materials/decals/stains/decal_stain_d.vmat",
+      "materials/decals/decal_street_line_marking_a.vmat",
+      "materials/decals/decal_liquid_a.vmat",
+      "materials/decals/footprints/decal_footprints_b.vmat",
+      "materials/decals/decal_sign_constructionsite_a.vmat",
+      "materials/decals/decal_tire_mark_b.vmat",
+      "materials/decals/decal_stencil_number_a.vmat",
+      "materials/decals/decal_sign_building_emergency.vmat"
+    ],
+    "reflection_probes": 55,
+    "reflection_modes": {
+      "Realtime": 55
+    },
+    "spot_lights": 77,
+    "point_lights": 82
+  },
+  "custom_scene_authored_reflection_counts": {
+    "Ares": 4,
+    "Belltower": 3,
+    "Collider": 4,
+    "Lowtide": 11,
+    "Railhead": 14,
+    "Veridant": 9
+  },
+  "observations": [
+    "Depot's viewed concrete room has localized runoff, layered wall/base dirt, irregular rubble, damaged thresholds and recessed construction joints.",
+    "Native model materials include concrete trim sheets, damaged blend materials, and distinct dirt, leak, crack, footprint and stain decals.",
+    "The reviewed Belltower square has more uninterrupted paving, continuous facade edges and repetitive construction than Depot's inspected room.",
+    "The reviewed Ares hall and Veridant courtyard have broad repeating panel/stone patterns, simple silhouette transitions and limited localized wear between props.",
+    "Custom materials already contain color, normal and roughness textures. Collider concrete is 1024 square; Ares and Veridant concrete are 2048 square; Belltower scanned limestone is 4096 square with its own AO.",
+    "Belltower's scanned and layered plaster surfaces demonstrate that increasing texture resolution alone cannot address all of the perceived quality gap."
+  ],
+  "priority_order": [
+    "Choose one representative player-height area per map and review the full composition at consistent FOV.",
+    "Improve primary architecture: appropriate bevels, recesses, trim junctions, construction thickness and selectively damaged edges.",
+    "Apply location-dependent wear and material blending at wall bases, corners, thresholds, water paths and traffic routes; preserve the intended clean or weathered character of each map.",
+    "Unify material scale, normal strength and roughness across architecture and props.",
+    "Review bounced light, contact shadows and local reflections after geometry/material work, then rebake changed areas and verify player visibility and performance."
+  ],
+  "limits": [
+    "Depot was inspected live in the stopped editor; comparison visuals for Belltower, Ares and Veridant are existing native captures from their recent work.",
+    "Different environments and capture profiles prevent treating these images as a controlled lighting comparison.",
+    "Material, object and probe counts are inventories, not quality scores or recommendations to duplicate those counts.",
+    "Mounted-file enumeration returned no Depot files; this does not establish whether legacy map lightmaps are present or missing. No lightmap warnings matched the current console buffer.",
+    "No gameplay, multiplayer or GPU benchmark was run."
+  ],
+  "input_sha256": {
+    "Assets/scenes/maps/Depot/Depot.scene": "12c0f8ded06464ab21ae434017dffb14487d9ff1ed329449d5404b587b740a12",
+    "Assets/materials/collider/co_concrete.vmat": "66dd7b1f9b268884f565c487a24cb6ead0da66df162c24d2262de80134512558",
+    "Assets/materials/ares/ar_concrete.vmat": "a3f8a95aef86a1311216aa57568ce621250390b4176bd3b6b30fd539eb895159",
+    "Assets/materials/veridant/vr_concrete.vmat": "a50414ed67342c5dfcb2b8f89222af7d8990431de1d0aa8dd937465795bd4981",
+    "Assets/materials/belltower/scans/limestone.vmat": "f54a5c9a5797eb2a3ee3ebc64b51befdd611a5b6b4d240f83d283e918ba63375",
+    "Assets/materials/belltower/plaster_cream.vmat": "f817386eae16e1d8c32ea807383e9dbeca309150df834adee08ecdc27e0f848e",
+    "Tools/collider_materials.py": "57b41c0ee28539bc9478115a66b3656b3284879de5e6c8847523af019b734aa7",
+    "Tools/collider_map.py": "8484eb4c818276a48b95ef8900d73a502901fc9dd7e8199b1ad893293e20a6e0"
+  },
+  "depot_capture": "C:\\sbox-projects\\hc1\\forked-shooter-main\\output\\depot-comparison-20261027\\current-view\\call_tools.png",
+  "comparison_captures": [
+    "output/belltower/quality/lamp-placement-installed/square-east.png",
+    "output/photographic-look-20261027/ares-gi-reduced/ares-hall-after.png",
+    "output/photographic-look-20261027/daylight-review/veridant-courtyard-after.png"
+  ],
+  "editor_state_preserved": true,
+  "editor_camera_preserved": true,
+  "final_compile_errors": 0
+}

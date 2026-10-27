@@ -1,0 +1,44 @@
+// Render the independent fixture in its own disposable scene. Does not switch
+// editor tabs, move the user's camera, or add objects to the edited map.
+var root=Sandbox.Project.Current.GetRootPath();
+var folder=System.IO.Path.Combine(root,"output/veridant/modern-lamp-v1");
+var session=Editor.SceneEditorSession.Active;var game=Game.ActiveScene?.Id;var playing=Game.IsPlaying;var dirty=session.HasUnsavedChanges;
+var source=System.IO.Path.Combine(root,"Assets/scenes/maps/Veridant/veridant.scene");
+string Hash(string path)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+var originalHash=Hash(source);
+var model=Model.Load("models/props/veridant/modern-lamp-v1/bollard.vmdl");
+if(model is null||model.IsError||model.Bounds.Size.z<39.9f||model.Bounds.Size.z>40.1f)throw new InvalidOperationException("Replacement model did not load correctly.");
+if(model.Materials.Any(m=>m is null||m.IsError))throw new InvalidOperationException("Replacement material failed.");
+var scene=new Scene();
+object result=null;
+try
+{
+    using(var scope=scene.Push())
+    {
+        var fixture=new GameObject(true,"Modern bollard preview");
+        fixture.Components.Create<ModelRenderer>().Model=model;
+        var ground=new GameObject(true,"Preview paving");
+        var groundModel=Model.Load("models/dev/box.vmdl");
+        var scale=new Vector3(260/groundModel.Bounds.Size.x,260/groundModel.Bounds.Size.y,2/groundModel.Bounds.Size.z);
+        ground.WorldScale=scale;ground.WorldPosition=new Vector3(0,0,-1)-groundModel.Bounds.Center*scale;
+        var renderer=ground.Components.Create<ModelRenderer>();renderer.Model=groundModel;
+        renderer.MaterialOverride=Material.Load("materials/veridant/vr_paving.vmat");
+        var sun=new GameObject(true,"Preview sun").Components.Create<DirectionalLight>();
+        sun.WorldRotation=Rotation.From(new Angles(45,140,0));sun.LightColor=new Color(1,.91f,.78f)*2f;sun.SkyColor=new Color(.45f,.50f,.58f);
+        var glow=new GameObject(true,"Shielded warm fixture light").Components.Create<PointLight>();
+        glow.WorldPosition=new Vector3(0,0,37.02f);glow.LightColor=new Color(.7f,.44f,.23f);glow.Radius=280;glow.Shadows=false;
+        var camera=new GameObject(true,"Preview camera").Components.Create<CameraComponent>();
+        camera.WorldPosition=new Vector3(-66,-86,63);camera.WorldRotation=Rotation.LookAt(new Vector3(0,0,20)-camera.WorldPosition);
+        camera.FieldOfView=34;camera.FovAxis=CameraComponent.Axis.Horizontal;camera.CustomSize=new Vector2(900,1000);
+        camera.ZNear=.5f;camera.BackgroundColor=new Color(.12f,.13f,.14f);camera.EnablePostProcessing=false;
+        for(int k=0;k<6;k++)scene.EditorTick(.02f,.02f);
+        using var bitmap=new Bitmap(900,1000);
+        camera.RenderToBitmap(bitmap,false);camera.RenderToBitmap(bitmap,false);
+        System.IO.File.WriteAllBytes(System.IO.Path.Combine(folder,"fixture-preview.png"),bitmap.ToPng());
+        result=new{Model=model.ResourcePath,Bounds=model.Bounds.ToString(),Materials=model.Materials.Select(m=>m.ResourcePath).ToArray(),Preview="output/veridant/modern-lamp-v1/fixture-preview.png",MapChanged=false};
+    }
+}
+finally{scene.Destroy();}
+if(!ReferenceEquals(session,Editor.SceneEditorSession.Active)||game!=Game.ActiveScene?.Id||playing!=Game.IsPlaying||dirty!=session.HasUnsavedChanges||Hash(source)!=originalHash)throw new InvalidOperationException("Shared editor state changed during independent preview.");
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"fixture-preview.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

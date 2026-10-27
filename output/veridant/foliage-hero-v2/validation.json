@@ -1,0 +1,171 @@
+{
+  "revision": "veridant-courtyard-olive-v2",
+  "final_stage": "stage-v6-final",
+  "planters_changed": 1,
+  "legacy_triangles_removed": 332,
+  "retained_foliage_bytes_exact": true,
+  "original_obj_indices_preserved": true,
+  "later_independent_base_triangles_removed_preserved": 80,
+  "later_independent_imports_preserved": [
+    "models/maps/veridant/shrub-volume-v1/rosemary-0.obj",
+    "models/maps/veridant/shrub-volume-v1/rosemary-1.obj"
+  ],
+  "existing_scene_objects_preserved": 449,
+  "scene_objects_added": 1,
+  "collision_unchanged": true,
+  "authored_exposure_range_normalisation": [
+    {
+      "MinimumExposure": [
+        2.2,
+        2.1
+      ]
+    },
+    {
+      "MaximumExposure": [
+        2.2,
+        2.4
+      ]
+    }
+  ],
+  "scene_sha256": "4b354d1561d858ecf281aff5881b28404bd481e4a16bf6ed40e16fb3d9ba03b1",
+  "native_tree": {
+    "Id": "598fecc8-e643-47eb-bac3-a8b23718de0f",
+    "WorldPosition": "239,-272,42",
+    "WorldScale": "0.449999988,0.449999988,0.449999988",
+    "Model": "models/sbox_props/trees/oak/tree_oak_small_a.vmdl",
+    "LodCount": 5,
+    "HighestDetailTriangles": 6092,
+    "Materials": [
+      "models/sbox_props/trees/oak/oak_bark.vmat",
+      "models/sbox_props/trees/oak/oak_branch.vmat"
+    ]
+  },
+  "planting": {
+    "herb_leaves": 720,
+    "herb_clumps": 3,
+    "soil_bounds": [
+      226.05,
+      309.95,
+      208.05,
+      269.95
+    ],
+    "triangles": 18967
+  },
+  "native_compile": {
+    "Success": true,
+    "Path": "models/maps/veridant/veridant_foliage.vmdl",
+    "CompiledFile": "C:/sbox-projects/hc1/forked-shooter-main/Assets/models/maps/veridant/veridant_foliage.vmdl_c",
+    "Hint": null
+  },
+  "native_materials_valid": true,
+  "matched_camera_and_exposure": true,
+  "captures": {
+    "courtyard": {
+      "path": "output/veridant/quality/foliage-hero-v2-authored/courtyard.png",
+      "sha256": "2b523a4a0622b7683d2b16b338881b19250d0e42b09e54b162d3897dca108d54",
+      "Capture": {
+        "Position": "100,-418,310",
+        "Angles": "Pitch = 42.54, Yaw = 46.41, Roll = 0.00",
+        "FieldOfView": 64,
+        "FovAxis": "Horizontal",
+        "Width": 1100,
+        "Height": 1000,
+        "EnablePostProcessing": true,
+        "TrialSurfaceSlots": 0,
+        "TrialForestVariant": "accepted",
+        "TrialForestSlots": 0,
+        "TrialModels": 0,
+        "TrialManifestSha256": {},
+        "RequestedExposure": 2.2,
+        "NativeEnabled": true,
+        "NativeMinimum": 2.2,
+        "ViewportSettledMilliseconds": 1500,
+        "NativeMaximum": 2.2,
+        "NativeCompensation": 0,
+        "MainCameraIsViewport": true,
+        "PreviousMainName": "GameObject",
+        "PreviousMainId": "09677109-c2a0-4ec4-bc3d-b6f510026aed",
+        "PreviousMainWasOrthographic": true,
+        "SourceSceneSha256": "4b354d1561d858ecf281aff5881b28404bd481e4a16bf6ed40e16fb3d9ba03b1",
+        "HelperSha256": "7edb00232ff37be04b327d63adea9a384ef9a9b2c1f6aa6aeeffd6e506ef5d7e",
+        "EffectiveGpuExposureVerified": false
+      },
+      "Restoration": {
+        "AssetsRestored": true,
+        "MainCameraRestored": true,
+        "ToneRestored": true,
+        "CamerasRestored": true,
+        "ObjectsRestored": true,
+        "EditorStatePreserved": true
+      },
+      "ExposureImageComparisonStillRequired": true
+    },
+    "detail": {
+      "path": "output/veridant/quality/foliage-hero-v2-authored/detail.png",
+      "sha256": "7906e923a0e9f4f06e7919d278ded06c35184200bb48a486dee273f2ad085bd5",
+      "Capture": {
+        "Position": "95,-414,215",
+        "Angles": "Pitch = 17.82, Yaw = 44.60, Roll = 0.00",
+        "FieldOfView": 50,
+        "FovAxis": "Horizontal",
+        "Width": 1100,
+        "Height": 1000,
+        "EnablePostProcessing": true,
+        "TrialSurfaceSlots": 0,
+        "TrialForestVariant": "accepted",
+        "TrialForestSlots": 0,
+        "TrialModels": 0,
+        "TrialManifestSha256": {},
+        "RequestedExposure": 2.2,
+        "NativeEnabled": true,
+        "NativeMinimum": 2.2,
+        "ViewportSettledMilliseconds": 1500,
+        "NativeMaximum": 2.2,
+        "NativeCompensation": 0,
+        "MainCameraIsViewport": true,
+        "PreviousMainName": "GameObject",
+        "PreviousMainId": "09677109-c2a0-4ec4-bc3d-b6f510026aed",
+        "PreviousMainWasOrthographic": true,
+        "SourceSceneSha256": "4b354d1561d858ecf281aff5881b28404bd481e4a16bf6ed40e16fb3d9ba03b1",
+        "HelperSha256": "7edb00232ff37be04b327d63adea9a384ef9a9b2c1f6aa6aeeffd6e506ef5d7e",
+        "EffectiveGpuExposureVerified": false
+      },
+      "Restoration": {
+        "AssetsRestored": true,
+        "MainCameraRestored": true,
+        "ToneRestored": true,
+        "CamerasRestored": true,
+        "ObjectsRestored": true,
+        "EditorStatePreserved": true
+      },
+      "ExposureImageComparisonStillRequired": true
+    }
+  },
+  "editor_status": {
+    "EngineVersion": "26.10.13c",
+    "Project": "razedtest",
+    "ProjectTitle": "RazedTest",
+    "ActiveScene": "veridant",
+    "ActiveScenePath": "scenes/maps/veridant/veridant.scene",
+    "SceneHasUnsavedChanges": false,
+    "IsPlaying": false,
+    "IsPaused": false,
+    "ToolCount": 128,
+    "IsCompiling": false,
+    "LastCompileSucceeded": true,
+    "LastCompileErrors": 0,
+    "Paths": {
+      "Engine": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\sbox",
+      "Logs": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\sbox\\logs",
+      "ProjectRoot": "C:\\sbox-projects\\hc1\\forked-shooter-main",
+      "ProjectSettings": "C:\\sbox-projects\\hc1\\forked-shooter-main\\ProjectSettings"
+    }
+  },
+  "editor_camera": {
+    "Position": "-403.311829,520.84314,98.7328644",
+    "Angles": "10.2512522,90.7590179,0",
+    "FieldOfView": 80
+  },
+  "highest_detail_total_triangles": 25059,
+  "performance_note": "Native tree retains five LODs; frame rate was not benchmarked."
+}

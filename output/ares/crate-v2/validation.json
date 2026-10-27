@@ -1,0 +1,628 @@
+{
+  "revision": "ares-cargo-case-v2",
+  "stage": "stage-v7",
+  "cases_saved": 132,
+  "shared_models": 4,
+  "lods_per_model": 3,
+  "new_authored_scene_objects_only_case_group": true,
+  "existing_authored_scene_properties_preserved": true,
+  "editor_save_serialization_audit": {
+    "differences_classified": 2715,
+    "categories": {
+      "editor_system_bookkeeping": 1,
+      "existing_description_metadata": 2,
+      "map_metadata_default": 1,
+      "unassigned_component_event": 2060,
+      "map_information_default": 1,
+      "float_serialization": 123,
+      "measured_engine_default": 399,
+      "typed_resource_same_path": 12,
+      "numeric_format": 104,
+      "measured_probe_migration": 8,
+      "measured_prefab_guid_bookkeeping": 4
+    },
+    "max_numeric_string_delta": 6.999999975221272e-07,
+    "original_authored_properties_preserved": true,
+    "probe_migrations_measured_in_disposable_scene": 4
+  },
+  "source_regeneration_ids_preserved": true,
+  "collision_definition_bytes_exact": true,
+  "old_case_triangles_removed": 12408,
+  "unrelated_obj_bytes_exact": true,
+  "original_obj_indices_preserved": true,
+  "models": {
+    "standard-plain": {
+      "size": [
+        48.0,
+        30.0,
+        32.0
+      ],
+      "lod_triangles": [
+        8868,
+        6356,
+        520
+      ],
+      "render_only": true
+    },
+    "standard-marked": {
+      "size": [
+        48.0,
+        30.0,
+        32.0
+      ],
+      "lod_triangles": [
+        8170,
+        5722,
+        522
+      ],
+      "render_only": true
+    },
+    "cargo-plain": {
+      "size": [
+        72.0,
+        45.0,
+        48.0
+      ],
+      "lod_triangles": [
+        8868,
+        6356,
+        520
+      ],
+      "render_only": true
+    },
+    "cargo-marked": {
+      "size": [
+        72.0,
+        45.0,
+        48.0
+      ],
+      "lod_triangles": [
+        8170,
+        5722,
+        522
+      ],
+      "render_only": true
+    }
+  },
+  "lid_closure_checks": [
+    {
+      "model": "standard-plain",
+      "lod": 0,
+      "triangles": 8868,
+      "open_lid_edges": 0
+    },
+    {
+      "model": "standard-plain",
+      "lod": 1,
+      "triangles": 6356,
+      "open_lid_edges": 0
+    },
+    {
+      "model": "standard-plain",
+      "lod": 2,
+      "triangles": 520,
+      "open_lid_edges": 0
+    },
+    {
+      "model": "standard-marked",
+      "lod": 0,
+      "triangles": 8170,
+      "open_lid_edges": 0
+    },
+    {
+      "model": "standard-marked",
+      "lod": 1,
+      "triangles": 5722,
+      "open_lid_edges": 0
+    },
+    {
+      "model": "standard-marked",
+      "lod": 2,
+      "triangles": 522,
+      "open_lid_edges": 0
+    },
+    {
+      "model": "cargo-plain",
+      "lod": 0,
+      "triangles": 8868,
+      "open_lid_edges": 0
+    },
+    {
+      "model": "cargo-plain",
+      "lod": 1,
+      "triangles": 6356,
+      "open_lid_edges": 0
+    },
+    {
+      "model": "cargo-plain",
+      "lod": 2,
+      "triangles": 520,
+      "open_lid_edges": 0
+    },
+    {
+      "model": "cargo-marked",
+      "lod": 0,
+      "triangles": 8170,
+      "open_lid_edges": 0
+    },
+    {
+      "model": "cargo-marked",
+      "lod": 1,
+      "triangles": 5722,
+      "open_lid_edges": 0
+    },
+    {
+      "model": "cargo-marked",
+      "lod": 2,
+      "triangles": 522,
+      "open_lid_edges": 0
+    }
+  ],
+  "native_prop_compiles": [
+    {
+      "Success": true,
+      "Path": "models/props/ares/crate-v2/standard-plain.vmdl",
+      "CompiledFile": "C:/sbox-projects/hc1/forked-shooter-main/Assets/models/props/ares/crate-v2/standard-plain.vmdl_c",
+      "Hint": null
+    },
+    {
+      "Success": true,
+      "Path": "models/props/ares/crate-v2/standard-marked.vmdl",
+      "CompiledFile": "C:/sbox-projects/hc1/forked-shooter-main/Assets/models/props/ares/crate-v2/standard-marked.vmdl_c",
+      "Hint": null
+    },
+    {
+      "Success": true,
+      "Path": "models/props/ares/crate-v2/cargo-plain.vmdl",
+      "CompiledFile": "C:/sbox-projects/hc1/forked-shooter-main/Assets/models/props/ares/crate-v2/cargo-plain.vmdl_c",
+      "Hint": null
+    },
+    {
+      "Success": true,
+      "Path": "models/props/ares/crate-v2/cargo-marked.vmdl",
+      "CompiledFile": "C:/sbox-projects/hc1/forked-shooter-main/Assets/models/props/ares/crate-v2/cargo-marked.vmdl_c",
+      "Hint": null
+    }
+  ],
+  "material_and_initial_model_compiles": [
+    {
+      "Success": true,
+      "Path": "materials/ares/crate-v2/black.vmat",
+      "CompiledFile": "C:/sbox-projects/hc1/forked-shooter-main/Assets/materials/ares/crate-v2/black.vmat_c",
+      "Hint": null
+    },
+    {
+      "Success": true,
+      "Path": "materials/ares/crate-v2/black_edge.vmat",
+      "CompiledFile": "C:/sbox-projects/hc1/forked-shooter-main/Assets/materials/ares/crate-v2/black_edge.vmat_c",
+      "Hint": null
+    },
+    {
+      "Success": true,
+      "Path": "materials/ares/crate-v2/rubber.vmat",
+      "CompiledFile": "C:/sbox-projects/hc1/forked-shooter-main/Assets/materials/ares/crate-v2/rubber.vmat_c",
+      "Hint": null
+    },
+    {
+      "Success": true,
+      "Path": "materials/ares/crate-v2/gasket.vmat",
+      "CompiledFile": "C:/sbox-projects/hc1/forked-shooter-main/Assets/materials/ares/crate-v2/gasket.vmat_c",
+      "Hint": null
+    },
+    {
+      "Success": true,
+      "Path": "materials/ares/crate-v2/steel.vmat",
+      "CompiledFile": "C:/sbox-projects/hc1/forked-shooter-main/Assets/materials/ares/crate-v2/steel.vmat_c",
+      "Hint": null
+    },
+    {
+      "Success": true,
+      "Path": "materials/ares/crate-v2/alloy.vmat",
+      "CompiledFile": "C:/sbox-projects/hc1/forked-shooter-main/Assets/materials/ares/crate-v2/alloy.vmat_c",
+      "Hint": null
+    },
+    {
+      "Success": true,
+      "Path": "materials/ares/crate-v2/dust.vmat",
+      "CompiledFile": "C:/sbox-projects/hc1/forked-shooter-main/Assets/materials/ares/crate-v2/dust.vmat_c",
+      "Hint": null
+    },
+    {
+      "Success": true,
+      "Path": "materials/ares/crate-v2/id.vmat",
+      "CompiledFile": "C:/sbox-projects/hc1/forked-shooter-main/Assets/materials/ares/crate-v2/id.vmat_c",
+      "Hint": null
+    },
+    {
+      "Success": true,
+      "Path": "materials/ares/crate-v2/stencil.vmat",
+      "CompiledFile": "C:/sbox-projects/hc1/forked-shooter-main/Assets/materials/ares/crate-v2/stencil.vmat_c",
+      "Hint": null
+    },
+    {
+      "Success": true,
+      "Path": "models/props/ares/crate-v2/standard-plain.vmdl",
+      "CompiledFile": "C:/sbox-projects/hc1/forked-shooter-main/Assets/models/props/ares/crate-v2/standard-plain.vmdl_c",
+      "Hint": null
+    },
+    {
+      "Success": true,
+      "Path": "models/props/ares/crate-v2/standard-marked.vmdl",
+      "CompiledFile": "C:/sbox-projects/hc1/forked-shooter-main/Assets/models/props/ares/crate-v2/standard-marked.vmdl_c",
+      "Hint": null
+    },
+    {
+      "Success": true,
+      "Path": "models/props/ares/crate-v2/cargo-plain.vmdl",
+      "CompiledFile": "C:/sbox-projects/hc1/forked-shooter-main/Assets/models/props/ares/crate-v2/cargo-plain.vmdl_c",
+      "Hint": null
+    },
+    {
+      "Success": true,
+      "Path": "models/props/ares/crate-v2/cargo-marked.vmdl",
+      "CompiledFile": "C:/sbox-projects/hc1/forked-shooter-main/Assets/models/props/ares/crate-v2/cargo-marked.vmdl_c",
+      "Hint": null
+    }
+  ],
+  "captures": {
+    "hall": {
+      "image": "output/ares/crate-v2/captures/final/hall-stack.png",
+      "sha256": "da0f2b93f35b99123ed23ad1976a6cad375f800712cc1a911f7756ff65b58ff7",
+      "Capture": {
+        "Position": "-190,452,76",
+        "Angles": "Pitch = 16.62, Yaw = 135.53, Roll = 0.00",
+        "FieldOfView": 50,
+        "FovAxis": "Horizontal",
+        "Width": 1200,
+        "Height": 950,
+        "EnablePostProcessing": true,
+        "TrialSurfaceSlots": 0,
+        "TrialForestVariant": "accepted",
+        "TrialForestSlots": 0,
+        "TrialModels": 0,
+        "TrialManifestSha256": {},
+        "RequestedExposure": 2.6,
+        "NativeEnabled": true,
+        "NativeMinimum": 2.6,
+        "ForcedCaseLod": null,
+        "ForcedCaseLodRenderers": 0,
+        "ViewportSettledMilliseconds": 3000,
+        "NativeMaximum": 2.6,
+        "NativeCompensation": 0,
+        "MainCameraIsViewport": true,
+        "PreviousMainName": "GameObject",
+        "PreviousMainId": "3b427d2d-488d-4312-b353-c33ef68cb473",
+        "PreviousMainWasOrthographic": true,
+        "SourceSceneSha256": "d4b026c3a729d7e65f580b1923bd5fce64dddd887b829efc14697232b6ab7929",
+        "HelperSha256": "219a9a7b89f26a725371c4d2efd81692da3dcb84032b896b88a99c55a2b7274a",
+        "EffectiveGpuExposureVerified": false
+      },
+      "Restoration": {
+        "AssetsRestored": true,
+        "MainCameraRestored": true,
+        "ToneRestored": true,
+        "CamerasRestored": true,
+        "ObjectsRestored": true,
+        "EditorStatePreserved": true
+      },
+      "ExposureImageComparisonStillRequired": true
+    },
+    "hardware": {
+      "image": "output/ares/crate-v2/captures/final/hardware.png",
+      "sha256": "06ad7abacd06e9b0b69521c38775d37cf0d1ad482cdc25dab90c541ae21ea6fe",
+      "Capture": {
+        "Position": "-240,492,76",
+        "Angles": "Pitch = 18.30, Yaw = 131.42, Roll = -0.00",
+        "FieldOfView": 40,
+        "FovAxis": "Horizontal",
+        "Width": 1200,
+        "Height": 950,
+        "EnablePostProcessing": true,
+        "TrialSurfaceSlots": 0,
+        "TrialForestVariant": "accepted",
+        "TrialForestSlots": 0,
+        "TrialModels": 0,
+        "TrialManifestSha256": {},
+        "RequestedExposure": 2.6,
+        "NativeEnabled": true,
+        "NativeMinimum": 2.6,
+        "ForcedCaseLod": null,
+        "ForcedCaseLodRenderers": 0,
+        "ViewportSettledMilliseconds": 3000,
+        "NativeMaximum": 2.6,
+        "NativeCompensation": 0,
+        "MainCameraIsViewport": true,
+        "PreviousMainName": "GameObject",
+        "PreviousMainId": "3b427d2d-488d-4312-b353-c33ef68cb473",
+        "PreviousMainWasOrthographic": true,
+        "SourceSceneSha256": "d4b026c3a729d7e65f580b1923bd5fce64dddd887b829efc14697232b6ab7929",
+        "HelperSha256": "219a9a7b89f26a725371c4d2efd81692da3dcb84032b896b88a99c55a2b7274a",
+        "EffectiveGpuExposureVerified": false
+      },
+      "Restoration": {
+        "AssetsRestored": true,
+        "MainCameraRestored": true,
+        "ToneRestored": true,
+        "CamerasRestored": true,
+        "ObjectsRestored": true,
+        "EditorStatePreserved": true
+      },
+      "ExposureImageComparisonStillRequired": true
+    },
+    "player": {
+      "image": "output/ares/crate-v2/captures/final/player.png",
+      "sha256": "d86f03e6f7126b2da6af288860708d29bf24a72e8e576ebf8c70fdeeaf717497",
+      "Capture": {
+        "Position": "-190,452,64",
+        "Angles": "Pitch = 12.44, Yaw = 135.53, Roll = 0.00",
+        "FieldOfView": 80,
+        "FovAxis": "Horizontal",
+        "Width": 1200,
+        "Height": 950,
+        "EnablePostProcessing": true,
+        "TrialSurfaceSlots": 0,
+        "TrialForestVariant": "accepted",
+        "TrialForestSlots": 0,
+        "TrialModels": 0,
+        "TrialManifestSha256": {},
+        "RequestedExposure": 2.6,
+        "NativeEnabled": true,
+        "NativeMinimum": 2.6,
+        "ForcedCaseLod": null,
+        "ForcedCaseLodRenderers": 0,
+        "ViewportSettledMilliseconds": 3000,
+        "NativeMaximum": 2.6,
+        "NativeCompensation": 0,
+        "MainCameraIsViewport": true,
+        "PreviousMainName": "GameObject",
+        "PreviousMainId": "3b427d2d-488d-4312-b353-c33ef68cb473",
+        "PreviousMainWasOrthographic": true,
+        "SourceSceneSha256": "d4b026c3a729d7e65f580b1923bd5fce64dddd887b829efc14697232b6ab7929",
+        "HelperSha256": "219a9a7b89f26a725371c4d2efd81692da3dcb84032b896b88a99c55a2b7274a",
+        "EffectiveGpuExposureVerified": false
+      },
+      "Restoration": {
+        "AssetsRestored": true,
+        "MainCameraRestored": true,
+        "ToneRestored": true,
+        "CamerasRestored": true,
+        "ObjectsRestored": true,
+        "EditorStatePreserved": true
+      },
+      "ExposureImageComparisonStillRequired": true
+    },
+    "cargo": {
+      "image": "output/ares/crate-v2/captures/final/cargo.png",
+      "sha256": "f2e8025badff61eb49749d426fbbfd17fc8b333341cb59b7037d6a1d835f62a8",
+      "Capture": {
+        "Position": "380,1320,104",
+        "Angles": "Pitch = 18.02, Yaw = 130.60, Roll = 0.00",
+        "FieldOfView": 45,
+        "FovAxis": "Horizontal",
+        "Width": 1200,
+        "Height": 950,
+        "EnablePostProcessing": true,
+        "TrialSurfaceSlots": 0,
+        "TrialForestVariant": "accepted",
+        "TrialForestSlots": 0,
+        "TrialModels": 0,
+        "TrialManifestSha256": {},
+        "RequestedExposure": 2.6,
+        "NativeEnabled": true,
+        "NativeMinimum": 2.6,
+        "ForcedCaseLod": null,
+        "ForcedCaseLodRenderers": 0,
+        "ViewportSettledMilliseconds": 3000,
+        "NativeMaximum": 2.6,
+        "NativeCompensation": 0,
+        "MainCameraIsViewport": true,
+        "PreviousMainName": "GameObject",
+        "PreviousMainId": "3b427d2d-488d-4312-b353-c33ef68cb473",
+        "PreviousMainWasOrthographic": true,
+        "SourceSceneSha256": "d4b026c3a729d7e65f580b1923bd5fce64dddd887b829efc14697232b6ab7929",
+        "HelperSha256": "219a9a7b89f26a725371c4d2efd81692da3dcb84032b896b88a99c55a2b7274a",
+        "EffectiveGpuExposureVerified": false
+      },
+      "Restoration": {
+        "AssetsRestored": true,
+        "MainCameraRestored": true,
+        "ToneRestored": true,
+        "CamerasRestored": true,
+        "ObjectsRestored": true,
+        "EditorStatePreserved": true
+      },
+      "ExposureImageComparisonStillRequired": true
+    },
+    "lod0": {
+      "image": "output/ares/crate-v2/captures/lod-check/player-lod0.png",
+      "sha256": "7785da17bdc5092ca8827c35855c0db12a8becc31476f0b5e18361800f90438b",
+      "Capture": {
+        "Position": "-190,452,64",
+        "Angles": "Pitch = 12.44, Yaw = 135.53, Roll = 0.00",
+        "FieldOfView": 80,
+        "FovAxis": "Horizontal",
+        "Width": 1200,
+        "Height": 950,
+        "EnablePostProcessing": true,
+        "TrialSurfaceSlots": 0,
+        "TrialForestVariant": "accepted",
+        "TrialForestSlots": 0,
+        "TrialModels": 0,
+        "TrialManifestSha256": {},
+        "RequestedExposure": 2.6,
+        "NativeEnabled": true,
+        "NativeMinimum": 2.6,
+        "ForcedCaseLod": 0,
+        "ForcedCaseLodRenderers": 132,
+        "ViewportSettledMilliseconds": 3000,
+        "NativeMaximum": 2.6,
+        "NativeCompensation": 0,
+        "MainCameraIsViewport": true,
+        "PreviousMainName": "GameObject",
+        "PreviousMainId": "3b427d2d-488d-4312-b353-c33ef68cb473",
+        "PreviousMainWasOrthographic": true,
+        "SourceSceneSha256": "d4b026c3a729d7e65f580b1923bd5fce64dddd887b829efc14697232b6ab7929",
+        "HelperSha256": "219a9a7b89f26a725371c4d2efd81692da3dcb84032b896b88a99c55a2b7274a",
+        "EffectiveGpuExposureVerified": false
+      },
+      "Restoration": {
+        "AssetsRestored": true,
+        "MainCameraRestored": true,
+        "ToneRestored": true,
+        "CamerasRestored": true,
+        "ObjectsRestored": true,
+        "EditorStatePreserved": true
+      },
+      "ExposureImageComparisonStillRequired": true
+    },
+    "lod1": {
+      "image": "output/ares/crate-v2/captures/lod-check/player-lod1.png",
+      "sha256": "39e35593d423d6d7ace6c7af15cd3f10eec3e687fb055f5334de003220aff527",
+      "Capture": {
+        "Position": "-190,452,64",
+        "Angles": "Pitch = 12.44, Yaw = 135.53, Roll = 0.00",
+        "FieldOfView": 80,
+        "FovAxis": "Horizontal",
+        "Width": 1200,
+        "Height": 950,
+        "EnablePostProcessing": true,
+        "TrialSurfaceSlots": 0,
+        "TrialForestVariant": "accepted",
+        "TrialForestSlots": 0,
+        "TrialModels": 0,
+        "TrialManifestSha256": {},
+        "RequestedExposure": 2.6,
+        "NativeEnabled": true,
+        "NativeMinimum": 2.6,
+        "ForcedCaseLod": 1,
+        "ForcedCaseLodRenderers": 132,
+        "ViewportSettledMilliseconds": 3000,
+        "NativeMaximum": 2.6,
+        "NativeCompensation": 0,
+        "MainCameraIsViewport": true,
+        "PreviousMainName": "GameObject",
+        "PreviousMainId": "3b427d2d-488d-4312-b353-c33ef68cb473",
+        "PreviousMainWasOrthographic": true,
+        "SourceSceneSha256": "d4b026c3a729d7e65f580b1923bd5fce64dddd887b829efc14697232b6ab7929",
+        "HelperSha256": "219a9a7b89f26a725371c4d2efd81692da3dcb84032b896b88a99c55a2b7274a",
+        "EffectiveGpuExposureVerified": false
+      },
+      "Restoration": {
+        "AssetsRestored": true,
+        "MainCameraRestored": true,
+        "ToneRestored": true,
+        "CamerasRestored": true,
+        "ObjectsRestored": true,
+        "EditorStatePreserved": true
+      },
+      "ExposureImageComparisonStillRequired": true
+    },
+    "lod2": {
+      "image": "output/ares/crate-v2/captures/lod-check-fixed/player-lod2.png",
+      "sha256": "9f65d2c4a2e9c6026b0c06972522854427b650bac51a5616ad5270c6dc5080a6",
+      "Capture": {
+        "Position": "-190,452,64",
+        "Angles": "Pitch = 12.44, Yaw = 135.53, Roll = 0.00",
+        "FieldOfView": 80,
+        "FovAxis": "Horizontal",
+        "Width": 1200,
+        "Height": 950,
+        "EnablePostProcessing": true,
+        "TrialSurfaceSlots": 0,
+        "TrialForestVariant": "accepted",
+        "TrialForestSlots": 0,
+        "TrialModels": 0,
+        "TrialManifestSha256": {},
+        "RequestedExposure": 2.6,
+        "NativeEnabled": true,
+        "NativeMinimum": 2.6,
+        "ForcedCaseLod": 2,
+        "ForcedCaseLodRenderers": 132,
+        "ViewportSettledMilliseconds": 3000,
+        "NativeMaximum": 2.6,
+        "NativeCompensation": 0,
+        "MainCameraIsViewport": true,
+        "PreviousMainName": "GameObject",
+        "PreviousMainId": "3b427d2d-488d-4312-b353-c33ef68cb473",
+        "PreviousMainWasOrthographic": true,
+        "SourceSceneSha256": "d4b026c3a729d7e65f580b1923bd5fce64dddd887b829efc14697232b6ab7929",
+        "HelperSha256": "219a9a7b89f26a725371c4d2efd81692da3dcb84032b896b88a99c55a2b7274a",
+        "EffectiveGpuExposureVerified": false
+      },
+      "Restoration": {
+        "AssetsRestored": true,
+        "MainCameraRestored": true,
+        "ToneRestored": true,
+        "CamerasRestored": true,
+        "ObjectsRestored": true,
+        "EditorStatePreserved": true
+      },
+      "ExposureImageComparisonStillRequired": true
+    }
+  },
+  "saved_scene_sha256": "d4b026c3a729d7e65f580b1923bd5fce64dddd887b829efc14697232b6ab7929",
+  "native_scene_compile": {
+    "Success": true,
+    "Path": "scenes/maps/ares/ares.scene",
+    "CompiledFile": "C:/sbox-projects/hc1/forked-shooter-main/Assets/scenes/maps/ares/ares.scene_c",
+    "Hint": null
+  },
+  "native_collision_traces": [
+    {
+      "Hit": true,
+      "StartedSolid": false,
+      "EndPosition": "-300,560,60",
+      "Normal": "0,0,1",
+      "Fraction": 0.4,
+      "Distance": 40,
+      "GameObject": {
+        "Id": "08059410-c3e9-5fd9-a9e5-1dde21faf1d8",
+        "Name": "Dressing"
+      },
+      "Component": "ModelCollider"
+    },
+    {
+      "Hit": true,
+      "StartedSolid": false,
+      "EndPosition": "235.5,1460,90",
+      "Normal": "0,0,1",
+      "Fraction": 0.30769232,
+      "Distance": 40,
+      "GameObject": {
+        "Id": "08059410-c3e9-5fd9-a9e5-1dde21faf1d8",
+        "Name": "Dressing"
+      },
+      "Component": "ModelCollider"
+    }
+  ],
+  "native_final_editor_status": {
+    "EngineVersion": "26.10.13c",
+    "Project": "razedtest",
+    "ProjectTitle": "RazedTest",
+    "ActiveScene": "ares",
+    "ActiveScenePath": "scenes/maps/ares/ares.scene",
+    "SceneHasUnsavedChanges": false,
+    "IsPlaying": false,
+    "IsPaused": false,
+    "ToolCount": 128,
+    "IsCompiling": false,
+    "LastCompileSucceeded": true,
+    "LastCompileErrors": 0,
+    "Paths": {
+      "Engine": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\sbox",
+      "Logs": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\sbox\\logs",
+      "ProjectRoot": "C:\\sbox-projects\\hc1\\forked-shooter-main",
+      "ProjectSettings": "C:\\sbox-projects\\hc1\\forked-shooter-main\\ProjectSettings"
+    }
+  },
+  "native_compile_errors": 0,
+  "native_compile_warnings": 89,
+  "matched_hall_camera_and_exposure": true,
+  "independent_hall_changes_preserved": {
+    "Assets/models/maps/ares/ares_hall.vmdl": {
+      "at_integration": "6babc27639dba648f8a8a483c2b64a3426c6fdf4d41bf9db0bfe11a1efb8b570",
+      "current": "4cfe4886f379251711bfe049db1dc7de49c5eeb2926bfc41958a245f5eaf96d7"
+    }
+  },
+  "performance_note": "Four reusable assets with three LODs each; frame-rate impact was not benchmarked."
+}

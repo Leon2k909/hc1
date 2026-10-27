@@ -1,0 +1,13 @@
+def lantern_post( m, name, base, h=132.0, light=True, radius=420 ):
+    """ A promenade lamp post: a black steel column, a box lantern with lit glass. """
+    b = v( *base )
+    P.cylinder( m, ( b[0], b[1] ), 4.5, b[2], b[2] + 10, "vr_steel", 10, top="vr_steel", surface=METAL )
+    P.cylinder( m, ( b[0], b[1] ), 2.2, b[2] + 10, b[2] + h - 16, "vr_steel", 8, surface=METAL )
+    top = b + UP * ( h - 16 )
+    box( m, top[0] - 6, top[0] + 6, top[1] - 6, top[1] + 6, top[2], top[2] + 2, "vr_steel" )
+    for sx, sy in ( ( -1, -1 ), ( 1, -1 ), ( 1, 1 ), ( -1, 1 ) ):
+        box( m, top[0] + sx * 5.2 - 0.6, top[0] + sx * 5.2 + 0.6, top[1] + sy * 5.2 - 0.6, top[1] + sy * 5.2 + 0.6, top[2] + 2, top[2] + 14, "vr_steel" )
+    box( m, top[0] - 4.6, top[0] + 4.6, top[1] - 4.6, top[1] + 4.6, top[2] + 2, top[2] + 14, "vr_lamp" )
+    lantern_roof( m, top )
+    if light:
+        LIGHTS.append( ( name, tuple( top + UP * 8 ), WARM, radius, False ) )

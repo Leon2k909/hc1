@@ -1,0 +1,59 @@
+{
+  "revision": "ares-core-lamp-mounts-v1",
+  "fixtures_fixed": 24,
+  "removed_triangles": 288,
+  "new_triangles": 10608,
+  "unrelated_obj_bytes_and_original_indices_preserved": true,
+  "model_document_materials_and_collision_sources_unchanged": true,
+  "scene_file_unchanged": true,
+  "source_reproduction_byte_exact": true,
+  "existing_collision_preserved_by_helper": true,
+  "whole_reactor_source_regeneration_passed": true,
+  "final_helper_sha256": "7b3540c25db9495503a899c145f2d70dbc9fc7cc9936013c60c7001957cb9a4b",
+  "native_compile": {
+    "Success": true,
+    "Path": "models/maps/ares/ares_reactor.vmdl",
+    "CompiledFile": "C:/sbox-projects/hc1/forked-shooter-main/Assets/models/maps/ares/ares_reactor.vmdl_c",
+    "Hint": null
+  },
+  "native_import": {
+    "Stage": "stage-v1",
+    "Imported": true,
+    "Fixtures": 24,
+    "EditorStatePreserved": true,
+    "ModelDocAndPhysicsUnchanged": true,
+    "MaterialsUnchanged": true
+  },
+  "captures": {
+    "before": {
+      "mount-close": {
+        "path": "output/ares/core-lamp-mounts-v1/before/mount-close.png",
+        "sha256": "f7ca5f2b5daedbc3ebb7180599e904f6b4610c3c9037f67a9776edb383e44682"
+      },
+      "mount-oblique": {
+        "path": "output/ares/core-lamp-mounts-v1/before/mount-oblique.png",
+        "sha256": "97b2039e2e390b87bc4657c45e1330193c74a450bee879fc1a20869e5355fa82"
+      },
+      "ring-context": {
+        "path": "output/ares/core-lamp-mounts-v1/before/ring-context.png",
+        "sha256": "e2c3a6cc72a350679ff442a268b1716e2eca3157a7deb32f2a4cb37df3e6b060"
+      }
+    },
+    "after": {
+      "mount-close": {
+        "path": "output/ares/core-lamp-mounts-v1/after/mount-close.png",
+        "sha256": "6d18022c4a0960905b3861243db7326de3ccaa6974d69296c0ec19219dd03cd2"
+      },
+      "mount-oblique": {
+        "path": "output/ares/core-lamp-mounts-v1/after/mount-oblique.png",
+        "sha256": "1278d5c70ec1ba3f2f81fca81d2b0d2edbc2ffa593adac482f06d799810c6435"
+      },
+      "ring-context": {
+        "path": "output/ares/core-lamp-mounts-v1/after/ring-context.png",
+        "sha256": "631a2a6cc4916a217b2be7fe2eadaea6f965c4ae96167ebbdf603cb5bfedc435"
+      }
+    }
+  },
+  "visual_review": "Close and oblique engine captures show attached metal housings; ring view checks all placements.",
+  "performance_note": "Geometry count recorded; no FPS benchmark."
+}

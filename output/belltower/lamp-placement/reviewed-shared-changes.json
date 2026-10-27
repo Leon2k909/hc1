@@ -1,0 +1,21 @@
+{
+  "reference_manifest": "output/belltower/shop-thresholds/stage-v1/manifest.json",
+  "reference_manifest_sha256": "e36efdb5f7c9f2735f92aa64029d467e00cc1d653614e4aa2d21067c938ff6c0",
+  "files": {
+    "Tools/belltower_map.py": {
+      "before": "48c83e37067d157290103e02bef659d55e15b41cc7ee5e5c4a2afc0dae86bb1e",
+      "after": "f8a6a8ffbeb7129e2f77d4e41f1d1fde096aea94c257f185b5e813deb2a4c355",
+      "review": "Only the threshold comment and slab_at hook were added; lamp placement retained."
+    },
+    "Assets/models/maps/belltower/compiler-safe/west/west_076_roller_grey.obj": {
+      "before": "f300beabe63c0e7d579b8e6e13dbef784c051bd33aeef0a8147fe92934af073a",
+      "after": "9cf9f304e14ef2d8a68f620acfd7a6a6d65c9488515d4886746394c0998f983e",
+      "review": "Published threshold stage; original bytes retained."
+    },
+    "Assets/models/maps/belltower/compiler-safe/east/east_074_roller_grey.obj": {
+      "before": "234ccdd21c06c8a1fec03348b3f7b770821b8f9a0ff2d845859db951fa7e79d4",
+      "after": "dad87aa068ba8b6ff685429fa2cc22b8d1baa15f14ef0ef527d3036a410790f9",
+      "review": "Published threshold stage; original bytes retained."
+    }
+  }
+}

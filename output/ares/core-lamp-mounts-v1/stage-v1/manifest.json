@@ -1,0 +1,523 @@
+{
+  "revision": "ares-core-lamp-mounts-v1",
+  "stage": "stage-v1",
+  "fixtures": 24,
+  "files": {
+    "Assets/models/maps/ares/ares_reactor.obj": {
+      "before": "e8dce86d202ca2b6fa9bed75a3a899dca08a144a2eb4514932fb47912448dc3a",
+      "after": "a85b5f188362ded2c5f43668c4e61cc6ec23c4c3197acd65d1668fd77fcb0e1b",
+      "source": "output/ares/core-lamp-mounts-v1/stage-v1/Assets/models/maps/ares/ares_reactor.obj",
+      "backup": "output/ares/core-lamp-mounts-v1/stage-v1/before/Assets/models/maps/ares/ares_reactor.obj"
+    }
+  },
+  "protected_sha256": {
+    "Assets/models/maps/ares/ares_reactor.vmdl": "5ed1bacaf612fed2f86981f87f730dc39422970e3d33bc405459a236464a648d",
+    "Assets/models/maps/ares/ares_reactor.mtl": "731fabc912f74d86fca78f42f2ec8c2d7af511f2eb604cbfcd1f9b8ebfcd7fa2",
+    "Assets/models/maps/ares/ares_reactor_hulls_metal.obj": "99bcb0484705783fdfd8826f1c57ed0ca759476a64d5d16ea2d375e3019a8079",
+    "Assets/materials/ares/ar_steel.vmat": "f10e5c00b6310c74ae5b4c64366fc579ab6fc1bf019673ae24f649b8cd0481de",
+    "Assets/materials/ares/ar_gunmetal.vmat": "bcdc58f1798b25556fdc8cb6b6404b365d16be66eafdb1b2b1a09e22d62ba43a",
+    "Assets/materials/ares/ar_led_warm.vmat": "7d68e31a37cdf11cb9498f2bd622000290af813f838d8727731124743eb192f8"
+  },
+  "source_sha256": {
+    "Tools/ares_core_lamps.py": "d1c714ea15437441c28c07c1e37a261998a1b11fe217e9405cbf7d3a4e4a1aad",
+    "Tools/ares_stage_core_lamps.py": "f584d50d231f3301ca4eb2d8c49f0508ba329f8e096f08c10b72209fe7030e8c",
+    "Tools/map_kit.py": "cc60204c747d064cb1fecdb666b24c847ae89dc863c2533d3811a0445f22020d",
+    "Tools/riverdale_parts.py": "a90f4f134053eb3397b2073f1ca4bb3bdc0bfb80a9521dce64ca1017e747f732"
+  },
+  "required_source_snippets": {
+    "Tools/ares_map.py": [
+      "    from ares_core_lamps import flared_ring_lamps\n    flared_ring_lamps( m )",
+      "def reactor( m, glass ):\n    \"\"\" The ATMOS PROCESSING column, from the floor to the roof: a plinth, a lower and an upper glass chamber of glowing\n    plasma round the ring catwalk, the lettered band, a third chamber, a flared lamp ring, and the stack into the roof,\n    with copper pipes running up its glass. Its collision is a solid cylinder (RING_R0) and the plinth. \"\"\"\n    o = np.zeros( 3 )\n    # The plinth, stepped up 16 (a stair's step), striped round its edge.\n    lathe_uv( m, o, [ ( 232.0, 0.0 ), ( 232.0, 16.0 ) ], \"ar_hazard\", sides=40, u_repeat=60 )\n    ring_surface( m, o, RING_R0, 232.0, 16.0, \"ar_grating\", sides=40 )\n    cylinder_hull( m, o, 232.0, 0.0, 16.0, METAL, sides=20 )\n    cylinder_hull( m, o, RING_R0, 0.0, HALL_TOP, METAL, sides=20 )\n\n    def chamber( z0, z1, r_glass=140.0, r_core=118.0, posts=12 ):\n        lathe_uv( m, o, [ ( r_core, z0 ), ( r_core, z1 ) ], \"ar_plasma\", sides=32, u_repeat=2.0, v_span=( z1 - z0 ) * 1.4 )\n        lathe_uv( m, o, [ ( r_core * 0.55, z0 ), ( r_core * 0.55, z1 ) ], \"ar_core\", sides=16 )\n        lathe_uv( glass, o, [ ( r_glass, z0 ), ( r_glass, z1 ) ], \"ar_reactor_glass\", sides=40 )\n        for k in range( posts ):\n            a = 2 * math.pi * ( k + 0.5 ) / posts\n            p = np.array( ( ( r_glass + 4 ) * math.cos( a ), ( r_glass + 4 ) * math.sin( a ), 0.0 ) )\n            m.beam( p + UP * z0, p + UP * z1, ( 7.0, 5.0 ), \"ar_gunmetal\", up=( math.cos( a ), math.sin( a ), 0 ) )\n\n    def band( z0, z1, r, paint=\"ar_steel\", lights=False, brass=False ):\n        lathe_uv( m, o, [ ( r, z0 ), ( r, z1 ) ], paint, sides=40, u_repeat=6 )\n        ring_surface( m, o, 0.0, r, z1, \"ar_steel\", sides=40 )\n        ring_surface( m, o, 0.0, r, z0, \"ar_steel\", sides=40, facing=-1.0 )\n        if brass:\n            lathe_uv( m, o, [ ( r + 1.5, z0 + ( z1 - z0 ) * 0.4 ), ( r + 1.5, z0 + ( z1 - z0 ) * 0.6 ) ], \"ar_brass\", sides=40, u_repeat=6 )\n        if lights:\n            for k in range( 16 ):\n                a = 2 * math.pi * k / 16\n                p = np.array( ( ( r + 0.5 ) * math.cos( a ), ( r + 0.5 ) * math.sin( a ), ( z0 + z1 ) / 2 ) )\n                d = np.array( ( math.cos( a ), math.sin( a ), 0 ) )\n                side = np.array( ( -math.sin( a ), math.cos( a ), 0 ) )\n                m.oriented_box( p + d * 0.6, ( d, side, UP ), ( 1.4, 6.0, 3.0 ), \"ar_led_amber\" )\n\n    band( 16.0, 48.0, 190.0, \"ar_steel\", lights=True, brass=True )\n    chamber( 48.0, 176.0 )\n    band( 176.0, G - DT, RING_R0, \"ar_steel\", lights=True )\n    band( G - DT, G + 14, RING_R0 - 4, \"ar_gunmetal\", brass=True )\n    chamber( G + 14, 346.0 )\n    band( 346.0, 362.0, 164.0, \"ar_steel\", brass=True )\n    # The lettered band: dark panels round it, ATMOS PROCESSING on four of them.\n    lathe_uv( m, o, [ ( 150.0, 362.0 ), ( 150.0, 470.0 ) ], \"ar_wall\", sides=40, u_repeat=4 )\n    for heading in ( 225.0, 45.0, 135.0, 315.0 ):\n        a0, a1 = heading - 32.0, heading + 32.0\n        steps = 8\n        for k in range( steps ):\n            t0, t1 = k / steps, ( k + 1 ) / steps\n            aa, ab = math.radians( a0 + ( a1 - a0 ) * t0 ), math.radians( a0 + ( a1 - a0 ) * t1 )\n            r = 154.0\n            pts = [ ( r * math.cos( aa ), r * math.sin( aa ), 372.0 ), ( r * math.cos( ab ), r * math.sin( ab ), 372.0 ),\n                    ( r * math.cos( ab ), r * math.sin( ab ), 462.0 ), ( r * math.cos( aa ), r * math.sin( aa ), 462.0 ) ]\n            uv = [ AM.region_uv( AM.SIGN, AM.SIGN_ATLAS, \"band_atmos\", t, v ) for t, v in ( ( t0, 0 ), ( t1, 0 ), ( t1, 1 ), ( t0, 1 ) ) ]\n            mid = ( aa + ab ) / 2\n            card( m, \"ar_signs\", pts, ( math.cos( mid ), math.sin( mid ), 0 ), uv=uv )\n            # The panel's frame: a lip top and bottom.\n        lathe_uv( m, o, [ ( 156.0, 368.0 ), ( 156.0, 372.0 ) ], \"ar_gunmetal\", sides=40, arc=( a0, a1 ) )\n        lathe_uv( m, o, [ ( 156.0, 462.0 ), ( 156.0, 466.0 ) ], \"ar_gunmetal\", sides=40, arc=( a0, a1 ) )\n        for a in ( a0, a1 ):\n            p = np.array( ( 154 * math.cos( math.radians( a ) ), 154 * math.sin( math.radians( a ) ), 0 ) )\n            m.box( p + np.array( ( -3, -3, 368 ) ), p + np.array( ( 3, 3, 466 ) ), \"ar_gunmetal\" )\n        # Small lamps over the panel.\n        for a in ( a0 + 8, heading, a1 - 8 ):\n            p = np.array( ( 157 * math.cos( math.radians( a ) ), 157 * math.sin( math.radians( a ) ), 470.0 ) )\n            m.box( p - np.array( ( 2.5, 2.5, 1.5 ) ), p + np.array( ( 2.5, 2.5, 1.5 ) ), \"ar_led_warm\" )\n    band( 470.0, 486.0, 160.0, \"ar_steel\", brass=True )\n    chamber( 486.0, 560.0, r_glass=128.0, r_core=104.0, posts=10 )\n    # The flared lamp ring.\n    lathe_uv( m, o, [ ( 150.0, 560.0 ), ( 224.0, 568.0 ), ( 224.0, 584.0 ), ( 150.0, 600.0 ) ], \"ar_steel\", sides=48, u_repeat=12 )\n    ring_surface( m, o, 0.0, 150.0, 560.0, \"ar_steel\", sides=40, facing=-1.0 )\n    from ares_core_lamps import flared_ring_lamps\n    flared_ring_lamps( m )\n    cylinder_hull( m, o, 224.0, 560.0, 600.0, METAL, sides=20 )\n    # The stack into the roof, and four big pipes from the lamp ring to the roof.\n    lathe_uv( m, o, [ ( 110.0, 604.0 ), ( 110.0, HALL_TOP ) ], \"ar_wall\", sides=24, u_repeat=3 )\n    for k in range( 4 ):\n        a = math.pi / 4 + k * math.pi / 2\n        p = np.array( ( 200 * math.cos( a ), 200 * math.sin( a ), 0 ) )\n        rod( m, p + UP * 588, p + UP * HALL_TOP, 14.0, \"ar_pipe\", sides=12 )\n        m.box( p + np.array( ( -18, -18, 588 ) ), p + np.array( ( 18, 18, 600 ) ), \"ar_gunmetal\" )\n    # Copper pipes up the glass, through the bands: in pairs between the lettered panels, so none crosses the lettering.\n    for k in range( 8 ):\n        a = math.radians( 90.0 * ( k // 2 ) + ( -6.0 if k % 2 == 0 else 6.0 ) )\n        p = np.array( ( 160 * math.cos( a ), 160 * math.sin( a ), 0 ) )\n        rod( m, p + UP * 16, p + UP * 560, 4.5, \"ar_copper\", sides=8 )\n        for z in ( 100.0, 280.0, 420.0, 520.0 ):\n            m.box( p + np.array( ( -6, -6, z ) ), p + np.array( ( 6, 6, z + 4 ) ), \"ar_gunmetal\" )\n    # Pumps on the floor round it.\n    for k, ( e, n ) in enumerate( ( ( 270.0, 270.0 ), ( -270.0, 270.0 ), ( -270.0, -270.0 ), ( 270.0, -270.0 ) ) ):\n        pump_unit( m, e, n, math.degrees( math.atan2( n, e ) ) + 90.0 )\n    sign_panel( m, \"plate_core\", ( 0.0, -233.0, 10.0 ), ( 0, -1 ), 40.0, 10.0, back=None )\n"
+    ]
+  },
+  "new_triangles": 10608,
+  "mounts": [
+    {
+      "index": 0,
+      "surface_origin": [
+        204.620959506159,
+        13.4115662506103,
+        566.0
+      ],
+      "surface_normal": [
+        0.10747917601139326,
+        0.007044557376315198,
+        -0.9941823781053876
+      ],
+      "mount_back_plane_distances": [
+        -0.09999999999994005,
+        -0.09999999999995016,
+        -0.09999999999994039,
+        -0.09999999999995038
+      ],
+      "lens_recess_inches": 0.345
+    },
+    {
+      "index": 1,
+      "surface_origin": [
+        194.17750061673647,
+        65.91437955979698,
+        566.0
+      ],
+      "surface_normal": [
+        0.10199364628436543,
+        0.034622177608232566,
+        -0.9941823781053876
+      ],
+      "mount_back_plane_distances": [
+        -0.09999999999994238,
+        -0.09999999999994955,
+        -0.09999999999994061,
+        -0.09999999999994827
+      ],
+      "lens_recess_inches": 0.345
+    },
+    {
+      "index": 2,
+      "surface_origin": [
+        170.50116595377548,
+        113.92523683064603,
+        566.0
+      ],
+      "surface_normal": [
+        0.089557418115528,
+        0.05984035365200264,
+        -0.9941823781053876
+      ],
+      "mount_back_plane_distances": [
+        -0.09999999999993955,
+        -0.09999999999994677,
+        -0.0999999999999405,
+        -0.09999999999994771
+      ],
+      "lens_recess_inches": 0.345
+    },
+    {
+      "index": 3,
+      "surface_origin": [
+        135.2054585975638,
+        154.17227748184217,
+        566.0
+      ],
+      "surface_normal": [
+        0.07101799990274849,
+        0.08098050848524888,
+        -0.9941823781053876
+      ],
+      "mount_back_plane_distances": [
+        -0.09999999999993917,
+        -0.0999999999999471,
+        -0.09999999999994066,
+        -0.09999999999994866
+      ],
+      "lens_recess_inches": 0.345
+    },
+    {
+      "index": 4,
+      "surface_origin": [
+        90.69572267551297,
+        183.91273220438578,
+        566.0
+      ],
+      "surface_normal": [
+        0.04763882235939061,
+        0.0966019754918432,
+        -0.9941823781053876
+      ],
+      "mount_back_plane_distances": [
+        -0.09999999999994066,
+        -0.09999999999994749,
+        -0.09999999999993939,
+        -0.09999999999994627
+      ],
+      "lens_recess_inches": 0.345
+    },
+    {
+      "index": 5,
+      "surface_origin": [
+        40.00522313489432,
+        201.11983815736076,
+        566.0
+      ],
+      "surface_normal": [
+        0.021013137799116555,
+        0.10564017751098105,
+        -0.9941823781053876
+      ],
+      "mount_back_plane_distances": [
+        -0.09999999999994044,
+        -0.09999999999995049,
+        -0.09999999999993944,
+        -0.09999999999994949
+      ],
+      "lens_recess_inches": 0.345
+    },
+    {
+      "index": 6,
+      "surface_origin": [
+        -13.411566250610317,
+        204.620959506159,
+        566.0
+      ],
+      "surface_normal": [
+        -0.007044557376315207,
+        0.10747917601139326,
+        -0.9941823781053876
+      ],
+      "mount_back_plane_distances": [
+        -0.09999999999994011,
+        -0.09999999999995016,
+        -0.09999999999994033,
+        -0.09999999999995038
+      ],
+      "lens_recess_inches": 0.345
+    },
+    {
+      "index": 7,
+      "surface_origin": [
+        -65.91437955979698,
+        194.17750061673647,
+        566.0
+      ],
+      "surface_normal": [
+        -0.034622177608232566,
+        0.10199364628436543,
+        -0.9941823781053876
+      ],
+      "mount_back_plane_distances": [
+        -0.09999999999994238,
+        -0.09999999999994955,
+        -0.09999999999994066,
+        -0.09999999999994827
+      ],
+      "lens_recess_inches": 0.345
+    },
+    {
+      "index": 8,
+      "surface_origin": [
+        -113.92523683064606,
+        170.50116595377546,
+        566.0
+      ],
+      "surface_normal": [
+        -0.05984035365200265,
+        0.08955741811552799,
+        -0.9941823781053876
+      ],
+      "mount_back_plane_distances": [
+        -0.09999999999993966,
+        -0.09999999999994694,
+        -0.09999999999994033,
+        -0.0999999999999476
+      ],
+      "lens_recess_inches": 0.345
+    },
+    {
+      "index": 9,
+      "surface_origin": [
+        -154.17227748184214,
+        135.20545859756382,
+        566.0
+      ],
+      "surface_normal": [
+        -0.08098050848524886,
+        0.0710179999027485,
+        -0.9941823781053876
+      ],
+      "mount_back_plane_distances": [
+        -0.09999999999993911,
+        -0.09999999999994699,
+        -0.09999999999994078,
+        -0.09999999999994882
+      ],
+      "lens_recess_inches": 0.345
+    },
+    {
+      "index": 10,
+      "surface_origin": [
+        -183.91273220438575,
+        90.69572267551305,
+        566.0
+      ],
+      "surface_normal": [
+        -0.09660197549184318,
+        0.04763882235939066,
+        -0.9941823781053876
+      ],
+      "mount_back_plane_distances": [
+        -0.09999999999994039,
+        -0.09999999999994721,
+        -0.09999999999993966,
+        -0.09999999999994644
+      ],
+      "lens_recess_inches": 0.345
+    },
+    {
+      "index": 11,
+      "surface_origin": [
+        -201.11983815736076,
+        40.00522313489429,
+        566.0
+      ],
+      "surface_normal": [
+        -0.10564017751098105,
+        0.021013137799116538,
+        -0.9941823781053876
+      ],
+      "mount_back_plane_distances": [
+        -0.0999999999999405,
+        -0.0999999999999506,
+        -0.09999999999993939,
+        -0.09999999999994943
+      ],
+      "lens_recess_inches": 0.345
+    },
+    {
+      "index": 12,
+      "surface_origin": [
+        -204.620959506159,
+        -13.41156625061026,
+        566.0
+      ],
+      "surface_normal": [
+        -0.10747917601139326,
+        -0.007044557376315177,
+        -0.9941823781053876
+      ],
+      "mount_back_plane_distances": [
+        -0.09999999999993994,
+        -0.09999999999995005,
+        -0.0999999999999405,
+        -0.09999999999995049
+      ],
+      "lens_recess_inches": 0.345
+    },
+    {
+      "index": 13,
+      "surface_origin": [
+        -194.17750061673647,
+        -65.91437955979697,
+        566.0
+      ],
+      "surface_normal": [
+        -0.10199364628436543,
+        -0.034622177608232566,
+        -0.9941823781053876
+      ],
+      "mount_back_plane_distances": [
+        -0.09999999999994238,
+        -0.09999999999994955,
+        -0.09999999999994061,
+        -0.09999999999994827
+      ],
+      "lens_recess_inches": 0.345
+    },
+    {
+      "index": 14,
+      "surface_origin": [
+        -170.5011659537755,
+        -113.92523683064599,
+        566.0
+      ],
+      "surface_normal": [
+        -0.08955741811552802,
+        -0.05984035365200262,
+        -0.9941823781053876
+      ],
+      "mount_back_plane_distances": [
+        -0.09999999999993944,
+        -0.09999999999994677,
+        -0.09999999999994055,
+        -0.09999999999994783
+      ],
+      "lens_recess_inches": 0.345
+    },
+    {
+      "index": 15,
+      "surface_origin": [
+        -135.20545859756385,
+        -154.17227748184214,
+        566.0
+      ],
+      "surface_normal": [
+        -0.07101799990274851,
+        -0.08098050848524886,
+        -0.9941823781053876
+      ],
+      "mount_back_plane_distances": [
+        -0.09999999999993905,
+        -0.09999999999994688,
+        -0.09999999999994089,
+        -0.09999999999994877
+      ],
+      "lens_recess_inches": 0.345
+    },
+    {
+      "index": 16,
+      "surface_origin": [
+        -90.69572267551298,
+        -183.91273220438578,
+        566.0
+      ],
+      "surface_normal": [
+        -0.04763882235939062,
+        -0.0966019754918432,
+        -0.9941823781053876
+      ],
+      "mount_back_plane_distances": [
+        -0.09999999999994061,
+        -0.09999999999994749,
+        -0.09999999999993944,
+        -0.09999999999994627
+      ],
+      "lens_recess_inches": 0.345
+    },
+    {
+      "index": 17,
+      "surface_origin": [
+        -40.005223134894386,
+        -201.11983815736076,
+        566.0
+      ],
+      "surface_normal": [
+        -0.021013137799116594,
+        -0.10564017751098104,
+        -0.9941823781053876
+      ],
+      "mount_back_plane_distances": [
+        -0.09999999999994022,
+        -0.09999999999995032,
+        -0.09999999999993961,
+        -0.09999999999994971
+      ],
+      "lens_recess_inches": 0.345
+    },
+    {
+      "index": 18,
+      "surface_origin": [
+        13.411566250610157,
+        -204.62095950615904,
+        566.0
+      ],
+      "surface_normal": [
+        0.007044557376315123,
+        -0.10747917601139327,
+        -0.9941823781053876
+      ],
+      "mount_back_plane_distances": [
+        -0.09999999999993972,
+        -0.09999999999994971,
+        -0.09999999999994078,
+        -0.09999999999995077
+      ],
+      "lens_recess_inches": 0.345
+    },
+    {
+      "index": 19,
+      "surface_origin": [
+        65.91437955979696,
+        -194.17750061673647,
+        566.0
+      ],
+      "surface_normal": [
+        0.03462217760823256,
+        -0.10199364628436543,
+        -0.9941823781053876
+      ],
+      "mount_back_plane_distances": [
+        -0.09999999999994238,
+        -0.09999999999994949,
+        -0.09999999999994066,
+        -0.09999999999994827
+      ],
+      "lens_recess_inches": 0.345
+    },
+    {
+      "index": 20,
+      "surface_origin": [
+        113.92523683064596,
+        -170.5011659537755,
+        566.0
+      ],
+      "surface_normal": [
+        0.059840353652002604,
+        -0.08955741811552802,
+        -0.9941823781053876
+      ],
+      "mount_back_plane_distances": [
+        -0.09999999999993933,
+        -0.09999999999994666,
+        -0.09999999999994061,
+        -0.09999999999994794
+      ],
+      "lens_recess_inches": 0.345
+    },
+    {
+      "index": 21,
+      "surface_origin": [
+        154.17227748184217,
+        -135.20545859756376,
+        566.0
+      ],
+      "surface_normal": [
+        0.08098050848524888,
+        -0.07101799990274847,
+        -0.9941823781053876
+      ],
+      "mount_back_plane_distances": [
+        -0.09999999999993922,
+        -0.09999999999994721,
+        -0.09999999999994061,
+        -0.09999999999994866
+      ],
+      "lens_recess_inches": 0.345
+    },
+    {
+      "index": 22,
+      "surface_origin": [
+        183.91273220438578,
+        -90.695722675513,
+        566.0
+      ],
+      "surface_normal": [
+        0.0966019754918432,
+        -0.047638822359390626,
+        -0.9941823781053876
+      ],
+      "mount_back_plane_distances": [
+        -0.09999999999994061,
+        -0.09999999999994744,
+        -0.09999999999993944,
+        -0.09999999999994627
+      ],
+      "lens_recess_inches": 0.345
+    },
+    {
+      "index": 23,
+      "surface_origin": [
+        201.11983815736076,
+        -40.0052231348944,
+        566.0
+      ],
+      "surface_normal": [
+        0.10564017751098104,
+        -0.021013137799116597,
+        -0.9941823781053876
+      ],
+      "mount_back_plane_distances": [
+        -0.09999999999994028,
+        -0.09999999999995032,
+        -0.09999999999993966,
+        -0.09999999999994977
+      ],
+      "lens_recess_inches": 0.345
+    }
+  ],
+  "removed_triangles": 288,
+  "unrelated_obj_bytes_exact": true,
+  "retained_bytes_sha256": "4c893e6901ce7859284ded15340740b093a61052a2ff9b4434b46e0613823342",
+  "scene_sha256_at_staging": "fb5f5eb035ac5517b104d08f71e8e974ce653bafc81e2b1163efdad6bf5b18a9",
+  "scene_edited": false,
+  "collision_changed": false,
+  "materials_changed": false
+}

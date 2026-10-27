@@ -1,0 +1,421 @@
+{
+  "revision": "veridant-palm-mulch-v1",
+  "stage": "stage-v3",
+  "beds_updated": 10,
+  "new_fill_triangles": 29600,
+  "bark_fragments": 1200,
+  "published_files": 5,
+  "stone_rim_triangles_preserved": 1760,
+  "retained_obj_bytes_exact": true,
+  "original_obj_indices_preserved": true,
+  "scene_written_by_task": false,
+  "collision_unchanged": true,
+  "source_hooks_verified": true,
+  "protected_files": {
+    "Assets/scenes/maps/Veridant/veridant.scene": {
+      "before": "d63b301e5b4c9ea2873bddd80a8a3f4d5da32f6fbd1caad6818725db2329e836",
+      "current": "4b354d1561d858ecf281aff5881b28404bd481e4a16bf6ed40e16fb3d9ba03b1",
+      "unchanged": false
+    },
+    "Assets/models/maps/veridant/veridant_palm_pits.vmdl": {
+      "before": "ffc707a4fa7f490f1a13f73adfe6a6c16f7729875bfc11aea4b0e81fe8d01f16",
+      "current": "ffc707a4fa7f490f1a13f73adfe6a6c16f7729875bfc11aea4b0e81fe8d01f16",
+      "unchanged": true
+    },
+    "Assets/models/maps/veridant/veridant_palm_pits.mtl": {
+      "before": "2cb37c7b9395b9de86c1d5d43a27bd637cff9b07966f31480f3d52f8da9ae309",
+      "current": "2cb37c7b9395b9de86c1d5d43a27bd637cff9b07966f31480f3d52f8da9ae309",
+      "unchanged": true
+    },
+    "Assets/materials/veridant/vr_stone_light.vmat": {
+      "before": "88fa44c515f373c6da00ee7e2a2aa0dc1c0c92955e5a2412eea0ea691156d679",
+      "current": "88fa44c515f373c6da00ee7e2a2aa0dc1c0c92955e5a2412eea0ea691156d679",
+      "unchanged": true
+    },
+    "Assets/materials/veridant/vr_gravel_color.jpg": {
+      "before": "c5c0335183d208f071af5b042ece1253c117424457694636e6292f2c3edf5f50",
+      "current": "c5c0335183d208f071af5b042ece1253c117424457694636e6292f2c3edf5f50",
+      "unchanged": true
+    },
+    "Assets/materials/veridant/vr_gravel_normal.jpg": {
+      "before": "e12729f965565eb4b619d30510e6281fe053ad74b9a2e4dae072415e82757966",
+      "current": "e12729f965565eb4b619d30510e6281fe053ad74b9a2e4dae072415e82757966",
+      "unchanged": true
+    },
+    "Assets/materials/veridant/vr_gravel_rough.png": {
+      "before": "d61b5f5cd4840e3a040e4ce7e3be961e2b57758f2d92abbdf50fd4594fc2e27c",
+      "current": "d61b5f5cd4840e3a040e4ce7e3be961e2b57758f2d92abbdf50fd4594fc2e27c",
+      "unchanged": true
+    }
+  },
+  "native_compiles": [
+    {
+      "Success": true,
+      "Path": "materials/veridant/vr_palm_mulch.vmat",
+      "CompiledFile": "C:/sbox-projects/hc1/forked-shooter-main/Assets/materials/veridant/vr_palm_mulch.vmat_c",
+      "Hint": null
+    },
+    {
+      "Success": true,
+      "Path": "models/maps/veridant/veridant_palm_pits.vmdl",
+      "CompiledFile": "C:/sbox-projects/hc1/forked-shooter-main/Assets/models/maps/veridant/veridant_palm_pits.vmdl_c",
+      "Hint": null
+    }
+  ],
+  "native_import": {
+    "Stage": "stage-v3",
+    "ImportedFiles": [
+      "Assets/materials/veridant/palm-mulch-v1/soil-bark-normal.png",
+      "Assets/materials/veridant/palm-mulch-v1/soil-bark-rough.png"
+    ],
+    "BedsUpdated": 10,
+    "Fragments": 1200,
+    "SceneChanged": false,
+    "CollisionChanged": false,
+    "StoneRimsPreserved": true,
+    "EditorStatePreserved": true
+  },
+  "bounds": [
+    {
+      "base": [
+        -1655.157,
+        -930.0,
+        0.0
+      ],
+      "seed": 101,
+      "fragments": 120,
+      "surface_triangles": 800,
+      "inner_half_width": 30.7,
+      "triangles": 2960,
+      "bounds_min": [
+        -1685.857,
+        -960.7,
+        0.28
+      ],
+      "bounds_max": [
+        -1624.4569999999999,
+        -899.3,
+        1.0348945143334243
+      ]
+    },
+    {
+      "base": [
+        -1646.977,
+        -630.0,
+        0.0
+      ],
+      "seed": 102,
+      "fragments": 120,
+      "surface_triangles": 800,
+      "inner_half_width": 30.7,
+      "triangles": 2960,
+      "bounds_min": [
+        -1677.6770000000001,
+        -660.7,
+        0.2780092518840859
+      ],
+      "bounds_max": [
+        -1616.277,
+        -599.3,
+        1.14021422833201
+      ]
+    },
+    {
+      "base": [
+        -1644.9,
+        570.0,
+        0.0
+      ],
+      "seed": 106,
+      "fragments": 120,
+      "surface_triangles": 800,
+      "inner_half_width": 30.7,
+      "triangles": 2960,
+      "bounds_min": [
+        -1675.6000000000001,
+        539.3,
+        0.28
+      ],
+      "bounds_max": [
+        -1614.2,
+        600.7,
+        1.107925844197027
+      ]
+    },
+    {
+      "base": [
+        -1643.775,
+        -30.0,
+        0.0
+      ],
+      "seed": 104,
+      "fragments": 120,
+      "surface_triangles": 800,
+      "inner_half_width": 30.7,
+      "triangles": 2960,
+      "bounds_min": [
+        -1674.4750000000001,
+        -60.7,
+        0.28
+      ],
+      "bounds_max": [
+        -1613.075,
+        0.6999999999999993,
+        1.1574412745126206
+      ]
+    },
+    {
+      "base": [
+        -1639.142,
+        270.0,
+        0.0
+      ],
+      "seed": 105,
+      "fragments": 120,
+      "surface_triangles": 800,
+      "inner_half_width": 30.7,
+      "triangles": 2960,
+      "bounds_min": [
+        -1669.842,
+        239.3,
+        0.28
+      ],
+      "bounds_max": [
+        -1608.442,
+        300.7,
+        1.1659860087359533
+      ]
+    },
+    {
+      "base": [
+        -1632.599,
+        -330.0,
+        0.0
+      ],
+      "seed": 103,
+      "fragments": 120,
+      "surface_triangles": 800,
+      "inner_half_width": 30.7,
+      "triangles": 2960,
+      "bounds_min": [
+        -1663.299,
+        -360.7,
+        0.28
+      ],
+      "bounds_max": [
+        -1601.899,
+        -299.3,
+        1.1894552310515203
+      ]
+    },
+    {
+      "base": [
+        -1631.19,
+        -1230.0,
+        0.0
+      ],
+      "seed": 100,
+      "fragments": 120,
+      "surface_triangles": 800,
+      "inner_half_width": 30.7,
+      "triangles": 2960,
+      "bounds_min": [
+        -1661.89,
+        -1260.7,
+        0.28
+      ],
+      "bounds_max": [
+        -1600.49,
+        -1199.3,
+        1.1682640925841115
+      ]
+    },
+    {
+      "base": [
+        -1623.791,
+        870.0,
+        0.0
+      ],
+      "seed": 107,
+      "fragments": 120,
+      "surface_triangles": 800,
+      "inner_half_width": 30.7,
+      "triangles": 2960,
+      "bounds_min": [
+        -1654.491,
+        839.3,
+        0.28
+      ],
+      "bounds_max": [
+        -1593.091,
+        900.7,
+        1.174055178302789
+      ]
+    },
+    {
+      "base": [
+        -900.0,
+        -1080.0,
+        0.0
+      ],
+      "seed": 200,
+      "fragments": 120,
+      "surface_triangles": 800,
+      "inner_half_width": 30.7,
+      "triangles": 2960,
+      "bounds_min": [
+        -930.7,
+        -1110.7,
+        0.28
+      ],
+      "bounds_max": [
+        -869.3,
+        -1049.3,
+        1.077176701144004
+      ]
+    },
+    {
+      "base": [
+        -900.0,
+        -660.0,
+        0.0
+      ],
+      "seed": 201,
+      "fragments": 120,
+      "surface_triangles": 800,
+      "inner_half_width": 30.7,
+      "triangles": 2960,
+      "bounds_min": [
+        -930.7,
+        -690.7,
+        0.27338732201736365
+      ],
+      "bounds_max": [
+        -869.3,
+        -629.3,
+        1.1615422590893338
+      ]
+    }
+  ],
+  "captures": [
+    {
+      "path": "output/veridant/quality/palm-mulch-v1-before/palm-bed.png",
+      "sha256": "3ce32a7e519fa8a902f8024a8cc7bc6796c93ad48e504803d01a13cf88cec75d",
+      "Capture": {
+        "Position": "-613.9399,1565.144,68.9217",
+        "Angles": "Pitch = 38.45, Yaw = 94.76, Roll = -0.00",
+        "FieldOfView": 64,
+        "FovAxis": "Horizontal",
+        "Width": 1200,
+        "Height": 850,
+        "EnablePostProcessing": true,
+        "TrialSurfaceSlots": 0,
+        "TrialForestVariant": "accepted",
+        "TrialForestSlots": 0,
+        "TrialModels": 0,
+        "TrialManifestSha256": {},
+        "RequestedExposure": 2.2,
+        "NativeEnabled": true,
+        "NativeMinimum": 2.2,
+        "ViewportSettledMilliseconds": 3000,
+        "NativeMaximum": 2.2,
+        "NativeCompensation": 0,
+        "MainCameraIsViewport": true,
+        "PreviousMainName": "GameObject",
+        "PreviousMainId": "09677109-c2a0-4ec4-bc3d-b6f510026aed",
+        "PreviousMainWasOrthographic": true,
+        "SourceSceneSha256": "d63b301e5b4c9ea2873bddd80a8a3f4d5da32f6fbd1caad6818725db2329e836",
+        "HelperSha256": "7edb00232ff37be04b327d63adea9a384ef9a9b2c1f6aa6aeeffd6e506ef5d7e",
+        "EffectiveGpuExposureVerified": false
+      },
+      "Restoration": {
+        "AssetsRestored": true,
+        "MainCameraRestored": true,
+        "ToneRestored": true,
+        "CamerasRestored": true,
+        "ObjectsRestored": true,
+        "EditorStatePreserved": true
+      },
+      "ExposureImageComparisonStillRequired": true
+    },
+    {
+      "path": "output/veridant/quality/palm-mulch-v1-after/palm-bed.png",
+      "sha256": "5155aaff23cff19bb6b17572bfd09b4cfa73ebdcd4ed5f586af3ab13996bd143",
+      "Capture": {
+        "Position": "-613.9399,1565.144,68.9217",
+        "Angles": "Pitch = 38.45, Yaw = 94.76, Roll = -0.00",
+        "FieldOfView": 64,
+        "FovAxis": "Horizontal",
+        "Width": 1200,
+        "Height": 850,
+        "EnablePostProcessing": true,
+        "TrialSurfaceSlots": 0,
+        "TrialForestVariant": "accepted",
+        "TrialForestSlots": 0,
+        "TrialModels": 0,
+        "TrialManifestSha256": {},
+        "RequestedExposure": 2.2,
+        "NativeEnabled": true,
+        "NativeMinimum": 2.2,
+        "ViewportSettledMilliseconds": 3000,
+        "NativeMaximum": 2.2,
+        "NativeCompensation": 0,
+        "MainCameraIsViewport": true,
+        "PreviousMainName": "GameObject",
+        "PreviousMainId": "09677109-c2a0-4ec4-bc3d-b6f510026aed",
+        "PreviousMainWasOrthographic": true,
+        "SourceSceneSha256": "d63b301e5b4c9ea2873bddd80a8a3f4d5da32f6fbd1caad6818725db2329e836",
+        "HelperSha256": "7edb00232ff37be04b327d63adea9a384ef9a9b2c1f6aa6aeeffd6e506ef5d7e",
+        "EffectiveGpuExposureVerified": false
+      },
+      "Restoration": {
+        "AssetsRestored": true,
+        "MainCameraRestored": true,
+        "ToneRestored": true,
+        "CamerasRestored": true,
+        "ObjectsRestored": true,
+        "EditorStatePreserved": true
+      },
+      "ExposureImageComparisonStillRequired": true
+    }
+  ],
+  "matched_camera_and_exposure": true,
+  "visually_reviewed": true,
+  "optional_second_view_discarded": {
+    "restoration": {
+      "AssetsRestored": true,
+      "MainCameraRestored": true,
+      "ToneRestored": true,
+      "CamerasRestored": true,
+      "ObjectsRestored": true,
+      "EditorStatePreserved": false
+    },
+    "reason": "Saved scene hash changed during this optional capture; view/tone/assets/objects restored. No scene overwrite attempted."
+  },
+  "editor_status": {
+    "EngineVersion": "26.10.13c",
+    "Project": "razedtest",
+    "ProjectTitle": "RazedTest",
+    "ActiveScene": "veridant",
+    "ActiveScenePath": "scenes/maps/veridant/veridant.scene",
+    "SceneHasUnsavedChanges": false,
+    "IsPlaying": false,
+    "IsPaused": false,
+    "ToolCount": 128,
+    "IsCompiling": false,
+    "LastCompileSucceeded": true,
+    "LastCompileErrors": 0,
+    "Paths": {
+      "Engine": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\sbox",
+      "Logs": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\sbox\\logs",
+      "ProjectRoot": "C:\\sbox-projects\\hc1\\forked-shooter-main",
+      "ProjectSettings": "C:\\sbox-projects\\hc1\\forked-shooter-main\\ProjectSettings"
+    }
+  },
+  "editor_camera": {
+    "Position": "-613.939941,1565.1438,68.9217224",
+    "Angles": "38.4512863,94.7587204,-2.18039418E-06",
+    "FieldOfView": 80
+  },
+  "performance_note": "29,600 fill triangles across ten beds. Frame-rate impact not benchmarked."
+}

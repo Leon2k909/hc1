@@ -1,0 +1,292 @@
+{
+  "revision": "veridant-palm-mulch-v1",
+  "stage": "stage-v2",
+  "files": {
+    "Assets/materials/veridant/vr_palm_mulch.vmat": {
+      "before": "c475c4d819c72674546b0ef614240f702d8b50fb6cf63b0306d3b6545e0f95ac",
+      "after": "6c07f80c974e623f68ef1512e36e2903be653d0ae6aebade67c3a85524dd1dc1",
+      "source": "output/veridant/palm-mulch-v1/stage-v2/Assets/materials/veridant/vr_palm_mulch.vmat",
+      "backup": "output/veridant/palm-mulch-v1/stage-v2/before/Assets/materials/veridant/vr_palm_mulch.vmat"
+    },
+    "Assets/materials/veridant/palm-mulch-v1/soil-bark-color.png": {
+      "before": null,
+      "after": "4f3857cb0cc7e524018ddc4b7baf688a6a1c535721e6bc5079ffa1c274db0721",
+      "source": "output/veridant/palm-mulch-v1/stage-v2/Assets/materials/veridant/palm-mulch-v1/soil-bark-color.png",
+      "backup": null
+    },
+    "Assets/materials/veridant/palm-mulch-v1/soil-bark-normal.png": {
+      "before": null,
+      "after": "0481db4e221b79f7a10d53418750f88e49a044d5ed2c16972d1e2de3a938c5ba",
+      "source": "output/veridant/palm-mulch-v1/stage-v2/Assets/materials/veridant/palm-mulch-v1/soil-bark-normal.png",
+      "backup": null
+    },
+    "Assets/materials/veridant/palm-mulch-v1/soil-bark-rough.png": {
+      "before": null,
+      "after": "2ed8624468995c0ea6a1ee261d859f7b9f61bd323b56e01ab0771f939fe0f98f",
+      "source": "output/veridant/palm-mulch-v1/stage-v2/Assets/materials/veridant/palm-mulch-v1/soil-bark-rough.png",
+      "backup": null
+    },
+    "Assets/models/maps/veridant/veridant_palm_pits.obj": {
+      "before": "db822acfff4452a41e18f830e29125f9534921906ec33dbda93bb9f880be9516",
+      "after": "a6b1048137f1265e69ed688d1f83081d5173fe7a4d34b629b1246ed30f1460e4",
+      "source": "output/veridant/palm-mulch-v1/stage-v2/Assets/models/maps/veridant/veridant_palm_pits.obj",
+      "backup": "output/veridant/palm-mulch-v1/stage-v2/before/Assets/models/maps/veridant/veridant_palm_pits.obj"
+    }
+  },
+  "source_sha256": {
+    "Tools/veridant_palm_mulch.py": "b775c111abac708054d56c998526654f64f609f61e7ff7f366a26962667acf40",
+    "Tools/veridant_stage_palm_mulch.py": "33d889ec7e74c571cea89c473e1e1c02e69a05aa327e8ac880cc9dc0094a1cfc",
+    "Tools/map_kit.py": "cc60204c747d064cb1fecdb666b24c847ae89dc863c2533d3811a0445f22020d",
+    "Tools/riverdale_parts.py": "a90f4f134053eb3397b2073f1ca4bb3bdc0bfb80a9521dce64ca1017e747f732",
+    "Sources/Veridant/palm-mulch-v1/soil-bark-albedo-generated.png": "4f3857cb0cc7e524018ddc4b7baf688a6a1c535721e6bc5079ffa1c274db0721"
+  },
+  "protected_sha256": {
+    "Assets/scenes/maps/Veridant/veridant.scene": "d63b301e5b4c9ea2873bddd80a8a3f4d5da32f6fbd1caad6818725db2329e836",
+    "Assets/models/maps/veridant/veridant_palm_pits.vmdl": "ffc707a4fa7f490f1a13f73adfe6a6c16f7729875bfc11aea4b0e81fe8d01f16",
+    "Assets/models/maps/veridant/veridant_palm_pits.mtl": "2cb37c7b9395b9de86c1d5d43a27bd637cff9b07966f31480f3d52f8da9ae309",
+    "Assets/materials/veridant/vr_stone_light.vmat": "88fa44c515f373c6da00ee7e2a2aa0dc1c0c92955e5a2412eea0ea691156d679",
+    "Assets/materials/veridant/vr_gravel_color.jpg": "c5c0335183d208f071af5b042ece1253c117424457694636e6292f2c3edf5f50",
+    "Assets/materials/veridant/vr_gravel_normal.jpg": "e12729f965565eb4b619d30510e6281fe053ad74b9a2e4dae072415e82757966",
+    "Assets/materials/veridant/vr_gravel_rough.png": "d61b5f5cd4840e3a040e4ce7e3be961e2b57758f2d92abbdf50fd4594fc2e27c"
+  },
+  "required_source_snippets": {
+    "Tools/veridant_parts.py": [
+      "def palm_pit( m, base, seed=0 ):\n    \"\"\" Low, walkable limestone surround with a textured soil bed, for palms in paving. \"\"\"\n    e, n, z = base\n    half, width, height = 35.0, 4.5, 3.0\n    axes = ( ( 1, 0, 0 ), ( 0, 1, 0 ), ( 0, 0, 1 ) )\n    # Separate lengths leave small masonry joints; bevels catch the grazing evening light.\n    for ce, cn, sx, sy in ( ( e, n - half + width / 2, half * 2 - .3, width ),\n                            ( e, n + half - width / 2, half * 2 - .3, width ),\n                            ( e - half + width / 2, n, width, ( half - width ) * 2 - .3 ),\n                            ( e + half - width / 2, n, width, ( half - width ) * 2 - .3 ) ):\n        P.bevel_box( m, ( ce, cn, z + height / 2 ), axes, ( sx, sy, height ), \"vr_stone_light\", bevel=.55 )\n    from veridant_palm_mulch import build_into\n    build_into( m, base, seed )\n"
+    ],
+    "Tools/veridant_materials.py": [
+      "if p == \"vr_palm_mulch\":\n                from veridant_palm_mulch import write_materials\n                write_materials( out )\n                continue"
+    ]
+  },
+  "beds": [
+    {
+      "base": [
+        -1655.157,
+        -930.0,
+        0.0
+      ],
+      "seed": 101,
+      "fragments": 120,
+      "surface_triangles": 800,
+      "inner_half_width": 30.7,
+      "triangles": 2960,
+      "bounds_min": [
+        -1685.857,
+        -960.7,
+        0.28
+      ],
+      "bounds_max": [
+        -1624.4569999999999,
+        -899.3,
+        1.0348945143334243
+      ]
+    },
+    {
+      "base": [
+        -1646.977,
+        -630.0,
+        0.0
+      ],
+      "seed": 102,
+      "fragments": 120,
+      "surface_triangles": 800,
+      "inner_half_width": 30.7,
+      "triangles": 2960,
+      "bounds_min": [
+        -1677.6770000000001,
+        -660.7,
+        0.2780092518840859
+      ],
+      "bounds_max": [
+        -1616.277,
+        -599.3,
+        1.14021422833201
+      ]
+    },
+    {
+      "base": [
+        -1644.9,
+        570.0,
+        0.0
+      ],
+      "seed": 106,
+      "fragments": 120,
+      "surface_triangles": 800,
+      "inner_half_width": 30.7,
+      "triangles": 2960,
+      "bounds_min": [
+        -1675.6000000000001,
+        539.3,
+        0.28
+      ],
+      "bounds_max": [
+        -1614.2,
+        600.7,
+        1.107925844197027
+      ]
+    },
+    {
+      "base": [
+        -1643.775,
+        -30.0,
+        0.0
+      ],
+      "seed": 104,
+      "fragments": 120,
+      "surface_triangles": 800,
+      "inner_half_width": 30.7,
+      "triangles": 2960,
+      "bounds_min": [
+        -1674.4750000000001,
+        -60.7,
+        0.28
+      ],
+      "bounds_max": [
+        -1613.075,
+        0.6999999999999993,
+        1.1574412745126206
+      ]
+    },
+    {
+      "base": [
+        -1639.142,
+        270.0,
+        0.0
+      ],
+      "seed": 105,
+      "fragments": 120,
+      "surface_triangles": 800,
+      "inner_half_width": 30.7,
+      "triangles": 2960,
+      "bounds_min": [
+        -1669.842,
+        239.3,
+        0.28
+      ],
+      "bounds_max": [
+        -1608.442,
+        300.7,
+        1.1659860087359533
+      ]
+    },
+    {
+      "base": [
+        -1632.599,
+        -330.0,
+        0.0
+      ],
+      "seed": 103,
+      "fragments": 120,
+      "surface_triangles": 800,
+      "inner_half_width": 30.7,
+      "triangles": 2960,
+      "bounds_min": [
+        -1663.299,
+        -360.7,
+        0.28
+      ],
+      "bounds_max": [
+        -1601.899,
+        -299.3,
+        1.1894552310515203
+      ]
+    },
+    {
+      "base": [
+        -1631.19,
+        -1230.0,
+        0.0
+      ],
+      "seed": 100,
+      "fragments": 120,
+      "surface_triangles": 800,
+      "inner_half_width": 30.7,
+      "triangles": 2960,
+      "bounds_min": [
+        -1661.89,
+        -1260.7,
+        0.28
+      ],
+      "bounds_max": [
+        -1600.49,
+        -1199.3,
+        1.1682640925841115
+      ]
+    },
+    {
+      "base": [
+        -1623.791,
+        870.0,
+        0.0
+      ],
+      "seed": 107,
+      "fragments": 120,
+      "surface_triangles": 800,
+      "inner_half_width": 30.7,
+      "triangles": 2960,
+      "bounds_min": [
+        -1654.491,
+        839.3,
+        0.28
+      ],
+      "bounds_max": [
+        -1593.091,
+        900.7,
+        1.174055178302789
+      ]
+    },
+    {
+      "base": [
+        -900.0,
+        -1080.0,
+        0.0
+      ],
+      "seed": 200,
+      "fragments": 120,
+      "surface_triangles": 800,
+      "inner_half_width": 30.7,
+      "triangles": 2960,
+      "bounds_min": [
+        -930.7,
+        -1110.7,
+        0.28
+      ],
+      "bounds_max": [
+        -869.3,
+        -1049.3,
+        1.077176701144004
+      ]
+    },
+    {
+      "base": [
+        -900.0,
+        -660.0,
+        0.0
+      ],
+      "seed": 201,
+      "fragments": 120,
+      "surface_triangles": 800,
+      "inner_half_width": 30.7,
+      "triangles": 2960,
+      "bounds_min": [
+        -930.7,
+        -690.7,
+        0.27338732201736365
+      ],
+      "bounds_max": [
+        -869.3,
+        -629.3,
+        1.1615422590893338
+      ]
+    }
+  ],
+  "beds_updated": 10,
+  "removed_triangles": 720,
+  "new_triangles": 29600,
+  "fragments": 1200,
+  "retained_bytes_sha256": "2907ff486b397038ab52bbbe8d1cad3e36d292bd990658b065c407569c280eb9",
+  "retained_bytes": 405472,
+  "stone_rim_triangles_preserved": 1760,
+  "scene_unchanged": true,
+  "collision_unchanged": true,
+  "original_indices_preserved": true
+}

@@ -1,0 +1,83 @@
+{
+  "files": {
+    "Assets/models/maps/ares/stair-rear-wall/ares_stair_rear_closures.mtl": {
+      "source": "output/ares/stair-rear-wall/stage-v1/Assets/models/maps/ares/stair-rear-wall/ares_stair_rear_closures.mtl",
+      "sha256": "0f016aa1f89215297f9dc451c72d0b25e7facd6632a238d63f8836e95e186852"
+    },
+    "Assets/models/maps/ares/stair-rear-wall/ares_stair_rear_closures.obj": {
+      "source": "output/ares/stair-rear-wall/stage-v1/Assets/models/maps/ares/stair-rear-wall/ares_stair_rear_closures.obj",
+      "sha256": "1dfb91a220e0ec3a9817947742bba0d06bd0412f4f795c2d7bcd14fef2498d4c"
+    },
+    "Assets/models/maps/ares/stair-rear-wall/ares_stair_rear_closures.vmdl": {
+      "source": "output/ares/stair-rear-wall/stage-v1/Assets/models/maps/ares/stair-rear-wall/ares_stair_rear_closures.vmdl",
+      "sha256": "4db18fe77f4bcb18b44143aa9523426e42a106ab97dafc2d2124926f9b0bb5b2"
+    }
+  },
+  "protected": {
+    "Assets/models/maps/ares/ares_hall.vmdl": "4cfe4886f379251711bfe049db1dc7de49c5eeb2926bfc41958a245f5eaf96d7",
+    "Assets/models/maps/ares/ares_hall.obj": "b2540404d6c9849512f5c9bc21c3ecd812b8f0d996d030fcb7b6774ac6b5e915",
+    "Assets/models/maps/ares/pressure-doors-v2/hall_base.obj": "d7fced4a9e5bc40abf3269986f863bc807bf89fd7595d625aeb4c265e776bb4c",
+    "Assets/scenes/maps/Ares/ares.scene": "d4b026c3a729d7e65f580b1923bd5fce64dddd887b829efc14697232b6ab7929"
+  },
+  "parts": [
+    {
+      "name": "hall-west",
+      "axis": "n",
+      "c0": -880.0,
+      "c1": -760.0,
+      "s0": -470.0,
+      "s1": -158.0,
+      "z0": 0,
+      "top": 192.0,
+      "depth": 4.2,
+      "collision_added": false,
+      "inside_existing_solid": true
+    },
+    {
+      "name": "hall-east",
+      "axis": "n",
+      "c0": 760.0,
+      "c1": 880.0,
+      "s0": -470.0,
+      "s1": -158.0,
+      "z0": 0,
+      "top": 192.0,
+      "depth": 4.2,
+      "collision_added": false,
+      "inside_existing_solid": true
+    },
+    {
+      "name": "wing-west",
+      "axis": "n",
+      "c0": -1990.0,
+      "c1": -1870.0,
+      "s0": 212.0,
+      "s1": 520.0,
+      "z0": 0,
+      "top": 192.0,
+      "depth": 4.2,
+      "collision_added": false,
+      "inside_existing_solid": true
+    },
+    {
+      "name": "wing-east",
+      "axis": "n",
+      "c0": 1870.0,
+      "c1": 1990.0,
+      "s0": 212.0,
+      "s1": 520.0,
+      "z0": 0,
+      "top": 192.0,
+      "depth": 4.2,
+      "collision_added": false,
+      "inside_existing_solid": true
+    }
+  ],
+  "triangles": 1936,
+  "source_sha256": {
+    "Tools/ares_stair_cladding.py": "1f88a5cf9155fbb4b0c92267c46b06e8cc8527a791cd4f700660c37870366551",
+    "Tools/ares_stage_stair_cladding.py": "a92a769c7686d8fdf4d98552e0cca12b7df928fddd224f8d52ea36b22eadc246"
+  },
+  "stair_source": "def stair( m, axis, c0, c1, s0, s1, z0, z1, rails=( True, True ) ):\n    \"\"\" A closed steel stair c0..c1 across, rising from s0 (at z0) to s1 (at z1) along axis 'e' or 'n': grating treads\n    with hazard nosings over steel risers, solid sides. Its collision is the ramp under the nosings and the solid\n    below it. rails ( low c side, high c side ). \"\"\"\n    rise = z1 - z0\n    count = max( 1, int( round( rise / 7.4 ) ) )\n    r = rise / count\n    run = ( s1 - s0 ) / count\n    sgn = 1.0 if s1 > s0 else -1.0\n\n    def P( c, s, z ):\n        return np.array( ( s, c, z ) if axis == \"e\" else ( c, s, z ), float )\n\n    front_face = ( \"-\" if sgn > 0 else \"+\" ) + axis\n    end_faces = ( \"+n\", \"-n\" ) if axis == \"e\" else ( \"+e\", \"-e\" )\n    for k in range( count ):\n        sa, sb = s0 + run * k, s0 + run * ( k + 1 )\n        top = z0 + r * ( k + 1 )\n        lo, hi = P( c0, min( sa, sb ), top - 1.5 ), P( c1, max( sa, sb ), top )\n        # The yellow nosing owns the front face. Drawing steel here too causes coplanar flicker.\n        m.box( lo, hi, { \"+z\": None, \"default\": \"ar_steel\" }, skip=( front_face, ) )\n        # Stop the grating at the nosing's back edge: the two top surfaces must not overlap either.\n        start = sa + sgn * 2.0\n        m.box( P( c0, min( start, sb ), top - 1.5 ), P( c1, max( start, sb ), top ), { \"+z\": \"ar_grating\" } )\n        # The nosing at the tread's front edge (its low s end), and the riser under it.\n        front = sa\n        nlo, nhi = P( c0, front, top - 1.5 ), P( c1, front + sgn * 2.0, top + 0.125 )\n        # Ends are enclosed by the stringers; the steel tread already owns the underside.\n        m.box( np.minimum( nlo, nhi ), np.maximum( nlo, nhi ), \"ar_hazard\", skip=end_faces + ( \"-z\", ) )\n        rlo, rhi = P( c0, front, z0 + r * k ), P( c1, front + sgn * 0.8, top - 1.5 )\n        m.box( np.minimum( rlo, rhi ), np.maximum( rlo, rhi ), \"ar_steel\" )\n    # The solid sides: a trapezoid each, the stringer's top 3 over the nosings' line.\n    for c, towards in ( ( c0, -1.0 ), ( c1, 1.0 ) ):\n        pts = [ P( c, s0 - sgn * 0.0, z0 ), P( c, s1, z0 ), P( c, s1, z1 + 3.0 ), P( c, s0, z0 + r + 3.0 ) ]\n        normal = np.array( ( 0, towards, 0 ) if axis == \"e\" else ( towards, 0, 0 ), float )\n        card( m, \"ar_steel\", pts, normal )\n        card( m, \"ar_steel\", [ p - normal * 0.01 for p in pts ], -normal )\n    # The ramp: a wedge from the foot's nosing to the head.\n    pts = [ P( c, s, z ) for c in ( c0, c1 ) for s, z in ( ( s0, z0 ), ( s1, z0 ), ( s1, z1 ), ( s0, z0 + r * 0.5 ) ) ]\n    m.hull( pts, METAL )\n    # The wedge already blocks players here; give its formerly open rear a skin.\n    from ares_stair_cladding import append_rear_closure\n    append_rear_closure( m, axis, c0, c1, s0, s1, z0, z1, landing_thickness=DT )\n    if rails[0]:\n        slope_rail( m, P( c0 + 1.5, s0, z0 + r ), P( c0 + 1.5, s1, z1 ) )\n    if rails[1]:\n        slope_rail( m, P( c1 - 1.5, s0, z0 + r ), P( c1 - 1.5, s1, z1 ) )\n",
+  "model": "models/maps/ares/stair-rear-wall/ares_stair_rear_closures.vmdl"
+}
