@@ -11,3 +11,9 @@
   show over it.
 - Not yet seen in a match.
 
+- Restyled 2026-10-27 to match the HUD ("scoreboard needs to look better"): Dinish capitals and numerals, the HUD's
+  ink and orange, no outer box. Each team's heading is a banner of its colour fading right (`GetTeamBannerStyle`), with
+  its score at 54 px. Rows are 48 px on dark ink with hairlines; your own row has the orange bar and wash; the dead are
+  greyed. Ping's signal bars are green, amber from 80 ms (`ping-fair`), red from 150 ms (`ping-poor`). The voice
+  channel picker is flat with an orange underline on the chosen one. Mocked up in headless Chromium from the real SCSS
+  (before/after in project files `scoreboard/`); not yet compiled or seen in a match.
