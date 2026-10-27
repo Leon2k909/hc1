@@ -702,9 +702,10 @@ def rock(m, centre, scale, rng):
 
 def water():
     m=K.Model()
-    # One continuous tailrace below the platforms avoids visible seams between water tiles.
-    for e0,e1,n0,n1 in ((-2800,2700,-7000,-1150),(-850,-500,-1150,3600),(750,1100,-1150,3600),(-7400,7400,2000,WATERFALLS.BASIN_END)):
-        P.quad(m,"sw_river",((e0+e1)/2,(n0+n1)/2,WATER_Z),(1,0,0),(0,1,0),e1-e0,n1-n0)
+    # One continuous sheet under the whole map. Opaque ground hides it where there is land;
+    # the old separate tiles left open sky between the west/east rocks and the platforms.
+    e0,e1,n0,n1=-7400,7400,-7000,WATERFALLS.BASIN_END
+    P.quad(m,"sw_river",((e0+e1)/2,(n0+n1)/2,WATER_Z),(1,0,0),(0,1,0),e1-e0,n1-n0)
     # Smaller outfalls on the island, just as in the foreground of the reference.
     for e in (-380,570):
         pts=[(e-32,-1240,-143),(e+32,-1240,-143),(e+47,-1265,WATER_Z),(e-47,-1265,WATER_Z)]
