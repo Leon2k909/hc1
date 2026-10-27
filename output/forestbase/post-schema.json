@@ -1,0 +1,1117 @@
+[
+  {
+    "type": "Sandbox.PostProcessVolume",
+    "properties": [
+      {
+        "name": "Id",
+        "type": "System.Guid"
+      },
+      {
+        "name": "SceneVolume",
+        "type": "Sandbox.Volumes.SceneVolume"
+      },
+      {
+        "name": "WorldTransform",
+        "type": "Transform"
+      },
+      {
+        "name": "Network",
+        "type": "Sandbox.GameObject\u002BNetworkAccessor"
+      },
+      {
+        "name": "LocalTransform",
+        "type": "Transform"
+      },
+      {
+        "name": "ComponentVersion",
+        "type": "System.Int32"
+      },
+      {
+        "name": "IsInfinite",
+        "type": "System.Boolean"
+      },
+      {
+        "name": "Priority",
+        "type": "System.Int32"
+      },
+      {
+        "name": "IsProxy",
+        "type": "System.Boolean"
+      },
+      {
+        "name": "WorldPosition",
+        "type": "Vector3"
+      },
+      {
+        "name": "LocalPosition",
+        "type": "Vector3"
+      },
+      {
+        "name": "BlendWeight",
+        "type": "System.Single"
+      },
+      {
+        "name": "WorldRotation",
+        "type": "Rotation"
+      },
+      {
+        "name": "LocalRotation",
+        "type": "Rotation"
+      },
+      {
+        "name": "BlendDistance",
+        "type": "System.Single"
+      },
+      {
+        "name": "Scene",
+        "type": "Sandbox.Scene"
+      },
+      {
+        "name": "EditorPreview",
+        "type": "System.Boolean"
+      },
+      {
+        "name": "WorldScale",
+        "type": "Vector3"
+      },
+      {
+        "name": "LocalScale",
+        "type": "Vector3"
+      },
+      {
+        "name": "Transform",
+        "type": "Sandbox.GameTransform"
+      },
+      {
+        "name": "GameObject",
+        "type": "Sandbox.GameObject"
+      },
+      {
+        "name": "Task",
+        "type": "Sandbox.TaskSource"
+      },
+      {
+        "name": "Components",
+        "type": "Sandbox.ComponentList"
+      },
+      {
+        "name": "Flags",
+        "type": "Sandbox.ComponentFlags"
+      },
+      {
+        "name": "Enabled",
+        "type": "System.Boolean"
+      },
+      {
+        "name": "Active",
+        "type": "System.Boolean"
+      },
+      {
+        "name": "IsValid",
+        "type": "System.Boolean"
+      },
+      {
+        "name": "OnComponentEnabled",
+        "type": "System.Action"
+      },
+      {
+        "name": "OnComponentStart",
+        "type": "System.Action"
+      },
+      {
+        "name": "OnComponentUpdate",
+        "type": "System.Action"
+      },
+      {
+        "name": "OnComponentFixedUpdate",
+        "type": "System.Action"
+      },
+      {
+        "name": "OnComponentDisabled",
+        "type": "System.Action"
+      },
+      {
+        "name": "OnComponentDestroy",
+        "type": "System.Action"
+      },
+      {
+        "name": "Tags",
+        "type": "Sandbox.ITagSet"
+      },
+      {
+        "name": "DebugOverlay",
+        "type": "Sandbox.DebugOverlaySystem"
+      }
+    ]
+  },
+  {
+    "type": "Sandbox.ScreenSpaceReflections",
+    "properties": [
+      {
+        "name": "Id",
+        "type": "System.Guid"
+      },
+      {
+        "name": "WorldTransform",
+        "type": "Transform"
+      },
+      {
+        "name": "Network",
+        "type": "Sandbox.GameObject\u002BNetworkAccessor"
+      },
+      {
+        "name": "LocalTransform",
+        "type": "Transform"
+      },
+      {
+        "name": "ComponentVersion",
+        "type": "System.Int32"
+      },
+      {
+        "name": "IsProxy",
+        "type": "System.Boolean"
+      },
+      {
+        "name": "WorldPosition",
+        "type": "Vector3"
+      },
+      {
+        "name": "LocalPosition",
+        "type": "Vector3"
+      },
+      {
+        "name": "RoughnessCutoff",
+        "type": "System.Single"
+      },
+      {
+        "name": "Camera",
+        "type": "Sandbox.CameraComponent"
+      },
+      {
+        "name": "WorldRotation",
+        "type": "Rotation"
+      },
+      {
+        "name": "LocalRotation",
+        "type": "Rotation"
+      },
+      {
+        "name": "Scene",
+        "type": "Sandbox.Scene"
+      },
+      {
+        "name": "WorldScale",
+        "type": "Vector3"
+      },
+      {
+        "name": "LocalScale",
+        "type": "Vector3"
+      },
+      {
+        "name": "Transform",
+        "type": "Sandbox.GameTransform"
+      },
+      {
+        "name": "GameObject",
+        "type": "Sandbox.GameObject"
+      },
+      {
+        "name": "Task",
+        "type": "Sandbox.TaskSource"
+      },
+      {
+        "name": "Components",
+        "type": "Sandbox.ComponentList"
+      },
+      {
+        "name": "Flags",
+        "type": "Sandbox.ComponentFlags"
+      },
+      {
+        "name": "Enabled",
+        "type": "System.Boolean"
+      },
+      {
+        "name": "Active",
+        "type": "System.Boolean"
+      },
+      {
+        "name": "IsValid",
+        "type": "System.Boolean"
+      },
+      {
+        "name": "OnComponentEnabled",
+        "type": "System.Action"
+      },
+      {
+        "name": "OnComponentStart",
+        "type": "System.Action"
+      },
+      {
+        "name": "OnComponentUpdate",
+        "type": "System.Action"
+      },
+      {
+        "name": "OnComponentFixedUpdate",
+        "type": "System.Action"
+      },
+      {
+        "name": "OnComponentDisabled",
+        "type": "System.Action"
+      },
+      {
+        "name": "OnComponentDestroy",
+        "type": "System.Action"
+      },
+      {
+        "name": "Tags",
+        "type": "Sandbox.ITagSet"
+      },
+      {
+        "name": "DebugOverlay",
+        "type": "Sandbox.DebugOverlaySystem"
+      }
+    ]
+  },
+  {
+    "type": "Sandbox.AmbientOcclusion",
+    "properties": [
+      {
+        "name": "Id",
+        "type": "System.Guid"
+      },
+      {
+        "name": "WorldTransform",
+        "type": "Transform"
+      },
+      {
+        "name": "Network",
+        "type": "Sandbox.GameObject\u002BNetworkAccessor"
+      },
+      {
+        "name": "LocalTransform",
+        "type": "Transform"
+      },
+      {
+        "name": "ComponentVersion",
+        "type": "System.Int32"
+      },
+      {
+        "name": "IsProxy",
+        "type": "System.Boolean"
+      },
+      {
+        "name": "WorldPosition",
+        "type": "Vector3"
+      },
+      {
+        "name": "LocalPosition",
+        "type": "Vector3"
+      },
+      {
+        "name": "Camera",
+        "type": "Sandbox.CameraComponent"
+      },
+      {
+        "name": "Intensity",
+        "type": "System.Single"
+      },
+      {
+        "name": "WorldRotation",
+        "type": "Rotation"
+      },
+      {
+        "name": "LocalRotation",
+        "type": "Rotation"
+      },
+      {
+        "name": "Quality",
+        "type": "Sandbox.AmbientOcclusion\u002BSampleQuality"
+      },
+      {
+        "name": "Radius",
+        "type": "System.Int32"
+      },
+      {
+        "name": "Scene",
+        "type": "Sandbox.Scene"
+      },
+      {
+        "name": "FalloffRange",
+        "type": "System.Single"
+      },
+      {
+        "name": "WorldScale",
+        "type": "Vector3"
+      },
+      {
+        "name": "LocalScale",
+        "type": "Vector3"
+      },
+      {
+        "name": "Transform",
+        "type": "Sandbox.GameTransform"
+      },
+      {
+        "name": "GameObject",
+        "type": "Sandbox.GameObject"
+      },
+      {
+        "name": "Task",
+        "type": "Sandbox.TaskSource"
+      },
+      {
+        "name": "Components",
+        "type": "Sandbox.ComponentList"
+      },
+      {
+        "name": "ThinCompensation",
+        "type": "System.Single"
+      },
+      {
+        "name": "Flags",
+        "type": "Sandbox.ComponentFlags"
+      },
+      {
+        "name": "Enabled",
+        "type": "System.Boolean"
+      },
+      {
+        "name": "Active",
+        "type": "System.Boolean"
+      },
+      {
+        "name": "IsValid",
+        "type": "System.Boolean"
+      },
+      {
+        "name": "OnComponentEnabled",
+        "type": "System.Action"
+      },
+      {
+        "name": "OnComponentStart",
+        "type": "System.Action"
+      },
+      {
+        "name": "OnComponentUpdate",
+        "type": "System.Action"
+      },
+      {
+        "name": "OnComponentFixedUpdate",
+        "type": "System.Action"
+      },
+      {
+        "name": "OnComponentDisabled",
+        "type": "System.Action"
+      },
+      {
+        "name": "OnComponentDestroy",
+        "type": "System.Action"
+      },
+      {
+        "name": "Tags",
+        "type": "Sandbox.ITagSet"
+      },
+      {
+        "name": "DebugOverlay",
+        "type": "Sandbox.DebugOverlaySystem"
+      }
+    ]
+  },
+  {
+    "type": "Sandbox.CameraComponent",
+    "properties": [
+      {
+        "name": "Id",
+        "type": "System.Guid"
+      },
+      {
+        "name": "WorldTransform",
+        "type": "Transform"
+      },
+      {
+        "name": "Network",
+        "type": "Sandbox.GameObject\u002BNetworkAccessor"
+      },
+      {
+        "name": "LocalTransform",
+        "type": "Transform"
+      },
+      {
+        "name": "ComponentVersion",
+        "type": "System.Int32"
+      },
+      {
+        "name": "Hud",
+        "type": "Sandbox.Rendering.HudPainter"
+      },
+      {
+        "name": "IsProxy",
+        "type": "System.Boolean"
+      },
+      {
+        "name": "WorldPosition",
+        "type": "Vector3"
+      },
+      {
+        "name": "LocalPosition",
+        "type": "Vector3"
+      },
+      {
+        "name": "ClearFlags",
+        "type": "Sandbox.ClearFlags"
+      },
+      {
+        "name": "Overlay",
+        "type": "Sandbox.Rendering.HudPainter"
+      },
+      {
+        "name": "WorldRotation",
+        "type": "Rotation"
+      },
+      {
+        "name": "LocalRotation",
+        "type": "Rotation"
+      },
+      {
+        "name": "BackgroundColor",
+        "type": "Color"
+      },
+      {
+        "name": "EnablePostProcessing",
+        "type": "System.Boolean"
+      },
+      {
+        "name": "Scene",
+        "type": "Sandbox.Scene"
+      },
+      {
+        "name": "WorldScale",
+        "type": "Vector3"
+      },
+      {
+        "name": "LocalScale",
+        "type": "Vector3"
+      },
+      {
+        "name": "PostProcessAnchor",
+        "type": "Sandbox.GameObject"
+      },
+      {
+        "name": "HudCommandList",
+        "type": "Sandbox.Rendering.CommandList"
+      },
+      {
+        "name": "IsMainCamera",
+        "type": "System.Boolean"
+      },
+      {
+        "name": "AutoExposure",
+        "type": "Sandbox.CameraComponent\u002BAutoExposureSetup"
+      },
+      {
+        "name": "Transform",
+        "type": "Sandbox.GameTransform"
+      },
+      {
+        "name": "OverlayCommandList",
+        "type": "Sandbox.Rendering.CommandList"
+      },
+      {
+        "name": "GameObject",
+        "type": "Sandbox.GameObject"
+      },
+      {
+        "name": "Task",
+        "type": "Sandbox.TaskSource"
+      },
+      {
+        "name": "FovAxis",
+        "type": "Sandbox.CameraComponent\u002BAxis"
+      },
+      {
+        "name": "Components",
+        "type": "Sandbox.ComponentList"
+      },
+      {
+        "name": "Flags",
+        "type": "Sandbox.ComponentFlags"
+      },
+      {
+        "name": "FieldOfView",
+        "type": "System.Single"
+      },
+      {
+        "name": "ZNear",
+        "type": "System.Single"
+      },
+      {
+        "name": "ZFar",
+        "type": "System.Single"
+      },
+      {
+        "name": "Priority",
+        "type": "System.Int32"
+      },
+      {
+        "name": "Enabled",
+        "type": "System.Boolean"
+      },
+      {
+        "name": "Orthographic",
+        "type": "System.Boolean"
+      },
+      {
+        "name": "OrthographicHeight",
+        "type": "System.Single"
+      },
+      {
+        "name": "TargetEye",
+        "type": "Sandbox.StereoTargetEye"
+      },
+      {
+        "name": "Active",
+        "type": "System.Boolean"
+      },
+      {
+        "name": "IsValid",
+        "type": "System.Boolean"
+      },
+      {
+        "name": "RenderTags",
+        "type": "Sandbox.TagSet"
+      },
+      {
+        "name": "RenderExcludeTags",
+        "type": "Sandbox.TagSet"
+      },
+      {
+        "name": "Viewport",
+        "type": "Vector4"
+      },
+      {
+        "name": "RenderTarget",
+        "type": "Sandbox.Texture"
+      },
+      {
+        "name": "DebugMode",
+        "type": "Sandbox.SceneCameraDebugMode"
+      },
+      {
+        "name": "WireframeMode",
+        "type": "System.Boolean"
+      },
+      {
+        "name": "OnComponentEnabled",
+        "type": "System.Action"
+      },
+      {
+        "name": "View",
+        "type": "Sandbox.CameraView"
+      },
+      {
+        "name": "OnComponentStart",
+        "type": "System.Action"
+      },
+      {
+        "name": "OnComponentUpdate",
+        "type": "System.Action"
+      },
+      {
+        "name": "OnComponentFixedUpdate",
+        "type": "System.Action"
+      },
+      {
+        "name": "OnComponentDisabled",
+        "type": "System.Action"
+      },
+      {
+        "name": "OnComponentDestroy",
+        "type": "System.Action"
+      },
+      {
+        "name": "Tags",
+        "type": "Sandbox.ITagSet"
+      },
+      {
+        "name": "DebugOverlay",
+        "type": "Sandbox.DebugOverlaySystem"
+      },
+      {
+        "name": "ScreenRect",
+        "type": "Sandbox.Rect"
+      },
+      {
+        "name": "CustomProjectionMatrix",
+        "type": "System.Nullable\u00601[[Matrix, Sandbox.System, Version=1.0.1.0, Culture=neutral, PublicKeyToken=null]]"
+      },
+      {
+        "name": "CustomSize",
+        "type": "System.Nullable\u00601[[Vector2, Sandbox.System, Version=1.0.1.0, Culture=neutral, PublicKeyToken=null]]"
+      },
+      {
+        "name": "ProjectionMatrix",
+        "type": "Matrix"
+      }
+    ]
+  },
+  {
+    "type": "Sandbox.VolumetricFogVolume",
+    "properties": [
+      {
+        "name": "Id",
+        "type": "System.Guid"
+      },
+      {
+        "name": "WorldTransform",
+        "type": "Transform"
+      },
+      {
+        "name": "Network",
+        "type": "Sandbox.GameObject\u002BNetworkAccessor"
+      },
+      {
+        "name": "LocalTransform",
+        "type": "Transform"
+      },
+      {
+        "name": "ComponentVersion",
+        "type": "System.Int32"
+      },
+      {
+        "name": "Bounds",
+        "type": "BBox"
+      },
+      {
+        "name": "Strength",
+        "type": "System.Single"
+      },
+      {
+        "name": "FalloffExponent",
+        "type": "System.Single"
+      },
+      {
+        "name": "Color",
+        "type": "Color"
+      },
+      {
+        "name": "IsProxy",
+        "type": "System.Boolean"
+      },
+      {
+        "name": "WorldPosition",
+        "type": "Vector3"
+      },
+      {
+        "name": "LocalPosition",
+        "type": "Vector3"
+      },
+      {
+        "name": "WorldRotation",
+        "type": "Rotation"
+      },
+      {
+        "name": "LocalRotation",
+        "type": "Rotation"
+      },
+      {
+        "name": "Scene",
+        "type": "Sandbox.Scene"
+      },
+      {
+        "name": "WorldScale",
+        "type": "Vector3"
+      },
+      {
+        "name": "LocalScale",
+        "type": "Vector3"
+      },
+      {
+        "name": "Transform",
+        "type": "Sandbox.GameTransform"
+      },
+      {
+        "name": "GameObject",
+        "type": "Sandbox.GameObject"
+      },
+      {
+        "name": "Task",
+        "type": "Sandbox.TaskSource"
+      },
+      {
+        "name": "Components",
+        "type": "Sandbox.ComponentList"
+      },
+      {
+        "name": "Flags",
+        "type": "Sandbox.ComponentFlags"
+      },
+      {
+        "name": "Enabled",
+        "type": "System.Boolean"
+      },
+      {
+        "name": "Active",
+        "type": "System.Boolean"
+      },
+      {
+        "name": "IsValid",
+        "type": "System.Boolean"
+      },
+      {
+        "name": "OnComponentEnabled",
+        "type": "System.Action"
+      },
+      {
+        "name": "OnComponentStart",
+        "type": "System.Action"
+      },
+      {
+        "name": "OnComponentUpdate",
+        "type": "System.Action"
+      },
+      {
+        "name": "OnComponentFixedUpdate",
+        "type": "System.Action"
+      },
+      {
+        "name": "OnComponentDisabled",
+        "type": "System.Action"
+      },
+      {
+        "name": "OnComponentDestroy",
+        "type": "System.Action"
+      },
+      {
+        "name": "Tags",
+        "type": "Sandbox.ITagSet"
+      },
+      {
+        "name": "DebugOverlay",
+        "type": "Sandbox.DebugOverlaySystem"
+      }
+    ]
+  },
+  {
+    "type": "Sandbox.Tonemapping",
+    "properties": [
+      {
+        "name": "Id",
+        "type": "System.Guid"
+      },
+      {
+        "name": "WorldTransform",
+        "type": "Transform"
+      },
+      {
+        "name": "Network",
+        "type": "Sandbox.GameObject\u002BNetworkAccessor"
+      },
+      {
+        "name": "LocalTransform",
+        "type": "Transform"
+      },
+      {
+        "name": "IsProxy",
+        "type": "System.Boolean"
+      },
+      {
+        "name": "WorldPosition",
+        "type": "Vector3"
+      },
+      {
+        "name": "LocalPosition",
+        "type": "Vector3"
+      },
+      {
+        "name": "Camera",
+        "type": "Sandbox.CameraComponent"
+      },
+      {
+        "name": "WorldRotation",
+        "type": "Rotation"
+      },
+      {
+        "name": "LocalRotation",
+        "type": "Rotation"
+      },
+      {
+        "name": "Scene",
+        "type": "Sandbox.Scene"
+      },
+      {
+        "name": "WorldScale",
+        "type": "Vector3"
+      },
+      {
+        "name": "LocalScale",
+        "type": "Vector3"
+      },
+      {
+        "name": "Transform",
+        "type": "Sandbox.GameTransform"
+      },
+      {
+        "name": "GameObject",
+        "type": "Sandbox.GameObject"
+      },
+      {
+        "name": "Task",
+        "type": "Sandbox.TaskSource"
+      },
+      {
+        "name": "Mode",
+        "type": "Sandbox.Tonemapping\u002BTonemappingMode"
+      },
+      {
+        "name": "ExposureMethod",
+        "type": "Sandbox.Tonemapping\u002BExposureColorSpaceEnum"
+      },
+      {
+        "name": "Components",
+        "type": "Sandbox.ComponentList"
+      },
+      {
+        "name": "Flags",
+        "type": "Sandbox.ComponentFlags"
+      },
+      {
+        "name": "AutoExposureEnabled",
+        "type": "System.Boolean"
+      },
+      {
+        "name": "MinimumExposure",
+        "type": "System.Single"
+      },
+      {
+        "name": "MaximumExposure",
+        "type": "System.Single"
+      },
+      {
+        "name": "ExposureCompensation",
+        "type": "System.Single"
+      },
+      {
+        "name": "Rate",
+        "type": "System.Single"
+      },
+      {
+        "name": "Enabled",
+        "type": "System.Boolean"
+      },
+      {
+        "name": "ComponentVersion",
+        "type": "System.Int32"
+      },
+      {
+        "name": "Active",
+        "type": "System.Boolean"
+      },
+      {
+        "name": "IsValid",
+        "type": "System.Boolean"
+      },
+      {
+        "name": "OnComponentEnabled",
+        "type": "System.Action"
+      },
+      {
+        "name": "OnComponentStart",
+        "type": "System.Action"
+      },
+      {
+        "name": "OnComponentUpdate",
+        "type": "System.Action"
+      },
+      {
+        "name": "OnComponentFixedUpdate",
+        "type": "System.Action"
+      },
+      {
+        "name": "OnComponentDisabled",
+        "type": "System.Action"
+      },
+      {
+        "name": "OnComponentDestroy",
+        "type": "System.Action"
+      },
+      {
+        "name": "Tags",
+        "type": "Sandbox.ITagSet"
+      },
+      {
+        "name": "DebugOverlay",
+        "type": "Sandbox.DebugOverlaySystem"
+      }
+    ]
+  },
+  {
+    "type": "Sandbox.SpotLight",
+    "properties": [
+      {
+        "name": "Id",
+        "type": "System.Guid"
+      },
+      {
+        "name": "WorldTransform",
+        "type": "Transform"
+      },
+      {
+        "name": "Network",
+        "type": "Sandbox.GameObject\u002BNetworkAccessor"
+      },
+      {
+        "name": "LocalTransform",
+        "type": "Transform"
+      },
+      {
+        "name": "ComponentVersion",
+        "type": "System.Int32"
+      },
+      {
+        "name": "Radius",
+        "type": "System.Single"
+      },
+      {
+        "name": "IsProxy",
+        "type": "System.Boolean"
+      },
+      {
+        "name": "WorldPosition",
+        "type": "Vector3"
+      },
+      {
+        "name": "LocalPosition",
+        "type": "Vector3"
+      },
+      {
+        "name": "WorldRotation",
+        "type": "Rotation"
+      },
+      {
+        "name": "LocalRotation",
+        "type": "Rotation"
+      },
+      {
+        "name": "ConeOuter",
+        "type": "System.Single"
+      },
+      {
+        "name": "Scene",
+        "type": "Sandbox.Scene"
+      },
+      {
+        "name": "WorldScale",
+        "type": "Vector3"
+      },
+      {
+        "name": "LocalScale",
+        "type": "Vector3"
+      },
+      {
+        "name": "Transform",
+        "type": "Sandbox.GameTransform"
+      },
+      {
+        "name": "ConeInner",
+        "type": "System.Single"
+      },
+      {
+        "name": "GameObject",
+        "type": "Sandbox.GameObject"
+      },
+      {
+        "name": "Task",
+        "type": "Sandbox.TaskSource"
+      },
+      {
+        "name": "Components",
+        "type": "Sandbox.ComponentList"
+      },
+      {
+        "name": "Attenuation",
+        "type": "System.Single"
+      },
+      {
+        "name": "Flags",
+        "type": "Sandbox.ComponentFlags"
+      },
+      {
+        "name": "Cookie",
+        "type": "Sandbox.Texture"
+      },
+      {
+        "name": "LightColor",
+        "type": "Color"
+      },
+      {
+        "name": "FogMode",
+        "type": "Sandbox.Light\u002BFogInfluence"
+      },
+      {
+        "name": "Enabled",
+        "type": "System.Boolean"
+      },
+      {
+        "name": "FogStrength",
+        "type": "System.Single"
+      },
+      {
+        "name": "Active",
+        "type": "System.Boolean"
+      },
+      {
+        "name": "Shadows",
+        "type": "System.Boolean"
+      },
+      {
+        "name": "IsValid",
+        "type": "System.Boolean"
+      },
+      {
+        "name": "ShadowBias",
+        "type": "System.Single"
+      },
+      {
+        "name": "ShadowHardness",
+        "type": "System.Single"
+      },
+      {
+        "name": "Contribution",
+        "type": "Sandbox.Light\u002BLightContribution"
+      },
+      {
+        "name": "OnComponentEnabled",
+        "type": "System.Action"
+      },
+      {
+        "name": "OnComponentStart",
+        "type": "System.Action"
+      },
+      {
+        "name": "OnComponentUpdate",
+        "type": "System.Action"
+      },
+      {
+        "name": "OnComponentFixedUpdate",
+        "type": "System.Action"
+      },
+      {
+        "name": "OnComponentDisabled",
+        "type": "System.Action"
+      },
+      {
+        "name": "OnComponentDestroy",
+        "type": "System.Action"
+      },
+      {
+        "name": "Tags",
+        "type": "Sandbox.ITagSet"
+      },
+      {
+        "name": "DebugOverlay",
+        "type": "Sandbox.DebugOverlaySystem"
+      }
+    ]
+  }
+]

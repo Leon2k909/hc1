@@ -1,0 +1,199 @@
+{
+  "date": "2026-10-21",
+  "reason": "User reports flicker across indoor and outdoor lights",
+  "change": "Clamp map exposure at 1.5 instead of allowing scale 1 to 2; compensation remains 0.15",
+  "sceneDelta": [
+    {
+      "path": "/GameObjects/7/Components/2/MaximumExposure",
+      "before": 2,
+      "after": 1.5
+    },
+    {
+      "path": "/GameObjects/7/Components/2/MinimumExposure",
+      "before": 1,
+      "after": 1.5
+    }
+  ],
+  "runtimeEffective": {
+    "Scene": "forestbase",
+    "Models": 741,
+    "Cameras": [
+      {
+        "Name": "editor_camera",
+        "IsMainCamera": false,
+        "Priority": 1,
+        "Position": "0,0,0",
+        "Auto": {
+          "Enabled": true,
+          "Compensation": 0.15,
+          "MinimumExposure": 1.5,
+          "MaximumExposure": 1.5,
+          "Rate": 1
+        },
+        "Native": {
+          "Enabled": true,
+          "Rate": 1,
+          "Fade": 1,
+          "MinExposure": 1.5,
+          "MaxExposure": 1.5,
+          "ExposureCompensation": 0.14999995,
+          "PercentTarget": -1,
+          "PercentBrightPixels": -1,
+          "MinAverageLuminance": -1
+        }
+      },
+      {
+        "Name": "Camera",
+        "IsMainCamera": true,
+        "Priority": 8,
+        "Position": "1399.111,-1178.199,60.0412",
+        "Auto": {
+          "Enabled": true,
+          "Compensation": 0.15,
+          "MinimumExposure": 1.5,
+          "MaximumExposure": 1.5,
+          "Rate": 1
+        },
+        "Native": {
+          "Enabled": true,
+          "Rate": 1,
+          "Fade": 1,
+          "MinExposure": 1.5,
+          "MaxExposure": 1.5,
+          "ExposureCompensation": 0.14999995,
+          "PercentTarget": -1,
+          "PercentBrightPixels": -1,
+          "MinAverageLuminance": -1
+        }
+      }
+    ],
+    "Tones": [
+      {
+        "Name": "Rain Reflections",
+        "MinimumExposure": 1.5,
+        "MaximumExposure": 1.5,
+        "AutoExposureEnabled": true
+      },
+      {
+        "Name": "Camera",
+        "MinimumExposure": 1,
+        "MaximumExposure": 2,
+        "AutoExposureEnabled": true
+      }
+    ]
+  },
+  "runtimeStability": {
+    "Samples": 16,
+    "MapLights": 36,
+    "Changes": [],
+    "Exposure": [
+      {
+        "Sample": 0,
+        "Camera": "Camera",
+        "Min": 1.5,
+        "Max": 1.5
+      },
+      {
+        "Sample": 1,
+        "Camera": "Camera",
+        "Min": 1.5,
+        "Max": 1.5
+      },
+      {
+        "Sample": 2,
+        "Camera": "Camera",
+        "Min": 1.5,
+        "Max": 1.5
+      },
+      {
+        "Sample": 3,
+        "Camera": "Camera",
+        "Min": 1.5,
+        "Max": 1.5
+      },
+      {
+        "Sample": 4,
+        "Camera": "Camera",
+        "Min": 1.5,
+        "Max": 1.5
+      },
+      {
+        "Sample": 5,
+        "Camera": "Camera",
+        "Min": 1.5,
+        "Max": 1.5
+      },
+      {
+        "Sample": 6,
+        "Camera": "Camera",
+        "Min": 1.5,
+        "Max": 1.5
+      },
+      {
+        "Sample": 7,
+        "Camera": "Camera",
+        "Min": 1.5,
+        "Max": 1.5
+      },
+      {
+        "Sample": 8,
+        "Camera": "Camera",
+        "Min": 1.5,
+        "Max": 1.5
+      },
+      {
+        "Sample": 9,
+        "Camera": "Camera",
+        "Min": 1.5,
+        "Max": 1.5
+      },
+      {
+        "Sample": 10,
+        "Camera": "Camera",
+        "Min": 1.5,
+        "Max": 1.5
+      },
+      {
+        "Sample": 11,
+        "Camera": "Camera",
+        "Min": 1.5,
+        "Max": 1.5
+      },
+      {
+        "Sample": 12,
+        "Camera": "Camera",
+        "Min": 1.5,
+        "Max": 1.5
+      },
+      {
+        "Sample": 13,
+        "Camera": "Camera",
+        "Min": 1.5,
+        "Max": 1.5
+      },
+      {
+        "Sample": 14,
+        "Camera": "Camera",
+        "Min": 1.5,
+        "Max": 1.5
+      },
+      {
+        "Sample": 15,
+        "Camera": "Camera",
+        "Min": 1.5,
+        "Max": 1.5
+      }
+    ]
+  },
+  "editor": {
+    "activeScene": "scenes/maps/forestbase/forestbase.scene",
+    "isPlaying": false,
+    "unsaved": false,
+    "lastCompileSucceeded": true,
+    "compileErrors": 0
+  },
+  "limitations": [
+    "This removes exposure pumping; the exact visible flicker has not been reproduced or confirmed resolved by the user.",
+    "Runtime sampling checks light parameters and effective camera settings, not a full pixel-level frame stability capture."
+  ]
+}

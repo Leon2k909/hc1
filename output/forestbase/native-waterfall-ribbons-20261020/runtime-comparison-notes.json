@@ -1,0 +1,20 @@
+{
+  "acceptedShader": "candidate2.shader",
+  "acceptedLighting": "native-lighting-candidate3.json",
+  "invalidComparisons": [
+    "native-candidate-compound.png (blank material used fallback checker texture)",
+    "native-candidate-waterfall-exact-player.png (same fallback texture)",
+    "native-candidate-waterfall-player.png (changing copied material shader did not rebuild actual shader program)"
+  ],
+  "validCandidateComparisons": [
+    "native-final-candidate-compound.png",
+    "native-final-candidate-waterfall-player.png"
+  ],
+  "bindingCaveat": "Legacy project API prefixes texture parameter names with g_t. Test material used the observed native texture setter for exact FlowTexture binding; real installed material remains compiled from its original vmat.",
+  "nativeVersion": "26.10.13a",
+  "engineExeMtimeUtc": "2026-10-20T04:23:38.519Z",
+  "legacyVersionFile": "26.10.02; stale for native running-version identification",
+  "networksStarted": 0,
+  "geometryOnly": true,
+  "fullMatchPerformance": false
+}

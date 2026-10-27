@@ -1,0 +1,12 @@
+// Tools/forestbase_materials.py
+"Layer0"
+{
+ shader "shaders/complex.shader"
+ F_SPECULAR "1"
+ g_flMetalness "0"
+ TextureColor "materials/forestbase/timber_color.png"
+ TextureNormal "materials/forestbase/timber_normal.png"
+ TextureRoughness "materials/forestbase/timber_rough.png"
+ TextureAmbientOcclusion "materials/default/default_ao.tga"
+ g_flModelTintAmount "1"
+}

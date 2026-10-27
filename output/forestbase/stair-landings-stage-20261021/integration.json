@@ -1,0 +1,84 @@
+{
+  "date": "2026-10-21",
+  "scope": "Playable stairwells in Barracks and Command only",
+  "problem": "Upper east side doors opened over a missing floor; native trace found the lower floor 146 inches below the probe",
+  "changes": [
+    "Upper east-side landing and front connection to the hall",
+    "64-inch rear landing with stair endpoint fitted to its edge",
+    "Upper guards on both sides and front of the stairwell, leaving top approach open"
+  ],
+  "geometry": {
+    "barracks": {
+      "boxesBefore": 299,
+      "boxesAfter": 318,
+      "unchangedBoxes": 268,
+      "removedBoxes": 31,
+      "addedBoxes": 50,
+      "hulls": 0,
+      "trianglesBefore": 64850,
+      "trianglesAfter": 65078,
+      "changedOnlyInsideStairwell": true
+    },
+    "command": {
+      "boxesBefore": 352,
+      "boxesAfter": 371,
+      "unchangedBoxes": 321,
+      "removedBoxes": 31,
+      "addedBoxes": 50,
+      "hulls": 0,
+      "trianglesBefore": 39562,
+      "trianglesAfter": 39790,
+      "changedOnlyInsideStairwell": true
+    }
+  },
+  "sceneUnchanged": true,
+  "sceneSha256": "6fcacdef30dce9e33a70c55026d3277736dbe1ecdfcdf3a34f2930d4ce3f662e",
+  "layoutChanges": [
+    {
+      "path": "/stats/barracks/triangles",
+      "before": 64602,
+      "after": 65078
+    },
+    {
+      "path": "/stats/barracks/boxes",
+      "before": 299,
+      "after": 318
+    },
+    {
+      "path": "/stats/command/triangles",
+      "before": 39314,
+      "after": 39790
+    },
+    {
+      "path": "/stats/command/boxes",
+      "before": 352,
+      "after": 371
+    },
+    {
+      "path": "/routes/0/end/1",
+      "before": 1023,
+      "after": 1001
+    },
+    {
+      "path": "/routes/4/end/1",
+      "before": 1093,
+      "after": 1071
+    }
+  ],
+  "native": {
+    "models": 9,
+    "modelErrors": 0,
+    "landingAndGuardChecks": 54,
+    "landingFailures": 0,
+    "routes": 26,
+    "routeFailures": 0,
+    "stairDirections": 22,
+    "stairFailures": 0,
+    "compilerSucceeded": true,
+    "compilerErrors": 0,
+    "unsaved": false
+  },
+  "limitations": [
+    "Sampled controller and navigation checks; human multiplayer balance and exhaustive mantle/perch behavior are not established."
+  ]
+}

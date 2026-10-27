@@ -1,0 +1,245 @@
+{
+  "date": "2026-10-20",
+  "projectRoot": "C:/Users/mimi-/Documents/S&box Projects/hc1",
+  "engine": "26.10.13a",
+  "editorPid": 32080,
+  "changes": {
+    "outerBankBoundsPlanInches": {
+      "before": [
+        -220,
+        1080,
+        2850,
+        4150
+      ],
+      "after": [
+        -420,
+        1280,
+        2650,
+        4150
+      ]
+    },
+    "innerBankContour": "Uses the existing pool contour, inset to 86%, with a cubic outer-tangent height profile; water mesh edge is hidden under land.",
+    "soil": "Shared floor UV chart and matching dry color; original stone shader branch preserved.",
+    "mist": "Advected, position-phased detail, continuous density, brighter diffuse spray and 28-inch soft intersections using the engine depth API.",
+    "grassInstancesAdjusted": 24,
+    "additionalRenderers": 0,
+    "additionalTextureFiles": 0,
+    "collisionChanges": 0
+  },
+  "audit": {
+    "sceneNodes": 752,
+    "changedGrass": [
+      "Shore grass 0",
+      "Shore grass 1",
+      "Shore grass 2",
+      "Shore grass 3",
+      "Shore grass 4",
+      "Shore grass 5",
+      "Shore grass 6",
+      "Shore grass 7",
+      "Shore grass 8",
+      "Shore grass 9",
+      "Shore grass 10",
+      "Shore grass 11",
+      "Shore grass 12",
+      "Shore grass 13",
+      "Shore grass 14",
+      "Shore grass 15",
+      "Shore grass 16",
+      "Shore grass 17",
+      "Shore grass 18",
+      "Shore grass 19",
+      "Shore grass 20",
+      "Shore grass 21",
+      "Shore grass 22",
+      "Shore grass 23"
+    ],
+    "allOtherSceneContentUnchanged": true,
+    "vistaTrianglesBefore": 111714,
+    "vistaTrianglesAfter": 111666,
+    "changedGeometryMaterials": [
+      "forest_soil",
+      "mud",
+      "shore_bank",
+      "shore_rock"
+    ],
+    "unchangedGeometryMaterials": 17,
+    "vistaModelDocAndCollisionUnchanged": true,
+    "materialSlots": 21,
+    "generatorInstances": 620,
+    "maximumGeneratorPositionErrorInches": 0.007285882628821128,
+    "poolEdge": {
+      "changedGroups": {
+        "shore_bank": {
+          "v": 3072,
+          "vt": 3072,
+          "vn": 3072
+        },
+        "shore_rock": {
+          "v": 100980,
+          "vt": 100980,
+          "vn": 100980
+        }
+      },
+      "poolEdgeSamples": 96,
+      "minimumBankOverlapInches": 6.791279814309803,
+      "maximumBankOverlapInches": 62.74120174379891,
+      "poolContourUnchanged": true,
+      "grass": 24
+    },
+    "mistProbe": {
+      "changedMotionPixelsOver2": 221871,
+      "softPatchMean": 52.344729817708334,
+      "hardPatchMean": 76.557841796875,
+      "scope": "Isolated installed mist shader on a plane over an existing valid rubber material; motion and softer depth intersection. Does not establish a fluid simulation or map FPS."
+    },
+    "sceneSha256": "8cbf8990611f17e70814d43f5a6d0ea931509b145367c668420813228dc05f52",
+    "mistShaderSha256": "82cecf64a9770d0df4b494a7b401585468d3c7bae1b54281c5fa8449ccfeeba1"
+  },
+  "nativeRoots": {
+    "samples": 24,
+    "hits": 24,
+    "burialRangeInches": [
+      1.05719,
+      2.339882
+    ]
+  },
+  "nativeWaterfallViews": {
+    "Models": 629,
+    "ModelErrors": 0,
+    "Views": [
+      {
+        "View": "front",
+        "File": "C:\\Users\\mimi-\\AppData\\Local\\Temp\\sbox-cli\\68fb5c5092c54f57bff404635a7e0c44\\shore-final-front.png",
+        "Position": "1080,-500,448",
+        "Fov": 90
+      },
+      {
+        "View": "basin",
+        "File": "C:\\Users\\mimi-\\AppData\\Local\\Temp\\sbox-cli\\68fb5c5092c54f57bff404635a7e0c44\\shore-final-basin.png",
+        "Position": "2200,-430,680",
+        "Fov": 72
+      },
+      {
+        "View": "basin-side",
+        "File": "C:\\Users\\mimi-\\AppData\\Local\\Temp\\sbox-cli\\68fb5c5092c54f57bff404635a7e0c44\\shore-final-basin-side.png",
+        "Position": "2950,-430,320",
+        "Fov": 80
+      }
+    ],
+    "Discarded": "Two attempted oblique cameras were inside fir crowns; final basin-side camera is over the open pool."
+  },
+  "nativeOverview": {
+    "Models": 629,
+    "ModelErrors": 0,
+    "Views": [
+      {
+        "View": "compound",
+        "File": "C:\\Users\\mimi-\\AppData\\Local\\Temp\\sbox-cli\\68fb5c5092c54f57bff404635a7e0c44\\shore-overview-compound.png",
+        "Position": "-2900,2600,2000",
+        "Fov": 72
+      },
+      {
+        "View": "waterfall",
+        "File": "C:\\Users\\mimi-\\AppData\\Local\\Temp\\sbox-cli\\68fb5c5092c54f57bff404635a7e0c44\\shore-overview-waterfall.png",
+        "Position": "1080,-500,448",
+        "Fov": 90
+      },
+      {
+        "View": "entrance",
+        "File": "C:\\Users\\mimi-\\AppData\\Local\\Temp\\sbox-cli\\68fb5c5092c54f57bff404635a7e0c44\\shore-overview-entrance.png",
+        "Position": "-1680,0,68",
+        "Fov": 90
+      }
+    ]
+  },
+  "nativeAssets": [
+    {
+      "Name": "vista",
+      "Path": "models/maps/forestbase/vista.vmdl",
+      "Type": "Model",
+      "Extension": "vmdl",
+      "IsGameResource": false,
+      "SourceFile": "c:/users/mimi-/documents/s&box projects/hc1/assets/models/maps/forestbase/vista.vmdl",
+      "CompiledFile": "c:/users/mimi-/documents/s&box projects/hc1/assets/models/maps/forestbase/vista.vmdl_c",
+      "IsCompiled": true,
+      "IsCompiledAndUpToDate": true,
+      "IsCompileFailed": false,
+      "CanRecompile": true,
+      "IsCloud": false,
+      "IsTransient": false,
+      "IsProcedural": false,
+      "IsTrivialChild": false,
+      "Package": null,
+      "Tags": [],
+      "ReferenceCount": 17,
+      "DependantCount": 1,
+      "LastOpened": null
+    },
+    {
+      "Name": "shore_bank",
+      "Path": "materials/forestbase/shore_bank.vmat",
+      "Type": "Material",
+      "Extension": "vmat",
+      "IsGameResource": false,
+      "SourceFile": "c:/users/mimi-/documents/s&box projects/hc1/assets/materials/forestbase/shore_bank.vmat",
+      "CompiledFile": "c:/users/mimi-/documents/s&box projects/hc1/assets/materials/forestbase/shore_bank.vmat_c",
+      "IsCompiled": true,
+      "IsCompiledAndUpToDate": true,
+      "IsCompileFailed": false,
+      "CanRecompile": true,
+      "IsCloud": false,
+      "IsTransient": false,
+      "IsProcedural": false,
+      "IsTrivialChild": false,
+      "Package": null,
+      "Tags": [
+        "@vmat_model"
+      ],
+      "ReferenceCount": 4,
+      "DependantCount": 1,
+      "LastOpened": null
+    }
+  ],
+  "editor": {
+    "EngineVersion": "26.10.13a",
+    "Project": "razedtest",
+    "ProjectTitle": "RazedTest",
+    "ActiveScene": "forestbase",
+    "ActiveScenePath": "scenes/maps/forestbase/forestbase.scene",
+    "SceneHasUnsavedChanges": false,
+    "IsPlaying": false,
+    "IsPaused": false,
+    "ToolCount": 401,
+    "IsCompiling": false,
+    "LastCompileSucceeded": true,
+    "LastCompileErrors": 0,
+    "Paths": {
+      "Engine": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\sbox",
+      "Logs": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\sbox\\logs",
+      "ProjectRoot": "C:\\Users\\mimi-\\Documents\\S&box Projects\\hc1",
+      "ProjectSettings": "C:\\Users\\mimi-\\Documents\\S&box Projects\\hc1\\ProjectSettings"
+    }
+  },
+  "sourceHashes": {
+    "Tools/forestbase_floor.py": "f1318e4bbfd80650ae5025362ce4eec8300b751a0c66621911559f9d08b0c1fb",
+    "Tools/forestbase_shore.py": "3d6cd2f00e737b3843678fc904995a5b6bbe3d490d78966da549cf88469ac352",
+    "Tools/forestbase_cascade.py": "52d1b3c8426c3363083459e6e6e2115901be168f3c93ba7b52f3d375975d3f3b",
+    "Assets/models/maps/forestbase/vista.obj": "dc065d21558e44ae4d400bd5266cc3454ae9591ffc3b26590264d0a11793c023",
+    "Assets/shaders/forestbase_shore.shader": "e30a9835326b5d5fed5655bda73ca3489919d341af36f53b87c48fa4098119cf",
+    "Assets/shaders/forestbase_mist.shader": "82cecf64a9770d0df4b494a7b401585468d3c7bae1b54281c5fa8449ccfeeba1",
+    "Assets/materials/forestbase/shore_bank.vmat": "ded0238f8d4844bdae8cae737e9f6b90f4a430e3e09a00b6cca9cd21e3563f7b",
+    "Assets/scenes/maps/forestbase/forestbase.scene": "8cbf8990611f17e70814d43f5a6d0ea931509b145367c668420813228dc05f52",
+    "output/forestbase/layout.json": "ad5282b51750aa767326e03a9f922a4046a70f344e7812c5904fac444052e570"
+  },
+  "fallingWaterShaderUnchangedSha256": "4a234f051858bcd9fb7c486e192a117b16fe0faa4b9cc63ac656344c676bed46",
+  "limitations": [
+    "Full reference visual fidelity remains unachieved.",
+    "This pass has native isolated views and source/native root checks, not new match FPS or remote 10–15-client testing. The previous Vulkan presentation stall remains unresolved.",
+    "Spray uses the existing translucent sheets; this is not a fluid simulation."
+  ],
+  "rejectedDiagnostics": [
+    "Two oblique cameras were inside fir crowns; the final side inspection is over the open pool.",
+    "An initial isolated probe used an empty complex background material and showed a checker fallback; repeated successfully with the existing rubber material. Only the corrected probe is used by installed-audit.json."
+  ]
+}

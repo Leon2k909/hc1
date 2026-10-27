@@ -1,0 +1,239 @@
+{
+  "verifiedAtUtc": "2026-10-08T21:21:29.269391+00:00",
+  "editorBuild": {
+    "command": "dotnet build Editor/razedtest.editor.csproj --no-restore -v quiet",
+    "scope": "incremental",
+    "exitCode": 0,
+    "errors": 0,
+    "warnings": 0
+  },
+  "nativeQa": {
+    "spawnChecks": 32,
+    "boundaries": 6,
+    "wheelQueries": [
+      {
+        "kind": "vehicle-collision",
+        "name": "APC front tire",
+        "expected": true,
+        "blocked": true,
+        "passed": true,
+        "objectName": "Yard"
+      },
+      {
+        "kind": "vehicle-collision",
+        "name": "APC underbody wheel gap",
+        "expected": false,
+        "blocked": false,
+        "passed": true,
+        "objectName": null
+      },
+      {
+        "kind": "vehicle-collision",
+        "name": "Transport front tire",
+        "expected": true,
+        "blocked": true,
+        "passed": true,
+        "objectName": "Yard"
+      },
+      {
+        "kind": "vehicle-collision",
+        "name": "Transport underbody wheel gap",
+        "expected": false,
+        "blocked": false,
+        "passed": true,
+        "objectName": null
+      }
+    ],
+    "blockedSpawnExposureSamples": 112,
+    "modelErrors": []
+  },
+  "nativeNavigation": {
+    "routes": 12,
+    "stairDirections": 22,
+    "generating": false
+  },
+  "offline": {
+    "radius": 16,
+    "height": 72,
+    "step": 18,
+    "reachableCells": 122668,
+    "checks": 79,
+    "problems": []
+  },
+  "wheelProxyCounts": {
+    "motor": 12,
+    "workshop": 7,
+    "yard": 14,
+    "logistics": 4
+  },
+  "views": [
+    "aerial",
+    "entrance",
+    "motor",
+    "apc-detail",
+    "vehicle-front",
+    "logistics",
+    "cargo-detail",
+    "command",
+    "barracks",
+    "control",
+    "roof-detail",
+    "workshop",
+    "catwalk",
+    "waterfall",
+    "waterfall-foot",
+    "gorge"
+  ],
+  "chunkStatistics": {
+    "ground": {
+      "triangles": 4234,
+      "boxes": 14,
+      "hulls": 6
+    },
+    "motor": {
+      "triangles": 45230,
+      "boxes": 17,
+      "hulls": 16
+    },
+    "barracks": {
+      "triangles": 29310,
+      "boxes": 299,
+      "hulls": 0
+    },
+    "command": {
+      "triangles": 22590,
+      "boxes": 351,
+      "hulls": 0
+    },
+    "workshop": {
+      "triangles": 34064,
+      "boxes": 45,
+      "hulls": 9
+    },
+    "yard": {
+      "triangles": 64312,
+      "boxes": 24,
+      "hulls": 20
+    },
+    "logistics": {
+      "triangles": 59804,
+      "boxes": 72,
+      "hulls": 4
+    },
+    "links": {
+      "triangles": 2666,
+      "boxes": 141,
+      "hulls": 0
+    },
+    "vista": {
+      "triangles": 5368,
+      "boxes": 0,
+      "hulls": 0
+    }
+  },
+  "memoryContext": "Initial offline attempts failed during system commit exhaustion; the audit passed after single-thread BLAS/collision-only allocation changes and external memory pressure subsided. No in-game FPS improvement is inferred.",
+  "bootstrapContext": "Earlier editor shut down at 22:00. A task-owned bootstrap at 23:12 could not initialize Steam because Steam was stopped. After Steam logon, the task-owned bootstrap was replaced at 23:14; the project and IPC then initialized and fresh isolated QA/nav completed.",
+  "limitations": [
+    "Current vehicle runtime performance unmeasured; previous water/fir timing does not cover these vehicles.",
+    "Remote replication and 10-15 human client load unverified.",
+    "Finite ray and route checks do not prove exhaustive escape prevention or multiplayer balance.",
+    "Current visual finish still below the requested modern AAA reference."
+  ],
+  "files": {
+    "Tools\\forestbase_map.py": {
+      "sha256": "35d0b4c2616ef87865cdc18f8f9186545cbb19b2208cf2896bb946d2d4950b52",
+      "modifiedUtc": "2026-10-08T21:16:11.649649+00:00"
+    },
+    "Tools\\forestbase_validate.py": {
+      "sha256": "9fbac5ee5f7b3c635b5f494d5b642e8a502f12ef2bf626313bf9640f9f47fd9a",
+      "modifiedUtc": "2026-10-08T19:59:14.440791+00:00"
+    },
+    "Tools\\forestbase_vehicle_materials.py": {
+      "sha256": "2cb02a2d011c2c851aa4b67abfe5448521ef531534542f9617dd7196bd3600b1",
+      "modifiedUtc": "2026-10-08T19:33:09.900552+00:00"
+    },
+    "Editor\\Hc1ForestBaseQa.cs": {
+      "sha256": "e0d45f7cb67509dea25ec4902f43703e2214fadbf3234505bf3b750a3d57a742",
+      "modifiedUtc": "2026-10-08T19:48:46.815878+00:00"
+    },
+    "Assets\\shaders\\forestbase_vehicle.shader": {
+      "sha256": "c5fa2800d920ff0de0f8bacee41b843315fa38f834ed43b24fbe4cdc5c049a33",
+      "modifiedUtc": "2026-10-08T19:33:09.902578+00:00"
+    },
+    "Assets\\scenes\\maps\\ForestBase\\forestbase.scene": {
+      "sha256": "78fc5f307548af3a9c2e7a504c9f730acaa4334b98001729cf1c004fea9ba615",
+      "modifiedUtc": "2026-10-08T21:10:41.964664+00:00"
+    },
+    "Assets\\models\\maps\\forestbase\\logistics_hulls_rubber.obj": {
+      "sha256": "dd566cb15ade164faae76ba51c20d1e911d141e57d0bf407713544b63710b9a3",
+      "modifiedUtc": "2026-10-08T19:53:03.916942+00:00"
+    },
+    "Assets\\models\\maps\\forestbase\\motor_hulls_rubber.obj": {
+      "sha256": "19b5d6d2e824d2c1c5fa5c073f06b1322ed7ec54e296efec9fbc3c541677c9b1",
+      "modifiedUtc": "2026-10-08T19:52:45.067202+00:00"
+    },
+    "Assets\\models\\maps\\forestbase\\workshop_hulls_rubber.obj": {
+      "sha256": "fb95c463927eb3aeea6401702139ee2c5159c3fbf1ae567f3b5c81ea5b33cad1",
+      "modifiedUtc": "2026-10-08T19:52:49.517812+00:00"
+    },
+    "Assets\\models\\maps\\forestbase\\yard_hulls_rubber.obj": {
+      "sha256": "de710cb49fdcebf709e8bfea3696dfa355b7058c278b9545f7cbefd1692e14e6",
+      "modifiedUtc": "2026-10-08T21:10:41.916620+00:00"
+    },
+    "Assets\\models\\maps\\forestbase\\motor.obj": {
+      "sha256": "6985770c32bff920132a832270b3fe57935c0aadfc08c905401b57413ccf5459",
+      "modifiedUtc": "2026-10-08T19:52:44.794945+00:00"
+    },
+    "Assets\\models\\maps\\forestbase\\workshop.obj": {
+      "sha256": "4bf93964305aba3169da843d18a01931f541c59fcf6c2bc55284cbaa89c06d46",
+      "modifiedUtc": "2026-10-08T19:52:49.476582+00:00"
+    },
+    "Assets\\models\\maps\\forestbase\\yard.obj": {
+      "sha256": "ad27facf86428b805e3321045e91d9183e9829268bff75056bdaf4cee97467e6",
+      "modifiedUtc": "2026-10-08T21:10:41.232486+00:00"
+    },
+    "Assets\\models\\maps\\forestbase\\logistics.obj": {
+      "sha256": "1e8941880fd5c1969ef7bc10cb2ecd0c86e9dd5d368177f7151f048463af6ca8",
+      "modifiedUtc": "2026-10-08T19:53:03.878942+00:00"
+    },
+    "output\\forestbase\\engine-qa.json": {
+      "sha256": "16a2971211372235abe8524907b718bb9fc7c2b52aadf291fb60c91d88f3b7ee",
+      "modifiedUtc": "2026-10-08T21:19:06.677987+00:00"
+    },
+    "output\\forestbase\\engine-nav.json": {
+      "sha256": "5049421ba4370475f470f6da7c99fe649bd22fee7aabebc921bfe2273354d96a",
+      "modifiedUtc": "2026-10-08T21:20:02.316115+00:00"
+    },
+    "output\\forestbase\\route-audit.json": {
+      "sha256": "1ad1353cd03a643ece6084905009ed125604d8482dfc431dde6bff729314a9ad",
+      "modifiedUtc": "2026-10-08T21:13:19.014263+00:00"
+    },
+    "output\\forestbase\\layout.json": {
+      "sha256": "2974f0108c2606a5ccc1f4aa128ebdd57d1d3cb75baba4b3a9f2fc3a4126b8b0",
+      "modifiedUtc": "2026-10-08T21:10:41.966691+00:00"
+    },
+    "output\\forestbase\\vehicle-partial-rebuild-audit.json": {
+      "sha256": "b112cc5eea52820aa1205a7844fde59b6ee46ffa82e2163d39c1e992aabfed41",
+      "modifiedUtc": "2026-10-08T21:10:42.100326+00:00"
+    },
+    "output\\forestbase\\vehicle-collision-build-parity.json": {
+      "sha256": "638f6bade76234c8bd098e0e7ca047ea61ae82e49742772935f62dad6d0a1d6c",
+      "modifiedUtc": "2026-10-08T21:16:43.383727+00:00"
+    },
+    "output\\forestbase\\vehicle-export-parity.json": {
+      "sha256": "04fddddf5f118c2a46a5af5fcbb0696243cca5aae1e11c53b52a3d6cce29214d",
+      "modifiedUtc": "2026-10-08T21:17:48.152957+00:00"
+    }
+  },
+  "editorPlayStateAfterQa": {
+    "id": "b5b08ab8-88cd-4a3a-8304-5e4f470febbc",
+    "success": true,
+    "data": {
+      "isPlaying": false,
+      "isPaused": false,
+      "gameFlag": false,
+      "tracked": false,
+      "sessionPlaying": true
+    }
+  }
+}

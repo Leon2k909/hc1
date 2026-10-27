@@ -1,0 +1,1641 @@
+{
+  "scope": "Bilinear atlas-alpha geometry heuristic in 16 sampled orthographic views; no native shading, mip/LOD transition or FPS acceptance.",
+  "width": 256,
+  "height": 512,
+  "alphaThreshold": 0.25,
+  "textureSha256": "6eecd1cf1e059488be2a41d15bb3c8cb3d844765ed11be8087e6e02acd58b181",
+  "results": [
+    {
+      "variant": "a",
+      "level": "distant",
+      "triangles": 20443,
+      "budget": 20443,
+      "needleTriangles": 19245,
+      "sourceNeedleTriangles": 33753,
+      "islands": 5608,
+      "protectedIslands": 140,
+      "before": [
+        {
+          "azimuth": 0,
+          "elevation": 0,
+          "pixels": 21539,
+          "referencePixels": 25799,
+          "referenceCoverage": 0.7668126671576417,
+          "intersectionOverUnion": 0.7179459263291599
+        },
+        {
+          "azimuth": 45,
+          "elevation": 0,
+          "pixels": 21462,
+          "referencePixels": 25486,
+          "referenceCoverage": 0.7767009338460331,
+          "intersectionOverUnion": 0.729017051522852
+        },
+        {
+          "azimuth": 90,
+          "elevation": 0,
+          "pixels": 22250,
+          "referencePixels": 26473,
+          "referenceCoverage": 0.7798133947795868,
+          "intersectionOverUnion": 0.7352113679262082
+        },
+        {
+          "azimuth": 135,
+          "elevation": 0,
+          "pixels": 22089,
+          "referencePixels": 26400,
+          "referenceCoverage": 0.77375,
+          "intersectionOverUnion": 0.7279238828308745
+        },
+        {
+          "azimuth": 180,
+          "elevation": 0,
+          "pixels": 21539,
+          "referencePixels": 25799,
+          "referenceCoverage": 0.7668126671576417,
+          "intersectionOverUnion": 0.7179459263291599
+        },
+        {
+          "azimuth": 225,
+          "elevation": 0,
+          "pixels": 21462,
+          "referencePixels": 25486,
+          "referenceCoverage": 0.7767009338460331,
+          "intersectionOverUnion": 0.729017051522852
+        },
+        {
+          "azimuth": 270,
+          "elevation": 0,
+          "pixels": 22250,
+          "referencePixels": 26473,
+          "referenceCoverage": 0.7798133947795868,
+          "intersectionOverUnion": 0.7352113679262082
+        },
+        {
+          "azimuth": 315,
+          "elevation": 0,
+          "pixels": 22089,
+          "referencePixels": 26400,
+          "referenceCoverage": 0.77375,
+          "intersectionOverUnion": 0.7279238828308745
+        },
+        {
+          "azimuth": 0,
+          "elevation": 25,
+          "pixels": 25441,
+          "referencePixels": 29676,
+          "referenceCoverage": 0.7949521498854293,
+          "intersectionOverUnion": 0.7483029880098966
+        },
+        {
+          "azimuth": 45,
+          "elevation": 25,
+          "pixels": 24770,
+          "referencePixels": 28848,
+          "referenceCoverage": 0.7954450915141431,
+          "intersectionOverUnion": 0.7481660200189104
+        },
+        {
+          "azimuth": 90,
+          "elevation": 25,
+          "pixels": 25276,
+          "referencePixels": 29398,
+          "referenceCoverage": 0.802129396557589,
+          "intersectionOverUnion": 0.7584022127166886
+        },
+        {
+          "azimuth": 135,
+          "elevation": 25,
+          "pixels": 26750,
+          "referencePixels": 31080,
+          "referenceCoverage": 0.8006756756756757,
+          "intersectionOverUnion": 0.7553498254666869
+        },
+        {
+          "azimuth": 180,
+          "elevation": 25,
+          "pixels": 26851,
+          "referencePixels": 31013,
+          "referenceCoverage": 0.8061780543642988,
+          "intersectionOverUnion": 0.7608179660398028
+        },
+        {
+          "azimuth": 225,
+          "elevation": 25,
+          "pixels": 27316,
+          "referencePixels": 31512,
+          "referenceCoverage": 0.8096280781924347,
+          "intersectionOverUnion": 0.7658111961578868
+        },
+        {
+          "azimuth": 270,
+          "elevation": 25,
+          "pixels": 27172,
+          "referencePixels": 31267,
+          "referenceCoverage": 0.8143729810982825,
+          "intersectionOverUnion": 0.7721676370693837
+        },
+        {
+          "azimuth": 315,
+          "elevation": 25,
+          "pixels": 26391,
+          "referencePixels": 30462,
+          "referenceCoverage": 0.8064802048453811,
+          "intersectionOverUnion": 0.7609180449730534
+        }
+      ],
+      "after": [
+        {
+          "azimuth": 0,
+          "elevation": 0,
+          "pixels": 24950,
+          "referencePixels": 25799,
+          "referenceCoverage": 0.9670917477421606,
+          "intersectionOverUnion": 0.9670917477421606
+        },
+        {
+          "azimuth": 45,
+          "elevation": 0,
+          "pixels": 24661,
+          "referencePixels": 25486,
+          "referenceCoverage": 0.9676292866671898,
+          "intersectionOverUnion": 0.9676292866671898
+        },
+        {
+          "azimuth": 90,
+          "elevation": 0,
+          "pixels": 25547,
+          "referencePixels": 26473,
+          "referenceCoverage": 0.9650209647565444,
+          "intersectionOverUnion": 0.9650209647565444
+        },
+        {
+          "azimuth": 135,
+          "elevation": 0,
+          "pixels": 25484,
+          "referencePixels": 26400,
+          "referenceCoverage": 0.9653030303030303,
+          "intersectionOverUnion": 0.9653030303030303
+        },
+        {
+          "azimuth": 180,
+          "elevation": 0,
+          "pixels": 24950,
+          "referencePixels": 25799,
+          "referenceCoverage": 0.9670917477421606,
+          "intersectionOverUnion": 0.9670917477421606
+        },
+        {
+          "azimuth": 225,
+          "elevation": 0,
+          "pixels": 24661,
+          "referencePixels": 25486,
+          "referenceCoverage": 0.9676292866671898,
+          "intersectionOverUnion": 0.9676292866671898
+        },
+        {
+          "azimuth": 270,
+          "elevation": 0,
+          "pixels": 25547,
+          "referencePixels": 26473,
+          "referenceCoverage": 0.9650209647565444,
+          "intersectionOverUnion": 0.9650209647565444
+        },
+        {
+          "azimuth": 315,
+          "elevation": 0,
+          "pixels": 25484,
+          "referencePixels": 26400,
+          "referenceCoverage": 0.9653030303030303,
+          "intersectionOverUnion": 0.9653030303030303
+        },
+        {
+          "azimuth": 0,
+          "elevation": 25,
+          "pixels": 28039,
+          "referencePixels": 29676,
+          "referenceCoverage": 0.9448375791885699,
+          "intersectionOverUnion": 0.9448375791885699
+        },
+        {
+          "azimuth": 45,
+          "elevation": 25,
+          "pixels": 27308,
+          "referencePixels": 28848,
+          "referenceCoverage": 0.9466167498613423,
+          "intersectionOverUnion": 0.9466167498613423
+        },
+        {
+          "azimuth": 90,
+          "elevation": 25,
+          "pixels": 27866,
+          "referencePixels": 29398,
+          "referenceCoverage": 0.9478876114021362,
+          "intersectionOverUnion": 0.9478876114021362
+        },
+        {
+          "azimuth": 135,
+          "elevation": 25,
+          "pixels": 29465,
+          "referencePixels": 31080,
+          "referenceCoverage": 0.948037323037323,
+          "intersectionOverUnion": 0.948037323037323
+        },
+        {
+          "azimuth": 180,
+          "elevation": 25,
+          "pixels": 29437,
+          "referencePixels": 31013,
+          "referenceCoverage": 0.949182600844807,
+          "intersectionOverUnion": 0.949182600844807
+        },
+        {
+          "azimuth": 225,
+          "elevation": 25,
+          "pixels": 30013,
+          "referencePixels": 31512,
+          "referenceCoverage": 0.9524308200050774,
+          "intersectionOverUnion": 0.9524308200050774
+        },
+        {
+          "azimuth": 270,
+          "elevation": 25,
+          "pixels": 29707,
+          "referencePixels": 31267,
+          "referenceCoverage": 0.9501071417149071,
+          "intersectionOverUnion": 0.9501071417149071
+        },
+        {
+          "azimuth": 315,
+          "elevation": 25,
+          "pixels": 28837,
+          "referencePixels": 30462,
+          "referenceCoverage": 0.9466548486639091,
+          "intersectionOverUnion": 0.9466548486639091
+        }
+      ],
+      "sourceSha256": "2a8564c6725da0744a7017de6a171c7b19b72ef1c887c85e2ed2cdc1739c2337",
+      "outputSha256": "ecc57281ad65ceaa0f624dc0441607244b2c007d30c5664083708ba2e1325f63"
+    },
+    {
+      "variant": "a",
+      "level": "horizon",
+      "triangles": 4998,
+      "budget": 4998,
+      "needleTriangles": 4200,
+      "sourceNeedleTriangles": 33753,
+      "islands": 1418,
+      "protectedIslands": 140,
+      "before": [
+        {
+          "azimuth": 0,
+          "elevation": 0,
+          "pixels": 19229,
+          "referencePixels": 25799,
+          "referenceCoverage": 0.6446761502383813,
+          "intersectionOverUnion": 0.5857162980701507
+        },
+        {
+          "azimuth": 45,
+          "elevation": 0,
+          "pixels": 19160,
+          "referencePixels": 25486,
+          "referenceCoverage": 0.6547123911166915,
+          "intersectionOverUnion": 0.5967811158798283
+        },
+        {
+          "azimuth": 90,
+          "elevation": 0,
+          "pixels": 19609,
+          "referencePixels": 26473,
+          "referenceCoverage": 0.6570845767385638,
+          "intersectionOverUnion": 0.6063722243524942
+        },
+        {
+          "azimuth": 135,
+          "elevation": 0,
+          "pixels": 19465,
+          "referencePixels": 26400,
+          "referenceCoverage": 0.6528030303030303,
+          "intersectionOverUnion": 0.6019349655967308
+        },
+        {
+          "azimuth": 180,
+          "elevation": 0,
+          "pixels": 19229,
+          "referencePixels": 25799,
+          "referenceCoverage": 0.6446761502383813,
+          "intersectionOverUnion": 0.5857162980701507
+        },
+        {
+          "azimuth": 225,
+          "elevation": 0,
+          "pixels": 19160,
+          "referencePixels": 25486,
+          "referenceCoverage": 0.6547123911166915,
+          "intersectionOverUnion": 0.5967811158798283
+        },
+        {
+          "azimuth": 270,
+          "elevation": 0,
+          "pixels": 19609,
+          "referencePixels": 26473,
+          "referenceCoverage": 0.6570845767385638,
+          "intersectionOverUnion": 0.6063722243524942
+        },
+        {
+          "azimuth": 315,
+          "elevation": 0,
+          "pixels": 19465,
+          "referencePixels": 26400,
+          "referenceCoverage": 0.6528030303030303,
+          "intersectionOverUnion": 0.6019349655967308
+        },
+        {
+          "azimuth": 0,
+          "elevation": 25,
+          "pixels": 23124,
+          "referencePixels": 29676,
+          "referenceCoverage": 0.6826728669632026,
+          "intersectionOverUnion": 0.6225684521065733
+        },
+        {
+          "azimuth": 45,
+          "elevation": 25,
+          "pixels": 21855,
+          "referencePixels": 28848,
+          "referenceCoverage": 0.6747781475318912,
+          "intersectionOverUnion": 0.623171239235522
+        },
+        {
+          "azimuth": 90,
+          "elevation": 25,
+          "pixels": 22790,
+          "referencePixels": 29398,
+          "referenceCoverage": 0.6942989319001293,
+          "intersectionOverUnion": 0.6423199169210435
+        },
+        {
+          "azimuth": 135,
+          "elevation": 25,
+          "pixels": 24531,
+          "referencePixels": 31080,
+          "referenceCoverage": 0.7023166023166023,
+          "intersectionOverUnion": 0.6461237900719297
+        },
+        {
+          "azimuth": 180,
+          "elevation": 25,
+          "pixels": 24902,
+          "referencePixels": 31013,
+          "referenceCoverage": 0.7074452648889176,
+          "intersectionOverUnion": 0.6457689477557027
+        },
+        {
+          "azimuth": 225,
+          "elevation": 25,
+          "pixels": 25610,
+          "referencePixels": 31512,
+          "referenceCoverage": 0.7210586443259711,
+          "intersectionOverUnion": 0.6605232558139534
+        },
+        {
+          "azimuth": 270,
+          "elevation": 25,
+          "pixels": 25331,
+          "referencePixels": 31267,
+          "referenceCoverage": 0.7201842197844373,
+          "intersectionOverUnion": 0.6607394366197183
+        },
+        {
+          "azimuth": 315,
+          "elevation": 25,
+          "pixels": 23853,
+          "referencePixels": 30462,
+          "referenceCoverage": 0.6937167618672444,
+          "intersectionOverUnion": 0.6368321128288581
+        }
+      ],
+      "after": [
+        {
+          "azimuth": 0,
+          "elevation": 0,
+          "pixels": 13833,
+          "referencePixels": 25799,
+          "referenceCoverage": 0.5361835730067057,
+          "intersectionOverUnion": 0.5361835730067057
+        },
+        {
+          "azimuth": 45,
+          "elevation": 0,
+          "pixels": 14158,
+          "referencePixels": 25486,
+          "referenceCoverage": 0.5555206780193047,
+          "intersectionOverUnion": 0.5555206780193047
+        },
+        {
+          "azimuth": 90,
+          "elevation": 0,
+          "pixels": 14884,
+          "referencePixels": 26473,
+          "referenceCoverage": 0.5622332187511805,
+          "intersectionOverUnion": 0.5622332187511805
+        },
+        {
+          "azimuth": 135,
+          "elevation": 0,
+          "pixels": 14521,
+          "referencePixels": 26400,
+          "referenceCoverage": 0.5500378787878788,
+          "intersectionOverUnion": 0.5500378787878788
+        },
+        {
+          "azimuth": 180,
+          "elevation": 0,
+          "pixels": 13833,
+          "referencePixels": 25799,
+          "referenceCoverage": 0.5361835730067057,
+          "intersectionOverUnion": 0.5361835730067057
+        },
+        {
+          "azimuth": 225,
+          "elevation": 0,
+          "pixels": 14158,
+          "referencePixels": 25486,
+          "referenceCoverage": 0.5555206780193047,
+          "intersectionOverUnion": 0.5555206780193047
+        },
+        {
+          "azimuth": 270,
+          "elevation": 0,
+          "pixels": 14884,
+          "referencePixels": 26473,
+          "referenceCoverage": 0.5622332187511805,
+          "intersectionOverUnion": 0.5622332187511805
+        },
+        {
+          "azimuth": 315,
+          "elevation": 0,
+          "pixels": 14521,
+          "referencePixels": 26400,
+          "referenceCoverage": 0.5500378787878788,
+          "intersectionOverUnion": 0.5500378787878788
+        },
+        {
+          "azimuth": 0,
+          "elevation": 25,
+          "pixels": 14329,
+          "referencePixels": 29676,
+          "referenceCoverage": 0.48284809273486995,
+          "intersectionOverUnion": 0.48284809273486995
+        },
+        {
+          "azimuth": 45,
+          "elevation": 25,
+          "pixels": 14517,
+          "referencePixels": 28848,
+          "referenceCoverage": 0.5032237936772047,
+          "intersectionOverUnion": 0.5032237936772047
+        },
+        {
+          "azimuth": 90,
+          "elevation": 25,
+          "pixels": 15807,
+          "referencePixels": 29398,
+          "referenceCoverage": 0.5376896387509355,
+          "intersectionOverUnion": 0.5376896387509355
+        },
+        {
+          "azimuth": 135,
+          "elevation": 25,
+          "pixels": 16366,
+          "referencePixels": 31080,
+          "referenceCoverage": 0.5265765765765765,
+          "intersectionOverUnion": 0.5265765765765765
+        },
+        {
+          "azimuth": 180,
+          "elevation": 25,
+          "pixels": 15996,
+          "referencePixels": 31013,
+          "referenceCoverage": 0.5157837036081643,
+          "intersectionOverUnion": 0.5157837036081643
+        },
+        {
+          "azimuth": 225,
+          "elevation": 25,
+          "pixels": 16291,
+          "referencePixels": 31512,
+          "referenceCoverage": 0.516977659304392,
+          "intersectionOverUnion": 0.516977659304392
+        },
+        {
+          "azimuth": 270,
+          "elevation": 25,
+          "pixels": 15913,
+          "referencePixels": 31267,
+          "referenceCoverage": 0.5089391371094125,
+          "intersectionOverUnion": 0.5089391371094125
+        },
+        {
+          "azimuth": 315,
+          "elevation": 25,
+          "pixels": 15087,
+          "referencePixels": 30462,
+          "referenceCoverage": 0.4952727988969864,
+          "intersectionOverUnion": 0.4952727988969864
+        }
+      ],
+      "sourceSha256": "2a8564c6725da0744a7017de6a171c7b19b72ef1c887c85e2ed2cdc1739c2337",
+      "outputSha256": "1cc5aaa2c6a59c833ea75efd1d7313a7ffd911d365d1317567e11da8dd03068c"
+    },
+    {
+      "variant": "b",
+      "level": "distant",
+      "triangles": 19116,
+      "budget": 21347,
+      "needleTriangles": 17920,
+      "sourceNeedleTriangles": 17920,
+      "islands": 5248,
+      "protectedIslands": 126,
+      "before": [
+        {
+          "azimuth": 0,
+          "elevation": 0,
+          "pixels": 25122,
+          "referencePixels": 25227,
+          "referenceCoverage": 0.9881476196139057,
+          "intersectionOverUnion": 0.9806065851068014
+        },
+        {
+          "azimuth": 45,
+          "elevation": 0,
+          "pixels": 25660,
+          "referencePixels": 25774,
+          "referenceCoverage": 0.9877007837355475,
+          "intersectionOverUnion": 0.9799822920275628
+        },
+        {
+          "azimuth": 90,
+          "elevation": 0,
+          "pixels": 26143,
+          "referencePixels": 26275,
+          "referenceCoverage": 0.9880875356803045,
+          "intersectionOverUnion": 0.981327487148473
+        },
+        {
+          "azimuth": 135,
+          "elevation": 0,
+          "pixels": 25452,
+          "referencePixels": 25509,
+          "referenceCoverage": 0.9898859226155474,
+          "intersectionOverUnion": 0.982147024504084
+        },
+        {
+          "azimuth": 180,
+          "elevation": 0,
+          "pixels": 25122,
+          "referencePixels": 25227,
+          "referenceCoverage": 0.9881476196139057,
+          "intersectionOverUnion": 0.9806065851068014
+        },
+        {
+          "azimuth": 225,
+          "elevation": 0,
+          "pixels": 25660,
+          "referencePixels": 25774,
+          "referenceCoverage": 0.9877007837355475,
+          "intersectionOverUnion": 0.9799822920275628
+        },
+        {
+          "azimuth": 270,
+          "elevation": 0,
+          "pixels": 26143,
+          "referencePixels": 26275,
+          "referenceCoverage": 0.9880875356803045,
+          "intersectionOverUnion": 0.981327487148473
+        },
+        {
+          "azimuth": 315,
+          "elevation": 0,
+          "pixels": 25452,
+          "referencePixels": 25509,
+          "referenceCoverage": 0.9898859226155474,
+          "intersectionOverUnion": 0.982147024504084
+        },
+        {
+          "azimuth": 0,
+          "elevation": 25,
+          "pixels": 29817,
+          "referencePixels": 29878,
+          "referenceCoverage": 0.9906954950130531,
+          "intersectionOverUnion": 0.9835520850639641
+        },
+        {
+          "azimuth": 45,
+          "elevation": 25,
+          "pixels": 28402,
+          "referencePixels": 28494,
+          "referenceCoverage": 0.9884186144451463,
+          "intersectionOverUnion": 0.9802311012111931
+        },
+        {
+          "azimuth": 90,
+          "elevation": 25,
+          "pixels": 28662,
+          "referencePixels": 28791,
+          "referenceCoverage": 0.9872876940710639,
+          "intersectionOverUnion": 0.979226953286482
+        },
+        {
+          "azimuth": 135,
+          "elevation": 25,
+          "pixels": 29790,
+          "referencePixels": 29864,
+          "referenceCoverage": 0.9901218858826681,
+          "intersectionOverUnion": 0.9828485956456706
+        },
+        {
+          "azimuth": 180,
+          "elevation": 25,
+          "pixels": 28699,
+          "referencePixels": 28735,
+          "referenceCoverage": 0.9894553680180964,
+          "intersectionOverUnion": 0.9803461830218606
+        },
+        {
+          "azimuth": 225,
+          "elevation": 25,
+          "pixels": 29610,
+          "referencePixels": 29711,
+          "referenceCoverage": 0.9877149877149877,
+          "intersectionOverUnion": 0.9790158465387823
+        },
+        {
+          "azimuth": 270,
+          "elevation": 25,
+          "pixels": 30954,
+          "referencePixels": 31011,
+          "referenceCoverage": 0.9904872464609332,
+          "intersectionOverUnion": 0.9829434541905341
+        },
+        {
+          "azimuth": 315,
+          "elevation": 25,
+          "pixels": 30006,
+          "referencePixels": 30090,
+          "referenceCoverage": 0.9910601528747092,
+          "intersectionOverUnion": 0.9850041288191578
+        }
+      ],
+      "after": [
+        {
+          "azimuth": 0,
+          "elevation": 0,
+          "pixels": 25227,
+          "referencePixels": 25227,
+          "referenceCoverage": 1.0,
+          "intersectionOverUnion": 1.0
+        },
+        {
+          "azimuth": 45,
+          "elevation": 0,
+          "pixels": 25774,
+          "referencePixels": 25774,
+          "referenceCoverage": 1.0,
+          "intersectionOverUnion": 1.0
+        },
+        {
+          "azimuth": 90,
+          "elevation": 0,
+          "pixels": 26275,
+          "referencePixels": 26275,
+          "referenceCoverage": 1.0,
+          "intersectionOverUnion": 1.0
+        },
+        {
+          "azimuth": 135,
+          "elevation": 0,
+          "pixels": 25509,
+          "referencePixels": 25509,
+          "referenceCoverage": 1.0,
+          "intersectionOverUnion": 1.0
+        },
+        {
+          "azimuth": 180,
+          "elevation": 0,
+          "pixels": 25227,
+          "referencePixels": 25227,
+          "referenceCoverage": 1.0,
+          "intersectionOverUnion": 1.0
+        },
+        {
+          "azimuth": 225,
+          "elevation": 0,
+          "pixels": 25774,
+          "referencePixels": 25774,
+          "referenceCoverage": 1.0,
+          "intersectionOverUnion": 1.0
+        },
+        {
+          "azimuth": 270,
+          "elevation": 0,
+          "pixels": 26275,
+          "referencePixels": 26275,
+          "referenceCoverage": 1.0,
+          "intersectionOverUnion": 1.0
+        },
+        {
+          "azimuth": 315,
+          "elevation": 0,
+          "pixels": 25509,
+          "referencePixels": 25509,
+          "referenceCoverage": 1.0,
+          "intersectionOverUnion": 1.0
+        },
+        {
+          "azimuth": 0,
+          "elevation": 25,
+          "pixels": 29878,
+          "referencePixels": 29878,
+          "referenceCoverage": 1.0,
+          "intersectionOverUnion": 1.0
+        },
+        {
+          "azimuth": 45,
+          "elevation": 25,
+          "pixels": 28494,
+          "referencePixels": 28494,
+          "referenceCoverage": 1.0,
+          "intersectionOverUnion": 1.0
+        },
+        {
+          "azimuth": 90,
+          "elevation": 25,
+          "pixels": 28791,
+          "referencePixels": 28791,
+          "referenceCoverage": 1.0,
+          "intersectionOverUnion": 1.0
+        },
+        {
+          "azimuth": 135,
+          "elevation": 25,
+          "pixels": 29864,
+          "referencePixels": 29864,
+          "referenceCoverage": 1.0,
+          "intersectionOverUnion": 1.0
+        },
+        {
+          "azimuth": 180,
+          "elevation": 25,
+          "pixels": 28735,
+          "referencePixels": 28735,
+          "referenceCoverage": 1.0,
+          "intersectionOverUnion": 1.0
+        },
+        {
+          "azimuth": 225,
+          "elevation": 25,
+          "pixels": 29711,
+          "referencePixels": 29711,
+          "referenceCoverage": 1.0,
+          "intersectionOverUnion": 1.0
+        },
+        {
+          "azimuth": 270,
+          "elevation": 25,
+          "pixels": 31011,
+          "referencePixels": 31011,
+          "referenceCoverage": 1.0,
+          "intersectionOverUnion": 1.0
+        },
+        {
+          "azimuth": 315,
+          "elevation": 25,
+          "pixels": 30090,
+          "referencePixels": 30090,
+          "referenceCoverage": 1.0,
+          "intersectionOverUnion": 1.0
+        }
+      ],
+      "sourceSha256": "2ab80b2d6502d854467df2d563422edba0d3d91d416e3f01fb0c3c9e95aa5a47",
+      "outputSha256": "48834caa83e45af40c52fd2e605e5c6bc64ab49d7d8fa25c69fd0cb07dd84df5"
+    },
+    {
+      "variant": "b",
+      "level": "horizon",
+      "triangles": 5000,
+      "budget": 5000,
+      "needleTriangles": 4200,
+      "sourceNeedleTriangles": 17920,
+      "islands": 1273,
+      "protectedIslands": 126,
+      "before": [
+        {
+          "azimuth": 0,
+          "elevation": 0,
+          "pixels": 20052,
+          "referencePixels": 25227,
+          "referenceCoverage": 0.6667855868712094,
+          "intersectionOverUnion": 0.5910815939278937
+        },
+        {
+          "azimuth": 45,
+          "elevation": 0,
+          "pixels": 19905,
+          "referencePixels": 25774,
+          "referenceCoverage": 0.651703266858074,
+          "intersectionOverUnion": 0.5815732982480437
+        },
+        {
+          "azimuth": 90,
+          "elevation": 0,
+          "pixels": 20547,
+          "referencePixels": 26275,
+          "referenceCoverage": 0.6672121788772597,
+          "intersectionOverUnion": 0.5985114881704278
+        },
+        {
+          "azimuth": 135,
+          "elevation": 0,
+          "pixels": 20241,
+          "referencePixels": 25509,
+          "referenceCoverage": 0.6801913050295973,
+          "intersectionOverUnion": 0.6109722173315962
+        },
+        {
+          "azimuth": 180,
+          "elevation": 0,
+          "pixels": 20052,
+          "referencePixels": 25227,
+          "referenceCoverage": 0.6667855868712094,
+          "intersectionOverUnion": 0.5910815939278937
+        },
+        {
+          "azimuth": 225,
+          "elevation": 0,
+          "pixels": 19905,
+          "referencePixels": 25774,
+          "referenceCoverage": 0.651703266858074,
+          "intersectionOverUnion": 0.5815732982480437
+        },
+        {
+          "azimuth": 270,
+          "elevation": 0,
+          "pixels": 20547,
+          "referencePixels": 26275,
+          "referenceCoverage": 0.6672121788772597,
+          "intersectionOverUnion": 0.5985114881704278
+        },
+        {
+          "azimuth": 315,
+          "elevation": 0,
+          "pixels": 20241,
+          "referencePixels": 25509,
+          "referenceCoverage": 0.6801913050295973,
+          "intersectionOverUnion": 0.6109722173315962
+        },
+        {
+          "azimuth": 0,
+          "elevation": 25,
+          "pixels": 23943,
+          "referencePixels": 29878,
+          "referenceCoverage": 0.6745766115536516,
+          "intersectionOverUnion": 0.5986752212915107
+        },
+        {
+          "azimuth": 45,
+          "elevation": 25,
+          "pixels": 22709,
+          "referencePixels": 28494,
+          "referenceCoverage": 0.6847055520460448,
+          "intersectionOverUnion": 0.615593348688985
+        },
+        {
+          "azimuth": 90,
+          "elevation": 25,
+          "pixels": 22985,
+          "referencePixels": 28791,
+          "referenceCoverage": 0.6816366225556597,
+          "intersectionOverUnion": 0.6104009206556561
+        },
+        {
+          "azimuth": 135,
+          "elevation": 25,
+          "pixels": 24548,
+          "referencePixels": 29864,
+          "referenceCoverage": 0.7069381194749531,
+          "intersectionOverUnion": 0.633993993993994
+        },
+        {
+          "azimuth": 180,
+          "elevation": 25,
+          "pixels": 24550,
+          "referencePixels": 28735,
+          "referenceCoverage": 0.7303984687663129,
+          "intersectionOverUnion": 0.6498436387280553
+        },
+        {
+          "azimuth": 225,
+          "elevation": 25,
+          "pixels": 24339,
+          "referencePixels": 29711,
+          "referenceCoverage": 0.6971828615664232,
+          "intersectionOverUnion": 0.6213702903767698
+        },
+        {
+          "azimuth": 270,
+          "elevation": 25,
+          "pixels": 25324,
+          "referencePixels": 31011,
+          "referenceCoverage": 0.6992680016768243,
+          "intersectionOverUnion": 0.6258297258297258
+        },
+        {
+          "azimuth": 315,
+          "elevation": 25,
+          "pixels": 24874,
+          "referencePixels": 30090,
+          "referenceCoverage": 0.7096045197740113,
+          "intersectionOverUnion": 0.635249315720576
+        }
+      ],
+      "after": [
+        {
+          "azimuth": 0,
+          "elevation": 0,
+          "pixels": 19279,
+          "referencePixels": 25227,
+          "referenceCoverage": 0.764220874459904,
+          "intersectionOverUnion": 0.764220874459904
+        },
+        {
+          "azimuth": 45,
+          "elevation": 0,
+          "pixels": 19463,
+          "referencePixels": 25774,
+          "referenceCoverage": 0.7551408396058042,
+          "intersectionOverUnion": 0.7551408396058042
+        },
+        {
+          "azimuth": 90,
+          "elevation": 0,
+          "pixels": 19754,
+          "referencePixels": 26275,
+          "referenceCoverage": 0.7518173168411038,
+          "intersectionOverUnion": 0.7518173168411038
+        },
+        {
+          "azimuth": 135,
+          "elevation": 0,
+          "pixels": 19481,
+          "referencePixels": 25509,
+          "referenceCoverage": 0.7636912462268219,
+          "intersectionOverUnion": 0.7636912462268219
+        },
+        {
+          "azimuth": 180,
+          "elevation": 0,
+          "pixels": 19279,
+          "referencePixels": 25227,
+          "referenceCoverage": 0.764220874459904,
+          "intersectionOverUnion": 0.764220874459904
+        },
+        {
+          "azimuth": 225,
+          "elevation": 0,
+          "pixels": 19463,
+          "referencePixels": 25774,
+          "referenceCoverage": 0.7551408396058042,
+          "intersectionOverUnion": 0.7551408396058042
+        },
+        {
+          "azimuth": 270,
+          "elevation": 0,
+          "pixels": 19754,
+          "referencePixels": 26275,
+          "referenceCoverage": 0.7518173168411038,
+          "intersectionOverUnion": 0.7518173168411038
+        },
+        {
+          "azimuth": 315,
+          "elevation": 0,
+          "pixels": 19481,
+          "referencePixels": 25509,
+          "referenceCoverage": 0.7636912462268219,
+          "intersectionOverUnion": 0.7636912462268219
+        },
+        {
+          "azimuth": 0,
+          "elevation": 25,
+          "pixels": 21551,
+          "referencePixels": 29878,
+          "referenceCoverage": 0.7212999531427806,
+          "intersectionOverUnion": 0.7212999531427806
+        },
+        {
+          "azimuth": 45,
+          "elevation": 25,
+          "pixels": 20721,
+          "referencePixels": 28494,
+          "referenceCoverage": 0.7272057275215835,
+          "intersectionOverUnion": 0.7272057275215835
+        },
+        {
+          "azimuth": 90,
+          "elevation": 25,
+          "pixels": 20870,
+          "referencePixels": 28791,
+          "referenceCoverage": 0.7248793025598277,
+          "intersectionOverUnion": 0.7248793025598277
+        },
+        {
+          "azimuth": 135,
+          "elevation": 25,
+          "pixels": 21236,
+          "referencePixels": 29864,
+          "referenceCoverage": 0.7110902759174926,
+          "intersectionOverUnion": 0.7110902759174926
+        },
+        {
+          "azimuth": 180,
+          "elevation": 25,
+          "pixels": 20631,
+          "referencePixels": 28735,
+          "referenceCoverage": 0.7179745954410997,
+          "intersectionOverUnion": 0.7179745954410997
+        },
+        {
+          "azimuth": 225,
+          "elevation": 25,
+          "pixels": 21230,
+          "referencePixels": 29711,
+          "referenceCoverage": 0.7145501666049612,
+          "intersectionOverUnion": 0.7145501666049612
+        },
+        {
+          "azimuth": 270,
+          "elevation": 25,
+          "pixels": 22090,
+          "referencePixels": 31011,
+          "referenceCoverage": 0.7123278836541872,
+          "intersectionOverUnion": 0.7123278836541872
+        },
+        {
+          "azimuth": 315,
+          "elevation": 25,
+          "pixels": 21890,
+          "referencePixels": 30090,
+          "referenceCoverage": 0.7274842140245928,
+          "intersectionOverUnion": 0.7274842140245928
+        }
+      ],
+      "sourceSha256": "2ab80b2d6502d854467df2d563422edba0d3d91d416e3f01fb0c3c9e95aa5a47",
+      "outputSha256": "878a371216eb085872b7e5bb5599c1319b0218fe356f3eaa7dd027d66406ab67"
+    },
+    {
+      "variant": "c",
+      "level": "distant",
+      "triangles": 6211,
+      "budget": 9900,
+      "needleTriangles": 5016,
+      "sourceNeedleTriangles": 5016,
+      "islands": 1568,
+      "protectedIslands": 118,
+      "before": [
+        {
+          "azimuth": 0,
+          "elevation": 0,
+          "pixels": 9530,
+          "referencePixels": 9530,
+          "referenceCoverage": 1.0,
+          "intersectionOverUnion": 1.0
+        },
+        {
+          "azimuth": 45,
+          "elevation": 0,
+          "pixels": 9703,
+          "referencePixels": 9703,
+          "referenceCoverage": 1.0,
+          "intersectionOverUnion": 1.0
+        },
+        {
+          "azimuth": 90,
+          "elevation": 0,
+          "pixels": 9903,
+          "referencePixels": 9903,
+          "referenceCoverage": 1.0,
+          "intersectionOverUnion": 1.0
+        },
+        {
+          "azimuth": 135,
+          "elevation": 0,
+          "pixels": 9648,
+          "referencePixels": 9648,
+          "referenceCoverage": 1.0,
+          "intersectionOverUnion": 1.0
+        },
+        {
+          "azimuth": 180,
+          "elevation": 0,
+          "pixels": 9530,
+          "referencePixels": 9530,
+          "referenceCoverage": 1.0,
+          "intersectionOverUnion": 1.0
+        },
+        {
+          "azimuth": 225,
+          "elevation": 0,
+          "pixels": 9703,
+          "referencePixels": 9703,
+          "referenceCoverage": 1.0,
+          "intersectionOverUnion": 1.0
+        },
+        {
+          "azimuth": 270,
+          "elevation": 0,
+          "pixels": 9903,
+          "referencePixels": 9903,
+          "referenceCoverage": 1.0,
+          "intersectionOverUnion": 1.0
+        },
+        {
+          "azimuth": 315,
+          "elevation": 0,
+          "pixels": 9648,
+          "referencePixels": 9648,
+          "referenceCoverage": 1.0,
+          "intersectionOverUnion": 1.0
+        },
+        {
+          "azimuth": 0,
+          "elevation": 25,
+          "pixels": 11320,
+          "referencePixels": 11320,
+          "referenceCoverage": 1.0,
+          "intersectionOverUnion": 1.0
+        },
+        {
+          "azimuth": 45,
+          "elevation": 25,
+          "pixels": 10916,
+          "referencePixels": 10916,
+          "referenceCoverage": 1.0,
+          "intersectionOverUnion": 1.0
+        },
+        {
+          "azimuth": 90,
+          "elevation": 25,
+          "pixels": 11000,
+          "referencePixels": 11000,
+          "referenceCoverage": 1.0,
+          "intersectionOverUnion": 1.0
+        },
+        {
+          "azimuth": 135,
+          "elevation": 25,
+          "pixels": 11582,
+          "referencePixels": 11582,
+          "referenceCoverage": 1.0,
+          "intersectionOverUnion": 1.0
+        },
+        {
+          "azimuth": 180,
+          "elevation": 25,
+          "pixels": 11721,
+          "referencePixels": 11721,
+          "referenceCoverage": 1.0,
+          "intersectionOverUnion": 1.0
+        },
+        {
+          "azimuth": 225,
+          "elevation": 25,
+          "pixels": 11822,
+          "referencePixels": 11822,
+          "referenceCoverage": 1.0,
+          "intersectionOverUnion": 1.0
+        },
+        {
+          "azimuth": 270,
+          "elevation": 25,
+          "pixels": 12406,
+          "referencePixels": 12406,
+          "referenceCoverage": 1.0,
+          "intersectionOverUnion": 1.0
+        },
+        {
+          "azimuth": 315,
+          "elevation": 25,
+          "pixels": 12338,
+          "referencePixels": 12338,
+          "referenceCoverage": 1.0,
+          "intersectionOverUnion": 1.0
+        }
+      ],
+      "after": [
+        {
+          "azimuth": 0,
+          "elevation": 0,
+          "pixels": 9530,
+          "referencePixels": 9530,
+          "referenceCoverage": 1.0,
+          "intersectionOverUnion": 1.0
+        },
+        {
+          "azimuth": 45,
+          "elevation": 0,
+          "pixels": 9703,
+          "referencePixels": 9703,
+          "referenceCoverage": 1.0,
+          "intersectionOverUnion": 1.0
+        },
+        {
+          "azimuth": 90,
+          "elevation": 0,
+          "pixels": 9903,
+          "referencePixels": 9903,
+          "referenceCoverage": 1.0,
+          "intersectionOverUnion": 1.0
+        },
+        {
+          "azimuth": 135,
+          "elevation": 0,
+          "pixels": 9648,
+          "referencePixels": 9648,
+          "referenceCoverage": 1.0,
+          "intersectionOverUnion": 1.0
+        },
+        {
+          "azimuth": 180,
+          "elevation": 0,
+          "pixels": 9530,
+          "referencePixels": 9530,
+          "referenceCoverage": 1.0,
+          "intersectionOverUnion": 1.0
+        },
+        {
+          "azimuth": 225,
+          "elevation": 0,
+          "pixels": 9703,
+          "referencePixels": 9703,
+          "referenceCoverage": 1.0,
+          "intersectionOverUnion": 1.0
+        },
+        {
+          "azimuth": 270,
+          "elevation": 0,
+          "pixels": 9903,
+          "referencePixels": 9903,
+          "referenceCoverage": 1.0,
+          "intersectionOverUnion": 1.0
+        },
+        {
+          "azimuth": 315,
+          "elevation": 0,
+          "pixels": 9648,
+          "referencePixels": 9648,
+          "referenceCoverage": 1.0,
+          "intersectionOverUnion": 1.0
+        },
+        {
+          "azimuth": 0,
+          "elevation": 25,
+          "pixels": 11320,
+          "referencePixels": 11320,
+          "referenceCoverage": 1.0,
+          "intersectionOverUnion": 1.0
+        },
+        {
+          "azimuth": 45,
+          "elevation": 25,
+          "pixels": 10916,
+          "referencePixels": 10916,
+          "referenceCoverage": 1.0,
+          "intersectionOverUnion": 1.0
+        },
+        {
+          "azimuth": 90,
+          "elevation": 25,
+          "pixels": 11000,
+          "referencePixels": 11000,
+          "referenceCoverage": 1.0,
+          "intersectionOverUnion": 1.0
+        },
+        {
+          "azimuth": 135,
+          "elevation": 25,
+          "pixels": 11582,
+          "referencePixels": 11582,
+          "referenceCoverage": 1.0,
+          "intersectionOverUnion": 1.0
+        },
+        {
+          "azimuth": 180,
+          "elevation": 25,
+          "pixels": 11721,
+          "referencePixels": 11721,
+          "referenceCoverage": 1.0,
+          "intersectionOverUnion": 1.0
+        },
+        {
+          "azimuth": 225,
+          "elevation": 25,
+          "pixels": 11822,
+          "referencePixels": 11822,
+          "referenceCoverage": 1.0,
+          "intersectionOverUnion": 1.0
+        },
+        {
+          "azimuth": 270,
+          "elevation": 25,
+          "pixels": 12406,
+          "referencePixels": 12406,
+          "referenceCoverage": 1.0,
+          "intersectionOverUnion": 1.0
+        },
+        {
+          "azimuth": 315,
+          "elevation": 25,
+          "pixels": 12338,
+          "referencePixels": 12338,
+          "referenceCoverage": 1.0,
+          "intersectionOverUnion": 1.0
+        }
+      ],
+      "sourceSha256": "5b88c3641e4becd2b9dbcfd6f29a4fdd63da2764beb85b8131c13377bbab511b",
+      "outputSha256": "73eb1047b721c127e7f9303287b34d62563365b9e2bc34663aa6fb99da470cb4"
+    },
+    {
+      "variant": "c",
+      "level": "horizon",
+      "triangles": 5000,
+      "budget": 5000,
+      "needleTriangles": 4200,
+      "sourceNeedleTriangles": 5016,
+      "islands": 1347,
+      "protectedIslands": 118,
+      "before": [
+        {
+          "azimuth": 0,
+          "elevation": 0,
+          "pixels": 9418,
+          "referencePixels": 9530,
+          "referenceCoverage": 0.8712486883525709,
+          "intersectionOverUnion": 0.7799906059182715
+        },
+        {
+          "azimuth": 45,
+          "elevation": 0,
+          "pixels": 9560,
+          "referencePixels": 9703,
+          "referenceCoverage": 0.8675667319385757,
+          "intersectionOverUnion": 0.776210235131397
+        },
+        {
+          "azimuth": 90,
+          "elevation": 0,
+          "pixels": 9863,
+          "referencePixels": 9903,
+          "referenceCoverage": 0.8801373321215793,
+          "intersectionOverUnion": 0.7887782805429864
+        },
+        {
+          "azimuth": 135,
+          "elevation": 0,
+          "pixels": 9607,
+          "referencePixels": 9648,
+          "referenceCoverage": 0.878731343283582,
+          "intersectionOverUnion": 0.7866753270854597
+        },
+        {
+          "azimuth": 180,
+          "elevation": 0,
+          "pixels": 9418,
+          "referencePixels": 9530,
+          "referenceCoverage": 0.8712486883525709,
+          "intersectionOverUnion": 0.7799906059182715
+        },
+        {
+          "azimuth": 225,
+          "elevation": 0,
+          "pixels": 9560,
+          "referencePixels": 9703,
+          "referenceCoverage": 0.8675667319385757,
+          "intersectionOverUnion": 0.776210235131397
+        },
+        {
+          "azimuth": 270,
+          "elevation": 0,
+          "pixels": 9863,
+          "referencePixels": 9903,
+          "referenceCoverage": 0.8801373321215793,
+          "intersectionOverUnion": 0.7887782805429864
+        },
+        {
+          "azimuth": 315,
+          "elevation": 0,
+          "pixels": 9607,
+          "referencePixels": 9648,
+          "referenceCoverage": 0.878731343283582,
+          "intersectionOverUnion": 0.7866753270854597
+        },
+        {
+          "azimuth": 0,
+          "elevation": 25,
+          "pixels": 11323,
+          "referencePixels": 11320,
+          "referenceCoverage": 0.8872791519434629,
+          "intersectionOverUnion": 0.7972061274704342
+        },
+        {
+          "azimuth": 45,
+          "elevation": 25,
+          "pixels": 10828,
+          "referencePixels": 10916,
+          "referenceCoverage": 0.8726639794796629,
+          "intersectionOverUnion": 0.7796693403175643
+        },
+        {
+          "azimuth": 90,
+          "elevation": 25,
+          "pixels": 10985,
+          "referencePixels": 11000,
+          "referenceCoverage": 0.8786363636363637,
+          "intersectionOverUnion": 0.7844967532467533
+        },
+        {
+          "azimuth": 135,
+          "elevation": 25,
+          "pixels": 11455,
+          "referencePixels": 11582,
+          "referenceCoverage": 0.8702296667242273,
+          "intersectionOverUnion": 0.7778206513350826
+        },
+        {
+          "azimuth": 180,
+          "elevation": 25,
+          "pixels": 11463,
+          "referencePixels": 11721,
+          "referenceCoverage": 0.8609333674601143,
+          "intersectionOverUnion": 0.7707171771175437
+        },
+        {
+          "azimuth": 225,
+          "elevation": 25,
+          "pixels": 11649,
+          "referencePixels": 11822,
+          "referenceCoverage": 0.8702419218406361,
+          "intersectionOverUnion": 0.7803989987104605
+        },
+        {
+          "azimuth": 270,
+          "elevation": 25,
+          "pixels": 12357,
+          "referencePixels": 12406,
+          "referenceCoverage": 0.8722392390778656,
+          "intersectionOverUnion": 0.7761440252474537
+        },
+        {
+          "azimuth": 315,
+          "elevation": 25,
+          "pixels": 12363,
+          "referencePixels": 12338,
+          "referenceCoverage": 0.877775976657481,
+          "intersectionOverUnion": 0.7807656261264508
+        }
+      ],
+      "after": [
+        {
+          "azimuth": 0,
+          "elevation": 0,
+          "pixels": 9291,
+          "referencePixels": 9530,
+          "referenceCoverage": 0.9749213011542497,
+          "intersectionOverUnion": 0.9749213011542497
+        },
+        {
+          "azimuth": 45,
+          "elevation": 0,
+          "pixels": 9447,
+          "referencePixels": 9703,
+          "referenceCoverage": 0.9736164072967124,
+          "intersectionOverUnion": 0.9736164072967124
+        },
+        {
+          "azimuth": 90,
+          "elevation": 0,
+          "pixels": 9690,
+          "referencePixels": 9903,
+          "referenceCoverage": 0.9784913662526508,
+          "intersectionOverUnion": 0.9784913662526508
+        },
+        {
+          "azimuth": 135,
+          "elevation": 0,
+          "pixels": 9447,
+          "referencePixels": 9648,
+          "referenceCoverage": 0.9791666666666666,
+          "intersectionOverUnion": 0.9791666666666666
+        },
+        {
+          "azimuth": 180,
+          "elevation": 0,
+          "pixels": 9291,
+          "referencePixels": 9530,
+          "referenceCoverage": 0.9749213011542497,
+          "intersectionOverUnion": 0.9749213011542497
+        },
+        {
+          "azimuth": 225,
+          "elevation": 0,
+          "pixels": 9447,
+          "referencePixels": 9703,
+          "referenceCoverage": 0.9736164072967124,
+          "intersectionOverUnion": 0.9736164072967124
+        },
+        {
+          "azimuth": 270,
+          "elevation": 0,
+          "pixels": 9690,
+          "referencePixels": 9903,
+          "referenceCoverage": 0.9784913662526508,
+          "intersectionOverUnion": 0.9784913662526508
+        },
+        {
+          "azimuth": 315,
+          "elevation": 0,
+          "pixels": 9447,
+          "referencePixels": 9648,
+          "referenceCoverage": 0.9791666666666666,
+          "intersectionOverUnion": 0.9791666666666666
+        },
+        {
+          "azimuth": 0,
+          "elevation": 25,
+          "pixels": 10914,
+          "referencePixels": 11320,
+          "referenceCoverage": 0.9641342756183745,
+          "intersectionOverUnion": 0.9641342756183745
+        },
+        {
+          "azimuth": 45,
+          "elevation": 25,
+          "pixels": 10451,
+          "referencePixels": 10916,
+          "referenceCoverage": 0.9574019787467937,
+          "intersectionOverUnion": 0.9574019787467937
+        },
+        {
+          "azimuth": 90,
+          "elevation": 25,
+          "pixels": 10550,
+          "referencePixels": 11000,
+          "referenceCoverage": 0.9590909090909091,
+          "intersectionOverUnion": 0.9590909090909091
+        },
+        {
+          "azimuth": 135,
+          "elevation": 25,
+          "pixels": 11048,
+          "referencePixels": 11582,
+          "referenceCoverage": 0.9538939734070109,
+          "intersectionOverUnion": 0.9538939734070109
+        },
+        {
+          "azimuth": 180,
+          "elevation": 25,
+          "pixels": 11214,
+          "referencePixels": 11721,
+          "referenceCoverage": 0.956744305093422,
+          "intersectionOverUnion": 0.956744305093422
+        },
+        {
+          "azimuth": 225,
+          "elevation": 25,
+          "pixels": 11386,
+          "referencePixels": 11822,
+          "referenceCoverage": 0.9631196075114193,
+          "intersectionOverUnion": 0.9631196075114193
+        },
+        {
+          "azimuth": 270,
+          "elevation": 25,
+          "pixels": 11999,
+          "referencePixels": 12406,
+          "referenceCoverage": 0.9671932935676286,
+          "intersectionOverUnion": 0.9671932935676286
+        },
+        {
+          "azimuth": 315,
+          "elevation": 25,
+          "pixels": 11989,
+          "referencePixels": 12338,
+          "referenceCoverage": 0.9717134057383693,
+          "intersectionOverUnion": 0.9717134057383693
+        }
+      ],
+      "sourceSha256": "5b88c3641e4becd2b9dbcfd6f29a4fdd63da2764beb85b8131c13377bbab511b",
+      "outputSha256": "7b69f2e8518cc5bc80e7e0f7bc2367c251e51ed4e43dfd4a243328b8acbe58af"
+    }
+  ]
+}

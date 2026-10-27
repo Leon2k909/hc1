@@ -32,7 +32,7 @@ public static partial class ClaudeBridge
 
 	// Bridge build version — surfaced in status.json + the Status menu so a
 	// marketplace-addon-vs-MCP-server skew is visible at a glance.
-	private const string BridgeVersion = "1.7.0";
+	public const string BridgeVersion = "1.7.0";
 
 	// status.json doubles as a heartbeat. _startedAtIso is stamped once at start;
 	// the heartbeat timestamp is refreshed from the frame loop at most once per
@@ -143,6 +143,7 @@ public static partial class ClaudeBridge
 	{
 		// ── Batch 1: File / project basics ──────────────────────────────
 		Register( "get_project_info",    () => new GetProjectInfoHandler() );
+		Register( "get_profiler_stats",  () => new GetProfilerStatsHandler() );
 		Register( "list_project_files",  () => new ListProjectFilesHandler() );
 		Register( "read_file",           () => new ReadFileHandler() );
 		Register( "write_file",          () => new WriteFileHandler() );
@@ -690,7 +691,7 @@ public static partial class ClaudeBridge
 	// Many handlers signal failure by returning an object with a non-empty
 	// `error` string property instead of throwing. Detect that via reflection
 	// so the dispatch envelope reports success=false (audit P1).
-	static bool TryGetHandlerError( object result, out string err )
+	internal static bool TryGetHandlerError( object result, out string err )
 	{
 		err = null;
 		if ( result == null )

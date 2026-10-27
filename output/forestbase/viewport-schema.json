@@ -1,0 +1,3813 @@
+[
+  {
+    "type": "Editor.SceneRenderingWidget",
+    "constructors": [
+      "Void .ctor(Editor.Widget)"
+    ],
+    "properties": [
+      {
+        "Name": "Scene",
+        "type": "Sandbox.Scene",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Camera",
+        "type": "Sandbox.CameraComponent",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "GizmoInstance",
+        "type": "Sandbox.Gizmo\u002BInstance",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "EnableEngineOverlays",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "CursorRay",
+        "type": "Ray",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "Enabled",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ReadOnly",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Parent",
+        "type": "Editor.Widget",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ContentMargins",
+        "type": "Sandbox.UI.Margin",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ContentRect",
+        "type": "Sandbox.Rect",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "Size",
+        "type": "Vector2",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "LocalRect",
+        "type": "Sandbox.Rect",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "ScreenRect",
+        "type": "Sandbox.Rect",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "Width",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Height",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "MinimumSize",
+        "type": "Vector2",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "MinimumWidth",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "MinimumHeight",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "FixedHeight",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "FixedWidth",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "FixedSize",
+        "type": "Vector2",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "MaximumWidth",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "MaximumHeight",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "MaximumSize",
+        "type": "Vector2",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Position",
+        "type": "Vector2",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Visible",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Hidden",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Name",
+        "type": "System.String",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "TranslucentBackground",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "NoSystemBackground",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "TransparentForMouseEvents",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ShowWithoutActivating",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "MouseTracking",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "AcceptDrops",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "IsFramelessWindow",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "IsTooltip",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "IsPopup",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "IsWindow",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "HasMaximizeButton",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "DeleteOnClose",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "DpiScale",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "IsFocused",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "IsActiveWindow",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "FocusMode",
+        "type": "Editor.FocusMode",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ContextMenuEnabled",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "WindowFlags",
+        "type": "Editor.WindowFlags",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Children",
+        "type": "System.Collections.Generic.IEnumerable\u00601[[Editor.Widget, Sandbox.Tools, Version=1.0.1.0, Culture=neutral, PublicKeyToken=null]]",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "Cursor",
+        "type": "Editor.CursorShape",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "PixmapCursor",
+        "type": "Editor.Pixmap",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ScreenPosition",
+        "type": "Vector2",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "FocusProxy",
+        "type": "Editor.Widget",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "IsUnderMouse",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "HorizontalSizeMode",
+        "type": "Editor.SizeMode",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "VerticalSizeMode",
+        "type": "Editor.SizeMode",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ToolTip",
+        "type": "System.String",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "StatusTip",
+        "type": "System.String",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ScreenGeometry",
+        "type": "Sandbox.Rect",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "WindowTitle",
+        "type": "System.String",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "IsMinimized",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "IsMaximized",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "WindowOpacity",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "UpdatesEnabled",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "DebugModeEnabled",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ProvidesDebugMode",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "IsPressed",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "IsDraggable",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "IsBeingDroppedOn",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "Layout",
+        "type": "Editor.Layout",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "IsValid",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      }
+    ],
+    "methods": [
+      "Sandbox.CameraComponent CreateSceneEditorCamera()",
+      "Void UpdateGizmoInputs(Boolean)",
+      "Ray GetRay(Vector2)"
+    ]
+  },
+  {
+    "type": "Editor.SceneEditorSession",
+    "constructors": [],
+    "properties": [
+      {
+        "Name": "All",
+        "type": "System.Collections.Generic.List\u00601[[Editor.SceneEditorSession, Sandbox.Tools, Version=1.0.1.0, Culture=neutral, PublicKeyToken=null]]",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "Active",
+        "type": "Editor.SceneEditorSession",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "IsPrefabSession",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "Scene",
+        "type": "Sandbox.Scene",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ShouldUpdate",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "OnFrameTo",
+        "type": "System.Action\u00601[[BBox, Sandbox.System, Version=1.0.1.0, Culture=neutral, PublicKeyToken=null]]",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "IsMounted",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "HasUnsavedChanges",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "GameSession",
+        "type": "Editor.GameEditorSession",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "IsPlaying",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "Selection",
+        "type": "Sandbox.SelectionSystem",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "UndoSystem",
+        "type": "Sandbox.Helpers.UndoSystem",
+        "CanRead": true,
+        "CanWrite": false
+      }
+    ],
+    "methods": [
+      "Void Destroy()",
+      "Void MakeActive(Boolean)",
+      "Void BringToFront()",
+      "Void Tick()",
+      "System.IDisposable Scope()",
+      "Void FrameTo(BBox ByRef)",
+      "Void Reload()",
+      "Void Save(Boolean)",
+      "Editor.SceneEditorSession Resolve(Sandbox.Scene)",
+      "ISceneEditorSession Resolve(Sandbox.Component)",
+      "ISceneEditorSession Resolve(Sandbox.GameObject)",
+      "Editor.SceneEditorSession Resolve(Sandbox.SceneFile)",
+      "Editor.SceneEditorSession Resolve(Sandbox.PrefabFile)",
+      "Editor.SceneEditorSession Resolve(Facepunch.ActionGraphs.ISourceLocation)",
+      "Void RecordChange(Sandbox.SerializedProperty)",
+      "Editor.SceneEditorSession CreateDefault()",
+      "Editor.SceneEditorSession CreateFromPath(System.String)",
+      "System.Collections.Generic.IEnumerable\u00601[System.Object] GetSelection()",
+      "Editor.SceneFolder GetSceneFolder()",
+      "Void SetPlaying(Sandbox.Scene)",
+      "Void StopPlaying()",
+      "System.String SerializeSelection()",
+      "Void DeserializeSelection(System.String)",
+      "System.IDisposable SuppressUndoSounds()",
+      "Void FullUndoSnapshot(System.String)",
+      "Void PushUndoSelection()",
+      "Void AddUndo(System.String, System.Action, System.Action)",
+      "ISceneUndoScope UndoScope(System.String)",
+      "Void CancelUndoScope()"
+    ]
+  },
+  {
+    "type": "Editor.GameMode",
+    "constructors": [],
+    "properties": [],
+    "methods": [
+      "Void SetPlayWidget(Editor.SceneRenderingWidget)",
+      "Void ClearPlayMode()"
+    ]
+  },
+  {
+    "type": "Editor.Window",
+    "constructors": [
+      "Void .ctor(Editor.Widget)"
+    ],
+    "properties": [
+      {
+        "Name": "StateCookie",
+        "type": "System.String",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Title",
+        "type": "System.String",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Canvas",
+        "type": "Editor.Widget",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "MenuBar",
+        "type": "Editor.MenuBar",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "MenuWidget",
+        "type": "Editor.Widget",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "StatusBar",
+        "type": "Editor.StatusBar",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "StartCentered",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "IsDialog",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "CloseButtonVisible",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Enabled",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ReadOnly",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Parent",
+        "type": "Editor.Widget",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ContentMargins",
+        "type": "Sandbox.UI.Margin",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ContentRect",
+        "type": "Sandbox.Rect",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "Size",
+        "type": "Vector2",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "LocalRect",
+        "type": "Sandbox.Rect",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "ScreenRect",
+        "type": "Sandbox.Rect",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "Width",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Height",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "MinimumSize",
+        "type": "Vector2",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "MinimumWidth",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "MinimumHeight",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "FixedHeight",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "FixedWidth",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "FixedSize",
+        "type": "Vector2",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "MaximumWidth",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "MaximumHeight",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "MaximumSize",
+        "type": "Vector2",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Position",
+        "type": "Vector2",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Visible",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Hidden",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Name",
+        "type": "System.String",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "TranslucentBackground",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "NoSystemBackground",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "TransparentForMouseEvents",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ShowWithoutActivating",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "MouseTracking",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "AcceptDrops",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "IsFramelessWindow",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "IsTooltip",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "IsPopup",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "IsWindow",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "HasMaximizeButton",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "DeleteOnClose",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "DpiScale",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "IsFocused",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "IsActiveWindow",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "FocusMode",
+        "type": "Editor.FocusMode",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ContextMenuEnabled",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "WindowFlags",
+        "type": "Editor.WindowFlags",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Children",
+        "type": "System.Collections.Generic.IEnumerable\u00601[[Editor.Widget, Sandbox.Tools, Version=1.0.1.0, Culture=neutral, PublicKeyToken=null]]",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "Cursor",
+        "type": "Editor.CursorShape",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "PixmapCursor",
+        "type": "Editor.Pixmap",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ScreenPosition",
+        "type": "Vector2",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "FocusProxy",
+        "type": "Editor.Widget",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "IsUnderMouse",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "HorizontalSizeMode",
+        "type": "Editor.SizeMode",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "VerticalSizeMode",
+        "type": "Editor.SizeMode",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ToolTip",
+        "type": "System.String",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "StatusTip",
+        "type": "System.String",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ScreenGeometry",
+        "type": "Sandbox.Rect",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "WindowTitle",
+        "type": "System.String",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "IsMinimized",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "IsMaximized",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "WindowOpacity",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "UpdatesEnabled",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "DebugModeEnabled",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ProvidesDebugMode",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "IsPressed",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "IsDraggable",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "IsBeingDroppedOn",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "Layout",
+        "type": "Editor.Layout",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "IsValid",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      }
+    ],
+    "methods": [
+      "Void RestoreFromStateCookie()",
+      "Void SaveToStateCookie()",
+      "Void SetWindowIcon(System.String)",
+      "Void SetWindowIcon(Editor.Pixmap)",
+      "Void Show()",
+      "Void Close()",
+      "Void Clear()",
+      "Void AddToolBar(Editor.ToolBar, Editor.ToolbarPosition)",
+      "Void RemoveToolBar(Editor.ToolBar)",
+      "System.String SaveState(Int32)",
+      "Void RestoreState(System.String)",
+      "Void Center()"
+    ]
+  },
+  {
+    "type": "Editor.Widget",
+    "constructors": [
+      "Void .ctor()",
+      "Void .ctor(Editor.Widget, Boolean)"
+    ],
+    "properties": [
+      {
+        "Name": "Enabled",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ReadOnly",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Parent",
+        "type": "Editor.Widget",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ContentMargins",
+        "type": "Sandbox.UI.Margin",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ContentRect",
+        "type": "Sandbox.Rect",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "Size",
+        "type": "Vector2",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "LocalRect",
+        "type": "Sandbox.Rect",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "ScreenRect",
+        "type": "Sandbox.Rect",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "Width",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Height",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "MinimumSize",
+        "type": "Vector2",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "MinimumWidth",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "MinimumHeight",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "FixedHeight",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "FixedWidth",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "FixedSize",
+        "type": "Vector2",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "MaximumWidth",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "MaximumHeight",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "MaximumSize",
+        "type": "Vector2",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Position",
+        "type": "Vector2",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Visible",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Hidden",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Name",
+        "type": "System.String",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "TranslucentBackground",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "NoSystemBackground",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "TransparentForMouseEvents",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ShowWithoutActivating",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "MouseTracking",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "AcceptDrops",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "IsFramelessWindow",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "IsTooltip",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "IsPopup",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "IsWindow",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "HasMaximizeButton",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "DeleteOnClose",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "DpiScale",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "IsFocused",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "IsActiveWindow",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "FocusMode",
+        "type": "Editor.FocusMode",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ContextMenuEnabled",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "WindowFlags",
+        "type": "Editor.WindowFlags",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Children",
+        "type": "System.Collections.Generic.IEnumerable\u00601[[Editor.Widget, Sandbox.Tools, Version=1.0.1.0, Culture=neutral, PublicKeyToken=null]]",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "Cursor",
+        "type": "Editor.CursorShape",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "PixmapCursor",
+        "type": "Editor.Pixmap",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ScreenPosition",
+        "type": "Vector2",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "FocusProxy",
+        "type": "Editor.Widget",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "IsUnderMouse",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "HorizontalSizeMode",
+        "type": "Editor.SizeMode",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "VerticalSizeMode",
+        "type": "Editor.SizeMode",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ToolTip",
+        "type": "System.String",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "StatusTip",
+        "type": "System.String",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ScreenGeometry",
+        "type": "Sandbox.Rect",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "WindowTitle",
+        "type": "System.String",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "IsMinimized",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "IsMaximized",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "WindowOpacity",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "UpdatesEnabled",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "DebugModeEnabled",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ProvidesDebugMode",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "IsPressed",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "IsDraggable",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "IsBeingDroppedOn",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Layout",
+        "type": "Editor.Layout",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "IsValid",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      }
+    ],
+    "methods": [
+      "Void SetContext(System.String, System.Object)",
+      "Void ClearContext(System.String)",
+      "T GetContext[T](System.String, T)",
+      "T GetAncestor[T]()",
+      "System.Collections.Generic.IEnumerable\u00601[T] GetDescendants[T]()",
+      "Boolean IsDescendantOf(Editor.Widget)",
+      "Boolean IsAncestorOf(Editor.Widget)",
+      "Void Focus(Boolean)",
+      "Void Blur()",
+      "Void SetStyles(System.String)",
+      "Void SetStylesheetFile(System.String)",
+      "Void DestroyChildren()",
+      "Void Update()",
+      "Vector2 ToScreen(Vector2)",
+      "Vector2 FromScreen(Vector2)",
+      "Void PostKeyEvent(Editor.KeyCode)",
+      "Void SetSizeMode(Editor.SizeMode, Editor.SizeMode)",
+      "System.String SaveGeometry()",
+      "Boolean RestoreGeometry(System.String)",
+      "Void ChildValuesChanged(Editor.Widget)",
+      "Void MakeSignal(System.String)",
+      "Void AdjustSize()",
+      "Void ConstrainToScreen()",
+      "Void ConstrainTo(Sandbox.Rect)",
+      "Void SetWindowIcon(System.String)",
+      "Void SetWindowIcon(Editor.Pixmap)",
+      "Void Show()",
+      "Void Hide()",
+      "Void Close()",
+      "Void MakeMinimized()",
+      "Void MakeMaximized()",
+      "Void SetMaximized(Boolean)",
+      "Void MakeWindowed()",
+      "Void SetModal(Boolean, Boolean)",
+      "Boolean IsModal()",
+      "Void DisableWindowActivation()",
+      "Void SetEffectOpacity(Single)",
+      "Boolean SetContentHash(Int32, Single)",
+      "Boolean SetContentHash(System.Func\u00601[System.Int32], Single)",
+      "Void AlignToParent(Sandbox.TextFlag, Vector2)",
+      "Void UpdateGeometry()",
+      "Editor.Widget GetWindow()",
+      "Void OnDragLeave()",
+      "Void OnDragHover(DragEvent)",
+      "Void OnDragDrop(DragEvent)",
+      "Void Raise()",
+      "Void Lower()"
+    ]
+  },
+  {
+    "type": "Editor.GameEditorSession",
+    "constructors": [
+      "Void .ctor(Editor.SceneEditorSession, Sandbox.Scene)"
+    ],
+    "properties": [
+      {
+        "Name": "Parent",
+        "type": "Editor.SceneEditorSession",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "IsPlaying",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "IsPrefabSession",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "Scene",
+        "type": "Sandbox.Scene",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "ShouldUpdate",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "OnFrameTo",
+        "type": "System.Action\u00601[[BBox, Sandbox.System, Version=1.0.1.0, Culture=neutral, PublicKeyToken=null]]",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "IsMounted",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "HasUnsavedChanges",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "GameSession",
+        "type": "Editor.GameEditorSession",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "Selection",
+        "type": "Sandbox.SelectionSystem",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "UndoSystem",
+        "type": "Sandbox.Helpers.UndoSystem",
+        "CanRead": true,
+        "CanWrite": false
+      }
+    ],
+    "methods": [
+      "Void StopPlaying()",
+      "Void FrameTo(BBox ByRef)"
+    ]
+  },
+  {
+    "type": "Sandbox.SkyBox2D",
+    "constructors": [
+      "Void .ctor()"
+    ],
+    "properties": [
+      {
+        "Name": "Tint",
+        "type": "Color",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "SkyIndirectLighting",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "SkyMaterial",
+        "type": "Sandbox.Material",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "SkyTexture",
+        "type": "Sandbox.Texture",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "Scene",
+        "type": "Sandbox.Scene",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "Transform",
+        "type": "Sandbox.GameTransform",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "GameObject",
+        "type": "Sandbox.GameObject",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Components",
+        "type": "Sandbox.ComponentList",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "Enabled",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Active",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "IsValid",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "OnComponentEnabled",
+        "type": "System.Action",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "OnComponentStart",
+        "type": "System.Action",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "OnComponentUpdate",
+        "type": "System.Action",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "OnComponentFixedUpdate",
+        "type": "System.Action",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "OnComponentDisabled",
+        "type": "System.Action",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "OnComponentDestroy",
+        "type": "System.Action",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Tags",
+        "type": "Sandbox.ITagSet",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "DebugOverlay",
+        "type": "Sandbox.DebugOverlaySystem",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "Flags",
+        "type": "Sandbox.ComponentFlags",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Id",
+        "type": "System.Guid",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "LocalTransform",
+        "type": "Transform",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "LocalPosition",
+        "type": "Vector3",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "LocalRotation",
+        "type": "Rotation",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "LocalScale",
+        "type": "Vector3",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Network",
+        "type": "Sandbox.GameObject\u002BNetworkAccessor",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "IsProxy",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "ComponentVersion",
+        "type": "System.Int32",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "WorldTransform",
+        "type": "Transform",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "WorldPosition",
+        "type": "Vector3",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "WorldRotation",
+        "type": "Rotation",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "WorldScale",
+        "type": "Vector3",
+        "CanRead": true,
+        "CanWrite": true
+      }
+    ],
+    "methods": []
+  },
+  {
+    "type": "Sandbox.GradientFog",
+    "constructors": [
+      "Void .ctor()"
+    ],
+    "properties": [
+      {
+        "Name": "Color",
+        "type": "Color",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Height",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "VerticalFalloffExponent",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "StartDistance",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "EndDistance",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "FalloffExponent",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Scene",
+        "type": "Sandbox.Scene",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "Transform",
+        "type": "Sandbox.GameTransform",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "GameObject",
+        "type": "Sandbox.GameObject",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Components",
+        "type": "Sandbox.ComponentList",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "Enabled",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Active",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "IsValid",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "OnComponentEnabled",
+        "type": "System.Action",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "OnComponentStart",
+        "type": "System.Action",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "OnComponentUpdate",
+        "type": "System.Action",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "OnComponentFixedUpdate",
+        "type": "System.Action",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "OnComponentDisabled",
+        "type": "System.Action",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "OnComponentDestroy",
+        "type": "System.Action",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Tags",
+        "type": "Sandbox.ITagSet",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "DebugOverlay",
+        "type": "Sandbox.DebugOverlaySystem",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "Flags",
+        "type": "Sandbox.ComponentFlags",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Id",
+        "type": "System.Guid",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "LocalTransform",
+        "type": "Transform",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "LocalPosition",
+        "type": "Vector3",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "LocalRotation",
+        "type": "Rotation",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "LocalScale",
+        "type": "Vector3",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Network",
+        "type": "Sandbox.GameObject\u002BNetworkAccessor",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "IsProxy",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "ComponentVersion",
+        "type": "System.Int32",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "WorldTransform",
+        "type": "Transform",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "WorldPosition",
+        "type": "Vector3",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "WorldRotation",
+        "type": "Rotation",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "WorldScale",
+        "type": "Vector3",
+        "CanRead": true,
+        "CanWrite": true
+      }
+    ],
+    "methods": []
+  },
+  {
+    "type": "Sandbox.DirectionalLight",
+    "constructors": [
+      "Void .ctor()"
+    ],
+    "properties": [
+      {
+        "Name": "SkyColor",
+        "type": "Color",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ShadowCascadeCount",
+        "type": "System.Int32",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ShadowCascadeSplitRatio",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Visualizer",
+        "type": "Sandbox.DirectionalLight\u002BCascadeVisualizer",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ContactShadows",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "LightColor",
+        "type": "Color",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "FogMode",
+        "type": "Sandbox.Light\u002BFogInfluence",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "FogStrength",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Shadows",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ShadowBias",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ShadowHardness",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Contribution",
+        "type": "Sandbox.Light\u002BLightContribution",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Scene",
+        "type": "Sandbox.Scene",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "Transform",
+        "type": "Sandbox.GameTransform",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "GameObject",
+        "type": "Sandbox.GameObject",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Components",
+        "type": "Sandbox.ComponentList",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "Enabled",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Active",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "IsValid",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "OnComponentEnabled",
+        "type": "System.Action",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "OnComponentStart",
+        "type": "System.Action",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "OnComponentUpdate",
+        "type": "System.Action",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "OnComponentFixedUpdate",
+        "type": "System.Action",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "OnComponentDisabled",
+        "type": "System.Action",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "OnComponentDestroy",
+        "type": "System.Action",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Tags",
+        "type": "Sandbox.ITagSet",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "DebugOverlay",
+        "type": "Sandbox.DebugOverlaySystem",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "Flags",
+        "type": "Sandbox.ComponentFlags",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Id",
+        "type": "System.Guid",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "LocalTransform",
+        "type": "Transform",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "LocalPosition",
+        "type": "Vector3",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "LocalRotation",
+        "type": "Rotation",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "LocalScale",
+        "type": "Vector3",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Network",
+        "type": "Sandbox.GameObject\u002BNetworkAccessor",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "IsProxy",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "ComponentVersion",
+        "type": "System.Int32",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "WorldTransform",
+        "type": "Transform",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "WorldPosition",
+        "type": "Vector3",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "WorldRotation",
+        "type": "Rotation",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "WorldScale",
+        "type": "Vector3",
+        "CanRead": true,
+        "CanWrite": true
+      }
+    ],
+    "methods": []
+  },
+  {
+    "type": "Sandbox.ColorAdjustments",
+    "constructors": [
+      "Void .ctor()"
+    ],
+    "properties": [
+      {
+        "Name": "Blend",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Saturation",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "HueRotate",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Brightness",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Contrast",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Scene",
+        "type": "Sandbox.Scene",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "Transform",
+        "type": "Sandbox.GameTransform",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "GameObject",
+        "type": "Sandbox.GameObject",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Components",
+        "type": "Sandbox.ComponentList",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "Enabled",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Active",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "IsValid",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "OnComponentEnabled",
+        "type": "System.Action",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "OnComponentStart",
+        "type": "System.Action",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "OnComponentUpdate",
+        "type": "System.Action",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "OnComponentFixedUpdate",
+        "type": "System.Action",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "OnComponentDisabled",
+        "type": "System.Action",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "OnComponentDestroy",
+        "type": "System.Action",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Tags",
+        "type": "Sandbox.ITagSet",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "DebugOverlay",
+        "type": "Sandbox.DebugOverlaySystem",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "Flags",
+        "type": "Sandbox.ComponentFlags",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Id",
+        "type": "System.Guid",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "LocalTransform",
+        "type": "Transform",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "LocalPosition",
+        "type": "Vector3",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "LocalRotation",
+        "type": "Rotation",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "LocalScale",
+        "type": "Vector3",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Network",
+        "type": "Sandbox.GameObject\u002BNetworkAccessor",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "IsProxy",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "ComponentVersion",
+        "type": "System.Int32",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "WorldTransform",
+        "type": "Transform",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "WorldPosition",
+        "type": "Vector3",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "WorldRotation",
+        "type": "Rotation",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "WorldScale",
+        "type": "Vector3",
+        "CanRead": true,
+        "CanWrite": true
+      }
+    ],
+    "methods": [
+      "Void Render()"
+    ]
+  },
+  {
+    "type": "Sandbox.Tonemapping",
+    "constructors": [
+      "Void .ctor()"
+    ],
+    "properties": [
+      {
+        "Name": "Mode",
+        "type": "Sandbox.Tonemapping\u002BTonemappingMode",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ExposureMethod",
+        "type": "Sandbox.Tonemapping\u002BExposureColorSpaceEnum",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "AutoExposureEnabled",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "MinimumExposure",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "MaximumExposure",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ExposureCompensation",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Rate",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ComponentVersion",
+        "type": "System.Int32",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "Scene",
+        "type": "Sandbox.Scene",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "Transform",
+        "type": "Sandbox.GameTransform",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "GameObject",
+        "type": "Sandbox.GameObject",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Components",
+        "type": "Sandbox.ComponentList",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "Enabled",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Active",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "IsValid",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "OnComponentEnabled",
+        "type": "System.Action",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "OnComponentStart",
+        "type": "System.Action",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "OnComponentUpdate",
+        "type": "System.Action",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "OnComponentFixedUpdate",
+        "type": "System.Action",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "OnComponentDisabled",
+        "type": "System.Action",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "OnComponentDestroy",
+        "type": "System.Action",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Tags",
+        "type": "Sandbox.ITagSet",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "DebugOverlay",
+        "type": "Sandbox.DebugOverlaySystem",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "Flags",
+        "type": "Sandbox.ComponentFlags",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Id",
+        "type": "System.Guid",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "LocalTransform",
+        "type": "Transform",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "LocalPosition",
+        "type": "Vector3",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "LocalRotation",
+        "type": "Rotation",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "LocalScale",
+        "type": "Vector3",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Network",
+        "type": "Sandbox.GameObject\u002BNetworkAccessor",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "IsProxy",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "WorldTransform",
+        "type": "Transform",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "WorldPosition",
+        "type": "Vector3",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "WorldRotation",
+        "type": "Rotation",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "WorldScale",
+        "type": "Vector3",
+        "CanRead": true,
+        "CanWrite": true
+      }
+    ],
+    "methods": [
+      "Void Render()"
+    ]
+  },
+  {
+    "type": "Sandbox.Bloom",
+    "constructors": [
+      "Void .ctor()"
+    ],
+    "properties": [
+      {
+        "Name": "Mode",
+        "type": "Sandbox.SceneCamera\u002BBloomAccessor\u002BBloomMode",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Strength",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Threshold",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Tint",
+        "type": "Color",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Gamma",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Filter",
+        "type": "Sandbox.Bloom\u002BFilterMode",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ComponentVersion",
+        "type": "System.Int32",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "Scene",
+        "type": "Sandbox.Scene",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "Transform",
+        "type": "Sandbox.GameTransform",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "GameObject",
+        "type": "Sandbox.GameObject",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Components",
+        "type": "Sandbox.ComponentList",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "Enabled",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Active",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "IsValid",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "OnComponentEnabled",
+        "type": "System.Action",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "OnComponentStart",
+        "type": "System.Action",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "OnComponentUpdate",
+        "type": "System.Action",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "OnComponentFixedUpdate",
+        "type": "System.Action",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "OnComponentDisabled",
+        "type": "System.Action",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "OnComponentDestroy",
+        "type": "System.Action",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Tags",
+        "type": "Sandbox.ITagSet",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "DebugOverlay",
+        "type": "Sandbox.DebugOverlaySystem",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "Flags",
+        "type": "Sandbox.ComponentFlags",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Id",
+        "type": "System.Guid",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "LocalTransform",
+        "type": "Transform",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "LocalPosition",
+        "type": "Vector3",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "LocalRotation",
+        "type": "Rotation",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "LocalScale",
+        "type": "Vector3",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Network",
+        "type": "Sandbox.GameObject\u002BNetworkAccessor",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "IsProxy",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "WorldTransform",
+        "type": "Transform",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "WorldPosition",
+        "type": "Vector3",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "WorldRotation",
+        "type": "Rotation",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "WorldScale",
+        "type": "Vector3",
+        "CanRead": true,
+        "CanWrite": true
+      }
+    ],
+    "methods": [
+      "Void Render()"
+    ]
+  },
+  {
+    "type": "Editor.Application",
+    "constructors": [],
+    "properties": [
+      {
+        "Name": "OnWidgetClicked",
+        "type": "System.Action\u00602[[Editor.Widget, Sandbox.Tools, Version=1.0.1.0, Culture=neutral, PublicKeyToken=null],[Editor.MouseEvent, Sandbox.Tools, Version=1.0.1.0, Culture=neutral, PublicKeyToken=null]]",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "DpiScale",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "CursorPosition",
+        "type": "Vector2",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "UnscaledCursorPosition",
+        "type": "Vector2",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "CursorDelta",
+        "type": "Vector2",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "MouseWheelDelta",
+        "type": "Vector2",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "KeyboardModifiers",
+        "type": "Sandbox.KeyboardModifiers",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "MouseButtons",
+        "type": "Sandbox.MouseButtons",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "FocusWidget",
+        "type": "Editor.Widget",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "HoveredWidget",
+        "type": "Editor.Widget",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "Editor",
+        "type": "Editor.EditorSystem",
+        "CanRead": true,
+        "CanWrite": false
+      }
+    ],
+    "methods": [
+      "Void SetStyles(System.String)",
+      "Void Spin()",
+      "Boolean IsKeyDown(Editor.KeyCode)",
+      "System.String KeyCodeToString(Editor.KeyCode)"
+    ]
+  },
+  {
+    "type": "Editor.DockWindow",
+    "constructors": [
+      "Void .ctor()"
+    ],
+    "properties": [
+      {
+        "Name": "DockManager",
+        "type": "Editor.DockManager",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "StateCookie",
+        "type": "System.String",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Title",
+        "type": "System.String",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Canvas",
+        "type": "Editor.Widget",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "MenuBar",
+        "type": "Editor.MenuBar",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "MenuWidget",
+        "type": "Editor.Widget",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "StatusBar",
+        "type": "Editor.StatusBar",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "StartCentered",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "IsDialog",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "CloseButtonVisible",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Enabled",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ReadOnly",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Parent",
+        "type": "Editor.Widget",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ContentMargins",
+        "type": "Sandbox.UI.Margin",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ContentRect",
+        "type": "Sandbox.Rect",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "Size",
+        "type": "Vector2",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "LocalRect",
+        "type": "Sandbox.Rect",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "ScreenRect",
+        "type": "Sandbox.Rect",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "Width",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Height",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "MinimumSize",
+        "type": "Vector2",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "MinimumWidth",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "MinimumHeight",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "FixedHeight",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "FixedWidth",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "FixedSize",
+        "type": "Vector2",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "MaximumWidth",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "MaximumHeight",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "MaximumSize",
+        "type": "Vector2",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Position",
+        "type": "Vector2",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Visible",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Hidden",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Name",
+        "type": "System.String",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "TranslucentBackground",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "NoSystemBackground",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "TransparentForMouseEvents",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ShowWithoutActivating",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "MouseTracking",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "AcceptDrops",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "IsFramelessWindow",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "IsTooltip",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "IsPopup",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "IsWindow",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "HasMaximizeButton",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "DeleteOnClose",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "DpiScale",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "IsFocused",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "IsActiveWindow",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "FocusMode",
+        "type": "Editor.FocusMode",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ContextMenuEnabled",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "WindowFlags",
+        "type": "Editor.WindowFlags",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Children",
+        "type": "System.Collections.Generic.IEnumerable\u00601[[Editor.Widget, Sandbox.Tools, Version=1.0.1.0, Culture=neutral, PublicKeyToken=null]]",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "Cursor",
+        "type": "Editor.CursorShape",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "PixmapCursor",
+        "type": "Editor.Pixmap",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ScreenPosition",
+        "type": "Vector2",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "FocusProxy",
+        "type": "Editor.Widget",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "IsUnderMouse",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "HorizontalSizeMode",
+        "type": "Editor.SizeMode",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "VerticalSizeMode",
+        "type": "Editor.SizeMode",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ToolTip",
+        "type": "System.String",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "StatusTip",
+        "type": "System.String",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ScreenGeometry",
+        "type": "Sandbox.Rect",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "WindowTitle",
+        "type": "System.String",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "IsMinimized",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "IsMaximized",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "WindowOpacity",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "UpdatesEnabled",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "DebugModeEnabled",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ProvidesDebugMode",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "IsPressed",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "IsDraggable",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "IsBeingDroppedOn",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "Layout",
+        "type": "Editor.Layout",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "IsValid",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      }
+    ],
+    "methods": [
+      "Void RestoreFromStateCookie()",
+      "Void RestoreLayout()",
+      "Void ResetLayout()",
+      "Void SaveLayout()",
+      "Void CreateDynamicViewMenu(Editor.Menu)"
+    ]
+  },
+  {
+    "type": "Editor.DockManager",
+    "constructors": [
+      "Void .ctor(Editor.Widget)"
+    ],
+    "properties": [
+      {
+        "Name": "DockTypes",
+        "type": "System.Collections.Generic.IEnumerable\u00601[[Editor.DockManager\u002BDockInfo, Sandbox.Tools, Version=1.0.1.0, Culture=neutral, PublicKeyToken=null]]",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "OnStateRestoring",
+        "type": "System.Action\u00601[[System.Collections.Generic.IReadOnlyCollection\u00601[[System.String, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "OnLayoutLoaded",
+        "type": "System.Action",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "State",
+        "type": "System.String",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Enabled",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ReadOnly",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Parent",
+        "type": "Editor.Widget",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ContentMargins",
+        "type": "Sandbox.UI.Margin",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ContentRect",
+        "type": "Sandbox.Rect",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "Size",
+        "type": "Vector2",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "LocalRect",
+        "type": "Sandbox.Rect",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "ScreenRect",
+        "type": "Sandbox.Rect",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "Width",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Height",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "MinimumSize",
+        "type": "Vector2",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "MinimumWidth",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "MinimumHeight",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "FixedHeight",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "FixedWidth",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "FixedSize",
+        "type": "Vector2",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "MaximumWidth",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "MaximumHeight",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "MaximumSize",
+        "type": "Vector2",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Position",
+        "type": "Vector2",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Visible",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Hidden",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Name",
+        "type": "System.String",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "TranslucentBackground",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "NoSystemBackground",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "TransparentForMouseEvents",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ShowWithoutActivating",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "MouseTracking",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "AcceptDrops",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "IsFramelessWindow",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "IsTooltip",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "IsPopup",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "IsWindow",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "HasMaximizeButton",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "DeleteOnClose",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "DpiScale",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "IsFocused",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "IsActiveWindow",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "FocusMode",
+        "type": "Editor.FocusMode",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ContextMenuEnabled",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "WindowFlags",
+        "type": "Editor.WindowFlags",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "Children",
+        "type": "System.Collections.Generic.IEnumerable\u00601[[Editor.Widget, Sandbox.Tools, Version=1.0.1.0, Culture=neutral, PublicKeyToken=null]]",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "Cursor",
+        "type": "Editor.CursorShape",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "PixmapCursor",
+        "type": "Editor.Pixmap",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ScreenPosition",
+        "type": "Vector2",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "FocusProxy",
+        "type": "Editor.Widget",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "IsUnderMouse",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "HorizontalSizeMode",
+        "type": "Editor.SizeMode",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "VerticalSizeMode",
+        "type": "Editor.SizeMode",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ToolTip",
+        "type": "System.String",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "StatusTip",
+        "type": "System.String",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ScreenGeometry",
+        "type": "Sandbox.Rect",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "WindowTitle",
+        "type": "System.String",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "IsMinimized",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "IsMaximized",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "WindowOpacity",
+        "type": "System.Single",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "UpdatesEnabled",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "DebugModeEnabled",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "ProvidesDebugMode",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "IsPressed",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "IsDraggable",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "IsBeingDroppedOn",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      },
+      {
+        "Name": "Layout",
+        "type": "Editor.Layout",
+        "CanRead": true,
+        "CanWrite": true
+      },
+      {
+        "Name": "IsValid",
+        "type": "System.Boolean",
+        "CanRead": true,
+        "CanWrite": false
+      }
+    ],
+    "methods": [
+      "Editor.DockWidget FindDockWidget(System.String)",
+      "Editor.DockWidget FindDockWidget(Editor.Widget)",
+      "Editor.DockWidget CreateDockWidget(System.String, System.String, Editor.Widget)",
+      "Void AddDock(Editor.DockWidget, Editor.DockArea)",
+      "Void AddDockFloating(Editor.DockWidget)",
+      "Void AddDock(Editor.DockWidget, Editor.DockArea, Editor.DockWidget)",
+      "Void AddDock(Editor.DockWidget, Editor.DockWidget)",
+      "Editor.DockWidget AddDock(System.String, System.String, Editor.Widget, Editor.DockArea, Editor.DockWidget)",
+      "Editor.DockWidget SetCentralWidget(Editor.Widget)",
+      "Boolean SetSplitterProportions(Editor.DockWidget, System.ReadOnlySpan\u00601[System.Single])",
+      "Boolean IsDockOpen(System.String)",
+      "Boolean IsDockOpen(Editor.Widget)",
+      "Void RemoveDock(Editor.DockWidget)",
+      "Boolean RaiseDock(System.String)",
+      "Boolean RaiseDock(Editor.Widget)",
+      "Void SetDockState(System.String, Boolean)",
+      "Editor.DockWidget OpenDock(System.String, Editor.DockArea, Editor.DockWidget)",
+      "Void Clear()",
+      "Void RegisterDockType(DockInfo)",
+      "Void AddDock(DockInfo)",
+      "Void RegisterDock(DockInfo)",
+      "Void UnregisterDockType(System.String)",
+      "Boolean RestoreState(System.String)"
+    ]
+  }
+]

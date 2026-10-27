@@ -1,0 +1,147 @@
+{
+  "scope": "Offline scene, mesh, soil and geometry-LOD audit. No native renderer/controller/navmesh/performance verification.",
+  "existingObjectsPreserved": 744,
+  "addedRendererObjects": 8,
+  "scenePropertiesAndExistingObjectsUnchanged": true,
+  "unrelatedModelDocsUnchanged": {
+    "ground": true,
+    "motor": true,
+    "barracks": true,
+    "command": true,
+    "workshop": true,
+    "yard": true,
+    "logistics": true,
+    "links": true
+  },
+  "vista": {
+    "vertices": 257040,
+    "normals": 255951,
+    "triangles": 111714,
+    "materials": [
+      "cascade_rock",
+      "concrete",
+      "glass",
+      "lamp",
+      "mud",
+      "mud_track",
+      "olive",
+      "plunge_basin",
+      "river",
+      "roof",
+      "shore_bank",
+      "shore_rock",
+      "steel",
+      "waterfall_0",
+      "waterfall_1",
+      "waterfall_2",
+      "waterfall_3",
+      "waterfall_current",
+      "waterfall_impact",
+      "waterfall_spray"
+    ],
+    "minimumDoubleTriangleArea": 0.09610687225184775
+  },
+  "vistaPhysicsShapes": 0,
+  "grass": [
+    {
+      "name": "grass_0_0",
+      "lodTriangles": [
+        7680,
+        1280,
+        896
+      ],
+      "rendererOnly": true
+    },
+    {
+      "name": "grass_0_1",
+      "lodTriangles": [
+        7680,
+        1280,
+        896
+      ],
+      "rendererOnly": true
+    },
+    {
+      "name": "grass_1_0",
+      "lodTriangles": [
+        7680,
+        1280,
+        896
+      ],
+      "rendererOnly": true
+    },
+    {
+      "name": "grass_1_1",
+      "lodTriangles": [
+        7680,
+        1280,
+        896
+      ],
+      "rendererOnly": true
+    },
+    {
+      "name": "grass_2_0",
+      "lodTriangles": [
+        7680,
+        1280,
+        896
+      ],
+      "rendererOnly": true
+    },
+    {
+      "name": "grass_2_1",
+      "lodTriangles": [
+        7680,
+        1280,
+        896
+      ],
+      "rendererOnly": true
+    },
+    {
+      "name": "grass_3_0",
+      "lodTriangles": [
+        7680,
+        1280,
+        896
+      ],
+      "rendererOnly": true
+    },
+    {
+      "name": "grass_3_1",
+      "lodTriangles": [
+        7680,
+        1280,
+        896
+      ],
+      "rendererOnly": true
+    }
+  ],
+  "grassTufts": 1024,
+  "rootSamples": 3072,
+  "rootHeightErrorRange": [
+    -1.9805849234318202,
+    0.5893213619667534
+  ],
+  "existingTreeSoilSamples": 525,
+  "soilRiseAtTreeRootsRange": [
+    0.15452103308756193,
+    10.421657395833321
+  ],
+  "grassLodTriangleSums": [
+    61440,
+    10240,
+    7168
+  ],
+  "sourceHashes": {
+    "Tools\\forestbase_floor.py": "e0985d9ce060bd8fe9b123757a8f7d752c9ae62018064cd4ea5c6d2ac8cefb4b",
+    "Tools\\forestbase_map.py": "021007163a78f0c11b39e120dae31bc5b5511424b88588f6f1e44ef7e0057416",
+    "Tools\\forestbase_floor_audit.py": "24a7530d7bb2fa292c74015ce3286d2a157f37ae254935b990da738e16a4f011",
+    "Assets\\shaders\\hc1grass.shader": "4308a7ec7bee3648bbbbeef3ef541dbcf82cc50089fab635a2fe008099addf5e"
+  },
+  "limitations": [
+    "Grass roots are sampled on exported soil, with up to 2.5-inch tolerance for local slope approximation.",
+    "Tree root transforms are unchanged. Soil rises by at most 12 inches, burying their bases rather than moving the trees.",
+    "LOD switch thresholds reuse the existing short-grass model values; native switching and visibility are unverified.",
+    "Added scene renderers and geometry require new native performance and multi-view acceptance."
+  ]
+}

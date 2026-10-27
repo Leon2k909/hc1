@@ -1,0 +1,11 @@
+"Layer0"
+{
+ shader "shaders/complex.shader"
+ F_ALPHA_TEST "1"
+ F_RENDER_BACKFACES "1"
+ TextureColor "materials/forestbase/vehicle_stencil_1_color.png"
+ TextureTranslucency "materials/forestbase/vehicle_stencil_1_alpha.png"
+ TextureNormal "materials/default/default_normal.tga"
+ TextureRoughness "[.74 .74 .74 0]"
+ g_flAlphaTestReference ".35"
+}

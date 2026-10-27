@@ -1,0 +1,1022 @@
+{
+  "status": "installed_offline_native_pending",
+  "scope": "Narrower connected waterfall crown and refitted shelves/impact parameters, reviewed together with the whole saved compound.",
+  "installedFiles": [
+    {
+      "from": "models/maps/forestbase/vista.obj",
+      "to": "Assets/models/maps/forestbase/vista.obj",
+      "beforeSha256": "cdfeedf32f6bbbb8928827bca8c285ad1ed35ec35cb61c009cb061530d5e20a7",
+      "sha256": "f317563ec7cb2f9f67ad6e5fc820f8178cefd0eb46f1008a4e72d44fdf900233"
+    },
+    {
+      "from": "materials/forestbase/waterfall_0.vmat",
+      "to": "Assets/materials/forestbase/waterfall_0.vmat",
+      "beforeSha256": "5d5df57fdb36ef79f96e06e50442d421179fa15e67da7b1894656313cd685ca6",
+      "sha256": "f5649398b778f8097ac57d954b597e0c4513eca8d87a5ffde8facac1ac9925c3"
+    },
+    {
+      "from": "materials/forestbase/waterfall_1.vmat",
+      "to": "Assets/materials/forestbase/waterfall_1.vmat",
+      "beforeSha256": "5d5df57fdb36ef79f96e06e50442d421179fa15e67da7b1894656313cd685ca6",
+      "sha256": "f5649398b778f8097ac57d954b597e0c4513eca8d87a5ffde8facac1ac9925c3"
+    },
+    {
+      "from": "materials/forestbase/waterfall_2.vmat",
+      "to": "Assets/materials/forestbase/waterfall_2.vmat",
+      "beforeSha256": "5d5df57fdb36ef79f96e06e50442d421179fa15e67da7b1894656313cd685ca6",
+      "sha256": "f5649398b778f8097ac57d954b597e0c4513eca8d87a5ffde8facac1ac9925c3"
+    },
+    {
+      "from": "materials/forestbase/waterfall_3.vmat",
+      "to": "Assets/materials/forestbase/waterfall_3.vmat",
+      "beforeSha256": "5d5df57fdb36ef79f96e06e50442d421179fa15e67da7b1894656313cd685ca6",
+      "sha256": "f5649398b778f8097ac57d954b597e0c4513eca8d87a5ffde8facac1ac9925c3"
+    },
+    {
+      "from": "materials/forestbase/plunge_basin.vmat",
+      "to": "Assets/materials/forestbase/plunge_basin.vmat",
+      "beforeSha256": "03dc3049f194e13bf491fa4175f3f940a38187123c8f697bc3c3c55267e909e7",
+      "sha256": "90d56cf8df89fa0ee2804f4198cc1fd2fa63bbc9711914dd997e078f928a816c"
+    }
+  ],
+  "preservationAudit": {
+    "scope": "Offline exported cascade and unrelated geometry preservation. No native shader, collision, animation or FPS verification.",
+    "allNineMainModelDocsUnchanged": {
+      "ground": true,
+      "motor": true,
+      "barracks": true,
+      "command": true,
+      "workshop": true,
+      "yard": true,
+      "logistics": true,
+      "links": true,
+      "vista": true
+    },
+    "sceneUnchanged": true,
+    "layoutUnchanged": true,
+    "unchangedMaterialGeometry": {
+      "concrete": true,
+      "glass": true,
+      "lamp": true,
+      "mud": true,
+      "mud_track": true,
+      "olive": true,
+      "plunge_basin": true,
+      "river": true,
+      "roof": true,
+      "shore_bank": true,
+      "shore_rock": true,
+      "steel": true,
+      "waterfall_current": true
+    },
+    "changedMaterialGeometry": [
+      "cascade_rock",
+      "waterfall_0",
+      "waterfall_1",
+      "waterfall_2",
+      "waterfall_3",
+      "waterfall_impact",
+      "waterfall_spray"
+    ],
+    "crownWidthMetresBefore": 33.400999999999996,
+    "crownWidthMetresAfter": 19.811999999999998,
+    "footWidthMetres": 16.256,
+    "cascadeGeometryAudit": {
+      "scope": "Offline OBJ geometry, new/refitted-rock principal-view rays, and all-column basin entry; no native shader/physics/performance proof.",
+      "triangleCount": 111714,
+      "newOrRefittedRockTriangles": 1836,
+      "oldRockTrianglesRefitted": 1836,
+      "streams": [
+        {
+          "material": "waterfall_0",
+          "rows": 129,
+          "columns": 25,
+          "widthRange": [
+            160,
+            195
+          ],
+          "maximumBacktrack": 0,
+          "entries": [
+            {
+              "point": [
+                110,
+                3072.552,
+                -255
+              ],
+              "basinRadiusSquared": 0.7791410166118476
+            },
+            {
+              "point": [
+                116.667,
+                3072.606,
+                -255
+              ],
+              "basinRadiusSquared": 0.7642284012473722
+            },
+            {
+              "point": [
+                123.333,
+                3072.851,
+                -255
+              ],
+              "basinRadiusSquared": 0.7488098212006599
+            },
+            {
+              "point": [
+                130,
+                3073.472,
+                -255
+              ],
+              "basinRadiusSquared": 0.7324050208624291
+            },
+            {
+              "point": [
+                136.667,
+                3074.491,
+                -255
+              ],
+              "basinRadiusSquared": 0.7150142291851197
+            },
+            {
+              "point": [
+                143.333,
+                3075.884,
+                -255
+              ],
+              "basinRadiusSquared": 0.6967647824443738
+            },
+            {
+              "point": [
+                150,
+                3077.256,
+                -255
+              ],
+              "basinRadiusSquared": 0.6787258352026073
+            },
+            {
+              "point": [
+                156.667,
+                3078.172,
+                -255
+              ],
+              "basinRadiusSquared": 0.6620006598868016
+            },
+            {
+              "point": [
+                163.333,
+                3078.895,
+                -255
+              ],
+              "basinRadiusSquared": 0.6458913758089253
+            },
+            {
+              "point": [
+                170,
+                3079.74,
+                -255
+              ],
+              "basinRadiusSquared": 0.6296190483586374
+            },
+            {
+              "point": [
+                176.667,
+                3080.849,
+                -255
+              ],
+              "basinRadiusSquared": 0.6128797674124653
+            },
+            {
+              "point": [
+                183.333,
+                3082.255,
+                -255
+              ],
+              "basinRadiusSquared": 0.5956483696508204
+            },
+            {
+              "point": [
+                190,
+                3083.836,
+                -255
+              ],
+              "basinRadiusSquared": 0.5782582624891218
+            },
+            {
+              "point": [
+                196.667,
+                3085.348,
+                -255
+              ],
+              "basinRadiusSquared": 0.5613137871097108
+            },
+            {
+              "point": [
+                203.333,
+                3086.578,
+                -255
+              ],
+              "basinRadiusSquared": 0.5453235860211937
+            },
+            {
+              "point": [
+                210,
+                3087.551,
+                -255
+              ],
+              "basinRadiusSquared": 0.5302402811116483
+            },
+            {
+              "point": [
+                216.667,
+                3088.381,
+                -255
+              ],
+              "basinRadiusSquared": 0.5158343081924235
+            },
+            {
+              "point": [
+                223.333,
+                3089.183,
+                -255
+              ],
+              "basinRadiusSquared": 0.5018865309657191
+            },
+            {
+              "point": [
+                230,
+                3090.057,
+                -255
+              ],
+              "basinRadiusSquared": 0.4882120236767944
+            },
+            {
+              "point": [
+                236.667,
+                3090.992,
+                -255
+              ],
+              "basinRadiusSquared": 0.4748823331128863
+            },
+            {
+              "point": [
+                243.333,
+                3091.939,
+                -255
+              ],
+              "basinRadiusSquared": 0.46205424569671516
+            },
+            {
+              "point": [
+                250,
+                3092.844,
+                -255
+              ],
+              "basinRadiusSquared": 0.44989272810153635
+            },
+            {
+              "point": [
+                256.667,
+                3093.78,
+                -255
+              ],
+              "basinRadiusSquared": 0.4382774403443557
+            },
+            {
+              "point": [
+                263.333,
+                3094.925,
+                -255
+              ],
+              "basinRadiusSquared": 0.4268348498754192
+            },
+            {
+              "point": [
+                270,
+                3096.429,
+                -255
+              ],
+              "basinRadiusSquared": 0.415233108316005
+            }
+          ]
+        },
+        {
+          "material": "waterfall_1",
+          "rows": 129,
+          "columns": 25,
+          "widthRange": [
+            160,
+            195
+          ],
+          "maximumBacktrack": 0,
+          "entries": [
+            {
+              "point": [
+                270,
+                3096.429,
+                -255
+              ],
+              "basinRadiusSquared": 0.415233108316005
+            },
+            {
+              "point": [
+                276.667,
+                3098.357,
+                -255
+              ],
+              "basinRadiusSquared": 0.4033283975882914
+            },
+            {
+              "point": [
+                283.333,
+                3100.574,
+                -255
+              ],
+              "basinRadiusSquared": 0.3914476230111122
+            },
+            {
+              "point": [
+                290,
+                3102.832,
+                -255
+              ],
+              "basinRadiusSquared": 0.3801958854114153
+            },
+            {
+              "point": [
+                296.667,
+                3104.801,
+                -255
+              ],
+              "basinRadiusSquared": 0.37040014835118507
+            },
+            {
+              "point": [
+                303.333,
+                3106.253,
+                -255
+              ],
+              "basinRadiusSquared": 0.362670554973516
+            },
+            {
+              "point": [
+                310,
+                3107.197,
+                -255
+              ],
+              "basinRadiusSquared": 0.3570572610862443
+            },
+            {
+              "point": [
+                316.667,
+                3107.778,
+                -255
+              ],
+              "basinRadiusSquared": 0.35326900009076584
+            },
+            {
+              "point": [
+                323.333,
+                3108.218,
+                -255
+              ],
+              "basinRadiusSquared": 0.350783761279614
+            },
+            {
+              "point": [
+                330,
+                3108.703,
+                -255
+              ],
+              "basinRadiusSquared": 0.34912157940512994
+            },
+            {
+              "point": [
+                336.667,
+                3109.254,
+                -255
+              ],
+              "basinRadiusSquared": 0.3482026104337366
+            },
+            {
+              "point": [
+                343.333,
+                3109.746,
+                -255
+              ],
+              "basinRadiusSquared": 0.34833209161689843
+            },
+            {
+              "point": [
+                350,
+                3110.308,
+                -255
+              ],
+              "basinRadiusSquared": 0.3491047963099393
+            },
+            {
+              "point": [
+                356.667,
+                3111.116,
+                -255
+              ],
+              "basinRadiusSquared": 0.34993790685583204
+            },
+            {
+              "point": [
+                363.333,
+                3112.323,
+                -255
+              ],
+              "basinRadiusSquared": 0.3502711323266947
+            },
+            {
+              "point": [
+                370,
+                3113.979,
+                -255
+              ],
+              "basinRadiusSquared": 0.3498163817915719
+            },
+            {
+              "point": [
+                376.667,
+                3116.08,
+                -255
+              ],
+              "basinRadiusSquared": 0.34843057256194615
+            },
+            {
+              "point": [
+                383.333,
+                3118.604,
+                -255
+              ],
+              "basinRadiusSquared": 0.3460174797574884
+            },
+            {
+              "point": [
+                390,
+                3121.508,
+                -255
+              ],
+              "basinRadiusSquared": 0.34253843794084243
+            },
+            {
+              "point": [
+                396.667,
+                3124.808,
+                -255
+              ],
+              "basinRadiusSquared": 0.33777802389030376
+            },
+            {
+              "point": [
+                403.333,
+                3128.542,
+                -255
+              ],
+              "basinRadiusSquared": 0.3314618310819398
+            },
+            {
+              "point": [
+                410,
+                3132.718,
+                -255
+              ],
+              "basinRadiusSquared": 0.3234162141062219
+            },
+            {
+              "point": [
+                416.667,
+                3137.295,
+                -255
+              ],
+              "basinRadiusSquared": 0.3136222924817065
+            },
+            {
+              "point": [
+                423.333,
+                3142.165,
+                -255
+              ],
+              "basinRadiusSquared": 0.30226752910562255
+            },
+            {
+              "point": [
+                430,
+                3147.013,
+                -255
+              ],
+              "basinRadiusSquared": 0.29010713300777174
+            }
+          ]
+        },
+        {
+          "material": "waterfall_2",
+          "rows": 129,
+          "columns": 25,
+          "widthRange": [
+            160,
+            195
+          ],
+          "maximumBacktrack": 0,
+          "entries": [
+            {
+              "point": [
+                430,
+                3147.013,
+                -255
+              ],
+              "basinRadiusSquared": 0.29010713300777174
+            },
+            {
+              "point": [
+                436.667,
+                3151.617,
+                -255
+              ],
+              "basinRadiusSquared": 0.2776602166179941
+            },
+            {
+              "point": [
+                443.333,
+                3155.741,
+                -255
+              ],
+              "basinRadiusSquared": 0.2655292695018864
+            },
+            {
+              "point": [
+                450,
+                3159.181,
+                -255
+              ],
+              "basinRadiusSquared": 0.25430136919604246
+            },
+            {
+              "point": [
+                456.667,
+                3161.845,
+                -255
+              ],
+              "basinRadiusSquared": 0.24436268164848515
+            },
+            {
+              "point": [
+                463.333,
+                3163.888,
+                -255
+              ],
+              "basinRadiusSquared": 0.2355698150350486
+            },
+            {
+              "point": [
+                470,
+                3165.522,
+                -255
+              ],
+              "basinRadiusSquared": 0.22769187067620905
+            },
+            {
+              "point": [
+                476.667,
+                3167.051,
+                -255
+              ],
+              "basinRadiusSquared": 0.22030477775136248
+            },
+            {
+              "point": [
+                483.333,
+                3168.842,
+                -255
+              ],
+              "basinRadiusSquared": 0.21286049452667707
+            },
+            {
+              "point": [
+                490,
+                3171.232,
+                -255
+              ],
+              "basinRadiusSquared": 0.20492076164314416
+            },
+            {
+              "point": [
+                496.667,
+                3174.438,
+                -255
+              ],
+              "basinRadiusSquared": 0.19637271779160242
+            },
+            {
+              "point": [
+                503.333,
+                3178.554,
+                -255
+              ],
+              "basinRadiusSquared": 0.18741262634797579
+            },
+            {
+              "point": [
+                510,
+                3183.481,
+                -255
+              ],
+              "basinRadiusSquared": 0.17862120075117824
+            },
+            {
+              "point": [
+                516.667,
+                3189.146,
+                -255
+              ],
+              "basinRadiusSquared": 0.1704550715187933
+            },
+            {
+              "point": [
+                523.333,
+                3195.406,
+                -255
+              ],
+              "basinRadiusSquared": 0.16337989106519765
+            },
+            {
+              "point": [
+                530,
+                3202.046,
+                -255
+              ],
+              "basinRadiusSquared": 0.15779117760881778
+            },
+            {
+              "point": [
+                536.667,
+                3208.73,
+                -255
+              ],
+              "basinRadiusSquared": 0.15399882892719172
+            },
+            {
+              "point": [
+                543.333,
+                3215.09,
+                -255
+              ],
+              "basinRadiusSquared": 0.15206586008316708
+            },
+            {
+              "point": [
+                550,
+                3220.998,
+                -255
+              ],
+              "basinRadiusSquared": 0.15158041303903866
+            },
+            {
+              "point": [
+                556.667,
+                3226.523,
+                -255
+              ],
+              "basinRadiusSquared": 0.15190326683755678
+            },
+            {
+              "point": [
+                563.333,
+                3231.765,
+                -255
+              ],
+              "basinRadiusSquared": 0.15248176674160643
+            },
+            {
+              "point": [
+                570,
+                3236.56,
+                -255
+              ],
+              "basinRadiusSquared": 0.15327436160834523
+            },
+            {
+              "point": [
+                576.667,
+                3240.438,
+                -255
+              ],
+              "basinRadiusSquared": 0.1548684223818024
+            },
+            {
+              "point": [
+                583.333,
+                3239.24,
+                -255
+              ],
+              "basinRadiusSquared": 0.16296358567985705
+            },
+            {
+              "point": [
+                590,
+                3237.673,
+                -255
+              ],
+              "basinRadiusSquared": 0.17173908019259299
+            }
+          ]
+        },
+        {
+          "material": "waterfall_3",
+          "rows": 129,
+          "columns": 25,
+          "widthRange": [
+            160,
+            195
+          ],
+          "maximumBacktrack": 0,
+          "entries": [
+            {
+              "point": [
+                590,
+                3237.673,
+                -255
+              ],
+              "basinRadiusSquared": 0.17173908019259299
+            },
+            {
+              "point": [
+                596.667,
+                3236.86,
+                -255
+              ],
+              "basinRadiusSquared": 0.17967102990875886
+            },
+            {
+              "point": [
+                603.333,
+                3236.516,
+                -255
+              ],
+              "basinRadiusSquared": 0.18712466095178865
+            },
+            {
+              "point": [
+                610,
+                3236.415,
+                -255
+              ],
+              "basinRadiusSquared": 0.1944373814846368
+            },
+            {
+              "point": [
+                616.667,
+                3236.39,
+                -255
+              ],
+              "basinRadiusSquared": 0.20188552148612007
+            },
+            {
+              "point": [
+                623.333,
+                3236.411,
+                -255
+              ],
+              "basinRadiusSquared": 0.2095546781295894
+            },
+            {
+              "point": [
+                630,
+                3236.487,
+                -255
+              ],
+              "basinRadiusSquared": 0.2174769926904562
+            },
+            {
+              "point": [
+                636.667,
+                3236.739,
+                -255
+              ],
+              "basinRadiusSquared": 0.2255247988130081
+            },
+            {
+              "point": [
+                643.333,
+                3237.285,
+                -255
+              ],
+              "basinRadiusSquared": 0.23359068281632686
+            },
+            {
+              "point": [
+                650,
+                3238.113,
+                -255
+              ],
+              "basinRadiusSquared": 0.2417680996558585
+            },
+            {
+              "point": [
+                656.667,
+                3238.773,
+                -255
+              ],
+              "basinRadiusSquared": 0.25069123673242477
+            },
+            {
+              "point": [
+                663.333,
+                3238.014,
+                -255
+              ],
+              "basinRadiusSquared": 0.261836583549951
+            },
+            {
+              "point": [
+                670,
+                3237.404,
+                -255
+              ],
+              "basinRadiusSquared": 0.27323515919365093
+            },
+            {
+              "point": [
+                676.667,
+                3237.265,
+                -255
+              ],
+              "basinRadiusSquared": 0.2845510251143606
+            },
+            {
+              "point": [
+                683.333,
+                3236.742,
+                -255
+              ],
+              "basinRadiusSquared": 0.296763626467067
+            },
+            {
+              "point": [
+                690,
+                3236.133,
+                -255
+              ],
+              "basinRadiusSquared": 0.3095251853422934
+            },
+            {
+              "point": [
+                696.667,
+                3235.323,
+                -255
+              ],
+              "basinRadiusSquared": 0.3229387753336901
+            },
+            {
+              "point": [
+                703.333,
+                3234.307,
+                -255
+              ],
+              "basinRadiusSquared": 0.3369855392677136
+            },
+            {
+              "point": [
+                710,
+                3233.224,
+                -255
+              ],
+              "basinRadiusSquared": 0.35152157998145933
+            },
+            {
+              "point": [
+                716.667,
+                3232.243,
+                -255
+              ],
+              "basinRadiusSquared": 0.36638946960126617
+            },
+            {
+              "point": [
+                723.333,
+                3231.543,
+                -255
+              ],
+              "basinRadiusSquared": 0.3814471878206883
+            },
+            {
+              "point": [
+                730,
+                3231.139,
+                -255
+              ],
+              "basinRadiusSquared": 0.3967224443876641
+            },
+            {
+              "point": [
+                736.667,
+                3230.92,
+                -255
+              ],
+              "basinRadiusSquared": 0.4123375109369826
+            },
+            {
+              "point": [
+                743.333,
+                3230.85,
+                -255
+              ],
+              "basinRadiusSquared": 0.428342189584545
+            },
+            {
+              "point": [
+                750,
+                3230.834,
+                -255
+              ],
+              "basinRadiusSquared": 0.44482265503595786
+            }
+          ]
+        }
+      ],
+      "sharedEdgeMaximumErrors": [
+        0,
+        0,
+        0
+      ],
+      "overallWidthRange": [
+        640,
+        780
+      ],
+      "ledgeRaySamples": 660,
+      "occludedByNewOrRefittedRock": [],
+      "candidateSha256": "f317563ec7cb2f9f67ad6e5fc820f8178cefd0eb46f1008a4e72d44fdf900233",
+      "baselineSha256": "cdfeedf32f6bbbb8928827bca8c285ad1ed35ec35cb61c009cb061530d5e20a7"
+    },
+    "sourceHashes": {
+      "Tools\\forestbase_cascade.py": "a06dae4ca401f1399a1a0f313f2e842fc4466eefb43e8753340dcee59753cc8a",
+      "Tools\\forestbase_cascade_audit.py": "8a282b611874fa1e2bfe1c90e4b1b50bcbbc71f9189b18bb5b7a674f30075870",
+      "Tools\\forestbase_cascade_width_audit.py": "e99e5ad5fa86c1d5031466984569fca597d865173a4bcd3bdccc9af011910c20"
+    }
+  },
+  "sceneUnchanged": true,
+  "layoutUnchanged": true,
+  "authoredCollisionSourcesUnchangedThisRevision": true,
+  "additionalDeclaredTriangles": 0,
+  "previews": [
+    {
+      "image": "output/forestbase/overview-water-baseline-compound.png",
+      "sha256": "7bdef83c878c5cc59e9247f7cbf784ec1b204bdd69360cdf50c99234e8234a4d",
+      "metadata": "output/forestbase/overview-water-baseline-compound.json",
+      "models": 629,
+      "lights": 37,
+      "scope": "Saved complete scene models and practical-light placements, forced LOD1, independent Blender energy/shading/tone approximations. No native fog, exposure, animation or performance validation."
+    },
+    {
+      "image": "output/forestbase/overview-water-narrow-compound.png",
+      "sha256": "11446716c26c922515d56dc33f7ba3ac71039a5777ef11b63089ee12930c88a5",
+      "metadata": "output/forestbase/overview-water-narrow-compound.json",
+      "models": 629,
+      "lights": 37,
+      "scope": "Saved complete scene models and practical-light placements, forced LOD1, independent Blender energy/shading/tone approximations. No native fog, exposure, animation or performance validation."
+    }
+  ],
+  "beforeSourceArchive": "output/forestbase/cascade-width-before",
+  "previewSourceNotes": "Before-preview source paths refer to the files present at render time. Replaced inputs are preserved at the same relative paths in beforeSourceArchive. Candidate preview paths remain in cascade-width-stage.",
+  "sourceHashes": {
+    "Tools/forestbase_cascade.py": "a06dae4ca401f1399a1a0f313f2e842fc4466eefb43e8753340dcee59753cc8a",
+    "Tools/forestbase_cascade_audit.py": "8a282b611874fa1e2bfe1c90e4b1b50bcbbc71f9189b18bb5b7a674f30075870",
+    "Tools/forestbase_cascade_width_audit.py": "e99e5ad5fa86c1d5031466984569fca597d865173a4bcd3bdccc9af011910c20",
+    "Tools/forestbase_overview_preview.py": "8ccd00ea7b12dbe30094393dd5e994c7c3ad4e7f4abe32fba2a70901c6a8f616",
+    "Tools/forestbase_waterfall_preview.py": "9c728f2a2e3f0c483239d386e5b7c06937033cf09a356b66c3857da84cc44397",
+    "Tools/FORESTBASE.md": "88bba288be9a8e22cabce8431a9b0187d99151ef92a4a8ad8d52f44adfbfaf6f",
+    "Assets/shaders/forestbase_waterfall.shader": "cc36dbe6d8158504bc7d7f3b586b50e287eff180fd2378a8e36a1de835e31889",
+    "Assets/materials/forestbase/waterfall_froth_v2.png": "24d20878ded3b5a641bd24049c95bdc20676466683ed0cdaaedd51d4a3419b84"
+  },
+  "nativeShaderCompileVerified": false,
+  "nativeAnimationVerified": false,
+  "nativeAppearanceVerified": false,
+  "nativePerformanceVerified": false,
+  "editorAccessed": false,
+  "limitations": [
+    "Overview images use independent Blender energy, static water and tone approximations, forced LOD1, and omit native fog, exposure behavior and live entities.",
+    "Shared gameplay camera ACES, map lighting, scene objects, terrain outside the cascade, and all authored collision sources are unchanged.",
+    "Wider forest density, courtyard cover/detail and architectural presentation still diverge visibly from the reference.",
+    "Fresh native traversal/spawn/escape, shader/water, LOD and performance checks remain outstanding."
+  ],
+  "additionalInspectionViews": [
+    {
+      "image": "output/forestbase/overview-water-narrow-yard.png",
+      "sha256": "8602772e8678452f6090bd402d88531120557d4d7bc92f2caf7c39b2025b8602",
+      "metadata": "output/forestbase/overview-water-narrow-yard.json",
+      "assessment": "Spawn-cover material close-up; view toward compound is occluded by the existing protected-spawn container. Not a broad yard acceptance view."
+    },
+    {
+      "image": "output/forestbase/overview-water-narrow-workshop.png",
+      "sha256": "2df1998ba31948b6df97272541a94085e5d05f1996035fb413efc518813cbb02",
+      "metadata": "output/forestbase/overview-water-narrow-workshop.json",
+      "assessment": "Workshop approach geometry inspection; independent Blender lighting/shading, no native appearance acceptance."
+    }
+  ],
+  "inspectionNotes": [
+    "The initial arbitrary yard camera was inside geometry and was rejected; the saved replacement is at a team-spawn eye location and is blocked by existing spawn cover. This does not establish a new gameplay collision failure.",
+    "Whole-compound and workshop views expose sparse wider forest, simplified architecture and insufficient reference cover/detail density; these remain work items."
+  ]
+}

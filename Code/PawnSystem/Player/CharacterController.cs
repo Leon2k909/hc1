@@ -285,6 +285,8 @@ public class CharacterController : Component
 	}
 
 	int _stuckTries;
+	Vector3 _lastUnstuckSafePosition;
+	bool _hasUnstuckSafePosition;
 
 	bool TryUnstuck()
 	{
@@ -304,6 +306,8 @@ public class CharacterController : Component
 		if ( !result.StartedSolid )
 		{
 			_stuckTries = 0;
+			_lastUnstuckSafePosition = WorldPosition;
+			_hasUnstuckSafePosition = true;
 			return false;
 		}
 
@@ -329,8 +333,23 @@ public class CharacterController : Component
 
 			if ( !result.StartedSolid )
 			{
+				// A free destination can be on the far side of a thin player clip.
+				// Check the root's path from its last clear position, ignoring ordinary
+				// props so recovery can still move out of the object trapping us.
+				// Use a point ray: a changed stance may make the old hull overlap a
+				// ceiling, while its root is still on the correct side of that ceiling.
+				var origin = _hasUnstuckSafePosition ? _lastUnstuckSafePosition : WorldPosition;
+				var clipTrace = Scene.Trace.Ray( origin, pos ).WithTag( "playerclip" )
+					.IgnoreGameObjectHierarchy( GameObject );
+				clipTrace = UseCollisionRules ? clipTrace.WithCollisionRules( Tags ) : clipTrace.WithoutTags( IgnoreLayers );
+				var clipHit = (_throughEnemies ? clipTrace.WithoutTags( EnemyTag ) : clipTrace).Run();
+				if ( clipHit.Hit || clipHit.StartedSolid )
+					continue;
+
 				//Log.Info( $"unstuck after {_stuckTries} tries ({_stuckTries * AttemptsPerTick} tests)" );
 				WorldPosition = pos;
+				_lastUnstuckSafePosition = pos;
+				_hasUnstuckSafePosition = true;
 				return false;
 			}
 		}

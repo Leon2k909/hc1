@@ -1,0 +1,293 @@
+{
+  "Scene": "forestbase",
+  "Name": "Forest Base verification camera",
+  "Id": "d0edbb6a-761d-4baf-8236-cf28a6b6ffd3",
+  "Enabled": true,
+  "ActiveInHierarchy": true,
+  "Tags": [],
+  "Parent": null,
+  "WorldPosition": "-2900,2600,2000",
+  "WorldRotation": "25.2700024,-39.9900017,0",
+  "WorldScale": "1,1,1",
+  "Components": [
+    {
+      "Type": "CameraComponent",
+      "Id": "e5fc50dd-cf13-407e-ace4-c3e77c4dc617",
+      "Enabled": true,
+      "Properties": {
+        "__type": "Sandbox.CameraComponent",
+        "__guid": "e5fc50dd-cf13-407e-ace4-c3e77c4dc617",
+        "__enabled": true,
+        "Flags": 0,
+        "BackgroundColor": "0.75478,0.83828,0.87624,1",
+        "ClearFlags": "All",
+        "EnablePostProcessing": true,
+        "FieldOfView": 90,
+        "FovAxis": "Horizontal",
+        "IsMainCamera": true,
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "Orthographic": false,
+        "OrthographicHeight": 1204,
+        "PostProcessAnchor": null,
+        "Priority": 8,
+        "RenderExcludeTags": "invis",
+        "RenderTags": "",
+        "RenderTexture": null,
+        "TargetEye": "None",
+        "Viewport": "0,0,1,1",
+        "ZFar": 100000,
+        "ZNear": 1
+      }
+    },
+    {
+      "Type": "AudioListener",
+      "Id": "521a90f8-700b-4a79-a2d5-6c8e68550eee",
+      "Enabled": true,
+      "Properties": {
+        "__type": "Sandbox.AudioListener",
+        "__guid": "521a90f8-700b-4a79-a2d5-6c8e68550eee",
+        "__enabled": true,
+        "Flags": 0,
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "UseCameraDirection": true
+      }
+    },
+    {
+      "Type": "Highlight",
+      "Id": "a3511eda-21ab-4673-973d-f08a2baf7735",
+      "Enabled": true,
+      "Properties": {
+        "__type": "Sandbox.Highlight",
+        "__guid": "a3511eda-21ab-4673-973d-f08a2baf7735",
+        "__enabled": true,
+        "Flags": 0,
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null
+      }
+    },
+    {
+      "Type": "Bloom",
+      "Id": "ac5c7626-f211-412b-aac3-42748b483c1b",
+      "Enabled": true,
+      "Properties": {
+        "__type": "Sandbox.Bloom",
+        "__guid": "ac5c7626-f211-412b-aac3-42748b483c1b",
+        "__enabled": true,
+        "Flags": 0,
+        "__version": 1,
+        "Mode": "Additive",
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "Strength": 0.1,
+        "Threshold": 1.6,
+        "Tint": "1,1,1,1"
+      }
+    },
+    {
+      "Type": "Tonemapping",
+      "Id": "49fdf53b-ca88-4b0b-9d95-8ce52f0b9ffa",
+      "Enabled": true,
+      "Properties": {
+        "__type": "Sandbox.Tonemapping",
+        "__guid": "49fdf53b-ca88-4b0b-9d95-8ce52f0b9ffa",
+        "__enabled": true,
+        "Flags": 0,
+        "__version": 3,
+        "AutoExposureEnabled": true,
+        "ExposureCompensation": 0,
+        "ExposureMethod": "RGB",
+        "MaximumExposure": 2,
+        "MinimumExposure": 1,
+        "Mode": "ACES",
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "Rate": 1
+      }
+    },
+    {
+      "Type": "Sharpen",
+      "Id": "e060820e-652f-4200-8273-50c158eb64b0",
+      "Enabled": true,
+      "Properties": {
+        "__type": "Sandbox.Sharpen",
+        "__guid": "e060820e-652f-4200-8273-50c158eb64b0",
+        "__enabled": true,
+        "Flags": 0,
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "Scale": 0.1,
+        "TexelSize": 1
+      }
+    },
+    {
+      "Type": "ChromaticAberration",
+      "Id": "6845a65a-fe62-4888-aa6a-7e535d185e78",
+      "Enabled": true,
+      "Properties": {
+        "__type": "Sandbox.ChromaticAberration",
+        "__guid": "6845a65a-fe62-4888-aa6a-7e535d185e78",
+        "__enabled": true,
+        "Flags": 0,
+        "Offset": "2,3,0",
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "Scale": 0
+      }
+    },
+    {
+      "Type": "Pixelate",
+      "Id": "178d0794-590a-4684-bad2-e045ac6b6bcd",
+      "Enabled": true,
+      "Properties": {
+        "__type": "Sandbox.Pixelate",
+        "__guid": "178d0794-590a-4684-bad2-e045ac6b6bcd",
+        "__enabled": true,
+        "Flags": 0,
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "Scale": 0
+      }
+    },
+    {
+      "Type": "ScreenShaker",
+      "Id": "43212a15-a9d1-4960-a637-1492c7beb44e",
+      "Enabled": true,
+      "Properties": {
+        "__type": "Facepunch.ScreenShaker",
+        "__guid": "43212a15-a9d1-4960-a637-1492c7beb44e",
+        "__enabled": true,
+        "Flags": 0,
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null
+      }
+    },
+    {
+      "Type": "AmbientOcclusion",
+      "Id": "fe2efa6a-2074-4198-8516-220088d3e03e",
+      "Enabled": true,
+      "Properties": {
+        "__type": "Sandbox.AmbientOcclusion",
+        "__guid": "fe2efa6a-2074-4198-8516-220088d3e03e",
+        "__enabled": true,
+        "Flags": 0,
+        "__version": 1,
+        "FalloffRange": 0.9,
+        "Intensity": 0.45,
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "Radius": 48,
+        "ThinCompensation": 1
+      }
+    },
+    {
+      "Type": "ColorAdjustments",
+      "Id": "b9b90af9-9fb6-4013-b458-db2f79a6aa84",
+      "Enabled": false,
+      "Properties": {
+        "__type": "Sandbox.ColorAdjustments",
+        "__guid": "b9b90af9-9fb6-4013-b458-db2f79a6aa84",
+        "__enabled": false,
+        "Flags": 0,
+        "Blend": 1,
+        "Brightness": 1,
+        "Contrast": 1.035,
+        "HueRotate": 0,
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "Saturation": 0.96
+      }
+    },
+    {
+      "Type": "Vignette",
+      "Id": "c5f87b06-8068-4500-8c3d-f0b902972c69",
+      "Enabled": true,
+      "Properties": {
+        "__type": "Sandbox.Vignette",
+        "__guid": "c5f87b06-8068-4500-8c3d-f0b902972c69",
+        "__enabled": true,
+        "Flags": 0,
+        "Center": "0.5,0.5",
+        "Color": "0,0,0,1",
+        "Intensity": 0.08,
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "Roundness": 1,
+        "Smoothness": 1
+      }
+    },
+    {
+      "Type": "DepthOfField",
+      "Id": "63e18dc4-f3b1-46cf-97d3-411dfa36a1ee",
+      "Enabled": false,
+      "Properties": {
+        "__type": "Sandbox.DepthOfField",
+        "__guid": "63e18dc4-f3b1-46cf-97d3-411dfa36a1ee",
+        "__enabled": false,
+        "Flags": 0,
+        "BackBlur": true,
+        "BlurSize": 30,
+        "DebugView": false,
+        "FocalDistance": 200,
+        "FocusRange": 500,
+        "FrontBlur": false,
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null
+      }
+    }
+  ],
+  "Children": []
+}

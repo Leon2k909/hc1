@@ -1,0 +1,71 @@
+{
+  "__guid": "175e84a0-f5eb-4225-ba6b-2725aa39c292",
+  "__version": 2,
+  "Flags": 0,
+  "Name": "Global effects schema",
+  "Position": "0,0,0",
+  "Rotation": "0,0,0,1",
+  "Scale": "1,1,1",
+  "Tags": "",
+  "Enabled": true,
+  "NetworkMode": 2,
+  "NetworkFlags": 0,
+  "NetworkOrphaned": 0,
+  "NetworkTransmit": true,
+  "OwnerTransfer": 1,
+  "Components": [
+    {
+      "__type": "Sandbox.PostProcessVolume",
+      "__guid": "bc35854a-9742-4afc-9b74-ef967fa619d0",
+      "__enabled": true,
+      "Flags": 0,
+      "BlendDistance": 50,
+      "BlendWeight": 1,
+      "EditorPreview": true,
+      "OnComponentDestroy": null,
+      "OnComponentDisabled": null,
+      "OnComponentEnabled": null,
+      "OnComponentFixedUpdate": null,
+      "OnComponentStart": null,
+      "OnComponentUpdate": null,
+      "Priority": 0,
+      "SceneVolume": {
+        "Type": "Infinite",
+        "Sphere": {
+          "Center": "0,0,0",
+          "Radius": 10
+        },
+        "Box": {
+          "Mins": "-50,-50,-50",
+          "Maxs": "50,50,50"
+        },
+        "Capsule": {
+          "CenterA": "0,0,10",
+          "CenterB": "0,0,90",
+          "Radius": 10
+        }
+      }
+    },
+    {
+      "__type": "Sandbox.Tonemapping",
+      "__guid": "0243ca32-7da2-4ed4-8429-fe1ba9a338a5",
+      "__enabled": true,
+      "Flags": 0,
+      "__version": 3,
+      "AutoExposureEnabled": true,
+      "ExposureCompensation": 0,
+      "ExposureMethod": "RGB",
+      "MaximumExposure": 3,
+      "MinimumExposure": 1,
+      "Mode": "HableFilmic",
+      "OnComponentDestroy": null,
+      "OnComponentDisabled": null,
+      "OnComponentEnabled": null,
+      "OnComponentFixedUpdate": null,
+      "OnComponentStart": null,
+      "OnComponentUpdate": null,
+      "Rate": 1
+    }
+  ],
+  "Children": []
+}

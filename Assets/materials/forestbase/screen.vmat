@@ -1,0 +1,16 @@
+// Tools/forestbase_materials.py
+"Layer0"
+{
+ shader "shaders/complex.shader"
+ F_SPECULAR "1"
+ g_flMetalness "0"
+ TextureColor "materials/forestbase/screen_color.png"
+ TextureNormal "materials/forestbase/screen_normal.png"
+ TextureRoughness "materials/forestbase/screen_rough.png"
+ TextureAmbientOcclusion "materials/default/default_ao.tga"
+ g_flModelTintAmount "1"
+ F_SELF_ILLUM "1"
+ TextureSelfIllumMask "[1 1 1 0]"
+ g_flSelfIllumAlbedoFactor "1"
+ g_flSelfIllumBrightness "0.6"
+}

@@ -1,0 +1,68 @@
+<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:modeldoc29:version{3cec427c-1b0e-4d48-a90a-0436f33a6041} -->
+{
+	rootNode =
+	{
+		_class = "RootNode"
+		children =
+		[
+			{
+				_class = "MaterialGroupList"
+				children =
+				[
+					{
+						_class = "DefaultMaterialGroup"
+						remaps =
+						[
+							{ from = "cascade_rock.vmat" to = "materials/forestbase/cascade_rock.vmat" },
+							{ from = "concrete.vmat" to = "materials/forestbase/scans/concrete_floor_02.vmat" },
+							{ from = "forest_soil.vmat" to = "materials/forestbase/forest_soil.vmat" },
+							{ from = "glass.vmat" to = "materials/forestbase/glass.vmat" },
+							{ from = "lamp.vmat" to = "materials/forestbase/lamp.vmat" },
+							{ from = "mud.vmat" to = "materials/forestbase/scans/mud_forest.vmat" },
+							{ from = "mud_track.vmat" to = "materials/forestbase/scans/muddy_tracks.vmat" },
+							{ from = "olive.vmat" to = "materials/forestbase/olive.vmat" },
+							{ from = "plunge_basin.vmat" to = "materials/forestbase/plunge_basin.vmat" },
+							{ from = "river.vmat" to = "materials/forestbase/river.vmat" },
+							{ from = "roof.vmat" to = "materials/forestbase/scans/corrugated_iron_02.vmat" },
+							{ from = "shore_bank.vmat" to = "materials/forestbase/shore_bank.vmat" },
+							{ from = "shore_rock.vmat" to = "materials/forestbase/shore_rock.vmat" },
+							{ from = "steel.vmat" to = "materials/forestbase/scans/metal_plate_02.vmat" },
+							{ from = "waterfall_0.vmat" to = "materials/forestbase/waterfall_0.vmat" },
+							{ from = "waterfall_1.vmat" to = "materials/forestbase/waterfall_0.vmat" },
+							{ from = "waterfall_2.vmat" to = "materials/forestbase/waterfall_0.vmat" },
+							{ from = "waterfall_3.vmat" to = "materials/forestbase/waterfall_0.vmat" },
+							{ from = "waterfall_current.vmat" to = "materials/forestbase/waterfall_current.vmat" },
+							{ from = "waterfall_impact.vmat" to = "materials/forestbase/waterfall_impact.vmat" },
+							{ from = "waterfall_spray.vmat" to = "materials/forestbase/waterfall_spray.vmat" }
+						]
+						use_global_default = false
+						global_default_material = ""
+					},
+				]
+			},
+			{
+				_class = "RenderMeshList"
+				children =
+				[
+					{
+						_class = "RenderMeshFile"
+						name = "vista"
+						filename = "models/maps/forestbase/vista.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+				]
+			},
+		]
+		model_archetype = ""
+		primary_associated_entity = ""
+		anim_graph_name = ""
+		base_model_name = ""
+	}
+}

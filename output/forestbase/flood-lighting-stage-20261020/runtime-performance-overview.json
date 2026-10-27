@@ -1,0 +1,153 @@
+{
+  "Window": {
+    "Frames": 2,
+    "Seconds": 0
+  },
+  "Fps": 0,
+  "TargetFps": 90,
+  "TargetSource": "fps_max_inactive",
+  "LimitedBy": "",
+  "MeetingTarget": false,
+  "Rating": "Info",
+  "Frame": {
+    "AvgMs": 0,
+    "P50Ms": 0,
+    "P99Ms": 0,
+    "MaxMs": 0
+  },
+  "CpuWork": {
+    "AvgMs": 0,
+    "P50Ms": 0,
+    "P99Ms": 0,
+    "MaxMs": 0
+  },
+  "Gpu": null,
+  "CapWait": {
+    "AvgMs": 0,
+    "P50Ms": 0,
+    "P99Ms": 0,
+    "MaxMs": 0
+  },
+  "PerfHubWindow": null,
+  "Hitches": {
+    "Count": 0,
+    "OverMs": 0,
+    "WorstMs": 0
+  },
+  "Issues": [
+    {
+      "Severity": "Warning",
+      "Title": "Video memory",
+      "Detail": "2.93 / 3.63 GiB (81%)",
+      "MoreIn": "perf_memory"
+    }
+  ],
+  "MainThread": [
+    {
+      "Name": "Render",
+      "AvgMs": 1325.64,
+      "MaxMs": 7562.66
+    },
+    {
+      "Name": "Update",
+      "AvgMs": 7.39,
+      "MaxMs": 34.71
+    },
+    {
+      "Name": "Audio",
+      "AvgMs": 4.02,
+      "MaxMs": 9.99
+    },
+    {
+      "Name": "Editor",
+      "AvgMs": 4.02,
+      "MaxMs": 18.34
+    },
+    {
+      "Name": "UI",
+      "AvgMs": 3.22,
+      "MaxMs": 37.8
+    },
+    {
+      "Name": "Animation",
+      "AvgMs": 3.21,
+      "MaxMs": 13.12
+    },
+    {
+      "Name": "Async",
+      "AvgMs": 2.97,
+      "MaxMs": 65.42
+    },
+    {
+      "Name": "GcPause",
+      "AvgMs": 2.76,
+      "MaxMs": 46.28
+    }
+  ],
+  "GpuPasses": [
+    {
+      "Name": "Dynamic Opaque Forward",
+      "AvgMs": 217.22,
+      "MaxMs": 217.22,
+      "Path": "RenderToSwapChain / Dynamic Opaque Forward"
+    },
+    {
+      "Name": "Depth Normal Prepass (Small)",
+      "AvgMs": 166.71,
+      "MaxMs": 166.71,
+      "Path": "RenderToSwapChain / Depth Normal Prepass (Small)"
+    },
+    {
+      "Name": "ScreenSpaceReflections",
+      "AvgMs": 145.38,
+      "MaxMs": 145.38,
+      "Path": "Managed: AfterDepthPrepass / ScreenSpaceReflections"
+    },
+    {
+      "Name": "DrawDepthOpaque",
+      "AvgMs": 131.65,
+      "MaxMs": 131.65,
+      "Path": "Sandbox.SceneSpotLight_Shadow / DrawDepthOpaque"
+    },
+    {
+      "Name": "DrawDepthOpaque",
+      "AvgMs": 92.73,
+      "MaxMs": 92.73,
+      "Path": "CSM Cascade 2 / DrawDepthOpaque"
+    },
+    {
+      "Name": "Bloom",
+      "AvgMs": 86.9,
+      "MaxMs": 86.9,
+      "Path": "Managed: BeforePostProcessing / Bloom"
+    },
+    {
+      "Name": "AO Denoise",
+      "AvgMs": 74.52,
+      "MaxMs": 74.52,
+      "Path": "Ambient Occlusion / AO Denoise"
+    },
+    {
+      "Name": "Depth Normal Prepass (Large)",
+      "AvgMs": 67.89,
+      "MaxMs": 67.89,
+      "Path": "RenderToSwapChain / Depth Normal Prepass (Large)"
+    }
+  ],
+  "Memory": {
+    "ProcessMiB": 4795.9,
+    "VideoMemory": {
+      "UsedMiB": 2995.8,
+      "BudgetMiB": 3716.6
+    },
+    "AllocatedMiBPerSecond": 3.8,
+    "GcPauseMsLastSecond": 0,
+    "GcLastSecond": {
+      "Gen0": 0,
+      "Gen1": 0,
+      "Gen2": 0
+    }
+  },
+  "DrawCalls": 1342,
+  "Triangles": 13851147
+}

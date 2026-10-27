@@ -1,0 +1,11 @@
+"Layer0"
+{
+ shader "shaders/forestbase_coating.shader"
+ F_SPECULAR "1"
+ TextureColor "materials/forestbase/truck041/paint_color.png"
+ TextureNormal "materials/forestbase/truck041/paint_normal.png"
+ TextureRoughness "materials/forestbase/truck041/paint_rough.png"
+ TextureAmbientOcclusion "materials/default/default_ao.tga"
+ g_flCoatingMetalness "0.08"
+ g_flModelTintAmount "1"
+}

@@ -1,0 +1,113 @@
+{
+  "auditUtc": "2026-10-19T14:11:25.708740+00:00",
+  "phase": "Broader crown channels and continuous distant ridge with overlapping scans",
+  "physicsIdentical": true,
+  "physicsSha256": "81d8a371f00911ebf03b275dd3f1fc756b1d55478a2e70b29cdcdc698fb6d9af",
+  "waterGeometry": [
+    {
+      "material": "waterfall_0",
+      "rows": 73,
+      "uniqueVertices": 4608,
+      "topHeight": 1139.648375,
+      "bottomHeight": -345.0,
+      "maximumBacktrack": 0.0,
+      "impactPlan": [
+        185.4759098801414,
+        3173.9530000000004,
+        -255
+      ],
+      "basinRadiusSquared": 0.3948477516800566,
+      "widthRange": [
+        70.49499999999998,
+        250.0
+      ]
+    },
+    {
+      "material": "waterfall_1",
+      "rows": 73,
+      "uniqueVertices": 4608,
+      "topHeight": 1107.890625,
+      "bottomHeight": -345.0,
+      "maximumBacktrack": 0.0,
+      "impactPlan": [
+        347.53892533613174,
+        3195.598,
+        -255
+      ],
+      "basinRadiusSquared": 0.1735217825256518,
+      "widthRange": [
+        109.142,
+        314.51599999999996
+      ]
+    },
+    {
+      "material": "waterfall_2",
+      "rows": 73,
+      "uniqueVertices": 4608,
+      "topHeight": 887.14734375,
+      "bottomHeight": -345.0,
+      "maximumBacktrack": 4.547473508864641e-13,
+      "impactPlan": [
+        537.0970642688442,
+        3267.6559999999995,
+        -255
+      ],
+      "basinRadiusSquared": 0.09105886494802842,
+      "widthRange": [
+        84.91400000000004,
+        259.24800000000005
+      ]
+    },
+    {
+      "material": "waterfall_3",
+      "rows": 73,
+      "uniqueVertices": 4608,
+      "topHeight": 1227.3681875,
+      "bottomHeight": -345.0,
+      "maximumBacktrack": 4.547473508864641e-13,
+      "impactPlan": [
+        685.2380884414092,
+        3344.4049999999997,
+        -255
+      ],
+      "basinRadiusSquared": 0.22664551298773888,
+      "widthRange": [
+        54.36400000000003,
+        180.00800000000004
+      ]
+    }
+  ],
+  "nominalCrownSpanMeters": 30.861,
+  "vistaTriangles": 82486,
+  "distantScanInstances": 3,
+  "nativeQaUtc": "2026-10-09T22:28:38.467529+00:00",
+  "nativeScope": "Full 18-view capture on 10 October; no new editor access during this audit.",
+  "modelErrors": 0,
+  "spawnChecks": 32,
+  "boundarySamples": 6,
+  "vehicleSamples": 4,
+  "blockedSampledSpawnRays": 112,
+  "selectiveCaptureVerified": [
+    "waterfall"
+  ],
+  "editorBuild": "0 errors, 3 existing warnings on 10 October",
+  "hashes": {
+    "Tools\\forestbase_cascade.py": "8505b2828acd7179d5e34d2f18e8762e3f9d1dc293983988f0ce1a6595110c5e",
+    "Tools\\forestbase_water.py": "22a15cd328cfcdcfe8ee29e7ce8d399c37654b7d7a13f5fb025dfd5ca9bb2f0f",
+    "Tools\\forestbase_map.py": "2aeadefe32955be5dec0ab44d093d1ea42c1b01620ae9c4b57024504683f0f7a",
+    "Editor\\Hc1ForestBaseQa.cs": "398e145224406b9aadf860064d113ab653e62d3c5b6efa4ca98df25fbe6c206a",
+    "Assets\\shaders\\forestbase_cascade_rock.shader": "f52522fe1e1489ad4bb7a6e287b3e3f20cfbc27f0670fd7e66b0bcffa038abef",
+    "Assets\\shaders\\forestbase_cliff_infill.shader": "3fd113cc89f28956c6936caa1a3bd0af252086fbefc6d13e2bf8cf1cc679cc3d",
+    "Assets\\materials\\forestbase\\cascade_rock.vmat": "668af5bb4507ee70b01ebf71c8a6c0dc07a1b638979ddbcb9d8290a22756a23f",
+    "Assets\\models\\maps\\forestbase\\vista.obj": "3c9d8b233fae4cb8b7bcab090511f473fd08aa0c1861686b1360d0646c4dc36b",
+    "Assets\\models\\maps\\forestbase\\vista.vmdl": "a97deeba3161dad1ec49c53d5e1f70fdbb4cb34d33e4db351808ac2d4382ace1",
+    "Assets\\scenes\\maps\\ForestBase\\forestbase.scene": "c6a3a29243c9264735ef8dca9bd9a727ad23b663c58cf647c73e36736112ce4b",
+    "Assets\\materials\\forestbase\\plunge_basin.vmat": "4223757294fc9d0543258c9f20d0e3a3b45015456da16a4edb2925f37f45f70c"
+  },
+  "limitations": [
+    "Other viewpoints still need visual scrutiny.",
+    "The reference terraced cascade and full visual finish remain incomplete.",
+    "Current performance and 10\u201315 remote clients remain unverified."
+  ],
+  "workflowConstraint": "User reserves S&box editor for another project; continue offline only until released."
+}

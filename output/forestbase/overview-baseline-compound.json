@@ -1,0 +1,3032 @@
+{
+  "scope": "Saved complete scene models and practical-light placements, forced LOD1, independent Blender energy/shading/tone approximations. No native fog, exposure, animation or performance validation.",
+  "renderer": "Blender Cycles CPU",
+  "samples": 24,
+  "view": "overview-baseline-compound.png",
+  "scenePath": "Assets\\scenes\\maps\\ForestBase\\forestbase.scene",
+  "sceneSha256": "30f9ed3ef41ba0872f591f8a24a7a528edf5eb1eb5859339cc804c1e47abdc7b",
+  "practicalLightEnergyScale": 65,
+  "worldStrength": 2,
+  "instances": [
+    {
+      "name": "Ground",
+      "model": "models/maps/forestbase/ground.vmdl"
+    },
+    {
+      "name": "Motor",
+      "model": "models/maps/forestbase/motor.vmdl"
+    },
+    {
+      "name": "Barracks",
+      "model": "models/maps/forestbase/barracks.vmdl"
+    },
+    {
+      "name": "Command",
+      "model": "models/maps/forestbase/command.vmdl"
+    },
+    {
+      "name": "Workshop",
+      "model": "models/maps/forestbase/workshop.vmdl"
+    },
+    {
+      "name": "Yard",
+      "model": "models/maps/forestbase/yard.vmdl"
+    },
+    {
+      "name": "Logistics",
+      "model": "models/maps/forestbase/logistics.vmdl"
+    },
+    {
+      "name": "Links",
+      "model": "models/maps/forestbase/links.vmdl"
+    },
+    {
+      "name": "Vista",
+      "model": "models/maps/forestbase/vista.vmdl"
+    },
+    {
+      "name": "Shore boulder 0",
+      "model": "models/maps/forestbase/shore_boulder.vmdl"
+    },
+    {
+      "name": "Shore boulder 1",
+      "model": "models/maps/forestbase/shore_boulder.vmdl"
+    },
+    {
+      "name": "Shore boulder 2",
+      "model": "models/maps/forestbase/shore_boulder.vmdl"
+    },
+    {
+      "name": "Shore boulder 3",
+      "model": "models/maps/forestbase/shore_boulder.vmdl"
+    },
+    {
+      "name": "Shore boulder 4",
+      "model": "models/maps/forestbase/shore_boulder.vmdl"
+    },
+    {
+      "name": "Shore boulder 5",
+      "model": "models/maps/forestbase/shore_boulder.vmdl"
+    },
+    {
+      "name": "Shore grass 0",
+      "model": "models/maps/forestbase/shore_grass.vmdl"
+    },
+    {
+      "name": "Shore grass 1",
+      "model": "models/maps/forestbase/shore_grass.vmdl"
+    },
+    {
+      "name": "Shore grass 2",
+      "model": "models/maps/forestbase/shore_grass.vmdl"
+    },
+    {
+      "name": "Shore grass 3",
+      "model": "models/maps/forestbase/shore_grass.vmdl"
+    },
+    {
+      "name": "Shore grass 4",
+      "model": "models/maps/forestbase/shore_grass.vmdl"
+    },
+    {
+      "name": "Shore grass 5",
+      "model": "models/maps/forestbase/shore_grass.vmdl"
+    },
+    {
+      "name": "Shore grass 6",
+      "model": "models/maps/forestbase/shore_grass.vmdl"
+    },
+    {
+      "name": "Shore grass 7",
+      "model": "models/maps/forestbase/shore_grass.vmdl"
+    },
+    {
+      "name": "Shore grass 8",
+      "model": "models/maps/forestbase/shore_grass.vmdl"
+    },
+    {
+      "name": "Shore grass 9",
+      "model": "models/maps/forestbase/shore_grass.vmdl"
+    },
+    {
+      "name": "Shore grass 10",
+      "model": "models/maps/forestbase/shore_grass.vmdl"
+    },
+    {
+      "name": "Shore grass 11",
+      "model": "models/maps/forestbase/shore_grass.vmdl"
+    },
+    {
+      "name": "Shore grass 12",
+      "model": "models/maps/forestbase/shore_grass.vmdl"
+    },
+    {
+      "name": "Shore grass 13",
+      "model": "models/maps/forestbase/shore_grass.vmdl"
+    },
+    {
+      "name": "Shore grass 14",
+      "model": "models/maps/forestbase/shore_grass.vmdl"
+    },
+    {
+      "name": "Shore grass 15",
+      "model": "models/maps/forestbase/shore_grass.vmdl"
+    },
+    {
+      "name": "Shore grass 16",
+      "model": "models/maps/forestbase/shore_grass.vmdl"
+    },
+    {
+      "name": "Shore grass 17",
+      "model": "models/maps/forestbase/shore_grass.vmdl"
+    },
+    {
+      "name": "Shore grass 18",
+      "model": "models/maps/forestbase/shore_grass.vmdl"
+    },
+    {
+      "name": "Shore grass 19",
+      "model": "models/maps/forestbase/shore_grass.vmdl"
+    },
+    {
+      "name": "Shore grass 20",
+      "model": "models/maps/forestbase/shore_grass.vmdl"
+    },
+    {
+      "name": "Shore grass 21",
+      "model": "models/maps/forestbase/shore_grass.vmdl"
+    },
+    {
+      "name": "Shore grass 22",
+      "model": "models/maps/forestbase/shore_grass.vmdl"
+    },
+    {
+      "name": "Shore grass 23",
+      "model": "models/maps/forestbase/shore_grass.vmdl"
+    },
+    {
+      "name": "Rock 87",
+      "model": "models/maps/forestbase/forest_boulder.vmdl"
+    },
+    {
+      "name": "Fir 0 0",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 0 1",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 0 2",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 0 3",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 0 4",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 0 5",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 0 6",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 0 7",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 0 8",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 0 9",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 0 10",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 0 11",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 0 12",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 0 13",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 0 14",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 0 15",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 0 16",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 0 17",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 0 18",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 0 19",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 0 20",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 0 21",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 0 22",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 0 23",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 0 24",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 0 25",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 0 26",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 0 27",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 0 28",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 0 29",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 0 30",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 0 31",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 0 32",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 0 33",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 0 34",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 0 35",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 0 36",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 0 37",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 0 38",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 0 39",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 0 40",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 0 41",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 0 42",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 0 43",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 0 44",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 0 45",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 0 46",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 0 47",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 1 0",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 1 1",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 1 2",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 1 3",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 1 4",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 1 5",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 1 6",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 1 7",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 1 8",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 1 9",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 1 10",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 1 11",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 1 12",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 1 13",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 1 14",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 1 15",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 1 16",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 1 17",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 1 18",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 1 19",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 1 20",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 1 21",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 1 22",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 1 23",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 1 24",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 1 25",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 1 26",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 1 27",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 1 28",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 1 29",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 1 30",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 1 31",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 1 32",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 1 33",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 1 34",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 1 35",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 1 36",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 1 37",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 1 38",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 1 39",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 1 40",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 1 41",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 1 42",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 1 43",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 1 44",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 1 45",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 1 46",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 1 47",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 2 0",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 2 1",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 2 2",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 2 3",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 2 4",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 2 5",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 2 6",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 2 7",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 2 8",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 2 9",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 2 10",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 2 11",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 2 12",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 2 13",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 2 14",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 2 15",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 2 16",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 2 17",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 2 18",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 2 19",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 2 20",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 2 21",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 2 22",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 2 23",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 2 24",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 2 25",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 2 26",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 2 27",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 2 28",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 2 29",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 2 30",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 2 31",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 2 32",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 2 33",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 2 34",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 2 35",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 2 36",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 2 37",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 2 38",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 2 39",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 2 40",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 2 41",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 2 42",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 2 43",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 2 44",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 2 45",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 2 46",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 2 47",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 3 0",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 3 1",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 3 2",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 3 5",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 3 6",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 3 7",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 3 8",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 3 9",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 3 10",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 3 11",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 3 12",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 3 14",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 3 16",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 3 17",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 3 19",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 3 20",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 3 21",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 3 22",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 3 23",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 3 25",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 3 26",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 3 27",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 3 28",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 3 29",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 3 30",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 3 32",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 3 33",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 3 34",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 3 36",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 3 37",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 3 39",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 3 40",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Fir 3 41",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 3 42",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 3 44",
+      "model": "models/maps/forestbase/fir/fir_c.vmdl"
+    },
+    {
+      "name": "Fir 3 45",
+      "model": "models/maps/forestbase/fir/fir_a.vmdl"
+    },
+    {
+      "name": "Fir 3 46",
+      "model": "models/maps/forestbase/fir/fir_b.vmdl"
+    },
+    {
+      "name": "Young fir 0 0",
+      "model": "models/maps/forestbase/sapling/sapling_a.vmdl"
+    },
+    {
+      "name": "Young fir 0 1",
+      "model": "models/maps/forestbase/sapling/sapling_b.vmdl"
+    },
+    {
+      "name": "Young fir 0 2",
+      "model": "models/maps/forestbase/sapling/sapling_c.vmdl"
+    },
+    {
+      "name": "Young fir 0 3",
+      "model": "models/maps/forestbase/sapling/sapling_a.vmdl"
+    },
+    {
+      "name": "Young fir 0 4",
+      "model": "models/maps/forestbase/sapling/sapling_b.vmdl"
+    },
+    {
+      "name": "Young fir 0 5",
+      "model": "models/maps/forestbase/sapling/sapling_c.vmdl"
+    },
+    {
+      "name": "Young fir 0 6",
+      "model": "models/maps/forestbase/sapling/sapling_a.vmdl"
+    },
+    {
+      "name": "Young fir 0 7",
+      "model": "models/maps/forestbase/sapling/sapling_b.vmdl"
+    },
+    {
+      "name": "Young fir 0 8",
+      "model": "models/maps/forestbase/sapling/sapling_c.vmdl"
+    },
+    {
+      "name": "Young fir 0 9",
+      "model": "models/maps/forestbase/sapling/sapling_a.vmdl"
+    },
+    {
+      "name": "Young fir 0 10",
+      "model": "models/maps/forestbase/sapling/sapling_b.vmdl"
+    },
+    {
+      "name": "Young fir 0 11",
+      "model": "models/maps/forestbase/sapling/sapling_c.vmdl"
+    },
+    {
+      "name": "Young fir 0 12",
+      "model": "models/maps/forestbase/sapling/sapling_a.vmdl"
+    },
+    {
+      "name": "Young fir 0 13",
+      "model": "models/maps/forestbase/sapling/sapling_b.vmdl"
+    },
+    {
+      "name": "Young fir 0 14",
+      "model": "models/maps/forestbase/sapling/sapling_c.vmdl"
+    },
+    {
+      "name": "Young fir 0 15",
+      "model": "models/maps/forestbase/sapling/sapling_a.vmdl"
+    },
+    {
+      "name": "Young fir 0 16",
+      "model": "models/maps/forestbase/sapling/sapling_b.vmdl"
+    },
+    {
+      "name": "Young fir 0 17",
+      "model": "models/maps/forestbase/sapling/sapling_c.vmdl"
+    },
+    {
+      "name": "Young fir 0 18",
+      "model": "models/maps/forestbase/sapling/sapling_a.vmdl"
+    },
+    {
+      "name": "Young fir 0 19",
+      "model": "models/maps/forestbase/sapling/sapling_b.vmdl"
+    },
+    {
+      "name": "Young fir 0 20",
+      "model": "models/maps/forestbase/sapling/sapling_c.vmdl"
+    },
+    {
+      "name": "Young fir 0 21",
+      "model": "models/maps/forestbase/sapling/sapling_a.vmdl"
+    },
+    {
+      "name": "Young fir 1 0",
+      "model": "models/maps/forestbase/sapling/sapling_a.vmdl"
+    },
+    {
+      "name": "Young fir 1 1",
+      "model": "models/maps/forestbase/sapling/sapling_b.vmdl"
+    },
+    {
+      "name": "Young fir 1 2",
+      "model": "models/maps/forestbase/sapling/sapling_c.vmdl"
+    },
+    {
+      "name": "Young fir 1 3",
+      "model": "models/maps/forestbase/sapling/sapling_a.vmdl"
+    },
+    {
+      "name": "Young fir 1 4",
+      "model": "models/maps/forestbase/sapling/sapling_b.vmdl"
+    },
+    {
+      "name": "Young fir 1 5",
+      "model": "models/maps/forestbase/sapling/sapling_c.vmdl"
+    },
+    {
+      "name": "Young fir 1 6",
+      "model": "models/maps/forestbase/sapling/sapling_a.vmdl"
+    },
+    {
+      "name": "Young fir 1 7",
+      "model": "models/maps/forestbase/sapling/sapling_b.vmdl"
+    },
+    {
+      "name": "Young fir 1 8",
+      "model": "models/maps/forestbase/sapling/sapling_c.vmdl"
+    },
+    {
+      "name": "Young fir 1 9",
+      "model": "models/maps/forestbase/sapling/sapling_a.vmdl"
+    },
+    {
+      "name": "Young fir 1 10",
+      "model": "models/maps/forestbase/sapling/sapling_b.vmdl"
+    },
+    {
+      "name": "Young fir 1 11",
+      "model": "models/maps/forestbase/sapling/sapling_c.vmdl"
+    },
+    {
+      "name": "Young fir 1 12",
+      "model": "models/maps/forestbase/sapling/sapling_a.vmdl"
+    },
+    {
+      "name": "Young fir 1 13",
+      "model": "models/maps/forestbase/sapling/sapling_b.vmdl"
+    },
+    {
+      "name": "Young fir 1 14",
+      "model": "models/maps/forestbase/sapling/sapling_c.vmdl"
+    },
+    {
+      "name": "Young fir 1 15",
+      "model": "models/maps/forestbase/sapling/sapling_a.vmdl"
+    },
+    {
+      "name": "Young fir 1 16",
+      "model": "models/maps/forestbase/sapling/sapling_b.vmdl"
+    },
+    {
+      "name": "Young fir 1 17",
+      "model": "models/maps/forestbase/sapling/sapling_c.vmdl"
+    },
+    {
+      "name": "Young fir 1 18",
+      "model": "models/maps/forestbase/sapling/sapling_a.vmdl"
+    },
+    {
+      "name": "Young fir 1 19",
+      "model": "models/maps/forestbase/sapling/sapling_b.vmdl"
+    },
+    {
+      "name": "Young fir 1 20",
+      "model": "models/maps/forestbase/sapling/sapling_c.vmdl"
+    },
+    {
+      "name": "Young fir 1 21",
+      "model": "models/maps/forestbase/sapling/sapling_a.vmdl"
+    },
+    {
+      "name": "Young fir 2 0",
+      "model": "models/maps/forestbase/sapling/sapling_a.vmdl"
+    },
+    {
+      "name": "Young fir 2 1",
+      "model": "models/maps/forestbase/sapling/sapling_b.vmdl"
+    },
+    {
+      "name": "Young fir 2 2",
+      "model": "models/maps/forestbase/sapling/sapling_c.vmdl"
+    },
+    {
+      "name": "Young fir 2 3",
+      "model": "models/maps/forestbase/sapling/sapling_a.vmdl"
+    },
+    {
+      "name": "Young fir 2 4",
+      "model": "models/maps/forestbase/sapling/sapling_b.vmdl"
+    },
+    {
+      "name": "Young fir 2 5",
+      "model": "models/maps/forestbase/sapling/sapling_c.vmdl"
+    },
+    {
+      "name": "Young fir 2 6",
+      "model": "models/maps/forestbase/sapling/sapling_a.vmdl"
+    },
+    {
+      "name": "Young fir 2 7",
+      "model": "models/maps/forestbase/sapling/sapling_b.vmdl"
+    },
+    {
+      "name": "Young fir 2 8",
+      "model": "models/maps/forestbase/sapling/sapling_c.vmdl"
+    },
+    {
+      "name": "Young fir 2 9",
+      "model": "models/maps/forestbase/sapling/sapling_a.vmdl"
+    },
+    {
+      "name": "Young fir 2 10",
+      "model": "models/maps/forestbase/sapling/sapling_b.vmdl"
+    },
+    {
+      "name": "Young fir 2 11",
+      "model": "models/maps/forestbase/sapling/sapling_c.vmdl"
+    },
+    {
+      "name": "Young fir 2 12",
+      "model": "models/maps/forestbase/sapling/sapling_a.vmdl"
+    },
+    {
+      "name": "Young fir 2 13",
+      "model": "models/maps/forestbase/sapling/sapling_b.vmdl"
+    },
+    {
+      "name": "Young fir 2 14",
+      "model": "models/maps/forestbase/sapling/sapling_c.vmdl"
+    },
+    {
+      "name": "Young fir 2 15",
+      "model": "models/maps/forestbase/sapling/sapling_a.vmdl"
+    },
+    {
+      "name": "Young fir 2 16",
+      "model": "models/maps/forestbase/sapling/sapling_b.vmdl"
+    },
+    {
+      "name": "Young fir 2 17",
+      "model": "models/maps/forestbase/sapling/sapling_c.vmdl"
+    },
+    {
+      "name": "Young fir 2 18",
+      "model": "models/maps/forestbase/sapling/sapling_a.vmdl"
+    },
+    {
+      "name": "Young fir 2 19",
+      "model": "models/maps/forestbase/sapling/sapling_b.vmdl"
+    },
+    {
+      "name": "Young fir 2 20",
+      "model": "models/maps/forestbase/sapling/sapling_c.vmdl"
+    },
+    {
+      "name": "Young fir 2 21",
+      "model": "models/maps/forestbase/sapling/sapling_a.vmdl"
+    },
+    {
+      "name": "Young fir 3 0",
+      "model": "models/maps/forestbase/sapling/sapling_a.vmdl"
+    },
+    {
+      "name": "Young fir 3 1",
+      "model": "models/maps/forestbase/sapling/sapling_b.vmdl"
+    },
+    {
+      "name": "Young fir 3 2",
+      "model": "models/maps/forestbase/sapling/sapling_c.vmdl"
+    },
+    {
+      "name": "Young fir 3 3",
+      "model": "models/maps/forestbase/sapling/sapling_a.vmdl"
+    },
+    {
+      "name": "Young fir 3 10",
+      "model": "models/maps/forestbase/sapling/sapling_b.vmdl"
+    },
+    {
+      "name": "Young fir 3 11",
+      "model": "models/maps/forestbase/sapling/sapling_c.vmdl"
+    },
+    {
+      "name": "Young fir 3 12",
+      "model": "models/maps/forestbase/sapling/sapling_a.vmdl"
+    },
+    {
+      "name": "Young fir 3 13",
+      "model": "models/maps/forestbase/sapling/sapling_b.vmdl"
+    },
+    {
+      "name": "Young fir 3 14",
+      "model": "models/maps/forestbase/sapling/sapling_c.vmdl"
+    },
+    {
+      "name": "Young fir 3 15",
+      "model": "models/maps/forestbase/sapling/sapling_a.vmdl"
+    },
+    {
+      "name": "Young fir 3 16",
+      "model": "models/maps/forestbase/sapling/sapling_b.vmdl"
+    },
+    {
+      "name": "Young fir 3 17",
+      "model": "models/maps/forestbase/sapling/sapling_c.vmdl"
+    },
+    {
+      "name": "Young fir 3 19",
+      "model": "models/maps/forestbase/sapling/sapling_b.vmdl"
+    },
+    {
+      "name": "Young fir 3 20",
+      "model": "models/maps/forestbase/sapling/sapling_c.vmdl"
+    },
+    {
+      "name": "Young fir 3 21",
+      "model": "models/maps/forestbase/sapling/sapling_a.vmdl"
+    },
+    {
+      "name": "Rock 80",
+      "model": "models/maps/forestbase/forest_boulder.vmdl"
+    },
+    {
+      "name": "Rock 81",
+      "model": "models/maps/forestbase/forest_boulder.vmdl"
+    },
+    {
+      "name": "Rock 82",
+      "model": "models/maps/forestbase/forest_boulder.vmdl"
+    },
+    {
+      "name": "Rock 83",
+      "model": "models/maps/forestbase/forest_boulder.vmdl"
+    },
+    {
+      "name": "Rock 84",
+      "model": "models/maps/forestbase/forest_boulder.vmdl"
+    },
+    {
+      "name": "Rock 85",
+      "model": "models/maps/forestbase/forest_boulder.vmdl"
+    },
+    {
+      "name": "Rock 92",
+      "model": "models/maps/forestbase/forest_boulder.vmdl"
+    },
+    {
+      "name": "Rock 93",
+      "model": "models/maps/forestbase/forest_boulder.vmdl"
+    },
+    {
+      "name": "Rock 94",
+      "model": "models/maps/forestbase/forest_boulder.vmdl"
+    },
+    {
+      "name": "Rock 95",
+      "model": "models/maps/forestbase/forest_boulder.vmdl"
+    },
+    {
+      "name": "Rock 96",
+      "model": "models/maps/forestbase/forest_boulder.vmdl"
+    },
+    {
+      "name": "Rock 97",
+      "model": "models/maps/forestbase/forest_boulder.vmdl"
+    },
+    {
+      "name": "Rock 98",
+      "model": "models/maps/forestbase/forest_boulder.vmdl"
+    },
+    {
+      "name": "Rock 99",
+      "model": "models/maps/forestbase/forest_boulder.vmdl"
+    },
+    {
+      "name": "Rock 100",
+      "model": "models/maps/forestbase/forest_boulder.vmdl"
+    },
+    {
+      "name": "Rock 101",
+      "model": "models/maps/forestbase/forest_boulder.vmdl"
+    },
+    {
+      "name": "Rock 102",
+      "model": "models/maps/forestbase/forest_boulder.vmdl"
+    },
+    {
+      "name": "Rock 103",
+      "model": "models/maps/forestbase/forest_boulder.vmdl"
+    },
+    {
+      "name": "Rock 104",
+      "model": "models/maps/forestbase/forest_boulder.vmdl"
+    },
+    {
+      "name": "Rock 105",
+      "model": "models/maps/forestbase/forest_boulder.vmdl"
+    },
+    {
+      "name": "Rock 106",
+      "model": "models/maps/forestbase/forest_boulder.vmdl"
+    },
+    {
+      "name": "Rock 107",
+      "model": "models/maps/forestbase/forest_boulder.vmdl"
+    },
+    {
+      "name": "Rock 108",
+      "model": "models/maps/forestbase/forest_boulder.vmdl"
+    },
+    {
+      "name": "Rock 109",
+      "model": "models/maps/forestbase/forest_boulder.vmdl"
+    },
+    {
+      "name": "Rock 110",
+      "model": "models/maps/forestbase/forest_boulder.vmdl"
+    },
+    {
+      "name": "Rock 111",
+      "model": "models/maps/forestbase/forest_boulder.vmdl"
+    },
+    {
+      "name": "Rock 112",
+      "model": "models/maps/forestbase/forest_boulder.vmdl"
+    },
+    {
+      "name": "Rock 113",
+      "model": "models/maps/forestbase/forest_boulder.vmdl"
+    },
+    {
+      "name": "Rock 114",
+      "model": "models/maps/forestbase/forest_boulder.vmdl"
+    },
+    {
+      "name": "Rock 115",
+      "model": "models/maps/forestbase/forest_boulder.vmdl"
+    },
+    {
+      "name": "Rock 116",
+      "model": "models/maps/forestbase/forest_boulder.vmdl"
+    },
+    {
+      "name": "Rock 117",
+      "model": "models/maps/forestbase/forest_boulder.vmdl"
+    },
+    {
+      "name": "Cascade cliff 0",
+      "model": "models/maps/forestbase/mountainside/cliff.vmdl"
+    },
+    {
+      "name": "Cascade cliff 1",
+      "model": "models/maps/forestbase/mountainside/cliff.vmdl"
+    },
+    {
+      "name": "Cascade cliff 2",
+      "model": "models/maps/forestbase/mountainside/cliff.vmdl"
+    },
+    {
+      "name": "Cascade cliff 3",
+      "model": "models/maps/forestbase/mountainside/cliff.vmdl"
+    },
+    {
+      "name": "Distant mountain 0",
+      "model": "models/maps/forestbase/mountainside/cliff.vmdl"
+    },
+    {
+      "name": "Distant mountain 1",
+      "model": "models/maps/forestbase/mountainside/cliff.vmdl"
+    },
+    {
+      "name": "Distant mountain 2",
+      "model": "models/maps/forestbase/mountainside/cliff.vmdl"
+    },
+    {
+      "name": "Forest middle 0 1",
+      "model": "models/maps/forestbase/fir/fir_b_far.vmdl"
+    },
+    {
+      "name": "Forest middle 0 2",
+      "model": "models/maps/forestbase/fir/fir_c_far.vmdl"
+    },
+    {
+      "name": "Forest middle 0 6",
+      "model": "models/maps/forestbase/fir/fir_a_far.vmdl"
+    },
+    {
+      "name": "Forest middle 0 7",
+      "model": "models/maps/forestbase/fir/fir_b_far.vmdl"
+    },
+    {
+      "name": "Forest middle 0 9",
+      "model": "models/maps/forestbase/fir/fir_a_far.vmdl"
+    },
+    {
+      "name": "Forest middle 0 11",
+      "model": "models/maps/forestbase/fir/fir_c_far.vmdl"
+    },
+    {
+      "name": "Forest middle 0 12",
+      "model": "models/maps/forestbase/fir/fir_a_far.vmdl"
+    },
+    {
+      "name": "Forest middle 0 15",
+      "model": "models/maps/forestbase/fir/fir_a_far.vmdl"
+    },
+    {
+      "name": "Forest middle 0 17",
+      "model": "models/maps/forestbase/fir/fir_c_far.vmdl"
+    },
+    {
+      "name": "Forest middle 0 19",
+      "model": "models/maps/forestbase/fir/fir_b_far.vmdl"
+    },
+    {
+      "name": "Forest middle 0 20",
+      "model": "models/maps/forestbase/fir/fir_c_far.vmdl"
+    },
+    {
+      "name": "Forest middle 0 21",
+      "model": "models/maps/forestbase/fir/fir_a_far.vmdl"
+    },
+    {
+      "name": "Forest middle 0 23",
+      "model": "models/maps/forestbase/fir/fir_c_far.vmdl"
+    },
+    {
+      "name": "Forest middle 1 0",
+      "model": "models/maps/forestbase/fir/fir_a_far.vmdl"
+    },
+    {
+      "name": "Forest middle 1 1",
+      "model": "models/maps/forestbase/fir/fir_b_far.vmdl"
+    },
+    {
+      "name": "Forest middle 1 2",
+      "model": "models/maps/forestbase/fir/fir_c_far.vmdl"
+    },
+    {
+      "name": "Forest middle 1 3",
+      "model": "models/maps/forestbase/fir/fir_a_far.vmdl"
+    },
+    {
+      "name": "Forest middle 1 4",
+      "model": "models/maps/forestbase/fir/fir_b_far.vmdl"
+    },
+    {
+      "name": "Forest middle 1 5",
+      "model": "models/maps/forestbase/fir/fir_c_far.vmdl"
+    },
+    {
+      "name": "Forest middle 1 6",
+      "model": "models/maps/forestbase/fir/fir_a_far.vmdl"
+    },
+    {
+      "name": "Forest middle 1 7",
+      "model": "models/maps/forestbase/fir/fir_b_far.vmdl"
+    },
+    {
+      "name": "Forest middle 1 8",
+      "model": "models/maps/forestbase/fir/fir_c_far.vmdl"
+    },
+    {
+      "name": "Forest middle 1 9",
+      "model": "models/maps/forestbase/fir/fir_a_far.vmdl"
+    },
+    {
+      "name": "Forest middle 1 10",
+      "model": "models/maps/forestbase/fir/fir_b_far.vmdl"
+    },
+    {
+      "name": "Forest middle 1 11",
+      "model": "models/maps/forestbase/fir/fir_c_far.vmdl"
+    },
+    {
+      "name": "Forest middle 1 12",
+      "model": "models/maps/forestbase/fir/fir_a_far.vmdl"
+    },
+    {
+      "name": "Forest middle 1 13",
+      "model": "models/maps/forestbase/fir/fir_b_far.vmdl"
+    },
+    {
+      "name": "Forest middle 1 14",
+      "model": "models/maps/forestbase/fir/fir_c_far.vmdl"
+    },
+    {
+      "name": "Forest middle 1 15",
+      "model": "models/maps/forestbase/fir/fir_a_far.vmdl"
+    },
+    {
+      "name": "Forest middle 1 16",
+      "model": "models/maps/forestbase/fir/fir_b_far.vmdl"
+    },
+    {
+      "name": "Forest middle 1 17",
+      "model": "models/maps/forestbase/fir/fir_c_far.vmdl"
+    },
+    {
+      "name": "Forest middle 1 18",
+      "model": "models/maps/forestbase/fir/fir_a_far.vmdl"
+    },
+    {
+      "name": "Forest middle 1 19",
+      "model": "models/maps/forestbase/fir/fir_b_far.vmdl"
+    },
+    {
+      "name": "Forest middle 1 20",
+      "model": "models/maps/forestbase/fir/fir_c_far.vmdl"
+    },
+    {
+      "name": "Forest middle 1 21",
+      "model": "models/maps/forestbase/fir/fir_a_far.vmdl"
+    },
+    {
+      "name": "Forest middle 1 22",
+      "model": "models/maps/forestbase/fir/fir_b_far.vmdl"
+    },
+    {
+      "name": "Forest middle 1 23",
+      "model": "models/maps/forestbase/fir/fir_c_far.vmdl"
+    },
+    {
+      "name": "Forest middle 2 0",
+      "model": "models/maps/forestbase/fir/fir_a_far.vmdl"
+    },
+    {
+      "name": "Forest middle 2 1",
+      "model": "models/maps/forestbase/fir/fir_b_far.vmdl"
+    },
+    {
+      "name": "Forest middle 2 2",
+      "model": "models/maps/forestbase/fir/fir_c_far.vmdl"
+    },
+    {
+      "name": "Forest middle 2 3",
+      "model": "models/maps/forestbase/fir/fir_a_far.vmdl"
+    },
+    {
+      "name": "Forest middle 2 4",
+      "model": "models/maps/forestbase/fir/fir_b_far.vmdl"
+    },
+    {
+      "name": "Forest middle 2 5",
+      "model": "models/maps/forestbase/fir/fir_c_far.vmdl"
+    },
+    {
+      "name": "Forest middle 2 6",
+      "model": "models/maps/forestbase/fir/fir_a_far.vmdl"
+    },
+    {
+      "name": "Forest middle 2 7",
+      "model": "models/maps/forestbase/fir/fir_b_far.vmdl"
+    },
+    {
+      "name": "Forest middle 2 8",
+      "model": "models/maps/forestbase/fir/fir_c_far.vmdl"
+    },
+    {
+      "name": "Forest middle 2 9",
+      "model": "models/maps/forestbase/fir/fir_a_far.vmdl"
+    },
+    {
+      "name": "Forest middle 2 10",
+      "model": "models/maps/forestbase/fir/fir_b_far.vmdl"
+    },
+    {
+      "name": "Forest middle 2 11",
+      "model": "models/maps/forestbase/fir/fir_c_far.vmdl"
+    },
+    {
+      "name": "Forest middle 2 12",
+      "model": "models/maps/forestbase/fir/fir_a_far.vmdl"
+    },
+    {
+      "name": "Forest middle 2 13",
+      "model": "models/maps/forestbase/fir/fir_b_far.vmdl"
+    },
+    {
+      "name": "Forest middle 2 14",
+      "model": "models/maps/forestbase/fir/fir_c_far.vmdl"
+    },
+    {
+      "name": "Forest middle 2 15",
+      "model": "models/maps/forestbase/fir/fir_a_far.vmdl"
+    },
+    {
+      "name": "Forest middle 2 16",
+      "model": "models/maps/forestbase/fir/fir_b_far.vmdl"
+    },
+    {
+      "name": "Forest middle 2 17",
+      "model": "models/maps/forestbase/fir/fir_c_far.vmdl"
+    },
+    {
+      "name": "Forest middle 2 18",
+      "model": "models/maps/forestbase/fir/fir_a_far.vmdl"
+    },
+    {
+      "name": "Forest middle 2 19",
+      "model": "models/maps/forestbase/fir/fir_b_far.vmdl"
+    },
+    {
+      "name": "Forest middle 2 20",
+      "model": "models/maps/forestbase/fir/fir_c_far.vmdl"
+    },
+    {
+      "name": "Forest middle 2 21",
+      "model": "models/maps/forestbase/fir/fir_a_far.vmdl"
+    },
+    {
+      "name": "Forest middle 2 22",
+      "model": "models/maps/forestbase/fir/fir_b_far.vmdl"
+    },
+    {
+      "name": "Forest middle 2 23",
+      "model": "models/maps/forestbase/fir/fir_c_far.vmdl"
+    },
+    {
+      "name": "Forest middle 3 0",
+      "model": "models/maps/forestbase/fir/fir_a_far.vmdl"
+    },
+    {
+      "name": "Forest middle 3 1",
+      "model": "models/maps/forestbase/fir/fir_b_far.vmdl"
+    },
+    {
+      "name": "Forest middle 3 2",
+      "model": "models/maps/forestbase/fir/fir_c_far.vmdl"
+    },
+    {
+      "name": "Forest middle 3 3",
+      "model": "models/maps/forestbase/fir/fir_a_far.vmdl"
+    },
+    {
+      "name": "Forest middle 3 5",
+      "model": "models/maps/forestbase/fir/fir_c_far.vmdl"
+    },
+    {
+      "name": "Forest middle 3 6",
+      "model": "models/maps/forestbase/fir/fir_a_far.vmdl"
+    },
+    {
+      "name": "Forest middle 3 7",
+      "model": "models/maps/forestbase/fir/fir_b_far.vmdl"
+    },
+    {
+      "name": "Forest middle 3 8",
+      "model": "models/maps/forestbase/fir/fir_c_far.vmdl"
+    },
+    {
+      "name": "Forest middle 3 10",
+      "model": "models/maps/forestbase/fir/fir_b_far.vmdl"
+    },
+    {
+      "name": "Forest middle 3 11",
+      "model": "models/maps/forestbase/fir/fir_c_far.vmdl"
+    },
+    {
+      "name": "Forest middle 3 13",
+      "model": "models/maps/forestbase/fir/fir_b_far.vmdl"
+    },
+    {
+      "name": "Forest middle 3 15",
+      "model": "models/maps/forestbase/fir/fir_a_far.vmdl"
+    },
+    {
+      "name": "Forest middle 3 17",
+      "model": "models/maps/forestbase/fir/fir_c_far.vmdl"
+    },
+    {
+      "name": "Forest middle 3 18",
+      "model": "models/maps/forestbase/fir/fir_a_far.vmdl"
+    },
+    {
+      "name": "Forest middle 3 19",
+      "model": "models/maps/forestbase/fir/fir_b_far.vmdl"
+    },
+    {
+      "name": "Forest middle 3 20",
+      "model": "models/maps/forestbase/fir/fir_c_far.vmdl"
+    },
+    {
+      "name": "Forest middle 3 22",
+      "model": "models/maps/forestbase/fir/fir_b_far.vmdl"
+    },
+    {
+      "name": "Forest middle 3 23",
+      "model": "models/maps/forestbase/fir/fir_c_far.vmdl"
+    },
+    {
+      "name": "Far fir 0 0",
+      "model": "models/maps/forestbase/fir/fir_a_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 0 1",
+      "model": "models/maps/forestbase/fir/fir_b_far.vmdl"
+    },
+    {
+      "name": "Far fir 0 2",
+      "model": "models/maps/forestbase/fir/fir_c_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 0 3",
+      "model": "models/maps/forestbase/fir/fir_a_far.vmdl"
+    },
+    {
+      "name": "Far fir 0 4",
+      "model": "models/maps/forestbase/fir/fir_b_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 0 5",
+      "model": "models/maps/forestbase/fir/fir_c_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 0 6",
+      "model": "models/maps/forestbase/fir/fir_a_far.vmdl"
+    },
+    {
+      "name": "Far fir 0 7",
+      "model": "models/maps/forestbase/fir/fir_b_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 0 8",
+      "model": "models/maps/forestbase/fir/fir_c_far.vmdl"
+    },
+    {
+      "name": "Far fir 0 9",
+      "model": "models/maps/forestbase/fir/fir_a_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 0 10",
+      "model": "models/maps/forestbase/fir/fir_b_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 0 11",
+      "model": "models/maps/forestbase/fir/fir_c_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 0 12",
+      "model": "models/maps/forestbase/fir/fir_a_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 0 13",
+      "model": "models/maps/forestbase/fir/fir_b_far.vmdl"
+    },
+    {
+      "name": "Far fir 0 14",
+      "model": "models/maps/forestbase/fir/fir_c_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 0 15",
+      "model": "models/maps/forestbase/fir/fir_a_far.vmdl"
+    },
+    {
+      "name": "Far fir 0 16",
+      "model": "models/maps/forestbase/fir/fir_b_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 0 17",
+      "model": "models/maps/forestbase/fir/fir_c_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 0 18",
+      "model": "models/maps/forestbase/fir/fir_a_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 0 19",
+      "model": "models/maps/forestbase/fir/fir_b_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 0 20",
+      "model": "models/maps/forestbase/fir/fir_c_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 0 21",
+      "model": "models/maps/forestbase/fir/fir_a_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 0 22",
+      "model": "models/maps/forestbase/fir/fir_b_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 0 23",
+      "model": "models/maps/forestbase/fir/fir_c_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 0 24",
+      "model": "models/maps/forestbase/fir/fir_a_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 0 25",
+      "model": "models/maps/forestbase/fir/fir_b_far.vmdl"
+    },
+    {
+      "name": "Far fir 0 26",
+      "model": "models/maps/forestbase/fir/fir_c_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 0 27",
+      "model": "models/maps/forestbase/fir/fir_a_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 0 28",
+      "model": "models/maps/forestbase/fir/fir_b_far.vmdl"
+    },
+    {
+      "name": "Far fir 0 29",
+      "model": "models/maps/forestbase/fir/fir_c_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 0 30",
+      "model": "models/maps/forestbase/fir/fir_a_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 0 31",
+      "model": "models/maps/forestbase/fir/fir_b_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 1 0",
+      "model": "models/maps/forestbase/fir/fir_a_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 1 1",
+      "model": "models/maps/forestbase/fir/fir_b_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 1 2",
+      "model": "models/maps/forestbase/fir/fir_c_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 1 3",
+      "model": "models/maps/forestbase/fir/fir_a_far.vmdl"
+    },
+    {
+      "name": "Far fir 1 4",
+      "model": "models/maps/forestbase/fir/fir_b_far.vmdl"
+    },
+    {
+      "name": "Far fir 1 5",
+      "model": "models/maps/forestbase/fir/fir_c_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 1 6",
+      "model": "models/maps/forestbase/fir/fir_a_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 1 7",
+      "model": "models/maps/forestbase/fir/fir_b_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 1 8",
+      "model": "models/maps/forestbase/fir/fir_c_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 1 9",
+      "model": "models/maps/forestbase/fir/fir_a_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 1 10",
+      "model": "models/maps/forestbase/fir/fir_b_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 1 11",
+      "model": "models/maps/forestbase/fir/fir_c_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 1 12",
+      "model": "models/maps/forestbase/fir/fir_a_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 1 13",
+      "model": "models/maps/forestbase/fir/fir_b_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 1 14",
+      "model": "models/maps/forestbase/fir/fir_c_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 1 15",
+      "model": "models/maps/forestbase/fir/fir_a_far.vmdl"
+    },
+    {
+      "name": "Far fir 1 16",
+      "model": "models/maps/forestbase/fir/fir_b_far.vmdl"
+    },
+    {
+      "name": "Far fir 1 17",
+      "model": "models/maps/forestbase/fir/fir_c_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 1 18",
+      "model": "models/maps/forestbase/fir/fir_a_far.vmdl"
+    },
+    {
+      "name": "Far fir 1 19",
+      "model": "models/maps/forestbase/fir/fir_b_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 1 20",
+      "model": "models/maps/forestbase/fir/fir_c_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 1 21",
+      "model": "models/maps/forestbase/fir/fir_a_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 1 22",
+      "model": "models/maps/forestbase/fir/fir_b_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 1 23",
+      "model": "models/maps/forestbase/fir/fir_c_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 1 24",
+      "model": "models/maps/forestbase/fir/fir_a_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 1 25",
+      "model": "models/maps/forestbase/fir/fir_b_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 1 26",
+      "model": "models/maps/forestbase/fir/fir_c_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 1 27",
+      "model": "models/maps/forestbase/fir/fir_a_far.vmdl"
+    },
+    {
+      "name": "Far fir 1 28",
+      "model": "models/maps/forestbase/fir/fir_b_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 1 29",
+      "model": "models/maps/forestbase/fir/fir_c_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 1 30",
+      "model": "models/maps/forestbase/fir/fir_a_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 1 31",
+      "model": "models/maps/forestbase/fir/fir_b_far.vmdl"
+    },
+    {
+      "name": "Far fir 2 0",
+      "model": "models/maps/forestbase/fir/fir_a_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 2 1",
+      "model": "models/maps/forestbase/fir/fir_b_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 2 2",
+      "model": "models/maps/forestbase/fir/fir_c_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 2 3",
+      "model": "models/maps/forestbase/fir/fir_a_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 2 4",
+      "model": "models/maps/forestbase/fir/fir_b_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 2 5",
+      "model": "models/maps/forestbase/fir/fir_c_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 2 6",
+      "model": "models/maps/forestbase/fir/fir_a_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 2 7",
+      "model": "models/maps/forestbase/fir/fir_b_far.vmdl"
+    },
+    {
+      "name": "Far fir 2 8",
+      "model": "models/maps/forestbase/fir/fir_c_far.vmdl"
+    },
+    {
+      "name": "Far fir 2 9",
+      "model": "models/maps/forestbase/fir/fir_a_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 2 10",
+      "model": "models/maps/forestbase/fir/fir_b_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 2 11",
+      "model": "models/maps/forestbase/fir/fir_c_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 2 12",
+      "model": "models/maps/forestbase/fir/fir_a_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 2 13",
+      "model": "models/maps/forestbase/fir/fir_b_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 2 14",
+      "model": "models/maps/forestbase/fir/fir_c_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 2 15",
+      "model": "models/maps/forestbase/fir/fir_a_far.vmdl"
+    },
+    {
+      "name": "Far fir 2 16",
+      "model": "models/maps/forestbase/fir/fir_b_far.vmdl"
+    },
+    {
+      "name": "Far fir 2 17",
+      "model": "models/maps/forestbase/fir/fir_c_far.vmdl"
+    },
+    {
+      "name": "Far fir 2 18",
+      "model": "models/maps/forestbase/fir/fir_a_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 2 19",
+      "model": "models/maps/forestbase/fir/fir_b_far.vmdl"
+    },
+    {
+      "name": "Far fir 2 20",
+      "model": "models/maps/forestbase/fir/fir_c_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 2 21",
+      "model": "models/maps/forestbase/fir/fir_a_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 2 22",
+      "model": "models/maps/forestbase/fir/fir_b_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 2 23",
+      "model": "models/maps/forestbase/fir/fir_c_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 2 24",
+      "model": "models/maps/forestbase/fir/fir_a_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 2 25",
+      "model": "models/maps/forestbase/fir/fir_b_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 2 26",
+      "model": "models/maps/forestbase/fir/fir_c_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 2 27",
+      "model": "models/maps/forestbase/fir/fir_a_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 2 28",
+      "model": "models/maps/forestbase/fir/fir_b_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 2 29",
+      "model": "models/maps/forestbase/fir/fir_c_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 2 30",
+      "model": "models/maps/forestbase/fir/fir_a_horizon.vmdl"
+    },
+    {
+      "name": "Far fir 2 31",
+      "model": "models/maps/forestbase/fir/fir_b_horizon.vmdl"
+    },
+    {
+      "name": "Rock 289",
+      "model": "models/maps/forestbase/forest_boulder.vmdl"
+    },
+    {
+      "name": "Rock 290",
+      "model": "models/maps/forestbase/forest_boulder.vmdl"
+    },
+    {
+      "name": "Rock 291",
+      "model": "models/maps/forestbase/forest_boulder.vmdl"
+    },
+    {
+      "name": "Rock 292",
+      "model": "models/maps/forestbase/forest_boulder.vmdl"
+    },
+    {
+      "name": "Rock 293",
+      "model": "models/maps/forestbase/forest_boulder.vmdl"
+    },
+    {
+      "name": "Rock 294",
+      "model": "models/maps/forestbase/forest_boulder.vmdl"
+    },
+    {
+      "name": "Rock 295",
+      "model": "models/maps/forestbase/forest_boulder.vmdl"
+    },
+    {
+      "name": "Rock 296",
+      "model": "models/maps/forestbase/forest_boulder.vmdl"
+    },
+    {
+      "name": "Rock 291.001",
+      "model": "models/maps/forestbase/forest_boulder.vmdl"
+    },
+    {
+      "name": "Rock 292.001",
+      "model": "models/maps/forestbase/forest_boulder.vmdl"
+    },
+    {
+      "name": "Rock 293.001",
+      "model": "models/maps/forestbase/forest_boulder.vmdl"
+    },
+    {
+      "name": "Rock 294.001",
+      "model": "models/maps/forestbase/forest_boulder.vmdl"
+    },
+    {
+      "name": "Rock 295.001",
+      "model": "models/maps/forestbase/forest_boulder.vmdl"
+    },
+    {
+      "name": "Rock 296.001",
+      "model": "models/maps/forestbase/forest_boulder.vmdl"
+    },
+    {
+      "name": "Rock 297",
+      "model": "models/maps/forestbase/forest_boulder.vmdl"
+    },
+    {
+      "name": "Rock 298",
+      "model": "models/maps/forestbase/forest_boulder.vmdl"
+    },
+    {
+      "name": "Cascade cliff 4",
+      "model": "models/maps/forestbase/mountainside/cliff.vmdl"
+    },
+    {
+      "name": "Far fir infill 0 0",
+      "model": "models/maps/forestbase/fir/fir_a_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 0 1",
+      "model": "models/maps/forestbase/fir/fir_b_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 0 2",
+      "model": "models/maps/forestbase/fir/fir_c_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 0 3",
+      "model": "models/maps/forestbase/fir/fir_a_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 0 4",
+      "model": "models/maps/forestbase/fir/fir_b_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 0 5",
+      "model": "models/maps/forestbase/fir/fir_c_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 0 6",
+      "model": "models/maps/forestbase/fir/fir_a_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 0 7",
+      "model": "models/maps/forestbase/fir/fir_b_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 0 8",
+      "model": "models/maps/forestbase/fir/fir_c_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 0 9",
+      "model": "models/maps/forestbase/fir/fir_a_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 0 10",
+      "model": "models/maps/forestbase/fir/fir_b_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 0 11",
+      "model": "models/maps/forestbase/fir/fir_c_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 0 12",
+      "model": "models/maps/forestbase/fir/fir_a_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 0 13",
+      "model": "models/maps/forestbase/fir/fir_b_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 0 14",
+      "model": "models/maps/forestbase/fir/fir_c_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 0 15",
+      "model": "models/maps/forestbase/fir/fir_a_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 1 0",
+      "model": "models/maps/forestbase/fir/fir_a_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 1 1",
+      "model": "models/maps/forestbase/fir/fir_b_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 1 2",
+      "model": "models/maps/forestbase/fir/fir_c_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 1 3",
+      "model": "models/maps/forestbase/fir/fir_a_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 1 4",
+      "model": "models/maps/forestbase/fir/fir_b_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 1 5",
+      "model": "models/maps/forestbase/fir/fir_c_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 1 6",
+      "model": "models/maps/forestbase/fir/fir_a_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 1 7",
+      "model": "models/maps/forestbase/fir/fir_b_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 1 8",
+      "model": "models/maps/forestbase/fir/fir_c_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 1 9",
+      "model": "models/maps/forestbase/fir/fir_a_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 1 10",
+      "model": "models/maps/forestbase/fir/fir_b_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 1 11",
+      "model": "models/maps/forestbase/fir/fir_c_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 1 12",
+      "model": "models/maps/forestbase/fir/fir_a_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 1 13",
+      "model": "models/maps/forestbase/fir/fir_b_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 1 14",
+      "model": "models/maps/forestbase/fir/fir_c_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 1 15",
+      "model": "models/maps/forestbase/fir/fir_a_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 2 0",
+      "model": "models/maps/forestbase/fir/fir_a_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 2 1",
+      "model": "models/maps/forestbase/fir/fir_b_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 2 2",
+      "model": "models/maps/forestbase/fir/fir_c_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 2 3",
+      "model": "models/maps/forestbase/fir/fir_a_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 2 4",
+      "model": "models/maps/forestbase/fir/fir_b_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 2 5",
+      "model": "models/maps/forestbase/fir/fir_c_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 2 6",
+      "model": "models/maps/forestbase/fir/fir_a_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 2 7",
+      "model": "models/maps/forestbase/fir/fir_b_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 2 8",
+      "model": "models/maps/forestbase/fir/fir_c_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 2 9",
+      "model": "models/maps/forestbase/fir/fir_a_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 2 10",
+      "model": "models/maps/forestbase/fir/fir_b_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 2 11",
+      "model": "models/maps/forestbase/fir/fir_c_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 2 12",
+      "model": "models/maps/forestbase/fir/fir_a_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 2 13",
+      "model": "models/maps/forestbase/fir/fir_b_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 2 14",
+      "model": "models/maps/forestbase/fir/fir_c_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 2 15",
+      "model": "models/maps/forestbase/fir/fir_a_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 3 0",
+      "model": "models/maps/forestbase/fir/fir_a_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 3 1",
+      "model": "models/maps/forestbase/fir/fir_b_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 3 2",
+      "model": "models/maps/forestbase/fir/fir_c_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 3 3",
+      "model": "models/maps/forestbase/fir/fir_a_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 3 4",
+      "model": "models/maps/forestbase/fir/fir_b_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 3 5",
+      "model": "models/maps/forestbase/fir/fir_c_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 3 6",
+      "model": "models/maps/forestbase/fir/fir_a_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 3 7",
+      "model": "models/maps/forestbase/fir/fir_b_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 3 8",
+      "model": "models/maps/forestbase/fir/fir_c_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 3 9",
+      "model": "models/maps/forestbase/fir/fir_a_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 3 10",
+      "model": "models/maps/forestbase/fir/fir_b_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 3 11",
+      "model": "models/maps/forestbase/fir/fir_c_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 3 12",
+      "model": "models/maps/forestbase/fir/fir_a_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 3 13",
+      "model": "models/maps/forestbase/fir/fir_b_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 3 14",
+      "model": "models/maps/forestbase/fir/fir_c_horizon.vmdl"
+    },
+    {
+      "name": "Far fir infill 3 15",
+      "model": "models/maps/forestbase/fir/fir_a_horizon.vmdl"
+    },
+    {
+      "name": "Forest understory 0 0",
+      "model": "models/maps/forestbase/fir/fir_a_far.vmdl"
+    },
+    {
+      "name": "Forest understory 0 1",
+      "model": "models/maps/forestbase/fir/fir_b_far.vmdl"
+    },
+    {
+      "name": "Forest understory 0 2",
+      "model": "models/maps/forestbase/fir/fir_c_far.vmdl"
+    },
+    {
+      "name": "Forest understory 0 3",
+      "model": "models/maps/forestbase/fir/fir_a_far.vmdl"
+    },
+    {
+      "name": "Forest understory 0 4",
+      "model": "models/maps/forestbase/fir/fir_b_far.vmdl"
+    },
+    {
+      "name": "Forest understory 0 5",
+      "model": "models/maps/forestbase/fir/fir_c_far.vmdl"
+    },
+    {
+      "name": "Forest understory 1 0",
+      "model": "models/maps/forestbase/fir/fir_a_far.vmdl"
+    },
+    {
+      "name": "Forest understory 1 1",
+      "model": "models/maps/forestbase/fir/fir_b_far.vmdl"
+    },
+    {
+      "name": "Forest understory 1 2",
+      "model": "models/maps/forestbase/fir/fir_c_far.vmdl"
+    },
+    {
+      "name": "Forest understory 1 3",
+      "model": "models/maps/forestbase/fir/fir_a_far.vmdl"
+    },
+    {
+      "name": "Forest understory 1 4",
+      "model": "models/maps/forestbase/fir/fir_b_far.vmdl"
+    },
+    {
+      "name": "Forest understory 1 5",
+      "model": "models/maps/forestbase/fir/fir_c_far.vmdl"
+    },
+    {
+      "name": "Forest understory 2 0",
+      "model": "models/maps/forestbase/fir/fir_a_far.vmdl"
+    },
+    {
+      "name": "Forest understory 2 1",
+      "model": "models/maps/forestbase/fir/fir_b_far.vmdl"
+    },
+    {
+      "name": "Forest understory 2 2",
+      "model": "models/maps/forestbase/fir/fir_c_far.vmdl"
+    },
+    {
+      "name": "Forest understory 2 3",
+      "model": "models/maps/forestbase/fir/fir_a_far.vmdl"
+    },
+    {
+      "name": "Forest understory 2 4",
+      "model": "models/maps/forestbase/fir/fir_b_far.vmdl"
+    },
+    {
+      "name": "Forest understory 2 5",
+      "model": "models/maps/forestbase/fir/fir_c_far.vmdl"
+    },
+    {
+      "name": "Forest understory 3 0",
+      "model": "models/maps/forestbase/fir/fir_a_far.vmdl"
+    },
+    {
+      "name": "Forest understory 3 1",
+      "model": "models/maps/forestbase/fir/fir_b_far.vmdl"
+    },
+    {
+      "name": "Forest understory 3 2",
+      "model": "models/maps/forestbase/fir/fir_c_far.vmdl"
+    },
+    {
+      "name": "Forest understory 3 3",
+      "model": "models/maps/forestbase/fir/fir_a_far.vmdl"
+    },
+    {
+      "name": "Forest understory 3 4",
+      "model": "models/maps/forestbase/fir/fir_b_far.vmdl"
+    },
+    {
+      "name": "Forest understory 3 5",
+      "model": "models/maps/forestbase/fir/fir_c_far.vmdl"
+    },
+    {
+      "name": "Forest floor grass 0 0",
+      "model": "models/maps/forestbase/floor/grass_0_0.vmdl"
+    },
+    {
+      "name": "Forest floor grass 0 1",
+      "model": "models/maps/forestbase/floor/grass_0_1.vmdl"
+    },
+    {
+      "name": "Forest floor grass 1 0",
+      "model": "models/maps/forestbase/floor/grass_1_0.vmdl"
+    },
+    {
+      "name": "Forest floor grass 1 1",
+      "model": "models/maps/forestbase/floor/grass_1_1.vmdl"
+    },
+    {
+      "name": "Forest floor grass 2 0",
+      "model": "models/maps/forestbase/floor/grass_2_0.vmdl"
+    },
+    {
+      "name": "Forest floor grass 2 1",
+      "model": "models/maps/forestbase/floor/grass_2_1.vmdl"
+    },
+    {
+      "name": "Forest floor grass 3 0",
+      "model": "models/maps/forestbase/floor/grass_3_0.vmdl"
+    },
+    {
+      "name": "Forest floor grass 3 1",
+      "model": "models/maps/forestbase/floor/grass_3_1.vmdl"
+    }
+  ],
+  "lights": [
+    {
+      "name": "Cool Daylight",
+      "kind": "Sandbox.DirectionalLight",
+      "nativeColor": [
+        0.42,
+        0.49,
+        0.58
+      ],
+      "blenderEnergy": 1.7400000095367432
+    },
+    {
+      "name": "Flood 0",
+      "kind": "Sandbox.SpotLight",
+      "nativeColor": [
+        10.8,
+        8.1,
+        4.6
+      ],
+      "blenderEnergy": 702.0
+    },
+    {
+      "name": "Flood 1",
+      "kind": "Sandbox.SpotLight",
+      "nativeColor": [
+        10.8,
+        8.1,
+        4.6
+      ],
+      "blenderEnergy": 702.0
+    },
+    {
+      "name": "Flood 2",
+      "kind": "Sandbox.SpotLight",
+      "nativeColor": [
+        10.8,
+        8.1,
+        4.6
+      ],
+      "blenderEnergy": 702.0
+    },
+    {
+      "name": "Flood 3",
+      "kind": "Sandbox.SpotLight",
+      "nativeColor": [
+        10.8,
+        8.1,
+        4.6
+      ],
+      "blenderEnergy": 702.0
+    },
+    {
+      "name": "Flood 4",
+      "kind": "Sandbox.SpotLight",
+      "nativeColor": [
+        10.8,
+        8.1,
+        4.6
+      ],
+      "blenderEnergy": 702.0
+    },
+    {
+      "name": "Flood 5",
+      "kind": "Sandbox.SpotLight",
+      "nativeColor": [
+        10.8,
+        8.1,
+        4.6
+      ],
+      "blenderEnergy": 702.0
+    },
+    {
+      "name": "Flood 6",
+      "kind": "Sandbox.SpotLight",
+      "nativeColor": [
+        10.8,
+        8.1,
+        4.6
+      ],
+      "blenderEnergy": 702.0
+    },
+    {
+      "name": "Flood 7",
+      "kind": "Sandbox.SpotLight",
+      "nativeColor": [
+        10.8,
+        8.1,
+        4.6
+      ],
+      "blenderEnergy": 702.0
+    },
+    {
+      "name": "Flood 8",
+      "kind": "Sandbox.SpotLight",
+      "nativeColor": [
+        10.8,
+        8.1,
+        4.6
+      ],
+      "blenderEnergy": 702.0
+    },
+    {
+      "name": "Flood 9",
+      "kind": "Sandbox.SpotLight",
+      "nativeColor": [
+        10.8,
+        8.1,
+        4.6
+      ],
+      "blenderEnergy": 702.0
+    },
+    {
+      "name": "Flood 10",
+      "kind": "Sandbox.SpotLight",
+      "nativeColor": [
+        10.8,
+        8.1,
+        4.6
+      ],
+      "blenderEnergy": 702.0
+    },
+    {
+      "name": "Hangar -1060 -1240.0",
+      "kind": "Sandbox.SpotLight",
+      "nativeColor": [
+        6.4,
+        4.5,
+        2.3
+      ],
+      "blenderEnergy": 416.0
+    },
+    {
+      "name": "Hangar -1060 -880.0",
+      "kind": "Sandbox.SpotLight",
+      "nativeColor": [
+        6.4,
+        4.5,
+        2.3
+      ],
+      "blenderEnergy": 416.0
+    },
+    {
+      "name": "Barracks room west 96",
+      "kind": "Sandbox.SpotLight",
+      "nativeColor": [
+        4.8,
+        3.1,
+        1.6
+      ],
+      "blenderEnergy": 312.0
+    },
+    {
+      "name": "Barracks room east 96",
+      "kind": "Sandbox.SpotLight",
+      "nativeColor": [
+        4.8,
+        3.1,
+        1.6
+      ],
+      "blenderEnergy": 312.0
+    },
+    {
+      "name": "Barracks room west 240",
+      "kind": "Sandbox.SpotLight",
+      "nativeColor": [
+        4.8,
+        3.1,
+        1.6
+      ],
+      "blenderEnergy": 312.0
+    },
+    {
+      "name": "Barracks room east 240",
+      "kind": "Sandbox.SpotLight",
+      "nativeColor": [
+        4.8,
+        3.1,
+        1.6
+      ],
+      "blenderEnergy": 312.0
+    },
+    {
+      "name": "Barracks door -1220.0 214",
+      "kind": "Sandbox.PointLight",
+      "nativeColor": [
+        1.8,
+        1.12,
+        0.55
+      ],
+      "blenderEnergy": 117.0
+    },
+    {
+      "name": "Barracks door -1220.0 358",
+      "kind": "Sandbox.PointLight",
+      "nativeColor": [
+        1.8,
+        1.12,
+        0.55
+      ],
+      "blenderEnergy": 117.0
+    },
+    {
+      "name": "Barracks door -950 214",
+      "kind": "Sandbox.PointLight",
+      "nativeColor": [
+        1.8,
+        1.12,
+        0.55
+      ],
+      "blenderEnergy": 117.0
+    },
+    {
+      "name": "Barracks door -950 358",
+      "kind": "Sandbox.PointLight",
+      "nativeColor": [
+        1.8,
+        1.12,
+        0.55
+      ],
+      "blenderEnergy": 117.0
+    },
+    {
+      "name": "Barracks door -695.0 214",
+      "kind": "Sandbox.PointLight",
+      "nativeColor": [
+        1.8,
+        1.12,
+        0.55
+      ],
+      "blenderEnergy": 117.0
+    },
+    {
+      "name": "Barracks door -695.0 358",
+      "kind": "Sandbox.PointLight",
+      "nativeColor": [
+        1.8,
+        1.12,
+        0.55
+      ],
+      "blenderEnergy": 117.0
+    },
+    {
+      "name": "Command room west 96",
+      "kind": "Sandbox.SpotLight",
+      "nativeColor": [
+        4.8,
+        3.1,
+        1.6
+      ],
+      "blenderEnergy": 312.0
+    },
+    {
+      "name": "Command room east 96",
+      "kind": "Sandbox.SpotLight",
+      "nativeColor": [
+        4.8,
+        3.1,
+        1.6
+      ],
+      "blenderEnergy": 312.0
+    },
+    {
+      "name": "Command room west 240",
+      "kind": "Sandbox.SpotLight",
+      "nativeColor": [
+        4.8,
+        3.1,
+        1.6
+      ],
+      "blenderEnergy": 312.0
+    },
+    {
+      "name": "Command room east 240",
+      "kind": "Sandbox.SpotLight",
+      "nativeColor": [
+        4.8,
+        3.1,
+        1.6
+      ],
+      "blenderEnergy": 312.0
+    },
+    {
+      "name": "Command door 25.0 214",
+      "kind": "Sandbox.PointLight",
+      "nativeColor": [
+        1.8,
+        1.12,
+        0.55
+      ],
+      "blenderEnergy": 117.0
+    },
+    {
+      "name": "Command door 25.0 358",
+      "kind": "Sandbox.PointLight",
+      "nativeColor": [
+        1.8,
+        1.12,
+        0.55
+      ],
+      "blenderEnergy": 117.0
+    },
+    {
+      "name": "Command door 265 214",
+      "kind": "Sandbox.PointLight",
+      "nativeColor": [
+        1.8,
+        1.12,
+        0.55
+      ],
+      "blenderEnergy": 117.0
+    },
+    {
+      "name": "Command door 265 358",
+      "kind": "Sandbox.PointLight",
+      "nativeColor": [
+        1.8,
+        1.12,
+        0.55
+      ],
+      "blenderEnergy": 117.0
+    },
+    {
+      "name": "Command door 490.0 214",
+      "kind": "Sandbox.PointLight",
+      "nativeColor": [
+        1.8,
+        1.12,
+        0.55
+      ],
+      "blenderEnergy": 117.0
+    },
+    {
+      "name": "Command door 490.0 358",
+      "kind": "Sandbox.PointLight",
+      "nativeColor": [
+        1.8,
+        1.12,
+        0.55
+      ],
+      "blenderEnergy": 117.0
+    },
+    {
+      "name": "Hangar 1100 935.0",
+      "kind": "Sandbox.SpotLight",
+      "nativeColor": [
+        6.4,
+        4.5,
+        2.3
+      ],
+      "blenderEnergy": 416.0
+    },
+    {
+      "name": "Hangar 1100 1265.0",
+      "kind": "Sandbox.SpotLight",
+      "nativeColor": [
+        6.4,
+        4.5,
+        2.3
+      ],
+      "blenderEnergy": 416.0
+    },
+    {
+      "name": "Logistics task",
+      "kind": "Sandbox.PointLight",
+      "nativeColor": [
+        1.1,
+        0.8,
+        0.46
+      ],
+      "blenderEnergy": 71.5
+    }
+  ],
+  "sourceHashes": {
+    "Assets\\models\\maps\\forestbase\\ground.vmdl": "bb007e256285b2e6290877655e04b8e4c061ceb1220adf62d1a678a2c2b423d9",
+    "Assets\\models\\maps\\forestbase\\ground.obj": "7e2e418879656a0a24a377cfe789b621376e7d4d1928e774ba63e34f91eb8c21",
+    "Assets\\materials\\forestbase\\scans\\asphalt_02.vmat": "edc5dd87bfc118b435b9665deb6cc43c559f48ea582288ddc8802553ab2695f8",
+    "Assets\\materials\\forestbase\\asphalt_repair.vmat": "39f2d300719e316cb7388f5929d177dc0968f68cd9eb57c087bb218c88e99e28",
+    "Assets\\materials\\forestbase\\asphalt_seam.vmat": "30f7b07c7979b4ce4ca8fd564b58f39e7d3ddb5cf35c5dd3651ff0390e34f8ee",
+    "Assets\\materials\\forestbase\\scans\\concrete_floor_02.vmat": "dd3abd34e2c8ef52e99082d6a3e3eac7259fc0b91c740e3d469778984dd1e9b6",
+    "Assets\\materials\\forestbase\\equipment_paint.vmat": "0edd9d556e54ec07f69a1ae76b5b74c062c35f483b649ada7de0adac0959e033",
+    "Assets\\materials\\forestbase\\fence.vmat": "d3c35486a760d6d29e1b651aab0614ef51744003243519cd094c67cf85983633",
+    "Assets\\materials\\forestbase\\lamp.vmat": "6035cf25fbe99308e778ccfbb99677bb0ee98091c853a788a3205a3717499c28",
+    "Assets\\materials\\forestbase\\scans\\mud_forest.vmat": "b50fe898c4b2fd13d2d3902eb4d80d66b055613b060daa418b36a0cfaa8c9a9c",
+    "Assets\\materials\\forestbase\\scans\\muddy_tracks.vmat": "8e5b49dbefd62a383b50a1d8a95bda7176338056cf2d241ebb83f1bf723655fc",
+    "Assets\\materials\\forestbase\\scans\\metal_plate_02.vmat": "37911a8fca33a698483a559fe8f2bcbd75e8bf98bf68f9059704d20829c0dbfa",
+    "Assets\\materials\\forestbase\\water.vmat": "7f2939364c7ddd0ff47106efe14ac3daf4f169f32362065ca3fdec213cba97cc",
+    "Assets\\materials\\forestbase\\yellow.vmat": "13b056defd975f1890613a1fd3383a3a7f36cce63318ec3a3aed90a0ab3bc58a",
+    "Assets\\models\\maps\\forestbase\\motor.vmdl": "81554f6e3eda228ba93e759a9bb2afdd175274feec47e932bbaebd9fa78d2ebc",
+    "Assets\\models\\maps\\forestbase\\motor.obj": "dc34a61ad8fd4ef5fe4ca0fe66a5040f190c3a5026730f863238bb45123748fc",
+    "Assets\\materials\\forestbase\\case_hardware.vmat": "2ee68b8603656c7cae3de30afd08303b335d2236a60bcdbc2d5373079b68695e",
+    "Assets\\materials\\forestbase\\scans\\concrete_wall_007.vmat": "279efcf270e2b0f7af1334ad11fde68ebe7711526c91dd5cb0f957f5b1fa4246",
+    "Assets\\materials\\forestbase\\scans\\corrugated_iron_02.vmat": "a929391deb657ad4ac41d2f33ecdcd9f042662e0608e577e5509addb040e2608",
+    "Assets\\materials\\forestbase\\rubber.vmat": "84a584fe3a09d570ae09b122f41e137be613a4bde5017de2dc60bbf39bd5137a",
+    "Assets\\materials\\forestbase\\sign_A.vmat": "a2dbb3a4dab43ba4f6068f9fd0e43a2ab88e4d830de04178f00b47f9095f32ae",
+    "Assets\\materials\\forestbase\\structural_steel.vmat": "68c871d6bc78e81c5cfbc97438c0ff2a787e92cf5cdedf3827450fdb9f88c1dd",
+    "Assets\\materials\\forestbase\\scans\\wood_planks.vmat": "3efdc21c39b3e455d70ce490aff458b78e7dc5324ef9a7a288153c691e354237",
+    "Assets\\materials\\forestbase\\vehicle_canvas.vmat": "980f900599a796299cff102f279b032b16b1eb331226611d71d8a3dea4ea0e54",
+    "Assets\\materials\\forestbase\\vehicle_glass.vmat": "8e3261ed7f886053c522197adb5396bfe6d856482d95875d124973a93eef8ac5",
+    "Assets\\materials\\forestbase\\vehicle_metal.vmat": "11a5a3a3abb00a8d274c0495f11ad79fea747d8be7b4d472aca8948feda92a5e",
+    "Assets\\materials\\forestbase\\vehicle_paint.vmat": "d9fdb75996953e445a3f063b2749414c2fe67dd4a442166fde6df53ddb5d66af",
+    "Assets\\materials\\forestbase\\vehicle_rubber.vmat": "9a285bf6e7aaf8c5a56bcad4d83163391b0246eb0926cb4773809411b3ff99a0",
+    "Assets\\materials\\forestbase\\vehicle_stencil_0.vmat": "fb7783d552a8762d0c96bc7d7e09246492d5c3d3d0e9736506ff6446ad9df724",
+    "Assets\\models\\maps\\forestbase\\barracks.vmdl": "8d8daf0716d9c3b94130bd3d4a137a35063941d6de3e531c9cf2277158874d69",
+    "Assets\\models\\maps\\forestbase\\barracks.obj": "97272efbfbe7befcf43d45e4b9bfa88da51af880b8e57938d7200fa841720710",
+    "Assets\\materials\\forestbase\\bed_blanket.vmat": "df6e1d8a29d644b61e38d3c603798d84014405d861e25a8b482b0b9ccfb14514",
+    "Assets\\materials\\forestbase\\bed_linen.vmat": "a2880326d0373411517cc1daa03ef151dd8c588561960c318ac74dba938bbbd4",
+    "Assets\\materials\\forestbase\\bed_ticking.vmat": "ba604b39653bcea4e8f4fcde930d0bbf85e16add504038b2b1e5c420384faa2f",
+    "Assets\\materials\\forestbase\\cargo_0.vmat": "2c5d4247ae2b3b6dd28f89f78c0c24130a3abf79d87afba4e80af31f0b4041e3",
+    "Assets\\materials\\forestbase\\cargo_1.vmat": "2c060d44d53d291304f2e2e5448cbaf3a01f5a8324979f22622e20a1af65e258",
+    "Assets\\materials\\forestbase\\cargo_2.vmat": "2f7105b58d7f3b34c5e115771b6935a9cb7fb01e3461446357252b83906639a5",
+    "Assets\\materials\\forestbase\\case_0.vmat": "6b290a4a97000a65131ccb0d301851a31f1308a6da2ddc382ccff088f2d1e8e0",
+    "Assets\\materials\\forestbase\\case_1.vmat": "d557c6093bc48d9fadbd249f460f0eee271c98649c2fd456256abb38cf8b35ad",
+    "Assets\\materials\\forestbase\\case_2.vmat": "5a899c302ea7030bc7f1d4ef84e2001cbdf844c1b32029793d29ea356be42c4b",
+    "Assets\\materials\\forestbase\\olive.vmat": "6d7d5336ac658e350e7bb460fea8792fd6be55dac2bc5f76b34d631493833fb0",
+    "Assets\\materials\\forestbase\\sign_B.vmat": "8e6891143fd4a7ac6ecb7a423e81a2520299b98064ee6710e844f322fcca6870",
+    "Assets\\models\\maps\\forestbase\\command.vmdl": "21debc7714825137fc6baac10db05b13a36a0ea49c018e1ed723addb3075325c",
+    "Assets\\models\\maps\\forestbase\\command.obj": "dafc4af100d46551c319301c515a891330d7d3b928721ce99a635794e948a26c",
+    "Assets\\materials\\forestbase\\dish_paint.vmat": "ebb8e1126e688e324b76901dd182441f3a08b98f384c29c1645e5de932a40757",
+    "Assets\\materials\\forestbase\\glass.vmat": "e36ea78b40f79fd7fd85969f58d407b8d41043d00cf0f9d7bc8e2f98186e7218",
+    "Assets\\materials\\forestbase\\screen.vmat": "2a7b9e7bb4afa4cd1928e34123722e4c4c07b21d3b46d4524dc5c5b4e6368253",
+    "Assets\\materials\\forestbase\\sign_C.vmat": "bb968e55ed69c0d45cf1b13b5bf133915fff1ccf1f2cdc5cc7eacd9dacd77947",
+    "Assets\\models\\maps\\forestbase\\workshop.vmdl": "c6356d47d3fbda936c04000ddeb0051084de68a477e75a280984c637d64ace18",
+    "Assets\\models\\maps\\forestbase\\workshop.obj": "f71a475a1ffb61f436414206075fefc3b5fb8de670a3f9631bf766e946316112",
+    "Assets\\materials\\forestbase\\sign_E.vmat": "9a54ef9e5b02ce8d0d637b30f6e5d7bbd71560330ec4e8a930faad07e35574ea",
+    "Assets\\models\\maps\\forestbase\\yard.vmdl": "ae59eb39c30fb1eecd76f7277bd4664996c2d6eee23bc506f47b4d63c3c9fa54",
+    "Assets\\models\\maps\\forestbase\\yard.obj": "c771e9d9888b68601a80e1205cd6fef0211f2fa57afa9088c119b7ab3923f001",
+    "Assets\\materials\\forestbase\\cargo_3.vmat": "4020650efad335fb44f9c018aec7045c132ee0121c3f13336e05577c57c5f972",
+    "Assets\\materials\\forestbase\\container_2.vmat": "402cfc4def653034f393d7287e16893a34e172a280d304d7342cb00a95b22dab",
+    "Assets\\materials\\forestbase\\vehicle_stencil_1.vmat": "409f32ac0f61ea305167d33e66fcc3970b140770c1a35d7290f43806d3883738",
+    "Assets\\models\\maps\\forestbase\\logistics.vmdl": "238d23edfcc76960214ece1ab694afe68d6e0534d51d591dc1110fbf41de1d54",
+    "Assets\\models\\maps\\forestbase\\logistics.obj": "4821de222d2d19c7624d6b167c5d1dbe6e320c093df11bcd6fb4bf20f4572127",
+    "Assets\\materials\\forestbase\\camonet.vmat": "c069aebc0138fb9c11ff3b952a247b05ecbb9b2a5f42dc4b178ecad918047338",
+    "Assets\\materials\\forestbase\\container_0.vmat": "5acd82f2c31931510300d3f772881a143b183c902a679bc9c7c1551b7349c555",
+    "Assets\\materials\\forestbase\\container_1.vmat": "10f536f7c01a1535bae79995901f1046c32a814eee0c1c2070f82fe3afcb7d81",
+    "Assets\\materials\\forestbase\\sign_D.vmat": "35b73544c447516d2eedd6e32da7f4e66cdd44ae17da7cfc00f7e57e8a8babbf",
+    "Assets\\models\\maps\\forestbase\\links.vmdl": "cc23b5aba8b00c4139b401e4cd2f96f0671af50331d4d9bad1668343ab3ddde7",
+    "Assets\\models\\maps\\forestbase\\links.obj": "833614ff5809d705720594e27139e5a8e3ae87cd4e66cdbe91503efca54428e5",
+    "Assets\\materials\\forestbase\\sign_F.vmat": "37ebcbd543f58983a4dca7d8bb81cfce5cc693b360cfff757fa3f6f565d7843f",
+    "Assets\\models\\maps\\forestbase\\vista.vmdl": "70206bfc48c0300269023282bc9c02a893db69196492c20a4ea0c8bd3b415fe0",
+    "Assets\\models\\maps\\forestbase\\vista.obj": "cdfeedf32f6bbbb8928827bca8c285ad1ed35ec35cb61c009cb061530d5e20a7",
+    "Assets\\materials\\forestbase\\cascade_rock.vmat": "668af5bb4507ee70b01ebf71c8a6c0dc07a1b638979ddbcb9d8290a22756a23f",
+    "Assets\\materials\\forestbase\\river.vmat": "bce6dfeb6df516006d340860e85b38f71b7822188986741a3ee0758e5dcd4194",
+    "Assets\\materials\\forestbase\\shore_bank.vmat": "b9591a0488e2dd7991e0ef89798d5e88801371f4efeafba03288ba0cdd1ceef7",
+    "Assets\\materials\\forestbase\\shore_rock.vmat": "323539c612f4a29b041ef2c7ac0dd56a88dcee2604194651d9be77d73414bf51",
+    "Assets\\models\\maps\\forestbase\\shore_boulder.vmdl": "a0c11b7cdeb245ab6ed238de94b9514dbb33ed269f8739fac71f81d20fbbdc59",
+    "Assets\\models\\maps\\forestbase\\boulder\\cliff_lod1.obj": "cc71e840cde38edd470751f1864040cc472bb1cfad9cf733a9f18dd46081d983",
+    "Assets\\models\\maps\\forestbase\\shore_grass.vmdl": "7f1e3f46af79b34759e46f18af37905399d38a69b88209924a66e0c8bc8fd57e",
+    "Assets\\models\\grass\\grass_far_short_lod1.obj": "b773410a03a796e0569bef8bb11d55ba781a7a3a44921a7c08e4b574399310ab",
+    "Assets\\materials\\forestbase\\shore_grass.vmat": "2273acbbdc79eeb706ffaba36d02c358faef02b9b77850ab324794fe731073da",
+    "Assets\\models\\maps\\forestbase\\forest_boulder.vmdl": "0354af114fa39cf15803b8aeba9521293be7f10601058512c13a471d71eb7163",
+    "Assets\\materials\\forestbase\\forest_rock.vmat": "c8056245fc378f71d72d86036a5ff936bc650e520390fd61ee6360536883265d",
+    "Assets\\models\\maps\\forestbase\\fir\\fir_a.vmdl": "4ea260e291732fe34bc631d8b9a4165093f42a382f5e2affa27bea6cb8951f5d",
+    "Assets\\models\\maps\\forestbase\\fir\\fir_a_lod1.obj": "44341b6b7df8f72d0a49798bad5e67f57c3c530dcab91cf7750fd13cc0f837bc",
+    "Assets\\models\\maps\\forestbase\\fir\\fir_tree_01_bark.vmat": "3a47defb1a71c094fe98bd4f68334a7c7c6871cb194ed664561c40087c739d82",
+    "Assets\\models\\maps\\forestbase\\fir\\fir_tree_01_trunk_a.vmat": "a07b76a0d9975fe0af651dbee8085ce3a2e3a96f6e936cc36f6204e71b659376",
+    "Assets\\models\\maps\\forestbase\\fir\\fir_tree_01_twig.vmat": "a6ec3bb50fa55228c2c81acef015ea162eefe67de5ee0b068d1bed74b87ae428",
+    "Assets\\models\\maps\\forestbase\\fir\\fir_tree_01_dead_branches.vmat": "e9e77ef91d6391e04bdb25f387cdc5805ded31fcc7f10280cc7cbe4de369f4ff",
+    "Assets\\models\\maps\\forestbase\\fir\\fir_b.vmdl": "b67dc889a3ad4d671eedee2388321c7d03bc78d60917307945fab13ace520e56",
+    "Assets\\models\\maps\\forestbase\\fir\\fir_b_lod1.obj": "f587573ec7e2df5bbb5183e1648b55004c14d161eff78ecef0fd304e3d365798",
+    "Assets\\models\\maps\\forestbase\\fir\\fir_tree_01_trunk_b.vmat": "b6213ab983ad894e0ecc104c28c1533ef39446420f19f6730e0f137c270d860c",
+    "Assets\\models\\maps\\forestbase\\fir\\fir_c.vmdl": "cac2a36a9e14fdb2f4733434c850dbb0359a789a02bcc2dfc4d1259f0afce72b",
+    "Assets\\models\\maps\\forestbase\\fir\\fir_c_lod1.obj": "b2d6e358cadbb81df979001f29118b16eaee058f73cb5e4621dc0971e27fb813",
+    "Assets\\models\\maps\\forestbase\\fir\\fir_tree_01_trunk_c.vmat": "3188c5b8724d698565601e295f25a43ace6caadd6ac7e2f98afeedd0e7025be3",
+    "Assets\\models\\maps\\forestbase\\sapling\\sapling_a.vmdl": "661162a3429bd95ae4c3fda5b5c26382a409b034ea3693b467248b3544035934",
+    "Assets\\models\\maps\\forestbase\\sapling\\sapling_a_lod1.obj": "1fd4e3ddbb38b68c8944ae880795f986c6cba52bb12f18e1736379e29f919039",
+    "Assets\\models\\maps\\forestbase\\sapling\\fir_sapling_branches.vmat": "32d7bf74f4e04ca931848ecc1890a7d4ddd079fdf99df2286c2c2d0f9a3d8cdb",
+    "Assets\\models\\maps\\forestbase\\sapling\\fir_sapling_twigs.vmat": "96d1d5757e687e4f086adcde6776a6375b859c5ce3d268b88a4d9ad7a4aaf675",
+    "Assets\\models\\maps\\forestbase\\sapling\\sapling_b.vmdl": "718d116f9c9a8ef674584f56dfe1e4f407bec00e2e4c1765c0ef38835b8b39e2",
+    "Assets\\models\\maps\\forestbase\\sapling\\sapling_b_lod1.obj": "260c2b7c0e720142bca9b76e5b15fd5d2e4a358744b305ef076a9aceb91dcd47",
+    "Assets\\models\\maps\\forestbase\\sapling\\sapling_c.vmdl": "f6cbf801d46b978e6749224a54426b7d0727bba9fbe7da34ede7f5b18e979c9a",
+    "Assets\\models\\maps\\forestbase\\sapling\\sapling_c_lod1.obj": "ec3bddc0d9228a7352f7c8bb11c6c9c95f9068c6e042114a11ed69a60e780d96",
+    "Assets\\models\\maps\\forestbase\\mountainside\\cliff.vmdl": "76e9cb55c8ff688b7211bf907ac1f0829f0c0ab3b4ac069f0b62673b7fca743f",
+    "Assets\\models\\maps\\forestbase\\mountainside\\cliff_lod1.obj": "d972a685630b97018627dc3216c58235e898571e4f06592a54d3bf866b68a000",
+    "Assets\\models\\maps\\forestbase\\mountainside\\cliff.vmat": "cbc205cfc17ebd44c10026c6b6bbdda9c5836666e70e6c924715c82745553618",
+    "Assets\\models\\maps\\forestbase\\fir\\fir_b_far.vmdl": "fa39b9282251d049eed37ae4bcfc1e1c93bafe64b17637c63eccba5319703c6c",
+    "Assets\\models\\maps\\forestbase\\fir\\fir_b_distant.obj": "8e6c0ffc9c495727ca4996dee94f0b63973f468b6b1632cef386d9e428de022a",
+    "Assets\\models\\maps\\forestbase\\fir\\fir_c_far.vmdl": "e3d211c1fca58bcd8f660b865f45d2bb899640e27211283f64efa869b05dde0d",
+    "Assets\\models\\maps\\forestbase\\fir\\fir_c_distant.obj": "c7c059e7f9b085f96ef54674e03aeea9772ce135bce62d18c9589a5001c95ba9",
+    "Assets\\models\\maps\\forestbase\\fir\\fir_a_far.vmdl": "e97840b2a68663076fa8a5bf406bc19b599d5f191eec6a527dfa507b2541d04b",
+    "Assets\\models\\maps\\forestbase\\fir\\fir_a_distant.obj": "fcedd815e72899a2629ae82c15dc219cc631fec906742ee1b32779d9899d2724",
+    "Assets\\models\\maps\\forestbase\\fir\\fir_a_horizon.vmdl": "c241c9a989d675236c46eb9c3548965377695c2274ac6cd20eb1b83c8d8ed86a",
+    "Assets\\models\\maps\\forestbase\\fir\\fir_a_horizon.obj": "2bba0e6b87b0f3542174838bbd650af4bb45d6e01a8befc4baf917f017ab793c",
+    "Assets\\models\\maps\\forestbase\\fir\\fir_c_horizon.vmdl": "2321822aeb44d6fbf992f4e56ea6c422efa389bfdb6efe3f394cba5a357414cd",
+    "Assets\\models\\maps\\forestbase\\fir\\fir_c_horizon.obj": "946e612fcf5e2e89e36d82d95baad1ce14431e1a943d3da56c53fc89342b6358",
+    "Assets\\models\\maps\\forestbase\\fir\\fir_b_horizon.vmdl": "252c8c3972896b44cc741b5698809b2bb465f1d9776ab95070b794c86e505b3e",
+    "Assets\\models\\maps\\forestbase\\fir\\fir_b_horizon.obj": "3e6e2951aff6fe59c01eff4989562411056ab170e2bca54611f450dcae57461d",
+    "Assets\\models\\maps\\forestbase\\floor\\grass_0_0.vmdl": "736a0d5847ce80258f8169ba68d267bdb455517ec62e0b71946ba5e8cf88f81a",
+    "Assets\\models\\maps\\forestbase\\floor\\grass_0_0_lod1.obj": "151e6eb259d2bc0f8eb49abd1d810e0815c10e958d93e19d45fdf0eb8ce0ee00",
+    "Assets\\materials\\forestbase\\forest_grass.vmat": "6ca91deb5d2f559d5db2d7dd6600648ab6abfe5564fa2a60688cba79a10e1768",
+    "Assets\\models\\maps\\forestbase\\floor\\grass_0_1.vmdl": "58b5f98003ca50b43a1866d22eaa45edf8404f36c07a3bce6eb5e3f4b026b4db",
+    "Assets\\models\\maps\\forestbase\\floor\\grass_0_1_lod1.obj": "78241e9a3620f421b209eded344de3298bc4e3c8da8a1602080e6832a75c1b16",
+    "Assets\\models\\maps\\forestbase\\floor\\grass_1_0.vmdl": "c9c8f0e09f17829d2d4a0bf7ef89c9f5a95ac2cc3f4229bde3d70733b00593d3",
+    "Assets\\models\\maps\\forestbase\\floor\\grass_1_0_lod1.obj": "ece95e35fe6e69c6d5c51947acecbf081e26dc908a94505aaaf194be139ba74a",
+    "Assets\\models\\maps\\forestbase\\floor\\grass_1_1.vmdl": "205e70a7d6fc43cab79a312a84cd30c580835bb5d115c77d04ccb4496eea45d7",
+    "Assets\\models\\maps\\forestbase\\floor\\grass_1_1_lod1.obj": "6852fa50fb0e439f06f181d3843ebef7109f0bc554d9bf732a031dd5e936630e",
+    "Assets\\models\\maps\\forestbase\\floor\\grass_2_0.vmdl": "b1d2b1ff4809f288cbe043b6cf168f624e9d8cefa41872f606dce4e0517dc74d",
+    "Assets\\models\\maps\\forestbase\\floor\\grass_2_0_lod1.obj": "02871c43551b9b62b34750071846bccd8211e5303c9f4fa7862d7135b3ae083c",
+    "Assets\\models\\maps\\forestbase\\floor\\grass_2_1.vmdl": "044281ba8ab0d490e6a5d3604be9334d7df4feca176a4fae8fc01b326e2c9a33",
+    "Assets\\models\\maps\\forestbase\\floor\\grass_2_1_lod1.obj": "144b808f0e06b1d3fe97a37582b1b39c9623b9840a6fc6df4b191537d53e192b",
+    "Assets\\models\\maps\\forestbase\\floor\\grass_3_0.vmdl": "e0500be139baa6170987154dafc0c2d63d7dd2e5af9e431bfb3302a012571758",
+    "Assets\\models\\maps\\forestbase\\floor\\grass_3_0_lod1.obj": "70773a23cea1cfb7ebaaac44f649a378e85aa1ff2ace1c06b0fc272d6055edf1",
+    "Assets\\models\\maps\\forestbase\\floor\\grass_3_1.vmdl": "e7825f3337b59f5b0944997485211a00119ed3600291628dc93dba5f2f1c9d1f",
+    "Assets\\models\\maps\\forestbase\\floor\\grass_3_1_lod1.obj": "26319a1b96fa0715ce5cf16acb7479d68a6a9d0498fb24959b4f7a40d7bb2c9e"
+  }
+}

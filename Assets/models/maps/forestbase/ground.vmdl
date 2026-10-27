@@ -1,0 +1,211 @@
+<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:modeldoc29:version{3cec427c-1b0e-4d48-a90a-0436f33a6041} -->
+{
+	rootNode =
+	{
+		_class = "RootNode"
+		children =
+		[
+			{
+				_class = "MaterialGroupList"
+				children =
+				[
+					{
+						_class = "DefaultMaterialGroup"
+						remaps =
+						[
+							{ from = "asphalt.vmat" to = "materials/forestbase/scans/asphalt_02.vmat" },
+							{ from = "asphalt_repair.vmat" to = "materials/forestbase/asphalt_repair.vmat" },
+							{ from = "asphalt_seam.vmat" to = "materials/forestbase/asphalt_seam.vmat" },
+							{ from = "concrete.vmat" to = "materials/forestbase/scans/concrete_floor_02.vmat" },
+							{ from = "equipment_paint.vmat" to = "materials/forestbase/equipment_paint.vmat" },
+							{ from = "fence.vmat" to = "materials/forestbase/fence.vmat" },
+							{ from = "lamp.vmat" to = "materials/forestbase/lamp.vmat" },
+							{ from = "mud.vmat" to = "materials/forestbase/scans/mud_forest.vmat" },
+							{ from = "mud_track.vmat" to = "materials/forestbase/scans/muddy_tracks.vmat" },
+							{ from = "steel.vmat" to = "materials/forestbase/scans/metal_plate_02.vmat" },
+							{ from = "water.vmat" to = "materials/forestbase/water.vmat" },
+							{ from = "yellow.vmat" to = "materials/forestbase/yellow.vmat" }
+						]
+						use_global_default = false
+						global_default_material = ""
+					},
+				]
+			},
+			{
+				_class = "RenderMeshList"
+				children =
+				[
+					{
+						_class = "RenderMeshFile"
+						name = "ground"
+						filename = "models/maps/forestbase/ground.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+				]
+			},
+			{
+				_class = "PhysicsShapeList"
+				children =
+				[
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "concrete"
+						collision_tags = "solid"
+						origin = [ 0.0000, -0.0000, -9.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 3100.0000, 2900.0000, 18.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
+						origin = [ 0.0000, 1550.0000, 75.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 6.0000, 2906.0000, 150.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "concrete"
+						collision_tags = "solid"
+						origin = [ 0.0000, 1550.0000, 42.0000 ]
+						angles = [ -0.0000, -0.0000, 0.0000 ]
+						dimensions = [ 2900.0000, 14.0000, 8.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
+						origin = [ 0.0000, -1550.0000, 75.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 6.0000, 2906.0000, 150.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "concrete"
+						collision_tags = "solid"
+						origin = [ 0.0000, -1550.0000, 42.0000 ]
+						angles = [ -0.0000, -0.0000, 0.0000 ]
+						dimensions = [ 2900.0000, 14.0000, 8.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
+						origin = [ 1450.0000, -0.0000, 75.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 3106.0000, 6.0000, 150.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "concrete"
+						collision_tags = "solid"
+						origin = [ 1450.0000, -0.0000, 42.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 3100.0000, 14.0000, 8.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
+						origin = [ -1450.0000, 865.0000, 75.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 1376.0000, 6.0000, 150.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "concrete"
+						collision_tags = "solid"
+						origin = [ -1450.0000, 865.0000, 42.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 1370.0000, 14.0000, 8.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
+						origin = [ -1450.0000, -865.0000, 75.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 1376.0000, 6.0000, 150.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "concrete"
+						collision_tags = "solid"
+						origin = [ -1450.0000, -865.0000, 42.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 1370.0000, 14.0000, 8.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "concrete"
+						collision_tags = "solid"
+						origin = [ -1580.0000, -0.0000, -19.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 360.0000, 260.0000, 38.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
+						origin = [ -1710.0000, -0.0000, 75.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 366.0000, 6.0000, 150.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "concrete"
+						collision_tags = "solid"
+						origin = [ -1690.0000, -0.0000, 42.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 360.0000, 14.0000, 8.0000 ]
+					},
+					{
+						_class = "PhysicsHullFile"
+						name = "ground_hulls_concrete"
+						parent_bone = ""
+						surface_prop = "concrete"
+						collision_tags = "solid"
+						recenter_on_parent_bone = false
+						offset_origin = [ 0.0, 0.0, 0.0 ]
+						offset_angles = [ 0.0, 0.0, 0.0 ]
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						filename = "models/maps/forestbase/ground_hulls_concrete.obj"
+						import_scale = 1.0
+						faceMergeAngle = 10.0
+						maxHullVertices = 0
+						import_mode = "HullPerElement"
+						optimization_algorithm = "QEM"
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+				]
+			},
+		]
+		model_archetype = ""
+		primary_associated_entity = ""
+		anim_graph_name = ""
+		base_model_name = ""
+	}
+}

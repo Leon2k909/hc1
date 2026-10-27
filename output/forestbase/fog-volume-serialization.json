@@ -1,0 +1,38 @@
+{
+  "__guid": "c042e983-ae3c-416a-95a6-5ca312da59a6",
+  "__version": 2,
+  "Flags": 0,
+  "Name": "Volumetric fog schema",
+  "Position": "0,0,0",
+  "Rotation": "0,0,0,1",
+  "Scale": "1,1,1",
+  "Tags": "",
+  "Enabled": true,
+  "NetworkMode": 2,
+  "NetworkFlags": 0,
+  "NetworkOrphaned": 0,
+  "NetworkTransmit": true,
+  "OwnerTransfer": 1,
+  "Components": [
+    {
+      "__type": "Sandbox.VolumetricFogVolume",
+      "__guid": "c727dbcd-e2c5-4a2e-943f-6bf985a8bd93",
+      "__enabled": true,
+      "Flags": 0,
+      "Bounds": {
+        "Mins": "-150,-150,-150",
+        "Maxs": "150,150,150"
+      },
+      "Color": "1,1,1,1",
+      "FalloffExponent": 1,
+      "OnComponentDestroy": null,
+      "OnComponentDisabled": null,
+      "OnComponentEnabled": null,
+      "OnComponentFixedUpdate": null,
+      "OnComponentStart": null,
+      "OnComponentUpdate": null,
+      "Strength": 1
+    }
+  ],
+  "Children": []
+}

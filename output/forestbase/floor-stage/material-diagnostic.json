@@ -1,0 +1,218 @@
+[
+  {
+    "object": "Forest floor grass 1 0",
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "shadow": false,
+    "material": "forest-inspection C:\\Users\\mimi-\\OneDrive\\Dokumente\\S&box Projects\\hc1\\output\\forestbase\\floor-stage\\forest_grass.vmat",
+    "nodes": [
+      {
+        "name": "Material Output",
+        "type": "ShaderNodeOutputMaterial",
+        "image": null
+      },
+      {
+        "name": "Principled BSDF",
+        "type": "ShaderNodeBsdfPrincipled",
+        "image": null
+      },
+      {
+        "name": "Image Texture",
+        "type": "ShaderNodeTexImage",
+        "image": "C:\\Users\\mimi-\\OneDrive\\Dokumente\\S&box Projects\\hc1\\Assets\\models\\grass\\grass_blades.png"
+      },
+      {
+        "name": "Object Info",
+        "type": "ShaderNodeObjectInfo",
+        "image": null
+      },
+      {
+        "name": "Mix (Legacy)",
+        "type": "ShaderNodeMixRGB",
+        "image": null
+      },
+      {
+        "name": "Geometry",
+        "type": "ShaderNodeNewGeometry",
+        "image": null
+      },
+      {
+        "name": "Vector Math",
+        "type": "ShaderNodeVectorMath",
+        "image": null
+      },
+      {
+        "name": "Vector Math.001",
+        "type": "ShaderNodeVectorMath",
+        "image": null
+      },
+      {
+        "name": "Vector Math.002",
+        "type": "ShaderNodeVectorMath",
+        "image": null
+      }
+    ],
+    "links": [
+      [
+        "Principled BSDF",
+        "BSDF",
+        "Material Output",
+        "Surface"
+      ],
+      [
+        "Image Texture",
+        "Color",
+        "Mix (Legacy)",
+        "Color1"
+      ],
+      [
+        "Object Info",
+        "Color",
+        "Mix (Legacy)",
+        "Color2"
+      ],
+      [
+        "Mix (Legacy)",
+        "Color",
+        "Principled BSDF",
+        "Base Color"
+      ],
+      [
+        "Geometry",
+        "Normal",
+        "Vector Math",
+        "Vector"
+      ],
+      [
+        "Vector Math",
+        "Vector",
+        "Vector Math.001",
+        "Vector"
+      ],
+      [
+        "Vector Math.001",
+        "Vector",
+        "Vector Math.002",
+        "Vector"
+      ],
+      [
+        "Vector Math.002",
+        "Vector",
+        "Principled BSDF",
+        "Normal"
+      ]
+    ]
+  },
+  {
+    "object": "Forest floor grass 1 1",
+    "color": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "shadow": false,
+    "material": "forest-inspection C:\\Users\\mimi-\\OneDrive\\Dokumente\\S&box Projects\\hc1\\output\\forestbase\\floor-stage\\forest_grass.vmat",
+    "nodes": [
+      {
+        "name": "Material Output",
+        "type": "ShaderNodeOutputMaterial",
+        "image": null
+      },
+      {
+        "name": "Principled BSDF",
+        "type": "ShaderNodeBsdfPrincipled",
+        "image": null
+      },
+      {
+        "name": "Image Texture",
+        "type": "ShaderNodeTexImage",
+        "image": "C:\\Users\\mimi-\\OneDrive\\Dokumente\\S&box Projects\\hc1\\Assets\\models\\grass\\grass_blades.png"
+      },
+      {
+        "name": "Object Info",
+        "type": "ShaderNodeObjectInfo",
+        "image": null
+      },
+      {
+        "name": "Mix (Legacy)",
+        "type": "ShaderNodeMixRGB",
+        "image": null
+      },
+      {
+        "name": "Geometry",
+        "type": "ShaderNodeNewGeometry",
+        "image": null
+      },
+      {
+        "name": "Vector Math",
+        "type": "ShaderNodeVectorMath",
+        "image": null
+      },
+      {
+        "name": "Vector Math.001",
+        "type": "ShaderNodeVectorMath",
+        "image": null
+      },
+      {
+        "name": "Vector Math.002",
+        "type": "ShaderNodeVectorMath",
+        "image": null
+      }
+    ],
+    "links": [
+      [
+        "Principled BSDF",
+        "BSDF",
+        "Material Output",
+        "Surface"
+      ],
+      [
+        "Image Texture",
+        "Color",
+        "Mix (Legacy)",
+        "Color1"
+      ],
+      [
+        "Object Info",
+        "Color",
+        "Mix (Legacy)",
+        "Color2"
+      ],
+      [
+        "Mix (Legacy)",
+        "Color",
+        "Principled BSDF",
+        "Base Color"
+      ],
+      [
+        "Geometry",
+        "Normal",
+        "Vector Math",
+        "Vector"
+      ],
+      [
+        "Vector Math",
+        "Vector",
+        "Vector Math.001",
+        "Vector"
+      ],
+      [
+        "Vector Math.001",
+        "Vector",
+        "Vector Math.002",
+        "Vector"
+      ],
+      [
+        "Vector Math.002",
+        "Vector",
+        "Principled BSDF",
+        "Normal"
+      ]
+    ]
+  }
+]

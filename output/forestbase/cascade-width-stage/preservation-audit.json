@@ -1,0 +1,917 @@
+{
+  "scope": "Offline exported cascade and unrelated geometry preservation. No native shader, collision, animation or FPS verification.",
+  "allNineMainModelDocsUnchanged": {
+    "ground": true,
+    "motor": true,
+    "barracks": true,
+    "command": true,
+    "workshop": true,
+    "yard": true,
+    "logistics": true,
+    "links": true,
+    "vista": true
+  },
+  "sceneUnchanged": true,
+  "layoutUnchanged": true,
+  "unchangedMaterialGeometry": {
+    "concrete": true,
+    "glass": true,
+    "lamp": true,
+    "mud": true,
+    "mud_track": true,
+    "olive": true,
+    "plunge_basin": true,
+    "river": true,
+    "roof": true,
+    "shore_bank": true,
+    "shore_rock": true,
+    "steel": true,
+    "waterfall_current": true
+  },
+  "changedMaterialGeometry": [
+    "cascade_rock",
+    "waterfall_0",
+    "waterfall_1",
+    "waterfall_2",
+    "waterfall_3",
+    "waterfall_impact",
+    "waterfall_spray"
+  ],
+  "crownWidthMetresBefore": 33.400999999999996,
+  "crownWidthMetresAfter": 19.811999999999998,
+  "footWidthMetres": 16.256,
+  "cascadeGeometryAudit": {
+    "scope": "Offline OBJ geometry, new/refitted-rock principal-view rays, and all-column basin entry; no native shader/physics/performance proof.",
+    "triangleCount": 111714,
+    "newOrRefittedRockTriangles": 1836,
+    "oldRockTrianglesRefitted": 1836,
+    "streams": [
+      {
+        "material": "waterfall_0",
+        "rows": 129,
+        "columns": 25,
+        "widthRange": [
+          160.0,
+          195.0
+        ],
+        "maximumBacktrack": 0.0,
+        "entries": [
+          {
+            "point": [
+              110.0,
+              3072.552,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.7791410166118476
+          },
+          {
+            "point": [
+              116.667,
+              3072.606,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.7642284012473722
+          },
+          {
+            "point": [
+              123.333,
+              3072.851,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.7488098212006599
+          },
+          {
+            "point": [
+              130.0,
+              3073.472,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.7324050208624291
+          },
+          {
+            "point": [
+              136.667,
+              3074.491,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.7150142291851197
+          },
+          {
+            "point": [
+              143.333,
+              3075.884,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.6967647824443738
+          },
+          {
+            "point": [
+              150.0,
+              3077.256,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.6787258352026073
+          },
+          {
+            "point": [
+              156.667,
+              3078.172,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.6620006598868016
+          },
+          {
+            "point": [
+              163.333,
+              3078.895,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.6458913758089253
+          },
+          {
+            "point": [
+              170.0,
+              3079.74,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.6296190483586374
+          },
+          {
+            "point": [
+              176.667,
+              3080.849,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.6128797674124653
+          },
+          {
+            "point": [
+              183.333,
+              3082.255,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.5956483696508204
+          },
+          {
+            "point": [
+              190.0,
+              3083.836,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.5782582624891218
+          },
+          {
+            "point": [
+              196.667,
+              3085.348,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.5613137871097108
+          },
+          {
+            "point": [
+              203.333,
+              3086.578,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.5453235860211937
+          },
+          {
+            "point": [
+              210.0,
+              3087.551,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.5302402811116483
+          },
+          {
+            "point": [
+              216.667,
+              3088.381,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.5158343081924235
+          },
+          {
+            "point": [
+              223.333,
+              3089.183,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.5018865309657191
+          },
+          {
+            "point": [
+              230.0,
+              3090.057,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.4882120236767944
+          },
+          {
+            "point": [
+              236.667,
+              3090.992,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.4748823331128863
+          },
+          {
+            "point": [
+              243.333,
+              3091.939,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.46205424569671516
+          },
+          {
+            "point": [
+              250.0,
+              3092.844,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.44989272810153635
+          },
+          {
+            "point": [
+              256.667,
+              3093.78,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.4382774403443557
+          },
+          {
+            "point": [
+              263.333,
+              3094.925,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.4268348498754192
+          },
+          {
+            "point": [
+              270.0,
+              3096.429,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.415233108316005
+          }
+        ]
+      },
+      {
+        "material": "waterfall_1",
+        "rows": 129,
+        "columns": 25,
+        "widthRange": [
+          160.0,
+          195.0
+        ],
+        "maximumBacktrack": 0.0,
+        "entries": [
+          {
+            "point": [
+              270.0,
+              3096.429,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.415233108316005
+          },
+          {
+            "point": [
+              276.667,
+              3098.357,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.4033283975882914
+          },
+          {
+            "point": [
+              283.333,
+              3100.574,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.3914476230111122
+          },
+          {
+            "point": [
+              290.0,
+              3102.832,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.3801958854114153
+          },
+          {
+            "point": [
+              296.667,
+              3104.801,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.37040014835118507
+          },
+          {
+            "point": [
+              303.333,
+              3106.253,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.362670554973516
+          },
+          {
+            "point": [
+              310.0,
+              3107.197,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.3570572610862443
+          },
+          {
+            "point": [
+              316.667,
+              3107.778,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.35326900009076584
+          },
+          {
+            "point": [
+              323.333,
+              3108.218,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.350783761279614
+          },
+          {
+            "point": [
+              330.0,
+              3108.703,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.34912157940512994
+          },
+          {
+            "point": [
+              336.667,
+              3109.254,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.3482026104337366
+          },
+          {
+            "point": [
+              343.333,
+              3109.746,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.34833209161689843
+          },
+          {
+            "point": [
+              350.0,
+              3110.308,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.3491047963099393
+          },
+          {
+            "point": [
+              356.667,
+              3111.116,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.34993790685583204
+          },
+          {
+            "point": [
+              363.333,
+              3112.323,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.3502711323266947
+          },
+          {
+            "point": [
+              370.0,
+              3113.979,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.3498163817915719
+          },
+          {
+            "point": [
+              376.667,
+              3116.08,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.34843057256194615
+          },
+          {
+            "point": [
+              383.333,
+              3118.604,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.3460174797574884
+          },
+          {
+            "point": [
+              390.0,
+              3121.508,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.34253843794084243
+          },
+          {
+            "point": [
+              396.667,
+              3124.808,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.33777802389030376
+          },
+          {
+            "point": [
+              403.333,
+              3128.542,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.3314618310819398
+          },
+          {
+            "point": [
+              410.0,
+              3132.718,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.3234162141062219
+          },
+          {
+            "point": [
+              416.667,
+              3137.295,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.3136222924817065
+          },
+          {
+            "point": [
+              423.333,
+              3142.165,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.30226752910562255
+          },
+          {
+            "point": [
+              430.0,
+              3147.013,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.29010713300777174
+          }
+        ]
+      },
+      {
+        "material": "waterfall_2",
+        "rows": 129,
+        "columns": 25,
+        "widthRange": [
+          160.0,
+          195.0
+        ],
+        "maximumBacktrack": 0.0,
+        "entries": [
+          {
+            "point": [
+              430.0,
+              3147.013,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.29010713300777174
+          },
+          {
+            "point": [
+              436.667,
+              3151.617,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.2776602166179941
+          },
+          {
+            "point": [
+              443.333,
+              3155.741,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.2655292695018864
+          },
+          {
+            "point": [
+              450.0,
+              3159.181,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.25430136919604246
+          },
+          {
+            "point": [
+              456.667,
+              3161.845,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.24436268164848515
+          },
+          {
+            "point": [
+              463.333,
+              3163.888,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.2355698150350486
+          },
+          {
+            "point": [
+              470.0,
+              3165.522,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.22769187067620905
+          },
+          {
+            "point": [
+              476.667,
+              3167.051,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.22030477775136248
+          },
+          {
+            "point": [
+              483.333,
+              3168.842,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.21286049452667707
+          },
+          {
+            "point": [
+              490.0,
+              3171.232,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.20492076164314416
+          },
+          {
+            "point": [
+              496.667,
+              3174.438,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.19637271779160242
+          },
+          {
+            "point": [
+              503.333,
+              3178.554,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.18741262634797579
+          },
+          {
+            "point": [
+              510.0,
+              3183.481,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.17862120075117824
+          },
+          {
+            "point": [
+              516.667,
+              3189.146,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.1704550715187933
+          },
+          {
+            "point": [
+              523.333,
+              3195.406,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.16337989106519765
+          },
+          {
+            "point": [
+              530.0,
+              3202.046,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.15779117760881778
+          },
+          {
+            "point": [
+              536.667,
+              3208.73,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.15399882892719172
+          },
+          {
+            "point": [
+              543.333,
+              3215.09,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.15206586008316708
+          },
+          {
+            "point": [
+              550.0,
+              3220.998,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.15158041303903866
+          },
+          {
+            "point": [
+              556.667,
+              3226.523,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.15190326683755678
+          },
+          {
+            "point": [
+              563.333,
+              3231.765,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.15248176674160643
+          },
+          {
+            "point": [
+              570.0,
+              3236.56,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.15327436160834523
+          },
+          {
+            "point": [
+              576.667,
+              3240.438,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.1548684223818024
+          },
+          {
+            "point": [
+              583.333,
+              3239.24,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.16296358567985705
+          },
+          {
+            "point": [
+              590.0,
+              3237.673,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.17173908019259299
+          }
+        ]
+      },
+      {
+        "material": "waterfall_3",
+        "rows": 129,
+        "columns": 25,
+        "widthRange": [
+          160.0,
+          195.0
+        ],
+        "maximumBacktrack": 0.0,
+        "entries": [
+          {
+            "point": [
+              590.0,
+              3237.673,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.17173908019259299
+          },
+          {
+            "point": [
+              596.667,
+              3236.86,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.17967102990875886
+          },
+          {
+            "point": [
+              603.333,
+              3236.516,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.18712466095178865
+          },
+          {
+            "point": [
+              610.0,
+              3236.415,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.1944373814846368
+          },
+          {
+            "point": [
+              616.667,
+              3236.39,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.20188552148612007
+          },
+          {
+            "point": [
+              623.333,
+              3236.411,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.2095546781295894
+          },
+          {
+            "point": [
+              630.0,
+              3236.487,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.2174769926904562
+          },
+          {
+            "point": [
+              636.667,
+              3236.739,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.2255247988130081
+          },
+          {
+            "point": [
+              643.333,
+              3237.285,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.23359068281632686
+          },
+          {
+            "point": [
+              650.0,
+              3238.113,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.2417680996558585
+          },
+          {
+            "point": [
+              656.667,
+              3238.773,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.25069123673242477
+          },
+          {
+            "point": [
+              663.333,
+              3238.014,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.261836583549951
+          },
+          {
+            "point": [
+              670.0,
+              3237.404,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.27323515919365093
+          },
+          {
+            "point": [
+              676.667,
+              3237.265,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.2845510251143606
+          },
+          {
+            "point": [
+              683.333,
+              3236.742,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.296763626467067
+          },
+          {
+            "point": [
+              690.0,
+              3236.133,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.3095251853422934
+          },
+          {
+            "point": [
+              696.667,
+              3235.323,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.3229387753336901
+          },
+          {
+            "point": [
+              703.333,
+              3234.307,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.3369855392677136
+          },
+          {
+            "point": [
+              710.0,
+              3233.224,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.35152157998145933
+          },
+          {
+            "point": [
+              716.667,
+              3232.243,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.36638946960126617
+          },
+          {
+            "point": [
+              723.333,
+              3231.543,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.3814471878206883
+          },
+          {
+            "point": [
+              730.0,
+              3231.139,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.3967224443876641
+          },
+          {
+            "point": [
+              736.667,
+              3230.92,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.4123375109369826
+          },
+          {
+            "point": [
+              743.333,
+              3230.85,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.428342189584545
+          },
+          {
+            "point": [
+              750.0,
+              3230.834,
+              -255.0
+            ],
+            "basinRadiusSquared": 0.44482265503595786
+          }
+        ]
+      }
+    ],
+    "sharedEdgeMaximumErrors": [
+      0.0,
+      0.0,
+      0.0
+    ],
+    "overallWidthRange": [
+      640.0,
+      780.0
+    ],
+    "ledgeRaySamples": 660,
+    "occludedByNewOrRefittedRock": [],
+    "candidateSha256": "f317563ec7cb2f9f67ad6e5fc820f8178cefd0eb46f1008a4e72d44fdf900233",
+    "baselineSha256": "cdfeedf32f6bbbb8928827bca8c285ad1ed35ec35cb61c009cb061530d5e20a7"
+  },
+  "sourceHashes": {
+    "Tools\\forestbase_cascade.py": "a06dae4ca401f1399a1a0f313f2e842fc4466eefb43e8753340dcee59753cc8a",
+    "Tools\\forestbase_cascade_audit.py": "8a282b611874fa1e2bfe1c90e4b1b50bcbbc71f9189b18bb5b7a674f30075870",
+    "Tools\\forestbase_cascade_width_audit.py": "e99e5ad5fa86c1d5031466984569fca597d865173a4bcd3bdccc9af011910c20"
+  }
+}

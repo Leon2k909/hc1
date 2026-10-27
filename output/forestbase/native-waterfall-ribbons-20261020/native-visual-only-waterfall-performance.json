@@ -1,0 +1,148 @@
+{
+  "utc": "2026-10-20T04:41:38.993Z",
+  "kind": "Isolated native geometry and effects, no gameplay systems, actors or bots; not match FPS",
+  "sceneName": "menu (runtime contents replaced with Forest Base visual groups)",
+  "screen": "1920x1080",
+  "nativeVersion": "26.10.13a",
+  "perf": {
+    "Window": {
+      "Frames": 170,
+      "Seconds": 2
+    },
+    "Fps": 84.9,
+    "TargetFps": 200,
+    "TargetSource": "fps_max",
+    "LimitedBy": "GPU",
+    "MeetingTarget": false,
+    "Rating": "Bad",
+    "Frame": {
+      "AvgMs": 11.78,
+      "P50Ms": 11.8,
+      "P99Ms": 14.01,
+      "MaxMs": 14.02
+    },
+    "CpuWork": {
+      "AvgMs": 11.78,
+      "P50Ms": 11.8,
+      "P99Ms": 14.01,
+      "MaxMs": 14.02
+    },
+    "Gpu": {
+      "AvgMs": 11.23,
+      "P50Ms": 11.23,
+      "P99Ms": 13.04,
+      "MaxMs": 13.14
+    },
+    "CapWait": {
+      "AvgMs": 0,
+      "P50Ms": 0,
+      "P99Ms": 0,
+      "MaxMs": 0
+    },
+    "PerfHubWindow": null,
+    "Hitches": {
+      "Count": 0,
+      "OverMs": 23.6,
+      "WorstMs": 0
+    },
+    "Issues": [],
+    "MainThread": [
+      {
+        "Name": "Render",
+        "AvgMs": 11.44,
+        "MaxMs": 13.7
+      },
+      {
+        "Name": "UI",
+        "AvgMs": 0.09,
+        "MaxMs": 0.22
+      },
+      {
+        "Name": "Audio",
+        "AvgMs": 0.03,
+        "MaxMs": 0.17
+      },
+      {
+        "Name": "Animation",
+        "AvgMs": 0.01,
+        "MaxMs": 0.06
+      },
+      {
+        "Name": "Physics",
+        "AvgMs": 0.01,
+        "MaxMs": 0.16
+      },
+      {
+        "Name": "Async",
+        "AvgMs": 0.01,
+        "MaxMs": 0.49
+      }
+    ],
+    "GpuPasses": [
+      {
+        "Name": "Dynamic Opaque Forward",
+        "AvgMs": 6.53,
+        "MaxMs": 10.26,
+        "Path": "RenderToSwapChain / Dynamic Opaque Forward"
+      },
+      {
+        "Name": "DrawDepthOpaque",
+        "AvgMs": 1.66,
+        "MaxMs": 2.93,
+        "Path": "CSM Cascade 2 / DrawDepthOpaque"
+      },
+      {
+        "Name": "Depth Normal Prepass (Small)",
+        "AvgMs": 1.34,
+        "MaxMs": 2.47,
+        "Path": "RenderToSwapChain / Depth Normal Prepass (Small)"
+      },
+      {
+        "Name": "DrawDepthOpaque",
+        "AvgMs": 0.92,
+        "MaxMs": 1.68,
+        "Path": "Sandbox.SceneSpotLight_Shadow / DrawDepthOpaque"
+      },
+      {
+        "Name": "VolumetricFog",
+        "AvgMs": 0.53,
+        "MaxMs": 1.14,
+        "Path": "RenderToSwapChain / VolumetricFog"
+      },
+      {
+        "Name": "DrawDepthOpaque",
+        "AvgMs": 0.36,
+        "MaxMs": 0.71,
+        "Path": "CSM Cascade 1 / DrawDepthOpaque"
+      },
+      {
+        "Name": "Depth Normal Prepass (Large)",
+        "AvgMs": 0.17,
+        "MaxMs": 0.5,
+        "Path": "RenderToSwapChain / Depth Normal Prepass (Large)"
+      },
+      {
+        "Name": "Bloom",
+        "AvgMs": 0.16,
+        "MaxMs": 0.4,
+        "Path": "Managed: BeforePostProcessing / Bloom"
+      }
+    ],
+    "Memory": {
+      "ProcessMiB": 5168.2,
+      "VideoMemory": {
+        "UsedMiB": 3586,
+        "BudgetMiB": 11175
+      },
+      "AllocatedMiBPerSecond": 2.1,
+      "GcPauseMsLastSecond": 0,
+      "GcLastSecond": {
+        "Gen0": 0,
+        "Gen1": 0,
+        "Gen2": 0
+      }
+    },
+    "DrawCalls": 2034,
+    "Triangles": 30946234
+  }
+}

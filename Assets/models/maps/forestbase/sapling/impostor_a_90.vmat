@@ -1,0 +1,12 @@
+"Layer0"
+{
+ shader "shaders/complex.shader"
+ F_ALPHA_TEST "1"
+ F_RENDER_BACKFACES "1"
+ TextureColor "models/maps/forestbase/sapling/impostor_a_90_color.png"
+ TextureTranslucency "models/maps/forestbase/sapling/impostor_a_90_alpha.png"
+ TextureNormal "materials/default/default_normal.tga"
+ TextureRoughness "[.85 .85 .85 0]"
+ TextureMetalness "[0 0 0 0]"
+ g_flAlphaTestReference "0.25"
+}

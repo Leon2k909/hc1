@@ -1,0 +1,38 @@
+{
+  "utc": "2026-10-20T11:24:12.726Z",
+  "projectRoot": "C:/Users/mimi-/Documents/S&box Projects/hc1",
+  "source": "Assets/shaders/forestbase_wetground.shader",
+  "beforeSha256": "9a28bc19798d7d3c2ddd3c64cd8bf9786cd67c47c11dc2e19ffcc1ac9b63aa41",
+  "afterSha256": "07e9b5efe300e49553b1b1f4e56c968857c65df37af24f2310a142c91109cd06",
+  "compiledSha256": "23926af22a5a7b43af9a651218a83ad8eb99eb355bb9f427f1ed125f6c5f8a6e",
+  "nativeCompile": {
+    "success": true,
+    "variants": 10,
+    "milliseconds": 4651.17,
+    "logTime": "2026-10-20T11:16:52.5306Z"
+  },
+  "changes": {
+    "wetnessThreshold": [
+      0.43,
+      0.68
+    ],
+    "albedoMultipliers": [
+      0.86,
+      0.46
+    ],
+    "roughnessDryMinimum": 0.52,
+    "roughnessWet": 0.055,
+    "normalLeveling": 0.94
+  },
+  "nativeComparison": {
+    "before": "project-relocation-20261020/verified-entrance.png",
+    "after": "native-ground-patches-20261020/candidate-entrance.png",
+    "camerasIdentical": true,
+    "rendererCount": 629,
+    "modelErrors": 0
+  },
+  "geometryOrCollisionChanged": false,
+  "materialOrTextureSourceChanged": false,
+  "shaderTextureSamplesAdded": 0,
+  "fullObjectiveComplete": false
+}

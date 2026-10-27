@@ -1,0 +1,252 @@
+{
+  "createdUtc": "2026-10-09T10:45:20.526003+00:00",
+  "phase": "Irregular wider jets, wispy impact mist and integrated rippled plunge water",
+  "engineQaUtc": "2026-10-09T10:44:06.482505+00:00",
+  "physicsIdentical": true,
+  "collisionSha256": "81d8a371f00911ebf03b275dd3f1fc756b1d55478a2e70b29cdcdc698fb6d9af",
+  "modelErrors": [],
+  "spawnChecks": 32,
+  "boundarySamples": 6,
+  "vehicleSamples": 4,
+  "spawnExposureRays": 112,
+  "waterGeometry": [
+    {
+      "material": "waterfall_0",
+      "rows": 73,
+      "uniqueVertices": 4608,
+      "topHeight": 1127.148375,
+      "bottomHeight": -345.0,
+      "maximumBacktrack": 0.0,
+      "impactPlan": [
+        185.46010288569406,
+        3174.5750000000003,
+        -255
+      ],
+      "basinRadiusSquared": 0.3936718154344142,
+      "widthRange": [
+        68.155,
+        100.815
+      ]
+    },
+    {
+      "material": "waterfall_1",
+      "rows": 73,
+      "uniqueVertices": 4608,
+      "topHeight": 1095.890625,
+      "bottomHeight": -345.0,
+      "maximumBacktrack": 0.0,
+      "impactPlan": [
+        347.51567812120345,
+        3194.8430000000003,
+        -255
+      ],
+      "basinRadiusSquared": 0.17483822651016726,
+      "widthRange": [
+        97.31699999999995,
+        154.51599999999996
+      ]
+    },
+    {
+      "material": "waterfall_2",
+      "rows": 73,
+      "uniqueVertices": 4608,
+      "topHeight": 998.314125,
+      "bottomHeight": -345.0,
+      "maximumBacktrack": 4.547473508864641e-13,
+      "impactPlan": [
+        537.21748568131,
+        3266.7249999999995,
+        -255
+      ],
+      "basinRadiusSquared": 0.0920927096564543,
+      "widthRange": [
+        68.13499999999999,
+        117.36100000000005
+      ]
+    },
+    {
+      "material": "waterfall_3",
+      "rows": 73,
+      "uniqueVertices": 4608,
+      "topHeight": 956.8681875,
+      "bottomHeight": -345.0,
+      "maximumBacktrack": 4.547473508864641e-13,
+      "impactPlan": [
+        685.5425792288809,
+        3363.1709999999994,
+        -255
+      ],
+      "basinRadiusSquared": 0.22417408966388502,
+      "widthRange": [
+        47.817999999999984,
+        75.98299999999995
+      ]
+    }
+  ],
+  "nativeCompletePaths": 24,
+  "stairDirections": 22,
+  "navigationScope": "Previous native navigation on identical authored collision.",
+  "limitations": [
+    "Visual fidelity and AAA finish remain incomplete.",
+    "Aerated water uses diffuse emission, not volumetric multiple scattering.",
+    "No physical fluid simulation or 10\u201315 remote-client verification."
+  ],
+  "shoreBoulders": 6,
+  "shoreGrassClumps": 24,
+  "shoreHasNoColliderComponents": true,
+  "basinImpactCentersMatchJets": true,
+  "assetRevisionHashes": {
+    "Assets\\scenes\\maps\\ForestBase\\forestbase.scene": "19caf59d16beffa19467d6b2859210e4a452bc3c85e429a0474441823893b434",
+    "Assets\\models\\maps\\forestbase\\vista.obj": "b1d15382d19fd1540b9b83a7a90c60ec3aadcbff7e230a8686762dab8df8d158",
+    "Assets\\models\\maps\\forestbase\\vista.vmdl": "a97deeba3161dad1ec49c53d5e1f70fdbb4cb34d33e4db351808ac2d4382ace1",
+    "Assets\\materials\\forestbase\\plunge_basin.vmat": "7d16ac4dc69b2b61efdebfa9f1bea2240ced1666e137f72342e7e523ff776e21",
+    "Assets\\shaders\\forestbase_basin.shader": "80175f8f37b52f2cede04d981e68d38084b4a39be4aab762459f9ebb2a908a64",
+    "Assets\\shaders\\forestbase_waterfall.shader": "781f5b2ed40a3b1387d3aecae42ec4b656bab2d859ef2cd010a32e10f5d5cf79",
+    "Assets\\shaders\\forestbase_mist.shader": "fe7d3931dd70e598852e458e76567dbafc2454b11cac8a392e361bbb47450203"
+  },
+  "waterMotion": {
+    "captures": [
+      {
+        "file": "turbulence-runtime-waterfall-0.png",
+        "utc": "2026-10-09T10:42:22.3779684Z",
+        "cameraPosition": "1080,-500,448"
+      },
+      {
+        "file": "turbulence-runtime-waterfall-1.png",
+        "utc": "2026-10-09T10:42:24.8101485Z",
+        "cameraPosition": "1080,-500,448"
+      },
+      {
+        "file": "turbulence-runtime-waterfall-2.png",
+        "utc": "2026-10-09T10:42:26.7835822Z",
+        "cameraPosition": "1080,-500,448"
+      }
+    ],
+    "pairs": [
+      {
+        "frames": [
+          0,
+          1
+        ],
+        "elapsedSeconds": 2.43218,
+        "regions": [
+          {
+            "roi": [
+              711,
+              410,
+              730,
+              660
+            ],
+            "pixelsChangedOver8": 3218,
+            "meanAbsoluteRgbDelta": 19.768842105263158
+          },
+          {
+            "roi": [
+              770,
+              445,
+              790,
+              760
+            ],
+            "pixelsChangedOver8": 4861,
+            "meanAbsoluteRgbDelta": 24.22089947089947
+          },
+          {
+            "roi": [
+              837,
+              480,
+              852,
+              720
+            ],
+            "pixelsChangedOver8": 2679,
+            "meanAbsoluteRgbDelta": 20.644537037037036
+          }
+        ]
+      },
+      {
+        "frames": [
+          1,
+          2
+        ],
+        "elapsedSeconds": 1.973434,
+        "regions": [
+          {
+            "roi": [
+              711,
+              410,
+              730,
+              660
+            ],
+            "pixelsChangedOver8": 3239,
+            "meanAbsoluteRgbDelta": 20.259087719298247
+          },
+          {
+            "roi": [
+              770,
+              445,
+              790,
+              760
+            ],
+            "pixelsChangedOver8": 4984,
+            "meanAbsoluteRgbDelta": 26.037936507936507
+          },
+          {
+            "roi": [
+              837,
+              480,
+              852,
+              720
+            ],
+            "pixelsChangedOver8": 2689,
+            "meanAbsoluteRgbDelta": 21.16953703703704
+          }
+        ]
+      }
+    ],
+    "waterShaderSha256": "781f5b2ed40a3b1387d3aecae42ec4b656bab2d859ef2cd010a32e10f5d5cf79",
+    "evidenceScope": "Animated appearance in three unobstructed jet regions at a fixed native runtime camera; pixel differences do not establish physical fluid simulation or independently measure the flow direction."
+  },
+  "snapshotHashes": {
+    "aerial.png": "1e0e86481d017601435543baf286f31e2b66b4af59ec29f4cf979ee17a3eaafa",
+    "command.png": "6a04478e905e28915581245e1cc4fcdc07baaa5fd3860dad5b1fa03cba03d1d9",
+    "engine-nav.json": "1e22e80ddef13e8eb3845afcbe76d0ee761ef0a1b533d04b06d92af525f0328d",
+    "engine-qa.json": "72e532829fd6802a560358cdd0b0af08e17a4bdd7adb8de698b6f9dff3693a63",
+    "entrance.png": "7a81999d719ac5b9ff20db1559ffb2ed3a87accb6907d9aa326269e537ae1750",
+    "forestbase_basin.shader": "80175f8f37b52f2cede04d981e68d38084b4a39be4aab762459f9ebb2a908a64",
+    "forestbase_cascade.py": "993c4782bb1e50fd9bc4d68553883406432479a12f332af5734a4dba026f9b49",
+    "forestbase_cascade_rock.shader": "153c1b292509b8e74bdf086a3443e9716f5268a1dd1c19bb80e3b5a37c9b03d4",
+    "forestbase_flow_motion_audit.py": "c8a0d02e3c0f400db092b619524b1aafcf074245bf5a43ba9510638c9cf919b0",
+    "forestbase_foam.shader": "d37b03fbebfdd33c85707b5fe78d111fcc672cd7e924b435e2c6a81f8a28cf1f",
+    "forestbase_map.py": "c3753480b14db447ec46b3bae39a696b1f1039ced213e46e47ebf9d57ff36c1a",
+    "forestbase_mist.shader": "fe7d3931dd70e598852e458e76567dbafc2454b11cac8a392e361bbb47450203",
+    "forestbase_shore.py": "3f054dae7a8360c56041c1b3bd5e4a1e7f89a5d7469deb0e36e1c10e97401f48",
+    "forestbase_shore.shader": "f5ff64dffcaa7048e3d0cf75ea979e07abf59264d883c4602ae402ab0e055f57",
+    "forestbase_water.py": "7dc96551fd69c66dc4ff43012d7fbd73533ee1be3de374d828493b3ae917c966",
+    "forestbase_waterfall.shader": "781f5b2ed40a3b1387d3aecae42ec4b656bab2d859ef2cd010a32e10f5d5cf79",
+    "gorge.png": "b2146840da40fbb4edc1d9aa4b6fd78b4692ee360de8201b00a298572459bfba",
+    "Hc1ForestBaseQa.cs": "82abd13c78dbfb50abbacd8de39f14e887017eff2a0b7760a9acae9799008408",
+    "layout.json": "2cf004504ba6cafe05d0e7c1482588f214216257433d5026392acb600c8795fe",
+    "plunge_basin.vmat": "7d16ac4dc69b2b61efdebfa9f1bea2240ced1666e137f72342e7e523ff776e21",
+    "shore_bank.vmat": "b9591a0488e2dd7991e0ef89798d5e88801371f4efeafba03288ba0cdd1ceef7",
+    "shore_boulder.vmdl": "a0c11b7cdeb245ab6ed238de94b9514dbb33ed269f8739fac71f81d20fbbdc59",
+    "shore_grass.vmat": "2273acbbdc79eeb706ffaba36d02c358faef02b9b77850ab324794fe731073da",
+    "shore_grass.vmdl": "7f1e3f46af79b34759e46f18af37905399d38a69b88209924a66e0c8bc8fd57e",
+    "shore_rock.vmat": "323539c612f4a29b041ef2c7ac0dd56a88dcee2604194651d9be77d73414bf51",
+    "turbulence-motion-audit.json": "90fb72799a464ab27c0d891ea6945ff1c0f0abe7f32c9408b319132f7d8f62e0",
+    "turbulence-runtime-captures.json": "bb9863a447cd4d28dcfcce67b20ea5ebffe1604380eb8f16b6551b445a9494bb",
+    "turbulence-runtime-waterfall-0.png": "69dd2eafccfd22e12d97b4ebe10c8d65e811e0e6a1ad9e0d8ddb1c6d9852e6d5",
+    "turbulence-runtime-waterfall-1.png": "17584db8865476306dfc52a2772a1f0b5e258f36a97c01e5605b5abc43e18431",
+    "turbulence-runtime-waterfall-2.png": "cb547e6068dca0ed673e26e0581187444bd4a5c93d0e901369fc0153a9879d0f",
+    "waterfall-foot.png": "f093fdcc96f474cc08e3b482c7f650de7350e1483b3641205fd887d4526b020b",
+    "waterfall.png": "f8be6b0c33c6f27451cfaa6076a71e0c185c62a052bc9303740ffc6fdba677e8",
+    "waterfall.vmat": "4f3e570c1e42a0b7024a61d7af672733673e6c1abb2d8d642ec21b762978e7fa",
+    "waterfall_0.vmat": "d49800466005577c5fa1e709f9be5fb874ad4cb701e264199a561595bed04d3c",
+    "waterfall_1.vmat": "89b4d2b96b40af7b6cfa72a2cf3f69b509a38aa81cb0915d3f1796267d52f3ad",
+    "waterfall_2.vmat": "392b9a2d217e3bf3025cfbac1dc884f2c4c6a6aadaa28d6e67efa4d1ce5b36c6",
+    "waterfall_3.vmat": "af0125e59fcbcfd8dffb49b8d176c3cd4e45b61ca45ec63e6e01c44c63e936b3",
+    "waterfall_current.vmat": "5c118805fe3f7b6d307a21d8b5635efbf9f3b881773e43a04da88945fd1d916f",
+    "waterfall_foam.vmat": "9f24ecb5f68a01e87adb5c87fd2889865a8c56d66dab3bc2c2be25c5db341e8b",
+    "waterfall_impact.vmat": "f635257c31464ceb6ff3cdea88ed3bf3fb2148c038b655dd5d1eb383c8006aa2",
+    "waterfall_plunge.vmat": "8709f3088b34aa384ab86794e91f915982ddc4db73895f5b18fa14f5e4206068",
+    "waterfall_spray.vmat": "e7ece3ca2d5c90485c3d4910802979720d002d5e692a88a7eae51610643a8c90"
+  }
+}

@@ -1,0 +1,176 @@
+{
+  "date": "2026-10-20",
+  "projectRoot": "C:/Users/mimi-/Documents/S&box Projects/hc1",
+  "engine": "26.10.13a",
+  "editorPid": 32080,
+  "changes": {
+    "floodPitchDegrees": {
+      "before": 58,
+      "after": 40
+    },
+    "floodRadiusInches": {
+      "before": 760,
+      "after": 950
+    },
+    "spotRgbGain": 1.8,
+    "pointRgbGain": 1.15,
+    "daylight": "0.40,0.47,0.58,1",
+    "skyFill": "0.065,0.085,0.12,1",
+    "skyTint": "0.13,0.17,0.22,1",
+    "gradientFogColor": "0.23,0.28,0.34,0.45",
+    "sourceFiles": [
+      "Tools/forestbase_map.py",
+      "Assets/models/maps/forestbase/ground.obj",
+      "Assets/scenes/maps/forestbase/forestbase.scene"
+    ]
+  },
+  "audit": {
+    "changedNodes": 39,
+    "changedNodeNames": [
+      "Cool Daylight",
+      "Sky",
+      "Forest Mist",
+      "Flood 0",
+      "Flood 1",
+      "Flood 2",
+      "Flood 3",
+      "Flood 4",
+      "Flood 5",
+      "Flood 6",
+      "Flood 7",
+      "Flood 8",
+      "Flood 9",
+      "Flood 10",
+      "Hangar -1060 -1240.0",
+      "Hangar -1060 -880.0",
+      "Barracks room west 96",
+      "Barracks room east 96",
+      "Barracks room west 240",
+      "Barracks room east 240",
+      "Barracks door -1220.0 214",
+      "Barracks door -1220.0 358",
+      "Barracks door -950 214",
+      "Barracks door -950 358",
+      "Barracks door -695.0 214",
+      "Barracks door -695.0 358",
+      "Command room west 96",
+      "Command room east 96",
+      "Command room west 240",
+      "Command room east 240",
+      "Command door 25.0 214",
+      "Command door 25.0 358",
+      "Command door 265 214",
+      "Command door 265 358",
+      "Command door 490.0 214",
+      "Command door 490.0 358",
+      "Hangar 1100 935.0",
+      "Hangar 1100 1265.0",
+      "Logistics task"
+    ],
+    "lightCount": 36,
+    "reaimedFloods": 11,
+    "allOtherSceneContentUnchanged": true,
+    "existingHeadVertexChanges": 2508,
+    "existingHeadNormalChanges": 540,
+    "existingHeadUvChanges": 2376,
+    "exactCollisionPreserved": true,
+    "ground": {
+      "triangles": 10052,
+      "boxes": 14,
+      "hulls": 6
+    },
+    "maximumGeneratorPositionErrorInches": 0.00005000000010113581,
+    "maximumGeneratorQuaternionError": 7.069999999886889e-7,
+    "sceneSha256": "d53d6691a8fdf850c4f88d2c4aca0b4190315ab4a946203e6616ea4beb2db13b",
+    "scope": "Scene identity, source geometry and light generator parity. Does not prove final match performance or remote-client playability."
+  },
+  "nativeViews": {
+    "Models": 629,
+    "ModelErrors": 0,
+    "Views": [
+      {
+        "View": "compound",
+        "File": "C:\\Users\\mimi-\\AppData\\Local\\Temp\\sbox-cli\\68fb5c5092c54f57bff404635a7e0c44\\flood-final-compound.png",
+        "Position": "-2900,2600,2000",
+        "Fov": 72
+      },
+      {
+        "View": "waterfall",
+        "File": "C:\\Users\\mimi-\\AppData\\Local\\Temp\\sbox-cli\\68fb5c5092c54f57bff404635a7e0c44\\flood-final-waterfall.png",
+        "Position": "1080,-500,448",
+        "Fov": 90
+      },
+      {
+        "View": "entrance",
+        "File": "C:\\Users\\mimi-\\AppData\\Local\\Temp\\sbox-cli\\68fb5c5092c54f57bff404635a7e0c44\\flood-final-entrance.png",
+        "Position": "-1680,0,68",
+        "Fov": 90
+      }
+    ]
+  },
+  "nativeDetails": {
+    "Models": 629,
+    "ModelErrors": 0,
+    "Views": [
+      {
+        "View": "barracks-hall",
+        "File": "C:\\Users\\mimi-\\AppData\\Local\\Temp\\sbox-cli\\68fb5c5092c54f57bff404635a7e0c44\\flood-detail-barracks-hall.png",
+        "Position": "710,950,164",
+        "Fov": 90
+      },
+      {
+        "View": "barracks-room",
+        "File": "C:\\Users\\mimi-\\AppData\\Local\\Temp\\sbox-cli\\68fb5c5092c54f57bff404635a7e0c44\\flood-detail-barracks-room.png",
+        "Position": "950,1100,164",
+        "Fov": 90
+      },
+      {
+        "View": "command-room",
+        "File": "C:\\Users\\mimi-\\AppData\\Local\\Temp\\sbox-cli\\68fb5c5092c54f57bff404635a7e0c44\\flood-detail-command-room.png",
+        "Position": "1040,-105,308",
+        "Fov": 90
+      },
+      {
+        "View": "flood-head",
+        "File": "C:\\Users\\mimi-\\AppData\\Local\\Temp\\sbox-cli\\68fb5c5092c54f57bff404635a7e0c44\\flood-detail-flood-head.png",
+        "Position": "-80,-430,250",
+        "Fov": 55
+      }
+    ]
+  },
+  "runtime": {
+    "File": "C:\\Users\\mimi-\\AppData\\Local\\Temp\\sbox-cli\\68fb5c5092c54f57bff404635a7e0c44\\tdm-flood-entrance.png",
+    "Scene": "forestbase",
+    "Mode": "tdm",
+    "Screen": "1920,1080",
+    "Players": 1,
+    "Bots": 9,
+    "Models": 719,
+    "ModelErrors": 0
+  },
+  "performance": {
+    "validMeasurement": false,
+    "reason": "Vulkan presentation stopped taking swapchain images; repeated present/fence wait warnings. perf_overview contains only 2–3 frames, a zero-second window and no valid frame/GPU aggregates. Do not report those wait times or raw pass counters as map FPS.",
+    "attempts": [
+      "Existing fixed 1920x1080 measurement viewport shown and active.",
+      "Re-raised existing window; no editor restart.",
+      "Resized viewport 1918x1080 then restored 1920x1080; presentation remained stalled."
+    ],
+    "previous600FrameTestPredatesThisPass": true
+  },
+  "cleanup": {
+    "playStopped": true,
+    "sceneClean": true,
+    "temporaryCameraRemoved": true,
+    "measurementViewportClosed": true,
+    "rejectedFoliageMaterialDeletedFromAssets": true,
+    "testSettingsRestored": true,
+    "NoDamage": false,
+    "EditorLobby": false
+  },
+  "limitations": [
+    "Visual quality still falls short of five references.",
+    "Enlarged light volumes may affect GPU cost; a new valid match measurement remains required.",
+    "No remote 10–15-client or exhaustive movement/bounds acceptance in this pass."
+  ]
+}

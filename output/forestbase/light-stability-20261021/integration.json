@@ -1,0 +1,72 @@
+{
+  "date": "2026-10-21",
+  "changes": [
+    "Uniform opal emission replaces unfiltered periodic UV brightness edges",
+    "Increased lamp diffuser roughness to reduce sharp glints",
+    "Separated flood lenses, exterior wall diffusers and ceiling diffusers farther from their housings"
+  ],
+  "checks": {
+    "sceneUnchanged": true,
+    "models": {
+      "ground": {
+        "triangles": 10052,
+        "physicsAndImportUnchanged": true,
+        "materialsUnchanged": true
+      },
+      "barracks": {
+        "triangles": 65078,
+        "physicsAndImportUnchanged": true,
+        "materialsUnchanged": true
+      },
+      "command": {
+        "triangles": 39790,
+        "physicsAndImportUnchanged": true,
+        "materialsUnchanged": true
+      }
+    },
+    "movement": {
+      "frames": 24,
+      "emissiveEnergyMin": 37528.66666666667,
+      "emissiveEnergyMax": 37918.66666666667,
+      "emissiveEnergyRangePercent": 1.0333015271740271,
+      "scope": "Small camera translation in barracks corridor; not a reproduction of the user perspective"
+    }
+  },
+  "native": {
+    "Scene": "scenes/maps/forestbase/forestbase.scene",
+    "Models": 629,
+    "ModelErrors": 0,
+    "Unsaved": false
+  },
+  "compiled": [
+    {
+      "Success": true,
+      "Path": "materials/forestbase/lamp.vmat",
+      "CompiledFile": "c:/users/mimi-/documents/s&box projects/hc1/assets/materials/forestbase/lamp.vmat_c",
+      "Hint": null
+    },
+    {
+      "Success": true,
+      "Path": "models/maps/forestbase/ground.vmdl",
+      "CompiledFile": "c:/users/mimi-/documents/s&box projects/hc1/assets/models/maps/forestbase/ground.vmdl_c",
+      "Hint": null
+    },
+    {
+      "Success": true,
+      "Path": "models/maps/forestbase/barracks.vmdl",
+      "CompiledFile": "c:/users/mimi-/documents/s&box projects/hc1/assets/models/maps/forestbase/barracks.vmdl_c",
+      "Hint": null
+    },
+    {
+      "Success": true,
+      "Path": "models/maps/forestbase/command.vmdl",
+      "CompiledFile": "c:/users/mimi-/documents/s&box projects/hc1/assets/models/maps/forestbase/command.vmdl_c",
+      "Hint": null
+    }
+  ],
+  "shaderSha256": "a4a8727f8cdb32fc4c810fc128eb430e238ea4cfcfb9545c4bb9d3f60dc7de5f",
+  "limitations": [
+    "The user reported severe flickering; its exact viewpoint and whether it affects lamp faces or illumination have not been supplied. The fixed-camera baseline was stable. These changes target view-dependent diffuser shimmer, not a proven temporal light-intensity bug.",
+    "Short 24-frame camera translation check, not an exhaustive runtime stability test."
+  ]
+}

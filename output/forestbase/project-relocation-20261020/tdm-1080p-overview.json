@@ -1,0 +1,151 @@
+{
+  "Window": {
+    "Frames": 121,
+    "Seconds": 2.01
+  },
+  "Fps": 60.3,
+  "TargetFps": 90,
+  "TargetSource": "fps_max_inactive",
+  "LimitedBy": "GPU",
+  "MeetingTarget": false,
+  "Rating": "Warning",
+  "Frame": {
+    "AvgMs": 16.58,
+    "P50Ms": 16.49,
+    "P99Ms": 20.25,
+    "MaxMs": 20.43
+  },
+  "CpuWork": {
+    "AvgMs": 16.58,
+    "P50Ms": 16.49,
+    "P99Ms": 20.25,
+    "MaxMs": 20.43
+  },
+  "Gpu": {
+    "AvgMs": 26.2,
+    "P50Ms": 26.23,
+    "P99Ms": 27.36,
+    "MaxMs": 27.53
+  },
+  "CapWait": {
+    "AvgMs": 0,
+    "P50Ms": 0,
+    "P99Ms": 0,
+    "MaxMs": 0
+  },
+  "PerfHubWindow": null,
+  "Hitches": {
+    "Count": 0,
+    "OverMs": 33,
+    "WorstMs": 0
+  },
+  "Issues": [],
+  "MainThread": [
+    {
+      "Name": "Render",
+      "AvgMs": 11.91,
+      "MaxMs": 14.32
+    },
+    {
+      "Name": "Update",
+      "AvgMs": 1.02,
+      "MaxMs": 5.18
+    },
+    {
+      "Name": "UI",
+      "AvgMs": 0.88,
+      "MaxMs": 1.6
+    },
+    {
+      "Name": "Animation",
+      "AvgMs": 0.65,
+      "MaxMs": 1.09
+    },
+    {
+      "Name": "Editor",
+      "AvgMs": 0.63,
+      "MaxMs": 3.61
+    },
+    {
+      "Name": "Physics",
+      "AvgMs": 0.33,
+      "MaxMs": 0.65
+    },
+    {
+      "Name": "Audio",
+      "AvgMs": 0.21,
+      "MaxMs": 0.89
+    },
+    {
+      "Name": "Particles",
+      "AvgMs": 0.09,
+      "MaxMs": 0.29
+    }
+  ],
+  "GpuPasses": [
+    {
+      "Name": "Dynamic Opaque Forward",
+      "AvgMs": 4.58,
+      "MaxMs": 5.81,
+      "Path": "RenderToSwapChain / Dynamic Opaque Forward"
+    },
+    {
+      "Name": "DrawDepthOpaque",
+      "AvgMs": 2.36,
+      "MaxMs": 4.26,
+      "Path": "Sandbox.SceneSpotLight_Shadow / DrawDepthOpaque"
+    },
+    {
+      "Name": "DrawDepthOpaque",
+      "AvgMs": 2.21,
+      "MaxMs": 4.56,
+      "Path": "CSM Cascade 2 / DrawDepthOpaque"
+    },
+    {
+      "Name": "Depth Normal Prepass (Small)",
+      "AvgMs": 1.41,
+      "MaxMs": 3.14,
+      "Path": "RenderToSwapChain / Depth Normal Prepass (Small)"
+    },
+    {
+      "Name": "UI Root: GameRootPanel",
+      "AvgMs": 0.87,
+      "MaxMs": 1.22,
+      "Path": "Managed: UI / UI Root: GameRootPanel"
+    },
+    {
+      "Name": "VolumetricFog",
+      "AvgMs": 0.71,
+      "MaxMs": 2.83,
+      "Path": "RenderToSwapChain / VolumetricFog"
+    },
+    {
+      "Name": "GameOverlay",
+      "AvgMs": 0.46,
+      "MaxMs": 0.73,
+      "Path": "RenderToSwapChain / GameOverlay"
+    },
+    {
+      "Name": "DrawDepthOpaque",
+      "AvgMs": 0.45,
+      "MaxMs": 0.55,
+      "Path": "CSM Cascade 1 / DrawDepthOpaque"
+    }
+  ],
+  "Memory": {
+    "ProcessMiB": 15819.8,
+    "VideoMemory": {
+      "UsedMiB": 5923.5,
+      "BudgetMiB": 11175
+    },
+    "AllocatedMiBPerSecond": 13.7,
+    "GcPauseMsLastSecond": 0,
+    "GcLastSecond": {
+      "Gen0": 0,
+      "Gen1": 0,
+      "Gen2": 0
+    }
+  },
+  "DrawCalls": 5830,
+  "Triangles": 55146878
+}

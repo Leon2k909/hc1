@@ -1,0 +1,79 @@
+{
+  "date": "2026-10-21",
+  "connection": {
+    "pid": 23084,
+    "project": "C:\\Users\\mimi-\\Documents\\S&box Projects\\hc1\\hc1.sbproj"
+  },
+  "verification": {
+    "models": 629,
+    "modelErrors": 0,
+    "timing": {
+      "outside": {
+        "frames": 12,
+        "elapsedMs": 6309,
+        "minimumGapMs": 530,
+        "maximumGapMs": 601
+      },
+      "hall": {
+        "frames": 12,
+        "elapsedMs": 5998,
+        "minimumGapMs": 459,
+        "maximumGapMs": 605
+      }
+    },
+    "pixels": {
+      "outside": {
+        "frameMeans": [
+          79.96305274971941,
+          79.94683726150393,
+          79.97438383838384,
+          79.94688215488216,
+          79.96537373737374,
+          79.95829405162739,
+          79.9486734006734,
+          79.95243995510663,
+          79.94450729517396,
+          79.94003591470258,
+          79.9425723905724,
+          79.94378900112234
+        ],
+        "meanRange": 0.034347923681266934,
+        "temporalMeanAbsoluteDifference": 0.11504744413835323,
+        "maxPixelChannelChange": 33,
+        "changedPixelsOver25Percent": 0.0006121824303642485
+      },
+      "hall": {
+        "frameMeans": [
+          115.6474878875969,
+          115.64749031007752,
+          115.64739583333333,
+          115.64704699612403,
+          115.64755571705426,
+          115.64733527131783,
+          115.64734253875969,
+          115.6472965116279,
+          115.64734980620155,
+          115.64739341085271,
+          115.64737403100776,
+          115.64706879844961
+        ],
+        "meanRange": 0.0005087209302274687,
+        "temporalMeanAbsoluteDifference": 0.0006437191684284708,
+        "maxPixelChannelChange": 34,
+        "changedPixelsOver25Percent": 0.0005285412262156447
+      }
+    }
+  },
+  "editor": {
+    "scene": "scenes/maps/forestbase/forestbase.scene",
+    "unsaved": false,
+    "compiling": false,
+    "compileSucceeded": true
+  },
+  "changesThisPass": [],
+  "limitations": [
+    "Offscreen temporal renders at two stationary viewpoints do not establish stability for every live player view.",
+    "User confirmation after the fixed map exposure is pending.",
+    "Offscreen captures bypass normal auto exposure; the fixed 1.5 exposure was separately verified at the live player camera in global-light-stability-20261021/runtime-effective-exposure.json."
+  ]
+}

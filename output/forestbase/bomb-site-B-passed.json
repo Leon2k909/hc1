@@ -1,0 +1,165 @@
+{
+  "site": 1,
+  "stage": "round-complete",
+  "placed": true,
+  "runId": "2026-10-08T17:09:56.6592195Z",
+  "controls": "Local host; active bots have movement/sight clamped and damage protection; actor protected, teleported and role switched; instant-defuse shortcut disabled for timed test. Production plant/defuse input and timers retained.",
+  "playerId": "a9c25d73-4339-4aa1-b791-e51c54bfe4d7",
+  "team": "CounterTerrorist",
+  "position": "-362,-1120,0.0413",
+  "zone": 1,
+  "zoneActive": true,
+  "deployed": false,
+  "currentEquipment": "m4a1",
+  "plantRuleActive": false,
+  "frozen": false,
+  "locallyControlled": true,
+  "menuOpen": false,
+  "hovered": null,
+  "inputTicks": 1266,
+  "grounded": true,
+  "canPlant": false,
+  "isPlanting": false,
+  "bombPosition": "-390,-1120,0",
+  "isDefused": true,
+  "isUsing": true,
+  "defusingPlayer": null,
+  "secondsRemaining": 35.36783,
+  "defuseProgress": 1,
+  "events": [
+    {
+      "name": "prepared",
+      "seconds": 0.0019662,
+      "data": {
+        "site": 1,
+        "target": "-390,-1120,2"
+      }
+    },
+    {
+      "name": "positioned",
+      "seconds": 0.0710524,
+      "data": {
+        "player": "a9c25d73-4339-4aa1-b791-e51c54bfe4d7",
+        "team": "Terrorist"
+      }
+    },
+    {
+      "name": "can-plant",
+      "seconds": 0.1199689,
+      "data": {
+        "grounded": true,
+        "plantTime": 4,
+        "zone": 1
+      }
+    },
+    {
+      "name": "input-hold",
+      "seconds": 1.2566949,
+      "data": {
+        "action": "Attack1",
+        "seconds": 1
+      }
+    },
+    {
+      "name": "plant-start",
+      "seconds": 1.3142393,
+      "data": {
+        "progress": 0.012442412
+      }
+    },
+    {
+      "name": "plant-cancelled",
+      "seconds": 2.3216129,
+      "data": {
+        "remainingBombs": 0
+      }
+    },
+    {
+      "name": "input-hold",
+      "seconds": 2.4384169,
+      "data": {
+        "action": "Attack1",
+        "seconds": 6
+      }
+    },
+    {
+      "name": "plant-start",
+      "seconds": 2.482077,
+      "data": {
+        "progress": 0.006624162
+      }
+    },
+    {
+      "name": "planted-observed",
+      "seconds": 6.5413113,
+      "data": {
+        "zone": [
+          1
+        ],
+        "position": "-390,-1120,0"
+      }
+    },
+    {
+      "name": "defender-ready",
+      "seconds": 6.7345472,
+      "data": {
+        "canUse": true,
+        "defuseTime": 7.5,
+        "duration": 45,
+        "distance": 28.071337
+      }
+    },
+    {
+      "name": "input-hold",
+      "seconds": 7.3702588,
+      "data": {
+        "action": "Use",
+        "seconds": 1
+      }
+    },
+    {
+      "name": "defuse-start-observed",
+      "seconds": 7.4471389,
+      "data": {
+        "defuseTime": 7.5
+      }
+    },
+    {
+      "name": "defuse-cancelled-observed",
+      "seconds": 8.4164936,
+      "data": {
+        "elapsed": 1.0416456,
+        "canUse": true
+      }
+    },
+    {
+      "name": "input-hold",
+      "seconds": 8.5329743,
+      "data": {
+        "action": "Use",
+        "seconds": 12
+      }
+    },
+    {
+      "name": "defuse-start-observed",
+      "seconds": 8.5856281,
+      "data": {
+        "defuseTime": 7.5
+      }
+    },
+    {
+      "name": "defused-observed",
+      "seconds": 16.0650248,
+      "data": {
+        "elapsed": 7.5166287
+      }
+    },
+    {
+      "name": "round-result",
+      "seconds": 16.1018463,
+      "data": {
+        "winner": "CounterTerrorist"
+      }
+    }
+  ]
+}

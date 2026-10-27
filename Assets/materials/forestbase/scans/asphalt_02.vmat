@@ -1,0 +1,11 @@
+"Layer0"
+{
+ shader "shaders/forestbase_wetground.shader"
+ F_SPECULAR "1"
+ TextureColor "materials/forestbase/scans/asphalt_02_diff.jpg"
+ TextureNormal "materials/forestbase/scans/asphalt_02_nor_gl.jpg"
+ TextureRoughness "materials/forestbase/scans/asphalt_02_rough.jpg"
+ TextureAmbientOcclusion "materials/forestbase/scans/asphalt_02_ao.jpg"
+ TextureMetalness "[0 0 0 0]"
+ g_flTintColor "[.7 .74 .76]"
+}

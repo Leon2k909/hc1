@@ -1,0 +1,11 @@
+"Layer0"
+{
+ shader "shaders/forestbase_coating.shader"
+ F_SPECULAR "1"
+ TextureColor "materials/forestbase/truck/glass_color.png"
+ TextureNormal "materials/forestbase/truck/glass_normal.png"
+ TextureRoughness "materials/forestbase/truck/glass_rough.png"
+ TextureAmbientOcclusion "materials/default/default_ao.tga"
+ g_flCoatingMetalness "0.25"
+ g_flModelTintAmount "1"
+}

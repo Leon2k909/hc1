@@ -1,0 +1,63 @@
+{
+  "installedAt": "2026-10-20T03:45:03.949Z",
+  "reason": "Current native controller audit found command service cargo blocking both directions of the east command entrance stair.",
+  "oldCenter": [
+    600,
+    480
+  ],
+  "newCenter": [
+    600,
+    250
+  ],
+  "files": [
+    {
+      "path": "Assets/models/maps/forestbase/logistics.obj",
+      "beforeSha256": "b6b2a6c2a5f901acb515ae6e7dad2e61701a32a4ec1f174dbb5ea7e1bc9d3f43",
+      "afterSha256": "ccfb4c606796e54d8bd0edbdfb51da79bf82dea579fe321cb01fc526262c0467"
+    },
+    {
+      "path": "Assets/models/maps/forestbase/logistics.vmdl",
+      "beforeSha256": "8a45b37a32620544e1dd314422a4e0163b504efe43b076d3578e89b5328933a5",
+      "afterSha256": "90087adc32bb2cb00736796dfe29f39006091b9724e036a6717446ac69da77e4"
+    }
+  ],
+  "trianglesBefore": 84068,
+  "trianglesAfter": 84068,
+  "boxes": 96,
+  "movedBoxIndices": [
+    81,
+    82,
+    83,
+    84,
+    85
+  ],
+  "hulls": 4,
+  "sceneSha256": "1b102b227cb555d661aa7adac7e5d7b962040147e4ac80022ecaad1da869c2b5",
+  "sceneUnchanged": true,
+  "layoutUnchanged": true,
+  "stagedAudit": "stair-clearance-stage/geometry-audit.json",
+  "grid": {
+    "destinations": 91,
+    "stairTreads": 210,
+    "blockedBefore": 5,
+    "blockedAfter": 0,
+    "scope": "Conservative tread clearance and destination connectivity. Interior-tread raster connectivity has false negatives; native traversal is separate."
+  },
+  "native": {
+    "paths": 24,
+    "pathFailures": 0,
+    "stairDirections": 22,
+    "stairFailures": 0,
+    "spawnChecks": 32,
+    "boundaryRays": 6,
+    "vehicleRays": 4,
+    "spawnSightlines": 112,
+    "modelErrors": [],
+    "navEvidence": "native-current-20261020/engine-nav-after-stair-fix.json",
+    "sceneEvidence": "native-current-20261020/engine-qa-after-stair-fix.json"
+  },
+  "limitations": [
+    "Sampled traces/controllers do not establish exhaustive escape, mantle/perch or human multiplayer balance.",
+    "Rendering and performance acceptance remain unfinished."
+  ]
+}

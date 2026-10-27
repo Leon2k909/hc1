@@ -1,0 +1,113 @@
+{
+  "createdUtc": "2026-10-09T21:52:31.512992+00:00",
+  "physicsIdentical": true,
+  "physicsSha256": "81d8a371f00911ebf03b275dd3f1fc756b1d55478a2e70b29cdcdc698fb6d9af",
+  "waterGeometryUnchangedTolerance": 1e-09,
+  "waterGeometry": [
+    {
+      "material": "waterfall_0",
+      "rows": 73,
+      "uniqueVertices": 4608,
+      "topHeight": 1127.148375,
+      "bottomHeight": -345.0,
+      "maximumBacktrack": 0.0,
+      "impactPlan": [
+        185.46010288569406,
+        3174.5750000000003,
+        -255
+      ],
+      "basinRadiusSquared": 0.3936718154344142,
+      "widthRange": [
+        68.155,
+        100.815
+      ]
+    },
+    {
+      "material": "waterfall_1",
+      "rows": 73,
+      "uniqueVertices": 4608,
+      "topHeight": 1095.890625,
+      "bottomHeight": -345.0,
+      "maximumBacktrack": 0.0,
+      "impactPlan": [
+        347.51567812120345,
+        3194.8430000000003,
+        -255
+      ],
+      "basinRadiusSquared": 0.17483822651016726,
+      "widthRange": [
+        97.31699999999995,
+        154.51599999999996
+      ]
+    },
+    {
+      "material": "waterfall_2",
+      "rows": 73,
+      "uniqueVertices": 4608,
+      "topHeight": 998.314125,
+      "bottomHeight": -345.0,
+      "maximumBacktrack": 4.547473508864641e-13,
+      "impactPlan": [
+        537.2174856813101,
+        3266.7249999999995,
+        -255
+      ],
+      "basinRadiusSquared": 0.09209270965645439,
+      "widthRange": [
+        68.13499999999999,
+        117.36100000000005
+      ]
+    },
+    {
+      "material": "waterfall_3",
+      "rows": 73,
+      "uniqueVertices": 4608,
+      "topHeight": 956.8681875,
+      "bottomHeight": -345.0,
+      "maximumBacktrack": 4.547473508864641e-13,
+      "impactPlan": [
+        685.542579228881,
+        3363.1709999999994,
+        -255
+      ],
+      "basinRadiusSquared": 0.22417408966388522,
+      "widthRange": [
+        47.817999999999984,
+        75.98299999999995
+      ]
+    }
+  ],
+  "vistaTriangles": 82494,
+  "hashes": {
+    "Tools\\forestbase_cascade.py": "07aea1c3e3b1dd8b027aaebbf58fa5bb6dd45b221e1d1f1c6d0190b1abb167cf",
+    "Tools\\forestbase_water.py": "2105cc57a9e2b0c6177e9830be41aa842f52335c61fca26b73764687a118f7cd",
+    "Tools\\forestbase_camonet.py": "40ba65337f9627713ab0af50cc349f7dd59a610f6af77de61cb68eceaafe50c1",
+    "Tools\\forestbase_materials.py": "6e3f59169fd27b63d6847440fbd2aa454ad4404b4bbe38437924e490cc6a7622",
+    "Assets\\models\\maps\\forestbase\\vista.obj": "58fdc7a353d777a1da2de06968dc788e229fd1593b16cc3048807db8c28b9c0c",
+    "Assets\\models\\maps\\forestbase\\vista.vmdl": "a97deeba3161dad1ec49c53d5e1f70fdbb4cb34d33e4db351808ac2d4382ace1",
+    "Assets\\materials\\forestbase\\cascade_rock.vmat": "df64df40605ab5a45bc02ea1db9bd2dbb15a46633706fea818eb762095b19b18",
+    "Assets\\shaders\\forestbase_coating.shader": "f1d9bd5f5bbc24bc23a95a8391d4e22eff5b4a7f97e09b4e067818fa3dc6c856",
+    "output\\forestbase\\aerial.png": "9ff911c70783382c19830054a937871d62d79094941735c137cd6014c7737058",
+    "output\\forestbase\\waterfall.png": "24101184412924fb78667da7d663947a33eac454ff4dcce84540ee439fd643b8",
+    "output\\forestbase\\waterfall-foot.png": "689909e837928186a0757d2418a6f2635046d9375bddbea99f551c65e74e20ea",
+    "output\\forestbase\\logistics.png": "e17b6298fb2c5a68b9b4cea1f0bc47df9411778b080ad57b236b238bfec12456",
+    "output\\forestbase\\cargo-detail.png": "6f226cc3cd02229c7ec2d667a41f118bfde36a7a2b693f402276e6d14119184c",
+    "output\\forestbase\\engine-qa.json": "4ce8b1e05b5d8d8b2c001aa2af34493c1c48eff762aec405408fde33a3796327",
+    "output\\forestbase\\layout.json": "708fdccfe1f7dbb39a27605071d1bf1bcf76d99378e65989e54f2ab14578a2e3"
+  },
+  "nativeQa": {
+    "utc": "2026-10-09T21:52:25.084333+00:00",
+    "modelErrors": 0,
+    "spawnChecks": 32,
+    "boundarySamples": 6,
+    "vehicleSamples": 4,
+    "blockedSampledSpawnRays": 112
+  },
+  "offlinePreview": "Blender Cycles with independent approximate lighting; preceding untapered end geometry",
+  "limitations": [
+    "Aerial view retains an unnatural striped vertical distant-cliff surface.",
+    "Waterfall width and stepped formation still differ from references.",
+    "Current performance and 10\u201315 remote clients remain unverified.",
+    "AAA visual objective is unfinished."
+  ]
+}

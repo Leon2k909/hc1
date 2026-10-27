@@ -1,0 +1,59 @@
+{
+  "editor": "Sandbox.EditorSystemPublic",
+  "properties": [
+    {
+      "Name": "Scene",
+      "type": "Sandbox.Scene"
+    },
+    {
+      "Name": "Camera",
+      "type": "Sandbox.CameraComponent"
+    }
+  ],
+  "focus": "Editor.SceneRenderingWidget",
+  "sessionViews": [
+    {
+      "name": "reefhall",
+      "target": "Editor.SceneViewportWidget",
+      "views": [
+        {
+          "type": "Editor.SceneRenderingWidget",
+          "Visible": false,
+          "scene": "reefhall"
+        }
+      ],
+      "gameTarget": null
+    },
+    {
+      "name": "belltower",
+      "target": "Editor.SceneViewportWidget",
+      "views": [
+        {
+          "type": "Editor.SceneRenderingWidget",
+          "Visible": false,
+          "scene": "belltower"
+        }
+      ],
+      "gameTarget": null
+    },
+    {
+      "name": "forestbase",
+      "target": "Editor.SceneViewportWidget",
+      "views": [
+        {
+          "type": "Editor.SceneRenderingWidget",
+          "Visible": false,
+          "scene": "forestbase"
+        }
+      ],
+      "gameTarget": null
+    },
+    {
+      "name": "forestbase",
+      "target": null,
+      "views": null,
+      "gameTarget": null
+    }
+  ],
+  "methods": []
+}

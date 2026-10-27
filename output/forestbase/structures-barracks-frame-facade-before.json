@@ -1,0 +1,16 @@
+{
+  "renderer": "Blender Cycles CPU",
+  "scope": "Actual exported before/after meshes and surface maps; independent approximate lighting. No S&box access or engine appearance claim.",
+  "textureLimit": 1024,
+  "denoising": false,
+  "samples": 32,
+  "sourceMeshes": {
+    "output/forestbase/facade-piers-before/Assets/models/maps/forestbase/barracks.obj": "97272efbfbe7befcf43d45e4b9bfa88da51af880b8e57938d7200fa841720710",
+    "output/forestbase/facade-piers-before/Assets/models/maps/forestbase/command.obj": "dafc4af100d46551c319301c515a891330d7d3b928721ce99a635794e948a26c",
+    "Assets/models/maps/forestbase/links.obj": "833614ff5809d705720594e27139e5a8e3ae87cd4e66cdbe91503efca54428e5"
+  },
+  "views": [
+    "barracks-frame-facade-before.png"
+  ],
+  "metadataRecovery": "Recovered source hashes after rendering; the original recorder assumed every chunk was staged, while the importer correctly loaded unchanged links from active assets."
+}

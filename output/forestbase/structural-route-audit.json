@@ -1,0 +1,682 @@
+{
+  "scope": "Offline sampled exported-box and OBJ checks; no native engine, navmesh, bullets or performance claim.",
+  "capsule": {
+    "radius": 24,
+    "height": 72,
+    "feet": 240,
+    "stepMaximum": 4,
+    "collisionTolerance": 0.05
+  },
+  "allOtherModelSourcesUnchanged": {
+    "ground": true,
+    "motor": true,
+    "barracks": true,
+    "command": true,
+    "workshop": true,
+    "yard": true,
+    "logistics": true,
+    "vista": true
+  },
+  "railTrussPhysicsUnchanged": true,
+  "beforeJunctionRepair": [
+    {
+      "route": "west-link",
+      "samples": 104,
+      "blocked": [],
+      "unsupportedCenters": [],
+      "partialFootprintSupport": [
+        {
+          "plan": [
+            -526.0679611650486,
+            850.6796116504854
+          ],
+          "ringSamples": [
+            12
+          ]
+        },
+        {
+          "plan": [
+            -518.2038834951456,
+            852.0388349514564
+          ],
+          "ringSamples": [
+            11
+          ]
+        },
+        {
+          "plan": [
+            -136.79611650485435,
+            917.9611650485436
+          ],
+          "ringSamples": [
+            3
+          ]
+        },
+        {
+          "plan": [
+            -128.93203883495147,
+            919.3203883495146
+          ],
+          "ringSamples": [
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "route": "east-link",
+      "samples": 105,
+      "blocked": [
+        {
+          "plan": [
+            994.1826923076924,
+            920.0
+          ],
+          "boxes": [
+            "links:61",
+            "links:64",
+            "links:65",
+            "links:66",
+            "links:69",
+            "links:70"
+          ]
+        },
+        {
+          "plan": [
+            998.1730769230769,
+            920.0
+          ],
+          "boxes": [
+            "links:61",
+            "links:64",
+            "links:65",
+            "links:66",
+            "links:69",
+            "links:70"
+          ]
+        },
+        {
+          "plan": [
+            1002.1634615384615,
+            920.0
+          ],
+          "boxes": [
+            "links:61",
+            "links:64",
+            "links:65",
+            "links:66",
+            "links:69",
+            "links:70"
+          ]
+        },
+        {
+          "plan": [
+            1006.1538461538462,
+            920.0
+          ],
+          "boxes": [
+            "links:61",
+            "links:64",
+            "links:65",
+            "links:66",
+            "links:69",
+            "links:70"
+          ]
+        },
+        {
+          "plan": [
+            1010.1442307692307,
+            920.0
+          ],
+          "boxes": [
+            "links:61",
+            "links:64",
+            "links:65",
+            "links:66",
+            "links:69",
+            "links:70"
+          ]
+        },
+        {
+          "plan": [
+            1014.1346153846154,
+            920.0
+          ],
+          "boxes": [
+            "links:61",
+            "links:64",
+            "links:65",
+            "links:66",
+            "links:69",
+            "links:70"
+          ]
+        },
+        {
+          "plan": [
+            1018.125,
+            920.0
+          ],
+          "boxes": [
+            "links:61",
+            "links:64",
+            "links:65",
+            "links:66",
+            "links:69",
+            "links:70"
+          ]
+        },
+        {
+          "plan": [
+            1022.1153846153846,
+            920.0
+          ],
+          "boxes": [
+            "links:61",
+            "links:64",
+            "links:65",
+            "links:66",
+            "links:69",
+            "links:70"
+          ]
+        },
+        {
+          "plan": [
+            1026.1057692307693,
+            920.0
+          ],
+          "boxes": [
+            "links:61",
+            "links:64",
+            "links:65",
+            "links:66",
+            "links:69",
+            "links:70"
+          ]
+        },
+        {
+          "plan": [
+            1030.0961538461538,
+            920.0
+          ],
+          "boxes": [
+            "links:61",
+            "links:64",
+            "links:65",
+            "links:66",
+            "links:69",
+            "links:70"
+          ]
+        },
+        {
+          "plan": [
+            1034.0865384615386,
+            920.0
+          ],
+          "boxes": [
+            "links:61",
+            "links:64",
+            "links:65",
+            "links:66",
+            "links:69",
+            "links:70"
+          ]
+        },
+        {
+          "plan": [
+            1038.076923076923,
+            920.0
+          ],
+          "boxes": [
+            "links:61",
+            "links:64",
+            "links:65",
+            "links:66",
+            "links:69",
+            "links:70"
+          ]
+        },
+        {
+          "plan": [
+            1042.0673076923076,
+            920.0
+          ],
+          "boxes": [
+            "links:61",
+            "links:64",
+            "links:65",
+            "links:66",
+            "links:69",
+            "links:70"
+          ]
+        }
+      ],
+      "unsupportedCenters": [],
+      "partialFootprintSupport": [
+        {
+          "plan": [
+            1050.048076923077,
+            920.0
+          ],
+          "ringSamples": [
+            15
+          ]
+        },
+        {
+          "plan": [
+            1054.0384615384614,
+            920.0
+          ],
+          "ringSamples": [
+            14,
+            15
+          ]
+        },
+        {
+          "plan": [
+            1058.0288461538462,
+            920.0
+          ],
+          "ringSamples": [
+            14,
+            15
+          ]
+        },
+        {
+          "plan": [
+            1062.0192307692307,
+            920.0
+          ],
+          "ringSamples": [
+            13,
+            14,
+            15
+          ]
+        },
+        {
+          "plan": [
+            1066.0096153846152,
+            920.0
+          ],
+          "ringSamples": [
+            13,
+            14,
+            15
+          ]
+        },
+        {
+          "plan": [
+            1070.0,
+            920.0
+          ],
+          "ringSamples": [
+            13,
+            14,
+            15
+          ]
+        }
+      ]
+    },
+    {
+      "route": "elbow",
+      "samples": 26,
+      "blocked": [
+        {
+          "plan": [
+            1070.0,
+            948.0
+          ],
+          "boxes": [
+            "links:43",
+            "links:44",
+            "links:45",
+            "links:51",
+            "links:52",
+            "links:53"
+          ]
+        },
+        {
+          "plan": [
+            1070.0,
+            952.0
+          ],
+          "boxes": [
+            "links:43",
+            "links:44",
+            "links:45",
+            "links:51",
+            "links:52",
+            "links:53"
+          ]
+        },
+        {
+          "plan": [
+            1070.0,
+            956.0
+          ],
+          "boxes": [
+            "links:43",
+            "links:44",
+            "links:45",
+            "links:51",
+            "links:52",
+            "links:53"
+          ]
+        },
+        {
+          "plan": [
+            1070.0,
+            960.0
+          ],
+          "boxes": [
+            "links:43",
+            "links:44",
+            "links:45",
+            "links:51",
+            "links:52",
+            "links:53"
+          ]
+        },
+        {
+          "plan": [
+            1070.0,
+            964.0
+          ],
+          "boxes": [
+            "links:43",
+            "links:44",
+            "links:45",
+            "links:51",
+            "links:52",
+            "links:53"
+          ]
+        },
+        {
+          "plan": [
+            1070.0,
+            968.0
+          ],
+          "boxes": [
+            "links:43",
+            "links:44",
+            "links:45",
+            "links:51",
+            "links:52",
+            "links:53"
+          ]
+        },
+        {
+          "plan": [
+            1070.0,
+            972.0
+          ],
+          "boxes": [
+            "links:43",
+            "links:44",
+            "links:45",
+            "links:51",
+            "links:52",
+            "links:53"
+          ]
+        },
+        {
+          "plan": [
+            1070.0,
+            976.0
+          ],
+          "boxes": [
+            "links:43",
+            "links:44",
+            "links:45",
+            "links:51",
+            "links:52",
+            "links:53"
+          ]
+        },
+        {
+          "plan": [
+            1070.0,
+            980.0
+          ],
+          "boxes": [
+            "links:43",
+            "links:44",
+            "links:45",
+            "links:51",
+            "links:52",
+            "links:53"
+          ]
+        },
+        {
+          "plan": [
+            1070.0,
+            984.0
+          ],
+          "boxes": [
+            "links:43",
+            "links:44",
+            "links:45",
+            "links:51",
+            "links:52",
+            "links:53"
+          ]
+        },
+        {
+          "plan": [
+            1070.0,
+            988.0
+          ],
+          "boxes": [
+            "links:43",
+            "links:44",
+            "links:45",
+            "links:51",
+            "links:52",
+            "links:53"
+          ]
+        },
+        {
+          "plan": [
+            1070.0,
+            992.0
+          ],
+          "boxes": [
+            "links:43",
+            "links:44",
+            "links:45",
+            "links:51",
+            "links:52",
+            "links:53"
+          ]
+        },
+        {
+          "plan": [
+            1070.0,
+            996.0
+          ],
+          "boxes": [
+            "links:43",
+            "links:44",
+            "links:45",
+            "links:51",
+            "links:52",
+            "links:53"
+          ]
+        }
+      ],
+      "unsupportedCenters": [],
+      "partialFootprintSupport": [
+        {
+          "plan": [
+            1070.0,
+            920.0
+          ],
+          "ringSamples": [
+            13,
+            14,
+            15
+          ]
+        },
+        {
+          "plan": [
+            1070.0,
+            924.0
+          ],
+          "ringSamples": [
+            13,
+            14,
+            15
+          ]
+        },
+        {
+          "plan": [
+            1070.0,
+            928.0
+          ],
+          "ringSamples": [
+            13,
+            14,
+            15
+          ]
+        },
+        {
+          "plan": [
+            1070.0,
+            932.0
+          ],
+          "ringSamples": [
+            13,
+            14
+          ]
+        },
+        {
+          "plan": [
+            1070.0,
+            936.0
+          ],
+          "ringSamples": [
+            13,
+            14
+          ]
+        },
+        {
+          "plan": [
+            1070.0,
+            940.0
+          ],
+          "ringSamples": [
+            13
+          ]
+        }
+      ]
+    },
+    {
+      "route": "landing",
+      "samples": 51,
+      "blocked": [],
+      "unsupportedCenters": [],
+      "partialFootprintSupport": []
+    },
+    {
+      "route": "stair-landing",
+      "samples": 56,
+      "blocked": [],
+      "unsupportedCenters": [],
+      "partialFootprintSupport": []
+    }
+  ],
+  "current": [
+    {
+      "route": "west-link",
+      "samples": 104,
+      "blocked": [],
+      "unsupportedCenters": [],
+      "partialFootprintSupport": [
+        {
+          "plan": [
+            -526.0679611650486,
+            850.6796116504854
+          ],
+          "ringSamples": [
+            12
+          ]
+        },
+        {
+          "plan": [
+            -518.2038834951456,
+            852.0388349514564
+          ],
+          "ringSamples": [
+            11
+          ]
+        },
+        {
+          "plan": [
+            -136.79611650485435,
+            917.9611650485436
+          ],
+          "ringSamples": [
+            3
+          ]
+        },
+        {
+          "plan": [
+            -128.93203883495147,
+            919.3203883495146
+          ],
+          "ringSamples": [
+            4
+          ]
+        }
+      ]
+    },
+    {
+      "route": "east-link",
+      "samples": 105,
+      "blocked": [],
+      "unsupportedCenters": [],
+      "partialFootprintSupport": []
+    },
+    {
+      "route": "elbow",
+      "samples": 26,
+      "blocked": [],
+      "unsupportedCenters": [],
+      "partialFootprintSupport": []
+    },
+    {
+      "route": "landing",
+      "samples": 51,
+      "blocked": [],
+      "unsupportedCenters": [],
+      "partialFootprintSupport": []
+    },
+    {
+      "route": "stair-landing",
+      "samples": 56,
+      "blocked": [],
+      "unsupportedCenters": [],
+      "partialFootprintSupport": []
+    }
+  ],
+  "mesh": {
+    "vertices": 48460,
+    "normals": 12657,
+    "triangles": 23146,
+    "materials": [
+      "case_hardware",
+      "sign_F",
+      "steel",
+      "structural_steel",
+      "yellow"
+    ]
+  },
+  "sourceHashes": {
+    "Tools\\forestbase_structures.py": "a2a0b089fb89d807537e276d7fd6e22db600297402821d01505a8543ea12aa4f",
+    "Assets\\models\\maps\\forestbase\\links.obj": "833614ff5809d705720594e27139e5a8e3ae87cd4e66cdbe91503efca54428e5",
+    "Assets\\models\\maps\\forestbase\\links.vmdl": "cc23b5aba8b00c4139b401e4cd2f96f0671af50331d4d9bad1668343ab3ddde7"
+  },
+  "limitations": [
+    "Four circular perimeter support samples near diagonal bridge abutments are outside the deck union; center support is checked separately.",
+    "Historical native navigation/spawn tests predate the earlier bridge junction collision repair. Fresh native verification remains required."
+  ]
+}

@@ -1,0 +1,18 @@
+2026/10/09 10:36:02.7868	[Generic] dev_perf: sampling 600 frames with 13 bots alive (bot LOD on)	
+2026/10/09 10:36:20.4758	[Generic] dev_perf over 600 frames, bots alive 10-14, players 1, bot LOD on
+  frame ms: avg 29.52 (34 fps)  p50 29.46  p95 33.35  p99 38.03  max 63.21
+  bot components ms/frame: avg 0.727  max 8.044  (thinking 0.546)
+  managed alloc 607.0 KB/frame, GCs gen0 11 gen1 5 gen2 0
+  engine timings, avg ms over the last 200 frames:
+    Update     avg 2.515  max 6.334
+    Animation  avg 1.320  max 9.518
+    Physics    avg 3.107  max 7.599
+    NavMesh    avg 0.216  max 0.916
+    Network    avg 0.232  max 2.452
+    Particles  avg 0.110  max 0.560
+    Audio      avg 0.392  max 1.221
+    UI         avg 1.561  max 3.033
+    Render     avg 17.995  max 29.086
+    Async      avg 0.078  max 0.269
+    Editor     avg 1.012  max 4.732
+    GcPause    avg 0.198  max 17.408	

@@ -1,0 +1,299 @@
+{
+  "Scene": "forestbase",
+  "Name": "Camera",
+  "Id": "a7feb97f-31fb-4389-86e2-8cddd2efd724",
+  "Enabled": true,
+  "ActiveInHierarchy": true,
+  "Tags": [
+    "player",
+    "noblockaudio"
+  ],
+  "Parent": {
+    "Id": "605ccb8b-5acd-4da1-b8bb-bae3744f5e11",
+    "Name": "Boom"
+  },
+  "WorldPosition": "-1174.20374,193.106537,60.0412407",
+  "WorldRotation": "0,-49.9413719,0",
+  "WorldScale": "1,1,1",
+  "Components": [
+    {
+      "Type": "CameraComponent",
+      "Id": "b187bdb5-1233-48cb-b5bc-883cbc2d049e",
+      "Enabled": true,
+      "Properties": {
+        "__type": "Sandbox.CameraComponent",
+        "__guid": "b187bdb5-1233-48cb-b5bc-883cbc2d049e",
+        "__enabled": true,
+        "Flags": 0,
+        "BackgroundColor": "0.75478,0.83828,0.87624,1",
+        "ClearFlags": "All",
+        "EnablePostProcessing": true,
+        "FieldOfView": 85,
+        "FovAxis": "Horizontal",
+        "IsMainCamera": true,
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "Orthographic": false,
+        "OrthographicHeight": 1204,
+        "PostProcessAnchor": null,
+        "Priority": 8,
+        "RenderExcludeTags": "invis,viewer",
+        "RenderTags": "",
+        "RenderTexture": null,
+        "TargetEye": "None",
+        "Viewport": "0,0,1,1",
+        "ZFar": 100000,
+        "ZNear": 1
+      }
+    },
+    {
+      "Type": "AudioListener",
+      "Id": "391a611e-3b66-4a8b-9ade-1a9d5b736187",
+      "Enabled": true,
+      "Properties": {
+        "__type": "Sandbox.AudioListener",
+        "__guid": "391a611e-3b66-4a8b-9ade-1a9d5b736187",
+        "__enabled": true,
+        "Flags": 0,
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "UseCameraDirection": true
+      }
+    },
+    {
+      "Type": "Highlight",
+      "Id": "68361b58-46ae-418d-9bbb-c2da02ecb8f4",
+      "Enabled": true,
+      "Properties": {
+        "__type": "Sandbox.Highlight",
+        "__guid": "68361b58-46ae-418d-9bbb-c2da02ecb8f4",
+        "__enabled": true,
+        "Flags": 0,
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null
+      }
+    },
+    {
+      "Type": "Bloom",
+      "Id": "1f5e7f25-25f9-4ef9-8ddd-a8b152e27ed1",
+      "Enabled": true,
+      "Properties": {
+        "__type": "Sandbox.Bloom",
+        "__guid": "1f5e7f25-25f9-4ef9-8ddd-a8b152e27ed1",
+        "__enabled": true,
+        "Flags": 0,
+        "__version": 1,
+        "Mode": "Additive",
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "Strength": 0.1,
+        "Threshold": 1.6,
+        "Tint": "1,1,1,1"
+      }
+    },
+    {
+      "Type": "Tonemapping",
+      "Id": "52684656-cfd1-4e90-b997-822ca845a983",
+      "Enabled": true,
+      "Properties": {
+        "__type": "Sandbox.Tonemapping",
+        "__guid": "52684656-cfd1-4e90-b997-822ca845a983",
+        "__enabled": true,
+        "Flags": 0,
+        "__version": 3,
+        "AutoExposureEnabled": true,
+        "ExposureCompensation": 0,
+        "ExposureMethod": "RGB",
+        "MaximumExposure": 2,
+        "MinimumExposure": 1,
+        "Mode": "ACES",
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "Rate": 1
+      }
+    },
+    {
+      "Type": "Sharpen",
+      "Id": "a6d8ffe7-1b1a-429b-94e8-57938623d12e",
+      "Enabled": true,
+      "Properties": {
+        "__type": "Sandbox.Sharpen",
+        "__guid": "a6d8ffe7-1b1a-429b-94e8-57938623d12e",
+        "__enabled": true,
+        "Flags": 0,
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "Scale": 0.1,
+        "TexelSize": 1
+      }
+    },
+    {
+      "Type": "ChromaticAberration",
+      "Id": "167cc0ae-dda5-4551-a2ff-4f7a7e773f81",
+      "Enabled": true,
+      "Properties": {
+        "__type": "Sandbox.ChromaticAberration",
+        "__guid": "167cc0ae-dda5-4551-a2ff-4f7a7e773f81",
+        "__enabled": true,
+        "Flags": 0,
+        "Offset": "2,3,0",
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "Scale": 0.9994901
+      }
+    },
+    {
+      "Type": "Pixelate",
+      "Id": "ae02ef5b-1b60-408c-8074-cfa587d77e81",
+      "Enabled": true,
+      "Properties": {
+        "__type": "Sandbox.Pixelate",
+        "__guid": "ae02ef5b-1b60-408c-8074-cfa587d77e81",
+        "__enabled": true,
+        "Flags": 0,
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "Scale": 0.19989802
+      }
+    },
+    {
+      "Type": "ScreenShaker",
+      "Id": "e7fbc60a-9799-4ef2-ab02-30351fe5700a",
+      "Enabled": true,
+      "Properties": {
+        "__type": "Facepunch.ScreenShaker",
+        "__guid": "e7fbc60a-9799-4ef2-ab02-30351fe5700a",
+        "__enabled": true,
+        "Flags": 0,
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null
+      }
+    },
+    {
+      "Type": "AmbientOcclusion",
+      "Id": "37e8dc45-1432-435c-b79e-239df23731be",
+      "Enabled": true,
+      "Properties": {
+        "__type": "Sandbox.AmbientOcclusion",
+        "__guid": "37e8dc45-1432-435c-b79e-239df23731be",
+        "__enabled": true,
+        "Flags": 0,
+        "__version": 1,
+        "FalloffRange": 0.9,
+        "Intensity": 0.45,
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "Radius": 48,
+        "ThinCompensation": 1
+      }
+    },
+    {
+      "Type": "ColorAdjustments",
+      "Id": "a56fe01e-a062-498f-b5f2-591434066526",
+      "Enabled": false,
+      "Properties": {
+        "__type": "Sandbox.ColorAdjustments",
+        "__guid": "a56fe01e-a062-498f-b5f2-591434066526",
+        "__enabled": false,
+        "Flags": 0,
+        "Blend": 1,
+        "Brightness": 1,
+        "Contrast": 1.035,
+        "HueRotate": 0,
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "Saturation": 0.96
+      }
+    },
+    {
+      "Type": "Vignette",
+      "Id": "adffc1ab-70a4-4a8f-831c-87c23f73de61",
+      "Enabled": true,
+      "Properties": {
+        "__type": "Sandbox.Vignette",
+        "__guid": "adffc1ab-70a4-4a8f-831c-87c23f73de61",
+        "__enabled": true,
+        "Flags": 0,
+        "Center": "0.5,0.5",
+        "Color": "0,0,0,1",
+        "Intensity": 0.08,
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "Roundness": 1,
+        "Smoothness": 1
+      }
+    },
+    {
+      "Type": "DepthOfField",
+      "Id": "833f7721-0872-4783-8bae-bee5448796b3",
+      "Enabled": false,
+      "Properties": {
+        "__type": "Sandbox.DepthOfField",
+        "__guid": "833f7721-0872-4783-8bae-bee5448796b3",
+        "__enabled": false,
+        "Flags": 0,
+        "BackBlur": true,
+        "BlurSize": 0,
+        "DebugView": false,
+        "FocalDistance": 200,
+        "FocusRange": 500,
+        "FrontBlur": false,
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null
+      }
+    }
+  ],
+  "Children": []
+}
