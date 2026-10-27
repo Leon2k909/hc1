@@ -1,73 +1,115 @@
-"""Give Spillway's two plain steel containers Lowtide's corrugated container finish.
+"""Replace Spillway's two plain box containers with Lowtide's detailed ISO container.
 
 python Tools/spillway_containers.py
 
-Only the container bodies (and their side ribs) in spillway_west/east.obj change
-material and UVs. Geometry, corner posts, rails and collision hulls are untouched.
-Scene coords: x = north, y = -east; OBJ axes are (y, z, x).
+Run once on the original spillway_west/east meshes. The old container (box body,
+side ribs, frame bars, end rods and its "03" stencil) is cut out of the OBJ, and a
+40 ft high-cube built by lowtide_container.build (corrugated sheets, doors, locking
+bars, corner castings, code markings) is appended in its place. Its collision box in
+the vmdl is resized to the new container. Plan coords are (east, north, up).
 """
+import re
 from pathlib import Path
 
 import numpy as np
 
-ROOT = Path(__file__).resolve().parents[1]
-MODELS = ROOT / "Assets/models/maps/spillway"
-PAINT = "lt_container_blue"
-TILE = 48.0
-# (model, east, north, length) from spillway_map.west_works / east_works; width 110, height 112.
-CONTAINERS = (("spillway_west", -1380, -1560, 350), ("spillway_east", 2070, 1830, 370))
+import building_textures as BT
+import map_kit as K
+import lowtide_container as LC
+
+MODELS = K.ROOT / "Assets/models/maps/spillway"
+SCRATCH = K.ROOT / "output/spillway/containers"
+# model, plan centre (east, north), old length; old boxes were 110 wide and 112 tall.
+CONTAINERS = (("spillway_west", (-1380, -1560), 350, "blue", +1),
+              ("spillway_east", (2070, 1830), 370, "blue", -1))
+SIZE, HIGH_CUBE = "40", True
+REMAPS = {"lt_container_blue": "materials/lowtide/containers/lt_container_blue.vmat",
+          "lt_container_blue_frame": "materials/lowtide/containers/lt_container_blue_frame.vmat",
+          "rw_black": "materials/railhead/rw_black.vmat",
+          "rw_container_code": "materials/railhead/rw_container_code.vmat",
+          "rw_steel_dark": "materials/railhead/rw_steel_dark.vmat",
+          "rw_steel_grey": "materials/railhead/rw_steel_grey.vmat",
+          "rw_yellow_paint": "materials/railhead/rw_yellow_paint.vmat"}
 
 
-def face_uv(point, normal):
-    n = normal / np.linalg.norm(normal)
-    up = np.array((1.0, 0, 0)) if abs(n[2]) > .999 else (np.array((0, 0, 1.0)) - n[2] * n)
-    up /= np.linalg.norm(up)
-    right = np.cross(-n, up)
-    return point @ right / TILE, point @ up / TILE
-
-
-def patch(name, boxes):
-    obj = MODELS / f"{name}.obj"
-    lines = obj.read_text().splitlines()
+def cut_old(lines, centre, length):
+    """Drop every face lying wholly inside the old container's envelope, except ground at z 0."""
+    e, n = centre
+    lo = np.array((-(e + length / 2 + 6), -.5, n - 58))   # OBJ axes: (-east, up, north)
+    hi = np.array((-(e - length / 2 - 6), 114.5, n + 58))
     v = [np.array([float(c) for c in l.split()[1:4]]) for l in lines if l.startswith("v ")]
-    vt_count = sum(1 for l in lines if l.startswith("vt "))
-    world = lambda p: np.array((p[2], p[0], p[1]))  # OBJ (y, z, x) -> scene (x, y, z)
-    keep, moved, new_vt, paint = [], [], [], None
+    out, removed = [], 0
     for line in lines:
-        if line.startswith("usemtl "):
-            paint = line.split()[1]
-        if line.startswith("f ") and paint == "rv_steel":
-            refs = [t.split("/") for t in line.split()[1:]]
-            pts = [world(v[int(r[0]) - 1]) for r in refs]
-            if any(all(lo[i] - .01 <= p[i] <= hi[i] + .01 for p in pts for i in range(3)) for lo, hi in boxes):
-                normal = np.cross(pts[1] - pts[0], pts[2] - pts[0])
-                fields = []
-                for r, p in zip(refs, pts):
-                    new_vt.append("vt %.5f %.5f" % face_uv(p, normal))
-                    fields.append(f"{r[0]}/{vt_count + len(new_vt)}/{r[2]}")
-                moved.append("f " + " ".join(fields))
+        if line.startswith("f "):
+            pts = np.array([v[int(t.split("/")[0]) - 1] for t in line.split()[1:]])
+            if (pts >= lo).all() and (pts <= hi).all() and pts[:, 1].max() > .5:
+                removed += 1
                 continue
-        keep.append(line)
-    assert moved, name
-    # New texture coordinates go after the last existing vt, before any face refers to them.
-    last_vt = max(i for i, l in enumerate(keep) if l.startswith("vt "))
-    out = keep[:last_vt + 1] + new_vt + keep[last_vt + 1:] + [f"usemtl {PAINT}"] + moved
-    obj.write_text("\n".join(out) + "\n")
-    mtl = obj.with_suffix(".mtl")
-    if f"newmtl {PAINT}\n" not in mtl.read_text():
-        mtl.write_text(mtl.read_text() + f"newmtl {PAINT}\nKd 1 1 1\nd 1\n")
-    vmdl = obj.with_suffix(".vmdl")
-    text = vmdl.read_text()
+        out.append(line)
+    return out, removed
+
+
+def new_container(name, centre, colour, door_end):
+    model = K.Model()
+    LC.build(model, *centre, 0, size=SIZE, axis="e", paint=f"rw_container_{colour}",
+             high_cube=HIGH_CUBE, door_end=door_end)
+    # Railhead's hardware paints aren't in building_textures; give them its usual 48-inch tile.
+    for paint in model.polygons:
+        if paint not in BT.PAINTS:
+            model.tile_overrides.setdefault(paint, 1.0 if paint == "rw_container_code" else 48.0)
+    path = SCRATCH / f"{name}_container.obj"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    K.write_obj(path, model, path.stem)
+    return path.read_text().splitlines(), model.boxes[0]
+
+
+def append(lines, extra):
+    counts = {k: sum(1 for l in lines if l.startswith(k + " ")) for k in ("v", "vt", "vn")}
+    # Vertex data goes before the first face group so every index resolves.
+    first = next(i for i, l in enumerate(lines) if l.startswith("usemtl "))
+    data = [l for l in extra if l.split(" ", 1)[0] in ("v", "vt", "vn")]
+    faces = []
+    for l in extra:
+        if l.startswith("usemtl "):
+            faces.append(l)
+        elif l.startswith("f "):
+            refs = []
+            for t in l.split()[1:]:
+                vi, ti, ni = (int(x) for x in t.split("/"))
+                refs.append(f"{vi + counts['v']}/{ti + counts['vt']}/{ni + counts['vn']}")
+            faces.append("f " + " ".join(refs))
+    return lines[:first] + data + lines[first:] + faces
+
+
+def patch_vmdl(path, centre, length, box):
+    text = path.read_text()
+    e, n = centre
+    # The old box: origin (north, -east, 56), dimensions (length, 110, 112).
+    old = re.compile(r"(origin = \[ )%s\.0000, %s\.0000, 56\.0000( \]\s*angles = \[[^\]]*\]\s*dimensions = \[ )"
+                     r"%s\.0000, 110\.0000, 112\.0000( \])" % (n, -e, length))
+    size = box[2]
+    text, count = old.subn(r"\g<1>%s.0000, %s.0000, %.4f\g<2>%.4f, %.4f, %.4f\g<3>"
+                           % (n, -e, size[2] / 2, size[0], size[1], size[2]), text)
+    assert count == 1, (path, count)
     anchor = next(l for l in text.splitlines() if 'from = "rv_steel.vmat"' in l)
-    remap = anchor.replace('"rv_steel.vmat"', f'"{PAINT}.vmat"').replace(
-        "materials/riverdale/rv_steel.vmat", f"materials/lowtide/containers/{PAINT}.vmat")
-    if remap not in text:
-        vmdl.write_text(text.replace(anchor, remap + "\n" + anchor))
-    print(f"{name}: {len(moved)} faces now {PAINT}")
+    for paint, target in sorted(REMAPS.items()):
+        if f'from = "{paint}.vmat"' not in text:
+            remap = anchor.replace('"rv_steel.vmat"', f'"{paint}.vmat"').replace(
+                "materials/riverdale/rv_steel.vmat", target)
+            text = text.replace(anchor, remap + "\n" + anchor)
+    path.write_text(text)
 
 
-for name, e, n, length in CONTAINERS:
-    # Body and the 3-unit-proud side ribs, in scene coordinates (x = north, y = -east).
-    lo = np.array((n - 55 - 2, -(e + length / 2) - .5, -.5))
-    hi = np.array((n + 55 + 2, -(e - length / 2) + .5, 112.5))
-    patch(name, [(lo, hi)])
+for name, centre, length, colour, door_end in CONTAINERS:
+    obj = MODELS / f"{name}.obj"
+    lines, removed = cut_old(obj.read_text().splitlines(), centre, length)
+    extra, box = new_container(name, centre, colour, door_end)
+    obj.write_text("\n".join(append(lines, extra)) + "\n")
+    mtl = obj.with_suffix(".mtl")
+    text = mtl.read_text()
+    for paint in REMAPS:
+        if f"newmtl {paint}\n" not in text:
+            text += f"newmtl {paint}\nKd 1 1 1\nd 1\n"
+    mtl.write_text(text)
+    patch_vmdl(obj.with_suffix(".vmdl"), centre, length, box)
+    print(f"{name}: removed {removed} old container faces, added a {SIZE} ft container")
