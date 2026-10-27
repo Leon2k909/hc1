@@ -1,0 +1,14 @@
+// Tools/veridant_pool_detail.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    TextureColor "materials/spillway/scans/seaside_rock_diff_2k.jpg"
+    TextureNormal "materials/spillway/scans/seaside_rock_nor_dx_2k.jpg"
+    TextureRoughness "materials/spillway/scans/seaside_rock_rough_2k.jpg"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[0.89 0.98 0.93 1]"
+    g_flRoughnessScaleFactor "2.6"
+    g_flMetalness "0"
+    g_flModelTintAmount "1"
+}

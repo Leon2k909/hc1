@@ -1,0 +1,12 @@
+var scene=Editor.SceneEditorSession.Active.Scene;
+var probes=scene.GetAllComponents<EnvmapProbe>().Select(p=>new{p.GameObject.Name,Position=p.WorldPosition.ToString(),p.Priority,Texture=p.Texture?.ResourcePath,Baked=p.BakedTexture?.ResourcePath,p.Enabled,Properties=p.Serialize()}).ToArray();
+var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.Public;
+var pointProperties=typeof(PointLight).GetProperties(flags).Select(p=>new{p.Name,Type=p.PropertyType.FullName}).ToArray();
+var probeMethods=typeof(EnvmapProbe).GetMethods(flags).Where(m=>m.DeclaringType==typeof(EnvmapProbe)).Select(m=>m.ToString()).ToArray();
+var materials=new System.Collections.Generic.List<object>();
+foreach(var file in System.IO.Directory.EnumerateFiles(System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(),"Assets/materials/veridant/backbar-v2"),"*.vmat"))
+{
+ var path="materials/veridant/backbar-v2/"+System.IO.Path.GetFileName(file);var m=Material.Load(path);
+ materials.Add(new{Path=path,m.IsError,Color=m.GetTexture("g_tColor")?.ResourcePath,Rma=m.GetTexture("g_tRma")?.ResourcePath});
+}
+return new{Probes=probes,ProbeMethods=probeMethods,PointProperties=pointProperties,Materials=materials,Camera=scene.GetAllComponents<CameraComponent>().Where(c=>c.GameObject.Name=="editor_camera").Select(c=>new{Position=c.WorldPosition.ToString(),Angles=c.WorldRotation.Angles().ToString()})};

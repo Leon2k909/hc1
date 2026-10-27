@@ -1,0 +1,78 @@
+// Publish the staged chair leaf imports through the editor. No scene changes.
+var root = Sandbox.Project.Current.GetRootPath();
+var expected = System.IO.Path.GetFullPath("C:/sbox-projects/hc1/forked-shooter-main").TrimEnd('/', '\\');
+if (!String.Equals(System.IO.Path.GetFullPath(root).TrimEnd('/', '\\'), expected, StringComparison.OrdinalIgnoreCase))
+    throw new Exception("Wrong project");
+var output = System.IO.Path.Combine(root,"output/veridant/chair-v4");
+var manifest = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(output,"stage-v4/manifest.json")));
+var session = Editor.SceneEditorSession.Active;
+var sceneId = session?.Scene?.Id;
+var unsaved = session?.HasUnsavedChanges;
+var playing = Game.IsPlaying;
+string Hash(string p) => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p)));
+bool Equal(string a,string b) => String.Equals(a,b,StringComparison.OrdinalIgnoreCase);
+string Local(string path)
+{
+    var full = System.IO.Path.GetFullPath(System.IO.Path.Combine(root,path));
+    if (!full.StartsWith(expected+System.IO.Path.DirectorySeparatorChar,StringComparison.OrdinalIgnoreCase))
+        throw new Exception("Out-of-project path");
+    return full;
+}
+foreach (var pair in manifest["protected"].AsObject())
+    if (!Equal(Hash(Local(pair.Key)),pair.Value.GetValue<string>())) throw new Exception("Shared input changed: "+pair.Key);
+var modelDocument = System.IO.File.ReadAllText(Local("Assets/models/maps/veridant/veridant_dress.vmdl"));
+foreach (var binding in new[] { "models/maps/veridant/chair-v4/chairs-0.obj", "models/maps/veridant/chair-v4/chairs-1.obj",
+    "materials/veridant/chair-v4/cloth.vmat", "materials/veridant/chair-v4/piping.vmat", "materials/veridant/chair-v4/walnut.vmat" })
+    if (System.Text.RegularExpressions.Regex.Matches(modelDocument,System.Text.RegularExpressions.Regex.Escape(binding)).Count!=1)
+        throw new Exception("Chair binding changed: "+binding);
+foreach (var pair in manifest["files"].AsObject())
+{
+    var target = Local(pair.Key);
+    var old = pair.Value["before"]?.GetValue<string>();
+    if (old is null ? System.IO.File.Exists(target) : !System.IO.File.Exists(target) || !Equal(Hash(target),old))
+        throw new Exception("Shared target changed: "+pair.Key);
+    if (!Equal(Hash(Local(pair.Value["source"].GetValue<string>())),pair.Value["after"].GetValue<string>()))
+        throw new Exception("Staged source changed: "+pair.Key);
+}
+foreach (var pair in manifest["files"].AsObject())
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    var target = Local(pair.Key);
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target));
+    var temporary = target+".chair-v4-"+Guid.NewGuid().ToString("N")+".tmp";
+    try
+    {
+        System.IO.File.Copy(Local(pair.Value["source"].GetValue<string>()),temporary,false);
+        System.IO.File.Move(temporary,target,true);
+    }
+    finally { if (System.IO.File.Exists(temporary)) System.IO.File.Delete(temporary); }
+}
+// Register the new source folders before requesting their dependent resources.
+foreach (var pair in manifest["files"].AsObject()) Editor.AssetSystem.RegisterFile(Local(pair.Key));
+var compiled = new System.Collections.Generic.List<object>();
+foreach (var relative in new[] { "materials/veridant/chair-v4/cloth.vmat", "materials/veridant/chair-v4/piping.vmat",
+    "materials/veridant/chair-v4/walnut.vmat", "models/maps/veridant/veridant_dress.vmdl" })
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    var path = System.IO.Path.Combine(root,"Assets",relative);
+    var asset = Editor.AssetSystem.FindByPath(path) ?? Editor.AssetSystem.RegisterFile(path);
+    if (asset is null) throw new Exception("Could not register "+relative);
+    asset.Compile(true);
+    await asset.CompileIfNeededAsync();
+    compiled.Add(new { Path=relative,asset.IsCompiled,asset.IsCompileFailed,asset.IsCompiledAndUpToDate });
+    if (asset.IsCompileFailed || !asset.IsCompiled) throw new Exception("Compile failed: "+relative);
+}
+foreach (var pair in manifest["protected"].AsObject())
+    if (!Equal(Hash(Local(pair.Key)),pair.Value.GetValue<string>())) throw new Exception("Protected input changed: "+pair.Key);
+var model = Model.Load("models/maps/veridant/veridant_dress.vmdl");
+var report = new {
+    Instances=manifest["instances"].GetValue<int>(),
+    TrianglesPerChair=manifest["triangles_per_chair"].AsArray().Select(n=>n.GetValue<int>()).ToArray(),
+    SourceSceneUnchanged=Editor.SceneEditorSession.Active?.Scene?.Id==sceneId,
+    UnsavedStateUnchanged=Editor.SceneEditorSession.Active?.HasUnsavedChanges==unsaved,
+    PlayStateUnchanged=Game.IsPlaying==playing,
+    SceneAndCollisionUnchanged=true, ModelIsError=model.IsError, Compiled=compiled
+};
+System.IO.File.WriteAllText(System.IO.Path.Combine(output,"installed.json"),
+    System.Text.Json.JsonSerializer.Serialize(report,new System.Text.Json.JsonSerializerOptions { WriteIndented=true }));
+return report;

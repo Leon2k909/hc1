@@ -1,0 +1,28 @@
+var session=Editor.SceneEditorSession.Active;
+if(session.Scene.Source?.ResourcePath?.Equals("scenes/maps/veridant/veridant.scene",StringComparison.OrdinalIgnoreCase)!=true)
+    throw new InvalidOperationException("Veridant is no longer active.");
+var renderers=session.Scene.GetAllComponents<ModelRenderer>()
+    .Where(r=>r.Model?.ResourcePath=="models/maps/veridant/veridant_foliage.vmdl").ToArray();
+var rows=new System.Collections.Generic.List<object>();
+var found=new System.Collections.Generic.HashSet<string>();
+foreach(var renderer in renderers)
+    for(var slot=0;slot<renderer.Materials.Count;slot++)
+    {
+        var material=renderer.Materials.GetOverride(slot)??renderer.Materials.GetOriginal(slot);
+        if(material?.ResourcePath?.StartsWith("materials/veridant/courtyard-olive-v2/",StringComparison.Ordinal)==true)
+        {
+            if(material.IsError)throw new InvalidOperationException("Error material: "+material.ResourcePath);
+            found.Add(material.ResourcePath);
+            rows.Add(new{Slot=slot,Path=material.ResourcePath,Error=material.IsError});
+        }
+    }
+if(found.Count!=5)throw new InvalidOperationException("Expected five live planting materials; found "+found.Count);
+var tree=session.Scene.GetAllComponents<ModelRenderer>().Single(r=>r.GameObject.Name=="Courtyard planter tree");
+if(tree.Model?.ResourcePath!="models/sbox_props/trees/oak/tree_oak_small_a.vmdl"||tree.Model.IsError)
+    throw new InvalidOperationException("Authored tree missing.");
+if(tree.Model.Materials.Any(m=>m.IsError))throw new InvalidOperationException("Authored tree has an error material.");
+return new{Renderers=renderers.Length,Materials=rows,Tree=new{tree.GameObject.Id,tree.WorldPosition,
+    tree.WorldScale,Model=tree.Model.ResourcePath,tree.Model.MeshInfo.LodCount,
+    HighestDetailTriangles=tree.Model.MeshInfo.Meshes.First(m=>(m.LodMask&1)!=0).Triangles,
+    Materials=tree.Model.Materials.Select(m=>m.ResourcePath).ToArray()},
+    SceneDirty=session.HasUnsavedChanges,Game.IsPlaying};

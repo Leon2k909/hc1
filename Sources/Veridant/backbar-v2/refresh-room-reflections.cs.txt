@@ -1,0 +1,15 @@
+var session=Editor.SceneEditorSession.Active;var scene=session.Scene;
+if(Game.IsPlaying||session.HasUnsavedChanges||!scene.Source.ResourcePath.Equals("scenes/maps/veridant/veridant.scene",StringComparison.OrdinalIgnoreCase))throw new InvalidOperationException("Inspect editor state before refreshing.");
+if(scene.GetAllObjects(true).Count(o=>o.Name.StartsWith("Backbar LED ",StringComparison.Ordinal))!=22)throw new InvalidOperationException("Fixture count changed.");
+var captures=new System.Collections.Generic.List<object>();
+foreach(var probe in scene.GetAllComponents<EnvmapProbe>().Where(p=>p.GameObject.Name is "Probe Cafe" or "Probe Lounge Down"))
+{
+ await probe.Bake(cancellationToken);
+ if(probe.BakedTexture is null||probe.BakedTexture.IsError)throw new InvalidOperationException("Reflection capture failed.");
+ captures.Add(new{Name=probe.GameObject.Name,Path=probe.BakedTexture.ResourcePath,Width=probe.BakedTexture.Width,Height=probe.BakedTexture.Height});
+}
+if(captures.Count!=2)throw new InvalidOperationException("Room probe count changed.");
+session.HasUnsavedChanges=true;
+var result=new{Captures=captures,MarkedDirty=session.HasUnsavedChanges};
+System.IO.File.WriteAllText(System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(),"output/veridant/backbar-v2/reflections-final.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

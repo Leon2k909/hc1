@@ -1,0 +1,19 @@
+// Tools/veridant_backbar_detail.py
+"Layer0"
+{
+    shader "shaders/glass.shader"
+    F_GLASS_QUALITY "2"
+    g_bFogEnabled "1"
+    g_flBlurAmount "0.02"
+    g_flRefractionStrength "1.012"
+    AlbedoAbsorption "0.20"
+    g_flTintColor "[1 1 1 0]"
+    TextureColor "[0.86 0.67 0.39 0]"
+    TextureNormal "materials/veridant/backbar-v2/flat_normal.png"
+    TextureRoughness "materials/veridant/backbar-v2/glass_rough.png"
+    TextureMetalness "[0 0 0 0]"
+    TextureAmbientOcclusion "[1 1 1 0]"
+    TextureTranslucency "[1 1 1 0]"
+    TextureBlendMask "[0 0 0 0]"
+    TextureTintMask "[1 1 1 0]"
+}

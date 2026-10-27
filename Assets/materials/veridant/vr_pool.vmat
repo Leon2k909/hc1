@@ -1,12 +1,10 @@
-// Tools/veridant_materials.py: the reflecting pool (Lowtide's water shader: filtered waves, depth absorption)
+// Tools/veridant_pool_detail.py: clear shallow water, pool-v2
 "Layer0"
 {
-    shader "shaders/hc1_lowtide_water.shader"
-    g_vWaterColor "[0.0300 0.0420 0.0380]"
-    g_vWaterFlow "[0.40 0.15]"
-    g_flRippleTile "26.0"
-    g_flRippleStrength "0.22"
-    g_flWaterRoughness "0.035"
-    g_flAbsorptionDistance "28.0"
-    g_flBankFade "0.30"
+    shader "shaders/hc1_veridant_pool_v2.shader"
+    TextureNormalA "materials/belltower/fountain_water_normal.png"
+    TextureNormalB "materials/belltower/fountain_water_normal.png"
+    g_vWaterColor "[0.035 0.085 0.073]"
+    g_flAbsorptionDistance "90"
+    g_flWaterRoughness "0.065"
 }

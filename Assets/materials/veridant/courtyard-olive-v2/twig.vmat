@@ -1,0 +1,14 @@
+// Tools/veridant_courtyard_olive.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    g_flRoughnessScaleFactor "1"
+    g_flMetalness "0"
+    TextureColor "materials/veridant/courtyard-olive-v2/bark_color.png"
+    TextureNormal "materials/veridant/courtyard-olive-v2/bark_normal.png"
+    TextureRoughness "materials/veridant/courtyard-olive-v2/bark_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[0.7 0.66 0.53 1]"
+    g_flModelTintAmount "1"
+}

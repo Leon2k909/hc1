@@ -1,0 +1,14 @@
+// Tools/veridant_wall_rosemary.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    g_flMetalness "0"
+    g_flRoughnessScaleFactor "1"
+    TextureColor "materials/default/default_color.tga"
+    TextureNormal "materials/veridant/shrub-volume-v1/flat_normal.png"
+    TextureRoughness "[0.76 0.76 0.76 0]"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[0.24 0.2 0.14 1]"
+    g_flModelTintAmount "1"
+}

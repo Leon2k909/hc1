@@ -1,0 +1,25 @@
+// Read-only material and live renderer checks after the scoped import.
+var session=Editor.SceneEditorSession.Active;
+if(Game.IsPlaying||session.HasUnsavedChanges||session.Scene.Source?.ResourcePath?.Equals("scenes/maps/veridant/veridant.scene",StringComparison.OrdinalIgnoreCase)!=true)
+    throw new InvalidOperationException("Requires the saved, stopped Veridant document.");
+var names=new[]{"olive","black","olive_edge","black_edge","rubber","gasket","steel","alloy","label"};
+var materials=names.Select(name=>{
+    var path="materials/veridant/cases-v4/"+name+".vmat";
+    var material=Material.Load(path);
+    if(material is null||material.IsError)throw new InvalidOperationException("Material failed: "+path);
+    var color=material.GetTexture("g_tColor");var normal=material.GetTexture("g_tNormal");
+    if(color is null||color.IsError||normal is null||normal.IsError)throw new InvalidOperationException("Texture failed: "+path);
+    return new{Path=path,ColorWidth=color.Width,NormalWidth=normal.Width,IsError=material.IsError};
+}).ToArray();
+var renderers=session.Scene.GetAllComponents<ModelRenderer>().Where(r=>r.Model?.ResourcePath is string p
+    &&(p.Equals("models/maps/veridant/veridant_buildings.vmdl",StringComparison.OrdinalIgnoreCase)
+       ||p.Equals("models/maps/veridant/veridant_dress.vmdl",StringComparison.OrdinalIgnoreCase))).ToArray();
+if(renderers.Length!=2)throw new InvalidOperationException("Expected both case-bearing map renderers.");
+var live=renderers.Select(r=>{
+    var slots=Enumerable.Range(0,r.Materials.Count).Select(i=>r.Materials.GetOverride(i)??r.Materials.GetOriginal(i)).ToArray();
+    if(slots.Any(m=>m is null||m.IsError))throw new InvalidOperationException("Live renderer has an error material.");
+    var paths=slots.Select(m=>m.ResourcePath).Where(p=>p?.Contains("/cases-v4/",StringComparison.OrdinalIgnoreCase)==true).Distinct().ToArray();
+    if(paths.Length<7)throw new InvalidOperationException("New case material slots missing.");
+    return new{Model=r.Model.ResourcePath,NewCaseMaterials=paths,ErrorMaterials=0};
+}).ToArray();
+return new{Materials=materials,LiveRenderers=live,Playing=Game.IsPlaying,Unsaved=session.HasUnsavedChanges};

@@ -1,0 +1,60 @@
+// Practical shelf lights and fresh captures for the two existing room probes.
+// Preserves every pre-existing object and all light/probe settings outside them.
+var root=Sandbox.Project.Current.GetRootPath();var folder=System.IO.Path.Combine(root,"output/veridant/backbar-v2");
+var request=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"import-request.json")));
+var stage=request["stage"].GetValue<string>();
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,stage,"manifest.json")));
+var session=Editor.SceneEditorSession.Active;var scene=session.Scene;
+if(Game.IsPlaying||session.HasUnsavedChanges||!scene.Source.ResourcePath.Equals("scenes/maps/veridant/veridant.scene",StringComparison.OrdinalIgnoreCase))throw new InvalidOperationException("Inspect changed editor state.");
+var path=System.IO.Path.Combine(root,"Assets/scenes/maps/Veridant/veridant.scene");
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+var hash=Hash(path);
+if(hash!=manifest["protected_sha256"]["Assets/scenes/maps/Veridant/veridant.scene"].GetValue<string>())throw new InvalidOperationException("Saved scene changed.");
+if(scene.GetAllObjects(true).Any(o=>o.Name=="Veridant Backbar practical lights"))throw new InvalidOperationException("Already installed; inspect receipt before retrying.");
+var probes=scene.GetAllComponents<EnvmapProbe>().Where(p=>p.GameObject.Name is "Probe Cafe" or "Probe Lounge Down").ToArray();
+if(probes.Length!=2)throw new InvalidOperationException("Room probes changed.");
+var oldProbes=probes.Select(p=>new{Probe=p,p.Mode,p.BakedTexture,p.Texture,Config=p.Serialize()}).ToArray();
+var beforeIds=scene.GetAllObjects(true).Select(o=>o.Id).ToHashSet();
+var beforePath=System.IO.Path.Combine(folder,"before-lighting.scene.json");
+if(System.IO.File.Exists(beforePath))throw new InvalidOperationException("Lighting attempt already recorded; inspect before retrying.");
+System.IO.File.Copy(path,beforePath);
+GameObject group=null;
+var created=new System.Collections.Generic.List<GameObject>();
+var captures=new System.Collections.Generic.List<object>();
+void Progress(string phase)=>System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"lighting-progress.json"),System.Text.Json.JsonSerializer.Serialize(new{Phase=phase,SourceHash=hash,Group=group?.Id,CreatedLights=created.Select(o=>new{o.Name,o.Id}),Captures=captures}));
+try
+{
+ using(scene.Push())
+ {
+  group=new GameObject(false,"Veridant Backbar practical lights");
+  foreach(var spec in manifest["lighting_recipe"].AsArray())
+  {
+   var point=spec["position"].AsArray();
+   var holder=new GameObject(false,spec["name"].GetValue<string>());holder.Parent=group;created.Add(holder);
+   holder.WorldPosition=new Vector3(point[1].GetValue<float>(),-point[0].GetValue<float>(),point[2].GetValue<float>());
+   var light=holder.Components.Create<PointLight>();light.LightColor=Color.Parse(spec["color"].GetValue<string>())??throw new InvalidOperationException("Invalid fixture color.");light.Radius=spec["radius"].GetValue<float>();light.Shadows=false;
+   holder.Enabled=true;
+  }
+  group.Enabled=true;
+ }
+ Progress("lights-created");
+ foreach(var probe in probes)
+ {
+  cancellationToken.ThrowIfCancellationRequested();
+  if(!ReferenceEquals(session,Editor.SceneEditorSession.Active)||Game.IsPlaying||Hash(path)!=hash)throw new InvalidOperationException("Editor state changed before reflection capture.");
+  await probe.Bake(cancellationToken);
+  if(probe.BakedTexture is null||probe.BakedTexture.IsError)throw new InvalidOperationException("Probe capture failed: "+probe.GameObject.Name);
+  captures.Add(new{Name=probe.GameObject.Name,Texture=probe.BakedTexture.ResourcePath,Config=probe.Serialize()});
+  Progress("captured-"+probe.GameObject.Name);
+ }
+ var result=new{SourceHash=hash,Group=group.Id,CreatedLights=created.Select(o=>new{o.Name,o.Id,Position=o.WorldPosition.ToString()}).ToArray(),Captures=captures,ExistingObjectIdsPreserved=beforeIds.IsSubsetOf(scene.GetAllObjects(true).Select(o=>o.Id).ToHashSet()),OriginalProbeSettings=oldProbes.Select(p=>new{Name=p.Probe.GameObject.Name,p.Config}).ToArray(),SourceSaved=false};
+ System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"lighting-native.json"),System.Text.Json.JsonSerializer.Serialize(result));
+ return result;
+}
+catch
+{
+ foreach(var p in oldProbes)if(p.Probe.IsValid()){p.Probe.Mode=p.Mode;p.Probe.BakedTexture=p.BakedTexture;p.Probe.Texture=p.Texture;}
+ if(group.IsValid())group.Destroy();
+ Progress("rolled-back-after-error");
+ throw;
+}

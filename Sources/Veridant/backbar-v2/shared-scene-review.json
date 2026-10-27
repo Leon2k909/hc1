@@ -1,0 +1,42 @@
+{
+  "note": "Concurrent map work added a courtyard oak tree and lowered four spa fixtures. This task only creates its own light group and bakes the Cafe / Lounge Down probes; it does not set these object positions. Retain these observed shared edits.",
+  "existing_object_fields": [
+    {
+      "id": "0feea7f9-0e65-5d51-a627-683c8be7a078",
+      "name": "Spa west lamp",
+      "field": "Position",
+      "before": "880,216.25,218",
+      "after": "880,216.25,192"
+    },
+    {
+      "id": "51e5c9ad-2ef2-5486-a339-9c7f09861e38",
+      "name": "Spa lamp 900.0",
+      "field": "Position",
+      "before": "743.75,-900,272",
+      "after": "743.75,-900,250"
+    },
+    {
+      "id": "99b329e8-ea2a-5821-8ad3-bdf318aaa7be",
+      "name": "Spa lamp 500.0",
+      "field": "Position",
+      "before": "743.75,-500,272",
+      "after": "743.75,-500,250"
+    },
+    {
+      "id": "3ef4fab5-e46e-58a9-9c62-875d6717912d",
+      "name": "Spa lamp 100.0",
+      "field": "Position",
+      "before": "743.75,-100,272",
+      "after": "743.75,-100,250"
+    }
+  ],
+  "references_before": [
+    "facepunch.beech_bush_small#145429",
+    "facepunch.beech_hedge_96x128#145491"
+  ],
+  "references_after": [
+    "facepunch.beech_bush_small#145429",
+    "facepunch.beech_hedge_96x128#145491",
+    "facepunch.tree_oak_small_a#288917"
+  ]
+}

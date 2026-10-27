@@ -1,0 +1,14 @@
+// Tools/veridant_pool_detail.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    TextureColor "[0.13 0.145 0.14 0]"
+    TextureNormal "materials/default/default_normal.tga"
+    TextureRoughness "[0.84 0.84 0.84 0]"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[1 1 1 1]"
+    g_flRoughnessScaleFactor "1"
+    g_flMetalness "0"
+    g_flModelTintAmount "1"
+}

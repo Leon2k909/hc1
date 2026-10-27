@@ -47,6 +47,7 @@ import railhead_preview as PV
 import veridant_materials as VM
 import veridant_parts as P
 import veridant_planter_bushes as PlanterBushes
+import veridant_courtyard_olive as CourtyardTree
 from riverdale_parts import v, unit, card, box, obox, rod, UP
 
 STONE, METAL, WOOD, PLASTIC, GLASS, FABRIC = "default", "metal", "wood", "plastic", "glass", "fabric"
@@ -134,13 +135,25 @@ HERO = ( ( 801.0, -40.0, 256.0 ), 90.0, -9.6, 74.0 )    # eye (plan), yaw (world
 # Paints
 
 PAINTS = set( VM.all_paints() )
-GLASS_PAINTS = { "vr_glass", "vr_glass_clear" }
+GLASS_PAINTS = { "vr_glass", "vr_glass_clear", "vr_spa_glass" }
 UNKNOWN = set()
 
 
 def configure( model ):
     for paint in list( model.polygons ):
-        if paint.startswith( ( "vr_backbar_", "vr_transport_" ) ) and paint in model.material_overrides:
+        if paint.startswith( "vr_spa_" ) and paint in model.material_overrides:
+            continue
+        if paint.startswith( "vr_gate_" ) and paint in model.material_overrides:
+            continue
+        if paint.startswith( "vr_wall_herb_" ) and paint in model.material_overrides:
+            continue
+        if paint.startswith( "vr_pool_" ) and paint in model.material_overrides:
+            continue
+        if paint.startswith( "vr_courtyard_olive_" ) and paint in model.material_overrides:
+            continue
+        if paint.startswith( "vr_bench_" ) and paint in model.material_overrides:
+            continue
+        if paint.startswith( ( "vr_backbar_", "vr_transport_", "vr_chair_" ) ) and paint in model.material_overrides:
             continue
         if paint.startswith( "vr_bv_" ) and paint in model.material_overrides:
             continue
@@ -591,25 +604,8 @@ def north_block( m, g, foliage ):
 # The courtyard: the pool, the deck, the pylon, the planter, the grand stair
 
 def pool( m, water ):
-    p0, p1, n0, n1 = POOL
-    k = 12.0
-    kz = POOL_KERB
-    for a, b, c, d in ( ( p0, p1, n0, n0 + k ), ( p0, p1, n1 - k, n1 ), ( p0, p0 + k, n0 + k, n1 - k ), ( p1 - k, p1, n0 + k, n1 - k ) ):
-        solid( m, a, b, c, d, 0, kz - 1.5, { "default": "vr_stone_dark", "+z": None } )
-        solid( m, a - 1.2, b + 1.2, c - 1.2, d + 1.2, kz - 1.5, kz, "vr_stone_dark" )
-    # The LED strip in the shadow under the kerb's lip, all round outside.
-    for a, b, out in ( ( ( p0 - 0.6, n0 - 0.6 ), ( p1 + 0.6, n0 - 0.6 ), ( 0, -1 ) ), ( ( p0 - 0.6, n1 + 0.6 ), ( p1 + 0.6, n1 + 0.6 ), ( 0, 1 ) ),
-                       ( ( p0 - 0.6, n0 ), ( p0 - 0.6, n1 ), ( -1, 0 ) ), ( ( p1 + 0.6, n0 ), ( p1 + 0.6, n1 ), ( 1, 0 ) ) ):
-        P.led( m, ( a[0], a[1], kz - 2.3 ), ( b[0], b[1], kz - 2.3 ), v( out[0], out[1], 0 ), 1.0 )
-    floor( m, p0 + k, p1 - k, n0 + k, n1 - k, 0.2, "vr_black" )
-    card( water, "vr_pool", [ v( p0 + k, n0 + k, WATER_Z ), v( p1 - k, n0 + k, WATER_Z ), v( p1 - k, n1 - k, WATER_Z ), v( p0 + k, n1 - k, WATER_Z ) ], UP )
-    # The boulder in the middle and a lower one behind it with the water welling over it.
-    P.boulder( m, ( 10.0, -40.0, 0.0 ), 46, seed=3, squash=0.62, paint="vr_rock_dark" )
-    # A light under the water on the boulder, as in the picture.
-    P.LIGHTS.append( ( "Pool light", ( 70.0, -60.0, WATER_Z - 4.0 ), P.WARM, 150, False ) )
-    P.boulder( m, ( -55.0, 22.0, 0.0 ), 26, seed=4, squash=0.5, paint="vr_rock_dark" )
-    for k_, n in enumerate( ( -70.0, 50.0 ) ):
-        P.wall_washer( m, f"Pool kerb light {k_}", ( p1, n, 8.0 ), ( 1, 0 ), 160, light=( k_ == 0 ), size=( 5.0, 3.0 ), rise=8 )
+    from veridant_pool_detail import build_into
+    return build_into( m, water, POOL, POOL_KERB, WATER_Z )
 
 
 def courtyard( m, foliage ):
@@ -626,8 +622,7 @@ def courtyard( m, foliage ):
     # The planter at the grand stair's foot with its uplit olive.
     a, b, c, d = PLANTER
     P.planter( m, ( a, c ), ( b, d ), 0, 46, sides=( "-e", ) )
-    P.olive( foliage, ( ( a + b ) / 2 + 4, ( c + d ) / 2, 42 ), 180, seed=11, spread=1.0, cards=15, leaf_scale=0.72 )
-    P.shrubs( foliage, ( a + 8, c + 8 ), ( b - 8, d - 8 ), 42, seed=12, kind="shrub", h=20 )
+    CourtyardTree.build_planting( foliage, PLANTER, 42, seed=12 )
     P.uplight( m, "Planter olive uplight", ( ( a + b ) / 2 + 10, ( c + d ) / 2 - 10, 42.2 ), 190 )
     for k, n in enumerate( ( 220.0, 258.0 ) ):
         P.wall_washer( m, f"Planter step light {k}", ( b, n, 12.0 ), ( 1, 0 ), 120, size=( 7.0, 3.0 ), rise=-6, light=( k == 0 ) )
@@ -707,8 +702,9 @@ def resort_finish( m, foliage ):
                    ( 0, -1 ), radius=190, size=( 13.0, 3.5 ), rise=-19.0 )
     # Coastal foliage grows along the retaining wall, away from the tunnel
     # opening at n=-260..-140 and away from the grand stair approach.
-    P.shrubs( foliage, ( 740.0, 34.0 ), ( 753.0, 148.0 ), 0.0,
-              seed=812, kind="rosemary", h=25.0, count=10 )
+    from veridant_wall_rosemary import build_into as wall_rosemary
+    wall_rosemary( foliage, ( 740.0, 34.0 ), ( 753.0, 148.0 ), 0.0,
+                   seed=812, kind="rosemary", h=25.0, count=10 )
     P.ivy( foliage, ( 759.0, 74.0, 177.0 ), ( 0, -1, 0 ), 94.0, 66.0,
            seed=813, off=3.0 )
 
@@ -785,19 +781,12 @@ def spa( m, g ):
     """ The spa along the north edge: closed, its south face over the terraces dressed with windows, its west face
     over the garden terrace. """
     e0, e1, n0, n1 = SPA
-    solid( m, e0, e1, n0, n1, 0, SPA_TOP, { "default": "vr_stone", "+n": None, "-z": None } )
-    solid( m, e0 - 6, e1 + 6, n0 - 6, n1 + 6, SPA_TOP, SPA_TOP + 14, "vr_stone_dark" )
-    rng = np.random.default_rng( 3 )
-    for e in np.arange( e0 + 100, e1 - 60, 160.0 ):
-        for z0, z1 in ( ( 250, 360 ), ):
-            box( m, e - 50, e + 50, n0 - 1.2, n0 - 0.4, z0, z1, "vr_window_lit" if rng.random() < 0.4 else "vr_window_dark" )
-            box( m, e - 54, e + 54, n0 - 2.5, n0, z0 - 4, z0, "vr_stone_light" )
-    for n in np.arange( n0 + 80, n1 - 40, 160.0 ):
-        box( m, e0 - 1.2, e0 - 0.4, n - 50, n + 50, 200, 330, "vr_window_lit" if rng.random() < 0.5 else "vr_window_dark" )
+    from veridant_spa_windows import build_spa
+    build_spa( m, SPA, SPA_TOP )
     P.letters( m, "spa", ( 700.0, n0, 330.0 ), ( 1, 0, 0 ), 26, "dark" )
     for e in ( 100.0, 500.0, 900.0 ):
-        P.wall_washer( m, f"Spa lamp {e}", ( e, n0, L2 + 70 ), ( 0, -1 ), 240 )
-    P.wall_washer( m, "Spa west lamp", ( e0, 880.0, L1 + 80 ), ( -1, 0 ), 240 )
+        P.wall_washer( m, f"Spa lamp {e}", ( e, n0, L2 + 48 ), ( 0, -1 ), 240 )
+    P.wall_washer( m, "Spa west lamp", ( e0, 880.0, L1 + 54 ), ( -1, 0 ), 240 )
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -952,11 +941,14 @@ def forecourt( m, foliage ):
     P.clip( "east wall", ( PLAY[1] + 12, PLAY[2] ), ( PLAY[1] + 12, PLAY[3] ), 0, 1000, thick=24 )
     solid( m, f0, f1, n1, n1 + 24, 0, 120, "vr_stone" )
     P.clip( "forecourt north", ( f0, n1 + 12 ), ( f1, n1 + 12 ), 0, 1000, thick=24 )
-    # The gates in the east wall: dark steel leaves, closed, lamps either side.
+    # Closed paired gates and coursed limestone piers. Existing collision and
+    # lamps are preserved independently of the visual assembly.
+    from veridant_boundary_wall import build_into as build_closed_gate
     for n in ( -300.0, 500.0 ):
-        box( m, PLAY[1] - 1, PLAY[1], n - 90, n + 90, 0, 110, "vr_steel" )
+        build_closed_gate( m, PLAY[1], n )
         for sn in ( -1, 1 ):
-            box( m, PLAY[1] - 14, PLAY[1] + 24, n + sn * 100 - 14, n + sn * 100 + 14, 0, 150, "vr_stone_dark", STONE )
+            m.collision_box( ( PLAY[1] - 14, n + sn * 100 - 14, 0 ),
+                             ( PLAY[1] + 24, n + sn * 100 + 14, 150 ), STONE )
             P.lantern_post( m, f"Gate lamp {n} {sn}", ( PLAY[1] - 6, n + sn * 100, 150 ), 30, radius=360 )
     # The fountain: a round basin with a stone bowl, water in it.
     c = ( 1600.0, 150.0 )
@@ -1206,11 +1198,13 @@ def probe_object( name, centre, box_ ):
     hi = K.to_world( ( e0, n1, z1 ) ) - at
     key = f"probe/{name}"
     far = name == "Outside"
-    return K.game_object( ids, f"Probe {name}", key, at, components=[
+    node = K.game_object( ids, f"Probe {name}", key, at, components=[
         K.component( ids, "Sandbox.EnvmapProbe", f"{key}/probe", Bounds={ "Mins": K.vec( lo ), "Maxs": K.vec( hi ) },
                      DelayBetweenUpdates=0.1, Feathering=0.04, FrameInterval=5, MaxDistance=512, Projection="Box",
                      RenderDynamically=True, TintColor="1,1,1,1", UpdateStrategy="OnEnabled", ZFar=60000 if far else 8192,
                      ZNear=8, **( { "Priority": 0 } if far else { "Priority": 1 } ) ) ] )
+    from veridant_backbar_detail import apply_baked_probe
+    return apply_baked_probe( node, name )
 
 
 def look_object():
@@ -1262,7 +1256,8 @@ def write_scene( written, light_list, probe_list, hedge_props=() ):
         model_object( title, f"world/{name}", name, collide, shadows )
         for name, title, collide, shadows in SCENE_MODELS if name in written ] + [
         K.game_object( ids, "Beech Hedges", "hedges", children=hedge_objects( hedge_props ) ),
-        PlanterBushes.scene_group( ids ) ] )
+        PlanterBushes.scene_group( ids ),
+        CourtyardTree.scene_object( ids ) ] )
     light_objects = [
         K.game_object( ids, name, f"light/{name}", K.to_world( position ), tags="light_point,light", components=[
             K.component( ids, "Sandbox.PointLight", f"light/{name}/light", Attenuation=1, FogMode="Enabled", FogStrength=1,
@@ -1406,7 +1401,8 @@ def write_scene( written, light_list, probe_list, hedge_props=() ):
         "ResourceVersion": 3,
         "Title": TITLE,
         "Description": None,
-        "__references": ( [ HEDGE_PACKAGE ] if hedge_props else [] ) + [ PlanterBushes.PACKAGE, "facepunch.pine_shrub_wide#145484" ],
+        "__references": ( [ HEDGE_PACKAGE ] if hedge_props else [] ) + [ PlanterBushes.PACKAGE, "facepunch.pine_shrub_wide#145484",
+            CourtyardTree.TREE_PACKAGE ],
         "__version": 3,
     }
     from map_daylight import apply_profile

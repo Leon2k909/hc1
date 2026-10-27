@@ -1,0 +1,22 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var session=Editor.SceneEditorSession.Active;var playing=Game.IsPlaying;var dirty=session.HasUnsavedChanges;
+var paths=new[]{"coping","coping_light","coping_dark","joint","liner","rock","rock_damp","rock_wet"}
+    .Select(n=>"materials/veridant/pool-v2/"+n+".vmat").Append("materials/veridant/vr_pool.vmat").ToArray();
+var materials=paths.Select(p=>new{Path=p,Error=Material.Load(p).IsError}).ToArray();
+var model=Model.Load("models/maps/veridant/veridant_dress.vmdl");
+var water=Model.Load("models/maps/veridant/veridant_water.vmdl");
+var document=System.IO.File.ReadAllText(System.IO.Path.Combine(root,"Assets/models/maps/veridant/veridant_dress.vmdl"));
+var before=System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/veridant/pool-v2/stage-v1/before/Assets/models/maps/veridant/veridant_dress.vmdl"));
+var marker="_class = \"PhysicsShapeList\"";
+var physicsExact=before.Substring(before.IndexOf(marker,StringComparison.Ordinal))==document.Substring(document.IndexOf(marker,StringComparison.Ordinal));
+var renderer=session.Scene.GetAllComponents<ModelRenderer>().Single(r=>r.Model?.ResourcePath=="models/maps/veridant/veridant_water.vmdl");
+var saved=System.IO.File.ReadAllBytes(System.IO.Path.Combine(root,"Assets/scenes/maps/Veridant/veridant.scene"));
+var sceneHash=Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(saved)).ToLowerInvariant();
+var result=new{Materials=materials,ModelError=model.IsError,WaterModelError=water.IsError,
+    WaterMaterialSlots=renderer.Materials.Count,PoolImportPresent=document.Contains("models/maps/veridant/pool-v2/pool.obj"),
+    PhysicsBytesExact=physicsExact,SceneSha256=sceneHash,
+    EditorStatePreserved=ReferenceEquals(session,Editor.SceneEditorSession.Active)&&playing==Game.IsPlaying&&dirty==session.HasUnsavedChanges};
+System.IO.File.WriteAllText(System.IO.Path.Combine(root,"output/veridant/pool-v2/native-validation.json"),System.Text.Json.JsonSerializer.Serialize(result));
+if(materials.Any(m=>m.Error)||model.IsError||water.IsError||!physicsExact||!result.PoolImportPresent||!result.EditorStatePreserved)
+    throw new InvalidOperationException("Pool validation failed; inspect native-validation.json.");
+return result;

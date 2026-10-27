@@ -1,0 +1,11 @@
+var session=Editor.SceneEditorSession.Active;var scene=session.Scene;
+if(Game.IsPlaying||!scene.Source.ResourcePath.Equals("scenes/maps/veridant/veridant.scene",StringComparison.OrdinalIgnoreCase))throw new InvalidOperationException("Editor state changed.");
+var root=Sandbox.Project.Current.GetRootPath();var folder=System.IO.Path.Combine(root,"output/veridant/backbar-v2");
+var receipt=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"lighting-native.json")));
+var path=System.IO.Path.Combine(root,"Assets/scenes/maps/Veridant/veridant.scene");
+var hash=Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+if(hash!=receipt["SourceHash"].GetValue<string>())throw new InvalidOperationException("Source changed before lighting save.");
+var group=scene.GetAllObjects(true).Single(o=>o.Id==Guid.Parse(receipt["Group"].GetValue<string>()));
+if(group.Children.Count()!=22||scene.GetAllComponents<EnvmapProbe>().Count(p=>p.GameObject.Name is "Probe Cafe" or "Probe Lounge Down"&&p.BakedTexture is not null)!=2)throw new InvalidOperationException("Lighting installation differs.");
+session.HasUnsavedChanges=true;
+return new{MarkedDirty=session.HasUnsavedChanges,NewLights=group.Children.Count()};

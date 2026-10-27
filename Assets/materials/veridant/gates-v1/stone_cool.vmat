@@ -1,0 +1,14 @@
+// Tools/veridant_boundary_wall.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    g_flMetalness "0"
+    g_flRoughnessScaleFactor "1"
+    TextureColor "materials/veridant/gates-v1/stone_color.jpg"
+    TextureNormal "materials/veridant/gates-v1/stone_normal.jpg"
+    TextureRoughness "materials/veridant/gates-v1/stone_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[0.94 0.95 0.94 1]"
+    g_flModelTintAmount "1.0"
+}

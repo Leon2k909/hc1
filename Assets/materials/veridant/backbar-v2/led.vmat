@@ -1,0 +1,20 @@
+// Tools/veridant_backbar_detail.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    F_SELF_ILLUM "1"
+    TextureSelfIllumMask "[1 1 1 0]"
+    g_flSelfIllumBrightness "0.6"
+    g_flSelfIllumAlbedoFactor "1"
+    g_vSelfIllumTint "[1 0.70 0.40 0]"
+    TextureColor "materials/default/default_color.tga"
+    TextureNormal "materials/veridant/backbar-v2/flat_normal.png"
+    TextureRoughness "materials/veridant/backbar-v2/backing_rough.png"
+    TextureMetalness "[0 0 0 0]"
+    g_flMetalness "0"
+    g_flRoughnessScaleFactor "1"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[1.0 1.0 1.0 1]"
+    g_flModelTintAmount "1"
+}
