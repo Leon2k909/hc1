@@ -1,0 +1,17 @@
+// Tools/ares_cargo_case.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    F_ALPHA_TEST "1"
+    g_flAlphaTestReference "0.4"
+    TextureTranslucency "materials/ares/crate-v2/stencil_alpha.png"
+    g_flMetalness "0.0"
+    g_flRoughnessScaleFactor "1"
+    TextureColor "materials/ares/crate-v2/stencil_color.png"
+    TextureNormal "materials/ares/crate-v2/flat_normal.png"
+    TextureRoughness "materials/ares/crate-v2/paper_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[1 1 1 1]"
+    g_flModelTintAmount "1"
+}

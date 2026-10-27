@@ -1,0 +1,10 @@
+var session=Editor.SceneEditorSession.Active;var scene=session.Scene;
+var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic;
+var group=scene.GetAllObjects(true).FirstOrDefault(o=>o.Name=="ARES transport cases");
+return new {
+    session.HasUnsavedChanges, SceneId=scene.Id, SceneSource=scene.Source?.ResourcePath,
+    Group=group is null?null:new{group.Id,Flags=group.Flags.ToString(),Children=group.Children.Count,Scene=group.Scene?.Id,Serialized=group.Serialize()?.ToJsonString().Substring(0,Math.Min(450,group.Serialize().ToJsonString().Length))},
+    SerializedContainsGroup=scene.Serialize().ToJsonString().Contains("ARES transport cases"),
+    Methods=session.GetType().GetMethods(flags).Where(m=>m.Name.Contains("Save")||m.Name.Contains("Dirty")||m.Name.Contains("Modified")||m.Name.Contains("Change")||m.Name.Contains("Edited")).Select(m=>new{m.Name,m.IsPublic,Parameters=m.GetParameters().Select(p=>new{p.Name,Type=p.ParameterType.ToString(),Default=p.HasDefaultValue?p.DefaultValue:null})}).ToArray(),
+    Properties=session.GetType().GetProperties(flags).Where(p=>p.Name.Contains("Unsaved")||p.Name.Contains("Dirty")).Select(p=>new{p.Name,Set=p.GetSetMethod(true)?.ToString()}).ToArray()
+};

@@ -1,0 +1,7 @@
+var flags=System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic|System.Reflection.BindingFlags.Instance;
+return new {
+    Deserialize=typeof(GameObject).GetMethods(flags).Where(m=>m.Name=="Deserialize"||m.Name=="DeserializeAsync").Select(m=>m.ToString()).ToArray(),
+    Id=typeof(GameObject).GetProperty("Id",flags)?.GetSetMethod(true)?.ToString(),
+    Save=Editor.SceneEditorSession.Active.GetType().GetMethods(flags).Where(m=>m.Name.Contains("Save")||m.Name=="OnEdited").Select(m=>m.ToString()).ToArray(),
+    Undo=typeof(Scene.ISceneEditorSession).GetMethods().Where(m=>m.Name.Contains("Undo")).Select(m=>m.ToString()).ToArray()
+};

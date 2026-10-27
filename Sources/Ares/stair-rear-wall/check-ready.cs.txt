@@ -1,0 +1,8 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/ares/stair-rear-wall/manifest.json")));
+var session=Editor.SceneEditorSession.Active;
+if(Game.IsPlaying||session.HasUnsavedChanges||session.Scene.Source?.ResourcePath!="scenes/maps/ares/ares.scene")throw new InvalidOperationException("Editor state changed before placing the wall.");
+if(session.Scene.GetAllObjects(true).Any(o=>o.Name=="Stair Rear Closures"))throw new InvalidOperationException("Closures already exist; inspect them instead of creating duplicates.");
+var model=Model.Load(manifest["model"].GetValue<string>());
+if(model is null||model.IsError)throw new InvalidOperationException("The separate wall model did not load.");
+return new{ModelReady=true,Model=model.ResourcePath,ActiveScene=session.Scene.Name,ExistingSceneSaved=true,Playing=false};

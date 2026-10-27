@@ -551,6 +551,21 @@ def grimy_panel( rng, shape, base, ppi=6.0, streaks=0.4 ):
     return c, big
 
 
+def warning_stripe( shape, rng=None ):
+    """Warning lettering sits in a clear yellow panel, inset from the stripes."""
+    h, w = shape
+    rng = rng if rng is not None else np.random.default_rng( 312 )
+    yy, xx = np.mgrid[0:h, 0:w].astype( np.float32 )
+    stripe = ( ( ( xx + yy ) / ( h * 0.25 ) ) % 2.0 ) < 1.0
+    c = np.where( stripe[..., None], lin( ( 214, 160, 28 ) ), lin( ( 24, 24, 24 ) ) ).astype( np.float32 )
+    box = ( np.abs( xx - w / 2 ) < w * 0.40 ) & ( np.abs( yy - h / 2 ) < h * 0.40 )
+    c = np.where( box[..., None], lin( ( 214, 160, 28 ) ), c )
+    words = text_layer( ( h, w ), [ ( "CAUTION  HIGH ENERGY", FONT_BOLD, h * 0.3, w * 0.5, h * 0.35, "m", 0.06, w * 0.62 ) ] )
+    c = mix( c, lin( ( 20, 20, 20 ) ), words )
+    worn = wear( rng, ( h, w ), 0.5, 6.0, 3.0 )
+    return mix( c, lin( ( 90, 90, 88 ) ), worn * 0.5 )
+
+
 def sign_atlas():
     W, H = px( SIGN_ATLAS[0] ), px( SIGN_ATLAS[1] )
     rng = np.random.default_rng( 312 )
@@ -685,16 +700,7 @@ def sign_atlas():
 
     # A warning stripe with text.
     h, w = size( "stripe_warning" )
-    yy, xx = np.mgrid[0:h, 0:w].astype( np.float32 )
-    stripe = ( ( ( xx + yy ) / ( h * 0.25 ) ) % 2.0 ) < 1.0
-    c = np.where( stripe[..., None], lin( ( 214, 160, 28 ) ), lin( ( 24, 24, 24 ) ) ).astype( np.float32 )
-    box = ( np.abs( xx - w / 2 ) < w * 0.3 ) & ( np.abs( yy - h / 2 ) < h * 0.34 )
-    c = np.where( box[..., None], lin( ( 214, 160, 28 ) ), c )
-    words = text_layer( ( h, w ), [ ( "CAUTION  HIGH ENERGY", FONT_BOLD, h * 0.3, w * 0.5, h * 0.35, "m", 0.06 ) ] )
-    c = mix( c, lin( ( 20, 20, 20 ) ), words )
-    worn = wear( rng, ( h, w ), 0.5, 6.0, 3.0 )
-    c = mix( c, lin( ( 90, 90, 88 ) ), worn * 0.5 )
-    put( "stripe_warning", c, 0.6 )
+    put( "stripe_warning", warning_stripe( ( h, w ), rng ), 0.6 )
 
     fine = noise( rng, ( H, W ), ( 20.0, 20.0 ), 1.0, 0.4, 0.05 )
     return T.linear_to_srgb( colour ), np.clip( rough, 0.1, 1 ), normals( 0.01 * fine, ( 20.0, 20.0 ) )
@@ -892,10 +898,10 @@ def write_text( path, text ):
 
 
 def write_maps( out, name, colour, rough, normal, metalness=0.0, illum=None, brightness=1.0, rough_size=None ):
-    BX.save_rgb( out / f"{name}_color.png" if illum is not None else out / f"{name}_color.jpg", colour )
+    colour_file = f"{name}_color.png" if illum is not None or name == "ar_signs" else f"{name}_color.jpg"
+    BX.save_rgb( out / colour_file, colour )
     BX.save_normal( out / f"{name}_normal.jpg", normal )
     BX.save_grey( out / f"{name}_rough.png", rough, rough_size )
-    colour_file = f"{name}_color.png" if illum is not None else f"{name}_color.jpg"
     illum_path = None
     if illum is not None:
         BX.save_grey( out / f"{name}_illum.png", illum )

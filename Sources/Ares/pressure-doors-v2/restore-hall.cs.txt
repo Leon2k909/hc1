@@ -1,0 +1,15 @@
+// Restore only the ModelDoc changed by this task. Original OBJ/MTL never changed.
+var root=Sandbox.Project.Current.GetRootPath();var folder=System.IO.Path.Combine(root,"output/ares/airlock-door-v1");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"stage-v1/manifest.json")));
+var key="Assets/models/maps/ares/ares_hall.vmdl";var item=manifest["files"][key];var target=System.IO.Path.Combine(root,key);
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+var current=Hash(target);var before=item["before"].GetValue<string>();var after=item["after"].GetValue<string>();
+if(current!=before&&current!=after)throw new InvalidOperationException("ModelDoc changed outside this task; inspect before restore.");
+var backup=System.IO.Path.Combine(root,item["backup"].GetValue<string>());
+if(Hash(backup)!=before)throw new InvalidOperationException("Backup hash differs.");
+if(current!=before)
+{
+ var incoming=target+".pressure-restore";System.IO.File.Copy(backup,incoming,true);System.IO.File.Move(incoming,target,true);
+}
+Editor.AssetSystem.RegisterFile(target);
+return new{Restored=Hash(target)==before,OriginalGeometrySourcesPreserved=true,SceneUntouched=true};

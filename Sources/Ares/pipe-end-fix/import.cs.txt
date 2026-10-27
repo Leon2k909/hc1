@@ -1,0 +1,42 @@
+// Append only dished closures to the active hall OBJ; keep its ModelDoc and physics exact.
+var root=Sandbox.Project.Current.GetRootPath();
+if(!string.Equals(System.IO.Path.GetFullPath(root).TrimEnd('\\','/'),@"C:\sbox-projects\hc1\forked-shooter-main",StringComparison.OrdinalIgnoreCase))throw new InvalidOperationException("Wrong checkout.");
+var folder=System.IO.Path.Combine(root,"output/ares/pipe-end-fix");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"stage-v1/manifest.json")));
+if(manifest["revision"].GetValue<string>()!="ares-pipe-end-caps-v1")throw new InvalidOperationException("Wrong revision.");
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+var session=Editor.SceneEditorSession.Active;var playing=Game.IsPlaying;var game=Game.ActiveScene?.Id;var dirty=session.HasUnsavedChanges;
+foreach(var group in new[]{"source_sha256","protected_sha256"})
+ foreach(var pair in manifest[group].AsObject())
+  if(Hash(System.IO.Path.Combine(root,pair.Key))!=pair.Value.GetValue<string>())throw new InvalidOperationException("Shared source changed: "+pair.Key);
+foreach(var pair in manifest["required_source_snippets"].AsObject())
+ foreach(var snippet in pair.Value.AsArray())
+  if(!System.IO.File.ReadAllText(System.IO.Path.Combine(root,pair.Key)).Replace("\r\n","\n").Contains(snippet.GetValue<string>().Replace("\r\n","\n"),StringComparison.Ordinal))throw new InvalidOperationException("Source hook changed.");
+var relative=manifest["target"].GetValue<string>();
+if(relative!="Assets/models/maps/ares/pressure-doors-v2/hall_base.obj")throw new InvalidOperationException("Unexpected target.");
+var target=System.IO.Path.Combine(root,relative);var source=System.IO.Path.Combine(root,manifest["source"].GetValue<string>());
+var before=manifest["before"].GetValue<string>();var after=manifest["after"].GetValue<string>();
+if(Hash(source)!=after||Hash(System.IO.Path.Combine(root,manifest["backup"].GetValue<string>()))!=before)throw new InvalidOperationException("Stage or backup changed.");
+using(var input=System.IO.File.OpenRead(source))
+using(var digest=System.Security.Cryptography.IncrementalHash.CreateHash(System.Security.Cryptography.HashAlgorithmName.SHA256))
+{
+ var remaining=manifest["original_bytes"].GetValue<long>();var buffer=new byte[65536];
+ while(remaining>0){var count=input.Read(buffer,0,(int)Math.Min(buffer.Length,remaining));if(count==0)throw new InvalidOperationException("Truncated original geometry.");digest.AppendData(buffer,0,count);remaining-=count;}
+ if(Convert.ToHexString(digest.GetHashAndReset()).ToLowerInvariant()!=before)throw new InvalidOperationException("Original OBJ bytes changed.");
+}
+var current=Hash(target);if(current!=before&&current!=after)throw new InvalidOperationException("Target changed since staging.");
+var changed=current!=after;
+if(changed)
+{
+ var incoming=target+".caps-incoming";
+ try{System.IO.File.Copy(source,incoming,true);if(Hash(incoming)!=after)throw new InvalidOperationException("Incoming hash differs.");System.IO.File.Move(incoming,target,true);}
+ finally{if(System.IO.File.Exists(incoming))System.IO.File.Delete(incoming);}
+}
+Editor.AssetSystem.RegisterFile(target);
+foreach(var pair in manifest["protected_sha256"].AsObject())
+ if(Hash(System.IO.Path.Combine(root,pair.Key))!=pair.Value.GetValue<string>())throw new InvalidOperationException("Protected source changed: "+pair.Key);
+var preserved=ReferenceEquals(session,Editor.SceneEditorSession.Active)&&playing==Game.IsPlaying&&game==Game.ActiveScene?.Id&&dirty==session.HasUnsavedChanges;
+var result=new{Imported=changed,Caps=manifest["caps"].GetValue<int>(),OriginalGeometryBytesPreserved=true,ModelDocAndPhysicsPreserved=true,EditorStatePreserved=preserved};
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"native-import.json"),System.Text.Json.JsonSerializer.Serialize(result));
+if(!preserved)throw new InvalidOperationException("Editor state changed; inspect the completed import.");
+return result;

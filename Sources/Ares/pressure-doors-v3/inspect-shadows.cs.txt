@@ -1,0 +1,3 @@
+var type=typeof(Scene).Assembly.GetType("Sandbox.Rendering.ShadowMapper");
+var flags=System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic|System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.Instance;
+return new{Type=type?.FullName,Methods=type?.GetMethods(flags).Where(m=>m.Name=="ResetCache").Select(m=>new{m.Name,m.IsStatic,Parameters=m.GetParameters().Select(p=>p.ParameterType.FullName).ToArray()}).ToArray()};

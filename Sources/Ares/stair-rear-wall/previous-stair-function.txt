@@ -1,0 +1,44 @@
+def stair( m, axis, c0, c1, s0, s1, z0, z1, rails=( True, True ) ):
+    """ A closed steel stair c0..c1 across, rising from s0 (at z0) to s1 (at z1) along axis 'e' or 'n': grating treads
+    with hazard nosings over steel risers, solid sides. Its collision is the ramp under the nosings and the solid
+    below it. rails ( low c side, high c side ). """
+    rise = z1 - z0
+    count = max( 1, int( round( rise / 7.4 ) ) )
+    r = rise / count
+    run = ( s1 - s0 ) / count
+    sgn = 1.0 if s1 > s0 else -1.0
+
+    def P( c, s, z ):
+        return np.array( ( s, c, z ) if axis == "e" else ( c, s, z ), float )
+
+    front_face = ( "-" if sgn > 0 else "+" ) + axis
+    end_faces = ( "+n", "-n" ) if axis == "e" else ( "+e", "-e" )
+    for k in range( count ):
+        sa, sb = s0 + run * k, s0 + run * ( k + 1 )
+        top = z0 + r * ( k + 1 )
+        lo, hi = P( c0, min( sa, sb ), top - 1.5 ), P( c1, max( sa, sb ), top )
+        # The yellow nosing owns the front face. Drawing steel here too causes coplanar flicker.
+        m.box( lo, hi, { "+z": None, "default": "ar_steel" }, skip=( front_face, ) )
+        # Stop the grating at the nosing's back edge: the two top surfaces must not overlap either.
+        start = sa + sgn * 2.0
+        m.box( P( c0, min( start, sb ), top - 1.5 ), P( c1, max( start, sb ), top ), { "+z": "ar_grating" } )
+        # The nosing at the tread's front edge (its low s end), and the riser under it.
+        front = sa
+        nlo, nhi = P( c0, front, top - 1.5 ), P( c1, front + sgn * 2.0, top + 0.125 )
+        # Ends are enclosed by the stringers; the steel tread already owns the underside.
+        m.box( np.minimum( nlo, nhi ), np.maximum( nlo, nhi ), "ar_hazard", skip=end_faces + ( "-z", ) )
+        rlo, rhi = P( c0, front, z0 + r * k ), P( c1, front + sgn * 0.8, top - 1.5 )
+        m.box( np.minimum( rlo, rhi ), np.maximum( rlo, rhi ), "ar_steel" )
+    # The solid sides: a trapezoid each, the stringer's top 3 over the nosings' line.
+    for c, towards in ( ( c0, -1.0 ), ( c1, 1.0 ) ):
+        pts = [ P( c, s0 - sgn * 0.0, z0 ), P( c, s1, z0 ), P( c, s1, z1 + 3.0 ), P( c, s0, z0 + r + 3.0 ) ]
+        normal = np.array( ( 0, towards, 0 ) if axis == "e" else ( towards, 0, 0 ), float )
+        card( m, "ar_steel", pts, normal )
+        card( m, "ar_steel", [ p - normal * 0.01 for p in pts ], -normal )
+    # The ramp: a wedge from the foot's nosing to the head.
+    pts = [ P( c, s, z ) for c in ( c0, c1 ) for s, z in ( ( s0, z0 ), ( s1, z0 ), ( s1, z1 ), ( s0, z0 + r * 0.5 ) ) ]
+    m.hull( pts, METAL )
+    if rails[0]:
+        slope_rail( m, P( c0 + 1.5, s0, z0 + r ), P( c0 + 1.5, s1, z1 ) )
+    if rails[1]:
+        slope_rail( m, P( c1 - 1.5, s0, z0 + r ), P( c1 - 1.5, s1, z1 ) )

@@ -1,0 +1,19 @@
+var root=Sandbox.Project.Current.GetRootPath();
+if(!string.Equals(System.IO.Path.GetFullPath(root).TrimEnd('\\','/'),@"C:\sbox-projects\hc1\forked-shooter-main",StringComparison.OrdinalIgnoreCase))throw new InvalidOperationException("Wrong checkout.");
+var folder=System.IO.Path.Combine(root,"output/ares/pressure-door-v3");
+var request=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"import-request.json")));
+var stage=request["rollback_stage"]?.GetValue<string>()??"stage-v5";
+if(!System.Text.RegularExpressions.Regex.IsMatch(stage,"^stage-[a-z0-9-]+$"))throw new InvalidOperationException("Invalid stage.");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,stage,"manifest.json")));
+var item=manifest["files"]["Assets/models/maps/ares/ares_hall.vmdl"];
+string Hash(string path)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+var target=System.IO.Path.Combine(root,"Assets/models/maps/ares/ares_hall.vmdl");
+var before=item["before"].GetValue<string>();var after=item["after"].GetValue<string>();
+if(Hash(target)!=before&&Hash(target)!=after)throw new InvalidOperationException("The shared hall changed; inspect it before restoring.");
+var backup=System.IO.Path.Combine(root,item["backup"].GetValue<string>());
+if(Hash(backup)!=before)throw new InvalidOperationException("Backup changed.");
+var incoming=target+".formed-restore";
+try{System.IO.File.Copy(backup,incoming,true);System.IO.File.Move(incoming,target,true);}
+finally{if(System.IO.File.Exists(incoming))System.IO.File.Delete(incoming);}
+Editor.AssetSystem.RegisterFile(target);
+return new{Restored=true,SceneUntouched=true,OriginalGeometrySourcesPreserved=true};

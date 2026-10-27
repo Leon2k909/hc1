@@ -1,0 +1,14 @@
+// Tools/ares_pressure_materials.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    g_flMetalness "0"
+    g_flRoughnessScaleFactor "1"
+    TextureColor "materials/ares/pressure-doors-v2/hazard_color.png"
+    TextureNormal "materials/ares/pressure-doors-v2/flat_normal.png"
+    TextureRoughness "materials/ares/pressure-doors-v2/label_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[1 1 1 1]"
+    g_flModelTintAmount "1"
+}
