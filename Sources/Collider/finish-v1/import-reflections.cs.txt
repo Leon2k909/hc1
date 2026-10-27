@@ -1,0 +1,27 @@
+if(Game.IsPlaying)throw new InvalidOperationException("Stop play before reflection import");
+var root=Project.Current.GetRootPath();
+var stage=System.IO.Path.Combine(root,"output/depot-finish-20261027/reflection-stage");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(stage,"manifest.json")));
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+var session=Editor.SceneEditorSession.Active;
+if(session.Scene.Source?.ResourcePath!="scenes/maps/collider/collider.scene" || session.HasUnsavedChanges)
+    throw new InvalidOperationException("Expected saved Collider document");
+if(Hash(System.IO.Path.Combine(root,"Assets/scenes/maps/Collider/collider.scene"))!=manifest["scene_sha256"].GetValue<string>())
+    throw new InvalidOperationException("Scene changed after capture");
+foreach(var entry in manifest["files"].AsArray())
+{
+    var relative=entry["relative"].GetValue<string>();
+    if(!relative.StartsWith("materials/collider/finish-v1/reflections/") || relative.Contains(".."))throw new Exception("Invalid reflection target");
+    if(System.IO.File.Exists(System.IO.Path.Combine(root,"Assets",relative)))throw new Exception("Reflection target exists");
+    if(Hash(System.IO.Path.Combine(stage,relative))!=entry["sha256"].GetValue<string>())throw new Exception("Reflection source changed");
+}
+var files=new System.Collections.Generic.List<string>();
+foreach(var entry in manifest["files"].AsArray())
+{
+    var relative=entry["relative"].GetValue<string>();
+    var target=System.IO.Path.Combine(root,"Assets",relative);
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target));
+    System.IO.File.Copy(System.IO.Path.Combine(stage,relative),target,false);files.Add(relative);
+}
+foreach(var relative in files.OrderBy(p=>p.EndsWith(".vmat")?1:0))Editor.AssetSystem.RegisterFile(System.IO.Path.Combine(root,"Assets",relative));
+return new{Imported=files,SceneUnchanged=Hash(System.IO.Path.Combine(root,"Assets/scenes/maps/Collider/collider.scene"))==manifest["scene_sha256"].GetValue<string>()};

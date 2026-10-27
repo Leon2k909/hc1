@@ -195,6 +195,8 @@ def build(out=OUT):
     (out / "co_glass.vmat").write_text(AM.glass_vmat((225,238,245), .09, .006), encoding="utf-8")
     equipment_surfaces(out)
     floor_markings(out)
+    import collider_finish
+    collider_finish.materials(out / "finish-v1")
     print(f"Staged {len(list(out.glob('*.vmat')))} Collider materials in {out}")
 
 if __name__ == "__main__":

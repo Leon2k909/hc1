@@ -1,0 +1,60 @@
+// Publish the pictured east concrete screen removal, one collision box and the radar.
+var root=Sandbox.Project.Current.GetRootPath();
+if(!string.Equals(System.IO.Path.GetFullPath(root).TrimEnd('\\','/'),@"C:\sbox-projects\hc1\forked-shooter-main",StringComparison.OrdinalIgnoreCase))throw new InvalidOperationException("Wrong checkout.");
+var directory=System.IO.Path.Combine(root,"output/collider/wall-removal-east");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(directory,"stage-v1/manifest.json")));
+if(manifest["revision"].GetValue<string>()!="collider-east-spawn-wall-removal-v1"||manifest["walls_removed"].GetValue<int>()!=1)throw new InvalidOperationException("Unexpected repair.");
+var session=Editor.SceneEditorSession.Active;
+if(Game.IsPlaying||session is null||session.Scene.Source?.ResourcePath?.Equals("scenes/maps/collider/collider.scene",StringComparison.OrdinalIgnoreCase)!=true)throw new InvalidOperationException("Requires the stopped Collider document.");
+var initialDirty=session.HasUnsavedChanges;
+var game=Game.ActiveScene?.Id;var ids=session.Scene.GetAllObjects(true).Select(o=>o.Id).ToHashSet();
+string Hash(string path)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+foreach(var group in new[]{"source_sha256","protected_sha256"})
+ foreach(var pair in manifest[group].AsObject())
+  if(Hash(System.IO.Path.Combine(root,pair.Key))!=pair.Value.GetValue<string>())throw new InvalidOperationException("Shared input changed: "+pair.Key);
+var allowed=new System.Collections.Generic.HashSet<string>{"Assets/models/maps/collider/collider_structure.obj","Assets/models/maps/collider/collider_structure.vmdl","Assets/ui/Minimaps/minimap_collider.png"};
+var files=manifest["files"].AsObject();if(files.Count!=3||files.Any(p=>!allowed.Contains(p.Key)))throw new InvalidOperationException("Unexpected targets.");
+var document=files["Assets/models/maps/collider/collider_structure.vmdl"];
+var oldDoc=System.IO.File.ReadAllText(System.IO.Path.Combine(root,document["backup"].GetValue<string>()));
+var newDoc=System.IO.File.ReadAllText(System.IO.Path.Combine(root,document["source"].GetValue<string>()));
+var removed=document["removed_node"].GetValue<string>();
+if(oldDoc.IndexOf(removed,StringComparison.Ordinal)!=oldDoc.LastIndexOf(removed,StringComparison.Ordinal)||oldDoc.Replace(removed,"",StringComparison.Ordinal)!=newDoc)throw new InvalidOperationException("The document changes more than the one wall box.");
+float[] Values(string key)=>System.Text.RegularExpressions.Regex.Match(removed,key+@"\s*=\s*\[([^\]]+)\]").Groups[1].Value.Split(',').Select(s=>float.Parse(s,System.Globalization.CultureInfo.InvariantCulture)).ToArray();
+if(!Values("origin").SequenceEqual(new[]{0f,-1512f,82f})||!Values("dimensions").SequenceEqual(new[]{24f,320f,164f}))throw new InvalidOperationException("Unexpected collision box.");
+var plan=new System.Collections.Generic.List<(string Source,string Target,string Backup,string After)>();
+foreach(var pair in files)
+{
+ var item=pair.Value;var target=System.IO.Path.Combine(root,pair.Key);var source=System.IO.Path.Combine(root,item["source"].GetValue<string>());var backup=System.IO.Path.Combine(root,item["backup"].GetValue<string>());
+ var before=item["before"].GetValue<string>();var after=item["after"].GetValue<string>();
+ if(Hash(source)!=after||Hash(backup)!=before)throw new InvalidOperationException("Stage or backup changed.");
+ var current=Hash(target);if(current==after)continue;
+ if(current!=before)throw new InvalidOperationException("Shared target changed: "+pair.Key);
+ plan.Add((source,target,backup,after));
+}
+var changed=new System.Collections.Generic.List<(string Target,string Backup)>();
+try
+{
+ foreach(var item in plan)
+ {
+  var incoming=item.Target+".wall-removal-incoming";
+  try
+  {
+   System.IO.File.Copy(item.Source,incoming,true);if(Hash(incoming)!=item.After)throw new InvalidOperationException("Incoming hash differs.");
+   changed.Add((item.Target,item.Backup));System.IO.File.Move(incoming,item.Target,true);
+  }
+  finally{if(System.IO.File.Exists(incoming))System.IO.File.Delete(incoming);}
+ }
+}
+catch
+{
+ foreach(var item in changed.AsEnumerable().Reverse())System.IO.File.Copy(item.Backup,item.Target,true);
+ throw;
+}
+foreach(var item in plan)Editor.AssetSystem.RegisterFile(item.Target);
+foreach(var pair in manifest["protected_sha256"].AsObject())
+ if(Hash(System.IO.Path.Combine(root,pair.Key))!=pair.Value.GetValue<string>())throw new InvalidOperationException("Protected source changed: "+pair.Key);
+var preserved=ReferenceEquals(session,Editor.SceneEditorSession.Active)&&game==Game.ActiveScene?.Id&&session.HasUnsavedChanges==initialDirty&&!Game.IsPlaying&&session.Scene.GetAllObjects(true).Select(o=>o.Id).ToHashSet().SetEquals(ids);
+var result=new{ImportedFiles=plan.Count,WallsRemoved=1,TrianglesRemoved=12,CollisionBoxesRemoved=1,MinimapUpdated=true,AllOtherPhysicsPreserved=true,SceneUnchanged=true,EditorStatePreserved=preserved};
+System.IO.File.WriteAllText(System.IO.Path.Combine(directory,"native-import.json"),System.Text.Json.JsonSerializer.Serialize(result));
+if(!preserved)throw new InvalidOperationException("Editor state changed; inspect the completed import.");
+return result;

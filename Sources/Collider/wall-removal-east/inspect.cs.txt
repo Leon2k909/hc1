@@ -1,0 +1,2 @@
+var session=Editor.SceneEditorSession.All.Single(s=>s.Scene.IsEditor&&s.Scene.Source?.ResourcePath?.Equals("scenes/maps/collider/collider.scene",StringComparison.OrdinalIgnoreCase)==true);
+return new{session.HasUnsavedChanges,Game.IsPlaying,Models=session.Scene.GetAllComponents<ModelRenderer>().Where(r=>r.Model?.ResourcePath?.StartsWith("models/maps/collider/",StringComparison.OrdinalIgnoreCase)==true).Select(r=>new{r.Id,Name=r.GameObject.Name,Path=r.Model.ResourcePath,r.Model.IsError,r.Enabled,Position=r.WorldPosition.ToString()}).ToArray()};

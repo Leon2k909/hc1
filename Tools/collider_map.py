@@ -22,6 +22,7 @@ import collider_materials as M
 import collider_detail_geometry as D
 import collider_services as S
 import collider_machinery as H
+import collider_finish as F
 
 ROOT = Path(__file__).resolve().parents[1]
 STAGE = ROOT / "output/collider/stage"
@@ -58,7 +59,10 @@ ART_VIEW = {"name":"art","eye":[850,-620,G+74],"target":[-650,500,220],"fov":82}
 
 def configure(m):
     for paint in m.polygons:
-        if paint.startswith("co_"):
+        if paint.startswith("cf_"):
+            m.material_overrides[paint] = f"{F.MATERIAL_DIR}/{paint}.vmat"
+            m.tile_overrides[paint] = F.TILES[paint]
+        elif paint.startswith("co_"):
             m.material_overrides[paint] = f"materials/collider/{paint}.vmat"
             m.tile_overrides[paint] = M.TILES.get(paint,64.)
         elif paint.startswith("ar_"):
@@ -179,7 +183,7 @@ def lamp(m,name,e,n,z,length=64,color="white",shadow=False,radius=440,axis="e",p
     LIGHTS.append((name,(e,n,z-10),",".join(str(round(c*power,3)) for c in rgb)+",1",radius,shadow))
 
 def portal(m,name,axis,center,cross,z=0,width=160,height=192):
-    A.door_frame(m,axis,center-width/2,center+width/2,cross-12,cross+12,z,z+height)
+    F.door_frame(m,axis,center-width/2,center+width/2,cross-12,cross+12,z,z+height)
     if axis=="e":
         for n in (cross-16,cross+16):
             lamp(m,name+str(n),center,n,z+height-8,width-10,"red",n<cross,280,power=4.0)
@@ -289,8 +293,6 @@ def wings(m):
         mirrored(1424,1900,-900,980,880,900,"co_steel")
         mirrored(1400,1900,650,674,G,900,"co_wall")
         mirrored(1424,1900,-350,350,544,560,"co_floor")
-        # Dogleg spawn cover blocks a shot from the opposite team's middle door.
-        mirrored(1500,1524,-160,160,0,164,"co_concrete")
         # The upper middle opening is glass: it needs no spawn cover in front of the displays.
         for index,n in enumerate((-190,-65,65,190)):
             for row,z in enumerate((G+125,G+203)):
@@ -473,8 +475,10 @@ def build():
     structure,details,accel,glass=K.Model(),K.Model(),K.Model(),K.Model()
     shell(structure,glass)
     wings(structure)
+    F.refine_structure(structure)
     detail(details)
     machine(accel)
+    F.add_finish(structure, F.surface_context([structure, details, accel]))
     return dict(zip((p[0] for p in MODELS),map(configure,(structure,details,accel,glass))))
 
 def component(kind,key,**values): return K.component(IDS,kind,key,**values)

@@ -1,0 +1,9 @@
+if(!Game.IsPlaying)throw new InvalidOperationException("Start the Collider play test first.");
+var scene=Game.ActiveScene;
+var door=scene.GetAllComponents<Facepunch.AutomaticSlidingDoor>().Single();
+return new{Scene=scene.Name,Networking.IsActive,Networking.IsHost,Networking.IsClient,
+ Door=door.GameObject.Id,door.OpenFraction,door.WantsOpen,door.Width,LeftBound=door.LeftLeaf.IsValid(),RightBound=door.RightLeaf.IsValid(),
+ Left=door.LeftLeaf?.LocalPosition.ToString(),Right=door.RightLeaf?.LocalPosition.ToString(),
+ Players=scene.GetAllComponents<Facepunch.PlayerPawn>().Select(p=>new{p.GameObject.Id,IsLocal=p==Facepunch.Client.Local?.PlayerPawn,Position=p.WorldPosition.ToString(),Health=p.HealthComponent?.Health,Inside=door.ContainsActorPosition(p.WorldPosition)}).ToArray(),
+ Bots=scene.GetAllComponents<Facepunch.LightweightCombatBot>().Select(b=>new{b.GameObject.Id,b.IsAlive,Position=b.WorldPosition.ToString(),Inside=door.ContainsActorPosition(b.WorldPosition)}).ToArray(),
+ Connections=Connection.All.Select(c=>new{c.Id,c.IsHost,c.IsActive,Local=c==Connection.Local}).ToArray(),NavGenerating=scene.NavMesh.IsGenerating};

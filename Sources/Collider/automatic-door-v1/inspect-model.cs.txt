@@ -1,0 +1,4 @@
+var model=Model.Load("models/maps/collider/automatic-door-v1/lab_door_leaf.vmdl");
+if(model is null||model.IsError)throw new InvalidOperationException("The leaf model has not compiled.");
+var scene=Editor.SceneEditorSession.Active.Scene;
+return new{ModelValid=true,Bounds=model.Bounds.ToString(),SnapshotValue=(int)NetworkMode.Snapshot,ColliderDoors=scene.GetAllComponents<Facepunch.AutomaticSlidingDoor>().Count(),Objects=scene.GetAllObjects(true).Where(o=>o.Name.StartsWith("Automatic west",StringComparison.Ordinal)).Select(o=>new{o.Id,o.Name,Components=o.Components.GetAll().Select(c=>c.GetType().Name).ToArray()}).ToArray()};

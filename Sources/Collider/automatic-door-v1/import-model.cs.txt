@@ -1,0 +1,30 @@
+var root=Sandbox.Project.Current.GetRootPath();
+if(!string.Equals(System.IO.Path.GetFullPath(root).TrimEnd('\\','/'),@"C:\sbox-projects\hc1\forked-shooter-main",StringComparison.OrdinalIgnoreCase))throw new InvalidOperationException("Wrong project.");
+var folder=System.IO.Path.Combine(root,"output/collider/automatic-door");
+var requestPath=System.IO.Path.Combine(folder,"import-request.json");
+var stage=System.IO.File.Exists(requestPath)?System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(requestPath))["stage"].GetValue<string>():"stage-v1";
+if(!System.Text.RegularExpressions.Regex.IsMatch(stage,"^stage-[a-z0-9-]+$"))throw new InvalidOperationException("Invalid stage.");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,stage,"manifest.json")));
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+var session=Editor.SceneEditorSession.Active;var dirty=session.HasUnsavedChanges;var game=Game.ActiveScene?.Id;var playing=Game.IsPlaying;
+foreach(var pair in manifest["source_sha256"].AsObject())
+ if(Hash(System.IO.Path.Combine(root,pair.Key))!=pair.Value.GetValue<string>())throw new InvalidOperationException("Source changed: "+pair.Key);
+var changed=new System.Collections.Generic.List<string>();
+foreach(var pair in manifest["files"].AsObject())
+{
+ if(!pair.Key.StartsWith("Assets/models/maps/collider/automatic-door-v1/",StringComparison.Ordinal)||pair.Key.Contains(".."))throw new InvalidOperationException("Unexpected target.");
+ var target=System.IO.Path.Combine(root,pair.Key);var source=System.IO.Path.Combine(root,pair.Value["source"].GetValue<string>());var after=pair.Value["after"].GetValue<string>();
+ if(Hash(source)!=after)throw new InvalidOperationException("Stage changed.");
+ if(System.IO.File.Exists(target))
+ {
+  var current=Hash(target);if(current==after)continue;
+  if(current!=pair.Value["before"]?.GetValue<string>())throw new InvalidOperationException("Target changed.");
+  if(Hash(System.IO.Path.Combine(root,pair.Value["backup"].GetValue<string>()))!=current)throw new InvalidOperationException("Backup changed.");
+ }
+ System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target));var incoming=target+".door-incoming";
+ try{System.IO.File.Copy(source,incoming,true);System.IO.File.Move(incoming,target,true);}
+ finally{if(System.IO.File.Exists(incoming))System.IO.File.Delete(incoming);}
+ Editor.AssetSystem.RegisterFile(target);changed.Add(pair.Key);
+}
+if(!ReferenceEquals(session,Editor.SceneEditorSession.Active)||dirty!=session.HasUnsavedChanges||playing!=Game.IsPlaying||game!=Game.ActiveScene?.Id)throw new InvalidOperationException("Editor state changed during import.");
+return new{Imported=changed,EditorStatePreserved=true};

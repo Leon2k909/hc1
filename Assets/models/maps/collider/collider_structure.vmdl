@@ -27,7 +27,16 @@
 							{ from = "co_steel.vmat" to = "materials/collider/co_steel.vmat" },
 							{ from = "co_trim.vmat" to = "materials/collider/co_trim.vmat" },
 							{ from = "co_wall.vmat" to = "materials/collider/co_wall.vmat" },
-							{ from = "co_white.vmat" to = "materials/collider/co_white.vmat" }
+							{ from = "co_white.vmat" to = "materials/collider/co_white.vmat" },
+							{ from = "cf_floor.vmat" to = "materials/collider/finish-v1/cf_floor.vmat" },
+							{ from = "cf_soffit.vmat" to = "materials/collider/finish-v1/cf_soffit.vmat" },
+							{ from = "cf_wall.vmat" to = "materials/collider/finish-v1/cf_wall.vmat" },
+							{ from = "cf_edge.vmat" to = "materials/collider/finish-v1/cf_edge.vmat" },
+							{ from = "cf_frame.vmat" to = "materials/collider/finish-v1/cf_frame.vmat" },
+							{ from = "cf_stainless.vmat" to = "materials/collider/finish-v1/cf_stainless.vmat" },
+							{ from = "cf_gasket.vmat" to = "materials/collider/finish-v1/cf_gasket.vmat" },
+							{ from = "cf_wear.vmat" to = "materials/collider/finish-v1/cf_wear.vmat" },
+							{ from = "cf_concrete.vmat" to = "materials/collider/finish-v1/cf_concrete.vmat" }
 						]
 						use_global_default = false
 						global_default_material = ""
@@ -1065,15 +1074,7 @@
 						angles = [ -0.0000, -90.0000, 0.0000 ]
 						dimensions = [ 476.0000, 700.0000, 16.0000 ]
 					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "metal"
-						collision_tags = "solid"
-						origin = [ 0.0000, 1512.0000, 82.0000 ]
-						angles = [ -0.0000, -90.0000, 0.0000 ]
-						dimensions = [ 24.0000, 320.0000, 164.0000 ]
-					},
+					
 					{
 						_class = "PhysicsShapeBox"
 						parent_bone = ""
@@ -1236,15 +1237,7 @@
 						angles = [ -0.0000, -90.0000, 0.0000 ]
 						dimensions = [ 476.0000, 700.0000, 16.0000 ]
 					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "metal"
-						collision_tags = "solid"
-						origin = [ 0.0000, -1512.0000, 82.0000 ]
-						angles = [ -0.0000, -90.0000, 0.0000 ]
-						dimensions = [ 24.0000, 320.0000, 164.0000 ]
-					},
+					
 					{
 						_class = "PhysicsShapeBox"
 						parent_bone = ""

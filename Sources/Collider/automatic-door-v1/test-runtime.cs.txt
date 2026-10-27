@@ -1,0 +1,49 @@
+if(!Game.IsPlaying||!Networking.IsHost)throw new InvalidOperationException("An owned Collider host test is required.");
+var scene=Game.ActiveScene;var door=scene.GetAllComponents<Facepunch.AutomaticSlidingDoor>().Single();
+var pawn=Facepunch.Client.Local?.PlayerPawn;
+if(!pawn.IsValid()||pawn.HealthComponent?.State!=Facepunch.LifeState.Alive)throw new InvalidOperationException("The local test pawn must be alive.");
+var original=pawn.WorldTransform;var frozen=pawn.IsFrozen;var noDamage=Facepunch.DevCommands.NoDamage;
+var bots=scene.GetAllComponents<Facepunch.LightweightCombatBot>().Select(b=>new{Bot=b,b.Enabled,Agent=b.Agent,AgentEnabled=b.Agent.IsValid()&&b.Agent.Enabled}).ToArray();
+var records=new System.Collections.Generic.List<object>();
+async Task Wait(int milliseconds)
+{
+ await Task.Delay(milliseconds,cancellationToken);
+ if(!Game.IsPlaying||Game.ActiveScene!=scene||!door.IsValid()||!pawn.IsValid())throw new InvalidOperationException("Owned test scene changed.");
+}
+void Move(float distance)=>pawn.WorldPosition=door.WorldTransform.PointToWorld(new Vector3(distance,0,1));
+bool Blocked()
+{
+ var a=door.WorldTransform.PointToWorld(new Vector3(-20,0,64));var b=door.WorldTransform.PointToWorld(new Vector3(20,0,64));
+ var trace=scene.Trace.Ray(a,b).IgnoreGameObjectHierarchy(pawn.GameObject).WithoutTags("player","movement","trigger","ragdoll").Run();
+ return trace.Hit&&(trace.GameObject==door.LeftLeaf||trace.GameObject==door.RightLeaf);
+}
+void Record(string name,bool passed)
+{
+ records.Add(new{Name=name,Passed=passed,door.OpenFraction,door.WantsOpen,Position=pawn.WorldPosition.ToString(),PhysicalDoorHit=Blocked()});
+ if(!passed)throw new InvalidOperationException("Door runtime check failed: "+name);
+}
+try
+{
+ Facepunch.DevCommands.NoDamage=true;pawn.IsFrozen=true;
+ foreach(var b in bots){b.Bot.Enabled=false;if(b.Agent.IsValid())b.Agent.Enabled=false;}
+ Move(-400);await Wait(3000);Record("empty-door-closes-and-blocks",door.OpenFraction<.01f&&Blocked());
+ Move(-110);await Wait(1000);Record("atrium-approach-opens",door.OpenFraction>.99f&&!Blocked());
+ Move(0);await Wait(2000);Record("occupied-door-stays-open",door.OpenFraction>.99f&&door.WantsOpen&&!Blocked());
+ Move(-400);await Wait(650);Record("close-delay-respected",door.OpenFraction>.99f&&door.WantsOpen);
+ for(var i=0;i<25&&door.WantsOpen;i++)await Wait(100);
+ Record("empty-door-starts-closing",!door.WantsOpen&&door.OpenFraction<.999f&&door.OpenFraction>.05f);
+ Move(36);await Wait(1000);Record("lab-side-entry-reverses-close",door.WantsOpen&&door.OpenFraction>.99f&&!Blocked());
+ Move(-400);await Wait(3000);Record("door-recloses-after-exit",door.OpenFraction<.01f&&Blocked());
+}
+finally
+{
+ if(pawn.IsValid()){pawn.WorldTransform=original;pawn.IsFrozen=frozen;}
+ foreach(var b in bots)
+ {
+  if(b.Bot.IsValid())b.Bot.Enabled=b.Enabled;
+  if(b.Agent.IsValid())b.Agent.Enabled=b.AgentEnabled;
+ }
+ Facepunch.DevCommands.NoDamage=noDamage;
+ System.IO.File.WriteAllText(System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(),"output/collider/automatic-door/runtime-checks.json"),System.Text.Json.JsonSerializer.Serialize(new{Checks=records,PawnAndBotsRestored=true,NoDamageRestored=Facepunch.DevCommands.NoDamage==noDamage}));
+}
+return new{Passed=records.Count==7,Checks=records,PawnAndBotsRestored=true};
