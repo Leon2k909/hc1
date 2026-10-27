@@ -47,8 +47,8 @@
                 }
                 else if ( Connection is not null )
                 {
-                    <i class="connection-icon">signal_cellular_alt</i>
-                    <label class="latency">@(Connection.Ping.CeilToInt()) ms</label>
+                    <i class="connection-icon @PingClass">signal_cellular_alt</i>
+                    <label class="latency">@Ping ms</label>
                 }
                 else
                 {
@@ -115,6 +115,9 @@
     private bool IsTextMuted => !IsBotEntry && CommunicationMuteState.IsTextMuted( Client );
     private bool IsVoiceMuted => !IsBotEntry && CommunicationMuteState.IsVoiceMuted( Client );
     private IEnumerable<(object Value, ScoreAttribute Attribute)> ScoreValues => IsBotEntry ? GetBotScoreValues() : IScore.Find( Client );
+    // The signal bars' colour by ping: green, amber from 80 ms, red from 150 ms.
+    private int Ping => Connection is null ? 0 : Connection.Ping.CeilToInt();
+    private string PingClass => Ping >= 150 ? "ping-poor" : Ping >= 80 ? "ping-fair" : "";
     private string DisplayName => IsBotEntry ? Bot.BotName : Client.DisplayName;
 
     // Match by the header's name, not by index: team-only fields such as Balance are absent from enemy scores.

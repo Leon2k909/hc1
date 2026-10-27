@@ -70,9 +70,9 @@
                     @foreach ( var group in groups.Where( x => x.Team != Team.Unassigned ) )
                     {
                         var team = group.Team;
-                        <div class="team-roster" style="border-top-color: @team.GetColor().Hex">
-                            <div class="team-heading" style="background-color: @team.GetColor().WithAlpha( 0.08f ).Hex">
-                                <Icon class="team-logo" file="@team.GetIconPath()" size="54" />
+                        <div class="team-roster">
+                            <div class="team-heading" style="@GetTeamBannerStyle( team )">
+                                <Icon class="team-logo" file="@team.GetIconPath()" size="48" />
                                 <div class="team-identity">
                                     <label class="team-name">@Tr( team.GetName() )</label>
                                     <label class="team-count">@group.Entries.Count @Tr( "Players" )</label>
@@ -203,6 +203,13 @@
         .OrderByDescending( x => GetZombiesEconomy( x )?.Points ?? -1 )
         .ThenBy( x => x.DisplayName )
         .ToList();
+
+    /// <summary> A team's banner: its colour, strong at the logo and fading toward its score. </summary>
+    private static string GetTeamBannerStyle( Team team )
+    {
+        var color = team.GetColor();
+        return $"background-image: linear-gradient( to right, {color.WithAlpha( 0.85f ).Hex}, {color.WithAlpha( 0.22f ).Hex} );";
+    }
 
     private void AddBot( Team team )
     {
