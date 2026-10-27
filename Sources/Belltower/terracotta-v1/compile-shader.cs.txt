@@ -1,0 +1,16 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var source=System.IO.Path.Combine(root,"Assets/shaders/belltower_terracotta.shader");
+var session=Editor.SceneEditorSession.Active;var dirty=session.HasUnsavedChanges;var playing=Game.IsPlaying;var game=Game.ActiveScene?.Id;
+var result=await Editor.EditorUtility.CompileShader("shaders/belltower_terracotta.shader",new(){ForceRecompile=true},cancellationToken);
+var output=result.Programs.SelectMany(p=>p.Output??new System.Collections.Generic.List<string>()).ToArray();
+if(!result.Success)throw new InvalidOperationException("Terracotta shader: "+string.Join("\n",output));
+if(result.CompiledShader is {Length:>0})
+{
+ var incoming=source+"_c.clay-incoming";
+ try{System.IO.File.WriteAllBytes(incoming,result.CompiledShader);System.IO.File.Move(incoming,source+"_c",true);}
+ finally{if(System.IO.File.Exists(incoming))System.IO.File.Delete(incoming);}
+}
+if(!ReferenceEquals(session,Editor.SceneEditorSession.Active)||dirty!=session.HasUnsavedChanges||playing!=Game.IsPlaying||game!=Game.ActiveScene?.Id)throw new InvalidOperationException("Shared state changed during shader compilation; shader output saved.");
+var report=new{ShaderCompiled=result.Success,CompiledBytes=result.CompiledShader?.Length??0,Output=output,EditorStatePreserved=true};
+System.IO.File.WriteAllText(System.IO.Path.Combine(root,"output/belltower/terracotta-v1/shader-compile.json"),System.Text.Json.JsonSerializer.Serialize(report));
+return report;

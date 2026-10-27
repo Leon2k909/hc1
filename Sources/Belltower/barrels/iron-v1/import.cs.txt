@@ -1,0 +1,26 @@
+// Publish only the private barrel hoop finish. No scene or model edits.
+var root=Sandbox.Project.Current.GetRootPath();
+if(!string.Equals(System.IO.Path.GetFullPath(root).TrimEnd('\\','/'),@"C:\sbox-projects\hc1\forked-shooter-main",StringComparison.OrdinalIgnoreCase))throw new InvalidOperationException("Wrong project.");
+var folder=System.IO.Path.Combine(root,"output/belltower/barrel-iron-v1");
+var m=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"manifest.json")));
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+var relative=m["target"].GetValue<string>();
+if(relative!="Assets/materials/belltower/barrels-v3/barrel_hoop_rust.vmat")throw new InvalidOperationException("Unexpected target.");
+var target=System.IO.Path.Combine(root,relative);var source=System.IO.Path.Combine(root,m["source"].GetValue<string>());
+var before=m["before"].GetValue<string>();var after=m["after"].GetValue<string>();var current=Hash(target);
+if(current!=before&&current!=after)throw new InvalidOperationException("The material changed since staging.");
+if(Hash(source)!=after||Hash(System.IO.Path.Combine(root,m["backup"].GetValue<string>()))!=before)throw new InvalidOperationException("Stage or backup changed.");
+if(Hash(System.IO.Path.Combine(root,"Tools/belltower_barrels_v3.py"))!=m["generator_sha256"].GetValue<string>())throw new InvalidOperationException("Generator changed.");
+var session=Editor.SceneEditorSession.Active;var dirty=session.HasUnsavedChanges;var playing=Game.IsPlaying;var game=Game.ActiveScene?.Id;
+if(current!=after)
+{
+ var incoming=target+".iron-incoming";
+ try{System.IO.File.Copy(source,incoming,true);if(Hash(incoming)!=after)throw new InvalidOperationException("Incoming hash differs.");System.IO.File.Move(incoming,target,true);}
+ finally{if(System.IO.File.Exists(incoming))System.IO.File.Delete(incoming);}
+}
+Editor.AssetSystem.RegisterFile(target);
+var preserved=ReferenceEquals(session,Editor.SceneEditorSession.Active)&&dirty==session.HasUnsavedChanges&&playing==Game.IsPlaying&&game==Game.ActiveScene?.Id;
+var result=new{Material=relative,Published=current!=after,EditorStatePreserved=preserved};
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"native-import.json"),System.Text.Json.JsonSerializer.Serialize(result));
+if(!preserved)throw new InvalidOperationException("Editor state changed; inspect the completed publication.");
+return result;

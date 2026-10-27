@@ -1,0 +1,73 @@
+// One restored bitmap of the existing Belltower document. No scene save or model edit.
+var root=Sandbox.Project.Current.GetRootPath();
+var folder=System.IO.Path.Combine(root,"output/belltower/terracotta-v1");
+var config=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"capture-request.json")));
+var phase=config["phase"].GetValue<string>();var name=config["name"].GetValue<string>();
+if(!System.Text.RegularExpressions.Regex.IsMatch(phase,"^[a-z0-9-]+$")||!System.Text.RegularExpressions.Regex.IsMatch(name,"^[a-z0-9-]+$"))throw new InvalidOperationException("Invalid image name.");
+var destination=System.IO.Path.Combine(root,"output/belltower/quality","terracotta-v1-"+phase);System.IO.Directory.CreateDirectory(destination);
+if(System.IO.File.Exists(System.IO.Path.Combine(destination,name+".png")))throw new InvalidOperationException("Preserve existing image evidence.");
+var previous=Editor.SceneEditorSession.Active;var playing=Game.IsPlaying;var game=Game.ActiveScene?.Id;
+var session=Editor.SceneEditorSession.All.Single(s=>s.Scene.IsEditor&&s.Scene.Source?.ResourcePath?.Equals("scenes/maps/belltower/belltower.scene",StringComparison.OrdinalIgnoreCase)==true);
+var scene=session.Scene;var dirty=session.HasUnsavedChanges;
+var source=System.IO.Path.Combine(root,"Assets/scenes/maps/Belltower/belltower.scene");
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+var sourceHash=Hash(source);
+using(scene.Push())
+{
+ var material=Material.Load("materials/buildings/clay_pot.vmat");
+ foreach(var key in new[]{"g_tColor","g_tNormal","g_tRma"})material.GetTexture(key)?.MarkUsed(2048);
+ foreach(var volume in scene.GetAllComponents<IndirectLightVolume>())
+  foreach(var texture in new[]{volume.IrradianceTexture,volume.DistanceTexture,volume.RelocationTexture})
+   if(texture is not null&&!texture.IsError)texture.MarkUsed(Math.Max(texture.Width,texture.Height));
+}
+await Task.Delay(1000,cancellationToken);
+if(!ReferenceEquals(previous,Editor.SceneEditorSession.Active)||Game.IsPlaying!=playing||Game.ActiveScene?.Id!=game||session.HasUnsavedChanges!=dirty||Hash(source)!=sourceHash)throw new InvalidOperationException("Shared editor state changed during prewarm; no camera edit made.");
+var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic;
+var cameraProperty=typeof(Scene).GetProperty("Camera",flags);
+var camera=scene.GetAllComponents<CameraComponent>().Single(c=>c.GameObject.Name=="editor_camera"&&c.GameObject.Flags.HasFlag(GameObjectFlags.EditorOnly));
+var main=scene.Camera;
+var pose=new{camera.WorldPosition,camera.WorldRotation,camera.FieldOfView,camera.FovAxis,camera.CustomSize};
+var exposure=new{camera.AutoExposure.Enabled,camera.AutoExposure.MinimumExposure,camera.AutoExposure.MaximumExposure,camera.AutoExposure.Compensation,camera.AutoExposure.Rate};
+var serialized=camera.Serialize().ToJsonString();
+var tone=scene.GetAllComponents<Tonemapping>().Single(c=>c.GameObject.Name=="Look");var toneBefore=tone.Serialize().ToJsonString();
+var objects=scene.GetAllObjects(true).Select(o=>o.Id).ToHashSet();
+var update=typeof(PostProcessSystem).GetMethod("UpdateCamera",flags);var post=scene.GetSystem<PostProcessSystem>();
+object capture=null;object restoration=null;
+try
+{
+ using(scene.Push())
+ {
+  cameraProperty.SetValue(scene,camera);
+  camera.WorldPosition=Vector3.Parse(config["position"].GetValue<string>());
+  camera.WorldRotation=Rotation.From(Angles.Parse(config["angles"].GetValue<string>()));
+  camera.FieldOfView=config["fov"].GetValue<float>();camera.FovAxis=CameraComponent.Axis.Horizontal;camera.CustomSize=new Vector2(1200,1200);
+  typeof(Scene).GetMethod("PreRender",flags,null,Type.EmptyTypes,null).Invoke(scene,null);
+  typeof(Scene).GetMethod("PreCameraRender",flags,null,Type.EmptyTypes,null).Invoke(scene,null);
+  update.Invoke(post,new object[]{camera});
+  var ddgiType=typeof(Scene).Assembly.GetType("Sandbox.DDGIVolumeSystem");
+  var get=typeof(Scene).GetMethods().Single(m=>m.Name=="GetSystem"&&m.IsGenericMethodDefinition&&m.GetParameters().Length==0);
+  var ddgi=get.MakeGenericMethod(ddgiType).Invoke(scene,null);ddgiType.GetMethod("MarkDirty",flags).Invoke(ddgi,null);ddgiType.GetMethod("UpdateVolumes",flags).Invoke(ddgi,null);
+  using var bitmap=new Bitmap(1200,1200);camera.RenderToBitmap(bitmap,false);
+  System.IO.File.WriteAllBytes(System.IO.Path.Combine(destination,name+".png"),bitmap.ToPng());
+  capture=new{Position=camera.WorldPosition.ToString(),Angles=camera.WorldRotation.Angles().ToString(),camera.FieldOfView,SourceSceneSha256=sourceHash,MainCameraIsViewport=ReferenceEquals(scene.Camera,camera),Material="materials/buildings/clay_pot.vmat",NativeScene=true};
+ }
+}
+finally
+{
+ using(scene.Push())
+ {
+  cameraProperty.SetValue(scene,main);camera.WorldPosition=pose.WorldPosition;camera.WorldRotation=pose.WorldRotation;camera.FieldOfView=pose.FieldOfView;camera.FovAxis=pose.FovAxis;camera.CustomSize=pose.CustomSize;
+  update.Invoke(post,new object[]{camera});
+  camera.AutoExposure.Enabled=exposure.Enabled;camera.AutoExposure.MinimumExposure=exposure.MinimumExposure;camera.AutoExposure.MaximumExposure=exposure.MaximumExposure;camera.AutoExposure.Compensation=exposure.Compensation;camera.AutoExposure.Rate=exposure.Rate;
+ }
+ var cameraRestored=camera.Serialize().ToJsonString()==serialized&&camera.WorldPosition==pose.WorldPosition&&camera.WorldRotation==pose.WorldRotation&&camera.FieldOfView==pose.FieldOfView&&camera.FovAxis==pose.FovAxis&&camera.CustomSize==pose.CustomSize&&ReferenceEquals(scene.Camera,main);
+ var toneRestored=tone.Serialize().ToJsonString()==toneBefore;
+ var statePreserved=ReferenceEquals(previous,Editor.SceneEditorSession.Active)&&Game.IsPlaying==playing&&Game.ActiveScene?.Id==game&&session.HasUnsavedChanges==dirty&&Hash(source)==sourceHash;
+ var objectsPreserved=scene.GetAllObjects(true).Select(o=>o.Id).ToHashSet().SetEquals(objects);
+ restoration=new{CameraRestored=cameraRestored,ToneRestored=toneRestored,EditorStatePreserved=statePreserved,ObjectsPreserved=objectsPreserved,InitialUnsavedState=dirty};
+ System.IO.File.WriteAllText(System.IO.Path.Combine(destination,name+"-restore.json"),System.Text.Json.JsonSerializer.Serialize(restoration));
+ if(!cameraRestored||!toneRestored||!statePreserved||!objectsPreserved)throw new InvalidOperationException("Capture restoration differs; inspect before continuing.");
+}
+var result=new{Capture=capture,Restoration=restoration};
+System.IO.File.WriteAllText(System.IO.Path.Combine(destination,name+"-camera.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

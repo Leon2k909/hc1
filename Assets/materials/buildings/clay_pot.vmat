@@ -1,14 +1,15 @@
-// Tools/building_textures.py
+// Tools/belltower_terracotta.py; dedicated pot finish
 "Layer0"
 {
-    shader "shaders/complex.shader"
+    shader "shaders/belltower_terracotta.shader"
     F_SPECULAR "1"
-    g_flRoughnessScaleFactor "1"
-    g_flMetalness "0.00"
-    TextureColor "materials/buildings/clay_pot_color.png"
-    TextureNormal "materials/buildings/render_normal.png"
-    TextureRoughness "materials/buildings/render_rough.png"
+    TextureColor "materials/belltower/terracotta-v1/clay-albedo-v1.png"
+    TextureNormal "materials/belltower/terracotta-v1/clay-normal-v1.png"
+    TextureRoughness "materials/belltower/terracotta-v1/clay-roughness-v1.png"
     TextureAmbientOcclusion "materials/default/default_ao.tga"
-    g_vColorTint "[1.0 1.0 1.0 1.0]"
-    g_flModelTintAmount "1.0"
+    g_flClayTileInches "12"
+    g_flClayNormalStrength "0.65"
+    g_flClayWeathering "0.7"
+    g_vColorTint "[0.82 0.86 0.87 1]"
+    g_flModelTintAmount "1"
 }

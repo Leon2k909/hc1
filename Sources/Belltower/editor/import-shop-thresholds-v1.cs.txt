@@ -1,0 +1,45 @@
+// Publish only the two shutter mesh imports. Preserve dirty scene documents.
+var root=Sandbox.Project.Current.GetRootPath();
+if(!string.Equals(System.IO.Path.GetFullPath(root).TrimEnd('\\','/'),@"C:\sbox-projects\hc1\forked-shooter-main",StringComparison.OrdinalIgnoreCase))throw new InvalidOperationException("Wrong checkout.");
+var directory=System.IO.Path.Combine(root,"output/belltower/shop-thresholds");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(directory,"stage-v1/manifest.json")));
+if(manifest["revision"].GetValue<string>()!="belltower-shop-thresholds-v1")throw new InvalidOperationException("Wrong revision.");
+var session=Editor.SceneEditorSession.Active;var playing=Game.IsPlaying;var game=Game.ActiveScene?.Id;var dirty=session.HasUnsavedChanges;
+var scenePath=System.IO.Path.Combine(root,"Assets/scenes/maps/Belltower/belltower.scene");
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+var sceneHash=Hash(scenePath);
+foreach(var group in new[]{"source_sha256","protected_sha256"})
+ foreach(var pair in manifest[group].AsObject())
+  if(Hash(System.IO.Path.Combine(root,pair.Key))!=pair.Value.GetValue<string>())throw new InvalidOperationException("Shared input changed: "+pair.Key);
+if(!System.IO.File.ReadAllText(System.IO.Path.Combine(root,"Tools/belltower_map.py")).Contains(manifest["generator_hook"].GetValue<string>(),StringComparison.Ordinal))throw new InvalidOperationException("Threshold generator hook changed.");
+var files=manifest["files"].AsObject();if(files.Count!=2)throw new InvalidOperationException("Expected exactly two shutter imports.");
+foreach(var pair in files)
+{
+ if(!System.Text.RegularExpressions.Regex.IsMatch(pair.Key,@"^Assets/models/maps/belltower/compiler-safe/(west/west_076|east/east_074)_roller_grey\.obj$"))throw new InvalidOperationException("Unexpected target.");
+ var item=pair.Value;var target=System.IO.Path.Combine(root,pair.Key);var staged=System.IO.Path.Combine(root,item["source"].GetValue<string>());
+ var before=item["before"].GetValue<string>();var after=item["after"].GetValue<string>();
+ if(Hash(staged)!=after||Hash(System.IO.Path.Combine(root,item["backup"].GetValue<string>()))!=before)throw new InvalidOperationException("Stage or backup changed.");
+ var current=Hash(target);if(current!=before&&current!=after)throw new InvalidOperationException("Shared shutter mesh changed.");
+ using(var input=System.IO.File.OpenRead(staged))
+ using(var digest=System.Security.Cryptography.IncrementalHash.CreateHash(System.Security.Cryptography.HashAlgorithmName.SHA256))
+ {
+  var remaining=item["original_bytes"].GetValue<long>();var buffer=new byte[65536];
+  while(remaining>0){var count=input.Read(buffer,0,(int)Math.Min(remaining,buffer.Length));if(count==0)throw new InvalidOperationException("Truncated original mesh.");digest.AppendData(buffer,0,count);remaining-=count;}
+  if(Convert.ToHexString(digest.GetHashAndReset()).ToLowerInvariant()!=before)throw new InvalidOperationException("Original geometry changed.");
+ }
+}
+var imported=new System.Collections.Generic.List<string>();
+foreach(var pair in files)
+{
+ var target=System.IO.Path.Combine(root,pair.Key);var item=pair.Value;
+ if(Hash(target)==item["after"].GetValue<string>())continue;
+ var incoming=target+".threshold-incoming";
+ try{System.IO.File.Copy(System.IO.Path.Combine(root,item["source"].GetValue<string>()),incoming,true);if(Hash(incoming)!=item["after"].GetValue<string>())throw new InvalidOperationException("Incoming hash differs.");System.IO.File.Move(incoming,target,true);imported.Add(pair.Key);}
+ finally{if(System.IO.File.Exists(incoming))System.IO.File.Delete(incoming);}
+ Editor.AssetSystem.RegisterFile(target);
+}
+var preserved=ReferenceEquals(session,Editor.SceneEditorSession.Active)&&playing==Game.IsPlaying&&game==Game.ActiveScene?.Id&&dirty==session.HasUnsavedChanges&&sceneHash==Hash(scenePath);
+var result=new{ImportedFiles=imported,Thresholds=manifest["thresholds"].GetValue<int>(),OriginalGeometryPreserved=true,CollisionPreserved=true,SceneSaved=false,EditorStatePreserved=preserved};
+System.IO.File.WriteAllText(System.IO.Path.Combine(directory,"native-import.json"),System.Text.Json.JsonSerializer.Serialize(result));
+if(!preserved)throw new InvalidOperationException("Editor state changed; inspect completed import.");
+return result;

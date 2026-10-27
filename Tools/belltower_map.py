@@ -575,6 +575,8 @@ def dress( model, wall, style, rng ):
                 slab_at( model, wall, o.r0, o.r1, -6.0, -1.0, o.z0, o.z0 + 24, trim )
             else:
                 pane( model, wall, o, roller, 4.0 )
+                # Close the unpaved four-inch recess beneath the shutter.
+                slab_at( model, wall, o.r0 - .25, o.r1 + .25, -4.5, .25, o.z0 - .75, o.z0 + .125, "ashlar_grey" )
                 slab_at( model, wall, o.r0, o.r1, -4.0, 4.0, o.z1 - 12, o.z1, "iron_black" )
             name = shop_name( style, glazed, key )
             canvas = style.get( "awning" )
@@ -2218,7 +2220,8 @@ def street_props( model, rng ):
             Detail.bistro_chair( model, ( e, n ), math.degrees( a ) + 180 + cafe.uniform( -12, 12 ) )
     for yaw, centre in ( ( 90, ( -150, 130 ) ), ( 45, ( -110, 240 ) ), ( 135, ( -110, 20 ) ) ):
         bench( model, centre, yaw, 70 )
-    for centre in ( ( -420, 330 ), ( -420, -150 ) ):
+    # Keep the northern square lamps beside the arcade's solid outer piers.
+    for centre in ( ( -420, 520 ), ( -420, -150 ) ):
         lamp_post( model, centre )
     # The spawn road: a cart, crates, barrels and a trough.
     cart( model, ( -2160, 1330 ), 96, load="sacks" )

@@ -1,0 +1,9 @@
+var material=Material.Load("materials/buildings/clay_pot.vmat");
+if(material is null||material.IsError)throw new InvalidOperationException("Pot material did not load.");
+var maps=new[]{"g_tColor","g_tNormal","g_tRma"}.Select(key=>
+{
+ var texture=material.GetTexture(key);
+ return new{Key=key,Valid=texture is not null&&!texture.IsError,Width=texture?.Width??0,Height=texture?.Height??0};
+}).ToArray();
+if(maps.Any(t=>!t.Valid||t.Width!=2048||t.Height!=2048))throw new InvalidOperationException("Unexpected compiled texture dimensions.");
+return new{MaterialValid=true,Textures=maps,SceneEdited=false};

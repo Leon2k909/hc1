@@ -1102,6 +1102,9 @@ def save_rgb( path, a ):
 def vmat( paint_name, texture, metalness ):
     if paint_name in SEE_THROUGH:
         return glass_vmat( paint_name, texture, SEE_THROUGH[paint_name] )
+    if paint_name == "clay_pot":
+        from belltower_terracotta import material as terracotta_material
+        return terracotta_material()
     generated_planks = paint_name == "planks" and ( OUT_DIR / "planks_color_v2.png" ).is_file()
     colour = f"{RESOURCE_DIR}/{paint_name}_color.png"
     normal = f"{RESOURCE_DIR}/{texture}_normal.png"
