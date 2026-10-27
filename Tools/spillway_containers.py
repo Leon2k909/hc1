@@ -28,7 +28,8 @@ REMAPS = {"lt_container_blue": "materials/lowtide/containers/lt_container_blue.v
           "rw_black": "materials/railhead/rw_black.vmat",
           "rw_container_code": "materials/railhead/rw_container_code.vmat",
           "rw_steel_dark": "materials/railhead/rw_steel_dark.vmat",
-          "rw_steel_grey": "materials/railhead/rw_steel_grey.vmat",
+          # The door locking bars: painted and weathered like the container's frame, not bare light grey.
+          "rw_steel_grey": "materials/lowtide/containers/lt_container_blue_frame.vmat",
           "rw_yellow_paint": "materials/railhead/rw_yellow_paint.vmat"}
 
 
@@ -53,6 +54,15 @@ def new_container(name, centre, colour, door_end):
     model = K.Model()
     LC.build(model, *centre, 0, size=SIZE, axis="e", paint=f"rw_container_{colour}",
              high_cube=HIGH_CUBE, door_end=door_end)
+    # The prop's code markings assume Railhead's frame handedness; un-mirror any that read backwards here.
+    for i, (points, normal) in enumerate(model.polygons.get("rw_container_code", [])):
+        uv = model.polygon_uvs.get(("rw_container_code", i))
+        if uv is None:
+            continue
+        right = np.cross(-np.asarray(normal, float), (0, 0, 1))
+        if np.dot(np.asarray(points[1]) - points[0], right) * (uv[1][0] - uv[0][0]) < 0:
+            us = [u for u, _ in uv]
+            model.polygon_uvs[("rw_container_code", i)] = [(min(us) + max(us) - u, t) for u, t in uv]
     # Railhead's hardware paints aren't in building_textures; give them its usual 48-inch tile.
     for paint in model.polygons:
         if paint not in BT.PAINTS:
