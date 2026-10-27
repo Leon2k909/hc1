@@ -164,3 +164,4 @@ This file is kept short on purpose. The full notes that used to live here (~900 
 - [Forest Base crown LODs (2026-10-20)](docs/notes/148-forest-base-crown-lods-2026-10-20.md) (0 KB)
 - [Native HC1 reconnection (2026-10-20)](docs/notes/149-native-hc1-reconnection-2026-10-20.md) (1 KB)
 - [Forest Base current native checks (2026-10-20)](docs/notes/150-forest-base-current-native-checks-2026-10-20.md) (31 KB)
+- [Crosshair settings preview (`CrosshairPreview`, 2026-10-27)](docs/notes/151-crosshair-settings-preview-crosshairpreview-2026-10-27.md) (1 KB)

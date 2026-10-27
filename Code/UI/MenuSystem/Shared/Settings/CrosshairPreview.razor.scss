@@ -1,0 +1,149 @@
+@import "/UI/Styles/Theme.scss";
+
+CrosshairPreview
+{
+    flex-direction: column;
+    gap: 6px;
+    width: 280px;
+    min-width: 280px;
+    flex-shrink: 0;
+    font-family: $main-font;
+
+    .pv-stage
+    {
+        position: relative;
+        width: 280px;
+        height: 200px;
+        border: 1px solid #ffffff1a;
+        border-radius: 2px;
+        overflow: hidden;
+        flex-shrink: 0;
+
+        &.bg-dark { background-color: #0d0f11; }
+        &.bg-grey { background-color: #5c6166; }
+        &.bg-light { background-color: #dfe3e6; }
+
+        // A sky over a sunlit wall and dirt: the bright and busy ground a crosshair has to read against in a match.
+        &.bg-outdoor
+        {
+            background-image: linear-gradient(to bottom, #9fbdd6 0%, #cfdbe3 46%, #a89a7c 46%, #8a7c5f 70%, #4d4636 100%);
+        }
+    }
+
+    .pv-layer
+    {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        pointer-events: none;
+        transform-origin: 50% 50%;
+    }
+
+    .pv-anchor
+    {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+    }
+
+    .pv-el
+    {
+        position: absolute;
+    }
+
+    // CrosshairHud's fixed Classic and Modern looks.
+    .classic
+    {
+        box-shadow: 0 0 9px rgba(255, 107, 53, 0.35);
+
+        &.v { background: linear-gradient(to bottom, #ff6b35, #ff8c42); }
+        &.h { background: linear-gradient(to right, #ff6b35, #ff8c42); }
+    }
+
+    .modern-ring
+    {
+        border: 2px solid #ff6b35;
+        box-shadow: 0 0 10px rgba(255, 107, 53, 0.4);
+    }
+
+    .modern-dot
+    {
+        background-color: #ff6b35;
+    }
+
+    .pv-note
+    {
+        position: absolute;
+        bottom: 8px;
+        left: 0;
+        right: 0;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 700;
+        color: #ffffffcc;
+        text-shadow: 0 1px 2px #000000cc;
+    }
+
+    .pv-tag
+    {
+        position: absolute;
+        top: 6px;
+        right: 8px;
+        font-size: 10px;
+        font-weight: 700;
+        color: #ffffffaa;
+        text-shadow: 0 1px 2px #000000cc;
+    }
+
+    .pv-row
+    {
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 5px;
+        flex-shrink: 0;
+    }
+
+    .pv-label
+    {
+        font-size: 11px;
+        font-weight: 700;
+        color: #9aa4af;
+        margin-right: 2px;
+    }
+
+    .pv-chip
+    {
+        padding: 4px 10px;
+        height: 24px;
+        min-width: 34px;
+        align-items: center;
+        justify-content: center;
+        border-radius: 2px;
+        border: 1px solid #ffffff1a;
+        background-color: #ffffff08;
+        color: #ffffffcc;
+        font-size: 11px;
+        font-weight: 600;
+        cursor: pointer;
+        pointer-events: all;
+
+        &.selected
+        {
+            border-color: #ff7a1a;
+            color: #ffffff;
+            background-color: #ff7a1a22;
+        }
+
+        &.accent
+        {
+            border-color: #ff7a1a44;
+            background-color: #ff7a1a22;
+            color: #ff963f;
+        }
+    }
+}
