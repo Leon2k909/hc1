@@ -1,0 +1,9300 @@
+# HC1 (Razed) — notes for Claude sessions
+
+## Editor connection
+- Active checkout on this workstation: `C:\sbox-projects\hc1\forked-shooter-main` (user direction, 2026-10-17).
+  Confirm the native editor's `Paths.ProjectRoot` matches this checkout before editing.
+- Use native s&box MCP (`sbox-cli --connect`) as the primary connection; see `AGENTS.md` for the workflow.
+- Native `bridge_helpers` exposes every registered Claude Bridge helper in process, including
+  read-only discovery and parameter inspection. Prefer the engine's dedicated tools for ordinary work.
+- `bridge_simulate_input` and `bridge_scatter_props` have explicit parameter schemas. Other helpers use
+  `bridge_describe_handler`, then `bridge_read` / `bridge_call`; their existing play-mode guards still apply.
+- The old `sbox_claude_bridge` MCP adapter remains available as a fallback. Use one route per operation.
+
+## Shared camera look (2026-10-17)
+- The gameplay camera (`Assets/prefabs/player/cameras/default_player_camera.prefab`) and Theater's camera
+  (`Assets/scenes/theater_playback.scene`) use native ACES. The extra camera `ColorAdjustments` is disabled.
+  A same-position native camera comparison rejected AgX plus the added grade: it crushed shadow detail and
+  pushed the brick colour too far. Keep map-authored white balance and grading as the starting point.
+- Fallback bloom is additive, strength 0.1 and threshold 1.6. Fallback AO uses radius 48, intensity 0.45,
+  falloff 0.9 and thin compensation 1; its quality and spatial denoising remain as authored. Vignette is 0.08.
+- The engine groups native effects by type: the camera selects the tonemapping mode, and subsequent map volumes
+  blend the numeric controls. Keep each map's exposure, fog, white balance, reflections and lighting authored in
+  its own scene/generator. These camera defaults do not replace the map volumes' numeric settings.
+- `CameraPostProcess.Copy` preserves component enabled state with an explicit include-disabled lookup and the
+  existing identity-safe serialization helper. `OpticZoom` and `ReconOctocopter` synchronize colour values while
+  their views are active, so runtime colour adjustments reach both views. The scope
+  also receives the main camera's sharpening; the drone receives its fallback vignette.
+- Spawn protection no longer changes screen colour: the blue `ScreenProtectionOverlay` and the camera's
+  protection-only saturation override were removed. Invulnerability and the timed "Spawn Protected" toast remain.
+- Offline verification is in `output/camera-look-20261017/`: the native preset JSON is valid, component IDs and
+  all camera/gameplay/UI content outside the look are preserved, and player/Theater profiles match. The full
+  `Code/razedtest.csproj` build passed with 0 errors and 83 warnings; none are in the changed C# files.
+- The follow-up native compile passed with zero errors (69 game warnings and 4 project-editor warnings, none in
+  the changed camera/HUD sources). `lowtide-camera-aces-neutral.png` and `lowtide-camera-agx-current.png` in the
+  audit folder compare the accepted and rejected profiles under the same map lighting and fog. These use a
+  temporary game camera and the native post-process builder; an ordinary editor viewport is not equivalent.
+  The temporary camera was removed. Full-match exposure transitions, scope/drone behaviour and GPU frame times
+  remain unmeasured. The comparison does not establish photorealism across every map.
+
+## Photographic map finish (2026-10-27)
+- `PhotographicResponse` adds restrained luminance contrast, highlight desaturation, peripheral lens softness,
+  subpixel radial colour separation and monochrome grain after native tone mapping and before the HUD. The shared
+  gameplay and Theater cameras use strength 0.65, local contrast 0.15, highlights 0.12, edge softness 0.18,
+  aberration 0.3 pixels at 1080p and grain 0.012. The central aiming region has no lens softness or separation.
+  It preserves the maps' existing ACES, exposure, white balance, bloom and fog. Strength zero skips its pass.
+- Recon feeds copy it using `CameraPostProcess.Copy`. Scope render targets do not receive another copy: the final
+  main-camera pass already covers the scope image. The shared camera prefab also serves spectators and Drone.
+- Ares now has one native DDGI volume, `Ares bounced lighting`: 11x23x5 probes, two lighting passes, intensity 0.65.
+  Its three textures are in `Assets/lighting/ares/photographic-v1/` and explicitly included by `.gitignore`.
+  `Tools/ares_lighting.py` and `Sources/Rendering/photographic-look-v1/ares-indirect-light.json` retain it on scene
+  regeneration. Rebake when facility geometry or lighting changes. No existing Ares scene object was edited.
+- `Sources/Rendering/photographic-look-v1/README.md` describes the implementation, native scripts and evidence.
+  Native comparisons cover Ares, Belltower, Lowtide, Veridant and Boxyard. Native profile loading, enabled/disabled
+  copy identity and shader/texture loading pass; game/editor compilation reports zero errors and no diagnostics in
+  the changed C# files. Full-match performance and multiplayer have not been benchmarked for this pass.
+
+## Map daylight profiles (2026-10-17)
+- The user wants different times of day across maps, with enough light for clear play. `Tools/map_daylight.py`
+  defines the saved environment profiles below. Each generator applies its profile after restoring its quality
+  state; Lowtide applies it at the end of `lowtide_finish.apply_scene`. Reapplication is idempotent.
+
+  | Map | Lighting mood |
+  | --- | --- |
+  | Belltower | Warm afternoon |
+  | Boxyard | Clear midday |
+  | Cerro Blanco | Clear late morning |
+  | Lowtide | Soft coastal daylight |
+  | Railhead | Early autumn afternoon |
+  | Riverdale | Golden morning |
+  | Orion | Bright golden hour |
+  | Veridant | Soft golden evening |
+  | Ares | Warm Martian light |
+
+- These are authored sky, fog and ambient-light settings. Baked maps retain the sun direction, direct light,
+  GI volumes and reflection resources that their bakes expect. Their existing interior exposure settings remain
+  in place. The profiles add no runtime component or per-frame work; the existing weather system uses them.
+- Boxyard has its own clear HDR sky, `materials/boxyard/sky/boxyard_midday.vmat`, with sun pitch 62/yaw -15.
+  `Tools/boxyard_sky.py` generates the matching 4096x2048 EXR and material into a staging directory; import the
+  reviewed files through the native editor. Regenerate this sky when its profile's sun direction or colour changes.
+- Orion's low sun and wet reflection cubes remain aligned. Ambient fill is slightly brighter, and map AO uses
+  intensity 0.65/radius 96 to retain tunnel and stair detail. Ares keeps its warm exterior and orange practical lights.
+- Native captures in `output/map-daylight-20261017/captures/` cover all nine profiles, with 14 views using the shared
+  player camera's ACES post-processing and settled exposure. `verification.json` compares the saved scenes to the
+  original C-drive documents and checks the generator hooks. Lowtide's independently added 56 downpipe colliders
+  are recorded separately and preserved; all earlier object identities and the lighting changes are retained.
+- `weather-restoration.json` verifies storm and fair-weather Apply/Restore against Lowtide's authored sky, sun,
+  fog and 11 reflection probes. Native compile status reports zero errors; all 11 changed Python sources compile.
+  These are scene and rendering checks, not a full multiplayer or GPU performance benchmark.
+
+## Iron sights: do not change the M4's AimOffset
+- `Assets/Weapons/M4A1/weapon_m4a1.prefab` → `ManualOffset.AimOffset` must stay `0,0,0`.
+  It was repeatedly "fixed" to `-4,0,-0.5` (believed to be upstream's value); that pushes the rear sight into the
+  camera and breaks ADS. `0,0,0` was verified in-game (front post centred in the rear aperture).
+- `Code/Weapons/IronSightCalibration.cs` holds the verified values and logs an error at runtime if a prefab drifts.
+  Only recalibrate after checking in-game, and update that table at the same time.
+- Magnified optics don't use this value: they use the optic's own `OpticAimOffset` (`.gnsmth` files).
+- A 1x sight's reticle is collimated, so its dot shows where the gun's rail points; each gun's
+  `ManualOffset.OpticAimAngleCorrection` turns the gun to put it on the centre (see Red dots on the bullet line). The
+  M4's is `0.328,-0.0004,0`, set by hand beside its `AimOffset`, which stays `0,0,0`.
+- Optic `OpticAimOffset`s are calibrated on the M4. Other weapons fitting M4 parts (the Kastovs) add
+  `ManualOffset.OpticAimCorrection`, generated by `Tools/kastov_prefabs.py` (`PREFABS[...].optic_aim_correction`),
+  so change it there, not in the prefab. Kastov 762: `4.084,0,-1.208` (verified in-game). Kastov-74u:
+  `3.162,0,-1.226`, PP-19-01 Vityaz: `1.728,0,-1.172` and RPK: `3.326,0,-1.426`, all derived from the 762's through
+  the guns' ADS poses and NOT yet checked in-game.
+- The Kastov-74u's, Vityaz's and RPK's iron-sight AimOffsets are `0,0,0` but unverified, so they aren't in
+  `IronSightCalibration` yet.
+
+## Kastov viewmodel pipeline (CoD MWII rips → HC1 arms)
+- Per-weapon config lives in `Tools/kastov_weapons.py`. Run `port_kastov.py`, `kastov_vmdl.py`, `kastov_animgraph.py`
+  and `kastov_prefabs.py` in that order, each with
+  `--weapon kastov762|kastov74u|vityaz|rpk|bizon|ak105|vepr12|m16|p90|mp7|aug|uzi|fal|famas|m18|mcx|l85a2|hk416|ak12|ak15|ak74m|spear|m16a2|rpk16`
+  (default kastov762). The 74u's, Vityaz's, RPK's, Bizon's, AK-105's, Vepr-12's, M16A4's, P90's, MP7A1's, AUG's, Uzi's,
+  FAL's, M18's, MCX's, L85A2's, HK416's, AK-12's, AK-15's, AK-74M's, MCX-SPEAR's, M16A2's and RPK-16's materials and sounds come first, from `Tools/ks74u_assets.py` /
+  `Tools/vityaz_assets.py` / `Tools/rpk_assets.py` / `Tools/bizon_assets.py` / `Tools/ak105_assets.py` /
+  `Tools/vepr12_assets.py` / `Tools/m16_assets.py` / `Tools/p90_assets.py` / `Tools/mp7_assets.py` /
+  `Tools/aug_assets.py` / `Tools/uzi_assets.py` / `Tools/fal_assets.py` / `Tools/p320_assets.py` /
+  `Tools/mcx_assets.py` / `Tools/l85a2_assets.py` / `Tools/hk416_assets.py` / `Tools/ak12_assets.py` / `Tools/ak15_assets.py` /
+  `Tools/ak74m_assets.py` / `Tools/spear_assets.py` / `Tools/m16a2_assets.py` / `Tools/rpk16_assets.py`.
+- ADS is the animgraph's float `ironsights_weight`, which `ViewModel` moves over `AimTime` and eases, so it turns
+  back from wherever it is. Don't go back to a selector on the `ironsights` enum: a Source 2 selector restarts its
+  blend from the full old pose, so spamming aim snapped the gun to the sights or the hip.
+- Firing while aimed: every gun's QC `fire` sequence blends `fire.smd` (the hip shot) into `fire_2.smd` (the aimed one)
+  by `aim_offset`, the MW base's ADS fraction. The port only had the hip clip, which the graph plays under the ADS
+  layer, so a hip clip that rolls the gun rocks the sights. `Weapon.ads_fire` (`"fire_2"`) exports the aimed clip as
+  `fire_ads`, and the graph's fire state blends the two by `ironsights_weight` (`fire_aim`, not looping, so the state
+  still finishes). The P90, the MP7A1, the AUG, the FAL, the M18, the MCX, the L85A2, the HK416 and the MCX-SPEAR have it so far. The 762's, 74u's, RPK's and
+  AK-105's fire clips don't move the gun (the AK-12, AK-15 and AK-74M play the AK-105's), and nor do the M16A4's and the Uzi's, which `Weapon.steady_fire` holds still
+  (see M16A4; the M16A2 plays the M16A4's, and the RPK-16 the RPK's), so don't give them `ads_fire`. The Vityaz's, Vepr-12's and Bizon's hip clips roll it (up to 2.6, 8.6 and 0.5
+  degrees), so they rock aimed until they get `ads_fire` and a rerun of `port_kastov.py`, `kastov_vmdl.py` and
+  `kastov_animgraph.py`.
+- The PP-19-01 Vityaz is MWII's Vaznev-9K (mg_iw9_aviktor, addon 3499492742) under its real name. It uses the 74u's
+  AK-74M-style folding stock and AK grip, like the real gun (the addon fits the 74u's stock). Its gameplay prefab is
+  generated (`kastov_prefabs.gameplay_vityaz`): 750 rpm, the rest of its 9mm values copied from `weapon_mp5.prefab`.
+- CoD's additive walk/sprint layers move the gun and arms separately (the game engine's IK keeps hands on the gun), so
+  `port_kastov.py` `pin_hands` IKs both wrists back onto `tag_sling` for layered clips; without it the hands let go
+  while sprinting. Authored clips (reload etc.) are left as animated.
+- All the guns sprint with the M4's sprint (`Weapon.m4_sprint`, `Kastov.m4_sprint`), which the user asked for so the
+  guns match. v_m4a1's `Shared_Sprint_Pose_delta` + `Shared_Sprint_delta` weapon_root motion moves the whole gun, and
+  the camera bone stays still. CoD's `a_sprint` runs the gun pointing straight ahead with a big sideways sway, and its
+  camera-bone motion shakes the view (HC1 adds the viewmodel camera bone to the view).
+- All the guns sway like the M4 when the view turns (`Tools/kastov_sway.py`). The user saw them hold dead still, where
+  the M4 swings and its hands move with it.
+  - The graphs blend 15 single-frame poses (`anims/sway.dmx`, `Kastov.m4_sway`), each a share of one of the M4's
+    `Shared_WeaponOffset_Generic_*` weapon_root poses. They're driven by `aim_yaw_inertia` / `aim_pitch_inertia`
+    (set by `ViewModel`), with the M4's blend values and springs: halved at the hip, a fifth of that in ADS.
+  - Then both arms are solved onto `ik_hand_L` / `ik_hand_R`: bones under tag_sling that hold each hand's pose in
+    every clip frame, so the IK changes nothing on the clips' own frames (`IK_TARGETS`, `IK_CHAINS`).
+  - The poses move only the gun. Don't sway the arms with additive layers of their own: those move in their own parent
+    spaces, so away from idle (reloading, drawing) the left hand came an inch or two off the magazine.
+  - Checked offscreen in the engine on 2026-09-28, with a SceneModel on the compiled model and graph: a hard flick
+    (`aim_yaw_inertia` -40 for 0.2 s) turns every gun 12.8 degrees at the hip (the M4 13.0) and 2.56 aimed. Both hands
+    stay within 0.01" of their grips, and the gun is back at rest 2 s later. Not yet checked in a match.
+  - Idle hand jitter (2026-10-13): the native two-bone solver repeatedly moved the AK-105's support hand up to
+    0.0067" between frames even with a stationary grip target; the clothing followed it exactly. `hand_ik_weight`
+    now bypasses IK only after two seconds without sway, movement, ADS changes, firing, reloads, sprint or lowering.
+    Blended clips still need IK: bypassing it during them moved some hands several inches. Held hip and ADS poses
+    are stable without it. All 24 graphs compile and pass offscreen idle and action-transition checks; live settled
+    AK-105 jumps fell to 0.00003". Reports and reproducible native scripts are in `output/hand-jitter/`.
+- After a pipeline run changes many files at once, the editor's file watcher can miss some. Then a new DMX isn't
+  registered (an endless on-demand recompile, "file stopped existing"), a vmdl fails with "Unknown bone 'ik_hand_L'",
+  the compiled model silently keeps old animations (the P90's and MP7's did), or a new gun's model gets no compiled
+  file and loads as an error model, so its first-person gun is invisible (the FAL's did, after an on-demand recompile
+  for "Invalid Dependency Information"). Register the gun's DMX (`recompile_asset` each, or
+  `Editor.AssetSystem.RegisterFile` them all in one `execute_csharp`), then recompile its vmdl and vanmgrph.
+- `Weapon.moved_bones` moves a rig bone the addon left where the real gun has nothing (name -> parent and local offset,
+  keeping its own turn). The L85A2's rig had `tag_brass` in the handguard, under the bore, so cases came out of it.
+- `Weapon.part_mounts` places a part's model on a rig bone (bone and offset along it), as the MW base draws a
+  VElement, for a part whose vertices don't sit where it fits: the HK416's Tarkov stocks.
+- `Weapon.part_moves` moves a piece of a part's mesh that stands where the real gun's doesn't (mesh path -> boxes and
+  offsets: each connected piece whose bounds lie inside a box moves, `port_kastov.move_pieces`). The M16A4's front sight
+  post screws down 0.104 into its base this way (see M16A4).
+- A ported gun's viewmodel prefab plays its model's own graph (`AnimationGraph` null; the vmdl names
+  `v_<gun>.vanmgrph`). `kastov_prefabs.viewmodel_prefab` copies `vm_m4a1.prefab`, which is pinned to the M4's
+  decompiled graph (see s&box 26.10.02), and until 2026-10-09 it kept that pin. So the L85A2, HK416, AK-12, AK-15 and
+  AK-74M played the M4's graph, whose clips their models don't have: the gun sat 216 units behind the camera, and the
+  user saw no gun in their hands (the AK-12, 2026-10-09). Checked offscreen after the fix: each holds its gun where
+  the AK-105 does (the AK-12's `tag_sling` 4.4 ahead of the camera). Not yet seen in a match.
+- `weapon_kastov74u.prefab` holds another session's hand-tuned gameplay values and sounds, so the prefab script only
+  patches its DeploySound, aim offsets and OpticAimCorrection (`Prefabs.gameplay=None`). The 762's, Vityaz's,
+  RPK's, Bizon's, AK-105's, Vepr-12's, M16A4's, P90's, MP7A1's, AUG's, Uzi's, FAL's, M18's, MCX's, L85A2's, HK416's,
+  AK-12's, AK-15's, AK-74M's, MCX-SPEAR's, M16A2's and RPK-16's weapon prefabs are fully generated.
+- The obj/mtl files in `Assets/Weapons/Kastov74u/models` are unused: `w_kastov74u.vmdl` now comes from the pipeline
+  so the gunsmith's attachments mount on the world model.
+- The 74u's stocks, pistol grips and magazines are bodygroups (`Weapon.part_choices`, choice 0 = factory part).
+  `kastov_prefabs.py` writes one part per other choice to `Assets/gunsmith/kastov74u/` (names and recoil scales in
+  `PARTS_74U`). New part materials go in `Tools/ks74u_assets.py` (run with `--materials-only`). Barrels are left out
+  because each one moves the left hand, which the ported clips can't do.
+- The Vityaz does the same (`PARTS_VITYAZ`, `Assets/gunsmith/vityaz/`): the addon's stocks (the 74u's plus the 74u's
+  own, the AKS-74U Folding Stock), grips, 45-round mag and the Long Barrel. Recoil scales are relative to its factory
+  polymer folding stock. Its materials, including those shared with the 74u (`vityaz_assets.SHARED_MATERIALS`), are in
+  `Tools/vityaz_assets.py`. The addon's other barrel is left out because it moves the left hand.
+- The long barrel is a Barrel-slot part with `GunsmithPart.MuzzleShift` (`Part.muzzle_shift`). Muzzle devices
+  (`GunsmithMw22Attachment.RefreshMount`) and discharge effects (`WeaponModel.DischargeMuzzle`) move by that shift.
+  Its brake is a muzzle_tip choice (`Weapon.tip_choices`): choices are on, the long barrel's tip, then off. Where
+  several slots set a bodygroup through `FittedBodygroups` / `Prefabs.part_slot_bodygroups`, the highest choice wins,
+  so a muzzle device (2) hides both brakes and the long barrel on its own shows its brake (1).
+  - A barrel with a flash hider of its own that's shorter than the factory one (the FAL's 18-inch Barrel) also sets
+    `GunsmithPart.TipShift` (`Part.tip_shift`): how much further back than MuzzleShift its bare muzzle is. Devices
+    still mount at MuzzleShift, and with no device fitted the discharge effects leave from MuzzleShift plus TipShift
+    (`GunsmithAttachmentPoint.DischargeShift`).
+  - A barrel's length changes where damage falls off, by the muzzle energy it gives (`Part.falloff`,
+    `GunsmithPart.DamageFalloffScale`), but not `MuzzleVelocity`, so bullet drop stays the factory barrel's.
+    `GunsmithAttachmentEffects` reads a scale of 0 as 1, since a hotload leaves a new field at 0.
+- `default_mesh_groups` is the models' `Model.Parts.DefaultMask`: one bit per bodygroup choice in vmdl order, then
+  the base mesh; the default sets each group's choice 0 plus the base (762 = 341, 74u = 605028693,
+  Vityaz = 22036489, RPK = 2363477, Bizon = 2129941, AK-105 = 285343829, Vepr-12 = 37814293, M16A4 = 341,
+  P90 = 21 (by that rule, not yet read from its compiled model), MP7A1 = 85, AUG = 85, Uzi = 1173, FAL = 174761,
+  M18 = 145, MCX = 341 (also by the rule), L85A2 = 85, HK416 = 74069, AK-12 = 135189, AK-15 = 36885 (by the rule), MCX-SPEAR = 341 (by the rule), M16A2 = 5 (by the rule), RPK-16 = 135189 (by the rule) and AK-74M =
+  553713749 (read from its compiled models)).
+  After changing any bodygroup, re-read it from the compiled model. An empty choice (a rail's or a folded sight's
+  "off") still has its bit in the default, but the Parts API gives it mask 0, so setting each group's choice 0 with
+  `SetBodyGroup` leaves those bits out (the FAL's 174209). It draws the same gun.
+
+## RPK (MWII's RPK, mg_iw9_rkilo, addon 3499492742)
+- The real 7.62x39 RPK LMG (category LMG, 3 spare mags): 600 rpm and the Kastov 762's shot sounds
+  (`kastov_prefabs.gameplay_rpk`). The factory magazine is MWII's 75-round drum; its parts (`PARTS_RPK`,
+  `Assets/gunsmith/rpk/`) are the RPK's own 40-round box mag, the AKM's 30, and the AK-platform stocks and grips.
+  Recoil scales are relative to its wooden club-foot stock. Left out: the 100-round drum and the other barrels.
+- CoD's `ads_in` leaves the RPK's camera pitched and rolled, with the front post 0.8 deg under the aim point, so
+  `kastov_weapons.RPK.aim` levels it on the post's top. That was checked in a render, not in-game.
+- Its weight effects are real-world figures, sourced in `gameplay_rpk` and `kastov_weapons.RPK`, not balance knobs:
+  - It keeps the rifles' SpeedPenalty 40, plus `Equipment.WeightSlowdown` 0.03 for the extra 3 kg (all gaits 3% slower).
+  - Aiming in takes 0.3 s (`Weapon.ads_time`, written to the viewmodel prefab's `ViewModel.AimTime`) instead of the
+    rifles' 0.25 s.
+  - `BarrelHeat`: per-shot heating and Newton cooling. Past ~200 C above the air there's a small heat dispersion, and a
+    chambered round cooks off at ~410 C, which takes ~280 rounds of nonstop fire.
+  - No extra sprint-to-fire delay. In real life the weight shows up as a slower mount, which ads_time already covers,
+    and a second penalty would count it twice. The user wants it left out.
+- HC1's hand is thicker than CoD's, so on the RPK's wooden handguard the palm heel and thumb sank 0.39" in.
+  `Weapon.left_grip` (`GripFit`) moves the left arm out and opens the fingers while the hand is on its grip, fading
+  out when it leaves (`port_kastov.GRIP_FADE`, reloads). Tune it by skinning the arms against the gun mesh and counting
+  hand vertices inside it (the verified 762 has 52, at most 0.10" deep).
+- Magazines with their own reload animations: `Weapon.reload_variants` (`_mag`, `_xmag`) ports `reload<suffix>` and
+  `reload_empty<suffix>`, and the animgraph picks them by the enum `reload_variant` (0 = the weapon's own). A
+  magazine part sets `GunsmithPart.ReloadAnimation` (1-based index into reload_variants) plus its own
+  ReloadTime / EmptyReloadTime / ReloadSounds / EmptyReloadSounds (`Part.reload_variant`, `Part.reload_times`;
+  sounds from `rpk_assets.json` "reloads"). `Equipment.ReloadMagazine` hands it to `Reloadable` and `ViewModel`.
+- The shot it shares with the Kastov 762 is voiced away from CoD's sound design (`Tools/kastov762_shot.py` on
+  `shot_voicing.py`, 2026-09-30), like the AK-105's and M16A4's. The user asked that each gun worked on gets some of
+  its CoD sounds, shot or reload, moved towards the real thing.
+  - The rip is MW2019's AK-47 close shot mixed with CoD's "atmosphere" layer. That layer opens with a 45-180 Hz boom
+    as loud as the blast's midrange, then washes out over 4.7 s like a hall. Under the close shot a designed rumble
+    under 150 Hz runs on for a second.
+  - Now it's the close shots alone:
+    - 2% lower, for the 7.62's heavier report;
+    - a 40 Hz high-pass, and under 130 Hz eased 6 dB after the first 40 ms;
+    - the rip's own sound eased 10 dB from 110 ms, after the bolt carrier's clack at ~92 ms, which stays;
+    - 1.5-5 kHz up 2 dB for 20 ms, and the ground at 7.1 ms;
+    - echoes from 35 ms to 1.4 s, as on the other voiced rifles.
+  - Loudness is within 0.1 dB of the old shot's. The tail is -32.5 dB 0.4 s after the loudest 100 ms (the rip's was
+    -22).
+  - Four takes (`kastov_shot_01-04.wav`, 04 new), pitch spread 0.98-1.02. The suppressed shots are voiced from the
+    same settings (see The ported guns' sounds).
+  - `kastov_sounds.py` builds the shot through it. `--preview <wav>` plays the old and new shots; the old WAVs and
+    event are in `Backups/kastov762_shot_rip/`.
+- Its reload foley is voiced too (`Tools/rpk_foley.py` on `Tools/foley_voicing.py`, 2026-09-30).
+  - As ripped, the drum going in and the bolt being charged were louder than the shot (loudest 100 ms -1.2 and -1.6 dB
+    against -4.7). The drum's seating was clipped flat for 50 ms at a time, and the draw and the gun's return to the
+    shoulder boomed at 45-90 Hz.
+  - Now:
+    - a 90 Hz high-pass, which takes the booms 17-20 dB down;
+    - the moves' lows under 250 Hz eased 6 dB;
+    - one gain for the whole set (-19.5 dB), so the loudest clack is 16 dB under the shot and the rip's balance between
+      the files stays.
+  - The level comes from rough real figures at the ear (a shot ~137 dB(A) over 100 ms, a reload's loudest clack ~100,
+    a walking footstep ~63), squeezed the way the game's mix squeezes the shot-to-footstep gap (74 dB to 32).
+    `foley_voicing`'s docstring has it.
+  - The 30-round magazine used the 74u's events. It now has its own voiced copies (`rpk.ak_*`, `rpk_assets.own_name`),
+    and `att_vm_p04_ar_akilo_mag_v0.gnsmth` points at them, as `kastov_prefabs.py` would write it. The 74u's own
+    sounds are unchanged.
+  - The other ported guns' reloads were voiced the same way afterwards (see The ported guns' sounds). Only the
+    Kastov-74u's are still at CoD's level.
+  - `rpk_assets.py --sounds-only` rebuilds the sounds without the materials. `rpk_foley.py --preview <wav>` plays the
+    shot and both drum reloads, before and after. The ripped WAVs are in `Backups/rpk_foley_rip/`.
+- Both were made offline: the WAVs, the new events and the part need compiling, and none of it has been heard
+  in-game.
+
+## PP-19 Bizon (MWII's "Minibak", mg_iw9_beta, addon 3499492742)
+- The real 9x18 Makarov Bizon (category SMG) under its real name: the 64-round helical mag, 680 rpm, auto and semi,
+  57-N-181S ball at 320 m/s from its 230 mm barrel, modelled as S&B's 95 gr FMJ (G1 0.122), sights 51 mm over the bore,
+  zero 100 m (`kastov_prefabs.gameplay_bizon`). Damage, falloff, recoil pattern and move speed are the Vityaz's (the
+  MP5's), even though 9x18 is a bit weaker than 9x19. The recoil scale (0.43,2.6) is the Vityaz's scaled by free recoil.
+- Its materials and sounds are from `Tools/bizon_assets.py`: its own shots (levelled -4 dB to match the Vityaz's) and
+  reload foley at the viewmodel QC's event frames. The stocks and grips (`PARTS_BIZON`, `Assets/gunsmith/bizon/`) are
+  the AK-platform parts, with the 74u's materials; the factory stock is the 74u's, so their recoil scales are the 74u's.
+- It has no Underbarrel slot (the helical mag sits where a grip would go), so `make_parts_eligible` skips the
+  categories a gun has no slot for. The CoD-only barrels are left out.
+- Optic `OpticAimCorrection` `2.554,0,-1.353` is derived, NOT checked in-game: the 762's verified correction minus how
+  far the Bizon's optic slot sits from the 762's in camera space at the ADS pose
+  (inv(cam_ads) · sling_ads · inv(sling_bind) · inv(world frame) · slot). That formula gives the 74u's, Vityaz's and
+  RPK's values exactly. The iron sights were checked in a render (post centred in the notch), not in-game, and the
+  left hand on the helical mag has no `GripFit`.
+
+## AK-105 (MWII's "Kastov 545", mg_iw9_akilo105, addon 3499492742)
+- The real 5.45x39 AK-105 carbine under its real name, all figures from the AK-102/104/105 manual
+  (`kastov_prefabs.gameplay_ak105`): 600 rpm, auto and semi, 30-round mag, 7N6 at 840 m/s from the 314 mm barrel
+  (G7 0.157), front post 48.5 mm over the bore, zero 300 m (sight 3 hitting 16 cm high at 100 m). At 3.5 kg loaded
+  it weighs what the M4 does: SpeedPenalty 40, no WeightSlowdown, 0.25 s ADS. Damage and falloff are the M4's 5.56
+  ones, like the 74u's. The recoil scale (1.54,3.85) is the M4's (2,5) scaled by free recoil (1.43 against 1.86 m/s).
+- Materials and sounds are from `Tools/ak105_assets.py`: its own shot and suppressed shots (-3 dB, to the 74u's level)
+  and reload foley at the viewmodel QC's event frames.
+- Its shot is voiced away from CoD's sound design (`Tools/ak105_shot.py`, 2026-09-29). The user asked for one gun's
+  sound to be "more realistic and different from cod", slightly, then for another gun's (see M16A4). The steps are
+  `Tools/shot_voicing.py`'s, shared by both guns, with each gun's settings (a `Voicing`) and findings in its own script.
+  - The rip's shot is designed: a 27 Hz sub drop ringing 300 ms under the blast, clipped almost square, and dry.
+  - Now: 3% higher; a 40 Hz high-pass, and the thump under 110 Hz eased 5 dB after the first 35 ms; the blast's
+    1.5-5 kHz up 4 dB for its first 25 ms; a ground reflection; and echoes from 35 ms to 1.4 s, different in each ear.
+  - The tail sits where the M16A4's and AUG's do (-33 dB 0.4 s after the loudest 100 ms). Loudness matches the old
+    shot's within 0.2 dB (K-weighted, loudest 100 ms), through a soft clipper, since the limiter alone ducked the blast.
+  - The two recordings make four takes (`ak105_shot_01-04.wav`), and the event's pitch spread is 0.98-1.02.
+  - The suppressed shots are voiced from the same settings (see The ported guns' sounds).
+  - `--preview <wav>` writes the old and new shots and eight-round bursts. The old WAVs and event are in
+    `Backups/ak105_shot_rip/`.
+  - Made with the editor closed: the WAVs and `ak105.fire.sound` need compiling (03 and 04 are new), and it hasn't
+    been heard in-game.
+- Parts (`PARTS_AK105`, `Assets/gunsmith/ak105/`): the AK-platform stocks and grips, with the 74u's materials, and the 20-,
+  RPK-74 45- and four-column 60-round mags, each with its own reloads (`reload_variants` `_smag`, `_xmag`, `_xmaglrg`;
+  the rip names the 60's empty reload `reload_xmaglrg_empty`, which `port_kastov.clips` falls back to). Reload times
+  are when the gun is level again: 2.3/2.6 s for the factory 30, then 2.05/2.3, 2.4/2.75 and 2.5/2.8. Stock recoil is
+  relative to its factory stock, the AK-74M's side-folder (the Polymer Folding Stock part).
+- The folding stock's hinge block is its own bodygroup (`stock_hinge`, shown by default). The Wooden and Thumbhole
+  stocks hide it through `Part.bodygroups`, as the addon's do (`tag_stock_hinge`).
+- The left hand holds the handguard through MW's grip pose (`Weapon.grip_pose`): the barrel's
+  `a_delta_barhvyshort_additive_for_offset` minus its corrective, layered on while the hand is on its grip, with
+  GRIP_FADE's fade (`Kastov.with_grip_pose`). It needs no `GripFit`: the idle left hand sinks 54 vertices, at most
+  0.10", like the verified 762's.
+- Optics sit on the rail mount (`optic_rail`, shown only under an optic). Its `OpticAimCorrection` `3.18,0,-1.269` is
+  derived with the Bizon's formula, NOT checked in-game. The iron sights (ads_in's last frame, post centred in the
+  U-notch) were checked in a render, not in-game.
+
+## Vepr-12 (MWII's "KV Broadside", mg_iw9_vecho, addon 3499492742)
+- The real Molot Vepr-12 (category Shotgun) under its real name: a semi-automatic 12-gauge on the RPK's receiver, here
+  the short VPO-205-03 (its barrel measures ~305 mm in the model). Its figures are in `kastov_prefabs.gameplay_vepr12`:
+  - 2 3/4" 00 buckshot: nine 8.4 mm, 3.49 g pellets at 365 m/s (Ballistics.cs's sphere table, BC 0.071). The sights sit
+    48.7 mm over the bore, zeroed at 25 m like the other buckshot guns.
+  - Semi only, capped at 450 rpm: the action's cycle rate. That's the figure quoted for full-auto Saiga-12
+    conversions, not checked against a source.
+  - The pattern is a cylinder bore's ~49 cm at 25 yd: BulletSpread 0.026, because Shootable's spread puts nine pellets
+    0.82 x BulletSpread apart on average.
+  - Falloff follows the pellets' kinetic energy along their path (`BUCKSHOT_FALLOFF`, from the sphere model): 68% at
+    25 m, 49% at 50 m, 29% at 100 m and 11% at 200 m, where they stop (MaxRange).
+  - The damage per pellet (8) and the shot effects are the Spaghelli's (`Gameplay.borrow`).
+  - It weighs 4.2 kg, 4.8 kg loaded. By the RPK's scaling against the AKM's 3.75 kg that gives WeightSlowdown 0.01 and
+    0.27 s ADS. The recoil scale (3,7.6) is the M4's (2,5) scaled by free recoil (~2.8 against 1.86 m/s).
+- Materials and sounds are from `Tools/vepr12_assets.py`: its own shot (-5 dB, to the Kastovs' level) and reload foley
+  at the viewmodel QC's event frames. It has no suppressed shot.
+- It was ported with CoD's markings still on: "Verdansk Arms Factory" and "Made in Kastovia" on the receiver, "First
+  Signal Solutions" and FSS on the drum, a maker's emblem on the 12-round mag and "CORVUS DEF" on the shells.
+  `Tools/texture_markings/specs/vepr12.json` takes them off (the drum's ring lettering and the headstamps as `ring`
+  regions), checked in before/after renders on 2026-09-28.
+- Parts (`PARTS_VEPR12`, `Assets/gunsmith/vepr12/`):
+  - The AK-platform stocks and grips, with the 74u's materials. Stock recoil is relative to its factory strut stock.
+  - Its own 12-round mag and 25-round drum, each with its own reloads (`reload_variants` `_xmag`, `_drummag`). Reload
+    times are when the left hand is back on the grip (the clips' grip-pose events): 2.3/2.87 s for the factory 8, then
+    2.67/3.27 and 3.17/4.2.
+  - Left out: CoD's barrels, bolts and conversions, and the grips and launcher that move the left hand.
+  - `GunsmithPart` has no weight or ADS time, so the bigger mags only slow the reloads. CoD also slows ADS with them
+    (x1/0.9 and x1/0.75).
+- Slots: Optic on the dust cover's rail, Underbarrel on the handguard's bottom rail and Laser on its right-side rail
+  (the `laser_rail` bodygroup, shown only under a laser). There's no Muzzle slot, because the M4's devices are 5.56
+  ones, so the brake always shows.
+- Its `OpticAimCorrection` `3.396,0,-1.26` is derived with the Bizon's formula, NOT checked in-game. The iron sights
+  (ads_in's last frame, post centred in the notch) were checked in a render, not in-game.
+- No `GripFit`. The idle left hand has 303 vertices inside the handguard, but they're at most 0.23" deep (mean 0.06"),
+  which is about where the RPK's fit left it (85, 0.21"). None of it shows from the camera at the hip or aiming. The
+  best fit found (shift `0,0.15,-0.25`, fingers 0.35, thumb 0.3) only got to 86 at 0.19", and it put a fingertip
+  beside the handguard in the ADS view.
+- The drum clips the left forearm (36 vertices, ~0.87" deep): its lua sets `grip_bartac_offset`, which isn't ported.
+  The clash is below the view in idle, ADS, walk, sprint, draw and fire.
+- Bots don't use it: shotguns aren't in their pool (`LightweightCombatBot.CategoryShare`). None of it has been checked
+  in-game yet.
+
+## M16A4 (MWII's M16, mg_iw9_mike16, easy4115's addon 2962304029)
+- The real 5.56x45 M16A4 (category AssaultRifle), through the Kastov pipeline from a separate addon
+  (`extracted/2962304029`, decompiled to `decompiled/mike16`). The user asked for a real gun from the CoD packs, not a
+  made-up one. Its figures are in `kastov_prefabs.gameplay_m16`:
+  - Semi-automatic and three-round burst, no automatic, at 800 rpm cyclic (the middle of the M16's 700-900).
+  - The M4's M855 round (damage 20, falloff and recoil pattern) from the 20-inch barrel: 945 m/s, G7 0.151. The sights
+    sit 68.5 mm over the bore (the eye height at ADS, through the carry handle's aperture), zeroed at 300 m.
+  - About 4.0 kg loaded, 0.6 kg over the M4: SpeedPenalty 40, no WeightSlowdown, 0.25 s ADS. The recoil scale
+    (1.78,4.44) is the M4's (2,5) scaled by free recoil (~1.65 against 1.86 m/s).
+  - Reload times are when the gun is level again: 2.3 s, 2.4 s empty.
+- Burst (`Shootable.OnInputUpdate`): a trigger pull fires one whole burst, and holding the trigger fires no more, as in
+  semi. A burst also ends when the magazine runs dry. `BurstEndDelay` is 0, so the next pull can follow at the cyclic
+  rate. The real gun's non-resetting burst cam isn't modelled, and letting go doesn't cut a burst short. The AK-12's
+  two-round burst works the same way (see AK-12). With a gun that has no automatic, bots fire at most `BurstAmount` rounds a pull
+  (`LightweightCombatBot._roundsPerPull`) instead of their 3-7 round strings.
+- Materials and sounds are from `Tools/m16_assets.py`: the M16's own receiver, carry handle, barrel, handguard, rails
+  and stock, plus the MWII M4 flash hider, pistol grip, 30-round magazine (with a see-through window) and rounds that
+  the addon ships. The shots are MWII's M4 recordings, levelled to the AK-105's (-3 dB, suppressed -10 dB). Reload
+  foley plays at the viewmodel QC's event frames.
+- Its shot is voiced away from CoD's sound design like the AK-105's (`Tools/m16_shot.py` on `Tools/shot_voicing.py`,
+  2026-09-29). The user asked for another gun after the AK-105. The script's docstring has each step and why.
+  - The rip is a carbine's shot mastered for a game: a 48 Hz boom for 200 ms, a rumble under 200 Hz running on for the
+    whole second, lows as loud as the blast's midrange, and its first 83 ms clipped flat. The clipping stays: the codec
+    smeared the plateaus, and fitting curves across them left them flat.
+  - Now: 2% higher (a 20-inch barrel's lower muzzle pressure gives a shorter blast); a 45 Hz high-pass, and under 140 Hz
+    eased 6 dB after the first 25 ms; the rip's own sound eased 12 dB from 80 ms to 200 ms (`Voicing.rip_tail_db`), so
+    its designed tail gives way to the echoes; 1.5-6 kHz up 3 dB for the first 20 ms; the ground 6.8 ms after the
+    direct sound (the muzzle 0.75 m ahead of the ear); echoes from 35 ms to 1.4 s, as the AK-105's.
+  - The tail is where the rip's was (-32.7 dB 0.4 s after the loudest 100 ms, against -32.5), but it's echoes, not a
+    low rumble. Loudness matches the old shot's within 0.1 dB.
+  - Four takes (`m16_shot_01-04.wav`), pitch spread 0.98-1.02 (was 0.96-1.04). The suppressed shots are voiced from
+    the same settings (see The ported guns' sounds).
+  - `--preview <wav>` writes the old and new shots and three three-round bursts each. The old WAVs and event are in
+    `Backups/m16_shot_rip/`.
+  - Made with the editor closed: the WAVs and `m16.fire.sound` need compiling (03 and 04 are new), and it hasn't been
+    heard in-game.
+- A part mesh path ending in `#bone,bone` keeps only the triangles on those bones, and `#!bone,bone` only the rest
+  (`port_kastov.part_triangles`). CoD hides the rail cover by its bone (`tag_grip_hide`), and the magazine's rounds are
+  one mesh with the clips' loose round (`j_ammo_31`). `Weapon.unmerged_bones` places the barrel's `tag_grip_hide` by
+  the part's own reference pose: bone-merged onto the rig's (5.7 back, 1.7 higher), it lifted the cover into the
+  handguard.
+- Bodygroups:
+  - `muzzle_tip`: the birdcage flash hider, hidden under a muzzle device.
+  - `laser_rail`: a rail section on the handguard's right side, shown only under a laser.
+  - `carry_handle`: with the rear sight. An optic takes it off, as on the real flat-top.
+  - `factory_front_sight`: the front sight post, on the barrel's fixed front sight base. It stays up under an optic,
+    as on the real M16A4, and the optics co-witness with it (`ManualOffset.OpticSightLines`, below). An optic briefly
+    took it off, because the dot sat low between the post's ears (the user: "it has the red dot inside of the front
+    ironsight"), and the user turned that down: "it should be realistic rather than removing the front post". A
+    replacement barrel takes the post off, and the barrel's own front sight folds under an optic
+    (`GunsmithMw22Attachment.RefreshMount`).
+  - `grip_cover`: the bottom rail's front cover, which a grip takes off.
+- The left hand holds the four-rail handguard through the grip pose `a_delta_grip_barmidhvy_additive_for_offset`, the
+  mid-length heavy barrel's (the QC's `grip_barmidhvy_offset`), made for a thick handguard: the palm on its left side,
+  the thumb over the top and the fingers under it.
+  - The factory barrel's lua asks for `grip_vertpro_offset`, which is a QC `$sequence` name: the QC plays the vertshort
+    clip there, which holds a short vertical grip. With it the hand closed on air 2.3" under the handguard (the user:
+    "im not holding it correctly"). Look a grip sequence's clip up in the QC; don't go by its name. The vertpro clip
+    itself also moves `tag_pistolgrip_attach`, which shifted every world point by (-4.4,0,2.4).
+  - The grip pose moves only the left arm: the gun, the camera and the right hand are where they were, so the aim and
+    the optic correction stand.
+  - No `GripFit`: the idle left hand has 121 vertices inside the handguard, at most 0.09" deep (the verified 762's 52
+    go 0.10").
+- The fire clip is `Weapon.steady_fire` (`Kastov.steady_fire`): the addon's first 15 frames with the gun and arms held
+  in the idle pose, so only the bolt, dust cover, trigger and trigger finger play, as in the Kastovs' own clips, and
+  HC1's recoil does the kick.
+  - The addon's clip rocked the gun 0.2" each way sideways and 2.5 degrees about the bore, settling over 1.4 s, and
+    every shot started it again, at the hip and aimed (the user: "too much moving horizontally its like bouncy").
+  - Its aimed clip, `fire_2`, still turns the gun 0.78 degrees, so the M16A4 doesn't take `ads_fire`.
+  - The fire state now lasts 0.5 s instead of 1.7 s, so a sprint straight after a shot animates sooner.
+- Its walk sway measured the same as the AK-105's and the 762's, so it was left alone.
+- No parts of its own: it takes the M4's MWII parts (56 made eligible: optics, muzzle devices, grips, lasers and tracer
+  rounds) in Optic, Muzzle, Underbarrel and Laser slots. The addon's M16 20-round magazine, and the M4 stocks, grips,
+  magazines and barrels it ships, aren't ported.
+- The hold and the steady fire clip were checked in renders of the compiled model on 2026-09-28: the muzzle and the
+  camera bone didn't move through a hip shot or an aimed one.
+- The iron sights were checked in a render (ads_in's last frame), not in-game. The addon's aim put the sight line 0.113
+  above the camera, with the front post 0.32 deg over the aim point and low in the rear aperture. `kastov_weapons.M16.aim`
+  lowers the gun onto the line through the aperture's centre and the post's top.
+- The front sight post stood 1.514" over the flat-top's rail, 0.104" taller than an AR's iron sight line: 1.41" over
+  the rail is the absolute co-witness height red dot mounts are made to (SIG's ROMEO8T manual; Scalarworks' LEAP/01 and
+  fixed front sight, 1.42). Since 2026-10-19 it screws down into its sight base (`Weapon.part_moves` on `sighton.smd`),
+  its tip 1.418" over the rail, and the base's ears stand over it as on a real A2 base.
+  - The aim turns the gun 0.293 degrees nose up about the rear aperture (4.2 ahead of the eye), so the lower tip is back
+    on the aim point: `aim` pitch -0.235 (was 0.058), z 0.003 (was 0.022). The arm retarget is built at that pose, so
+    every clip's arms turn with it (about 0.02" at the fingertips).
+  - Solved from the meshes, not checked in a render or in-game. The carry handle's rear aperture still sits about 0.077"
+    over the 1.41" line, as if its drum were set a click higher.
+- Its `OpticAimCorrection` `1.613,0,0.079` is derived with the Bizon's formula, NOT checked in-game. Its z is near 0
+  where the Kastovs' are about -1.2, because the irons sit 1.5 above the rail on the carry handle.
+- Co-witness: each 1x optic has a sight line on top of the correction (`ManualOffset.OpticSightLines`, written from
+  `kastov_prefabs` `Prefabs.optic_sight_lines`), so the dot sits against the post as a real one does. Since the
+  reticles were collimated (2026-10-18, see Red dots on the bullet line), the dot only shows where the sight points: the
+  gun-level `OpticAimAngleCorrection` (`0.2325,-0.0001,0` since the post went down: the aim's 0.293 degrees nose up put
+  the dots 0.287 high; it was `-0.0547,0.0031,0`) puts it on the screen's centre, and each line only moves the eye
+  (Angles `0,0,0`), up or down in the window (Position z -0.30 to +0.03) until the post's tip is at its mark. The old
+  lines also turned the gun 0.44-2.18 degrees nose down to bring the drawn-at-depth dot onto the post; collimated,
+  that put the dots up to 2 degrees low. Each optic takes its real analog's height on a flat-top:
+  - Absolute (the dot on the post's tip, the optic on its own low base): the Box Collimator (`att_vm_reflex_02`, an
+    EOTech-type holographic, which sits absolute on an M16A4's rail, so it isn't raised), the Tube Collimator, the Dial
+    Holographic, and the Long-Body, Hooded and Round-Hood Reflex.
+  - Lower 1/3 (the post's tip 0.14" under the dot, from a real optic's 1.535-1.57" line over the rail against 1.41" at
+    absolute): the `_tall` risers (the three Mini Red Dots, the Ring Reflex, the Tube Red Dot), and the raised-base
+    Enclosed and QD Holographic.
+  - The eye stays within the middle 60% of the window's height; past that a small window would hide the dot. On
+    2026-10-18 six optics couldn't reach their mark inside it, because the post stood 0.104" too tall and five optics sat
+    too low. Since 2026-10-19 both are at real heights and all 13 reach it, the QD Holographic's eye nearest the limit
+    (0.258 of 0.303).
+  - The five sat 0.3-0.47" under their real analogs: the three Mini Red Dots' windows 1.08-1.10" over the rail on their
+    riser, the Tube Red Dot's 1.25 and the Tube Collimator's 1.10, against 1.516-1.57" for lower 1/3 mounts (Trijicon's
+    AC32059, Aimpoint's 39 mm, Scalarworks) and 1.41 absolute. `Tools/optic_risers.py` lengthens their mounts: the Mini
+    Red Dots and the Tube Red Dot to 1.55" (lower 1/3), the Tube Collimator to 1.41" (absolute).
+    - Each mount is cut through a plain, vertical part of it, everything over the cut goes up, and a band between the
+      halves repeats the texture's row at the cut, so the riser reads as the same block, taller, with nothing stretched.
+    - Every part made from these models (the M4's MWII parts, which the ported guns share, and the MP5's copies) lowers
+      its `OpticAimOffset` z by the same, so on every gun the eye stays where it was in the window and the collimated
+      dot where it was on the screen (the survey after it found every other gun's dots unmoved).
+    - It also lifts the tags over the cut and the bounds' top in `Sources/MW2022/models/<model>.json`, where the QA
+      tools find `tag_reticle_attach`.
+    - The rips, records and original offsets are in `Backups/optic_risers_rip/`, which every run starts from. Rerun it
+      after `Sources/MW2022/convert_models.py` rewrites these models; `--check` lists what's stale.
+  - Solved with `output/reticle-survey-20261018/collimated/m16-cowitness.cs.txt` (`m16-cowitness-risers.jsonl`,
+    2026-10-19; `m16-cowitness.jsonl` is 2026-10-18's): the gun turned for the dot by the prefab's correction, then the
+    eye stepped with numerical derivatives until the post's tip (on `tag_barrel_attach`, `14.287,0,1.418`; the old
+    `13.872,0,1.522` was 0.415 short of the tip) is at its mark.
+  - The 2x-6x optics have no line, and haven't been looked at with the post up.
+- `hc1_m16_cowitness [optic|all]` (`Editor/Hc1M16OpticQa.cs`) finds the lines: it renders the aimed view, finds the red
+  dot in a 9-degree close-up and the post's tip on `tag_barrel_attach` (`14.287,0,1.418`), and steps the line (first
+  order) until both are within 0.006 degrees. It writes `output/m16-gunsmith/cowitness.txt`, with `LINE` entries ready for
+  `kastov_prefabs.py`, and before/after views (`cowitness-<optic>-{before,absolute,lower-third}.png`). The lens shader
+  drew the dot at a virtual depth then, so it moved with the eye: hence the steps, re-rendered each time. Since
+  2026-10-18 it looks for the dot along the sight's axis, far off, as the collimated shader draws it. It doesn't keep
+  the eye inside the window; the collimated solve above does.
+  - In its offscreen scene, a GameObject moved after its first render drew where it was first placed, so the tool moves
+    the camera (the eye, at minus the aim offset, turned by the inverse aim angles) and leaves the gun still. Turning the
+    optic's ModelRenderers off didn't hide it either.
+- `hc1_m16_optic_check [optic] [label]` (default the Box Collimator) checks the optic's bodygroups on both models, with
+  the factory barrel and a replacement one, and renders the aimed view (with the M16's line for the optic), a close-up
+  round the dot and the world model to `output/m16-gunsmith/optic-<optic>[-label]-*.png`. A cyan ring marks
+  `tag_reticle_attach`. It fails unless the dot is within 0.02 degrees of the centre and the post's tip on it or 0.14"
+  under it. Since the reticles were collimated its rig applies `OpticAimAngleCorrection` (by reflection) and looks for
+  the dot along the sight's axis. On 2026-10-18 the Box Collimator passed (the dot 0.004 degrees off the centre, the
+  tip 0.001" under it), and the Mini Red Dot failed as expected (the tip 0.227" over the dot): its rig, the ADS clip's
+  pose with no camera bone, agrees with the collimated solve's.
+  - On 2026-10-19, with the post and the five optics at real heights, all 13 passed (`optic-<optic>-risers.*`): every
+    dot within 0.003 degrees of the centre, the post's tip 0.001" under the six absolute sights' dots and 0.140" under
+    the seven lower 1/3 ones'. `output/reticle-survey-20261018/collimated/optic-check-all.cs.txt` (run_csharp) runs it on
+    all 13 in turn.
+- The weapon prefab's sight lines reach an M16 when it spawns: one already out keeps the old aim. None of it has been
+  checked in-game yet.
+
+## FN P90 (MW2019's P90, mg_papa90, Viper's MW2019 SMG pack 2802430252)
+- The real FN P90 (category SMG) under its real name, through the Kastov pipeline from MW2019 (`extracted/2802430252`,
+  decompiled to `decompiled/papa90`). The user asked for another real gun from the CoD packs. Its figures are in
+  `kastov_prefabs.gameplay_p90`:
+  - 900 rpm (the figure usually quoted; FN's sheet gives 850-1,100), automatic and semi, from the 50-round magazine
+    lying along its top.
+  - SS190 ball: a 2.0 g bullet at 715 m/s (FN's figure) from the 264 mm barrel. No BC is published for it, so G1 0.155
+    is an estimate: the pointed 40 gr V-MAX's form factor at the SS190's sectional density. The sights sit 101 mm over
+    the bore (the model's sight line, above the magazine and the top rail), zeroed at 100 m like the other SMGs.
+  - Damage, falloff, range, effects, recoil pattern, view punch and move speed are the MP5's, as for the Vityaz. The
+    recoil scale (0.29,1.73) is the Vityaz's (0.5,3) scaled by free recoil (~0.64 against ~1.1 m/s).
+  - Reload times are when the left hand is back on the grip (the clips' grip-pose events, 2.53 and 2.93 s) and the
+    last foley has played: 2.55 s, 3.05 s empty.
+  - The real gun throws its cases down through a chute behind the grip (`tag_brass` faces down there), but
+    `SpentCasing.Launch` ignores the port's rotation, so that isn't modelled.
+- Materials and sounds are from `Tools/p90_assets.py`: the P90's own receiver, rails, barrel and flash hider, iron
+  sights and magazine. The magazine's shell is see-through, like the real one's (its vmt's `$translucent`: the colour
+  map's alpha is opacity, not a metal mask). A 5.7 mm shot is louder than a 9 mm SMG's and quieter than a 5.45 mm
+  carbine's, so the shot is levelled between the Vityaz's and the Kastov-74u's, and the suppressed shot to the other
+  SMGs' suppressed shots. Reload foley plays at the viewmodel QC's event frames.
+- It was ported with markings on: the plate of CoD's made-up maker FORGE TAC with its address and RESTRICTED LAW
+  ENFORCEMENT / GOVERNMENT USE ONLY, the selector's A 1 S, a handwritten 38, the serials (FT098324), cal 5.7x28, the
+  sights' maker and part numbers and their R / UP, and the magazine's RESTRICTED line and 50 / 25 / 10 round counts.
+  `Tools/texture_markings/specs/p90.json` takes them off, checked in before/after renders on 2026-09-28. The sights'
+  arrows and scale lines stay.
+- Bodygroups (DefaultMask 21 by the bit rule, not yet read from the compiled model):
+  - `muzzle_tip`: the flash hider, hidden under a muzzle device.
+  - `iron_sights`: the flip-up sights on the top rail, which an optic takes off.
+- Slots: Optic at the back of the top rail (`tag_reflex`), Muzzle at the flash hider's rear face (`tag_tip`) and Laser
+  on the right-side rail (`tag_laser_attach`). No Underbarrel slot: the left hand holds the frame's front, which has
+  no rail. No parts of its own.
+- The M4's MWII parts (optics, muzzle devices, lasers and tracer rounds) fit it through `kastov_prefabs.make_parts_eligible`,
+  which adds the P90 to those shared `.gnsmth` files. The prefabs came from a run that left the shared parts alone, so
+  on 2026-09-29 it was run on its own for the P90: 27 optics, 17 muzzle devices, 3 lasers and tracers
+  (`dev_thumbnails p90` draws 47). Not yet looked at on the gun in a match.
+- No `GripFit`. The charm hangs on the stock's left side behind the thumbhole, clear of both hands.
+- Aimed, it fires with the addon's `fire_2` (`Weapon.ads_fire`, see the pipeline notes). The user saw it jitter left
+  and right when it fired with the hip clip there (2026-09-28). That clip rolls the gun up to 2 degrees about the bore,
+  pitches it 1.9 and drops it 0.6" in its first two frames, and at 900 rpm each shot restarts it two frames in (the
+  graph and the QC's `snap` both restart it with no blend), so the sights rocked 15 times a second. `fire_2` rolls it
+  under 0.2 degrees and pushes it 0.16" straight back. The hip clip is unchanged. The fix compiled, but it hasn't been
+  checked in-game yet.
+- Checked in renders only: the iron sights (ads_in's last frame with the addon's aim offset, `0,-4,0` in its lua: the
+  front post's tip on the aim point, centred between the rear sight's shoulders). Its `OpticAimCorrection`
+  `2.596,0,-0.445` is derived with the Bizon's formula, NOT checked in-game; its z is small because the irons stand
+  high on the top rail. The parts on its slots and the charm haven't been seen on it. Apart from the user firing it
+  (above), none of it has been checked in-game yet.
+
+## MP7A1 (MW2019's MP7, mg_mpapa7, Viper's MW2019 SMG pack 2802430252)
+- The real H&K MP7A1 (category SMG), through the Kastov pipeline from MW2019 (`extracted/2802430252`, decompiled to
+  `decompiled/mpapa7`). The user asked for another real gun from the CoD packs. Its figures are in
+  `kastov_prefabs.gameplay_mp7`:
+  - 950 rpm (H&K's figure), automatic and semi, from the 40-round magazine in the pistol grip.
+  - DM11 ball: a 2.0 g bullet at 720 m/s from the 180 mm barrel, G1 0.145. The sights sit 73.5 mm over the bore (the
+    sight line through the flip-up rear sight), zeroed at 100 m like the 9 mm SMGs: the MP7's own zero wasn't found.
+  - Damage, falloff, range, effects, recoil pattern, view punch and move speed are the MP5's, as for the Vityaz. The
+    recoil scale (0.38,2.3) is the Vityaz's (0.5,3) scaled by free recoil (~0.85 against ~1.1 m/s). DM11's powder
+    charge in that sum (~0.4 g) is a guess from the case's capacity.
+  - Reload times are when the gun is level again: 2.1 s, 2.17 s empty.
+  - Bots can be issued it: it's a Primary SMG, so it's in `WeaponPool` and shares the SMGs' three in ten.
+- Materials and sounds are from `Tools/mp7_assets.py`: the MP7's own receiver, barrel, sights, magazine and stock, and
+  MW's flash hider and laser mount from Viper's MW attachment pack (Workshop 2459720887). The shot is levelled to the
+  P90's (-2 dB). The suppressed shot is a mono 20 ms burst that the limiter holds down: at +4 dB it matches the other
+  suppressed guns over 20 ms (-10.4 dB) but is quieter over 100 ms (-15.9 against their -12.1 to -14.8). Reload foley
+  plays at the viewmodel QC's event frames.
+- It was ported with markings on: the receiver's RESTRICTED MILITARY / GOVERNMENT / LAW ENFORCEMENT USE ONLY labels
+  (their plates stay), the selector's semi, AUTO and E, MADE IN USA, 4.6x30mm, the serials, the FSS logos and the FSS
+  badge on the grip, the sight's .50 MOA and 56-LP LOW PROFILE / PIN, the stock's part number and FSS logos, and the
+  magazine's 30, 4.6x30mm, mould date wheel and the lettering round its feed lips.
+  `Tools/texture_markings/specs/mp7.json` takes them off (162 regions over 4 materials), checked in before/after views
+  of the textures on 2026-09-28, not yet on the model. The flash hider and the laser mount had none.
+- Bodygroups (DefaultMask 85, read from the compiled models):
+  - `muzzle_tip`: the flash hider, hidden under a muzzle device.
+  - `laser_rail`: the ring mount a laser brings to the top rail's right side, shown only under a laser.
+  - `iron_sights`: the raised flip-up sights, which an optic takes off.
+- Slots: Optic at the back of the top rail (`tag_reflex`), Muzzle at the flash hider's rear face and Laser at the ring
+  mount's back, above the left hand's fingers, which wrap the receiver's own right-side rail. 48 of the M4's MWII
+  parts are made eligible (optics, muzzle devices, lasers and tracer rounds).
+- No Underbarrel slot: the left hand holds the receiver's front, where a grip would go. CoD's rail there
+  (`attachment_vm_sm_mpapa7_ub_rail`) is left out, and so are the pack's grips, the folding foregrip like the real
+  gun's included: they move the left hand (`grip_vert_offset`), which a part can't do.
+- No parts of its own. Also left out: MW2019's 50- and 60-round magazines (the real gun's go up to 40), its barrels,
+  the XRK stock and the Piercer receiver.
+- No `GripFit`: the idle left hand sinks 57 vertices, at most 0.10", like the verified 762's.
+- Aimed, it fires with the pack's `fire_2` (`Weapon.ads_fire`, see the pipeline notes): the hip clip rolls it 2.3
+  degrees about the bore every shot, and `fire_2` only kicks it 0.7" straight back. Compiled, not checked in-game.
+- Checked in renders only: the iron sights (ads_in's last frame with the addon's own aim, its lua's 3 forward), the
+  optics, muzzle devices and lasers on their slots (from the camera, at the hip and aiming, the lasers sit right of
+  the rear sight, below the sight line), and the charm's anchor on the receiver's left side at its rear, clear of both
+  hands. Its `OpticAimCorrection`
+  `1.375,0,-0.462` is derived with the Bizon's formula, NOT checked in-game. None of it has been checked in-game yet.
+
+## Steyr AUG A3 (MW2019's AUG, mg_augolf, Viper's MW2019 SMG pack 2802430252)
+- The real Steyr AUG A3 (category AssaultRifle) in 5.56x45, through the Kastov pipeline from MW2019
+  (`extracted/2802430252`, decompiled to `decompiled/augolf`). The user asked for the AUG with real figures. MW2019's
+  AUG is a 9 mm gun until its 5.56 conversion goes in, so it's built as that rifle: the pack's 407 mm (16-inch) barrel
+  and the AUG's own 30-round magazine, which reloads with its own clips (`Weapon.factory_reload` `_armag`:
+  `reload_armag` and `reload_empty_armag`). Its figures are in `kastov_prefabs.gameplay_aug`:
+  - 715 rpm (the middle of Steyr's 680-750), automatic and semi. The real gun's two-stage trigger (semi on the first
+    stage, automatic pulled through) isn't modelled: it has HC1's fire-mode switch.
+  - The M4's M855 round (damage 20, falloff and recoil pattern) at ~916 m/s from the 16-inch barrel, between the M4's
+    905 from 14.5 inches and the M16A4's 945 from 20 (Steyr quotes 970 from its 508 mm barrel), G7 0.151. The sights
+    sit 61.7 mm over the bore (the sight line through the flip-up sights on the top rail), zeroed at 300 m like the
+    other M855 rifles.
+  - 3.3 kg empty, about 3.8 kg loaded: SpeedPenalty 40, no WeightSlowdown, 0.25 s ADS. The recoil scale (1.81,4.53) is
+    the M4's (2,5) scaled by free recoil (~1.69 against 1.86 m/s).
+  - Reload times are when the left hand is back on the foregrip (the clips' grip-pose events): 1.83 s, and 2.97 s
+    empty, after the charging handle.
+  - Bots can be issued it: it's a Primary AssaultRifle, so it's in `WeaponPool` and shares the rifles' half.
+- CoD's gun is 1.1 times the real one's size: its top rail's slots are 0.433 apart and the rail 0.918 wide, where a
+  Picatinny rail's are 0.394 and 0.835 (the P90's and MP7's rails measure that), while its arms are the P90's size.
+  `Weapon.model_scale` (1.1) shrinks the whole pose about the camera (the gun, the arms' targets and the meshes), so the
+  gun is its real size and the sight picture stays CoD's.
+- Its pistol grip is the stock's, so `tag_pistolgrip_attach` is an extra bone on the centreline, as for the P90 and
+  MP7A1. A mesh path ending in `@material,material` keeps only the triangles in those materials, and `@!material,...`
+  only the rest (`port_kastov.part_triangles`, after any `#bone` filter): the foregrip's mesh carries a second copy of
+  it in the rail's material, whose UVs don't fit that texture, and the barrel's pieces have `_s` copies in materials
+  that don't exist.
+- Materials and sounds are from `Tools/aug_assets.py`: the AUG's own stock (the housing with the pistol grip, trigger
+  guard and butt), upper (the top rail and the barrel's collar), sights, foregrip, barrel and magazine, and MW's flash
+  hider and laser mount from Viper's MW attachment pack (Workshop 2459720887). The shots are the pack's 5.56 ones (its
+  lua's `doCalConversionStats` swaps them in with the 5.56 magazine), levelled to the M16A4's: -1 dB, and -13 dB for
+  the suppressed shot, whose peaks ran 9 dB over full scale. Reload foley plays at the viewmodel QC's event frames of
+  the 5.56 reloads.
+- It was ported with markings on: a CAUTION: Read Manual Before Use warning on the stock, a heart and an arrow under the
+  ejection block, the rail's slot numbers (2-28), a serial (S/N 8004-090), CoD's made-up SOLOZERO OPTICS logo and faded
+  lettering on the sights, and a SOLOZERO ATTACHMENTS plate on the magazine. `Tools/texture_markings/specs/aug.json`
+  takes them off, checked on the textures before and after on 2026-09-28.
+- Bodygroups (DefaultMask 85, read from the compiled models):
+  - `muzzle_tip`: the flash hider, hidden under a muzzle device.
+  - `iron_sights`: the flip-up sights on the top rail, which an optic takes off.
+  - `laser_rail`: the laser's mount on the barrel's right side, shown only under a laser.
+- Slots: Optic on the top rail (`tag_reflex`), Muzzle at the flash hider's rear face (`tag_tip`) and Laser at the back
+  of the mount on the barrel's right side, ahead of the foregrip. 48 of the M4's MWII parts are made eligible (optics,
+  muzzle devices, lasers and tracer rounds). No Underbarrel slot: the left hand holds the AUG's own folding foregrip.
+- No parts of its own. Left out: the pack's 9 mm barrel and magazines, its long LMG barrel and drum, its rails and its
+  three stocks.
+- No `GripFit`: the idle left hand sinks 88 vertices into the foregrip, at most 0.50" deep (mean 0.20: the palm, the
+  thumb's base and the index knuckle, counted by winding number). Fits that open the fingers took it to 58 vertices
+  (0.41") but lifted the fingertips off the grip (0-3 of 490 tip vertices touching it, against 99), and plain shifts
+  sank more vertices. None of it shows in the renders from the camera, at the hip or aiming.
+- Aimed, it fires with the pack's `fire_2` (`Weapon.ads_fire`, see the pipeline notes): the hip clip rolls it 4.6
+  degrees about the bore on the shot's first frame and rocks it +-2.6 for the next five, and `fire_2` rolls it 0.56 at
+  most and kicks it 0.94 straight back.
+- It has the look sway and hand IK (see the pipeline notes), re-ported on 2026-09-28. Offscreen, with
+  `aim_yaw_inertia` held at 120 the gun turns 22 degrees at the hip and about a fifth of that aimed, then settles back
+  to rest, and both hands stay within 0.002 of their IK targets.
+- Checked in renders only (2026-09-28):
+  - the iron sights (ads_in's last frame with the pack's aim, its lua's 3 forward: the front post centred in the rear
+    notch), steady aimed fire, the reloads and the sprint;
+  - the optics, muzzle devices and lasers on their slots, at the hip and from outside, and aimed, the four optics tried
+    (a holographic sight, a magnified scope, a mini red dot and a reflex) centred on the aim point with its
+    `OpticAimCorrection` `-0.206,0,-0.69`, which is derived with the Bizon's formula (offscreen, a magnified lens shows
+    no picture);
+  - the charm on the stock's left side above the magazine, clear of both hands;
+  - the world model with parts, and both teams' models holding it (see Third-person left hand).
+- None of it has been checked in-game yet.
+
+## Uzi (MW2019's Uzi, mg_uzulu, Viper's MW2019 SMG pack 2802430252)
+- The real IMI Uzi (category SMG), through the Kastov pipeline from MW2019 (`extracted/2802430252`, decompiled to
+  `decompiled/uzulu`). The user asked for it with real figures, like the other guns. The model is the real gun's size:
+  435 mm from the receiver's back to the muzzle, where the real gun's is 445 without a stock. Its figures are in
+  `kastov_prefabs.gameplay_uzi`:
+  - 600 rpm cyclic from the open bolt, automatic and semi, from the 32-round magazine in the pistol grip.
+  - 9x19 ball at 400 m/s from the 260 mm barrel, modelled as 124 gr ball (G1 0.145) like the Vityaz's. The sights sit
+    47 mm over the bore (the model's sight line from the rear aperture to the front post's tip, 309 mm apart like the
+    real gun's), zeroed at 100 m: the flip rear sight's 100 m aperture.
+  - Damage, falloff, range, effects, recoil pattern and view punch are the MP5's, as for the Vityaz. The recoil scale
+    (0.38,2.26) is the Vityaz's (0.5,3) scaled by free recoil (~0.83 against ~1.1 m/s).
+  - It's heavy for its size: 3.5-3.7 kg empty with the metal stock (sources differ), ~4.2 kg loaded, more than the M4.
+    So it moves like the rifles (SpeedPenalty 40, not the MP5's) and aims in their 0.25 s. It's too little over the
+    AKM's 3.75 kg for a WeightSlowdown.
+  - Reload times are when the gun is level again: 2.53 s, and 3.23 s empty (after the cocking knob pull). The clips'
+    grip-pose events come earlier, at 2.3 and 2.97 s, with the gun still tilted 12 and 27 degrees.
+  - Bots can be issued it: it's a Primary SMG, so it's in `WeaponPool` and shares the SMGs' three in ten.
+- The viewmodel's receiver model has every piece twice, the second copy in an `_s` material, so its `vm_meshes` path
+  leaves those out (`@!material,material`, `port_kastov.part_triangles`).
+- Materials and sounds are from `Tools/uzi_assets.py`: the Uzi's own receiver, barrel, sights, top rail, magazines and
+  stocks, and MW's laser mount from Viper's MW attachment pack (Workshop 2459720887). The shot is levelled to the
+  Vityaz's (-5 dB). The suppressed shot peaks 7 dB over full scale, which the limiter holds down: at +2 dB it matches
+  the Vityaz's over 20 ms (-8.9 against -8.8 dB) and is a little quieter over 100 ms (-13.5 against -12.9). Reload
+  foley plays at the viewmodel QC's event frames.
+- It was ported with markings on: CoD's made-up maker CRONEN IND. with MODEL A and 9 mm PARA (on the receiver and the
+  barrel), the serials and engraved letters, the selector's A / F / S, the rear sight's range numbers, CORVUS DEFENSE
+  and an SMG serial on the top rail, the made-up XRK logo on the 40- and 50-round magazines, and a rack number carved
+  into the wooden stock. `Tools/texture_markings/specs/uzi.json` takes them off (20 regions over 8 materials), checked
+  in before/after renders on 2026-09-28. The selector's three position lines stay.
+- Bodygroups (DefaultMask 1173, read from the compiled models):
+  - `optic_rail`: the claw mount an optic brings onto the top cover, shown only under an optic.
+  - `laser_rail`: the ring mount a laser brings to the receiver's front, on its right side, shown only under a laser.
+  - `stock` and `magazine`: the factory parts and the ones below.
+  - The iron sights have no bodygroup and stay under an optic, which the claw mount holds above them.
+- Slots: Optic at the back of the claw mount (`tag_reflex`), Muzzle at the barrel's front face and Laser at the back
+  of the ring mount (`tag_laser_attach` is its front). 48 of the M4's MWII parts are made eligible (optics, muzzle
+  devices, lasers and tracer rounds). No Underbarrel slot: the left hand holds the lower receiver's front, and the
+  pack's grips move it (a part can't).
+- Parts (`PARTS_UZI`, `Assets/gunsmith/uzi/`), with recoil relative to the factory folding metal stock, extended:
+  - The Folded Stock: folded under the receiver, 40% more recoil.
+  - The Wooden Stock: the early fixed wooden stock, with the 74u's Wooden Stock part's name, text and 0.9 recoil.
+  - The 40- and 50-round magazines. They reload with the pack's xmag clips (`reload_variants` `_xmag`), which level
+    the gun at the same times as the factory 32's.
+  - Left out: CoD's barrels, its suppressed barrel and calibre conversion, and the MW grips and stocks.
+- The fire clip is `Weapon.steady_fire` (8 frames), as for the M16A4. The pack's clip rolls the gun up to 1.5 degrees
+  about the bore and pitches it 0.9 in its first three frames, and at 600 rpm every shot starts it again. Its aimed
+  clip (`fire_2`) still rolls it 0.95, so the Uzi doesn't take `ads_fire`. In the exported clip the camera, the gun and
+  both wrists hold still; only the bolt (seen through the ejection port), the trigger finger and the thumb move. The
+  cocking knob on the top cover stays put, as on the real gun.
+- `Weapon.left_grip` is a `GripFit` (shift `0,0.25,-0.1`, fingers 0.1). Where CoD's hand sits on the lower receiver's
+  front, HC1's thumb base sank 0.34" into its left side, the palm into its bottom and the fingertips into its right
+  side: 154 vertices. With the fit it's 60, at most 0.10" deep (the verified 762's 52 go 0.10").
+- Its `OpticAimCorrection` `0.241,0,-1.747` is derived with the Bizon's formula, NOT checked in-game. Its z is lower
+  than the Kastovs' (about -1.2): at the ADS pose the claw mount holds an optic's base 0.32 over the iron sight line,
+  where the 762's rail is 0.22 under its own.
+- It sways like the other ported guns (see the pipeline notes). Checked offscreen the same way on 2026-09-28: a hard
+  flick turns it 12.79 degrees at the hip and 2.56 aimed, with both hands within 0.010" of their grips.
+- Checked in renders only:
+  - The iron sights (ads_in's last frame with the pack's own aim, its lua's 3 forward).
+  - Six optics on the claw mount, from the side and through them aiming: the fixed rear sight stays at least 0.29
+    under each, and their windows are clear of it.
+- Magnified optics at the hip (2026-10-05): the claw mount holds every optic higher than the rifles' rails, so at the
+  hip its eyepiece is 0.2-0.8" above eye level (from idle.dmx's first frame: the 6x Precision Scope's 5.95" ahead, 2.48"
+  right and 0.51" up; the Kastov 762's 0.19" below). The 6x scopes fill the top right of the screen there. The user
+  saw it ("looks weird on the uzi"), was offered taking them off the Uzi or holding it lower at the hip with a
+  magnified optic, and chose to leave it as it is.
+- Not seen on it yet: the muzzle devices and lasers on their slots, the charm (at the back of the receiver's left
+  side) and the third-person hand. None of it has been checked in-game yet.
+
+## FN FAL (MW2019's FAL, mg_falima, Viper's MW2019 Assault Rifles pack 2528829149)
+- The real FN FAL 50.00 (category AssaultRifle) in 7.62x51, through the Kastov pipeline from MW2019
+  (`extracted/2528829149`, decompiled to `decompiled/falima`). The user asked for another real gun from the packs, and
+  for the UI to say it still needs checking (the review note, see Gunsmith). The model is the real gun's size: 42.9 in
+  from the butt to the muzzle, the real 50.00's 1,090 mm. Its figures are in `kastov_prefabs.gameplay_fal`:
+  - 675 rpm (the middle of FN's 650-700), semi and automatic, starting on semi as armies fired it, from a 20-round
+    magazine.
+  - M80 ball at 840 m/s from the 533 mm (21-inch) barrel, G7 0.200 like the SCAR-H's. The sights sit 48.6 mm over the
+    bore (the sight line through the rear aperture and the front post's tip), zeroed at 200 m: the rear sight's lowest
+    setting, the battle zero.
+  - BaseDamage 41, the M4's 20 scaled by muzzle energy (3,362 J against M855's 1,646), so in hardcore a body hit at full
+    damage always kills. Falloff, recoil pattern and view punch are the M4's, as the SCAR-H's are, and the muzzle flash
+    is the SCAR-H's.
+  - About 5.0 kg loaded (4.25 kg empty), 1.25 kg over the AKM: SpeedPenalty 40, WeightSlowdown 0.0125 and 0.27 s ADS, by
+    the RPK's scaling. The recoil scale (2.66,6.66) is the M4's (2,5) scaled by free recoil (~2.48 against 1.86 m/s).
+  - Reload times are when the gun is level again: 2.67 s, and 3.4 s empty, after the charging handle.
+  - Bots can be issued it: it's a Primary AssaultRifle, so it's in `WeaponPool` and shares the rifles' half. It has
+    automatic, so they fire their usual 3-7 round strings with it.
+- Like the P90's, its rig has no pistol grip part (the grip is the receiver's), so `tag_pistolgrip_attach` is an extra
+  bone on the centreline.
+- Materials and sounds are from `Tools/fal_assets.py`: the FAL's own receiver (with the carrying handle, pistol grip and
+  optic rail), rear sight, handguard, barrel and flash hider, magazine and stock, the parts' own (the Para stock, the
+  18-inch barrel and the 30-round magazine), and MW's laser mount and the 18-inch barrel's short flash hider from
+  Viper's MW attachment pack (Workshop 2459720887). The 30-round magazine's reload foley plays at its own clips' frames. The shot is the pack's six dry recordings, levelled to one loudness (+8 dB), so
+  every shot sounds a little different: 0.7-1 dB over the 5.56 rifles' (the M16A4's, AUG's and AK-105's), as a .308 is
+  at the shooter, and under the SCAR-H's. The suppressed shot is the pack's six suppressed recordings at -12 dB, about
+  as far over the 5.56 rifles' suppressed shots. Reload foley plays at the viewmodel QC's event frames.
+- It was ported with markings on: serials (6822), proof marks, rack numbers, the selector's S and F, and the rear
+  sight's range numbers and stamps, and on the Para stock a proof mark and a serial (SN-750404).
+  `Tools/texture_markings/specs/fal.json` takes them off (23 regions over 5 materials).
+- Bodygroups (DefaultMask 174761, read from the compiled models):
+  - `muzzle_tip`: the flash hider, then the 18-inch Barrel's short one, then none (under a muzzle device, which the
+    Muzzle slot's `FittedBodygroups` sets to 2).
+  - `optic_rail`: the rail an optic brings onto the top cover, shown only under an optic.
+  - `laser_rail`: the laser's mount on the handguard's right side, shown only under a laser.
+  - `iron_sights` and `sight_folded`: the rear sight raised, and folded down under an optic.
+  - `stock`, `barrel` and `magazine`: the factory parts and the ones below.
+- Slots: Optic on the top cover's rail (`tag_reflex`), Muzzle at the flash hider's rear face (`tag_tip`) and Laser at
+  the back of the mount on the handguard's right side (`tag_laser_attach` is its front), then Stock, Barrel and
+  Magazine. 48 of the M4's MWII parts are made eligible (optics, muzzle devices, lasers and tracer rounds). No
+  Underbarrel slot: the left hand holds the handguard, whose short bottom rail its fingers wrap.
+- Its own parts (`Prefabs.parts` in its `kastov_prefabs` entry, `Assets/gunsmith/fal/`), from the pack. The user asked
+  for more than its four slots (2026-09-28):
+  - Para Folding Stock: the FAL Para's tubular folding stock, with a thin buttplate. 5% more recoil.
+  - 18-inch Barrel: the 50.62's 458 mm barrel with its short flash hider. M80 leaves it at ~817 m/s against 840, 0.946
+    of the energy, so damage falls off 5% earlier. A muzzle device mounts 2.1 further back (`muzzle_shift`), and with
+    none the shots leave the short hider's end, 5.9 behind the factory one's (`tip_shift`, see the pipeline notes).
+  - 30 Round Mag: the heavy-barrel squad rifle's (the FALO's), with the pack's xmag reloads (`reload_variants`
+    `_xmag`). The gun is level again at 2.67 s, and 3.57 s empty. Mid-reload the new magazine is in the left hand while
+    the old one is still angled in the magwell: the factory reload does the same, so it's the pack's clips.
+  - Left out:
+    - The pack's long barrel: ~575 mm, which no service FAL had (533, the L1A1's 554, 458 and 436).
+    - Its loose muzzle piece, which the pack never fits, and its 24-round magazine, which no real FAL had.
+    - The stockless receiver, MW's own stocks (CoD designs), and the FAL's grips: they move the left hand, and there's
+      no Underbarrel slot.
+  - `hc1_fal_parts_check [world] [variant] [pose] [cycle] [view]` (`Editor/Hc1FalGunsmithQa.cs`) checks them
+    offscreen and renders them to `output/fal-gunsmith/`:
+    - the masks;
+    - each part's values and effects;
+    - `muzzle_tip` and the discharge shift for each barrel, with and without a suppressor.
+- No `GripFit`: the idle left hand has 121 vertices inside the handguard, at most 0.09" deep (the verified 762's 52 go
+  0.10"), and 124 (0.08") aimed. The right hand's thumb base sinks up to 0.54" into the pistol grip (223 vertices; the
+  762's go 0.37"), but at the default 85-degree view only 8 of them are on screen at the hip and 5 aimed, inside the gun
+  at the screen's bottom edge.
+- Aimed, it fires with the pack's `fire_2` (`Weapon.ads_fire`, see the pipeline notes): the hip clip rolls the gun up to
+  3 degrees about the bore and swings it 1" forward every shot, and `fire_2` rolls it 0.25 at most and kicks it 0.6"
+  straight back.
+- The charm hangs on the stock's left side, near its front (`Prefabs.charm`), not on the receiver like the Kastovs'.
+  The empty reload's left hand racks the charging handle (on the receiver's left, where the AK's is on the right) along
+  the whole receiver, and its thumb went through a charm there, while above the trigger guard the disk rested on the
+  right thumb. On the stock every hand joint stays over 2" from its bounds through both reloads, the sprint and aiming
+  (the 762's left thumb comes within 0.49" of its charm's). It's out of view at the hip and aimed.
+- Its `OpticAimCorrection` `2.402,0,-1.066` is derived with the Bizon's formula, NOT checked in-game. Offscreen, a
+  holographic sight's and a mini red dot's dots land where they do on the 762 with its in-game-measured correction
+  (0.371 against 0.372 degrees under the screen's centre, and 0.189 against 0.190).
+- It has the look sway and hand IK (see the pipeline notes).
+- The first compile of `v_fal.vmdl` left no compiled file, so the editor loaded an error model and the first-person gun
+  was invisible until the vmdl and vanmgrph were recompiled (see the pipeline notes).
+- Checked offscreen on 2026-09-28, in renders and measurements of the compiled models:
+  - the iron sights (ads_in's last frame, with no aim offset: the pack's lua has none): the front post centred in the
+    rear aperture;
+  - aimed fire: 0.54" straight back and 0.28 degrees of pitch;
+  - both reloads within 4 degrees and 0.6" of rest at their reload times, and at rest 1 s later;
+  - the M4's sprint, with the left hand on its grip;
+  - a hard flick: 12.83 degrees at the hip and 2.57 aimed, the hands within 0.009" of their grips, back at rest 2 s
+    later;
+  - the parts on their slots at the hip, aimed and from outside (a magnified lens shows no picture offscreen);
+  - the charm on the viewmodel and the world model;
+  - both teams' models holding it (see Third-person left hand);
+  - its own three parts (`hc1_fal_parts_check`): on the world model, a suppressor seated on the 18-inch Barrel, the
+    charm's hook on the Para stock's upper tube, and the 30 Round Mag's reloads in first person.
+- Its gunsmith review note stays until all of it has been checked in a match: the iron sights and the optics' aim,
+  recoil, reload timing and sounds (the 30 Round Mag's too), the look sway and sprint, the left hand in first and third
+  person, and the 18-inch Barrel's muzzle flash and devices. None of it has been checked in-game yet.
+
+## SIG Sauer M18 (MW2019's "M19", mg_p320, Viper's MW2019 pistol pack 2459723892)
+- The real SIG Sauer M18 (category Pistol, in the Secondary slot), the US Army's compact P320 with the coyote grip module
+  and slide, through the Kastov pipeline from MW2019 (`extracted/2459723892`, decompiled to `decompiled/p320`). The user
+  asked for a real pistol from the CoD packs and left the pick to Claude (2026-09-29). Its figures are in
+  `kastov_prefabs.gameplay_m18`:
+  - Semi only, from a 17-round magazine. FireRate 450 is the shortest split between shots (0.13 s), as for the USP.
+  - M1152 ball (115 gr FMJ) at ~375 m/s from the 3.9-inch barrel, G1 0.14. The sights sit 16 mm over the bore, zeroed
+    at 25 m like the other pistols.
+  - Damage and falloff are the MP5's 9 mm (BaseDamage 12; the USP's .45 is 15), with MaxRange cut to 0.815 by muzzle
+    energy (524 J against the MP5's 643 J).
+  - The rest of the handling is the USP's (`Gameplay.borrow`): the Pistol hold, the crosshair, SpeedPenalty 20, recoil
+    with no pattern, view punch, casing and flash. It has no FovOffset shot kick (`Gameplay.remove` takes the M4's off).
+    The recoil (1.86 up, ±1.3 sideways) is the USP's scaled by free recoil (~3.2 against ~3.5 m/s).
+  - Reload times are when the gun is level again: 1.57 s, and 2.1 s empty, after the slide release.
+  - `Prefabs.equip_fields` sets the .equip's Slot (Secondary) and the USP's armour penetration (ArmorReduction 0.775,
+    HelmetReduction 0.4). `icon_width` 0.33 sizes its icon like the USP's.
+  - Bots don't use it: their pool is primaries only.
+- The pistol rig hangs the gun off `tag_pistol_offset`, which `Weapon.bone_renames` reads as `tag_sling`
+  (`kastov_smd.BONE_RENAMES`), the bone the pipeline and the prefabs go by.
+  - The rig has no muzzle, left-hand tag or pistol grip mount (the left hand cups the right), so `muzzle` and
+    `tag_pistolgrip_attach` are extra bones.
+  - `tag_pistolgrip_attach` is placed so the world model's grip sits where w_usp's does, for the third-person Pistol
+    hold.
+  - It has no `LeftHandIK` (`world_left_hand=None`, like the USP's and 1911's) and no charm (`charm=None`).
+- Slide lock (`Weapon.slide_lock`: the QC's `empty_offset`, `a_delta_empty_additive_for_offset`). While the magazine is
+  empty, the slide stays back, the barrel tilts out of battery and the magazine's top rounds are gone.
+  - The port exports it as `empty_delta`.
+  - It also exports `fire_empty` (and `fire_ads_empty`): the shot with the slide held from the frame the recoil takes it
+    furthest back.
+  - The graph adds the delta to idle, sprint, lowered and draw while `b_empty` holds, and the fire state picks the empty
+    shot by `b_empty` (synced).
+  - A slide lock can't go with `steady_fire`: the port asserts it.
+- The slide and its sights are one piece from two models, a mesh path of `+`-joined SMDs (`port_kastov.part_triangles`).
+  The attachment model has its sights as a bodygroup.
+- Materials and sounds are from `Tools/p320_assets.py`: the pistol's own frame, slides, sights and magazines.
+  - The pack plays its shot as a distance-variant sound, so only its near channel is used, levelled -6 dB: a touch over
+    the Vityaz's 9 mm, as a short barrel is at the shooter.
+  - Reload foley plays at the viewmodel QC's event frames.
+- It was ported with markings on:
+  - the label plate's QR code and MFR CORDEF / PNO / SER, the serials, and CA - USA;
+  - CoD's made-up makers CORVUS DEFENSE and XRK on the grip, slides and magazines;
+  - 9MM PARA and 9mm x 19, and the sights' CD / T38 marks;
+  - the magazines' witness numbers, and the 21-round one's base plate label and headstamp.
+  `Tools/texture_markings/specs/m18.json` takes them off (38 regions over 6 materials), checked in before/after views of
+  the textures on 2026-09-29.
+- Bodygroups (DefaultMask 145, read from the compiled models): `barrel` (the slides: coyote, black, vented, long) and
+  `magazine` (17, 21, 32).
+- Slots: Barrel (the slide, as a pistol's slide is in CoD), Magazine, and Ammunition (tracer rounds, made eligible).
+  There's no optic, muzzle or laser slot (`slots=[]`): the barrel isn't threaded, the model's slide has no optic cut,
+  and the M4's lasers are rifle lasers.
+- Parts (`PARTS_M18`, `Assets/gunsmith/m18/`):
+  - Black Slide: SIG's black Nitron slide.
+  - 21 Round Mag: the Army's extended magazine, with the pack's xmag reloads (`reload_variants` `_xmag`): 1.57 s, and
+    2.13 s empty.
+  - Not offered: the vented and long slides (CoD's designs) and the 32-round magazine (SIG's longest holds 21).
+- The sticker is on the slide's left side between its serrations. Its viewmodel point rides the slide's bone object,
+  `j_slide` (`Prefabs.sticker_bone`, placed by `bind_position`), so it moves with the slide.
+- Aimed, it fires with the pack's `fire_2` (`Weapon.ads_fire`). Both fire clips flip the muzzle up ~10 degrees as the
+  slide cycles, back by frame 12. The hip one also swings it 4.3 degrees sideways, and the aimed one 1.6.
+- The iron sights use the pack's own aim (its lua's 0.15 forward) at ads_in's last frame.
+- v_m18.vmdl, w_m18.vmdl and v_m18.vanmgrph compiled on 2026-09-29 with no errors. Nothing else has been checked, in
+  renders or in-game: the iron sights, the slide lock, the M4's sprint on a pistol, the reloads, the look sway, the
+  sticker, and the world model in hand and holstered. Its gunsmith review note stays until they've been checked in a
+  match.
+
+## SIG MCX Virtus (MW2019's "M13", mg_mcharlie, Viper's MW2019 Assault Rifles pack 2528829149)
+- The real SIG MCX Virtus SBR (category AssaultRifle) in 5.56x45, through the Kastov pipeline from MW2019
+  (`extracted/2528829149`, decompiled to `decompiled/mcharlie`). The user asked for a real gun from the packs that looks
+  like the real one, not one changed for CoD (2026-10-03). MW2019's M13 is the Virtus SBR as SIG sells it, at the real
+  gun's size: the 11.5-inch barrel, the free-float M-LOK handguard with its full-length top rail, flip-up sights, SIG's
+  three-prong flash hider, a 30-round polymer magazine and the folding telescoping stock. Its figures are in
+  `kastov_prefabs.gameplay_mcx`:
+  - 850 rpm (the middle of the 800-900 usually quoted), automatic and semi, from the 30-round magazine.
+  - M855 at ~837 m/s from the 292 mm (11.5-inch) barrel, where the M4's 14.5-inch gives 905, G7 0.151. The sights sit
+    68 mm over the bore (the sight line through the rear aperture and the front post's tip), zeroed at 300 m like the
+    other M855 rifles.
+  - The M4's M855 damage (20), falloff curve and recoil pattern, with MaxRange cut to 0.855 of the M4's: the short
+    barrel's share of its muzzle energy, as for the M18.
+  - About 2.9 kg empty and 3.4 kg loaded, what the M4 weighs: SpeedPenalty 40, no WeightSlowdown, 0.25 s ADS. The
+    recoil scale (1.85,4.62) is the M4's (2,5) scaled by free recoil (~1.72 against 1.86 m/s).
+  - A suppressor doesn't change its rate (`SuppressorFireRateScale` 1): the Virtus's short-stroke piston has a
+    two-position gas valve with a setting for one.
+  - Reload times are when the gun is level again: 2.33 s, and 2.6 s empty, after the bolt release.
+  - Bots can be issued it: it's a Primary AssaultRifle, so it's in `WeaponPool` and shares the rifles' half.
+- Like the FAL's, its rig has no pistol grip part (the grip is the lower receiver's), so `tag_pistolgrip_attach` is an
+  extra bone on the centreline. The viewmodel's stock adapter (its `tag_stock` bodygroup) is left out: it's for MW's
+  generic stocks, and each MCX stock carries its own hinge. The flip-up sights are two models' pieces joined with `+`
+  (`port_kastov.part_triangles`): the rear sight is the receiver model's `tag_sight` bodygroup, the front the barrel's.
+- Materials and sounds are from `Tools/mcx_assets.py`: the MCX's own lower (with the pistol grip, magazine well and
+  trigger guard), upper (the handguard and the top rail), flip-up sights, barrel, flash hider, magazine (its window
+  see-through, the vmt's `$translucent`) and both stocks.
+  - The shot is the pack's six dry recordings, each levelled to the same loudness (+9 dB), so every shot sounds a little
+    different, at about the AUG's level. The pack's own event plays a premixed copy of the first, with a long reverb
+    tail baked in. The suppressed shot is the six suppressed recordings at -12 dB. The .300 BLK conversion's subsonic
+    set isn't used.
+  - Reload foley plays at the viewmodel QC's event frames. The MW base's generic rattles and magazine drop are left out.
+  - All three are voiced like the other ported guns' (see The ported guns' sounds). The rip's shot has a designed low
+    ring (under 150 Hz at -11 dB 100-250 ms after the onset, where the other voiced rifles' are at -19 to -24) and is
+    dark (its first 30 ms centre at 0.67-1.15 kHz). A short barrel's blast at the shooter is a sharp crack, with much of
+    the powder burning past the muzzle, so it keeps its pitch and gets the lows eased 8 dB and 5 dB of presence: voiced,
+    the ring is at -23 dB and the first 30 ms centre at 1.1-1.55 kHz. The reload foley came down 17.2 dB: its loudest
+    file, the empty reload's magazine going in, was 1.2 dB over the shot.
+- It was ported with markings on: QR codes and a coded strip on the lower and one on the handguard, serials (TA
+  300248-B-77 and TA 300240-B-77, and TA 300249-B-77 on the Thin Folding Stock's hinge), the rip's made-up makers TEMPUS
+  ARMAMENT INC (its name and address, and its logo on the handguard), CRONEN and SOLOZERO OPTICS (its name, and its
+  chevron logo on the rear sight's leaf and a knob), a RESTRICTED MILITARY/GOVERNMENT LAW ENFORCEMENT USE ONLY label,
+  the selector's lettering, the rail's slot numbers, lettering on the charging handle's latch, a helmeted skull emblem
+  on the upper's round plate, a worn stamp, the sights' R and UP, the magazine's round counts (10, 20, 30) and a painted
+  181, and handwriting (T8) inside it. `Tools/texture_markings/specs/mcx.json` takes them off (64 regions over 8
+  materials), checked in before/after close-ups of the textures on 2026-10-03, not yet on the model. The selector's
+  pictograms, the sights' arrows and the counts' moulded underlines stay.
+  - The markings tool got two keys for it (its README has them): a region with `maps` edits only those maps (the 181 is
+    paint, so only the colour and roughness), and a `keep` region's pixels are never written (the underlines).
+- Bodygroups (DefaultMask 341 by the bit rule, not yet read from the compiled models):
+  - `muzzle_tip`: the flash hider, hidden under a muzzle device.
+  - `iron_sights` and `sight_folded`: the flip-up sights raised, and folded down under an optic.
+  - `stock`: the factory stock and the Thin Folding Stock.
+- Slots: Optic on the top rail (`tag_reflex`; an optic folds the sights), Muzzle at the flash hider's rear face
+  (`tag_tip`), Underbarrel on the handguard's flat bottom (below) and Laser on the handguard's right side at the bore's
+  height, ahead of the fingertips, then Stock. 56 of the M4's MWII parts are made eligible (optics, muzzle devices,
+  grips, lasers and tracer rounds).
+- The Underbarrel slot's origin is at x 9.76 (2026-10-05). The handguard's flat bottom runs 5.82 to 12.0 in the world
+  model, and the left hand's index finger wraps it at 9.1.
+  - It was at the pack's `tag_grip_attach` (11.168). The M4's grips reach forward from their origin (the vertical ones
+    and the stubbies 2.1, the bipod 2.14; the angled one reaches 4.2 back), so every vertical grip ended 1.3 past the
+    handguard's front, out under the flash hider. The user saw it on the Bipod, Slotted Vertical, Stubby, Tall Vertical
+    and Wide Stubby Foregrips.
+  - Now their fronts are 0.1 inside the handguard's front, as on the other guns (their grips end at their rail's
+    front), and their backs 0.5 clear of the index finger. The angled grip runs 5.53 to 9.83.
+  - Measured from the OBJs and `w_mcx.dmx` (the DMXs are keyvalues2 text). The prefabs were patched by hand to what
+    `kastov_prefabs.py` writes. Not seen in-game.
+- Its own part (`Prefabs.parts`, `Assets/gunsmith/mcx/stocks/`): the Thin Folding Stock, SIG's thin folding stock (the
+  pack's light stock), a skeleton stock with a narrow buttplate: 5% more recoil, and 0.06 kg lighter. Left out: the
+  pack's other stock (CoD's), its 50- and 60-round magazines, its .300 BLK magazine and barrel (another calibre), and
+  its other barrels.
+- Its left thumb lies over the top rail from the left side. The user saw it sink into the rail (2026-10-05). An
+  earlier count had the idle left hand at 84 vertices inside the handguard (0.08") and 128 aimed (0.15"). So it has a
+  `GripFit` (`kastov_weapons.MCX.left_grip`): the arm 0.05 right and 0.15 up, and the thumb's bend 20% open.
+  - The thumb's axis went from 0.44 over the rail at the hip and 0.25 aimed to 0.60 and 0.52. The AK-105's, M16A4's
+    and FAL's thumbs keep 0.49-0.52.
+  - The fingertips went from 0.13 to 0.18 off the handguard, and the palm stays 0.57 off it (the M16A4's 0.57).
+  - The arms' mesh is a cloud model whose glTF export wasn't to hand, so this was measured from the bones (sample
+    points along the palm and each finger) against the skinned gun mesh, with the tools in `Tools/grip_fit/`.
+  - The rips weren't to hand either, so the fit went into the exported clips directly (`Tools/grip_fit/apply.js`),
+    as `port_kastov.Kastov.pose` would apply it: the same weight, arm shift, `ik_hand_L` and finger opening.
+    `port_kastov.py` from the rips gives the same clips. Don't run `apply.js` on them again: it would add the fit twice.
+  - Not yet seen in-game. If the old grip still shows, the editor missed the changed DMXs: recompile `v_mcx.vmdl` (see
+    the pipeline notes).
+  - The right hand's go up to 0.39" into the gun (155 vertices; the 762's 0.37").
+- The iron sights use ads_in's last frame. The addon's aim (`0,-1,0`) left the rear aperture's centre 0.01 above the
+  camera and the front post's tip 0.058 degrees over the aim point; `kastov_weapons.MCX.aim` lowers the gun onto the
+  line through them and turns out its tilt. Checked in a render, not in-game.
+- Aimed, it fires with the pack's `fire_2` (`Weapon.ads_fire`, see the pipeline notes): the hip clip rolls the gun up to
+  2.5 degrees about the bore and pitches it 1.1 every shot, and at 850 rpm each shot starts it again; `fire_2` rolls it
+  0.5 at most and kicks it 0.5" straight back.
+- It sprints with the M4's sprint and has the look sway and hand IK (see the pipeline notes).
+- The charm hangs on the stock's hinge block at the back of the receiver, by the real gun's QD sling sockets, which both
+  stocks share: not over the grip, where the right thumb rests, nor on the factory stock, where it would float beside
+  the thin one. Every hand joint stays 1.07" or more from it through every clip. The sticker is on the upper receiver's
+  left side above the magazine well.
+- Its `OpticAimCorrection` `3.118,0,-0.274` is derived with the Bizon's formula, NOT checked in-game. Its z is small
+  (the Kastovs' are about -1.2): its flip-up sights stand on the top rail, as the M4's do.
+- Its third-person left hand (`4.2,2.735,2.49`, see Third-person left hand) hasn't been rendered.
+- Made offline on 2026-10-03 with the editor closed. When the editor next opened (2026-10-04) it compiled the models
+  (`v_mcx.vmdl_c` 1 MB, `w_mcx.vmdl_c`), the animgraph, the materials, sounds, prefabs and its part, each leaving a
+  compiled file. Nothing has been checked in-game. If the gunsmith doesn't offer it the 56 shared parts,
+  `recompile_asset` them after a hotload. Its gunsmith review note stays until all of it has been checked in a match.
+
+## L85A2 (MW2019's "SA87", mg_lima86, Viper's MW2019 LMG pack 2960120610)
+- The real L85A2 (category AssaultRifle), the British SA80 service rifle, through the Kastov pipeline from MW2019
+  (`extracted/2960120610`, decompiled to `decompiled/lima86`). MW2019's SA87 is the L86A2 light support weapon. Built
+  with the pack's short barrel, it's the L85A2 rifle, which is what's built. The user asked whether the game had the
+  AK-12, HK416, G95, SA80 and AK-15 (2026-10-08), then for the best Workshop models of them, one gun at a time, leaving
+  out the G95, whose only model is poor. The SA80 is the first. Its figures are in `kastov_prefabs.gameplay_l85a2`:
+  - 690 rpm (the middle of the 610-775 quoted), automatic and semi, from a 30-round magazine.
+  - SS109 (L2A2) ball, which is M855: the M4's damage (20), falloff curve and recoil pattern. It leaves the 518 mm
+    (20.4-inch) barrel at ~940 m/s, the M16A4's figure from about the same length (G7 0.151). The sights sit 100 mm over
+    the bore (the line through the carrying handle's aperture and the front post's tip), zeroed at 300 m like the other
+    5.56 rifles.
+  - 3.82 kg empty and ~4.7 kg loaded with the iron sights' carrying handle: SpeedPenalty 40, WeightSlowdown 0.0095 and
+    0.26 s ADS, by the RPK's scaling. The recoil scale (1.5,3.76) is the M4's (2,5) scaled by free recoil (~1.40
+    against 1.86 m/s).
+  - A suppressor speeds it up as on the other rifles: its gas regulator has no setting for one (normal, adverse, and
+    off for rifle grenades).
+  - Reload times are when the gun is level again: 3.53 s, and 4.0 s empty, after the cocking handle. A bullpup's
+    magazine is behind the grip, so its reloads are slow.
+  - Bots can be issued it: it's a Primary AssaultRifle, so it's in `WeaponPool` and shares the rifles' half.
+  - `part_masses.GUN_KG` has it at 4.7.
+- Materials and sounds are from `Tools/l85a2_assets.py`:
+  - The pack's own receiver (the body, and the front end with its rails), butt plate, carrying handle with its sights,
+    short barrel and 30-round magazine. The flash hider and the laser's mount are MW's, from Viper's MW attachment pack
+    (Workshop 2459720887).
+  - The shot is the pack's one close recording, levelled to the M16A4's: the same round from a barrel of about the same
+    length. The suppressed shot is its one suppressed recording. Reload foley plays at the viewmodel QC's event frames.
+  - All three are voiced like the other ported guns' (see The ported guns' sounds). The shot keeps its pitch (MW2019's
+    5.56, like the AUG's), and its lows under 130 Hz are eased 6 dB after 30 ms, with 3 dB of presence for 25 ms. The
+    ground comes 7.1 ms after the direct sound, the muzzle ~0.64 m ahead of the ear. The one recording makes four takes
+    with their own echoes, pitch spread 0.97-1.03.
+- It was ported with markings on, which `Tools/texture_markings/specs/l85a2.json` takes off (37 regions over 4
+  materials):
+  - the body's part stamps (L/M, 29630/LM), the selector's R and A, a stock number (1005-88-230-8062), and the rifle's
+    name and serials (L1 A834872) on the receiver and the magazine housing;
+  - a number in marker (Z-37), another number (3067) and small stamps (8R, R21);
+  - the handguard's rail slot numbers (R16, R7, B5, B9);
+  - the sights' part number (20846/B) and stamps (R1, 02);
+  - a number painted by hand on the magazine, and a smudged mark.
+  The magazine's blank follower stays. Checked in before/after close-ups of the textures on 2026-10-08, not yet on the
+  model.
+- Bodygroups (DefaultMask 85, read from the compiled models):
+  - `muzzle_tip`: the flash hider, hidden under a muzzle device.
+  - `iron_sights`: the carrying handle with its rear aperture, and the foresight on its bracket. An optic takes both
+    off, as on the real gun, where the handle and a sight clamp to the same rail.
+  - `laser_rail`: the laser's mount on the handguard's right side, shown only under a laser.
+- Slots: Optic on the receiver's top rail (`tag_reflex`), Muzzle at the flash hider's rear face (`tag_tip`) and Laser
+  at the back of the mount on the handguard's right side. 48 of the M4's MWII parts are made eligible (optics, muzzle
+  devices, lasers and tracer rounds).
+  - No Underbarrel slot: the left hand's fingers wrap the bottom rail up to x 15.6 in the viewmodel, and the rail ends
+    at 18.0. That leaves 2.1, where the M4's vertical grips need 2.26 (the FAL's case).
+  - No parts of its own. Left out: the pack's long and mid barrels (the L86A2's), its bipod, its 60-round magazines and
+    CoD's stocks.
+- The rig's `tag_brass` was in the handguard, 3 under the bore, so `Weapon.moved_bones` puts it at the real ejection
+  port: behind the cocking handle's slot, under its hinged cover.
+- The left hand has a `GripFit` (`kastov_weapons.L85A2.left_grip`: shift `0,0.55,-0.55`, fingers 0.4, thumb 0.1). Where
+  CoD's hand sits on the handguard, HC1's palm heel and thumb sank 0.39" into its left side and the fingers into the
+  bottom rail: 417 vertices. With the fit it's 24 at the hip and 26 aimed, at most 0.10" deep (the verified 762's 54 and
+  49 go 0.10"). The fingers still wrap the rail's underside.
+- Aimed, it fires with the pack's `fire_2` (`Weapon.ads_fire`, see the pipeline notes): the hip clip rolls the gun 2.5
+  degrees about the bore and yaws it 1.2 every shot, and `fire_2` only kicks it 0.24" straight back.
+- The iron sights use the addon's own aim (its lua's 1 forward) at ads_in's last frame. Measured from the meshes there, the
+  rear aperture's centre and the front post's tip are level with the eye, 3.944 (100 mm) over the bore. Not checked in
+  a render or in-game.
+- Its `OpticAimCorrection` `-0.004,0,1.047` is derived with the Bizon's formula, NOT checked in-game. Its z is high (the
+  Kastovs' are about -1.2), because the carrying handle holds the sight line 2.47 over the rail's `tag_reflex`, as the
+  M16A4's does.
+- It sprints with the M4's sprint and has the look sway and hand IK (see the pipeline notes).
+- The charm hangs on the receiver's left side behind the magazine well. Every hand joint stays 1.9" or more from it
+  through every clip (the empty reload's left thumb is nearest); above the magazine well that thumb came within 0.2".
+  The sticker is on the upper receiver's left side under the carrying handle.
+- Its third-person left hand (`-0.62,1.76,1.33`, see Third-person left hand) hasn't been rendered.
+- The models, the animgraph, the materials, sounds and prefabs compiled in the editor on 2026-10-08 with no errors.
+  Nothing has been checked in-game. Its gunsmith review note stays until all of it has been checked in a match.
+
+## HK416 A5 (Ready or Not's HK416 A5, mg_ron_hk416, Ha2ard's pack 3385630838)
+- The real Heckler & Koch HK416 A5 (category AssaultRifle) in 5.56x45, with the 11-inch barrel and HK's tan M-LOK
+  handguard, through the Kastov pipeline (`extracted/3385630838`, decompiled to `decompiled/hk416`). The pack ("[MW
+  Unofficial] RON HK416 A5") is Ready or Not's model on the MW base, with Escape from Tarkov's HK stocks and its HK and
+  Magpul magazines as attachments. It's the second of the user's list after the L85A2 (see L85A2). Its figures are in
+  `kastov_prefabs.gameplay_hk416`:
+  - 850 rpm (the middle of the 700-900 usually quoted for the short HK416s), automatic and semi, from a 30-round
+    magazine.
+  - M855 at ~826 m/s from the 279 mm (11-inch) barrel, between the 10.3-inch's ~790 and the MCX's 837 from 11.5 inches,
+    G7 0.151. The sights sit 72.5 mm over the bore (the eye's height at the ADS pose, through the flip-up rear sight's
+    aperture), zeroed at 300 m like the other M855 rifles.
+  - The M4's M855 damage (20), falloff curve and recoil pattern, with MaxRange cut to 0.833 of the M4's by muzzle energy,
+    as for the MCX.
+  - 3.13 kg (HK USA's 6.9 lb) without a magazine, ~3.75 kg loaded with HK's steel magazine: what the M4 weighs, so
+    SpeedPenalty 40, no WeightSlowdown and 0.25 s ADS. The recoil scale (1.66,4.14) is the M4's (2,5) scaled by free
+    recoil (~1.54 against 1.86 m/s).
+  - A suppressor doesn't change its rate (`SuppressorFireRateScale` 1): the A5's gas regulator has two positions, N for
+    normal fire and S for a suppressor.
+  - Reload times are when the gun is level again: 2.33 s, and 2.73 s empty, after the bolt release.
+  - Bots can be issued it: it's a Primary AssaultRifle, so it's in `WeaponPool` and shares the rifles' half.
+- The model is close to the real gun's size: 29.3 in from the butt to the muzzle with the stock collapsed, where HK USA
+  gives 27.9 in for the 11-inch A5. Its top rail is 0.814 wide (a Picatinny rail's 0.835), so it isn't scaled.
+- Its rig is RoN's, not CoD's (`part_mounts` and `icon_rows` are new for it):
+  - Its pieces (the receiver, handguard, pistol grip, charging handle, bolt carrier and the reloads' loose round) are
+    the viewmodel's own meshes (`vm_meshes`), and its barrel and magazines are bone-merged models.
+  - Its Tarkov stocks are VElements, placed on a rig bone (`Weapon.part_mounts`: `tag_stock_attach`, 1.6 forward and
+    0.07 down, from the pack's lua), not where their vertices sit.
+  - `Prefabs.icon_rows` crops the pack's icon to the gun's rows (60-255) before the white silhouette is drawn.
+  - `muzzle` and `tag_pistolgrip_attach` are extra bones, as for the P90.
+- Materials and sounds are from `Tools/hk416_assets.py`:
+  - RoN's receiver (with every gun part and the stock) and steel magazine (with the rounds), partly metal. Tarkov's HK
+    polymer magazine, E1 and Slim Line stocks and the M-LOK rail sections are polymer. Magpul's PMAGs are Source-style
+    sheets; the PMAG 30's window is see-through, though its vmt says otherwise. The laser's mount is MW's.
+  - The shot is Tarkov's two close HK416 recordings and the suppressed shot its suppressed one, levelled to the MCX's:
+    the same round from a barrel of about the same length.
+  - Reload foley plays at the QC's event-5004 frames, through the pack's alias list (`mw_sounds_hk416.lua`): the MCX's
+    MW2019 moves and the pack's own magazine and charging handle sounds. The MW base's generic rattles and magazine
+    drop are left out.
+  - All three are voiced like the other ported guns' (see The ported guns' sounds). The shot keeps its pitch, the lows
+    under 130 Hz are eased 8 dB after 30 ms, the recordings' own tail is eased 20 dB from 80 ms (it was baked in, like
+    the FAL's), and there's 2 dB of presence for 25 ms. The ground comes 7.3 ms after the direct sound (the muzzle
+    ~0.56 m ahead of the ear). The two recordings make four takes, pitch spread 0.98-1.02.
+- It was ported with markings on, which `Tools/texture_markings/specs/hk416.json` takes off (52 regions over 8
+  materials):
+  - RoN's made-up maker on the receiver: the HaKa logos, "HaKa 416 Cal. 5.56 mm x 45", "Hartmann & Karl GmbH, Made in
+    Deutschland", the serials (65-000404) and the red 30s beside the selector's pictograms;
+  - the steel magazine's calibre and the made-up maker on its floorplate;
+  - the stocks' and the polymer magazine's HK logos and names, its date wheel, and Made in Germany;
+  - on the PMAGs, Magpul's names and logos, GEN M3, the CAGE code, part numbers, patent and web address, the mould
+    numbers and date wheels, and the round counts.
+  The moulded outlines, pills and the logo ring stay. Checked in before/after close-ups of the textures on 2026-10-08,
+  not yet on the model.
+- Bodygroups (DefaultMask 74069 by the bit rule, not yet read from the compiled models):
+  - `muzzle_tip`: the flash hider, hidden under a muzzle device.
+  - `iron_sights` and `sight_folded`: HK's flip-up diopter sights raised, and folded down under an optic.
+  - `laser_rail`: an M-LOK rail section on the handguard's right side, shown only under a laser.
+  - `magazine` and `stock`: the factory parts and the ones below.
+- Slots: Optic on the upper's rail (`tag_reflex`; an optic folds the sights), Muzzle at the flash hider's rear face
+  (`tag_silencer`) and Laser at the back of the M-LOK section (9.34 to 11.72), ahead of the left hand's fingertips, then
+  Stock and Magazine. 48 of the M4's MWII parts are made eligible (optics, muzzle devices, lasers and tracer rounds).
+  - No Underbarrel slot: the left hand cups the handguard's underside from x 6.5 to 10.4, and its bottom rail ends at
+    11.1, where the M4's vertical grips need 2.26.
+- Parts (`Prefabs.parts` in its `kastov_prefabs` entry, `Assets/gunsmith/hk416/`), with recoil relative to the
+  viewmodel's own collapsible stock and weights against HK's steel magazine (~0.25 kg):
+  - E1 Stock: HK's, with a broad rubber buttpad. 5% less recoil, +0.05 kg.
+  - Slim Line Stock: HK's, lighter and narrower, with a thin buttpad. 5% more recoil, -0.05 kg.
+  - Polymer 30 Round Mag: HK's polymer magazine (0.14 kg).
+  - PMAG 20, 30 and 40: Magpul's Gen M3 (0.11, 0.136 and 0.18 kg). The 20 and 40 reload with the pack's own clips
+    (`reload_variants` `_smag`, `_xmag`): the gun is level again at 2.07/2.17 s and 2.63/3.13 s. The 30s use the
+    factory reloads.
+  - Left out: the pack's ISO and TAQ magazines (Tarkov's made-up ones), its speed-pull loops, the other makers' AR
+    stocks and an AK-12's stock, and its grips (there's no Underbarrel slot).
+- No `GripFit`: the idle left hand has 78 vertices inside the handguard, at most 0.085" deep, and 80 (0.068") aimed
+  (the verified 762's 54 go 0.10").
+- Aimed, it fires with the pack's `fire_2` (`Weapon.ads_fire`, see the pipeline notes): the hip clip rolls the gun 2.5
+  degrees about the bore and pitches it 1.1 every shot, and `fire_2` rolls it 0.54 at most and kicks it 0.5" straight
+  back.
+- The iron sights use the addon's own aim (its lua's Aim, 0.5 forward and 0.18 down) at ads_in's last frame. Not checked
+  in a render or in-game.
+- Its `OpticAimCorrection` `1.617,0,-0.105` is derived with the Bizon's formula, NOT checked in-game. Its z is small (the
+  Kastovs' are about -1.2): its flip-up sights stand on the top rail, as the M4's do.
+- It sprints with the M4's sprint and has the look sway and hand IK (see the pipeline notes).
+- The charm hangs on the receiver end plate's left side, by the real gun's QD sling socket, in front of every stock.
+  Every hand joint stays 0.97" or more from it through every clip (the right thumb is nearest). The sticker is on the
+  magazine well's left side.
+- Its third-person left hand (`4.97,2.47,2.57`, see Third-person left hand) hasn't been rendered.
+- The models, the animgraph, the prefabs and its parts compiled in the editor on 2026-10-08, each leaving a compiled
+  file. Nothing has been checked in-game. Its gunsmith review note stays until all of it has been checked in a match.
+
+## AK-12 (Escape from Tarkov's AK-12, ARC9 EFT Assault Rifles 2962829818)
+- The real Kalashnikov AK-12 (6P70, category AssaultRifle) in 5.45x39, the 2018-2022 production rifle. It's the third
+  of the user's list, after the L85A2 and the HK416 (see L85A2). The model is Tarkov's, from darsu_eft's ARC9 pack
+  (`extracted/2962829818`, decompiled to `decompiled/ak12`), on the AK-105's CoD rig and clips. Its figures are in
+  `kastov_prefabs.gameplay_ak12`, from Rosoboronexport's catalogue:
+  - 700 rpm, with the 2018-2022 rifles' selector: automatic, a two-round burst and semi (the 2023 model dropped the
+    burst). It starts on automatic. The burst is the M16A4's (`BurstAmount` 2, `BurstEndDelay` 0): a pull fires both
+    rounds, and letting go doesn't cut it short. It has automatic, so bots fire their usual strings with it.
+  - 7N6 at 900 m/s from the 415 mm barrel, as from the AK-74M's, G7 0.157. The sights sit 55.3 mm over the bore (the
+    eye's height over it at the ADS pose, through the diopter's aperture), zeroed at 300 m like the AK-105.
+  - The M4's 5.56 damage (20) and falloff, as the AK-105's 5.45 has.
+  - 3.5 kg without a magazine, ~4.0 kg with a loaded 30: the M16A4's weight, too little over the AKM's 3.75 kg for a
+    WeightSlowdown. So SpeedPenalty 40 and 0.25 s ADS. The recoil scale (1.43,3.58) is the M4's (2,5) scaled by free
+    recoil (~1.33 against 1.86 m/s).
+  - Reload times are the AK-105's clips': the gun is level again at 2.3 s, and 2.6 s after the empty reload's bolt pull.
+  - Bots can be issued it: it's a Primary AssaultRifle, so it's in `WeaponPool` and shares the rifles' half.
+- `Tools/ak12_rig.py` puts Tarkov's pieces on the AK-105's skeleton as ARC9 draws them, and writes them as SMDs
+  (`decompiled/ak12/rig`):
+  - the receiver with the 415 mm barrel, the gas block's front sight, the railed dust cover and handguard and the
+    folding, telescoping stock, then the muzzle brake (`muzzle_tip`), the diopter rear sight (`iron_sights`), the grip
+    and the windowed magazine;
+  - the bolt carrier on `j_boltcarrier`, the trigger on `j_trigger`, the selector on `j_fireselect`, the mag catch on
+    `j_magrelease` and the magazine with its top rounds on `j_mag1` / `j_mag2`. The real gun's magazine well, trigger
+    group, selector and catch are the AK-74M's, so they fit the AK-105's to within 0.08.
+  - `muzzle` is an extra bone, 0.2 inside the brake's front.
+  - The pack's icon is a three-quarter render, so the script draws the side-on `ui/weapons/guns/ak12_01.png` from the
+    model.
+- Materials and sounds are from `Tools/ak12_assets.py`:
+  - Tarkov's sheets are Source VertexLitGeneric (colour, normal, phong exponent), built like the HK416's Tarkov parts:
+    no metal, roughness from the exponent.
+  - The magazine's window points at a glass texture the pack doesn't ship, so it's a flat smoked translucent polymer.
+    The rounds seen through it are a stack drawn on an alpha-tested card, greened towards Russian lacquered steel cases
+    like the loose rounds.
+  - The AK-105's magazines and the AK grips, which it takes as parts, keep the AK-105's and 74u's materials.
+  - The shot: Tarkov plays one shot as one of four 81 ms starts (`_loop1-4`) under the last round's tail (`_loopt`),
+    so each take is the two mixed, levelled to the AK-105's (the same 7N6). Voiced (see The ported guns' sounds) at its
+    own pitch, with the lows under 130 Hz eased 8 dB after 30 ms, Tarkov's tail eased 14 dB from 80 ms (it was 23 dB
+    under the blast at 0.4 s, where the voiced rifles' are 33), 3 dB of presence for 25 ms, the ground at 6.9 ms (the
+    muzzle ~0.73 m ahead of the ear) and the echoes at -33 dB. Four takes, pitch 0.98-1.02.
+  - The suppressed shot is Tarkov's three suppressed takes, built the same way, 10 dB under the voiced open shot.
+  - Reload foley: the AK-105's moves, and Tarkov's AK-74 recordings for the AK-12's own parts. The charging handle goes
+    back and home, and the mag catch, the magazine coming out and going in (split into the front lug catching and the
+    catch locking) each sound on the frame the AK-105's clip moves that part. Voiced as one set, so the magazine's clicks
+    stay ~9 dB under the bolt.
+- It was ported with markings on, which `Tools/texture_markings/specs/ak12.json` takes off (8 materials):
+  - the receiver's selector markings (АВ, 2, ОД; the track's line and detents stay), the index and calibre (6П70,
+    5.45x39), a serial and small stamps;
+  - the magazine's round counts (10 to 30, on both sides) and its moulded maker's mark;
+  - a mould number on the grip, the stock tube's position numbers 1-4 (the holes stay), the calibre on the rear sight's
+    base, the bolt's acceptance stamps and serial, and the rounds' headstamps;
+  - the rear sight leaf's range numbers 1-8 and the battle setting's П, each copied from the plain leaf above them. The
+    scale's ticks and the leaf's groove rims are `keep` regions, out of the patches' borders. The 1 and 5 patches are a
+    little smoother than the leaf round them.
+  Checked in the tool's previews of each patch on 2026-10-08, not on the model.
+- Bodygroups (DefaultMask 135189 by the bit rule, not yet read from the compiled models): `muzzle_tip` (the brake,
+  hidden under a muzzle device), `iron_sights` (the diopter, which an optic takes off: on the real gun it slides off
+  the same rail), `pistol_grip` and `magazine` (the factory parts and the ones below).
+- Slots: Optic on the dust cover's rail (-4.5 to 4.0), Muzzle at the brake's rear face, Underbarrel on the handguard's
+  bottom rail (6.5 to 10.5) and Laser on the handguard's right side, then Pistol Grip and Magazine. 56 of the M4's MWII
+  parts are made eligible (optics, muzzle devices, grips, lasers and tracer rounds). A fitted foregrip hasn't been seen
+  beside the left hand.
+- Parts (`PARTS_AK12`, `Assets/gunsmith/ak12/`), 11 in all: it takes any AK-74 magazine and AK grip, as the real one
+  does.
+  - AK-74M Pistol Grip, then the AK-105's AK-platform grips.
+  - AK-74M 30 Round Mag (no window), then the AK-105's 20, RPK-74 45 and four-column 60, with the AK-105's reloads and
+    reload times (`reload_variants` `_smag`, `_xmag`, `_xmaglrg`).
+  - No stocks or barrels. `part_masses.py` has its own magazine at 0.215 kg and its own grip at 0.09.
+- Hands: the left hand holds the handguard through the AK-105's grip pose (`a_delta_barhvyshort_additive_for_offset`).
+  No `GripFit`:
+  - the idle left hand has 57 vertices inside the gun, at most 0.14" deep, about what the AK-105's does;
+  - the right hand's are on the grip, below the view at the hip and aiming. The empty reload's bolt pull puts 25 into
+    the receiver on screen, at most 0.09" deep (the AK-105's 0.08").
+- It plays the AK-105's fire clip, which doesn't move the gun, so it has no `ads_fire`.
+- The iron sights use ads_in's last frame. The AK-105's aim left the diopter 0.23 high, so `kastov_weapons.AK12.aim`
+  lowers the gun until the aperture's centre is on the aim point and pitches it 0.095 degrees up onto the post's tip
+  (within 0.001 and 0.005 degrees). Checked in a render (the post centred in the aperture), not in-game.
+- Its `OpticAimCorrection` `3.18,0,-1.032` is the 762's measured correction moved by how far the AK-12's ADS pose puts
+  its optic slot from the 762's, like the 74u's. NOT checked in-game: tune it with `dev_optic_correction`.
+- It sprints with the M4's sprint and has the look sway and hand IK (see the pipeline notes).
+- The sticker is on the receiver's left side above the magazine well. Neither it nor the charm has been seen on it.
+- Its third-person left hand (`6.9,2.55,2.23`, see Third-person left hand) hasn't been rendered.
+- Made on 2026-10-08 with the editor's bridge down. The editor compiled the prefabs, the .equip and the sounds, but not
+  yet the models, the animgraph, the materials or the parts. If the first-person gun is invisible or keeps old clips,
+  register its DMX and recompile `v_ak12.vmdl` and `v_ak12.vanmgrph` (see the pipeline notes), and `recompile_asset`
+  the shared parts if the gunsmith doesn't offer them. Nothing has been checked in-game. Its gunsmith review note stays
+  until all of it has been checked in a match.
+
+## AK-15 (Escape from Tarkov's AK-12 with its AK-103 magazine, ARC9 EFT Assault Rifles 2962829818)
+- The real Kalashnikov AK-15 (6P71, category AssaultRifle): the AK-12 in 7.62x39, with the same receiver, furniture,
+  sights and selector on a 7.62 barrel. It's the fourth of the user's list (see L85A2), after the AK-12. No pack has an
+  AK-15 of the quality wanted, so it's the AK-12's model and rig (see AK-12) with a 7.62 magazine. No source shows the
+  AK-15 with a different brake from the AK-12's, so it keeps the AK-12's. Its figures are in
+  `kastov_prefabs.gameplay_ak15`, from Rosoboronexport's catalogue:
+  - 700 rpm, with the AK-12's automatic, two-round burst and semi (`BurstAmount` 2, `BurstEndDelay` 0). It starts on
+    automatic.
+  - PS ball at 715 m/s from the 415 mm barrel, as from the AKM's of the same length (`PS_BALLISTICS`, G7 0.149). The
+    sights are the AK-12's on the same receiver, 55.3 mm over the bore, zeroed at 300 m like the AKM's battle zero.
+  - The Kastov 762's and RPK's PS damage (26) and falloff.
+  - 3.5 kg without a magazine and ~4.24 kg with a loaded AK-103 30 (~0.25 kg, and 30 rounds of 16.3 g). Like the Uzi's
+    ~4.2 kg, that's too little over the AKM's 3.75 kg for a WeightSlowdown. So it has SpeedPenalty 40 and 0.25 s ADS.
+  - The recoil scale (1.94,4.85) is the M4's (2,5) scaled by free recoil (~1.80 against 1.86 m/s).
+  - Reload times are the AK-105's clips', as for the AK-12: 2.3 s, and 2.6 s empty.
+  - Bots can be issued it: it's a Primary AssaultRifle, so it's in `WeaponPool` and shares the rifles' half.
+- `Tools/ak15_rig.py` builds the AK-12's pieces with Tarkov's AK-103 polymer 30-round magazine.
+  - `ak12_rig.py` was split into `weapon_bones`, `add_mesh`, `place_model` and `Rig` for it.
+  - The magazine goes where the pack's AK-103 puts it on `mod_magazine` (0, -0.05, -0.25).
+  - The 7.62 rounds in its lips are the pack's c_ak100's (`762.smd`). c_ak100 and c_ak12 share their skeleton and clips.
+  - It writes `decompiled/ak12/rig/ak15_mag.smd` and the side-on icon `ui/weapons/guns/ak15_01.png`.
+  - The magazine's fit was checked against the rig's `j_mag1` / `j_mag2`, not in a render.
+- Materials and sounds are from `Tools/ak15_assets.py`, run after `ak12_assets.py` and `rpk_assets.py`:
+  - The materials are the AK-12's, plus:
+    - the magazine, Tarkov's AK-103, built like the AK-12's;
+    - the rounds, Tarkov's `patron_762x39`, greened towards lacquered steel cases like the AK-12's. They come from the
+      ARC9 EFT SHARED pack that the Assault Rifles pack requires (Workshop 2917343547), downloaded to
+      `extracted/2917343547` for it.
+  - The shot is Tarkov's AKM: the same round from the same barrel length. Four 102 ms starts go under the last round's
+    tail, mixed at 0 dB, which is the Kastov 762's voiced shot's level (the same round).
+    - It's voiced at its own pitch (see The ported guns' sounds): the lows under 130 Hz eased 8 dB after 30 ms, Tarkov's
+      tail eased 6 dB from 100 ms, 3 dB of presence for 25 ms, the ground at 6.9 ms and the echoes at -33 dB.
+    - The heavy 45-90 Hz is in the blast's first 20 ms, where the voicing leaves it.
+    - Four takes, pitch 0.98-1.02.
+  - The suppressed shot is Tarkov's four suppressed AKM takes, built the same way, 10 dB under the voiced open shot.
+  - The reloads are the AK-12's: the AK-105's clips, with Tarkov's AK-74 charging handle and polymer magazine foley,
+    which suit the AK-103's polymer magazine. The AKM 30 part plays them too: it's steel, but uses the factory reload.
+- It was ported with markings on, which `Tools/texture_markings/specs/ak15.json` takes off:
+  - the magazine's calibre (762x39), a handwritten 13 and a moulded Izhmash triangle;
+  - the rounds' headstamp.
+  Checked in close-ups of the textures on 2026-10-08, not on the model. Everything else uses the AK-12's materials,
+  which are already cleaned.
+- Bodygroups (DefaultMask 36885 by the bit rule, not yet read from the compiled models):
+  - `muzzle_tip` (2 choices) and `iron_sights` (2);
+  - `pistol_grip` (8: the AK-12's);
+  - `magazine` (3: the factory AK-103 30, the AKM 30 and the RPK 40).
+- These are all the AK-12's:
+  - the slots, and 56 of the M4's MWII parts made eligible;
+  - the optic correction `3.18,0,-1.032` (derived, NOT checked in-game) and the iron sights' aim;
+  - the hands: no `GripFit`, and the left hand's fit wasn't measured again, since only the magazine changed;
+  - the fire clip (no `ads_fire`), the sticker and the charm;
+  - the third-person left hand (`6.9,2.55,2.23`).
+- Parts (`PARTS_AK15`, `Assets/gunsmith/ak15/`), 9 in all:
+  - the AK-12's seven grips;
+  - the AKM's ribbed steel 30 (`AKM 30 Round Mag`, the factory reload);
+  - the RPK's 40 (`RPK 40 Round Mag`): the AK-105 45's clips through `reload_variants` `_xmag`, level again at 2.4 s,
+    and 2.75 s empty.
+  - Both magazines keep the RPK's materials. `part_masses.py` has its own magazine at 0.25 kg and its own grip at 0.09.
+  - The RPK's 75-round drum isn't offered: the AK-105's clips have no drum reload.
+- Made on 2026-10-08 with the editor's bridge down: nothing has been compiled or seen in-game.
+  - If the first-person gun is invisible or keeps old clips, register its DMX and recompile `v_ak15.vmdl` and
+    `v_ak15.vanmgrph` (see the pipeline notes).
+  - If the gunsmith doesn't offer the parts, `recompile_asset` the shared ones and its own.
+  - Its gunsmith review note stays until all of it has been checked in a match.
+
+## AK-74M (Escape from Tarkov's AK-74M, ARC9 EFT Assault Rifles 2962829818)
+- The real Kalashnikov AK-74M (6P20, category AssaultRifle) in 5.45x39, the Russian army's standard rifle since 1991,
+  as issued:
+  - the 415 mm barrel with the 6P20 0-20 muzzle brake, the plain dust cover, the black polymer handguard, the
+    side-folding polymer stock, the tangent rear sight and the 6L23 polymer magazine;
+  - no top rail: an optic goes on a bracket clamped to the dovetail on the receiver's left side.
+- The user asked for guns that look exactly like the real ones, not ones adapted for a game (2026-10-08), so it's
+  Tarkov's model, from darsu_eft's ARC9 pack (the c_ak100 viewmodel, decompiled to `decompiled/ak15`, and its default
+  attachments, to `decompiled/ak74m`). It's on the AK-105's CoD rig and clips with the AK-12's fit (see AK-12). Its
+  figures are in `kastov_prefabs.gameplay_ak74m`, from Rosoboronexport's catalogue:
+  - 600 rpm, automatic and semi. It starts on automatic.
+  - 7N6 at 900 m/s from the 415 mm barrel, G7 0.157, like the AK-12's. The sights sit 52.9 mm over the bore (the eye's
+    height over it at the ADS pose, on the line from the rear notch's shoulders to the front post's tip), zeroed at
+    300 m like the AK-105's and AK-12's.
+  - The M4's 5.56 damage (20) and falloff, as the AK-105's and AK-12's 5.45 have.
+  - 3.4 kg without a magazine and ~3.95 kg with a loaded 6L23 30 (0.23 kg, and 30 rounds of 10.5 g): too little over
+    the AKM's 3.75 kg for a WeightSlowdown. So SpeedPenalty 40 and 0.25 s ADS.
+  - The recoil scale (1.45,3.62) is the M4's (2,5) scaled by free recoil (~1.35 against 1.86 m/s).
+  - Reload times are the AK-105's clips', as for the AK-12: 2.3 s, and 2.6 s empty.
+  - Bots can be issued it: it's a Primary AssaultRifle, so it's in `WeaponPool` and shares the rifles' half.
+- `Tools/ak74m_rig.py` puts Tarkov's pieces on the AK-105's skeleton with `ak12_rig.py`'s tools, and writes them as
+  SMDs (`decompiled/ak74m/rig`). Its docstring has every piece.
+  - c_ak100 has slot bones c_ak12 lacks, so its own skeleton is posed (`weapon_bones`): a bone the shared `ak_anims`
+    idle animates takes the idle, and any other keeps its reference offset from its posed parent. Its magazine slot
+    and dust cover bone are within 0.3 of the AK-12's, so the AK-12's fit holds.
+  - The pack's default handguard is the Vityaz's, whose material it doesn't ship. The AK-74M's own black polymer
+    handguard is in the pack only as the stock pieces two aftermarket models keep, in the AK-74M's handguard material.
+    So the lower comes from the UltiMAK M1-B gas tube's model, and the upper from the CNC Guns OV GP's. Only those
+    triangles are taken (`HANDGUARD`). The lower's front tongue is pressed back to the barrel's ferrule (`FERRULE_Y`),
+    where the Vityaz's lower ends.
+  - The optic mount is Zenit's B-13 "Klassika" (the pack's `eft_mount_dovetail_b13`): a Picatinny rail over the dust
+    cover, on an arm from the dovetail.
+  - `muzzle` is an extra bone, 0.2 inside the brake's front.
+  - The side-folder (`ak74m_stock`) and its release button on the receiver's rear (`ak74m_stock_hinge`) are SMDs of
+    their own, so the AK-105's stocks can take the stock's place and the fixed ones can hide the button.
+  - It draws the side-on icon `ui/weapons/guns/ak74m_01.png` from the model, as for the AK-12.
+- Materials and sounds are from `Tools/ak74m_assets.py`, run after `ak12_assets.py`:
+  - Tarkov's sheets, built like the AK-12's (no metal, roughness from the phong exponent), from the Assault Rifles pack
+    and EFT SHARED (Workshop 2917343547):
+    - the receiver and barrel, the shared parts and bolt, the front sight block, the side rail, the dust cover, the
+      brake, the rear sight and the magazine;
+    - the stock and the pistol grip, whose `$color2` tints Tarkov's plum AK-74 grip to the AK-74M's black;
+    - the handguard and the gas tube;
+    - the B-13 in grey-black anodised aluminium.
+  - The rounds in the magazine's lips are the AK-12's. The AK-105's magazines and the AK grips keep the AK-105's and
+    Kastov-74u's materials.
+  - The shot is Tarkov's AK-74M: four starts, each under the last round's tail, at the AK-12's level (the same 7N6 from
+    the same barrel length).
+    - Voiced at its own pitch (see The ported guns' sounds): the lows under 130 Hz eased 8 dB after 30 ms, Tarkov's
+      tail eased 6 dB from 100 ms, 4 dB of presence for 25 ms (the recordings are darker than the AK-12's), the ground
+      at 6.9 ms and the echoes at -33 dB.
+    - Four takes, pitch 0.98-1.02.
+  - The suppressed shot is Tarkov's four suppressed AK-74M takes under the AK-74's suppressed tail, 10 dB under the
+    voiced open shot.
+  - The reloads are the AK-12's events: the AK-105's clips, with Tarkov's AK-74 charging handle and polymer magazine
+    foley, which is the 6L23's.
+- It was ported with markings on, which `Tools/texture_markings/specs/ak74m.json` takes off (8 materials):
+  - the selector's АВ and ОД (the dimple's ring and the track's line stay), acceptance stamps, and the serials with
+    Izhmash's triangle;
+  - the rear sight leaf's range numbers 1-10 and the battle setting's П, each copied from the plain leaf, with the
+    scale's ticks kept;
+  - the magazine's moulded number and Izhmash's triangle, the bolt's serial and a stamp, the stock's moulded label
+    lettering and marks, and a number on the gas tube;
+  - Zenit's markings on the B-13: ЗЕНИТКА™, its web address, ООО "ЗЕНИТ", Сделано в России and Б-13 "КЛАССИКА".
+  Checked in close-ups of the textures on 2026-10-08, not on the model.
+- Bodygroups (DefaultMask 553713749, read from the compiled `v_ak74m.vmdl_c` and `w_ak74m.vmdl_c` in the editor on
+  2026-10-09; the two match):
+  - `muzzle_tip` (the brake, hidden under a muzzle device);
+  - `optic_rail` (the B-13, shown only under an optic);
+  - `stock_hinge` (the folding stock's release button, hidden by the fixed stocks);
+  - `stock` (10), `pistol_grip` (8) and `magazine` (5): the factory parts and the ones below.
+  - The rear sight has no bodygroup: it stays under an optic, as on the real gun, where the B-13's rail ends behind it.
+- Slots: Optic on the B-13's rail (-4.55 to 2.86) and Muzzle at the brake's rear face, then Stock (at
+  `tag_stock_attach`, -5.716,0,3.649), Pistol Grip and Magazine.
+  No Underbarrel or Laser slot: the polymer handguard has no rails. 45 of the M4's MWII parts are made eligible
+  (optics, muzzle devices and tracer rounds).
+- Parts (`PARTS_AK74M`, `Assets/gunsmith/ak74m/`), 20 in all. The user saw only a few and asked why the other AKs'
+  parts weren't on it (2026-10-09). It takes what the real one takes:
+  - The AK-105's stocks (9: it's the same AK-100 receiver), with recoil relative to the AK-74M's side-folder, as the
+    AK-105's is. The AK-105's two copies of that side-folder aren't offered again. The Wooden, RPK Club-Foot and
+    Thumbhole stocks are fixed, so they hide the release button. Strictly a fixed stock needs a fixed-stock rear
+    trunnion, which a folding AK-74M doesn't have; they're offered as on the AK-105.
+  - The AK-12 Pistol Grip, then the AK-platform grips (6), the AK-12's parts.
+  - The AK-12 30 Round Mag (the 6L31, with a window; the factory reload), then the AK-105's 20, RPK-74 45 and
+    four-column 60, with the AK-105's reloads and reload times (`reload_variants` `_smag`, `_xmag`, `_xmaglrg`).
+  - Its own 6P34 Sb.15 side-folder, 6P1 Sb.8 grip and 6L23 30 are the factory parts, so the AK-12's AK-74M grip and
+    30 aren't offered again.
+  - `part_masses.py` has its stock at 0.45 kg, its grip at 0.08 and its magazine at 0.23, keyed by group
+    (`stock/factory`, `pistol_grip/factory`: see Part weight), and the AK-12's grip at 0.09 and 30 at 0.215.
+  - `hc1_ak74m_parts_check [filter] [view]` (`Editor/Hc1Ak74mGunsmithQa.cs`) fits every part on the world model
+    offscreen, checks the masks and each part's bodygroups, and renders it to `output/ak74m-gunsmith/` (view 0 the
+    stock and grip, 1 the whole gun, 2 the magazine). On 2026-10-09 all 21 passed, and in the renders every stock
+    seats on the receiver's rear and every grip and magazine sits where it should. Not yet seen in first person or
+    in a match.
+- Hands: the left hand holds the handguard through the AK-105's grip pose (`a_delta_barhvyshort_additive_for_offset`).
+  No `GripFit`, and the left hand's fit on the polymer handguard hasn't been measured.
+- It plays the AK-105's fire clip, which doesn't move the gun, so it has no `ads_fire`.
+- The iron sights use ads_in's last frame. The AK-105's aim left the rear notch 0.123 high, so `kastov_weapons.AK74M.aim`
+  lowers the gun until the notch's centre is on the aim point and turns it 0.12 degrees down and 0.023 left onto the
+  front post's tip (within 0.002 degrees). Measured from the meshes, not checked in a render or in-game.
+- Its `OpticAimCorrection` `3.18,0,-1.371` is the 762's measured correction moved by how far the AK-74M's ADS pose puts
+  the B-13's rail from the 762's slot: the AK-12's x, and 0.34 lower, since the B-13 holds an optic higher over the
+  bore. NOT checked in-game: tune it with `dev_optic_correction`.
+- It sprints with the M4's sprint and has the look sway and hand IK (see the pipeline notes).
+- The charm hangs on the dovetail, just in front of the B-13's arm, its chain 0.27 clear of the clamp. The empty
+  reload's left index finger comes within 0.2, as on the AK-105 and AK-12. The sticker is on the receiver's left side
+  above the magazine well, between the dovetail and the rivets. Neither has been seen on it.
+- Its third-person left hand (`6.9,2.7,2.27`, see Third-person left hand) hasn't been rendered.
+- The editor compiled the materials and sounds on 2026-10-08, and the models, the animgraph, the prefabs, its parts and
+  the shared parts on 2026-10-09, with no errors. Nothing has been checked in-game. Its gunsmith review note stays until all of it has been
+  checked in a match.
+
+## SIG MCX-SPEAR (Escape from Tarkov's MCX-SPEAR, ARC9 EFT Assault Rifles 2962829818)
+- The real SIG Sauer MCX-SPEAR (category AssaultRifle) in 6.8x51 (.277 Fury), the rifle the US Army adopted as the M7.
+  It's built as the M7 and SIG's own SPEAR come, in coyote tan:
+  - the 330 mm (13-inch) barrel with the Clutch-LOK QD flash hider, the adjustable gas piston, the M-LOK handguard with
+    its full-length top rail, SIG's flip-up sights and the side charging handle;
+  - SIG's locking hinge and low-profile tube with a Magpul MOE SL-K stock, SIG's reduced-angle pistol grip, and
+    Lancer's L7 AWM 20-round magazine.
+- The user asked for guns that look exactly like the real ones, not ones adapted for a game (2026-10-08), so it's
+  Tarkov's model, from darsu_eft's ARC9 pack (the c_spear viewmodel, decompiled to `decompiled/spear`, and its default
+  attachments, to `decompiled/spear_atts`). It's on the MCX Virtus's CoD rig and clips (MW2019's M13, see SIG MCX
+  Virtus): both are SIG's short-stroke piston MCX family on AR-15-pattern lowers. Its figures are in
+  `kastov_prefabs.gameplay_spear`:
+  - 850 rpm, automatic and semi, from a 20-round magazine. It starts on automatic.
+  - 135 gr ball at ~915 m/s from the 13-inch barrel, G1 0.488. The sights sit 85 mm over the bore (the line through the
+    rear aperture's centre and the front post's tip), zeroed at 300 m like the other rifles.
+  - BaseDamage 44, the M4's 20 scaled by muzzle energy (3,663 J against M855's 1,646), so in hardcore a body hit at full
+    damage always kills, as with the FAL's M80. Falloff, range, recoil pattern, view punch, casing and flash are the
+    M4's.
+  - 3.8 kg (8.38 lb) without a magazine, ~4.35 kg with a loaded Lancer 20 (0.17 kg, and 20 rounds of ~19.4 g): 0.6 kg
+    over the AKM, so SpeedPenalty 40, WeightSlowdown 0.006 and 0.26 s ADS, by the RPK's scaling. `part_masses.GUN_KG`
+    has it at 4.35.
+  - The recoil scale (3.28,8.2) is the M4's (2,5) scaled by free recoil: a 6.8x51 round (8.75 g at 915 m/s, ~3.3 g of
+    powder) kicks it back at ~3.05 m/s, against the M4's 1.86.
+  - A suppressor doesn't change its rate (`SuppressorFireRateScale` 1): its adjustable gas valve has a suppressed
+    setting, and the M7 is issued with a suppressor.
+  - Reload times are the MCX's clips': the gun is level again at 2.33 s, and 2.6 s after the empty reload's bolt
+    release.
+  - Bots can be issued it: it's a Primary AssaultRifle, so it's in `WeaponPool` and shares the rifles' half.
+- `Tools/spear_rig.py` puts Tarkov's pieces on the MCX's skeleton with `ak12_rig.py`'s tools (its `Rig` now takes another
+  gun's receiver, idle clip, fit, bone map and dropped materials), and writes them as SMDs (`decompiled/spear/rig`). Its
+  docstring has every piece.
+  - Its SHIFT puts the SPEAR's trigger pivot on the MCX's `j_trigger`. Both have AR-15-pattern fire controls and
+    magazine wells, so the bolt, trigger, selector, bolt release, magazine release, charging handle and magazine ride
+    the MCX's bones (`BONES`, checked against what the MCX's clips move). The bore sits 0.32 under the MCX's.
+  - The pack's spear_atts models are in studiomdl's pre-rotation space, so each is turned 90 degrees (`TURN`) first.
+  - SIG's flip-up sights come from EFT SHARED (Workshop 2917343547): the pack's own build leaves them off for its
+    scope. The pack's suppressor, scope and mount are left out.
+  - The grip is part of the receiver (`vm_meshes`): SIG's reduced-angle grip is the only one offered. `muzzle` is an
+    extra bone 0.2 inside the flash hider's front, and `tag_pistolgrip_attach` is the MCX's.
+  - It draws the side-on icon `ui/weapons/guns/spear_01.png` from the model, as for the AK-12.
+- Materials and sounds are from `Tools/spear_assets.py`, run after `spear_rig.py` and `mcx_assets.py`:
+  - Tarkov's sheets, built like the AK-12's (no metal, roughness from the phong exponent), in the pack's coyote tan:
+    the lower, the upper and its details, the internals, barrel, gas piston, charging handle, handguard and flash
+    hider, the stock's hinge, tube and MOE SL-K, the grip, both magazines and the 6.8x51 rounds, and SIG's sights from
+    EFT SHARED.
+  - The shot is Tarkov's MCX-SPEAR: four close starts, each under the last round's tail. Mixed and limited, they were
+    -7.0 to -7.4 dB (K-weighted, loudest 100 ms), under the M16A4's -5.4. 6.8x51 runs at ~80,000 psi against 5.56's and
+    7.62x39's 52-55,000, from a 13-inch barrel, so each take is lifted through the voicing's soft clipper to -4.8 dB.
+    - Voiced at its own pitch (see The ported guns' sounds): the lows under 130 Hz eased 8 dB after 30 ms, Tarkov's
+      tail eased 16 dB from 80 ms (it was 15 dB under the blast at 0.2 s and 21 at 0.4 s, 12 dB over the voiced
+      rifles'), 4 dB of presence for 25 ms (the recordings are dark), the ground at 7.1 ms (the muzzle ~0.65 m ahead
+      of the ear, stock extended) and the echoes at -33 dB.
+    - Four takes, pitch 0.98-1.02.
+  - The suppressed shot is Tarkov's four suppressed takes under their own tail, 10 dB under the voiced open shot.
+  - The draw, holster and reloads are the MCX's events, voiced already: it plays the MCX's clips.
+- It was ported with markings on, which `Tools/texture_markings/specs/spear.json` takes off (53 regions over 15
+  materials):
+  - SIG's logos (on the lower, the sights' discs, the grip and the internals), SIG SAUER INC / NEWINGTON / NH USA, the
+    serial, the model's name and MULTI-CALIBER, and a torque figure;
+  - Lancer's L7-AWM, its maker's block and CAGE code, the calibre (7.62 X 51), the round counts, mould numbers and a
+    date wheel on both magazines (the boxed counts and the calibre's recessed plate stay);
+  - the gas valve's ADVERSE and NORMAL (their arrows stay);
+  - Magpul's MOE SL-K name and logos, and the stock label's part number and web address (the label's edges stay);
+  - the rounds' headstamp, the flash hider's 6.8 and its thread (5/8-24), and faint stamps on the gas block, barrel and
+    hinge.
+  `clean.py --check` finds every map as cleaned. Not checked on the model.
+- Bodygroups (DefaultMask 341 by the bit rule, not yet read from the compiled models):
+  - `muzzle_tip`: the flash hider, hidden under a muzzle device.
+  - `iron_sights` and `sight_folded`: the flip-up sights raised, and folded down under an optic.
+  - `magazine`: the factory 20 and the 25 below.
+- Slots:
+  - Optic on the upper's top rail (`tag_reflex`, -2.71,0,6.696; an optic folds the sights).
+  - Muzzle at the flash hider's rear face (15.337,0,4.82).
+  - Underbarrel on the handguard's flat bottom, which runs 5.75 to 14.5. Its origin is at 12.4, so the M4's vertical
+    grips end 0.1 inside the handguard's front, clear of the index finger.
+  - Laser on the handguard's right side at the bore's height (9.5,-0.926,4.82), ahead of the fingertips.
+  - Then Magazine. 56 of the M4's MWII parts are made eligible (optics, muzzle devices, grips, lasers and tracer
+    rounds).
+- Its own part (`Prefabs.parts`, `Assets/gunsmith/spear/magazines/`): Lancer's L7 AWM 25, the longer of the two
+  magazines SIG ships the SPEAR with in the US. It uses the factory reload: it's only an inch longer. `part_masses.py`
+  has the factory 20 at 0.17 kg and the 25 at 0.19.
+- The rig's `tag_brass` is the MCX's, 0.5 behind the middle of the SPEAR's longer ejection port and inside the
+  receiver, so `Weapon.moved_bones` puts it at the port's middle (the port runs x 4.7 to 8.0).
+- The left hand has the MCX's `GripFit` with the fingers 3% open (`kastov_weapons.SPEAR.left_grip`: shift
+  `0,-0.05,0.15`, fingers 0.03, thumb 0.2).
+  - The handguard is wider than the MCX's, and with the MCX's fit alone the pinky's tip came within 0.05-0.07 of it.
+  - Now the nearest joint, the pinky's middle, is 0.148 off at the hip and aiming, the middle fingertip 0.25-0.27 and
+    the palm 0.49. The verified 762's nearest fingertip is 0.118.
+  - Measured from the bones with `Tools/grip_fit/measure.js`, not seen in a render.
+- Aimed, it fires with the MCX's `fire_2` (`Weapon.ads_fire`, see the pipeline notes): the hip clip rolls the gun up to
+  2.5 degrees about the bore every shot, and `fire_2` only kicks it back.
+- The iron sights use ads_in's last frame. With the MCX's aim the rear aperture's centre sat 0.371 above the camera
+  (the SPEAR's sights stand higher over its bore), so `kastov_weapons.SPEAR.aim` lowers the gun onto the line through
+  the aperture's centre and the post's tip and turns it onto it (within 0.001 degrees). Measured from the meshes, not
+  checked in a render or in-game.
+- Its `OpticAimCorrection` `3.118,0,0.052` is the 762's measured correction moved by how far the SPEAR's ADS pose puts
+  its optic slot from the 762's, like the MCX's. NOT checked in-game: tune it with `dev_optic_correction`.
+- It sprints with the M4's sprint and has the look sway and hand IK (see the pipeline notes).
+- The charm hangs where the MCX's does, on the stock's hinge block by the QD sling sockets. It plays the MCX's clips, so
+  the hands keep the MCX's 1.07" or more from it. The sticker is on the magazine well's left side. Neither has been
+  seen on it.
+- Its third-person left hand (`4.2,2.574,2.702`, see Third-person left hand) hasn't been rendered.
+- Made on 2026-10-09 with the editor closed: only its sounds are compiled. The models, the animgraph, the materials,
+  the prefabs, the .equip, its part and the 56 shared parts aren't.
+  - If the first-person gun is invisible or keeps old clips, register its DMX and recompile `v_spear.vmdl` and
+    `v_spear.vanmgrph` (see the pipeline notes).
+  - If the gunsmith doesn't offer the shared parts, `recompile_asset` them.
+  - Nothing has been checked in-game. Its gunsmith review note stays until all of it has been checked in a match.
+
+## Colt M16A2 (Escape from Tarkov's M16A2, ARC9 EFT Assault Rifles 2962829818)
+- The real Colt M16A2 (category AssaultRifle) in 5.56x45, the US service rifle the Marine Corps adopted in 1983 and the
+  Army in 1986, before the flat-top M16A4. It's built as issued, in black and dark grey:
+  - the A2 upper with its fixed carry handle and adjustable rear sight, the 20-inch (508 mm) barrel with the front sight
+    base on its gas block and the A2 birdcage flash hider, and the round ribbed A2 handguard;
+  - the A2 fixed stock and pistol grip, the burst trigger group, the early charging handle and Colt's 30-round
+    aluminium magazine.
+- The user asked for guns that look exactly like the real ones, not ones adapted for a game (2026-10-08), so it's
+  Tarkov's model, from darsu_eft's ARC9 pack (the c_m16 viewmodel, decompiled to `decompiled/m16a2`, and its default
+  attachments, to `decompiled/m16a2_atts`). It's on the M16A4's CoD rig and clips (MWII's M16, see M16A4): the same Colt
+  rifle on the same lower. Its figures are in `kastov_prefabs.gameplay_m16a2`:
+  - Semi-automatic and three-round burst, no automatic, at 800 rpm cyclic (the middle of the 700-900 quoted), from a
+    30-round magazine. It starts on semi. The burst is the M16A4's (`BurstAmount` 3, `BurstEndDelay` 0); the real
+    burst cam doesn't reset when the trigger is let go, which isn't modelled.
+  - M855 at 945 m/s from the 20-inch barrel, G7 0.151, as the M16A4's. The sights sit 67.1 mm over the bore (the line
+    through the carry handle's rear aperture and the front post's tip), zeroed at 300 m: the rear sight's 300 m
+    setting, the A2's battle zero (FM 3-22.9).
+  - The M4's M855 damage (20), falloff curve and recoil pattern.
+  - 3.53 kg (7.78 lb) empty and 3.99 kg with a loaded 30 (TM 9-1005-319-10), what the M16A4 weighs: SpeedPenalty 40, no
+    WeightSlowdown and 0.25 s ADS. `part_masses.GUN_KG` has it at 3.99. The recoil scale (1.78,4.44) is the M16A4's:
+    the same round from the same barrel kicks it back at ~1.65 m/s, against the loaded M4's 1.86.
+  - Reload times are the M16A4's clips': the gun is level again at 2.3 s, and 2.4 s after the empty reload's bolt
+    release.
+  - Bots can be issued it: it's a Primary AssaultRifle, so it's in `WeaponPool` and shares the rifles' half. With no
+    automatic, bots fire at most `BurstAmount` rounds a pull with it, as with the M16A4.
+- `Tools/m16a2_rig.py` puts Tarkov's pieces on the M16A4's skeleton with `ak12_rig.py`'s tools, and writes them as SMDs
+  (`decompiled/m16a2/rig`). Its docstring has every piece.
+  - Its SHIFT puts the M16A2's trigger pivot (`weapon_trigger`) on the M16A4's `j_trigger`. Both are Colt's M16 on the
+    same lower, so the fire control group, the magazine well and the bore sit where the M16A4's do. The bolt, trigger,
+    selector, magazine release, bolt catch, charging handle, stock and magazine ride the M16A4's bones (`BONES`,
+    checked against what the M16A4's clips move).
+  - The pack's m16a2_atts models are in studiomdl's pre-rotation space, so each is turned 90 degrees (`TURN`) first,
+    except the handguard's two halves (`UNTURNED`): they carry the left arm's bones for ARC9's hand IK, and their slot
+    turns them itself.
+  - The A2 buffer tube and pistol grip come from EFT SHARED (Workshop 2917343547). The rounds' card for see-through
+    magazines (`556fakebullets`) is dropped: in the steel-walled USGI magazine it's never seen.
+  - The carry handle and the front sight base are part of the receiver (`vm_meshes`), as on the real gun. `muzzle` is an
+    extra bone 0.2 inside the flash hider's front.
+  - It draws the side-on icon `ui/weapons/guns/m16a2_01.png` from the model, as for the AK-12.
+- Materials and sounds are from `Tools/m16a2_assets.py`, run after `m16a2_rig.py` and `m16_assets.py`:
+  - Tarkov's sheets, built like the AK-12's (no metal, roughness from the phong exponent): the lower, internals, bolt
+    carrier, upper, handguard and its retainer and slip rings, stock, barrel, charging handle, front sight base, gas
+    tube, end plate, flash hider and magazine, and the buffer tube, pistol grip and 5.56x45 rounds from EFT SHARED.
+  - The shot is Tarkov's M4A1, the pack's only Colt 5.56 recordings (its M16A1 and M16A2 play them too): four outdoor
+    close single shots, each with its echo in it. They were made at -7.2 to -8.2 dB (K-weighted, loudest 100 ms), so
+    each is lifted through the voicing's soft clipper to the M16A4's -5.4 dB: the same round from the same barrel.
+    - Voiced (see The ported guns' sounds): 2% higher, as the M16A4's (a carbine's recording for a 20-inch barrel); the
+      lows under 130 Hz eased 8 dB after 30 ms; the recordings' baked-in tail eased 22 dB from 80 ms (it was 13 dB under
+      the blast at 0.2 s and 11 at 0.4, the loudest of any rip); 2 dB of presence for 25 ms; the ground at 6.8 ms (the
+      muzzle ~0.75 m ahead of the ear, as the M16A4's) and the echoes at -33 dB.
+    - Four takes, pitch 0.98-1.02.
+  - The suppressed shot is Tarkov's four suppressed M4A1 takes under their own tail, 10 dB under the voiced open shot.
+  - The draw, holster and reloads are the M16A4's events, voiced already: it plays the M16A4's clips.
+- It was ported with markings on, which `Tools/texture_markings/specs/m16a2.json` takes off (52 regions over 9
+  materials):
+  - Colt's names and address (COLT'S FIREARMS DIVISION, COLT INDUSTRIES, HARTFORD CONN, U.S.A.), its two logos, the
+    serial, CAL. 5.56 MM and M16 A2 on the lower, and the selector's SAFE, SEMI and BURST (an engraved circle stays);
+  - on the upper, the rear sight's 0-2, the elevation drum's DN and UP, the range scale's 4-7 (its ticks stay), the
+    windage knob's R (its arrow stays), a copyright mark and acceptance stamps;
+  - Colt's logo, name and address and CAL. 5.56 MM on the magazine, and DO NOT REMOVE on the handguard (four times);
+  - the barrel's C MP CHROME BORE, the front sight's UP (its arrow stays), the bolt's and internals' acceptance stamps
+    (their stamped rings stay), and the rounds' PPU 11 and 5.56x45 headstamps.
+  Checked in close-ups of the textures on 2026-10-09 (`clean.py --check` finds every map as cleaned), not on the model.
+- Bodygroups (DefaultMask 5 by the bit rule, not yet read from the compiled models): `muzzle_tip`, the A2 birdcage,
+  hidden under a muzzle device.
+- Slots: Muzzle only, at the birdcage's rear face (22.355,0,4.609). 18 of the M4's MWII parts are made eligible (the
+  muzzle devices and tracer rounds).
+  - No Optic slot: the carry handle is part of the upper, as on the real A2, which took a scope only on a carry-handle
+    mount. Its `OpticAimCorrection` is the M16A4's `1.613,0,0.079`, only so the field is set.
+  - No Underbarrel or Laser slot: the round handguard has no rails. No parts of its own: the A2 took the USGI 20 and
+    30, and the 20 isn't in the pack.
+- The rig's `tag_brass` is the M16A4's, 0.43 over the M16A2's ejection port and inside its upper (its bore sits 0.34
+  lower on the rig), so `Weapon.moved_bones` puts it in the port (5.85,0.081,0.5; the port runs x 4.3 to 7.4).
+- The left hand holds the round handguard through the M16A4's grip pose (`a_delta_grip_barmidhvy_additive_for_offset`).
+  No `GripFit`: the pinky's knuckle lies over one of the handguard's vent holes, its bone 0.01 inside the hole's rear
+  edge (the M16A4's pinky is 0.03-0.04 off). Every shift tried (0.08 each way, the fingers 8-20% open) left it as deep
+  or deeper.
+- The fire clip is the M16A4's `steady_fire` (15 frames): only the bolt, trigger and trigger finger move, so it has no
+  `ads_fire`.
+- The iron sights use ads_in's last frame. With the M16A4's aim the rear aperture's centre and the front post's tip sat
+  0.44 under the camera (its bore sits lower on the rig, and the A2's carry handle is lower than the A4's), so
+  `kastov_weapons.M16A2.aim` raises the gun onto the line through them and turns it onto it. Measured from the meshes,
+  not checked in a render or in-game.
+- It sprints with the M4's sprint and has the look sway and hand IK (see the pipeline notes).
+- The charm hangs where the M16A4's does, on the lower's left side above the magazine well, and the sticker is on the
+  magazine well's flat left side. Neither has been seen on it.
+- Its third-person left hand (`5.7,2.23,2.21`, where the first-person hand holds the handguard, by the rules in
+  Third-person left hand) hasn't been rendered.
+- The editor compiled the models, the animgraph, the materials, sounds, prefabs, the .equip and the 18 shared parts on
+  2026-10-09 with no errors. The markings were cleaned after that, with the editor closed: if the textures still show
+  Colt's markings, `recompile_asset` its vmats. Nothing has been checked in-game. Its gunsmith review note stays until
+  all of it has been checked in a match.
+
+## RPK-16 (Escape from Tarkov's RPK-16, ARC9 EFT Assault Rifles 2962829818)
+- The real Kalashnikov RPK-16 (category LMG) in 5.45x39: Kalashnikov's light machine gun of 2016 on the AK-12's
+  receiver, which went to the Russian army's trials in 2018-2019. It's built as it went there:
+  - the long barrel (580 mm on the real gun; the pack's model measures ~550) with its muzzle brake, the railed dust
+    cover and handguard, and the tangent rear sight clamped to the dust cover's rail;
+  - the AK-12's telescoping stock on the RPK-16's own folding tube, the AK-12's pistol grip and the 95-round drum.
+- The user asked for guns that look exactly like the real ones, not ones adapted for a game (2026-10-08), so it's
+  Tarkov's model, from darsu_eft's ARC9 pack (the c_rpk16 viewmodel, decompiled to `decompiled/rpk16`, and its default
+  attachments, to `decompiled/rpk16_atts`). It's on the RPK's CoD rig and clips (MWII's mg_iw9_rkilo, see RPK): an
+  RPK's receiver bones sit where the AK-105's do, so the AK-12's fit holds on it. Its figures are in
+  `kastov_prefabs.gameplay_rpk16`:
+  - 700 rpm, automatic and semi, from the 95-round drum. It starts on automatic.
+  - 7N6 at ~950 m/s from the long barrel, between the AK-74M's 900 from 415 mm and the RPK-74's 960 from 590 mm, G7
+    0.157. The sights sit 60.3 mm over the bore (the line through the rear sight's aperture and the front post's tip),
+    zeroed at 300 m like the AK-12's.
+  - The M4's 5.56 damage (20) and falloff, as the AK-12's 5.45 has.
+  - 4.5 kg without a magazine (Kalashnikov's figure) and ~6.4 kg with the loaded drum: ~1.9 kg for the drum and its 95
+    rounds is an estimate, since no weight is published for it. By the RPK's scaling against the AKM's 3.75 kg that's
+    SpeedPenalty 40, WeightSlowdown 0.027 and 0.29 s ADS (`Weapon.ads_time`). `part_masses.GUN_KG` has it at 6.4.
+  - The recoil scale (0.94,2.36) is the M4's (2,5) scaled by free recoil: a 7N6 round kicks the loaded gun back at
+    ~0.88 m/s, against the loaded M4's 1.86.
+  - The RPK's `BarrelHeat`, with 1.4 C a round (a 7N6 round's 1.45 g of powder, where the RPK's PS gives ~1.5). The
+    real gun's quick-change barrel isn't modelled.
+  - Reload times are the RPK's drum clips': the drum is seated and the gun level at 4.25 s, and 5.05 s after the empty
+    reload's bolt pull.
+  - Bots can be issued it: it's a Primary LMG, so it's in `WeaponPool` and shares the LMGs' fifth with the RPK. They
+    fire it as the RPK's gunner does (`_isMachineGunner`, by category), and LMGs weight them to the Anchor style.
+- `Tools/rpk16_rig.py` puts Tarkov's pieces on the RPK's skeleton with `ak12_rig.py`'s tools, and writes them as SMDs
+  (`decompiled/rpk16/rig`). Its docstring has every piece.
+  - c_rpk16 plays the same ak_anims as c_ak12 and c_ak100, so the AK-12's idle poses it. Its own skeleton is posed as
+    the AK-74M's is (`weapon_bones`), which also puts the bolt, selector, trigger and mag catch (left far in front of
+    the muzzle by the reference pose) back in the receiver.
+  - The pack's default barrel (370 mm) is no real RPK-16's, so it's the pack's long one (`550.smd`). The real short
+    barrel is 415 mm.
+  - The stock, grip and drum are meshes of their own, so parts take their places, and so are the brake (`muzzle_tip`)
+    and the rear sight with its base (`iron_sights`).
+  - `muzzle` is an extra bone 0.2 inside the brake's front. It draws the side-on icon `ui/weapons/guns/rpk16_01.png`
+    from the model, as for the AK-12.
+- Materials and sounds are from `Tools/rpk16_assets.py`, run after `ak74m_assets.py` and `rpk_assets.py`:
+  - Tarkov's sheets, built like the AK-12's (no metal, roughness from the phong exponent): the receiver, the long
+    barrel, the dust cover, the handguard and its side rails, the rear sight, the brake, the stock tube and the drum.
+    The AK-12's stock and grip and the 5.45 rounds keep the AK-12's materials, and the parts keep theirs.
+  - The shot is Tarkov's RPK-16: four close starts, each under the last round's tail, mixed at 0 dB. Limited, they're
+    -6.2 to -7.1 dB (K-weighted, loudest 100 ms), where the AK-12's are (-6.2 to -6.9): the same 7N6, whose longer
+    barrel puts the muzzle further from the ear.
+    - Voiced at its own pitch (see The ported guns' sounds): the lows under 130 Hz eased 8 dB after 30 ms, Tarkov's
+      tail eased 14 dB from 80 ms (it was 21-22 dB under the blast at 0.2 s and 27-28 at 0.4), 4 dB of presence for
+      25 ms (the recordings are dark, 60 Hz their loudest band), the ground at 6.6 ms (the muzzle ~0.87 m ahead of the
+      ear, as the FAL's) and the echoes at -31.5 dB.
+    - Four takes, pitch 0.98-1.02.
+  - The suppressed shot is Tarkov's four suppressed takes under their own tail, 10 dB under the voiced open shot.
+  - The draw, holster and reloads are the RPK's events, voiced already: it plays the RPK's clips.
+- It was ported with markings on, which `Tools/texture_markings/specs/rpk16.json` takes off (14 regions over 3
+  materials):
+  - the selector's АВ and ОД (the track's line and the dimple stay), a stamped 183 and the serial on the receiver;
+  - a mirrored scrawl inside the dust cover (ЧЕ ТУТ ИЩЕШЬ?, "what are you looking for here?");
+  - the rear sight leaf's range numbers 1-8 and the battle setting's П, each copied from the plain leaf, with the
+    scale's ticks and line kept.
+  `clean.py --check` finds every map as cleaned. Not checked on the model.
+- Bodygroups (DefaultMask 135189 by the bit rule, not yet read from the compiled models): `muzzle_tip` (the brake,
+  hidden under a muzzle device), `iron_sights` (the rear sight, which an optic takes off: on the real gun both clamp
+  to the same rail), `pistol_grip` (8) and `magazine` (5).
+- Slots: Optic on the dust cover's rail (-2.2,0,6.111), Muzzle at the brake's rear face (25.247,0,4.351) and Laser at
+  the back of the handguard's right side rail (10.97 to 13.1), then Pistol Grip and Magazine. 48 of the M4's MWII
+  parts are made eligible (optics, muzzle devices, lasers and tracer rounds).
+  - No Underbarrel slot: the left hand's fingers wrap the bottom rail up to x 11.0, and the rail ends at 13.18. That
+    leaves 2.18, where the M4's vertical grips need 2.26 (the L85A2's and HK416's case).
+- Parts (`PARTS_RPK16`, `Assets/gunsmith/rpk16/`), 11 in all: it takes any AK grip and any AK-74 magazine, as the
+  real one does.
+  - The AK-74M Pistol Grip and the AK-platform grips (7), the AK-12's parts. Its own AK-12 grip is the factory one.
+  - The AK-74M's 6L23 30 and the AK-12's windowed 30, with the RPK's AKM 30 reloads (`reload_variants` `_mag`), level
+    again at 2.2 s and 2.6 s empty; the RPK-74 45 and the four-column 60, with the RPK 40's (`_xmag`), 2.3 and 2.8 s.
+  - `part_masses.py` has the drum at 0.9 kg (no figure is published: taken as the RPK's 75-round drum's), the 30s at
+    0.23 and 0.215, and its grip at 0.09.
+- The left hand holds the handguard with the RPK's `GripFit` (`kastov_weapons.RPK16.left_grip`: shift `0,0.38,-0.1`,
+  fingers 0.25, thumb 0.1). Measured from the bones with `Tools/grip_fit/measure.js`, not in a render: the nearest
+  joint, the pinky's middle, is 0.131 off the handguard at the hip and 0.135 aimed, the index fingertip 0.242 and the
+  palm 0.85-1.2. The verified 762's nearest fingertip is 0.118, the RPK's nearest joint 0.189.
+- It plays the RPK's fire clip, which doesn't move the gun, so it has no `ads_fire`.
+- The iron sights use ads_in's last frame. The RPK's aim left the rear sight's aperture 0.26 over the eye, so
+  `kastov_weapons.RPK16.aim` lowers the gun onto the line through the aperture's centre and the hooded front post's tip
+  and turns it onto it. Checked in a flat-shaded render of the meshes (the post's tip centred in the aperture, on the
+  aim point), not in-game.
+- Its `OpticAimCorrection` `3.328,0,-0.971` is the 762's measured correction moved by how far the RPK-16's ADS pose puts
+  its optic slot from the 762's, like the AK-12's. NOT checked in-game: tune it with `dev_optic_correction`.
+- It sprints with the M4's sprint and has the look sway and hand IK (see the pipeline notes).
+- The charm hangs on the folding stock tube's left side behind the receiver: the AKs' spot above the magazine well is
+  over the drum, where the empty drum reload's left index finger came within 0.28 of it. Every hand joint stays 1.03"
+  or more from it through every clip. The sticker is on the receiver's left side above the drum. Neither has been seen
+  on it.
+- Its third-person left hand (`6.9,2.5,2.03`, where the first-person hand holds the handguard, by the rules in
+  Third-person left hand) hasn't been rendered.
+- The editor compiled the models, the animgraph, the materials, sounds, prefabs, the .equip, its parts and the 48
+  shared parts on 2026-10-10 with no errors. Nothing has been checked in-game. Its gunsmith review note stays until all
+  of it has been checked in a match.
+
+## MP5 barrels (Workshop MW19 parts)
+- The Rail Handguard (`gunsmith/mpapa5/underbarrel/rail_grip.gnsmth`) only swaps the handguard. It hides
+  `v_mp5_b` (handguard + barrel + both sights) and shows `native_front.vmdl`, a copy of `v_mp5_b` without the
+  handguard, so the MP5 keeps its own sights and muzzle.
+- `Tools/fit_mp5_barrels.py <mp5 GLB>` generates all four parts: the native pieces, the vmdls (no bodygroups;
+  the prefabs' ModelRenderer BodyGroups default to all bits set), prefabs and `HiddenWeaponMaterials`. It takes
+  the stock v_mp5 mesh from a Source2Viewer GLB (`D:/tmp/hc1-mw22-tools/vrf/mp5-native.glb`). Every piece follows
+  its own bone through `GunsmithMp5NativeReceiver.BoneName` (bolt, cocking lever, magazine latch). All parts share
+  one transform: offset `2.652,-0.248,8.128`, scale 1.122.
+- The integral and railed suppressor barrels keep the stock barrel and front sight (`native_front`), the same as the
+  Rail Handguard.
+  Their Workshop front sights are left out because they're taller than the stock sight, which would put the iron
+  sights out of line.
+- The Short Barrel (an MP5K-style shroud with no barrel of its own) hides v_mp5_a too. `native_receiver` cuts the
+  cocking tube at the shroud's sight notch, moves the stock front sight back into that notch (same post height,
+  so the iron sights still line up), and moves the stock muzzle back to stick out 1" past the shroud. Not yet checked
+  in-game when aiming.
+- Muzzle devices sit against the barrel part's front face. The shifts in `GunsmithBoneAttachment.RefreshMount`
+  are printed by the script.
+
+## Teams: Red Team and Blue Team
+- The user renamed the teams: `Team.Terrorist` is Red Team (was Anarchists, red "A" logo) and `Team.CounterTerrorist`
+  is Blue Team (was Security/Operators). The enum keeps its old names because scenes and prefabs store them.
+- The logos are the user's art (`Tools/team_logo_sources/`). `Tools/team_logos.py` builds `ui/teams/<red|blue>_team_logo.png`
+  (the icon) and `_banner.png` (spawn banner) from them. The old `anarchists_*` / `operators_*` art stays, because the
+  menus use `operators_logo_banner.png` as the game's brand logo. Show names through `Team.GetName()`, never hard-coded strings. A team win banner always reads
+  "<GetName()> Wins!" (`Toast.Headline`/`Accent`), whatever the game-mode prefab's message says. While it's up,
+  `MainHUD` hides everything else (`Toast.IsWinShowing`), including the end-of-match freecam's spectate panel.
+- A team's colour means that team to every viewer (`TeamExtensions.GetColor`; Red 228,32,40, Blue 5,146,235). Red is
+  the logo's pure red: the old 235,64,52 read as orange. Enemy markers and minimap dots use the enemy's team colour,
+  not a generic red, which would look like Red Team's teammates. Scoreboard bot rows, avatars and AI/BOT tags take the
+  bot's team colour (`ScoreboardRow.BotRowStyle`). `$terror-color` in Theme.scss is the UI's amber accent, not a team
+  colour.
+
+## Operator outfits (`OperatorOutfits`, `MilitaryUniform`, the Operators page)
+- Blue Team has two outfits: the Military Operator (the army kit it always wore) and the Tactical Operator, which the
+  user asked for on 2026-10-05 ("we only have british military operator one"). Red Team has three: the Field Operator
+  and the Desert Operator, asked for next ("add another red team outfit too"), and the Militia Fighter (2026-10-13,
+  "we only have british army ones atm").
+- The Tactical Operator (`MilitaryUniformStyle.Tactical`) is a counter-terror team's dark kit: the same army garments
+  dyed by `MilitaryUniform.TacticalTint`, plus the engine's balaclava under the helmet. A black helmet and plate carrier,
+  dark grey camouflage, and black boots and fingerless gloves.
+  - A garment's Tint multiplies its colour in linear space: the Field Operator's tints on military.png's colours give
+    field_military.png's to within 2 sRGB steps. So each dye was worked out from the garment's colour in military.png
+    to land on a target (the helmet 33,33,35, the carrier 36,36,38, the sleeves 49,50,52, the boots 30,29,29), and the
+    gloves' from the Field Operator's undyed brown leather. The balaclava's own colour isn't known; it's only darkened.
+  - The engine also has police versions of the helmet and vest (`tactical_helmet.clothing`, `tactical_vest.clothing`:
+    the same meshes, other textures). Their textures aren't in sbox-public, so their colours couldn't be seen, and
+    they're not used.
+  - `MilitaryUniformStyle` is saved in prefabs by number: add new styles last. Each style's garments are listed in the
+    code (`TacticalClothingPaths`) and in the prefabs' `MilitaryUniform` (`TacticalPieces`), as Field's are.
+- The Desert Operator (`MilitaryUniformStyle.Desert`) wears the Field Operator's garments (its `FieldClothingPaths` /
+  `FieldPieces`) dyed by `MilitaryUniform.DesertTint`, worked out the same way: brown camouflage (65,50,36 on the
+  sleeves), a tan helmet (66,56,43) and vest (76,62,45) and brown boots (70,55,40). Its gloves stay the brown leather
+  they are. Every dye is at most 1, since a tint over 1 brightens and may not hold.
+- The Militia Fighter (`MilitaryUniformStyle.Militia`) is the one outfit that isn't army kit: s&box's citizen clothing
+  in its own colours (`MilitiaClothingPaths` / `MilitiaPieces`). A green beanie, a bandana over the face, a flannel
+  shirt, a black tactical vest, brown cargo trousers, black boots and fingerless gloves, with no tints.
+  - The citizen vest's back patch reads POLICE. `Tools/militia_vest.py` copies its material with the lettering filled
+    from the patch round it (`materials/operators/militia_vest.vmat`), and `MilitaryUniform.Refresh` gives that
+    style's vest it (`MilitiaVestMaterial`). s&box ships the vest's colour map only compiled, so the script takes it as
+    read out from the editor (its docstring has the snippet).
+  - It has no portrait yet, so its card shows the Field Operator's.
+  - Checked in offscreen renders of the body on 2026-10-13, the patch blank on the model. Not yet seen in first person
+    (its sleeves and gloves through `ViewModelClothing`), on the Operators page or in a match.
+- Who wears what:
+  - A player wears the outfit they equipped for their team: EQUIP over the 3D preview on the Operators page (cookie
+    `hc1.operator.<Team>`), else the team's first in `OperatorOutfits.All`. Their client sends its picks to the host
+    (`Client.OperatorPicks`, as the clan tag goes), resent each second until they arrive.
+  - The host picks the outfit (`HumanOutfitter.OutfitFor`; its own player's straight from its cookies) and broadcasts
+    the style (`Wear`), so the body and the first-person legs match on every machine. Picks that arrive after a spawn
+    dress the living body.
+  - Each lightweight bot is issued one at random with its gun, kept per name all match (`BotIdentity.Outfit`), and set
+    before networking, so clients spawn it with the uniform's style. A player-pawn bot gets one by its BotId.
+- The Tactical and Desert Operators' portraits (`ui/operators/tactical.png`, `desert.png`) are stand-ins, not renders:
+  `Tools/operator_portraits.py` (standard library only) recolours military.png with the same dyes, draws the
+  Tactical Operator's balaclava with an eye slot and puts the gloves on. They aren't in the repository: the session
+  that made them couldn't upload to the LFS store (Forbidden). Run the script and commit the PNGs from a machine that
+  can push LFS. Until they're there, a card shows its team's first outfit's picture (`OperatorOutfit.Portrait`).
+  Replace them with in-engine captures like the other two (512x640, transparent).
+- The Operators page's text wasn't in the nine languages after the four columns; it is now.
+- Made without the editor or a compiler (2026-10-05): none of it has been compiled or seen in-game. To check: the dyes
+  in the 3D preview, the balaclava under the helmet (clipping), EQUIP, a client's pick reaching the host, a late
+  joiner seeing the right kit, and bots in every kit.
+
+## Corner slicing (Black Ops 6/7-style gun tilt, `ViewModel.CornerSlicing.cs`)
+- Settings → Game → Corner Slicing (`GameSettings.CornerSlicing`, on by default). It's stored inverted (`plainCorners`)
+  because a hotload leaves a new field at false instead of running its initialiser. The user wants Black Ops 7's: ADS
+  with a wall's edge beside the sights cants the gun, sights towards the opening and its body over the wall. It must
+  stay visual only, with no advantage: the view, the body, the hitboxes and the shots don't change.
+- `ViewModel.Setup` rolls the whole viewmodel about the camera's forward axis (`CornerRoll`, up to 15 degrees, eased),
+  which keeps the sights centred. `FindCornerLean` casts a fan of 9 level rays (±32 degrees, 400 units) from the eye:
+  - An edge is a neighbouring pair where the near ray hit a wall within 110 units and the far ray went on past where
+    that wall would be (`IsWallEdge`). One flat wall seen at a glancing angle doesn't count.
+  - The wall's closeness and the edge's angle from the sights set the strength. Edges on both sides (a doorway) cancel.
+  - Not with a flat scope ("scoped"), in third person, or looking steeply up or down.
+- Checked in-game (2026-09-26, AK-105 irons on Flatgrass): a brick wall close on the left canted the gun 14.6 degrees,
+  sights leaning right and the body over the wall, with the front post still in the rear notch at the screen's centre.
+  A leftward cant and a magnified optic weren't checked in-game.
+- `OpticZoom` measures the optic against the canted view and turns the lens camera back, so a magnified optic's picture
+  stays level while the gun cants.
+- The setting used to cut menu panels' corners (`Slicing.scss`, `CornerSlicing.Class`, Settings → Interface). The user
+  said that was never meant to happen, so it was removed on 2026-09-26.
+- `dev_corner [radius] [side]` puts you at the strongest corner nearby and logs the cant (side 1: sights lean right,
+  -1 left). Aim with `dev_force_aim 1`. It samples 80 random navmesh points, so run it again if the cant it logs is
+  weak: after the teleport the capsule can end up a little off the point it judged.
+
+## Breadcrumb bars (the gunsmith's and `MenuTopbar`)
+- Every breadcrumb bar looks like the gunsmith's, which the user asked for: a bordered back button, then the trail with
+  the current page in orange. The gunsmith's `.gs-crumbs` and the menu pages' `MenuTopbar` both draw it with the
+  mixins in `Code/UI/Styles/Breadcrumbs.scss`, so change the look there. Pages only set the bar's side padding (48 px,
+  24 px in portrait) to line it up with their content; don't give them their own height or font sizes again.
+- A page inside another passes `ParentTitle` / `ParentAction` (Profile › Career Record, Profile › a section). Don't
+  name a Panel property `Parent`: it hides `Panel.Parent`, and it compiled without complaint.
+
+## Emblem editor (`EmblemEditor`, PROFILE → Emblem Editor)
+- The canvas is `EmblemCanvas` (2026-10-05, the user: the transform sliders "shouldnt be the only thing"):
+  - Press a layer to select it and drag it about.
+  - Drag a corner of the selected layer's outline to scale it, from its centre.
+  - The sliders follow, and a drag stays inside their ranges (position -50 to 150, scale 0.1 to 10).
+- How a press is read:
+  - It's tested against the top layer first, in the layer's rotated box (`EmblemViewer`'s sizes: an emoji's box is
+    28 px times its scale, an icon 32 px).
+  - Small layers can be picked up within 12 px of their centre.
+  - A corner counts only when the press is nearer it than the centre, so the middle of a small layer still moves it.
+- The canvas's children take no pointer events, so it stays the pressed panel and `HasActive` holds through the drag
+  (`TheaterTimeline`'s pattern).
+- The EMOJI tab scrolls as one list (`.ee-emoji-list`). Each category used to be its own shrinking, scrolling grid:
+  the panel squeezed each to about a row, and the second row spilled under the next category's heading (the user's
+  screenshot, 2026-10-05).
+- Not compiled or checked in-game.
+
+## Report a Bug (`BugReportPanel`)
+- One panel, opened from the menu header and Settings (MainMenuRoot's) and from the pause menu (PausePage's). The user
+  wanted it to match the other menus, so it uses MenuPage.scss's panel, section titles and buttons. Its categories
+  are the settings page's choice buttons, its admin tabs are the gunsmith's segmented tabs, and its backdrop is the hub
+  map picker's.
+- The orange line along the top is a child (`.br-topbar`) over the window's 1px top border, as is QuitPrompt's.
+- Reports only go into the reporter's own cookies (`hc1.bug.*`). Nothing is sent anywhere, and the admin tab (the
+  developer's Steam ID, `AdminSteamId`) lists that machine's reports only.
+
+## Languages (`GameText`, `Tr`)
+- Settings → Game → Language is the game's own language (`GameSettings.Language`), separate from s&box's: English (UK),
+  English (US), French, German, Spanish and Brazilian Portuguese, the ones the user asked for, then (asked for later)
+  Italian, Polish, Russian, Ukrainian, Turkish, Japanese, Korean and Simplified and Traditional Chinese. A first run
+  picks it from the system's culture (`GameSettings.GetDefaultLanguage`).
+- The setting is a dropdown with a search box (`LanguagePicker` opens `LanguageMenu`), which the user asked for. Each
+  language shows its own name with the English one beside it, sorted by its own name. The search matches either
+  name, ignoring case and accents; a new language's accented letters go in `LanguageMenu.Accented` / `Plain`.
+  - The list is a `Popup` in the root panel, outside the menu's stylesheets, so it sets its own fonts. s&box closes it
+    on any press outside it.
+  - MainMenuRoot, and over a match MainHUD and PauseMenuPanel, ask `LanguageMenu.CloseAny()` first, so Escape closes
+    the list before the quit prompt or the pause menu.
+- Code keeps its English and shows it through `Tr( "PLAY NOW" )`, or `Tr( "{0} XP TO LEVEL {1}", xp, level )` for text
+  with values (`GlobalGameNamespace`, usable in any .cs or .razor). Text with no translation shows in English. Keys are
+  the English, ignoring case. An ALL-CAPS key shows its translation in capitals (ß as SS: Mina has no capital ß), so
+  the tables are written in natural case.
+- Tables are in `Code/Settings/Text/*.cs`, one per area, as `["English"] = (French, German, Spanish, Portuguese)`:
+  - `CommonText` holds menu names, buttons, modes and their descriptions, weapon classes, slots, ranks and teams. It
+    wins over the other tables, so don't repeat its keys.
+  - They're C# rather than JSON because hc1.sbproj's Resources wouldn't package a loose data file, and C# hotloads.
+- The languages after those four have a table each, `Code/Settings/Text/Languages/<Language>.cs`, as
+  `["English"] = "text"` (`GameText.OwnTable`), with every key of the column tables. So a new key needs a line in
+  each of those nine files as well, or those languages show it in English. `check_translations.py` reports each one
+  that's INCOMPLETE; `--missing <Language>` lists what its file lacks, and `--todo <Language>` gives that as JSON with
+  the four columns' text for context.
+- To add a language: append it to `GameLanguage` (last: `GameText.Current`'s range ends at the last value), then add
+  it to `NativeName`, `EnglishName`, `OwnTable`, `GetDefaultLanguage` and `dev_language`, and give it a Languages file.
+- s&box falls back to system fonts for glyphs Chakra Petch lacks, so Cyrillic, Japanese, Korean and Chinese render
+  with no font changes. Turkish capitals keep the dotted İ and make the dotless ı an I (`GameText.Capitalise`). CSS
+  `text-transform: uppercase` can't: the engine writes "Sesli" as "SESLI", not "SESLİ". Text written in capitals in the
+  code gets the Turkish rules.
+- Some translations are short on purpose, to fit fixed-width labels: the gunsmith's stat names (96 px: Polish fire rate
+  "Tempo", Turkish mobility "Hareket") and its fire-mode column (Russian and Ukrainian semi-auto "Полуавт." /
+  "Напівавт."). The hub rail sets a mode name over 14 letters smaller (`HubModeRail.Fit`).
+- English (UK) and (US) differ by `GameText.Spellings` (colour/color, armour/armor, centre/center). Each English
+  respells the code's text its own way, and a key matches in both spellings.
+- Translate on the machine that shows the text, when it's drawn. Don't translate on the host for text sent to
+  clients, and don't store translated text in fields. `GameText.SetLanguage` saves and calls StateHasChanged on every
+  panel, so the whole screen changes at once.
+- So toasts and notices carry the English and its values: `Toast.Show( "{0} Wins!", type, duration, args )` translates
+  when it's shown (a `Team` argument shows its translated name), `GameMode.ShowToast` sends the English over its RPC,
+  and the gunsmith's notices are a `GunsmithMessage` (English plus arguments; `.Shown` translates). Toasts the host
+  builds with the values already in stay English until their RPC carries the arguments: Battle Royale's winner,
+  Zombies' revive, Weapon Crate and not-enough-points toasts, and the Retakes site.
+- Names aren't translated: players, weapons, attachments, camos, maps and "RAZED".
+- A word with two meanings needs two keys. The volume slider "Master" is looked up as "Master volume"
+  (`SettingEntry.FullTitles`), because "Master" is also the top rank.
+- `python Tools/check_translations.py` lists:
+  - literal text passed to Tr that no table has;
+  - empty translations, placeholder mismatches and duplicate keys.
+  It takes the first string literal in a `Tr( ... )` call as the key, so build a key in a property outside the call
+  (`GunsmithPanel.DrawerCategory`). In-game, `dev_text_missing` lists what was shown in English, including text
+  passed by value (`Tr( mode.Title )`).
+
+## Video settings: resolution and quality are s&box's
+- Window mode, resolution, VSync, frame rate limits and graphics quality (textures, shadows, AA, AO, bloom, motion
+  blur, upscaling) are s&box's own settings, shared by every game. Only its menu can read or change them
+  (`MenuUtility.RenderSettings` is in Sandbox.Menu.dll, which the game doesn't reference), so they can't go on our
+  settings page. Settings → Video ends with `SboxSettingsLinks`, whose rows open s&box's settings over the game at its
+  Display or Graphics tab (`Game.Overlay.ShowSettingsModal( "display" | "graphics" )`).
+- That modal opens in the editor too, a frame after the call (checked 2026-09-26). A second call while it's open
+  closes it, so only one handler in a click's bubble path may call it.
+
+## Field of view settings (Settings → Video)
+- The user asked for CoD-style control over the field of view, "affected or independent etc" (2026-10-08).
+  - Field Of View is 60-120 (was 65-110), horizontal, default 85.
+  - ADS Field Of View (`GameSettings.IndependentAdsFov`): Affected (the default) or Independent.
+  - Third Person Field Of View (`ThirdPersonFieldOfView`, 60-120, default 85) is used whenever
+    `CameraController.Mode` is ThirdPerson: the deathcam and spectating from behind (`CameraController.HipFieldOfView`).
+    Its getter reads 0 as 85, since a settings file or a hotloaded settings object from before it existed has 0.
+- How aiming zooms now (`Equipment.AimFov`, `OffsetMagnification`, `ReferenceFov` 85):
+  - A gun's `AimFovOffset` (-5 on most, the M700's -30) is degrees off 85. It's turned into a magnification, and a
+    magnified optic multiplies it by `OpticZoom.ViewMagnification` (1.2).
+  - Affected zooms the player's own Field Of View by that magnification. At 110 the irons aim at 105.2 (it was 110 - 5).
+  - Independent zooms 85 by it, so the ADS view is the same at any Field Of View: irons 80, the M700 55 and a magnified
+    optic 69.9.
+  - `GetAimFovOffset`, `TheaterViewModel` and `FlatScope.GetMagnification` (its `ZoomLevels` are degrees off 85) all go
+    through it. The scope lens (`OpticZoom`) works from the main camera's field of view, so it follows either choice
+    unchanged.
+- There's no Weapon (viewmodel) field of view. The viewmodel draws in the main camera's overlay pass, with the main
+  camera's field of view. A separate one would need either:
+  - a second camera, which loses the post-processing and breaks `ViewModelMask` and the scope lens;
+  - or the viewmodel squashed along the view, which skews the bone-mounted attachments and misplaces the lens.
+- Aim sensitivity doesn't follow the zoom: irons aren't scaled at all (`ManualOffset` only divides `AimDampening` by
+  a magnified optic's power). So at a high Field Of View, Independent irons feel faster than Affected ones.
+- Compiled with dotnet and hotloaded into the user's match (2026-10-08). Not yet checked in-game.
+- Weapon position (2026-10-20, the user: the gun sat "further away from my screen", and they wanted it in settings):
+  Weapon Distance (-4 to 4), Weapon Horizontal Position and Weapon Vertical Position (-3 to 3), in inches from where
+  the gun's animations hold it at the hip (`GameSettings.WeaponDistance`, `WeaponSidePosition`, `WeaponHeightPosition`;
+  0 is the default and what an old settings file reads as).
+  - `ViewModel.HipOffset` adds them in the view's space in `ApplyOffsets`, faded out by the eased `ironsights_weight`,
+    so aiming down the sights lines up exactly as before. It moves the arms and clothing with the gun.
+  - Theater's first-person gun (`TheaterViewModel`) doesn't take them yet.
+  - What had made the gun look further away wasn't found: no hip pose, viewmodel or camera change since 2026-10-15
+    moves it. A wider Field Of View shrinks it, since the viewmodel draws with the main camera's.
+  - Built with dotnet and compiled in the editor, not yet seen in a match.
+
+## Hitmarker (`HitmarkerPainter`, Settings → Crosshair's hit marker)
+- The user (2026-10-20): the kill hitmarker "isnt fully centered". It was a UI panel in `CrosshairHud`, while the HC1
+  crosshair is drawn with the camera's HUD painter at `Screen.Size * 0.5`. UI layout snaps to whole pixels, so on an odd
+  width (the editor's game view was 1905 px, centre 952.5) the two could sit a pixel apart.
+- Now `CrosshairInputSystem` (Stage.FinishUpdate) calls `HitmarkerPainter.Draw` on the main camera's HUD painter every
+  frame, at the crosshair's own centre and scale (`Screen.Height / 1080`), with the old CSS animation (in from 0.6x over
+  30%, out to 1.2x, ease-out). Same style, colour, alpha, size, thickness, outline and duration settings.
+  - The X and the diamond are `DrawLine`s, as the crosshair's arms are. `DrawRect` (and `DrawCircle`) snap their rect
+    to whole pixels, so the ring and the dot are sized to a whole number of pixels whose corner already lands on one
+    (`Aligned`).
+  - The diamond is a turned square now: the panel's animation replaced its `rotate(45deg)`, so it had shown as a square.
+  - Hidden as the panel was: HUD off, a team's win banner, the recon drone's feed. It also draws in the firing range
+    and the main menu (the settings' Preview Hit), which have a camera but no `Crosshair` component.
+- Checked offscreen in the editor (`HitmarkerPainter.Paint` into a throwaway scene's camera, beside crosshair-style
+  lines): every style's centroid within 0.001 px of the cross's centre, round a whole pixel and between pixels. Not yet
+  seen in a match.
+
+## Quitting (`QuitPrompt`): a game can't close s&box
+- Escape on the main menu (`MainMenuRoot.HandleEscape`) closes one thing at a time: the language list, the bug report,
+  the quit prompt, a header menu, the hub's playlists or zombies map picker, then the squad's privacy menu. With
+  nothing open, Escape opens `QuitPrompt`, and so does the header's QUIT GAME. All checked in-game (2026-09-26), and
+  QUIT TO S&BOX ended play mode in the editor.
+- The user asked for a power button at the hub's bottom right: `.hub-power` in `.hub-footer`, one of the header's round
+  buttons (`gnav-round-btn`) with its label above it. It opens `QuitPrompt` (`MainMenuRoot.OpenQuitPrompt`). Checked
+  in-game 2026-09-27 (`dev_click hub-power`, then `dev_click qp-btn` to cancel): the button sits opposite "RAZED" and
+  opens the prompt with QUIT TO S&BOX as its only option. Its hover label wasn't checked.
+- Take Escape in a component's `OnUpdate` (here `MainMenuPanel`'s, over a match `MainHUD`'s), never in a Panel's
+  `Tick`. After the scene's update, s&box's pause menu (in the editor, the editor) takes whatever Escape is left, and
+  panels tick after that, so a Panel's `Input.EscapePressed` check never fires. The bug report's and the language list's
+  own checks were dead for that reason.
+- The user asked for a choice between leaving the game and exiting to the desktop, but s&box won't let a game close
+  it. Checked in the engine source (sbox-public) and by reflection on 2026-09-27:
+  - `Application.Exit` is internal, and so is the setter of `Application.IsStandalone`.
+  - `ConsoleSystem.Run` only runs managed commands that aren't protected, and every native command is protected
+    (`quit` and `exit` included). No managed command quits.
+  - The API whitelist has no `Environment.Exit` / `FailFast`, `Process` or P/Invoke.
+  - `Game.Close` goes back to s&box's menu, and in the editor it ends play mode. Only a standalone build (or a
+    dedicated server) exits the app on `Game.Close`.
+- So the prompt has one option, QUIT TO S&BOX. There's no greyed-out QUIT TO DESKTOP: the user had it removed. A
+  standalone build labels the same option QUIT TO DESKTOP, because there `Game.Close` does exit to the desktop.
+- The pause menu's quit button is `Game.Close` too, so it reads "Quit to s&box" (in a standalone build, "Quit to
+  Desktop").
+
+## Controller in the menus (s&box's virtual cursor)
+- On a controller, s&box's virtual cursor stands in for the mouse (`Input.EnableVirtualCursor`): the left stick moves
+  the pointer, A clicks and the right stick scrolls. The header's LB / RB step through its tabs
+  (`MainMenuRoot.ControllerNavRoutes`), WEAPONS included since 2026-10-15 (the user: RB "skips past it"): it loads the
+  gunsmith's scene, whose header has LB / RB too (`GunsmithPanel.NavStep`), back out to PLAY and OPERATORS. Both start
+  with the bumpers counted as held, so one still held through the scene load doesn't step on again. The D-pad drives the
+  UIs that offer themselves to `PadNavigation` (below).
+- `GameUtils.UpdateCombatMouseVisibility` turns the virtual cursor off in combat, where the stick moves the player, and
+  since 2026-10-14 back on whenever the cursor shows (as does `TheaterController.ShowCursor`). Before, nothing turned it
+  back on, so after the first match the left stick couldn't move the pointer in any menu (the user's report). The
+  bumpers also skipped Ranked and Custom Game.
+- Compiled with dotnet, not yet tried with a controller in-game.
+- Jump is on the pad's A (2026-10-14, `ProjectSettings/Input.config`): it had no controller button. Only the project's
+  default changes; a player who rebound Jump in s&box's bind editor keeps theirs.
+
+### D-pad navigation (`PadNavigation`, `Code/UI/Navigation/`, 2026-10-14)
+- The user: "the settings menu isnt compatible on controller, all UIs should be really well supported".
+- `PadNavigation` is a GameObjectSystem (Stage.StartUpdate, before the game's components). It drives the UI that offers
+  itself every Tick (`PadNavigation.Offer( panel, IPadScope, layer )`), the topmost when several are up: a dialog at
+  100, a popup at 50, a page at 0.
+  - The D-pad moves a focus to the nearest target that way (`PadNavMath.Pick`: the nearest edge, with sideways distance
+    counted three times, so a move stays in its column). Held, it repeats after 0.35 s.
+  - The pointer follows the focus (`Mouse.Position`, every frame), so A, the virtual cursor's click, presses what has
+    the focus, and hover styles and sounds work as for a mouse. Moving the stick or the mouse hands the pointer back.
+  - Left and right change an `IPadAdjustable` (a settings row) or a `CustomSlider` instead of leaving it
+    (`PadNavMath.SliderStep`: about fifty presses end to end on the slider's own grid, four times as far once held
+    1.2 s). B is the scope's `PadBack` (else Escape), LT and RT its `PadTab`.
+  - Back from a popup or a dialog, the focus goes back where it was.
+  - When the focused control goes away (A swapped the list it was in), it waits two frames for the new one to be laid
+    out, then takes the target nearest where the old one was (`Replacement`, `PadNavMath.Distance`). If that target's
+    list (the nearest panel round it with other targets) has a `pad-first` one, that wins: the fitted part, the slot
+    just backed out of. Before 2026-10-15 it went to the page's first target: opening a gunsmith slot's parts on the
+    right put the focus on the primary weapon on the left (the user's report).
+  - Scopes on the same layer that sit inside each other are driven as one (`Chain`, innermost first): the outermost's
+    panel is where the targets are, and B, LT, RT and the first focus ask the innermost scope first. That's how the
+    main menu works: `MainMenuRoot` offers itself and each page offers itself inside it, so the D-pad reaches the
+    header from the page, and the page still gets B and the triggers first. Among equals on a layer, the one offered
+    first is under (a pause menu opened over the class menu wins).
+  - `PadScope` is an `IPadScope` made of delegates (`First`, `Back`, `Tab`), for a UI that offers more than one scope
+    (a page and the popups it opens). Keep it in a field.
+- Targets: panels with the `pad-target` class, checkboxes, sliders (`CustomSlider` and the engine's `SliderControl`),
+  or a `cursor: pointer` panel. The cursor style is inherited, so it's the first one down the tree; what's inside a
+  target isn't another, unless it's marked `pad-target` (`CollectMarked`: a row's TUNE button, a card's favourite
+  star). A cursor set only on `:hover` doesn't count: those need `pad-target`. `pad-skip` leaves a panel
+  and everything in it out, so never put it on a modal's backdrop that holds the modal. The focus starts on a
+  `pad-first` target, else the first that isn't inside a `pad-late` panel (`MenuTopbar`, a page's back button), else
+  the first. The focused one gets `pad-focus`: Theme.scss rings it (2 px, the accent orange), and a UI can restyle it.
+- The pad's menu buttons are actions in `Input.config`'s "Menus" group, hidden from the keybinds: MenuUp, MenuDown,
+  MenuLeft and MenuRight (the D-pad), MenuSelect (A, for hints), MenuBack (B), MenuPrevTab and MenuNextTab (LT, RT).
+  While a UI is driven with a controller, every action on those buttons is cleared each frame before the game reads it
+  (`Input.Clear`): in the pause menu the D-pad dropped the gun (Drop) and opened the class menu (ChooseClass).
+- What offers itself so far:
+  - The settings page. Each row (`SettingEntry`) is one target: up and down move between rows, and left and right
+    change it (a slider steps, a switch or a checkbox goes to its left, off, or right, on side, a row of choices to the
+    next). A presses the row's control (`PadPoint`: the checkbox, the chosen option, the slider's thumb, the language
+    field). LT and RT step through the categories. B clears a search, or saves and goes back ("/": the hub, or the
+    pause menu's page). `PadHints` in the footer shows the buttons while a controller is in use.
+  - The language list (B closes it), `DialogModal` (B cancels, or dismisses a notice), the bug report (B closes it, LT
+    and RT change its admin tabs), and the pause menu's page (B resumes; its leave-match question traps the focus; B
+    closes the party invite popup first).
+  - The main menu (2026-10-15), all as one area with the header:
+    - `MainMenuRoot`: B on any page but the hub goes back to the hub, and on the hub it's Escape, so the quit prompt.
+      An open header menu (the bell's notifications, the round MORE button's menu) is a popup (layer 40) that B closes.
+      `QuitPrompt` is a dialog (100) that starts on CANCEL.
+    - The hub: the focus starts on the featured screen's PLAY / PLAY NOW (`pad-first`), LT and RT step through the
+      rail's Multiplayer, Battle Royale and Zombies, and the playlists overlay and the zombies map picker are popups
+      that B closes. The squad card's privacy menu and the party's invite popup are popups too. The hub's power button
+      is a target.
+    - Custom game: LT and RT step through MATCH, RULES and PLAYER (not for Zombies, nor while starting).
+    - Profile (`BarracksPage`): B leaves a section for the profile page; in the emblem editor LT and RT change the
+      picker's SHAPES / EMOJI / LETTERS tab (`EmblemEditor.CyclePickerTab`). Career Record: B goes back to the profile,
+      and the service milestone cards are targets.
+    - Sessions, Ranked, Operators, Store and the Theater page needed nothing of their own: their controls already
+      have pointer cursors, and B goes back to the hub.
+  - The gunsmith: the focus starts on the primary weapon's card, B steps back one layer as Escape does (the last step
+    leaves), LT and RT switch BUILD and CUSTOMIZE. An open modal (builds, share, compare) is a popup (50) that
+    B steps out of, and a build's name is a target (A renames it).
+    - Opening a list puts the focus on its current choice (`pad-first`): a slot's fitted part, the weapon on the stand,
+      the equipped perk or gear, the active class. Backing out puts it on the row it was opened from (the browser's
+      `_lastCategory`, the panel's `_padReturn`).
+    - TUNE (in a slot row and on the fitted optic), the weapon cards' chevrons and the favourite stars on weapons and
+      camos are `pad-target` inside their rows.
+    - Every part row is `pad-target`: a locked one has no pointer cursor, so the D-pad skipped it and never scrolled
+      the list down to it. The tactical buy menu's owned and unaffordable items are `pad-target` for the same reason.
+  - Also `pad-target` inside their rows (2026-10-15, from an audit of every pad-driven UI): the emblem editor's layer
+    up, down and delete buttons, the squad bar's kick buttons, and the settings' English (UK) / (US) buttons.
+  - The firing range's pause menu (`FiringRangeHud`): the focus starts on RESUME, and B resumes.
+  - Colour pickers (`ColorPicker`: the gunsmith's custom paint and reticle colour, the settings, the emblem editor):
+    left and right turn the hue field's hue (`ColorSlider`, an `IPadAdjustable`; a grey starts from full colour), and
+    step each RGB box (`ColorChannel`, 0-255, five a press, twenty once held). The hue field's cursor now follows a
+    colour set any way, not only by dragging.
+  - In a match:
+    - The class menu (`ClassSelect`): B steps back as Escape does (a slot's choices, the editor, then closed), LT and RT
+      change the primaries' category. Its choices, slots, perks and buttons are `pad-target` (their pointer is
+      hover-only).
+    - The tactical buy menu: B closes it, LT and RT step through its categories.
+    - The Zombies workbench: B steps back (a slot's parts, then closed), LT and RT change the gun; its rows and buy
+      buttons are `pad-target`.
+    - The map vote: the map cards (`MapVoteCard`, `pad-target`), the other modes and Leave game. B is Escape (the
+      pause menu), which opens over it.
+    - The end-of-match screen: the focus starts on CONTINUE or PLAY AGAIN; B continues where there's nothing to start.
+  - The Theater's playback HUD: the focus starts on play/pause, LT and RT change the soldier followed (not in
+    freecam), and B is Escape (back to the Theater page). While it's driven, A doesn't pause any more (Jump is on A,
+    which is cleared for the HUD): press the play button.
+  - To add a UI: offer it every Tick (a PanelComponent in OnUpdate), implement `IPadScope` or keep a `PadScope`, give
+    targets without a steady pointer cursor `pad-target`, and mark where the focus should start `pad-first`.
+- Text boxes (`TextEntry`) are targets since 2026-10-15, never the first focus: A focuses one (a class or build name,
+  the import code, the bug report's title, the searches). Typing still needs a keyboard or the Steam on-screen keyboard:
+  the game has none of its own.
+- What the pad still can't do: drag (the gunsmith stage, the emblem canvas, the Theater timeline) or fly the Theater's
+  freecam. The virtual cursor and the sticks still do those.
+- The scoreboard isn't pad-driven. It shows while Score is held (the cursor and the virtual cursor come on then), and
+  driving it would take A, B, the D-pad and the triggers from the game while it's held: no jumping or shooting with it
+  up. On a pad, Score shares the left thumb with the D-pad, so it would want a press-to-toggle there. Left to the user.
+- `dotnet run --project Tools/PadNavChecks` checks `PadNavMath` on a settings-like layout, the sliders' steps and the
+  replacement for a focus that went away (30 checks, all passing). The settings part was compiled with dotnet and hotloaded into the user's match on 2026-10-14;
+  the hotload warned "Lambda signature has changed" for PausePage, so reopen the pause menu (or restart play) if its
+  buttons misbehave. The rest (2026-10-15) was compiled with dotnet only, with the editor shared with the user's match.
+  `PadNavigation` is a GameObjectSystem, so changes to it only run once play restarts. None of it has been tried with
+  a controller: every UI above, the header reached from a page, the popups' layers, and the triggers' tabs.
+  The user then tried the gunsmith with a controller (2026-10-15) and found RB skipping WEAPONS and the focus jumping
+  left on opening Muzzle. Those fixes, the nested targets, the text boxes, the colour pickers and the range menu
+  compiled with dotnet and hotloaded into the editor with no errors; none of them has been tried with a controller yet.
+
+## Look sensitivity and the settings search (2026-10-14)
+- Settings → Controls has a SENSITIVITY section (the user asked for controller and mouse sensitivity): Mouse, Mouse
+  ADS, Controller Horizontal, Controller Vertical and Controller ADS Sensitivity (`GameSettings`, multipliers, default
+  1; each getter reads 0 as 1 for old settings files and hotloaded objects). They multiply s&box's own mouse
+  sensitivity and stick look speed, which only s&box's menu can change.
+  - `LookSensitivitySystem` (Stage.StartUpdate, the active scene only) scales `Input.AnalogLook` once a frame before
+    anything reads it. s&box adds the mouse and the right stick into it, so a frame the mouse moved (`Input.MouseDelta`)
+    counts as the mouse's, any other as the stick's. ADS is the local pawn's `aiming` equipment tag. It's a new
+    GameObjectSystem, so after a hotload it starts only once play restarts.
+  - Aim Assist was in the Controls group but never drawn (InputSettings draws that group by hand); it's there now.
+  - Every slider in SettingEntry now shows its value beside it (`SliderText`, decimals from its step).
+- The settings page has a search box over its categories (`SettingsSearch`): every word must be in a setting's name or
+  category, in the player's language or English, case and accents ignored (`LanguageMenu.Fold`). Results are grouped
+  by category, and matching keybinds come after them through `InputSettings` with its `Query` set (a keybind's key
+  name counts too: "space" finds Jump). Picking a category clears the search. Aim and Sprint Input have
+  `[Choices( "Hold", "Toggle" )]` so they show as a switch in the results.
+- Compiled with dotnet and hotloaded into the user's match with no errors, with every text in all ten tables. Not yet
+  seen: the sliders' effect, the search, or A jumping.
+
+## Main menu hub page (`HubPage`)
+- `.hub-container` is a row of three: `HubModeRail` (the "Play" tabs, 240 px), the featured screen (see Maps below),
+  then `HubSidebar` (squad, then daily challenges). The featured screen is flex-grow, so it takes whatever the rail leaves.
+- The rail's Multiplayer, Battle Royale and Zombies cards pick what the featured screen shows (`Selected` / `OnSelect`);
+  Campaign is locked. Their art is the portrait mode art, cropped by a layer 375% of the card's height with a
+  negative `top`: s&box's `background-position` percentages offset the image by a share of the box (`center 28%`
+  pushed it down, leaving a gap), unlike CSS. The Zombies skull is `ui/modes/zombies_icon.png` (cropped from the
+  minimap's), since Material Icons has no skull.
+- The toggle in the rail's heading folds it to a 72 px strip of icons with hover labels (`.rail-tip`), saved in the
+  `hc1.hub.rail.collapsed` cookie. Below 1900 wide (tight-nav) it stays folded, without the heading, because it's the
+  featured screen's only mode switch. `collapsed` is set with `SetClass`: a Panel's `<root class="@(...)">` added the
+  class but never took it off again. And in a `.razor` file, an auto-property initialised with a cookie read failed to
+  compile ("An attribute argument must be a constant expression" in the generated code), so `_collapsed` is a field.
+- `HubSidebar` (330 px, hidden below 1600 wide) is real data only. Daily challenges come from
+  `Code/Stats/DailyChallenges.cs`: three a day from a fixed pool, picked by a hash of the UTC day so everyone gets the
+  same set, reset at midnight UTC. Progress is kept in `hc1.daily.*` cookies, and the XP is paid through
+  `Progression.AddXP` on the step that finishes a challenge. Kills and headshots count in
+  `PlayerStatsRule.SendKillStat` (runs on the killer's machine; zombies don't raise `KillEvent`, so they don't count).
+  Finished and won matches count in `EndOfMatchScreen.AwardXp`. The squad is the Steam `PartyRoom.Current`. It sits
+  above the challenges and has a single INVITE FRIENDS row (`PartyPanel.InviteFriends()`) while there's room, as the user
+  asked: a row per free slot looked like duplicate buttons.
+- The squad card's cog sets who can join (`Code/Party/SquadPrivacy.cs`, cookie `hc1.party.privacy`, the player's own):
+  Open (listed in s&box's party browser, as squads always were), Invite Only (unlisted, as s&box's own menu makes them)
+  or Private. s&box takes a party's listing only when it's made (`PartyRoom.Create`'s `ispublic`), so a squad of one is
+  made again at once, and one with others in it keeps its listing until the next squad ("Applies to your next squad").
+  Private holds the party's `MaxMembers` at its size (`SquadPrivacy.Enforce`, also run in every scene by
+  `SquadSocialSystem`) and puts a lock where the invite row was. Only the leader can change it. The invite row ends
+  with the setting's icon, not its name, which pushed the row onto two lines in German. The menu comes last in the
+  card's markup, because siblings draw in order and the squad's rows were drawn over it.
+- Under the squad, the FRIENDS card lists the Steam friends the player has been in a match or a squad with
+  (`RecentFriends`, cookie `hc1.friends.recent`, the newest 20) with their live status (`new Friend( id )`). A game can't
+  read the Steam friends list or invite a chosen friend: `MenuUtility.Friends` / `InviteToParty` are in Sandbox.Menu,
+  which games don't reference, and a `Friend` only answers for an id you already have (checked by reflection
+  2026-09-27). So a row's INVITE opens s&box's invite overlay, like INVITE FRIENDS, and ALL FRIENDS opens s&box's own
+  list (`Game.Overlay.ShowFriendsList`). These open in the editor too: s&box's menu pushes them the way it pushes the
+  settings modal (read from its code 2026-09-27, not yet clicked there), so they have no `Game.IsEditor` check any more.
+  `dev_friends_sample [rows]` fills it to check the layout (you, plus made-up offline rows; again to take them off);
+  `dev_friends_clear` empties the card, real friends too.
+- The header bell opens an empty NOTIFICATIONS panel ("No notifications"). It used to list hand-written "what's new"
+  notes (`MenuNews`), which the user had removed (2026-09-26) because they read as fake update notices. Only real
+  notifications belong there.
+- Changing `MainMenuRoot`'s markup can hotload with "Lambda signature has changed", and then NavigationHost throws in
+  `OnTemplateSlot` and the hub page goes blank. A fresh menu fixes it: `dev_scene scenes/menu.scene`.
+
+## Custom games (`CreateLobbyPage`, `CustomGameSettings`)
+- The header's CUSTOM GAME tab (`/new`) was PRIVATE / Private Match. The user renamed it when WHO CAN JOIN got a public
+  option. The page picks a match map, mode, player limit, bot fill and who can join. START CUSTOM GAME puts the
+  choices in `CustomGameSettings.Current` and loads the map, and opening the main menu clears them.
+  - `GameNetworkManager` makes the lobby from `CreateLobbyConfig()`, named "<host>'s Custom Game".
+  - `BotFillRule` fills to the page's player limit.
+- WHO CAN JOIN is the lobby's `LobbyPrivacy`: Invite Only (`Private`, the default), Friends (`FriendsOnly`) or Public.
+  Only Public lobbies show in SESSIONS' server browser and s&box's own server list.
+- In the editor, s&box makes every lobby with `Networking.EditorLobbyPrivacy` and marks it as a dev lobby, which the
+  server browser hides outside the editor. So the Public listing can only be checked in a published build.
+- `hc1_private_ui` (Editor/Hc1PrivateMatchQa.cs) clicks through the page's options. `hc1_private_ui start` starts a
+  4-player TDM from them; once it has loaded, `hc1_private_ui check` checks the lobby.
+- Match rules, like CoD's private match options (2026-10-05). The user found the page "too bare bones" and asked to
+  change "values like health etc like cod does".
+  - The page has three tabs: MATCH (map, mode, player limit, bot fill, bot difficulty, who can join), RULES and PLAYER.
+    Zombies plays by its own rules, so it has only the first and gets no rules.
+  - A tab shows how many of its rules differ from a normal match's, and a normal match's value is underlined. The
+    summary lists the limits and every rule that's changed, in orange. RESET RULES puts the RULES and PLAYER tabs back.
+  - The picks go into `CustomGameSettings.Rules` (`CustomGameRules`). They hold for every map the lobby plays through
+    the map vote, since `Current` lasts until the main menu.
+- The rules:
+  - TIME LIMIT: 5-30 min or none. It's the mode's "Play Game" state's `DefaultDuration`
+    (`CustomGameSettings.IsTimedPlayState`), so only TDM, Deathmatch, Domination, Hot Zone, Gun Game and the Skirmishes
+    have one. No limit is an infinite duration, and `GameMode.DisplayedTime` then shows no clock.
+  - SCORE LIMIT: `TeamEarlyWinCondition.TargetScore`, from a list for each mode. "No limit" is int.MaxValue, offered
+    only where the clock still ends the match. Defuse's is ROUNDS TO WIN, which also sets `RoundLimit.MaxRounds` to
+    twice it (the prefab's 6 of 12), and Retakes' is ROUND LIMIT (`MaxRounds`).
+  - RESPAWN DELAY: instant to 10 s (`Respawner.RespawnDelaySeconds`). It isn't offered in the round modes, which
+    respawn everyone at the next round. Bots wait it out too: `LightweightBotManager.AwaitingRespawn` counts a bot
+    killed within the delay as still there. Without a custom game, a dead bot is replaced at the next fill check, as before.
+  - FRIENDLY FIRE: on, as in every hardcore match, or off. Off, `HealthComponent.IsRuledOut` drops a teammate's
+    damage (bullets, blades, blasts, fire) before anyone hears of it, so there's no hitmarker. Your own still hurts you.
+    Team modes only.
+  - MAX HEALTH: 30-300, for players (each spawn) and bots (`CustomGameSettings.ApplyMaxHealth`).
+    `HealthComponent.MaxHealth` is synced now, since the HUD shows health against it. Head and neck hits still kill.
+    A body hit's chance to kill outright scales by 100 over the health (an M4's 50% at 100, 25% at 200), and the body
+    and limb wounds take more hits to add up.
+  - HEALTH REGENERATION: normal (4 s, then 25 a second), fast (2 s, 50), slow (8 s, 10) or off
+    (`CustomGameRules.RegenSpeed`, `PlayerPawn.UpdateHealthRegen`).
+  - HEADSHOTS ONLY: bullets anywhere but the head or neck do nothing. Knives, blasts and fire still hurt anywhere.
+  - BOT DIFFICULTY: mixed (the usual roll), recruit, regular, hardened or veteran. `LightweightCombatBot.RollSkill`
+    narrows the skill roll round the level.
+- How they reach the match: `GameMode.OnStart` calls `CustomGameSettings.ApplyTo` on the host, which writes the
+  limits and the respawn delay into the mode's own components before play starts. Those are all synced. The rest is
+  read where it applies, through `CustomGameSettings.ActiveRules` (a normal match's defaults outside a custom game).
+  Everything is on the host but `MaxHealth`, which is synced.
+- Made without an s&box SDK, so it has been compiled nowhere. Watch the editor's log for errors after the hotload.
+  Checked only in a browser mockup of the page's real SCSS. Nothing has been seen in-game.
+
+## Lobby input (controller / mouse-and-keyboard lobbies, `LobbyInputRules`, `LobbyInputGuard`)
+- The user asked for controller-only and mouse-only lobbies, for players who only want to play in those (2026-10-14).
+  Settings → Game → Lobby Input (`GameSettings.LobbyInput`): Any Input (the default), Controller Only or Mouse &
+  Keyboard Only. It's saved by number, so a new value goes last.
+- A lobby carries its rule in its lobby data, `input` = `pad`, `kbm` or `any` (`LobbyInputRules.Stamp`, called just
+  before `Networking.CreateLobby`, which copies `Networking.SetData`'s data into the new lobby):
+  - `GameNetworkManager` stamps every match a player hosts: the custom game page's INPUT (MATCH tab, starting at the
+    player's setting), else the host's setting. Ranked's `HostRankedMatch` stamps the setting.
+  - A lobby with no key (an older build's, or one from the editor's Start Hosting) is open to all.
+- Joining (`LobbyInputRules.CanJoin`): with a preference, only lobbies with that rule. With Any Input, open lobbies and
+  those for what the player is using now (`Input.UsingController`: the last button pressed; a pad's buttons and
+  triggers count, a key or a mouse button the other way, and moving a stick or the mouse alone neither).
+  - SESSIONS lists every lobby, the joinable ones first. A restricted one has a controller or mouse icon, and one the
+    player can't join is dimmed. Its details show INPUT and why, and Join Session reads the rule and does nothing.
+  - Ranked's matchmaking skips lobbies it can't join.
+- Invites and a squad following its leader skip both, so in a match `LobbyInputGuard` (a GameObjectSystem) holds every
+  machine's player to the rule:
+  - The host syncs it (`GameMode.LobbyInputRule`, FromHost) from its lobby data. Clients don't read their own: the
+    engine keeps lobby data after leaving a lobby (nothing in sbox-public's networking code clears it, and a new
+    lobby's handshake only overwrites the keys it has), so a key from an earlier lobby can linger.
+  - Only play counts: alive, with no pause menu, class or buy menu, chat, scoreboard, gunsmith or win banner open. A
+    button of the right input starts the count again.
+  - After 1 s with the other input, `LobbyInputOverlay` warns (in MainHUD while there's a pawn), with a countdown for
+    clients. After 15 s (`Grace`) a client disconnects to the menu, which says why (`MainMenuRoot.PendingNotice`: a
+    DialogModal with only OK, since DialogModal now hides Cancel when it's given no text for it).
+  - The host is only warned: taking it out would end the match or hand it to another player.
+- Ranked: `HostRankedMatch` sets `ranked_closed` to 0 before making its lobby. A finished ranked match sets it to 1,
+  every client gets it, and the engine copies a machine's leftover lobby data into the next lobby it makes, so the
+  next ranked lobby that host or any of its players made was closed to matchmaking from the start.
+- Compiled with dotnet on 2026-10-14 (0 errors), with its text in every language (`check_translations.py` at its 22
+  problems from before, none new). The open editor stalled at 21:55 that day, before the last of it, so it hasn't
+  compiled there. Nothing has been seen in-game: the setting, the browser's icons and details, the custom game's
+  INPUT, the warning and the leave, the menu's notice, a host migration keeping the rule, and two machines (one on a
+  controller, one on mouse and keyboard).
+
+## Map changes with players connected (`GameUtils.LoadMap`)
+- The user hosted from the editor's network menu (Start Hosting) in the main menu, joined with Join via new instance,
+  then started a TDM from the host. The second instance was left in freecam on Flatgrass (2026-09-30).
+- `Scene.Load` only loads on the machine that calls it; the engine's docs say so. After it, the host's own
+  `OnJoined(Connection.Local)` makes the host's Client, and nobody else's. It also network-spawns the new map's objects
+  into the clients' old scene, which is how the second instance saw Flatgrass. With no Client, `SpectateSystem` fell
+  back to freecam.
+- `Game.ChangeScene` loads with those spawn and destroy messages suppressed, then `LoadSceneBroadcast`s the scene. Each
+  client loads it, and when it's done the host's `OnSceneLoadedMsg` runs `OnJoined`, so `GameNetworkManager.OnActive`
+  makes its Client. Read from Sandbox.Engine.dll's IL on 2026-09-30.
+- `GameUtils.LoadMap` uses `ChangeScene` on a networked host, and `Scene.Load` otherwise. It's used by
+  `MatchLauncher.StartMatch` (the hub, playlists, the map picker), `PregameLobbyManager.StartMatch`, the map vote's next
+  map, and `dev_quickplay`, `dev_zombies`, `dev_defuse` and `dev_mode`.
+- Local loads stay `Scene.Load`: the main menu, the gunsmith, Theater, `dev_scene`, and the custom game and Ranked, which
+  leave or make their lobby first.
+- Two instances on one Steam account work, since `Client.IsLocalPlayer` goes by the connection. But the map vote keys
+  votes by Steam ID, so they count as one voter.
+- Tried with a second instance on 2026-09-30: it followed the host into the TDM and played in it.
+- A second instance from Join via new instance loads the game's files from the editor over the network. That took over 5
+  minutes, and hundreds of compiled files came up missing there (ERROR_FILEOPEN), though they're on disk:
+  - the newer guns' prefabs and `.equip`s;
+  - sound events;
+  - gunsmith parts;
+  - `first_person_arms.vmdl_c`.
+  So that instance can show no first-person gun, or play no sounds. The cause is how the editor serves the files, not
+  the game.
+- The main menu's background map (`menu.scene`'s MapInstance, the cloud map `facepunch.depot`) is missing its lightmaps.
+  While the menu is up, the log gets "Unable to stream in resource file maps/depot/lightmaps/..." about 100 times a
+  second. It's harmless, and it comes from Facepunch's package.
+
+## Ranked (`Code/Stats/Rank.cs`, `RankedPage`)
+- The only rating is the SR you can see (`razed.rank.sr` cookie); there's no hidden MMR. Six tiers of 600 SR (Bronze
+  to Master), and every tier below Master has divisions III, II and I of 200 SR (`GetRankName`: "Gold III"). A win is
+  +25 and a loss -20. Ranked lobbies are named with the tier (`MatchTag`, "[R:GOLD]"), and matchmaking only joins a
+  lobby with the same tag. `Rank.RecordResult` isn't called anywhere yet, so SR doesn't change in play.
+- A season is three calendar months, starting with Season 1 in September 2026 (`SeasonOneStart`). `CheckSeason` runs
+  when the page opens and on Play Ranked. The first time in a new season it drops SR one tier, keeping the division, and
+  restarts the season high (`razed.rank.season_high`). The first check on a machine only records the season.
+- `RankedPage` (the RANKED tab), in the hub's style with no map picture:
+  - Under the title, a COMING SOON notice (`.ranked-notice`), which the user asked for (2026-10-05). PLAY RANKED still
+    works. Not yet seen in-game.
+  - Left: your rank, Play Ranked, the season's countdown and high, and the rules. The rules restate `Rank.cs`, so change
+    them together.
+  - Middle: a ladder of the six tier emblems with yours lit, then the map pool. The pool is `GameUtils.GetMatchMaps()`,
+    each map in its ranked mode: Defuse where the map has bomb sites, else TDM. The host picks a random map from it.
+  - Right: `HubSidebar`, sized in RankedPage.razor.scss.
+- The emblems are `Assets/ui/ranked/<tier>.png`, drawn by `Tools/rank_emblems.py` (numpy + PIL): a metal shield in the
+  tier colour, with more trim for each tier. Keep its colours in step with `Rank.TierColors`.
+
+## Soldier training (`SoldierTrainingRules`, `SoldierTraining`, `Client.Training`, `PlayerPawn.Training`)
+- Players improve the skills they use (2026-10-18). The existing career level stays 1–55; Endurance and Weapon Handling
+  each run from 1–50. Earned skill XP also adds to career XP. Skills survive deaths, map changes and prestige.
+- Endurance earns 1 XP per 10 metres of actual ground sprinting. The host samples movement every 0.25 s and rejects
+  stationary movement, teleport-sized/stale samples, other movement modes and the first sample after a pawn changes.
+  Handling earns 1 practice XP at most every 2 s from the existing synced discharge times, plus 2 XP for an enemy
+  bullet hit (3 for a headshot), at most once per 0.5 s across pellets/targets. Accepted zombie hits use the same cap.
+  Only living, active players earn it; downed/frozen players, noclip, drone control, developer movement/god modes and
+  the gunsmith firing range do not. The game mode must have an active PlayerStatsRule. Bots get baseline modifiers.
+- Curves and tuning are in `Code/Stats/SoldierTrainingRules.cs`. Benefits grow within each level. Maximum bonuses are
+  +20% sprint capacity, +15% stamina recovery, -12% recoil, -15% weapon sway, and -10% aim/reload duration. No damage,
+  health or movement-speed bonus. Attachments, mounting, wounds and Zombies perks keep their existing effects.
+- Sprinting now uses a normalized stamina pool: 12 s at baseline, 14.4 s at maximum Endurance. It recovers fully in
+  6 s at baseline after a 1.25 s delay; exhaustion holds sprint off until 25% is recovered. Actual ground movement
+  drains it, and respawn refills it. Endurance also speeds the existing jump/prone fatigue recovery. The owner drives
+  stamina as it does movement; the host owns earned training totals.
+- Aimed breathing (2026-10-20): `AimBreathingRules` supplies a small vertical breathing cycle, slower hand drift and a
+  tiny smooth tremor. `CameraController.Breathing.cs` applies it to the first-person aiming camera after its per-frame
+  rotation reset; the viewmodel, scope and existing `Shootable.WeaponRay` follow the same view. Mouse input and
+  `EyeAngles` are not accumulated or rewritten. ADS transitions fade the effect; inactive/dead/frozen/drone/noclip
+  cameras reset it, and holstering, lowering, reloads, mantling and climbing fade out the aimed motion.
+  Rested novice additional bounds are 0.119 degrees pitch and 0.0555 yaw, before existing animations/effects.
+  Handling retains its continuous 15% maximum reduction, including the remaining motion at level 50. Crouching,
+  prone and mounting scale this breathing by 0.70, 0.42 and 0.22 respectively. Stamina depletion smoothly raises its
+  amplitude up to 1.8 times and rate from 13 to 24 breaths/minute; trained Endurance helps through stamina/recovery.
+  The training harness now passes 17 scenarios, including breathing bounds, all skill levels, stance/fatigue effects,
+  ADS transitions and 30/60/120/144 Hz continuity. The game project builds with 0 errors, and native compilation
+  and the loaded rules passed a read-only check in `output/aim-breathing/native-verified/`. Scene/play/document state
+  stayed unchanged. The live aimed view and feel have not been reviewed yet.
+- `Reloadable` captures its combined duration multiplier at the start of a reload, including shell continuations.
+  Reload completion, sound timing and the viewmodel's existing reload-speed parameter use that captured value, so a
+  skill gain midway through cannot move them apart. A cancelled reload's delayed sounds cannot bleed into a new one.
+- Progress uses the existing local-cookie trust model, not server-verified account storage. Versioned, account-scoped
+  keys are `hc1.training.v1.{Game.SteamId}.Endurance` and `.Handling`. The host imports capped values once per connection
+  and merges higher retained values on reconnect. Owner snapshots merge monotonically; they never undo newer saved
+  progress or award career XP for an import. Dirty profiles save every 5 s, immediately on a skill improvement, and
+  on Client teardown (including after its network owner is cleared). Account changes flush the old keys first.
+- `SoldierTrainingPanel` sits in Profile → Career Record between career rank and service milestones. It shows both
+  levels, XP remaining, current benefits and caps. `SoldierTrainingHud` puts career progress and stamina below Vitals.
+  It hides for spectators and drone control.
+  All new text is in the 13 translation languages as well as English; the translation checker adds no new findings.
+- A skill's level-up is a medal at the top centre (2026-10-19). The user found the old box beside Vitals horrible
+  ("SKILL IMPROVED / WEAPON HANDLINGLEVEL 3": Razor had dropped the "·"), and asked for it at the top middle, like
+  the one-shot-one-kill medal.
+  - `MedalFeed` watches `SoldierTraining.LevelUpRevision` and queues a `training` medal with the kill medals:
+    the skill's name, SKILL IMPROVED, and the new level in the badge's diamond (`.medal-level`), up for 2.4 s.
+  - A feed built after a level-up doesn't show it again: the first tick only takes the current revision.
+  - The badge is `ui/medals/training.png`, made by `Tools/training_emblem.py` from the plain Ranked shield
+    (`ui/ranked/unranked.png`): the steel warmed to brass and its empty diamond filled with dark gunmetal.
+  - `dev_medal handling|endurance [seconds]` shows one.
+  - Checked in a browser mockup of the flattened SCSS, beside the one-shot medal. Not yet seen in a match.
+- Original training validation (2026-10-18): `dotnet run --project Tools/SoldierTrainingChecks/SoldierTrainingChecks.csproj` passed 12 scenarios using
+  the actual rules/profile files (only account, cookies and clock are stubbed), covering every level threshold, caps,
+  several tick rates, recovery hysteresis, movement rejection and account/save/snapshot behavior. The C: project's
+  `Code/razedtest.csproj` builds against the installed engine with 0 errors (95 existing warnings on the final build).
+  sbox-cli reported no running editor with this project open, so live HUD rendering, RPC/host migration, respawn and
+  weapon feel still need an in-game playtest. No editor was launched or scene/prefab edited for this feature.
+
+## Prestige emblem (`Progression.GetPrestigeEmblem`)
+- The user asked to show any prestige they've reached, not just their highest (2026-10-13). On Career Record's SERVICE
+  MILESTONES, clicking a reached card picks it (EQUIPPED); a locked card does nothing.
+- The pick is the cookie `hc1.progress.prestige_emblem` (`Progression.SetPrestigeEmblem`). `GetPrestigeEmblem` returns it
+  while it's reached, else the highest prestige, and a new prestige clears it.
+- The emblem shows in the menus' header, the squad card, the gunsmith's header, the rank card and the scoreboard. Over
+  a match, a pick goes out at once (`Client.Local.RpcUpdatePrestige`). Unlocks and the rank label still go by
+  `GetPrestige()`.
+- Compiled with dotnet, not yet seen in-game.
+
+## Gunsmith (`Code/Gunsmith/GunsmithPanel.razor`)
+- Laid out like the main menu, after the user's CoD-style mockup: MainMenuRoot's header, a breadcrumb bar, then
+  LOADOUT (left), the gun in `.gs-stage` (centre) and BUILD / CUSTOMIZE (right). The header's styles are copied into
+  GunsmithPanel.razor.scss under the same `gnav-*` names, so change both. Its nav tabs load the menu on that page
+  (`GameUtils.ReturnToMainMenu( route )`, `MainMenuRoot.PendingRoute`). Over a match (the "GunsmithStudio" prefab) the
+  tabs, party and settings are hidden.
+- `GunsmithController.FrameWeapon` fits the gun (the Reticle tab: its optic) into `GunsmithPanel.StageRect` by
+  widening the FOV and sliding the camera. Only drags and scrolls over the stage turn and zoom it.
+- The stage gun is the weapon's viewmodel prefab (`GunsmithSystem.LoadEquipment`). `HidePreviewArms` swaps every
+  material named like a hand or an arm (`IsPreviewArmMaterial`: sleeve, glove, `_hand`, `_arm`, ...) for toolsnodraw,
+  which a model draws as its yellow NODRAW texture instead of hiding it. Names with "handguard" or "handle" are left
+  alone: the M16A4's `m16_carry_handle.vmat` matched `_hand`, so its carry handle showed yellow (fixed 2026-09-28).
+  Name new gun materials so they don't match.
+- The 1911's viewmodel has its gun renderer on a child ("Viewmodel"), not the prefab's root like every other gun's.
+  `SetFirstPerson` moves the renderer out under the camera and back, so it puts a child renderer back under its gun
+  object, and `LoadEquipment` destroys a renderer left outside it. Before that fix (2026-09-29) every 1911 load left
+  its model on the stage: the user saw it over the USP. It also didn't turn with a drag or frame properly.
+  - The fix hotloaded into a gunsmith that had been open since before it, so that scene kept four 1911s from its earlier
+    loads, and the user saw them again over the USP and the M18. So `LoadEquipment` also destroys every model under the
+    GunsmithSystem's object before it loads a gun (any child with a SkinnedModelRenderer): only the gun it's loading
+    belongs on the stage. That also takes off the MP5 the gunsmith scene starts with.
+- The bars are `GunsmithStats`, read from the prefabs with the class's parts and tuning, on one scale for every gun, with
+  the change from the factory gun in green or red. HANDLING (ADS time) stands where CoD has accuracy, since the game has
+  no spread or bloom. FIRING RANGE opens `scenes/gunsmith_range.scene` through
+  `GunsmithRangeSession.Enter`, carrying the selected weapon into a private practice session.
+  From a match the card says LEAVE MATCH & TEST BUILD; entry disconnects the local player
+  before loading the range. `FiringRangeSystem` uses the regular pawn/weapons, replenishes
+  reserve ammunition, and provides target reset, moving targets and shot/damage feedback.
+  `Tools/gunsmith_range_bench.py` supplies generated long-grain/end-grain oak and beveled
+  bench timbers; the range model maps both oak materials. These are current source facts,
+  not a replacement for an end-to-end play test.
+- Every pick saves as it's made, and `PlayerLoadout` sends the saved class to the host every second, so there's no
+  apply step (the user had the mockup's APPLY BUILD removed). SAVE LOADOUT, which only confirmed, was removed too at
+  the user's ask (2026-10-13). Over a match, picking a class (`SelectClass`) picks it as the class menu does, which swaps
+  it in straight after a spawn.
+- BUILDS (`GunsmithPresets`, 2026-10-13, the user: "i might want different attachments on the same gun, as a separate
+  build"): named builds of a gun (its parts, camo, finish, reticle and optic tune), 8 a gun, shared by every class.
+  - Each is a build code (`ExportWeaponBuildCode( resource, withLockedParts: true )`, so a part not yet unlocked stays
+    in it and comes back once it is) with an Id and a name (24 letters at most, "BUILD n" if left blank), in the cookie
+    `hc1.gunsmith.presets.<weapon>`. Presets saved before Ids get one when they're loaded.
+  - Each class links one build per gun by its Id (`hc1.gunsmith.class<n>.<weapon>.build`).
+    The gun is "modified" when its fitted build's code differs from the linked build's (`GetCurrent`).
+  - The BUILDS card opens the list: name a build and SAVE AS NEW, the bin deletes, APPLY puts a build on the gun in
+    this class, and a modified one offers UPDATE (save over it) or REVERT.
+  - The pencil, or a click on a build's name, renames it (the equipped one too). The box takes the keyboard at once
+    (`FocusRenameEntry`), Enter saves, and Escape leaves the rename before it closes the list. The user didn't find the
+    pencil at first (2026-10-13): another session's firing range code had stopped the game compiling, so their editor
+    still ran a build without it.
+  - The weapon cards carry the build's name under the gun's ("*" when modified). In the weapon picker each gun lists
+    its builds, and a click puts that gun in the class wearing that build (`PickBuild`). The panel reads the states
+    twice a second (`RefreshBuildStates`).
+  - Compiled with dotnet, not yet seen in-game.
+- Escape and the back button close one layer at a time (tuning, compare, builds, share, first person, a slot's parts,
+  the picker, the class list), then leave. MainHUD and PauseMenuPanel ask `GunsmithPanel.HandleEscapeAny()` first.
+- Clicks bubble to every parent's handler and `@onclick:stopPropagation` does nothing here. A control inside a clickable
+  row uses `ClickInside` (`e.StopPropagation()`), and a modal's backdrop closes only when `e.Target == e.This`
+  (`ClickBackdrop`). Without that, the tuning panel's DONE closed it and the backdrop's toggle opened it again.
+- Header hover labels (`.gnav-tip`) on an open round button are hidden with `opacity: 0`, not `display: none`, in the
+  menu and the gunsmith: a label back from `display: none` was sometimes drawn as bare text with no box.
+- A label in a row with a `flex-grow` sibling can shrink to one letter's width and wrap letter by letter. The weapon
+  cards' "LV" did, beside the XP bar (the user's report, 2026-10-01). Short labels like that get `flex-shrink: 0` and
+  `white-space: nowrap` (`.gs-lv-key`, `.gs-lv-num`), and the growing sibling `min-width: 0`.
+- Equipment icons (lethal, tactical) are drawn in a square about twice their box, and the box clips them: the
+  loadout's 56 px `.gs-gear-img` holds a 110 px `.gs-img-square`, the picker's 44 px box a 90 px one. So an icon must
+  be framed like the grenade PNGs, with the item centred and about 40% of the canvas wide. The Recon Drone's SVG filled
+  its canvas, so its plane overflowed the Tactical box (the user: "img is too big"). On 2026-09-28 its viewBox was
+  widened round the drawing (`-142.5 -187.5 525 525`, `ui/weapons/recon_drone.svg`).
+- Attachments unlock by weapon level (`AttachmentUnlocks`, levels 2-30). Each weapon's parts are dealt out one slot at a
+  time (optic, muzzle, underbarrel, magazine, ...), plainest first; a part's own `RequiredLevel` above 1 overrides that.
+  `GunsmithLoadoutManager.TryGetAttachment` treats a locked part as not fitted (it stays saved). Prestige resets
+  weapon levels, so parts lock again.
+- Unlock points: one every 5 player levels (`AttachmentUnlocks.LevelsPerPoint`), spent on any locked attachment for
+  one weapon (click a locked row, then click again). A point comes back once that weapon reaches the part's level.
+  Purchases are in the cookie `hc1.gunsmith.point_unlocks.p<prestige>`, so a new prestige starts them again.
+- Leon's Steam account (`AttachmentUnlocks.DeveloperSteamId`) alone sees UNLOCK ALL in the hero, which opens every
+  attachment and camo (cookie `hc1.gunsmith.dev_unlock_all`).
+- The parts list shows a picture of each part (`AttachmentThumbnails`), rendered at runtime in a scene of its own, one
+  per frame, cached for the session; nothing is saved to Assets. Prefab parts are drawn from their prefab's meshes,
+  turned by their mount; bodygroup parts from the gun's model with only their choices shown. The bind pose leaves some
+  animated bits floating (the RPK mags' top round), so `DropLooseBits` removes small pieces away from the part's main
+  one. The studio scene is never ticked, and a destroyed subject's meshes kept rendering into the next part's framing
+  look, so `Render` hides them (`SceneObject.RenderingEnabled`) and destroys the subject inside `_studio.Push()`. `dev_thumbnails <weapon> [filter] [probes]` writes them as PNGs to the game's data folder
+  (`thumbnails/<weapon>/`) for checking; `probes` also writes the framing looks and the raw shot.
+- COMPARE (`WeaponComparePanel`, WEAPON STATS) shows the real figures behind the bars, beside another weapon or
+  (the FACTORY chip) this one from the factory:
+  - damage, RPM, DPS and the time to empty a magazine;
+  - hardcore kill chance, hits to kill and the time to kill (first hit to the killing one, at the full rate);
+  - one shot's damage at 10, 25, 50, 100 and 200 m (`GunsmithStats.RangeDamage`: the falloff curve as
+    `Shootable.CalculateDamageFalloff` applies it, "-" past MaxRange, where the trace ends);
+  - full damage range, muzzle velocity, ADS and reload times, recoil control and its vertical and horizontal parts (on
+    control's scale, out of `NoControlKick`), walk/sprint/crouch/prone speeds in m/s and ammo.
+  It reads `GunsmithStats`, whose raw fields follow the game's own rules (`PlayerPawn.GetWishSpeed`,
+  `Reloadable.GetReloadTime`, `WeaponAmmo.GetMaxReserve`, `HealthComponent.HardcoreBullet`), so change them together.
+  - The COMPARE WITH list has category chips over it (2026-10-13, the user: "need filters for assault rifles etc"):
+    ALL, then each kind of gun it has. They're bigger than the gun chips and sit over a rule, so they read as its tabs.
+    It opens on the compared gun's kind.
+  - The YOUR BUILDS / FACTORY toggle is commented out (2026-10-13, the user: "just your build is enough to compare";
+    they may want it back), so both columns are the saved builds. The FACTORY chip in COMPARE WITH stays.
+  - Saved builds (BUILDS, `GunsmithPresets`) can be compared in either column, two builds of the same gun included
+    (2026-10-13, the user: "if i have 2 ak 74us, i wanna be able to compare them too").
+    - Over the left column, YOUR BUILD chips: CURRENT BUILD and this gun's builds.
+    - COMPARE WITH has a SAVED BUILDS tab after the categories: every gun's builds, and this gun's CURRENT BUILD.
+    - Any gun's builds from its chip (2026-10-13, the user: "i need to be able to compare other guns builds for other
+      weapons"). Each gun chip shows how many saved builds it has. Picking a gun lists a BUILDS row under the chips:
+      CURRENT BUILD (that gun in the active class) and its saved builds. Picking your own gun starts on one of its
+      other saved builds. The list opens on the compared gun's kind.
+    - A build's figures come from `GunsmithStats.Compute( resource, buildCode )`, through
+      `GunsmithLoadoutManager.TryReadWithBuild`, with any part the player hasn't unlocked left off.
+    - Picks are kept by the build's Id, so renaming one keeps it picked. The column heads show each build's name under
+      its gun.
+    - Compiled with dotnet, not yet seen in-game.
+- DETAILS (the stats card's `.gs-stats-details`, `ShowDetails`): the same figures in the loadout column, as the build
+  beside the factory gun (`WeaponComparePanel.Live`, fed GunsmithPanel's `_stats` / `_baseStats`, so they change when
+  the bars do). The user asked for more than the bars (2026-09-29), then to watch those figures while changing parts.
+  So it isn't a modal like COMPARE: the parts list on the right stays usable. The build's figures, and their rows,
+  are green or red where they beat or fall short of the factory's. Escape closes it after a slot's parts list, before
+  the picker. Compiled offline; the editor closed before it hotloaded, so it hasn't been seen in-game.
+- The user removed the gunsmith's CHECK / NEEDS CHECKING badges and review-note box on 2026-10-12, including in the
+  editor and on the developer's account. Existing `EquipmentResource.ReviewNote` / `kastov_prefabs.Prefabs.review_note`
+  metadata stays in the assets for development reference; the gunsmith does not display it.
+- Parts are what the real gun takes (the user: "as close to real as possible"; optics are left alone). On 2026-09-29
+  the FAMAS F1's 50- and 60-round magazines (the F1 only feeds from its own 25-round one) and the MP5's 10mm 30-round
+  magazine (the MP5/10 is another gun) came out. Their files are in `Backups/disabled_gunsmith_parts/` under their
+  Assets paths; copy them back to restore. A kastov gun's choice the real gun can't take is `Part(..., offered=False)`:
+  the model keeps the bodygroup, `own_parts` writes no part, and a group with nothing offered gets no slot (the FAMAS
+  has no Magazine slot). A saved build with a removed part gets the factory part (`TryGetSavedAttachment`).
+- A part's `MainPrefab` is written `{"_type": "gameobject", "prefab": "<path>.prefab"}`. Six parts had the bare string
+  (`"MainPrefab": "gunsmith/.../x.prefab"`), which didn't resolve in-game, so they were never offered: the SCAR-H's
+  Barrel and Underbarrel rows and the USP's Barrel row were empty until 2026-09-29. `dev_thumbnails <weapon>` logs
+  what a gun really offers.
+- The HC1 grips and suppressors (`gunsmith/hc1/`) are the SCAR-H's alone: the M4 has its own grips, and its Barrel
+  slot is for barrels, where a can would stack with a Muzzle-slot one. They sit on the model's `muzzle` socket
+  (`GunsmithSocketAttachment`, `hc1_attachment_preview scarh` renders them), and the cans' `MuzzleShift` (6.26, 4.36)
+  puts the shots at their front in first person. The old "Tactical Suppressor" (`gunsmith/scarh/barrel/`) is still
+  a bare string with no socket fit, so it stays unoffered. The SCAR-H has no Stock, Muzzle or Laser slot yet, though the
+  real one takes them.
+- The USP's suppressor is its model's own threaded barrel and 9mm can: `muzzle` 2 on v_usp, `barrel` 2 on w_usp
+  (`ModelBodygroups`), 6.696 past the bare muzzle (`MuzzleShift`). Choice 1 of each is a match compensator, not offered.
+
+## Weapon tuning is off (`WeaponTuningManager`, `WeaponTuningPanel`)
+- The WEAPON TUNING sliders (damage, fire rate, reload, ADS move, recoil and magazine size, -10 to +10 per weapon,
+  kept in `hc1.tune.<weapon>.<stat>` cookies) were turned off on 2026-09-30. The user may bring them back, so nothing
+  was deleted.
+- What's commented out, each marked "Put back with tuning":
+  - the gunsmith's TUNING card and its modal (`GunsmithPanel.razor`);
+  - the gameplay reads: `Shootable.GetEffectiveDamage` / `GetEffectiveFireRate` (and `TuningId`),
+    `ShootRecoil.GetRecoilScale`, `Reloadable.DurationMultiplier`, `Aimable.GetAdsMoveScale` and
+    `WeaponAmmo.GetEffectiveMaxAmmo`;
+  - `GunsmithStats.Compute`, which now works every build out untuned.
+- Players' saved tunings stay in their cookies but do nothing. Turning tuning back on brings them back as they were.
+- `ShowTuning`, `ToggleTuning`, `CloseTuning` and `IsTuned` are still in GunsmithPanel, with the Escape and back
+  chains that close the modal. The styles and the `Tr` keys are still there too.
+- COMPARE's captions still say "no tuning" / "with tuning". They weren't changed, because that needs new keys in all
+  ten tables.
+
+## Gunsmith caches (what a shot and a frame no longer work out again, 2026-10-17)
+- A performance audit found every shot asking `GunsmithLoadoutManager.TryGetAttachment` about 84 times: 7 effect passes
+  over 11 slots (`GunsmithAttachmentEffects.For`, from Shootable, its effects, ShootRecoil and ViewPunch), plus
+  `RefreshAmmunitionLoadout` and the suppressor check. Each lookup read cookies and searched all ~900 parts. Measured
+  in a match on the Kastov-74u with 9 parts fitted, that took 3.56 ms a shot. It now takes 0.5 µs.
+- `GunsmithLoadoutManager.Version` / `MarkChanged()` decide when anything is worked out again. Everything that can
+  change a fitted part bumps it:
+  - SetAttachment, SetActiveClassIndex, the optic tune setters, ApplyAttachments' barrel clear and the USP-SD migration;
+  - UNLOCK ALL, spending a point, a weapon level-up (`WeaponProgression.AddXP`) and a prestige;
+  - a part loading or reloading (`GunsmithPart.PostLoad`/`PostReload`, which also bump `GunsmithPart.LibraryVersion`).
+  **A new cookie write that changes a part, its unlocking or its tune must call `MarkChanged()`**, or the guns keep the
+  old answer.
+- What it keeps:
+  - TryGetAttachment's answers, per resource and slot. Parts are found through an index by path and name
+    (`PartsNamed`), in the library's order.
+  - Per gun: the effects (`Equipment.FittedEffects`, also keyed by prone for the bipod), the ammunition loadout (also
+    keyed by possession: the first refresh runs before the pawn is possessed), the suppressor check and the tuned zero.
+  - While a build is being fitted (`IsFittingBuild`: Theater, COMPARE) nothing is kept.
+- The unlock ladder (`AttachmentUnlocks.GetLadder`) used to be made again every 5 s. Now it's made again when a part
+  loads or the scene changes, so a viewmodel prefab's new slot shows on the next map. A rebuild takes ~0.2 ms.
+- Per frame:
+  - `GunsmithAttachmentPoint.On( root )` keeps each weapon's point list until a point is made, destroyed or given a part
+    (`GunsmithAttachmentPoint.Version`; SetPart bumps it). Category and CurrentPart are still auto-properties, so
+    hotloads keep them, so code that assigns CurrentPart directly must go through SetPart. A point walk went from 1.6 µs
+    to 0.015 µs.
+  - `GunsmithMw22Attachment.BoneDelta` keeps each model's bones by name: 3.8 µs to 0.12 µs a call, with identical
+    transforms.
+  - The mounts' camera-setup remount (`ICameraSetup.PostSetup`) now only runs for viewmodels
+    (`GunsmithMw22Attachment.OnViewModel`). A world model's parts are its children and move with it. Bone attachments
+    that follow an animated bone or hide one still remount.
+- CameraScope (the M700's 3D scope) does its setup once instead of every frame (the texture clear, the material, the
+  render target and the parent). It puts the material back when the camo pass clears it. The audit thought the scope
+  camera rendered at the hip too. It doesn't: the lens is 9.7 from the eye at the hip and 3.7 aimed, so the `> 5` check
+  already only draws it while the scope is up. Gating it on the aim tag was tried and taken out: the lens went black
+  while the scope came down.
+- The scope's picture was a fixed 512 x 512, which the lens stretched more than twice over (the user: "it looks really
+  low res"). It's now the screen's height rounded up to 128, between 512 and 2048 (`CameraScope.PictureSize`: 1152 at
+  1080p). Aimed, the M700's glass is about 1.06 screen heights across. That's ~5x the pixels for the scope's camera
+  while scoped. A new size is made when the screen's changes, and the picture goes with its viewmodel (`OnDestroy`).
+  Live in the user's match (1152 x 1152), not yet looked at through the scope.
+- The scope went black while strafing aimed (the user, 2026-10-19: "when i move with a and d i dont think it should go
+  completely black"). Its `OnPreRender` could run before `CameraController.OnPreRender` put the gun at the eye that
+  frame, so the eye was measured against last frame's gun: moving sideways read as the eye far off the scope's axis
+  (`ScopeEyeOffset`, which slides the shader's 0.43 window off the glass). Now the scope is worked out in
+  `ICameraSetup.LateSetup`, after the gun and its parts are placed; `OnPreRender` only does it for a scope no camera
+  sets up (Theater, test scenes). The eye box is left as it was: it goes black ~21 mm off axis, already kinder than a
+  real 10x40's 4 mm exit pupil, and with a cheek weld the eye moves with the rifle, so strafing shouldn't shade it.
+  Built with dotnet; the editor was closed, so not hotloaded or looked through yet.
+- Checked in the editor on 2026-10-17:
+  - 1,800 lookups (45 weapons, 20 slots, fresh and kept) and 17,913 index checks against the old logic: no differences.
+  - In a Lowtide TDM: the kept loadout, effects and suppressor check match fresh ones, and 5 shots left the version
+    alone (so no cookie reads or part searches). The M700's scope ran through hip, aim and release.
+  - Not yet seen by eye: every gun's parts in first and third person, and the Theater's M700.
+
+## Fire rate and fire modes in the gunsmith (the Action and Trigger slots)
+- The user (2026-09-30): a suppressor shouldn't change a gun's rate unless a real one would, every part should do what
+  the real one does, and there could be a category for changing fire rates "however you would do that in real life".
+- What really sets a cyclic rate, and what the game models:
+  - A suppressor's back-pressure speeds up gas-operated and blowback actions (`Shootable.SuppressorFireRateScale`):
+    about 10% on direct-impingement ARs and AKs (the M4A1 template the rifles copy in `kastov_prefabs.py`), about 5% on
+    blowback and roller-delayed SMGs (the MP5's, which the SMGs borrow). It's 1 where a real one wouldn't change the
+    rate: the semi-only M18 and Vepr-12 (the trigger finger sets their pace), the FAL, whose adjustable regulator is set
+    for the can (FN's procedure), and the MCX Virtus and the HK416 A5, whose two-position gas valves have a setting for
+    one, and the MCX-SPEAR, whose adjustable valve has a suppressed setting. The SCAR-H and
+    the old pistols and bolt guns have none.
+  - The gas system's length: the AR barrels already did it (`GunsmithAttachmentEffects.FireRate`).
+  - The buffer's mass, and a gas regulator: the Action slot (`GunsmithPartType.Action`, `GunsmithPart.FireRateScale`,
+    `GunsmithPart.SuppressedGasSetting`).
+  - A trigger can't change the cyclic rate. A fire control group changes the modes the selector has: the Trigger slot
+    (`GunsmithPartType.Trigger`, `GunsmithPart.FireModes`).
+- Action and Trigger are internal slots like Ammunition (`AttachmentUnlocks.IsInternalSlot`): no mesh, no socket.
+  `GunsmithLoadoutManager.ApplyAttachments` makes their runtime attachment points, and `AttachmentUnlocks.GetSlots` lists
+  a slot only for a weapon with a part for it. Their parts carry an explicit `RequiredLevel`, so the unlock ladder
+  leaves them out.
+- The parts:
+  - M4A1 buffers (`Assets/gunsmith/m4a1/action/`), against its factory H2 (4.6 oz) at 800 rpm: Carbine Buffer (3.0 oz,
+    x1.095, ~876 rpm, level 12), H Buffer (3.8 oz, x1.045, ~836, level 6), H3 Buffer (5.4 oz, x0.959, ~767, level 18).
+    The cycle time goes as (bolt carrier 11.5 oz + buffer) to the power 0.87, fitted to a measured pair: 5.6 oz to
+    7.5 oz buffers took an AR from 971 to 886 rpm.
+  - AUG A3 Suppressed Gas Regulator (`Assets/gunsmith/aug/action/`, level 12): with a suppressor it keeps the rate at
+    715 instead of 10% higher, and without one it changes nothing (the regulator's normal setting).
+    `Shootable.SuppressorRateScale` reads it.
+  - M4 Trigger Group (`Assets/gunsmith/m4a1/trigger/`, level 10): the real M4's semi and three-round burst in place of
+    the M4A1's automatic. The M4A1's `BurstEndDelay` is 0 like the M16A4's, so the next pull follows at the cyclic rate.
+  - M16A3 Trigger Group (`Assets/gunsmith/m16/trigger/`, level 14): semi and automatic in place of the M16A4's burst.
+- Fire modes: `Equipment.TriggerFireModes` (owner-side, set in `RefreshAmmunitionLoadout`) overrides
+  `Shootable.SupportedFireModes`, and everything that lists modes reads `Shootable.FireModes` (the selector, the HUD's
+  ammo counter, the gunsmith's figures through `GunsmithStats.BuildFireModes`). When a trigger group takes the mode
+  you're on away, `KeepFireModeFitted` switches automatic to burst (or back), else the first mode.
+- The DETAILS and COMPARE rate follows the fitted buffer and regulator, as the gun does.
+- Made offline (2026-09-30). The open editor compiled the six `.gnsmth` files as they were written, with every new
+  field in the compiled data, but nobody has seen them in the gunsmith: if the Action or Trigger slot is missing,
+  `recompile_asset` them after the code has hotloaded. None of it has been checked in-game.
+
+## Part weight (`GunsmithPart.Mass`, `Equipment.LoadedMass`, `Tools/part_masses.py`)
+- The user asked whether the parts have real-life downsides and wanted the missing ones in (2026-09-30). The main gap
+  was weight: a drum, a scope or a can weighed nothing.
+- Downsides that were already modelled:
+  - tracers give the shooter away;
+  - lasers show on the world model;
+  - brakes are louder, heard further and flash more, and compensators flash more;
+  - suppressors change the rate as the action would;
+  - bigger magazines reload with their own, slower clips;
+  - stocks change the recoil by how they brace.
+- Left out: a magnified optic's eye box, reliability, heat mirage off the barrel, a can's shift of the point of impact,
+  and gas in the face.
+- `GunsmithPart.Mass` is what a part adds against the factory part it replaces, in kg, so it can be negative (the
+  RPK's AKM 30 against its 75-round drum, -1.304). Magazines count loaded. `Equipment.LoadedMass` is the gun's own
+  weight with a loaded factory magazine, from the makers' figures (0 = unknown, read as 3.75 kg).
+- `GunsmithAttachmentEffects.ApplyMass` works out three things from the gun plus its parts (at least half the gun):
+  - Recoil: times gun / total, since free recoil goes as one over the weight.
+  - Aiming in: times the square root of (total + 4) / (gun + 4), where the 4 kg is the arms swung up with it.
+    `ViewModel` stretches `AimTime` by it, and the Facepunch-graph guns get `speed_ironsights` 1 / that.
+  - Moving: 1% slower per kg over 3.75 kg (`AttachmentWeightSlowdown`, added to the gun's own `WeightSlowdown` in
+    `PlayerPawn.GetWishSpeed`). A gun under 3.75 kg doesn't get faster than the rifles.
+  - Examples: the M4 with a 60-round mag (+0.61) kicks 15% less and aims in 4% slower. The Vepr-12's drum (+1.63)
+    kicks 25% less, aims in 9% slower and moves 1.6% slower.
+  - The owner works it out in `RefreshAmmunitionLoadout`, which runs on every shot. A magazine doesn't get lighter as
+    it empties.
+- The gunsmith shows it:
+  - each part's weight change under its description (`GunsmithAttachmentBrowser`, "+0.61 KG");
+  - WEIGHT in DETAILS and COMPARE (`GunsmithStats.Mass`);
+  - the recoil and ADS bars and figures include it.
+- `python Tools/part_masses.py` writes every part's Mass (tables with sources, by gun and file) and every gun's
+  LoadedMass (`GUN_KG`). `--check` lists what it would change and any part without a figure. `kastov_prefabs.py` and
+  `m16_gunsmith.py` write the same figures when they regenerate parts and prefabs. The Kastov-74u's hand-tuned prefab
+  got the new field only.
+  - A gun's own choices (`OWN_CHOICES`) are looked up as `"<group>/<choice>"` first, then by the plain choice name,
+    so a gun with a factory choice in several groups keys each one by its group (the AK-74M's `stock/factory` and
+    `pistol_grip/factory`).
+- Made offline, and compiled with dotnet. The new `.gnsmth` and prefab fields only load into files compiled after the
+  code has them, so `recompile_asset` the parts and weapon prefabs after the hotload. None of it has been checked
+  in-game.
+
+## Magnified optics: eye relief and the lens picture (`OpticZoom`, `Tools/optic_eyepieces.py`)
+- The user aimed the FAMAS F1's 2x Magnifier and Holo and asked if a scope really looks like that (2026-09-29). The
+  eyepiece's housing filled most of the screen, with a small magnified circle inside a ring of plain glass.
+  - Every M4 optic had `OpticAimOffset` x -4, red dots and scopes alike. So a magnified optic's eyepiece sat wherever
+    that put its model: that magnifier's glass 2.1" from the eye, the 6x scopes' 1.2-1.6" (their eyepieces filled the
+    screen), and the 3x Flip Magnifier's (x -2.5) 5.3".
+  - The picture was a fixed 0.3 of the screen's height (`OpticLensDiameter`), anchored 4 in front of the eye.
+- `Tools/optic_eyepieces.py` writes each magnified MWII optic's `OpticEyepiece` and `OpticEyepieceDiameter`: its rear
+  glass (the model's `lens` bodygroup disc, in its `_reticle` material). It also sets `OpticAimOffset` x so the eye
+  sits a real eye relief behind that glass. y and z, which line the sight up, stay. The reliefs are the longest of each
+  kind's common real optics (sources in the script):
+  - magnifiers 2.8" (Aimpoint's 3XMag-1);
+  - fixed 3x scopes 2.6" (Vortex's Spitfire 3x);
+  - digital scopes 2.56" (Pulsar's Thermion 2 60 mm);
+  - 6x scopes 4" (Vortex's Razor HD 1-6x24).
+  `--check` reports part files it would change. Rerun it after editing an optic's model or a relief.
+- `OpticZoom` anchors the lens where the line of sight crosses that glass, and sizes the picture to the glass's diameter
+  over its distance, so the picture fills the eyepiece wherever it is on screen (sway, recoil, a rail's shift).
+  Optics without eyepiece data (the MP5's, the Scout 3x) keep `OpticLensDiameter` at 4.
+- When the picture shows (2026-10-05, the user: aiming the 6x Precision Scope on the Uzi, "its delayed to move to the
+  magnified view"):
+  - It used to wait for the camera's zoom, which eases in exponentially (`CameraController`, `LerpTo` at 5/s). It came
+    in from 75% to 95% of the zoom: ~0.28 to ~0.6 s after pressing aim, though the scope was at the eye after ~0.3 s
+    (`ViewModel.AimTime` 0.25 s, then the aim offset's ease at 10/s).
+  - Now it goes by where the scope is (`OpticZoom.LensVisibility`, the overlay's opacity). It needs the optic pointing
+    along the view (full within 2 degrees, gone at 8) and the line of sight on the eyepiece's glass: full within
+    `FullOnAxis` (0.35) of its radius, gone off its edge. Optics without eyepiece data go by `ViewModel.AimProgress`
+    (75-95%).
+  - The lens stays active while the sights come down (`ScopeBlend` is `ViewModel.AimProgress`), so the picture leaves
+    with the scope instead of vanishing while it's still at the eye.
+  - The optic's place in front of the eye is learned once the aim has settled for `SettleTime` (0.15 s,
+    `ViewModel.IsAimSettled`), not after the zoom's 98% (~0.8 s). Until then the optic's own axis stands in for it.
+  - Compiled nowhere yet (made without a compiler), and not seen in-game.
+- The M4 holds an optic's origin 8.718 in front of the eye before its `OpticAimOffset` (`M4_OPTIC_DEPTH`: the 762's slot
+  at its ADS pose plus its correction). The ported guns' `OpticAimCorrection`s copy that, so each relief holds on them:
+  the 762, M16A4, P90 and Uzi all put a 2x's glass at the same depth. A rail's `RailOpticAimCorrection` moves the eye
+  with it (the FAMAS's low rail 0.6 further back).
+- Checked in software renders of the optics' OBJs from the eye (before and after), not in-game. A new `GunsmithPart`
+  field only loads into a part file compiled after the code has it: `recompile_asset` the part files after the hotload.
+
+## Flip-to-side magnifiers (`GunsmithFlipMagnifier`, `Tools/flip_magnifiers.py`)
+- The user aimed a magnifier and wanted T to move the magnifier away and use the front sight on its own (2026-10-12),
+  as a real flip-to-side mount does. The 2x Magnifier and Mini Dot, the 2x Magnifier and Holo, and the 3x Flip
+  Magnifier with the Holo or the Digital Sight (the M4's, and the MP5's 2x copies) now have an alternate sight
+  (`GunsmithPart.HasAlternateSight`, the other session's T framework in `Equipment.Optics.cs`): 1x through the front
+  sight, its dot drawn by `ScopeOverlay`'s reflex dot.
+- `Tools/flip_magnifiers.py` splits each model in two: `<stem>_mount` (the front sight, its mount and the magnifier's
+  base) on the prefab's root, and `<stem>_magnifier` (the tube, its glass and reticle) on a "Magnifier" child with a
+  `GunsmithFlipMagnifier`. It patches the prefabs and the parts' alternate-sight values (from the front glass), and
+  `--check` lists what's stale. Its docstring has the split rules and hinges.
+- While `Equipment.IsUsingAlternateSight` holds, the child swings 90 degrees about its hinge along the bore in 0.3 s
+  (the 2x ones to the gun's right, the 3x to its left), and back. It follows the mount's renderer (enabled, tint,
+  layers). In the gunsmith, Theater and on the floor it stays in.
+- `optic_eyepieces.py` now finds the rear glass on any renderer in the prefab; its values didn't change.
+- Made with the editor closed: the new vmdls, prefabs and parts need compiling (`recompile_asset` the six .gnsmth).
+  Not checked in a render or in-game: the hinges' sides and the swing, whether a cut left a hole in the 2x Mini Dot's
+  base, the dot through each front sight, and that a flipped tube stays clear of the window.
+
+## Optic tuning (`OpticTuning`, the gunsmith's TUNE)
+- The user asked for an optic tuning system like Modern Warfare II's (2022) (2026-10-08). In MWII, a fitted
+  attachment's TUNE opens two sliders that trade one trait for another, saved with the build. Here each slider is
+  something a shooter really sets on a sight, not a made-up stat:
+  - EYE POSITION (MWII's): the optic slides along its rail, one Picatinny slot (0.394") at a time, NEAR to FAR.
+    Nearer the eye, its window or eyepiece fills more of the view. Further, more of the world shows round it.
+  - ZERO: the elevation turret, the range where the bullet's path comes back through the line of sight. It replaces
+    `Shootable.ZeroRange` in `ApplyBallistics` (`Equipment.GetSightZero`), so it only moves the shots where bullets drop
+    (Battle Royale's `BulletDrop`). The choices are 25-600 m (`OpticTuning.Zeros`) plus the gun's own, up to the 12
+    mrad of elevation a red dot's or holographic sight's turret gives (`MaxElevation`). A gun with no ballistics
+    figures has no ZERO card.
+  - MWII's optics also had a weight slider, trading aiming speed for steadiness, and its variable scopes a zoom one.
+    The optics here have fixed magnifications, and a part's real weight already counts (`GunsmithPart.Mass`), so
+    neither is modelled.
+- Only the 27 MWII optics on the M4's mounts (`gunsmith/m4a1/mw2022/`, `OpticTuning.IsTunable`) take it: their mount
+  (`GunsmithMw22Attachment.RefreshMount`) slides the optic along the bore by `GunsmithAttachmentPoint.OpticRailShift`,
+  which leaves the sight line, and so every `ManualOffset` aim, where it was. The old `gunsmith/m4a1/optics/`, the
+  MP5's, the M700's and the SCAR-H's optics aren't tunable.
+- How far each gun's optic can move (`OpticTuning.Travel`, back towards the eye and forward, in slots): the M4A1,
+  M16A4 and AUG 2 and 2, the MCX 2 and 3, the P90 and MP7A1 0 and 2, the Uzi's claw mount 0 and 1, the AK family,
+  Vepr-12, FAL and FAMAS 1 and 1. Read off where each rail ends round the optic's slot, not checked on every gun
+  in-game. A gun not in the table gets 1 and 1.
+- A magnified optic's eye relief follows the slide: `OpticZoom` measures the eye from the rated relief, less the
+  rail shift (the learned neutral eye sits wherever the optic is), so off its rated relief the lens picture shrinks and
+  shades (`ScopeEyeBox`), as a real scope's does. The tune view says so, and shows the relief against the rated one.
+- The tune view (`GunsmithAttachmentBrowser`): TUNE on the fitted optic's row (in the slot list and the Optic slot's
+  parts) opens it in place of the parts list. EYE POSITION shows the rail position, how big the sight looks against
+  its usual place and the eye relief; ZERO shows where the bullet passes the point of aim at 50-300 m
+  (`OpticTuning.HeightAt`, from the gun's prefab's load). RESET puts both back. Back and Escape step out of it to the
+  parts list first (`Back`). The stage gun's optic slides as the slider moves.
+- Saved per class, weapon and optic in cookies (`hc1.gunsmith.class<n>.<weapon>.optic.<optic>.eye|zero`,
+  `GunsmithLoadoutManager.Get/SetOpticEyePosition`, `Get/SetOpticZero`), so each optic keeps its own tune. Build codes
+  carry the fitted optic's (`SharedWeaponBuild.OpticEye`, `OpticZero`), and Theater's first-person gun gets the
+  recorded build's through `_fitting`. A gun picked up off the floor shoots at its factory zero.
+- Compiled offline and hotloaded into the editor (2026-10-08). None of it has been seen in the gunsmith or in a match:
+  the view, the slide on each gun (that the optic stays on its rail), the relief's shading through a scope, and a
+  zero in Battle Royale.
+
+## Aiming lasers and reflex sight glass (`GunsmithLaserBeam`, `LaserOptics`, `m4_optic_lens.shader`)
+- The user aimed a Kastov-74u with the Box Collimator and a green laser (2026-10-18). The beam was drawn as a bright line
+  across the view, and the glass looked strongly blue. They asked whether you'd see the beam at all when aiming, and for
+  1:1 realism.
+- The laser parts (the M4's MWII Compact Green Laser and the Green and Red Laser Modules) are drawn as a real Class 3R
+  aiming laser:
+  - 5 mW, a 3 mm beam and 0.5 mrad divergence;
+  - green at 532 nm (603 lm/W) or red at 635 nm (148 lm/W), picked from `LaserColor`.
+- The spot is the beam's Gaussian irradiance on what it hits, reflected by an assumed 0.35 surface, and longer when it
+  strikes at a slant.
+  - Its core is drawn at least a pixel round, holding its light, and capped at 8 adapted greys, where ACES still keeps
+    its green. A brighter spot shows through the eye's glare round it (the CIE's veiling luminance, 10·E/θ²).
+  - Indoors it's a vivid green pinpoint at any range. On a sunlit wall it's a faint speck at 25 m and gone by 50 m.
+- The beam is only the light the air scatters toward the eye, so its brightness depends on what's in the air:
+  - clean air's aerosol and molecules;
+  - the maps' `VolumetricFogVolume`s, at the renderer's 0.0022 per inch per unit of strength (Riverdale's hall haze
+    lets you see ~190 m);
+  - smoke grenades' puffs, from their size and alpha;
+  - rain outdoors (Marshall and Palmer's drops).
+  - The particles scatter with a two-term Henyey-Greenstein phase function: a strong forward peak, and the ~0.02/sr
+    straight back that lidar measures.
+  - A beam under 1% contrast isn't drawn. Clean air leaves it invisible by day and in lit rooms, and faint at night.
+    Haze, mist, smoke and rain show it, most of all looking toward the laser. Looking down your own beam you see only
+    its weak backscatter.
+- Brightness is photometric (cd/m², lux) over the luminance the eye is adapted to (`LaserOptics.Adapted`):
+  - Nine view rays, five times a second, sort what's in view into sunlit, shade, indoors and night, by the map's
+    brightest sun, the weather's overcast and the sky.
+  - A map with no sky (Collider) is a 400 lux interior. Without that rule, Collider read as night and the spot came out
+    30-60 times too bright.
+  - That luminance is set against the camera's grey (0.25 over the geometric mean of its exposure range).
+- The zero:
+  - A laser is fixed to the gun and zeroed to its sights at 25 m (`GunsmithMw22Attachment.LaserZeroMetres`), so it
+    points wherever the gun does: sway, recoil, reloads, the hip. Nearer than 25 m the spot sits off the sights on the
+    laser's side, and past it on the other.
+  - The sights' line is learned in the laser's own frame once the gun is aimed and held still (`ScopeEyeAlignment`, as
+    the magnified optics learn their eye). It's cached per gun, laser and optic for the session (`LaserZeros`).
+  - Until then, and on world models, the laser points along its rail.
+  - This replaced an uncommitted bend toward the crosshair (2026-10-18).
+- `SceneLineObject` facts:
+  - It drops a point within 0.1 units of the one before, so the spot and glare discs are capsules at least
+    `MinimumSegment` long. Before this, the old spot's two points were 0.03 apart, so it never drew.
+  - Its width is a radius, and the line shader reads vertex colour as sRGB.
+- The glass (every 1x reflex and holographic sight's window, the vmats with `g_flLensCoatingOpacity`):
+  - 2026-10-19, the user aiming a Box Collimator: "it looks like there is no glass". 11 of the 14 1x sights had no
+    `g_flLensCoatingOpacity`, so they passed the view untouched. Now all 14 have it: 0.065 for the reflex sights (one
+    coated objective, ~93% passed) and 0.11 for the holographic ones (two windows round the film, ~88%).
+  - It blends premultiplied and passes the view at the coating's share (`g_flLensCoatingOpacity` is the loss).
+  - `g_vWindowTint` passes each colour as a share of the brightest: the dot's mirror coating reflects a narrow red band
+    out of the view, so the view through a reflex sight is a little cyan ((0.88, 0.96, 1); holographic (0.90, 0.97,
+    1)). Scalar alpha can't tint, so the dimmest colour's share passes through the blend and the rest comes from the
+    scene behind (`bWantsFBCopyTexture`, `g_tFrameBufferCopyTexture`), as the engine's layered glass does. An offscreen
+    render with the tint's red at 0.4 took the window's red to 0.35-0.42 of clear glass and left green alone, so the
+    backdrop copy works on the overlay layer.
+  - `g_flDust` / `g_flDustSeed`: specks at three sizes and a smudge film, lit by the scene. It's 0 on all 14 sights
+    since 2026-10-19 (the user: "glass texture is not good"). In a match, against a dark background in sunlight, the
+    specks showed as hundreds of white dots (150 cells across the window, about 300 specks), and the film's value noise
+    as blurry grey rectangles. Real dust on a sight's window doesn't show: a 50 µm speck 10 cm from a 4 mm pupil is
+    blurred to a disc with ~1/6000 of its contrast. Leave it off; the shader code is still there, unused.
+    `output/sight-glass/clean/` has the dust on/off renders against a dark wall (`cmp_*.png`) and their script.
+  - It adds only reflected scene light: the engine's reflection times the coatings' (0.035, 0.012, 0.014) at normal
+    incidence, the red band's being the dot mirror, rising to 1 at grazing.
+  - Within ~35 degrees of the line back to the eye, the reflection is cut to `g_flFaceShade`: that's the shooter's own
+    face in the hood's shade. It was a fixed 0.08 (the shader's default), which hid every reflection looking through
+    the window, at the hip as well as aimed. With the dust off the user saw no glass at all (2026-10-20, "i dont see any
+    glass now"). Now it's 0.5 on the reflex sights and 0.3 on the four holographic-strength ones (`att_vm_reflex_02`, the
+    Box Collimator, and the three `holo_*`), whose coating scales their reflection 1.8 times: at 0.5 they went pink.
+  - `g_flHaze` (0.02 on all 14): an even share of the light on the window that its coatings scatter, lit by the scene
+    (the dust's code path with no texture), so the window lifts a little over a dark background in light and not in
+    the dark.
+  - Together over the dark wall in sunlight (aimed, offscreen), the window went from 89% of clear glass's brightness to
+    about 118%, a faint purple-grey cast; over a pale panel it reads a little cool. Trials are in
+    `output/sight-glass/visible/` (`cmp2_*.png`: the old look, then three settings; `final_cmp_*.png`: before and
+    after). The isolated scene's only reflection source is its sky, so how strong reflections look on a map with
+    probes hasn't been seen.
+  - The reticle's light adds to the view.
+  - The old glass laid a fixed (0.13, 0.28, 0.36) blue over the view at ~7% alpha. That wasn't relative to the scene,
+    so it flooded dim scenes.
+  - Don't bump the shader's HEADER `Version` (it's 9) while the editor is open. On 2026-10-19 Version 10 stranded all
+    14 materials: the editor kept rejecting their compiled files ("special dependency mismatch"), refused to rebuild
+    them ("already tried with this fingerprint"), and every model holding them loaded `materials/error.vmat` (a lit red
+    checkerboard in the window). Putting 9 back and compiling the shader, then the materials, fixed it; a code-only
+    change recompiles cleanly. A shader compile finishes in the background, so compile materials only after its
+    `.shader_c` has been rewritten.
+  - Checked 2026-10-19 in offscreen renders of the M4 aimed through all 17 1x sights against a lit wall
+    (`output/sight-glass/render-glass.cs.txt`, old glass beside new: `sheet_before.png`, `sheet_after.png`, `zoom_*.png`).
+    Not yet seen in a match: the backdrop copy in the overlay layer at full screen.
+- Checked:
+  - Offscreen renders: a lit room at 7 m and 25 m, a sunlit wall at 25 m and 50 m, haze, and a misty night.
+  - The Box Collimator aimed on the M4 offscreen: through it the view is neutral, 94% of the view without the gun, dim
+    and bright.
+  - Live in the user's match on Collider and Orion: no beam indoors, the window neutral, and the zero learned.
+- Red dots on the bullet line (2026-10-18). While aiming there's no crosshair, so a dot drawn off the screen's centre
+  puts the shots beside it.
+  - The 1x sights' reticles are collimated, as a real reflex or holographic sight's are (`m4_optic_lens.shader` v9, every
+    material with `g_flScopeReticle` 0). The vertex shader passes the optic model's own forward and up axes, and the
+    reticle is drawn by the view ray's angle off that forward axis alone (`g_flCollimationScale` 5.5 reticle units a
+    radian: the dot is 1.8 mrad in radius, about what the old projection drew). So the dot shows where the sight
+    points, whatever the eye's height: moving the head moves the window round the dot, and past the window's edge the
+    window hides it. Only the Scout 3x (`g_flScopeReticle` 1) keeps the old projection: the MWII magnified sights leave
+    it at 0, so their glass is collimated too, and once raised ScopeOverlay's lens picture (aligned by OpticZoom) covers it.
+  - Before that the reticle was drawn a few inches past the glass (`g_flSightDistanceScale` 0.35), so the dot moved
+    7-12° per inch of eye height (`eye-height-762.jsonl`). The first survey (`table.txt`, `results.jsonl`) had the 18
+    ported guns' dots 0.2-0.45° low, nearly the same per optic on every gun; that was parallax, not aim.
+  - Collimated, each gun's dots share one error, the angle its ADS pose holds its rail off the view.
+    `ManualOffset.OpticAimAngleCorrection` turns the gun about the eye by it, for 1x sights only
+    (`OpticAngleCorrection`; `TheaterViewModel` too). The ported guns' come from `kastov_prefabs.py` (`optic_aim_angles`,
+    written by `set_aim`). The M4's (`0.328,-0.0004,0`) is set by hand in its prefab; its `AimOffset` stays `0,0,0`.
+  - Measured with `output/reticle-survey-20261018/collimated/` (`survey.cs.txt`, driven by `run_survey.py`): each gun's
+    viewmodel settled aimed, placed as `ViewModel.Setup` places it, the view on the camera bone at every sample. The
+    rendered dot matches the optic's own axis to 0.001°, so the rig also reports the axis (`axisRight`, `axisDown`).
+    - Before the corrections (`before*.jsonl`): the M4's dots 0.33° high, the RPK-16's 0.30° low, the AK-74M's 0.12°
+      high, the AK-12's and AK-15's 0.10° low, eight guns already on the centre and the rest within 0.06°.
+    - After (`after*.jsonl`, `table.txt`): every ported gun's 13 dots within 0.004° of the centre (the M16A4's worst;
+      the rest under 0.001°). The M4's average on the centre, and its idle sway carries them round a ±0.13° loop.
+    - After the M16A4's post and the five raised optics (2026-10-19, `risers-m16-b.jsonl`, `risers-all.jsonl`): the
+      M16A4's dots within 0.0007°, every other ported gun's within 0.002°, their optics' axes unchanged.
+  - The Kastov-74u's Box Collimator sight line (Angles `-0.4466,-0.04,0`, solved for the old reticle) is gone: with a
+    collimated dot it threw that optic 0.41° off.
+  - Renders at three eye heights (`renders.png`): the dot holds still while the window, post and hands move.
+  - The M4's two old 1x sights (`gunsmith/m4a1/optics/`: the Reflex Sight and Patrol Red Dot) are collimated too: on the
+    M4 their dots sit 0.03 degrees high and 0.05 low (`old-optics.jsonl`). Unlike the MWII optics they don't move with
+    the M4's idle sway: their mounts don't follow its animated bone.
+  - Not yet seen in a match: the dots, the M4's sway, and the gunsmith stage and thumbnails, where a collimated dot only
+    shows looking down the sight.
+
+## Weapon stickers (`GunsmithSticker`, `Tools/weapon_stickers.py`)
+- The user asked for a weapon sticker (2026-09-29) and left the design to Claude. Gunsmith → CUSTOMIZE → Stickers lists
+  them (the tab was already there, with no parts), and clicking the fitted one takes it off. They have no gameplay
+  effect and no unlock.
+- `Tools/weapon_stickers.py` draws four original die-cut vinyl stickers with numpy and PIL, from the game's own fonts:
+  Razed Logo, Ace of Spades, Hot Rod Flames and Hazard Stripes (`--preview <png>` draws them on a sheet instead). For
+  each it writes:
+  - the artwork (`materials/stickers/<name>.png`, cropped to its cut), which is also the gunsmith's tile;
+  - the cut (`_mask.png`) and the material (`.vmat`: alpha tested, satin vinyl);
+  - a universal part (`gunsmith/stickers/<name>.gnsmth`).
+  It also writes `prefabs/gunsmith/stickers/sticker.prefab`, which every sticker mounts.
+- `GunsmithSticker` builds a quad in the artwork's shape, as large as the point's `StickerSize` allows. It sits 0.012
+  off the surface and is drawn from both sides. It's a mesh rather than a decal: a decal would lag the viewmodel by a
+  frame and paint the hands too.
+  - The point's +X is the surface's outward normal, +Z is up and +Y = Z × X. So on the left side the artwork reads from
+    the muzzle to the butt.
+  - The camo loop skips it (`GunsmithLoadoutManager`: a sticker is vinyl over the paint).
+  - Theater doesn't record it: `MatchRecorder` skips models built at runtime, since a replay can only name model files.
+- Every gun but the SCAR-H has one Sticker point, on its left side, which the gunsmith's camera shows:
+  - The ported guns' come from `kastov_prefabs.py` (`Prefabs.sticker`: the centre and outward normal in world model
+    space, and the room). The viewmodel's point rides the `tag_sling` bone object like the charm's (the M18's rides
+    its slide's, `Prefabs.sticker_bone`). The world model's
+    is `WORLD_STICKER_LIFT` (0.018) further out, so it doesn't flicker into the gun at a distance.
+  - The older guns' (M4A1, MP5, M700, Spaghelli, USP, USP-SD, 1911) were placed by hand in their prefabs. Their bone
+    objects' frames differ gun to gun (the MP5's are placeholders at 0), so each viewmodel point is a child of the gun
+    renderer's own object, in the model's bind space. `StickerBone` names the bone the sticker follows (`weapon_root`;
+    the pistols' `slide`), through `GunsmithMw22Attachment.BoneDelta`. The world model points sit on the w_ models'
+    surface plus 0.018. The Spaghelli's and 1911's w_ models are offset from their v_ ones (5.138 and 0.355 back).
+  - Don't give a sticker point a `MountBone`: `GunsmithMw22Attachment.IsRemounted` takes any point with one for a
+    non-M4 gun, which turns off the M4's factory piece swap.
+  - The SCAR-H's model couldn't be exported to look for a flat spot, so it has no point yet.
+  - The spots come from scans of each model's left side for flat, clear patches. In first person at the hip, the
+    P90's and MP7A1's show only in part, and the AUG's and FAMAS F1's don't show at all. A holstered gun shows no
+    sticker.
+- Checked offline only: the artwork, and the spots in renders of the models (the side, and for the ported guns the
+  hip view from the camera). The code compiled and hotloaded into a running game (2026-09-29), but no sticker has been
+  seen in the engine yet. If the Stickers tab is empty, the new .gnsmth files weren't loaded: recompile them.
+
+## Core modes are off (hardcore only)
+- Ordinary multiplayer modes are hardcore for now; Tactical Defuse uses its own standard-health preset. The user
+  wants Core back later, so the Core/Hardcore toggles, the
+  "HC" labels and the `SetHardcore( IsHardcore )`-style calls are commented out with "Put back with Core" notes
+  (MatchLauncher, PregameLobbyMenu/Manager, CreateLobbyPage, RankedPage, RoundStateDisplay, `GameMode.DisplayTitle`,
+  `GameMode.ActiveHardcore` defaults to true). The menus show plain mode names, no "Hardcore". The Core/Hardcore
+  toggle for public matches was on the removed Multiplayer page, so it needs a new home when Core comes back.
+- Zombies still sets `SetHardcore( false )`, so hardcore's hit rules and one-shot bots don't apply to it. It has its
+  own faster regen (`UpdateHealthRegen`).
+
+## Tactical Defuse (`tactical_defuse.prefab`, verified 2026-10-14)
+- The 20-second Freeze Time state must have its `EnableBuyMenu` component enabled. It was disabled, so B could
+  never open the buy menu. Waiting has buying disabled; the round's buy phase is when purchases become available.
+- `TacticalBuyMenu` opens when buying first becomes available. B (`ChooseClass`) toggles it, Escape closes it,
+  and entering combat closes it and rejects purchases. Its `visible` class is managed with `SetClass` so closing
+  also releases the overlay's input capture.
+- Lightweight bots use `LightweightCombatBot.Tactical.cs`, with cash and retained equipment in `BotIdentity`.
+  They start with the team's authored pistol and $800. Primaries must be purchasable for their team and affordable;
+  armour and helmets deduct the same prices as player purchases. Tactical bots receive factory weapon parts.
+- The bank receives team income after loss bonuses, weapon kill rewards and friendly-fire penalties, capped at
+  the mode's maximum. Death clears equipment; surviving weapons and remaining protection carry into the next round.
+  Half resets clear gear and reset cash, and the roster follows the side swap.
+- Both bot round-mode checks include `tactical_defuse`. Round respawn saves survivors before clearing their old
+  positions, then fills after 0.1 seconds in the buy phase. Combat cannot replace killed bots.
+- Verified against the loaded engine in temporary scenes: 18 lifecycle/spawn checks and 9 UI/input checks,
+  plus the existing 34 purchase/RPC/protection checks. The real menu was captured through native `ui_screenshot`,
+  and native simulated B closed and reopened it. Reports are in `output/tactical-defuse/buy-menu-fix/`.
+
+## Hardcore hit locations (`HealthComponent.Wounds.cs`)
+- Hardcore bullets go by where they hit, the same for players and bots, PvP included. Everything scales with the
+  round's damage after falloff (`gunDamage` in `TakeDamage`). Bots do their gun's full damage to players in hardcore
+  (`RealPlayerDamageScale` 0.75 is outside hardcore only). The table is `HardcoreTrauma`, and armour takes its share
+  first (`transmission`, from `ModifyDamage`'s split).
+  - Head or neck: 10x the damage, so dead (a helmet can save you).
+  - Body: a chance to kill outright of damage / 40, at most 95% (`HardcoreTrauma.KillChance`: M4 50%, 9 mm 30%, a
+    7.62x39 AK 65%, SCAR-H 90%, FAL and SPEAR 95%), 0.6x for the belly and pelvis, times the share armour lets
+    through, and rarer with a custom game's extra health. Otherwise 4.5x the damage to the chest (3x the belly), but
+    never more than 90% of your health (`SurvivedBodyHitHealth`), so a body hit that doesn't roll a kill always leaves
+    you alive: M4 90, so the second kills unless you've healed; 9 mm 54.
+  - History: the chance came in as the user's "real life" ask, then on 2026-10-07 commit b733fcbd made body hits
+    deterministic (chest 4.5x: 5.56 always two hits, 7.62 always one). On 2026-10-16 the user saw "2 body shots every
+    time", said one would kill in real life, and chose "whatever is realistic": the chance is back, and the heavy rounds
+    no longer kill every time. `dotnet run --project Tools/TraumaChecks` checks the table (25 checks).
+  - Arms, hands, legs and feet: 1.7x the damage, at most half your health (M4 34, so three kill; pistols four, SMGs
+    five). Only these, and falls, add wounds.
+- Explosions, knives and falls aren't bullets: they still kill bots (and players hit by bots) outright in hardcore,
+  and otherwise use normal HP. Burns (`DamageFlags.Burn`, see Incendiary grenade) never kill outright: like the
+  battle royale's zone, they only wear health down.
+- There's no bleeding or bandaging: the user turned those down because they'd slow the game. Health regenerates in
+  hardcore too, like Core (4 s after the last hit, 25 HP/s): the user sees it as the character patching themselves
+  up. Only the arm wounds' recoil and sway last. Bots have no regen.
+- Each leg/foot wound makes every gait 15% slower (`WoundSpeedScale`, up to two count; bots too, via `GoTo`), and the
+  limp wears off by itself: `LegWounds` is a float the host heals at 0.6 a second from 1.5 s after the last leg hit,
+  so one hit is gone in ~3 s and two in ~5 s (the user found a 20% limp that lasted until death far too slow). Any
+  fall damage adds one leg wound the same way, in every mode, Zombies included (the user asked for it). Each
+  arm/hand wound adds 25% recoil and a slow aim drift (`CameraController.ApplyWoundSway`, 0.35 deg, less crouched
+  or prone). A bot's aim error goes up 40% per arm wound. Arm wounds last until death (`ClearWounds` on respawn).
+- The player models (`models/player/*_side_player_01_v2.vmdl`) tag only head, spine and arm hitboxes (pelvis is
+  "pelvis"; the legs and clavicles have none), so `SceneTraceExtensions.GetHitboxTags` falls back to the bone name.
+  Bullets find bodies with a ±7 in box (see Bullet traces), which touches several hitboxes at once, so `Shootable` hits
+  each body once per bullet. `SceneTraceExtensions.ThroughBody` (also used by bot shots) follows the bullet's line through that body and
+  takes the first vital hitbox on it, else the first limb: a round through an arm held across the chest hits the chest.
+  Before this, a leg shot also hit the pelvis, and PvP bullets did their damage several times over.
+
+## Zombies match (`zombies.prefab`)
+- The prefab has one state, "Zombies" (respawns after 3 s). It was a copy of TDM's, and the user saw TDM's
+  "Preparing to start..." after their Zombies game had begun, so its Waiting, Preparing, Play Game and Game Over (team
+  victory) states are gone. `ZombiesRoundSystem`, which `ZombiesGameMode` adds at runtime, runs the waves.
+- Everyone is on Blue Team (`TeamAssigner.OnlyTeam` CounterTerrorist, no balancing), so every player gets the CT
+  loadout.
+- The scoreboard has no teams in Zombies (`Scoreboard.IsZombies`): one list of players with their Points and Kills from
+  `ZombiesPlayerEconomy`. The pawn is replaced on respawn, so both carry over through `ZombiesGameMode.CarriedPoints` /
+  `CarriedKills`, which a restart clears.
+- Editing `zombies.prefab` while a Zombies match runs reloads the mode without its runtime `ZombiesRoundSystem`, so no
+  zombies come: start a fresh match.
+- TDM's Play Game state also gave 10 s of spawn protection, which Zombies doesn't need: the dead respawn in the break
+  between rounds, with no zombies alive.
+- Checked in-game 2026-09-26 (`dev_zombies`): the Zombies intro and no "Preparing to start", Blue Team, and the
+  scoreboard's Points and Kills list. Solo, an idle player with the class menu open (it opens on joining a match) is
+  downed about 17 s into round 1, and with nobody to revive them that's game over.
+- The pause menu pauses the match only for a player on their own (`ZombiesRoundSystem.ApplyMenuPause`). The pause is
+  the scene's TimeScale, and any player's menu used to freeze everyone where they stood. A match paused solo plays on
+  when someone joins.
+- A revived player stands up (`PlayerPawn.BuildInput`'s `_wasDowned`): they used to stay prone after a revive.
+- The points and perk badges are `ZombiesPointsPanel`, in MainHUD's right column above the weapon list, which pushes
+  them up as it grows. Pinned at a fixed height in `ZombiesRoundUI`, they were drawn over the list's rows (the user's
+  screenshot, 2026-10-01).
+
+## Zombies perk dispensers and badges
+- Perk machines are turned off: the user will revisit the perk system later. Their placement in
+  `ZombiesRoundSystem.PlaceBuyStations` is commented out ("Put back with perks"); everything else (the perk code, the
+  dispenser art and the HUD badges below) is kept, unused. Don't turn them back on unless asked.
+- One shared dispenser model (`Assets/Perks/build_dispenser.py`, run with Blender) is dressed per perk in
+  `ZombiesRoundSystem.CreatePerkDispenser`: the grey enamel is tinted the perk's paint colour, the poster card and lit
+  name sign get `Perks/<art>_poster.vmat` / `_sign.vmat` (`ZombiesBuyStation.PerkArt`), the lamps glow `PerkColor`.
+- `Assets/Perks/build_perk_art.py` makes the posters, signs, grey enamel and HUD badges (`ui/zombies/perks/<art>.png`)
+  from the square `<art>_label.png` illustrations. The poster window is 29.6 x 42.6, so the square art gets name and
+  effect plates instead of being stretched. `preview_dispenser.py` renders all five; keep its colours matching the code.
+
+## Zombies workbench (`ZombiesWorkbench.cs`, `ZombiesWorkbenchPanel`)
+- One `ZombiesBuyKind.Workbench` station per match (`PlaceBuyStations`). Its model is the user's own Blender workbench
+  (`C:/Users/leon2/Documents/Workbench/`, the game-ready copy in `GameReady/Workbench_GameReady.blend`), which the user
+  saw had been left out for a stand-in built from dev boxes (2026-10-01).
+  - `Tools/zombies_workbench.py` (headless Blender) bakes its procedural materials into three texture sets (the bench,
+    the props on it, the pegboard) and writes `Assets/models/zombies/workbench/`: the OBJ, the vmdl, the PNGs and the
+    vmats. Its docstring has the axes and the bakes.
+  - It bakes a dozen objects at a time onto a joined copy of them (`CHUNK`), then grows each UV island 16 texels
+    (`grow_islands`). One bake for all 255 props took minutes a map and left some objects unbaked; Blender's own margin
+    can't be used, since one chunk's would paint over the islands of those baked before it.
+  - The model faces +X with its back at x -20: 72 wide, 86 tall and 40 deep, with wood shavings 13 further out on the
+    floor. The station's BoxCollider is 40 x 72 x 86 (`StationSize`, `CreateStation`), and the vmdl has no collision.
+  - `CreateBenchModel` loads `workbench.vmdl`, and builds the old stand-in (`CreateStandInBench`) if it hasn't compiled.
+  - A full run (2048 textures, 8 samples, AO 128) took 40 minutes on the RTX 5070; `--size 512 --samples 2
+    --ao-samples 16 --out <dir>` takes 25 and is enough to check the look. A render (Cycles, the OBJ with its textures)
+    showed every prop in its colours on 2026-10-01: the painted vise, the toolbox, the clamps and the tools' handles.
+    About 2% of the bench's texels baked facing away (hidden faces, black in the AO), which didn't show.
+  - Not yet seen in the engine: the editor hadn't compiled the vmdl when it was written, and nothing in a match has
+    loaded it yet.
+- Use opens its menu on the player's own machine (the panel's Tick checks `PlayerPawn.Hovered`); the host's `OnUse` does
+  nothing for it. E, Escape (one step back at a time, from MainHUD's chain), walking more than `WorkbenchRange` away,
+  going down or dying closes it. It's in `IsInteractiveMouseUiOpen` / `GetCombatMouseBlockReason` (cursor) and
+  WeaponInputAction's `menuOpen` (no shooting).
+- Attachments are free: the player's gunsmith build for the active class, from their unlocked parts only (locked ones are
+  listed with their level). The menu saves each pick (`SetAttachment`) and refits the viewmodel, world model and
+  holstered model at once (`RefitAttachments`).
+- Armour, ammo and grenades cost points, paid on the host by `ZombiesBuyStation.Buy` ([Rpc.Host], checked again there):
+  - Plates of 50, up to 3 (150), at 5 points per point of armour (250 a plate). Plates take damage point for point before
+    health, except falls (`ZombiesPlayerState.AbsorbWithArmor`). Zombies spawns with no armour or helmet
+    (`zombies.prefab` DefaultEquipment), so plates are the only armour.
+  - Spare ammo: a primary's full load is 500, a secondary's 250, charged for the share that's missing. The owner adds the
+    rounds (`WeaponAmmo.ReceiveReserve`), since it owns the synced count.
+  - An HE grenade (250) into an empty Lethal slot. `Explosion.AtPoint` damages zombies too (`DamageReceiver`: things
+    with no HealthComponent that are `IDamageable`), and a grenade kill pays the thrower's points.
+- Not yet checked in-game.
+
+## Zombie hits and kills (`ZombieAI.OnDamage`)
+- Zombies have no HealthComponent, so hitting one raises none of the events a bot hit does. `OnDamage` (host only) sends
+  the shooter's hitmarker itself (`ShowHitmarker` → `Crosshair.ShowHit`, on whoever is viewing the shooter).
+- A kill goes in the score feed right of centre, like a bot kill's "Killed a player": `ZombiesPlayerEconomy.AddPoints`
+  with a reason ("Killed a zombie") also sends the owner an `OnScoreAddedEvent`. The amount is what the kill paid: 60,
+  100 for a headshot, doubled under Point Boost. Hits, the Clean Sweep and revives pass no reason, so they stay out of it.
+- Zombie kills still raise no `KillEvent`, so they stay out of the kill feed, medals, daily challenges and stats.
+- Checked in-game 2026-09-26 with `dev_zombie_hit`: the hitmarker on a hit, and "Killed a zombie 100" for a headshot kill.
+
+## Zombies, doors and players (`ZombieAI.KeepOut`)
+- The user (2026-10-01): zombies walked through doors on Innocent Hotel, and players got stuck in Zombies.
+- Doors: a NavMeshAgent moves a zombie with no collision, and doors are left out of the navmesh (the `door` tag), so
+  paths go through doorways. `MapMover.FindDoorAhead` stopped a zombie only for a door within 80 straight ahead, so one
+  coming at a door from an angle walked through it. Now each host update `KeepOut` sweeps a 16-unit sphere at the waist
+  along the agent's last step. If it meets a door that's less than `OpenEnough` open, the step is taken back
+  (`Agent.SetAgentPosition`) and the zombie opens the door and waits for it, as `WaitForDoor` does. A step that starts
+  inside a door (one shut on it) isn't stopped.
+- Players: zombies walked up to the player's centre. Once a zombie's capsule (16) was over a player's box, the box
+  started solid, and `CharacterController.TryUnstuck` hopped them about on the spot.
+  - A zombie now stops at `StandOff` (40, horizontally) from its target to swing, inside its 64 reach.
+  - `KeepOut` takes back any step that brings it within `PlayerClearance` (34) of a living player, downed ones included,
+    and it goes for whoever that was.
+  - A player whose box starts inside a zombie walks through zombies until clear of them all
+    (`CharacterController._throughEnemies`, the `enemy` tag).
+- Not yet checked in-game.
+
+## Zombie voices (`ZombieAI.PlayVoice`, `Tools/zombie_sounds.py`)
+- ZombieAI played s&box's `zombie.attack`, `zombie.pain` and `zombie.die`, events the game doesn't have, so zombies were
+  silent (the user, 2026-10-01). `Tools/zombie_sounds.py` synthesises their voices with no samples, from a source-filter
+  model of a man's voice (its docstring has every layer):
+  - groans while they hunt, every 5-12 s;
+  - a snarl as they swing;
+  - a grunt when hit, at most one every 0.35 s;
+  - a groan as they die, the last breath bubbling out.
+- Levels are a real voice's against a walk on concrete, squeezed as the rest of the mix is: groans -32 dB, the death
+  groan -30, the grunt -29 and the snarl -23.5.
+- `sounds/zombies/zombie_{groan,attack,pain,death}.sound`. A re-run rewrites the WAVs and keeps the events.
+  `--preview <wav>` plays every take.
+- The voice comes from the mouth and follows the zombie (the death groan stays where it fell). One throat, so a new sound
+  cuts the last short. Until an event has compiled, the stock name plays, which is silent.
+- The editor compiled the WAVs and events as they were written (2026-10-01), but they haven't been heard in-game.
+
+## Zombie animations (NMRIH mocap and a made walk, on the citizen skeleton)
+- A zombie is an invisible driver with the zombie mesh bone-merged onto it (`SpawnZombie`). The driver is
+  `models/zombie/zombie_driver.vmdl`: the citizen's body, physics, hitboxes and constraints (its prefabs) plus No More
+  Room in Hell's zombie clips, with no animgraph. `ZombieAI.UpdateSequence` plays them as crossfaded sequences from the
+  `ZombieClips` table. If the driver won't load, zombies fall back to the citizen and its human animgraph.
+- `Tools/zombie_anims.py` writes the clips, the vmdl and `Code/NPCs/Zombies/ZombieClips.cs`. Its docstring covers the
+  sources (GMod addons 3255961963 / 3255991053 decompiled with Crowbar, the citizen skeleton from a Source2Viewer dump)
+  and the retarget. The zombie mesh is skinned mostly to twist/helper bones, so the clips bake those too.
+- Clips: idle, `walk_a` (70 u/s, made by `Tools/zombie_walk.py`, below), run (188.7 u/s) and six attacks. NMRIH's
+  shambles (walk1-10) aren't used: they're 10-33 u/s, and hold the arms out, lurch, flail, limp or shuffle.
+- The walk was the classic zombie's a_WalkN until 2026-10-01: a crouched waddle with the hips 1-5" low, the feet 19"
+  apart and the arms up with clawed hands. Its 17" steps covered only 31.8 u/s against the Walkers' 70 (the user: "their
+  animation is too fast"), and lengthening them by IK (`Clip.stride` 1.5, 47.8 u/s) sank the hips 3" more. The user
+  then saw zombies in a deep, wide squat with raised arms and claws: "it feels like we're exaggerating what a zombie
+  would look like". Next it was walk7, NMRIH's one upright shamble, with its legs replaced by IK'd heel-to-toe steps
+  twice as long (65.4 u/s). The user: "nah they walk a bit weird". Its knees snapped from bent to straight in a frame
+  at heel strike, and the source's uneven timing showed through.
+- So the walk is made, not ported (`Tools/zombie_walk.py`, 2026-10-01; `zombie_anims.py` writes it as `walk_a`). Its
+  docstring has the reasoning, and `Walk` every figure:
+  - One stride of 26 frames on the citizen's own upright posture: 70 u/s at ~138 steps a minute, 0.77 m steps, a
+    person's brisk walk. A Walker plays it at 1x.
+  - The upper body: the pelvis turns, lists and tilts, the chest turns against it and leans 4 degrees, and the head
+    holds its gaze. The arms hang just clear of the sides and swing 15 degrees each way opposite the legs, the elbows
+    bent 18 degrees and more as the arm comes forward, with relaxed hands.
+  - The legs follow a person's gait curves at a brisk pace (Winter's and Perry's knee, thigh and heel-rise angles:
+    `STANCE_KNEE`, `HEEL_RISE`, `SWING_KNEE`, `SWING_THIGH`). Each foot lands heel first with the toes 15 degrees up,
+    rolls flat, lifts its heel about the ball and leaves over the toes' tips, pitched ~70 degrees. The feet are 6"
+    apart with the toes turned out 7 degrees. A planted foot slides back at exactly 70 u/s.
+  - The hips go as high as the stance legs let them: a linear programme over the loop (`lp_heights`) keeps each stance
+    knee bent at least 5 degrees and near its curve's bend, the hips' height accelerating within bounds and its jerk
+    penalised. They bob 2" (5 cm).
+  - Late in the stance the trailing heel rises further than its curve as the knee needs (`Leg.pitch_limits`), a
+    push-off, so that leg doesn't hold the hips down.
+  - The swing leaves the stance at its rates and follows the knee's and thigh's curves. The knee is straightest just
+    before heel strike and the thigh swings back into it (swing-leg retraction), so the foot comes down slowing.
+  - The knees: 5 degrees at heel strike, up to 17 as the weight comes on, ~5 by mid-stance and 58 at most in the
+    swing. The swinging foot clears the floor by 0.2" at its lowest. `python Tools/zombie_walk.py` prints it frame by
+    frame.
+  - ZombieAI no longer plays each zombie's walk at its own rate (0.93-1.07x), which made the feet slide. Each still
+    starts at its own point in the cycle.
+  - Checked in Blender renders of the zombie mesh skinned on it (side and front, and heel strike close up), against
+    the walk7 version. Not yet seen in the engine: the editor recompiles `zombie_driver.vmdl` from the new DMX by
+    itself (register it if it misses it, see the Kastov pipeline notes).
+- The ported clips were toned down to a person's (2026-10-01):
+  - `Clip.arms` keeps that share of the source's arm pose and lets the rest hang like the idle's, keeping the swing
+    about it (`relax`, times `Clip.swing`). `Clip.hands` keeps that share of the source's wrists and fingers, and the
+    rest is a relaxed hand (`RELAXED_*`: the wrist bent a little towards the palm, the fingers lightly curled).
+  - `Clip.lean` keeps that share of the trunk's forward lean from the citizen's upright rest (the pelvis to the neck,
+    seen from the side), and `straighten` bends spine_0-2 equally to take the rest out.
+  - Per clip: the run keeps 0.6 of its arms and swing (it flung them to shoulder height), 0.5 of its hands and 0.55 of its lean (21-34
+    degrees, now 11-18; a runner at its 4.8 m/s leans ~10-15). The idle keeps 0.25 of its hands. The attacks keep their
+    swings, with the hands half way to relaxed.
+  - Checked in Blender renders of the zombie mesh skinned on the new clips (side and front, every clip, and the hands
+    close up).
+- Hands and fingers are posed from where the source's knuckles and finger joints are (`HANDS`, `FINGERS`, `TIPS`),
+  not from rotation changes. The NMRIH-made clips (idle, run, attacks A and C) use NMRIH's own skeleton, whose
+  hand bone is rolled ~90 degrees from the classic zombie's reference pose, which twisted the palms sideways and the
+  wrists by up to 140 degrees. Attacks B, D, E and F are on the classic skeleton (claws curled ~75 degrees per joint).
+- Elbows are hinges. The ValveBiped (a Max Biped) rolls its forearm with the hand, which wrung the citizen's elbows, so
+  the forearms keep no roll of their own (`HINGES`) and the hand's turn goes to the forearm twist bones. In game the
+  citizen's constraints recompute those from the hand (twist0 none of it, twist1 ~67%). The upper arms' roll matches
+  the elbows' bend axes (`ROLLS`). The run bends its forearms up to 60 degrees off that hinge, so each frame the upper
+  arm also rolls to bring its forearm into the bend plane (`ELBOWS`, faded in over `ELBOW_LOOSE`).
+- The forearms turn the hands only as far as a person's can (the user: "the zombies hands are like backwards",
+  "twisted"). `forearm_turn` measures the turn from the elbow's hinge (0 = palm fully towards the biceps, 180 = fully
+  away; the citizen rests at ~102). Each clip keeps it in `Clip.turn` (5-170), and a hand past it turns back through
+  the range at `FOREARM_TURN_RATE` at most. The old walk (a_WalkN) and attacks B, D, E and F hold their claws palm up
+  (0-40) with the wrists bent ~60 degrees, which on a person's hands read as bent back towards the zombie, so they use `CLAW_TURN`
+  (100-170): palm down, the bent wrists droop. Attack E's right hand spins a whole turn, and the forearm used to roll
+  at the elbow to follow it (`WRIST_TWIST`, now gone).
+- That turn didn't fix it (the user, 2026-10-01: "i keep asking for this to be fixed but it never gets changed").
+  The hand was turned about its own length, which kept each claw pointing where the source pointed it, so a palm-down
+  claw's 60-degree wrist bend became a sideways bend at the wrist, up to 60 degrees where a person's goes 20-30. The
+  classic attacks also held clenched fists bent back at the belly.
+  - Now the forearm turns the whole hand, bend and all.
+  - `limit_wrist` keeps the wrist to a relaxed hand's range: 45 degrees flexion, 35 extension, 20 towards the little
+    finger and 12 towards the thumb (`WRIST_*`, soft limits).
+  - Each finger joint curls at most `FINGER_BEND` (45 degrees) past the citizen's relaxed pose: a loose claw, never a
+    tight fist.
+  - The worst wrist went from ~60 degrees sideways to ~22, and the fingers' total curl from 177-187 degrees to at
+    most 138.
+- The "checked in-game 2026-09-26" captures (a driver and body posed out of sight with `Sequence.Time`, playback rate
+  0) showed whole bodies, too small to judge the hands. On 2026-10-01 the hands were checked in Blender close-ups of the
+  zombie mesh skinned on the clips. The editor recompiled `zombie_driver.vmdl_c` by itself, and its clips matched the
+  script to 0.01 degrees (Source2Viewer-CLI's glTF export with `--gltf_mesh_list nomesh`, after stripping the
+  vmdl_c's GUID block, which it can't read). Not yet seen in a match.
+- The run pumped its left fist up in front of the face. That's the arm swing, not the wrist; its swing is now 0.6 of
+  the source's.
+- The run's side-to-side sway is cut down (`Clip.sway`, 0.6; the user said the old a_WalkN's full sway "looks like
+  they're having a dance"). `damp_sway` scales the hips' and spine's roll and yaw, and the hips' sideways shift, about
+  their loop average. The arms turn with the chest. A clip can also narrow its feet (`Clip.stance`, through
+  `plant_leg`).
+- The attacks start part-way in, so the swing's furthest reach (`ZombieClip.Hit`) lands at `AttackWindup`.
+  `SwingCount` is synced, so every client picks the same attack.
+- Headshots go by the driver's head bone height (bullets stop on the capsule), not the renderer bounds.
+
+## Maps
+- Match maps (map picker, Quick Play, end-of-match vote) are `GameUtils.IsMatchReadyMap`: Flatgrass, Innocent Hotel,
+  Belltower, Reef Hall, Railhead, Lowtide, Boxyard, Cerro Blanco, Riverdale, Ares, Collider and Veridant (see their
+  sections below).
+- The hub (`HubPage`) is one featured screen for the tab picked on its left rail (`HubModeRail`, `HubPage.Operation`:
+  Multiplayer, Battle Royale or Zombies; Campaign is locked), like the user's CoD-style mockup. Its art is
+  `ui/modes/<mode>_wide.png`, a 1024x720 cut of the 2:3 card art. Battle Royale has no wide cut or blurred backdrop, so
+  HubPage.razor.scss shows `battle-royale.png` in a layer of the art's own 2:3 shape (`aspect-ratio`, moved up with
+  `top`) and blurs it for the backdrop. Its screen has PLAY, then MAP cards (`br_map`: Flatgrass or Ridgeback) beside
+  the FIELD SIZE cards (`br_bots`), in one row (`.royale-options`) so the featured screen keeps its height.
+- Quick Play (the featured screen's PLAY NOW) picks a random mode from those ticked in the filter that opens when you
+  hover PLAY NOW's row, then a random ticked map that has it (`QuickPlayFilter`). The
+  cookies store the modes and maps left *out*, so new ones start ticked, and at least one of each stays ticked.
+  PLAY NOW is the outlined orange button the old hub cards had (the user asked for it back instead of a filled DEPLOY).
+- Under the Multiplayer hero is a POPULAR PLAYLISTS row (the user asked for "popular", not the mockup's "featured"):
+  the top 4 modes by the global `wins-<ident>` stat's player count, then a curated order (`PopularPlaylists`). Only
+  the modes with `SendExtraGameModeStat` send that stat, and global stats read 0 in the editor, so there it's always
+  the curated order. A card starts its mode on a random map (ticked ones first). Card art is
+  `ui/modes/playlists/<ident>.png`, 1.7:1 cuts of the key art, named in HubPage.razor.scss by class so it's packaged.
+  Swap in real per-mode art there if the user supplies it. The hero's PLAYLISTS link and the row's VIEW ALL open
+  every mode's card in an overlay on the hub (`_showingAllPlaylists`): the old Multiplayer page (`/multiplayer`,
+  LandingPage) was removed. Matches start through `MatchLauncher.StartMatch`.
+- The end-of-match vote (`MapVoteSystem`, `MapVoteOverlay`, `MapVoteCard`) offers each match map once, in the mode
+  just played: players vote on the map, not the mode. Options are networked by `GameMode.GetPrefabPath`: the modes are
+  prefab roots with no `PrefabInstanceSource`, which made every option TDM. A tie, or no votes at all, is settled at
+  random, and `WinnerIndex` is synced for the cards. Don't put `hud` on the overlay's root: its `pointer-events: none`
+  and `cursor: none` made the cards unclickable and hid the cursor. A card's `.art` must stay `position: relative`:
+  absolute panels go by the nearest positioned ancestor, so the map name landed in the screen's corner over the hint.
+- The vote's ScreenPanel is ZIndex 999 and the pause menu's 1000 (`PauseMenuPanel.ScreenZIndex`, set in its OnStart
+  over the prefabs' 999), so Escape over the vote opens the pause menu on top. At 999 each, the vote, made later, drew
+  over the menu (the user's screenshot, 2026-10-02). Compiled offline, not yet seen in-game.
+- Vote card pictures (`MapArt`) are the scene's `MapInformation.Image` if it's a wide screenshot (at least 960 px wide
+  and 1.5:1), otherwise the wide thumbnail of the cloud map its MapInstance loads (`Package.FetchAsync`), cached.
+- Under the maps, the vote offers every other mode (PLAY A DIFFERENT MODE, the user's ask): the playlists
+  (`PopularPlaylists.Top`, each on `PopularPlaylists.PickMap`), battle royale on the hub's `br_map` and Zombies on a
+  random Zombies map, less the mode just played.
+  - A card leaves the lobby and starts that mode the way the hub does (`MatchLauncher.LeaveAndStart`:
+    `Networking.Disconnect`, wait until it's inactive, then `StartMatch`), so the player hosts a new match with bots.
+    Unranked play has no matchmaking queue to join.
+  - Meanwhile `MapVoteSystem.IsLeaving` stops the vote moving that machine on: once the lobby's gone, a client's copy
+    would run the host's side and load the winning map over the new mode's. A failed leave clears it again.
+  - Every lobby is made with `DestroyWhenHostLeaves` (true in `new LobbyConfig()` too), so a host who leaves closes the
+    lobby for everyone. The row says so when anyone else is in it.
+  - The cards' art is `Code/UI/Styles/ModeArt.scss`'s `mode-art` mixin, shared with the hub's playlist cards.
+  - Not yet checked in-game. `hc1_dev_mapvote` opens a vote in a running match.
+- Innocent Hotel (`scenes/maps/InnocentHotel/innocent_hotel.scene`, cloud map `thieves.innocent_hotel`) is a TTT map. All
+  its own spawns are in one room, and its basement and roof are reached by teleporters, so the scene has hand-placed
+  team spawns (T west wing, CT east wing), and its `MapSpawnSettings` turns off map spawn points and bot navmesh spawns.
+- Keep spawns out of the traitor room (the red room behind the west-wing elevator lobby's west wall, x < -1580): its
+  secret door (`T room Door 4`, `AllowDirectUse` false) opens for nobody, so anything spawned there is trapped.
+  T Spawn 5 was in it, which slowly trapped the whole T bot team there, with the CTs piled up against the lobby wall.
+  Every spawn must have a Complete navmesh path to the other team's spawns.
+
+## Depot (cloud map integration and performance, 2026-10-27)
+- `Assets/scenes/maps/Depot/Depot.scene` keeps the original `facepunch.depot` cloud map. Its Map object now has
+  `DepotMapCleanup` (`Code/World/DepotMapCleanup.cs`), which disables 69 inert legacy pickup/charger roots when the
+  map loads. Those roots contain 183 model renderers and 69 colliders, including 16 error-model placeholders.
+  The compiled map geometry and all lighting are unchanged; the only authored scene-data addition is this component.
+- Cleanup matches only direct `ammo_`, `item_` and `charger_` children with the exact known presentation/collider
+  component types. It preserves a root if an updated map adds another component, and disabling cleanup restores the
+  objects it suppressed. There is no per-frame cleanup callback. Native checks verify a functional pickup guard,
+  protected object/component identities, unchanged floor traces in three areas, 55 probes, 82 point lights and 77 spots.
+- Final native 1080p/4x MSAA offline TDM comparison: one stationary invulnerable player and nine active bots,
+  900 frames per before/after run in three fixed views (5,400 measured frames). Pump: 63.02 to 63.83 FPS;
+  stairs: 71.69 to 75.93; upper: 67.69 to 72.80. Mean frame time across the views: 14.863 to 14.191 ms (-4.52%).
+  This is one pair per view with stochastic bot combat and desktop/editor overhead, so small changes are observations,
+  not a statistically established FPS guarantee. CPU rendering/gameplay remains the main limit; lighting was not reduced.
+- `Sources/Depot/performance-v1/results.json` records conditions, checks, timings and final source hashes.
+  Raw frames, source fingerprints, captures and native CPU/GPU snapshots are in `output/depot-performance-20261027/`.
+  The final `stable-*` runs have identical code/shader revisions and game assembly, no detected compiler activity,
+  matching camera/player positions, nine bots and no cap wait. Earlier menu, match-transition, concurrent shader/hotload
+  and incomplete samples are excluded. Native compilation has zero errors. Benchmark settings are restored and play stopped.
+- This does not change `IsMatchReadyMap`: Depot's match readiness and exhaustive spawn/multiplayer acceptance remain separate.
+
+## Collider (accelerator laboratory, `Tools/collider_map.py`)
+- Ceiling fabrication `ceiling-v1` (2026-10-27) replaces 36 hanging solid blocks with bracketed industrial LED fixtures,
+  connected power conduits and cooling fins. Nine plain beam envelopes now have separate flanges/webs, edge bevels and
+  stiffeners. Three ceiling undersides use a private matte concrete material and recessed construction joints.
+  The structure now has 208,601 triangles; original physics/hulls and the saved scene are unchanged. Native model/material
+  compilation and all 68 support/clearance/nav checks pass. `Tools/collider_ceiling.py` plus generator hooks preserve it;
+  `Sources/Collider/ceiling-v1/installed.json` records the accepted stage-v3 and matched native views. Existing GI/reflections
+  are retained; no new bake or match-performance result is claimed. Prior craft/finish structure hashes below are historical.
+- Wall seam correction (2026-10-27): the accelerator side walls overlapped the playable shell at e +/-1900,
+  n674..980, z0..900, competing `co_concrete` against `cf_wall`. `Tools/collider_wall_seams.py` trims those faces
+  and the smaller accelerator rear-corner overlaps; `collider_map.build` retains the correction. Only the machine
+  OBJ changes: 20 old triangles replaced by 31 retained fragments, 136,421 total. Original attributes/unaffected
+  face lines, all materials/textures, physics/hulls and saved scene are unchanged. Independent concrete overlap
+  audit: eight groups before, zero afterward; native compilation, four corridor views and all 68 clearance/nav
+  checks pass. `Sources/Collider/wall-seams-v1/installed.json` supersedes craft-v1's machine OBJ hash. Evidence and
+  backups: `output/collider-wall-overlap-20261027/`. Collider remained selected/stopped/clean; no new lighting or
+  match performance result is claimed.
+- Fabrication/detail pass `craft-v1` (2026-10-27) supersedes the finish-v1 geometry below. Twenty rail runs, including
+  eight stair runs, now use round closed steel tubes, dedicated contact-wear/roughness/metalness maps, smaller anchor
+  hardware, weld collars and folded toe plates. Background accelerator guards use simpler hardware. Two recessed
+  drains, two split access covers with flush ring pulls, three shallow concrete spalls and thirteen actual cut
+  control joints add floor construction depth. The structure/machine have 169,073 / 136,410 triangles; the four base
+  static models total 438,527, up 7.4% from finish-v1. Published collision/convex-hull sources and the scene are unchanged.
+  Nineteen assets compiled/imported; all 68 native floor/clearance/navmesh checks pass with no missing resources.
+  `Tools/collider_craft.py` and generator hooks retain the work; scoped migration is `collider_stage_craft.py`.
+  `Sources/Collider/craft-v1/README.md` and `installed.json` identify the accepted stage-v6 and final native images.
+  The older pale angular spall trial was rejected. GI v6/reflections v4 are retained; they were not rebaked for this pass.
+  Bitmap screenshots at 1600x900 visibly undersampled thin rails/stairs relative to the viewport. The canonical
+  `Sources/Collider/editor/capture.cs.txt` now defaults to 2x native resolution and filtered downsampling, warms material
+  textures and restores the persistent camera. Hidden-session rendering also blurred the sign atlas despite a sharp
+  native mip-zero readback; temporarily matching `SceneEditorSession` with `MakeActive(false)` during the synchronous
+  render fixes it. The previous session is restored in `finally`, without bringing Collider's tab forward. A disposable
+  texture-streaming scope follows the engine's asset-preview implementation. Captures record nineteen source hashes;
+  no game quality preference changes. Final views are native 3728x1832, resolved to 1864x916, in
+  `output/collider-detail-v3-20261027/captures-final/`; the menu image uses their art view. The selected Veridant document
+  and its dirty/play state were preserved while finishing Collider in its background document. No live-match or new
+  performance benchmark was run. The existing primary staged scene was not replaced; older package/finish receipts
+  describe historical geometry.
+- Environment finish v1 (2026-10-27) is installed. `Tools/collider_finish.py` adds closed bevelled portal frames,
+  coved skirting, screwed thresholds, local circulation/door wear and ceiling mounts for the existing hanging lights.
+  The concrete floor uses a matched 2 m photographic albedo/GL-normal/roughness/AO scan; walls and columns use the
+  existing cast-concrete albedo with its matching GL normal at the scan's 1.805 m scale. Soffits have a separate matte
+  concrete finish. No coplanar floor-joint strips were retained. The structure now has 109,614 visual triangles;
+  original retained geometry and all physics definitions/hull sources are preserved. Other model sources are unchanged.
+  Native import/compilation, five final screenshots and all 68 support/clearance/Complete-navmesh checks passed.
+  Current GI is `lighting-v6` (two passes, 2205 probes); four static reflection cubes are `reflection_*_v4.vtex_c`.
+  `Sources/Collider/lighting/` retains these accepted objects, and the map-picker image uses the new native art view.
+  `Sources/Collider/finish-v1/README.md` and `installed.json` record hashes, source attribution, guards and rollback.
+  `output/depot-finish-20261027/` holds the accepted stage-v8 and final native evidence. The existing primary staged
+  scene had a different hash and was preserved; a reviewed scene snapshot is saved with this pass. No new live-match,
+  multiplayer or performance benchmark was run. Earlier native-v2 package/live/performance records below are historical.
+- East-wing screen removal (2026-10-27): the remaining concrete screen at e 1500..1524, n -160..160, z 0..164
+  is also removed. Both screens and their box colliders are gone; the generator and minimap retain this layout.
+  All 68 positions remain supported, clear and reachable. Two Retakes A attacker/defender sightlines become
+  exposed, confirmed with native standing-eye rays; see `Sources/Collider/wall-removal-east/README.md` and
+  `installed.json`. The scoped asset import preserves the current unsaved document and concurrent door props.
+- West-wing concrete screen removal (2026-10-27): the freestanding wall at plan e -1524..-1500, n -160..160,
+  z 0..164 is removed, including its single box collider. `collider_map.wings` now only places the east screen.
+  The scoped migration removes 12 render triangles, preserves all other geometry/physics bytes and updates the
+  radar from published collision. All 68 layout positions and Retakes sight checks pass; native rays through
+  the removed wall are clear. See `Sources/Collider/wall-removal/README.md` and `installed.json`.
+- Built from the user's blue particle-accelerator reference on 2026-10-15. The playable research hall has an open
+  two-level atrium, two main stairs, control/laboratory wings with their own stairs, and a ground-level service lane.
+  A large observation window separates the combat space from the accelerator chamber. The upper laboratory display
+  and accelerator machinery are scenery; the navmesh's custom bounds stop below that inaccessible upper display.
+- `Tools/collider_materials.py` and `Tools/collider_map.py` stage assets under `output/collider/stage/`. The scene is
+  `Assets/scenes/maps/Collider/collider.scene`; its title is in the map catalog in `Code/GameLoop/GameUtils.cs`.
+  The material source uses the existing Ares surface generators without changing Ares materials. Layout uses plan
+  coordinates east/north/up, mapped to world `(north,-east,up)`. Upper walkways are z256.
+- Offline revision 2 adds a four-panel telemetry atlas, control desks/chairs, a rounded observation surround,
+  wider steel/concrete columns, segmented ring housings, coolant risers and detailed flight cases. Ground spawn
+  doglegs remain; the upper doglegs were removed because they obscured the glazed control rooms. Machine panel
+  axes are right-handed so their outward faces render correctly. These assets are now imported and compiled natively.
+- Detail pass 2 (`Tools/collider_detail_geometry.py`) adds bevelled handrails, bolted mounting plates, open stairs
+  with thin collision decks, equipment-case lids/latches/handles, galvanized treads and worn floor stencils.
+  All four models/materials are imported; the structure has 70,700 visual triangles, the detail model 97,256,
+  the machine 165,594 and the glass 60. All four stair paths and their under-stair clearance passed native checks
+  in `output/collider/stair-validation.json`; all 68 gameplay positions were also rechecked after import.
+- Services pass 1 (`Tools/collider_services.py`) is imported and compiled. Two glazed openings beneath the
+  observation gallery reveal service-room instruments; the original solid player collision is retained exactly.
+  Open cable ladders, suspended cables, pipe offsets/flanges/valves and bolted gallery beams add reference detail.
+  Structure/detail/machine/glass now have 71,396 / 132,960 / 165,594 / 84 triangles. The collision arrays, compiled
+  model physics definitions, convex-hull source and minimap match the previous pass; all 68 offline layout checks pass.
+  `Sources/Collider/verify-services.py` also checks finite nondegenerate geometry and clear render rays through all
+  four window panes. Staged files and evidence are in `output/collider/services-v1/`; the primary stage now matches the saved build.
+  `import-services.cs.txt` checks source hashes and backs up replaced files. Eight native views in
+  `services-v1/native-review/` record the earlier geometry review. The accepted v4 bake includes the new openings;
+  eleven practical lights now have wider coverage, and GI runtime intensity is 1.6 with unchanged exposure.
+  Use a fresh revision for future bakes. The bake script fingerprints inputs, refuses play, cancels and drains
+  its updater if the game/editor state changes, and rejects changed inputs before adopting textures.
+- East stair server repair (2026-10-27): the former 48x60x138-inch cabinet at plan (430,80,0) is replaced with a
+  28x44x84-inch rack at (430,-60,0), 78 inches clear of the near stair edge. Its single collision box moves/resizes
+  with it; all other detail-mesh lines, physics and material bindings are retained. Recessed equipment, open side
+  louvres, frame hardware, rear fans and levelling feet replace the flat repeated panels. The west rack is unchanged.
+  `Tools/collider_server_rack.py` and the east branch in `collider_map.detail` preserve regeneration. Native compilation,
+  40 stair-width body probes, all four stair routes and all 68 map navigation checks pass. Sources/accepted hashes and
+  screenshots: `Sources/Collider/server-rack-v1/`, `output/collider-server-rack-20261027/`. No new match-performance result.
+- Authored setup: six team spawns per side, 20 Deathmatch/Gun Game spawns, two Defuse sites, 22 Retakes spawns,
+  three Domination flags, three Hot Zones, three Cash Grab/extraction pairs, buy zones, callouts and a minimap.
+  Team spawns are disabled during Deathmatch, Gun Game and Retakes. Retakes spawns use the matching site/role tags.
+  The minimap uses Collider's bounds and excludes the service ceiling from the upper-floor overlay.
+- `--check` checks all 68 player/objective positions for clearance, support and connectivity, plus standing/crouching
+  sight between opposing Retakes spawns. `Tools/collider_validate.py` checks IDs, references, resources, generated
+  model/material/texture dependencies and mode wiring.
+  Reports are `output/collider/layout-validation.json` and `scene-validation.json`; the latter also resolves the seven
+  compiled lighting textures, including native resource references serialized as `{Id, Path}` objects.
+- `Sources/Collider/editor/import-build.cs.txt` installs the staged build through the editor, refuses an open Collider
+  document, writes changed assets atomically and preserves the selected scene and play state. Copy it into the current
+  native MCP exchange directory before invoking `run_csharp`. `import-visual-assets.cs.txt` handles material/model/menu
+  changes without replacing an open document. `export-reviewed.cs.txt` exports the saved native scene and lighting cache.
+- Native validation (2026-10-15): all 68 authored positions passed engine floor support, player-box clearance and Complete
+  navmesh paths, with no missing model/material resources (`native-validation.json`). All four stairs also passed.
+  A fresh local TDM run on the saved services/v4 build selected the pawn camera and observed eight of nine bots moving
+  over four seconds (`live-round-validation.json`). A separate game process then joined the editor host: both processes
+  had the same four model identities, two correctly owned player pawns, valid materials and selected player cameras.
+  A host-owned QA teleport of approximately 100 units replicated to the client (`network-validation.json` and `network/`).
+  This verifies position replication, not manual keyboard traversal or an Internet latency test. The owned test client
+  was closed and temporary launch/game/network settings restored before releasing the editor.
+- Lighting: 82 point lights, six shadow casters. High hall/machine fills contribute diffuse/transmission only, preventing
+  large specular dots. Painted metal uses a dielectric coating instead of dark bare metal. The saved GI bake is
+  `Assets/lighting/collider/lighting-v6/` with 2205 probes and two passes; relocation is serial to avoid the engine's
+  `ResourceSystem.RegisterWeak` race. Never call default parallel `ComputeProbeRelocation` on this workstation.
+  Four custom reflection cubes (`reflection_*_v4.vtex_c`) come from ordinary camera faces and native sky texture
+  compilation (`collider_reflections.py`). Do not use the GPU Quality GGX bake that faults `envmap_filtering_cs`.
+  Seven compiled lighting textures are intentionally included in source control and the package. Regeneration retains
+  the accepted GI and reflection objects from `Sources/Collider/lighting/`.
+- The unaccepted v3 indirect bake had `GamePreserved=false` and predates the services pass; never adopt it.
+  V4 completed with unchanged input hashes and game state. The document was then closed by another editor action;
+  `adopt-completed-bake.cs.txt` revalidated every input hash and saved those completed textures into Collider.
+  `lighting-v4/adoption-result.json` and `lighting-review.json` record this. Future bakes save their own session
+  atomically after completion, avoiding dependence on whichever editor tab is selected in a later call.
+- `output/collider/captures/` contains eight historical native views, including service windows and ceiling details.
+  They show the earlier case finish, v4 GI and v3 reflections. Current finish-v1 views and the map-picker source are
+  in `output/depot-finish-20261027/captures/`. `live-tdm.png` and `live-client.png` show the earlier local host and separate
+  client, not a test of finish-v1. `capture.cs.txt` uses the open document's
+  persistent camera and restores it. It creates no isolated scene and performs no reflection bake. Historical
+  `offline-preview/` images are approximate software renders and are superseded by these captures. Camera position,
+  rotation, FOV, projection and size are reset before each render because SceneViewportWidget may overwrite them.
+- `Tools/collider_package_native.py` checks saved/staged scene identity, all seven lighting textures, native evidence,
+  menu-image freshness and archive CRC/SHA256. Its current default is `collider-native-v2.zip`; it requires current
+  saved-scene hashes in navigation, live-match, capture and lighting-review evidence. Separate-client and performance
+  status are recorded independently, so stale evidence cannot imply successful validation of a new scene.
+  `output/collider/current-build.json` points to the historical native-v2 archive; it does not contain finish-v1.
+  `collider-detail-v2-review.zip`, native-v1 and offline-v2 are historical snapshots; their pending-review notes are superseded.
+- Native performance samples are in `performance-validation.json`: the 300-frame host sample averaged 12.85 ms
+  (77.8 FPS; P99 19.93 ms); the lower-hall sample averaged 14.05 ms (71.2 FPS). These are short editor-hosted samples
+  with bots, not a full-match benchmark. The raw report retains startup/GC hitches and the missed 90 FPS target.
+- Network test helpers preserve launch mode, hardcore/ranked flags, no-damage, custom-game rules, lobby privacy and
+  local-instance arguments. Test time/score limits are disabled to prevent map rotation during asset downloads.
+  `check-network.cs.txt` records each process's player ownership, cameras and assets; `collider_verify_network.py`
+  compares before/after snapshots from both processes and requires replicated movement. `network-test-state.json`
+  must have `RestoredAt` after cleanup. Host startup may stall for several minutes while scanning shared assets;
+  inspect the running operation and logs rather than starting hosting again after an observation timeout.
+
+## Belltower (multiplayer map, `Tools/belltower_map.py`)
+- Northern plaza lamp placement (2026-10-27): the two lamps at plan `(±420,330)` now stand beside the arcade's
+  solid outer piers at `(±420,520)`, clearing the square-to-arcade walkway. Only their render positions and four
+  base/shaft collision hulls move; the map generator retains the new placement. Both town models compile, and
+  native traces confirm the old sites are clear and new sites solid. `belltower_move_square_lamps.py`,
+  `belltower_check_lamp_placement.py` and `Sources/Belltower/props/lamp-placement-v1.json` record the scoped migration.
+- Current checkout checkpoint (2026-10-18): work in `C:\sbox-projects\hc1\forked-shooter-main`.
+  The live town models include the `firewood-v2` integration, not just garden v3; its six model files and twelve
+  material/texture files match the staged sources. Native firewood views are in `firewood-production-v1-saved/`.
+  The installed landscape is `parcel-v4`, with 1,600 near trees and 88 compiled woodland sectors. Its 264 model
+  source files, 18 published files/backups, scene groups and regeneration caches have been checked in this checkout.
+  `Tools/belltower_finalize_parcel.py --check-only` checks these inputs without writing; its normal mode refreshes
+  metadata only after validation. It preserves the newer `map_daylight.apply_profile` sky/fog settings and rejects
+  other scene drift. `parcel-v4-production/verification.json` records the exact scene hash and validation scope.
+  The old v8 visual verification and old landscape hashes no longer describe parcel v4. Current fixed-exposure native
+  baselines are in `forest-coverage-v1-native-fixed-baseline/`; they expose noisy distant woodland. Gameplay performance and the
+  overall visual target remain unverified. Earlier milestones below are historical; do not restore
+  their models or landscape over these newer files. `oct18-current/current-installed-assets.json` records this check.
+- Offline ground-edge trial (2026-10-18): `Tools/belltower_ground_edges.py` stages a separate, unreferenced
+  `ground-edge-v1` model/material set. The original built-in ImageGen `ground-edge-v2.png` and edit prompt are in
+  `Sources/Belltower/generated/`; the broad first atlas, meshes and studio views remain in
+  `ground-edge-v1-first-atlas/`. The thinner atlas puts its dense back edge toward the wall. UV selection omits
+  isolated specks between atlas cells without editing source pixels or alpha. There are 58 pockets per half,
+  232 triangles total and one shared material, with no collision. Placement derives from the existing house
+  fronts and requires a whole quad on one flat paving rectangle, clear of plinths and 12-inch-expanded shop/door gaps.
+  `belltower_check_ground_edges.py` independently checks exported OBJ data, UV proportions, exact mirroring and
+  deliberately invalid doorway/wall fixtures. Its report is `ground-edge-v1/geometry-checks.json`.
+  Matched wide and close Blender views are in `ground-edge-v1-studio/`; they are construction renders, not engine
+  captures. The preview opt-in reads original RGBA alpha directly, and the studio paving accounts for the native
+  stone shader's UV scale. `Sources/Belltower/ground-edges/trial-v1.json` records the review and remaining work.
+  Nine versioned files have now passed the guarded native import; the shader, material and both models compiled.
+  They remain unreferenced by the saved scene. The clear native close comparison is in
+  `ground-edge-v1-native-visible-{baseline,candidate}/ground-edge-close.png`. Its thin shaded deposit follows the
+  plinth with broken alpha edges, and both temporary renderers were removed with original object identities restored.
+  The first wider shots were obstructed by a market stand and a wall; they remain invalid. The corrected contextual
+  pair is now in `ground-edge-v1-native-fixed-wide-{baseline,candidate}/`. Two further sunlit comparisons are in
+  `ground-edge-v1-native-fixed-sunlit-{baseline,candidate}/`. These temporarily fixed exposure at 2 and restored tone
+  and object identities. Reject the current ground mesh for saved-map use: the sunlit view exposes a flat tan gravel
+  strip bridging the cobble relief. Redesign contact before checking the 900-1600-unit fade and gameplay timing.
+  A map-generator source change triggered the placement guard. `belltower_revalidate_ground_edges.py` regenerated
+  all nine files separately and verified byte-identical assets and identical placements before refreshing provenance;
+  the original manifest/check/import records remain archived. Native revalidation wrote no assets. The play preview's
+  camera had moved, then the editor switched to Ares; no fair timing
+  comparison was completed. `runtime-cleanup-audit.json` confirms the old runtime scene is no longer active and
+  no temporary comparison objects remain in the Belltower editor scene. Ares was preserved.
+- Native ground-decal replacement (2026-10-18): `Tools/belltower_ground_decals.py` stages four private `.decal`
+  definitions under `ground-edge-v2/`, using the existing atlas and the validated 116 footprints. The engine's image
+  source selects the four original atlas rectangles; source pixels and alpha are unchanged. The decals use Multiply
+  albedo at a component mix of 0.5, with no normal, RMO, emission, height or parallax override. They inherit the
+  receiving stone's surface detail instead of adding a flat gravel mesh. Four definitions compiled natively and
+  remain unreferenced by the saved scene. `capture-ground-decals.cs.txt` uses the existing hidden Belltower document
+  and fixed ACES exposure 2; `belltower_capture_ground_decals.py` preserves shared play, selection, camera and tone.
+  Eight matched sunlit/shaded close/contextual views across both halves, plus zero-mix controls, are in
+  `ground-edge-v2-native-{dedup-baseline,all-control,all-half}/` and `ground-edge-v2-native-east-*`.
+  Every trial capture removed all 116 temporary decals.
+  Initial `native-*` and `native-warm-*` captures lost background texture detail and are invalid for visual review.
+  The corrected prewarm filters the established Belltower model set, keeps distinct material references across the
+  wait and requests all normal-map variants. It agrees with the established helper's sharp surface detail.
+  `check-ground-decal-bounds.cs.txt` checks native computed volume and actual world rotation against every validated
+  footprint; maximum planar error is 0.000123 inches, and all projectors contain the paving plane. The public
+  `Decal.WorldBounds` getter omits rotation in this engine, so its box cannot validate a downward projector; the
+  read-only API record includes that getter's IL. `belltower_review_ground_decals.py` verifies native compilation,
+  loaded crop dimensions/PBR inheritance, controls, source hashes and restoration. `ground-edge-v2/native-review.json`
+  and `Sources/Belltower/ground-edges/trial-v2.json` record scope. The restrained dirt stain preserves cobble relief in
+  these stills. Remaining-frontage walkthrough, gameplay motion, distance/culling and cost remain before promotion.
+- Offline forest-detail trial (2026-10-18): `Tools/belltower_forest_detail_trial.py` stages only a private shader
+  and material under `forest-detail-v1/`. The existing atlas, all landscape inputs and all 88 forest meshes remain
+  unchanged. The accepted response hard-clips 25-41% of visible base-level source texels in the three variants
+  actually used by the current 640,000-triangle forest. The trial uses a smooth mean-matched response and restrained
+  source colour, so branches can retain colour rather than receiving only the terrain green. Source colour is
+  normalized before fading uncertain-alpha fringes back to the terrain tint. The rejected fallback and tonal-only
+  studies are preserved in `colour-before-edge-fix/` and `tonal-only/` inside that trial folder.
+  `belltower_check_forest_detail.py` inspected the installed OBJ UV indices and verifies the numerical calibration,
+  the fringe regression, unchanged opacity/normal/lighting/fog code and unchanged texture-sample calls. The current
+  linear box-mip proxy stays below 2% channel-mean drift through levels 0-5 for used variants; levels 6-7 have larger
+  drift, up to about 5.5%. This is not the native BC7 result. Detail returns toward the accepted response with the
+  existing card fade, and blend zero returns the accepted response. Six matched unlit Blender albedo studies use
+  the original atlas and a canopy colour sampled near a real forest card. They isolate the transfer function and
+  do not show native lighting or prove forest realism. `Sources/Belltower/landscape/forest-detail-trial-v1.json`
+  records their review and scope. The two private assets are now imported and natively compiled, with loaded
+  calibration vectors checked. Four matched current parcel-v4 views and two blend-zero controls restored all 88
+  original material slots. The native colour improvement is subtle; distant woodland remains noisy. A separate
+  10000-22000-unit fade experiment reduced the far noise but exposed a conspicuous boundary on the near ridge,
+  so that setting is rejected. The trial remains unreferenced and the accepted shader is unchanged. Further coverage
+  work and consistent gameplay timing remain required; see `native-detail-review-oct18.json` for the exact scope.
+- Native comparison tooling (2026-10-18): matched parcel-v4 baselines, candidates, native exposure and restoration
+  records are in the `forest-detail-v1-native-*` and `ground-edge-v1-native-*` folders. Eleven versioned source assets
+  are installed for these comparisons; neither trial has been promoted. The current capture helper supports
+  `forest_detail_trial` on all 88 woodland material slots, validates loaded calibration vectors and uses a private
+  material copy for `forest_detail_blend` zero-to-one comparisons. It restores the original overrides and checks
+  renderer serialization. Optional fade overrides act only on that private copy. `ground_edge_trial` temporarily
+  inserts the two checked models with `RenderType: Off`
+  and no collider components, then verifies that the original scene object identities are restored. These trials
+  are compared separately. New wide/close ground views and a narrower ridge detail view are in `capture_views.py`.
+  The initial helper and guarded imports passed a separate engine-DLL compile; its exact source hashes are in
+  `forest-detail-v1-native/helper-static-compile.json`. Later helper changes also ran in the engine. The initial
+  colour-comparison helper is archived as `capture-helper-ca8b36.cs.txt`. Native shader compilation uses the guarded
+  `compile-detail-shader.cs.txt` and `EditorUtility.CompileShader`; the generic `asset_compile` tool rejects shader
+  sources. Both shader result records report success. `Tools/belltower_review_native_details.py` validates matched
+  camera/lighting/source hashes, native compile records and restoration, while recording rejected or incomplete
+  visual checks separately. `native-detail-comparisons-v1.json` records the session and remaining requirements.
+- Forest coverage experiment (2026-10-18): `Tools/belltower_forest_coverage_trial.py` stages a separate two-asset
+  `forest-coverage-v1` shader/material experiment. A read-only native query confirmed the accepted atlas is 1254 by
+  1254 with nine mip levels. `Tools/belltower_analyze_forest_projection.py` estimates minification from the actual
+  320,000 cached crowns and saved native cameras, without occlusion. Its valley frustum centres have a median
+  projected width of about 3.1 pixels; those counts are not visible-tree counts. At the rejected 22,000-unit distance
+  boundary, the closer ridge view still resolves many crowns at about 20 pixels or more, explaining why a fixed
+  distance cut removes useful detail. The installed engine's `vr_common.fxc` boosts alpha by `1 + .25 * mip` before
+  alpha testing. The source box-mip proxy shows substantial coverage expansion at levels six and seven, and atlas
+  cells become very coarse at the last mip. This is not native BC7/raster coverage proof. The staged shader cancels
+  only the requested share of that boost. Strength one takes the accepted path, and mip zero is unchanged; colour,
+  normals, lighting, textures, geometry and existing fade distances are preserved. No extra texture sample is added.
+  Source checks pass. The two private assets are installed and natively compiled, but remain unreferenced by the
+  saved scene. The guarded import/compiler and hidden Belltower document captures preserved Orion play and the
+  selected document; no shared-editor handoff was needed. The old static API binding proof predates removal of
+  unnecessary play guards in two helpers; current helpers also executed successfully in the engine.
+  Adaptive exposure made the initial strength-one control invalid despite identical settings. The replacement
+  `forest-coverage-v1-native-fixed-*` study uses temporary ACES exposure 2, restored after each image. All four native
+  strength-one controls pass in valley, ridge, ridge detail and terrace. Zero compensation reduces coarse grey grain
+  while retaining the closer crown shapes in these stills; the repeated crown pattern remains conspicuous.
+  `belltower_review_forest_coverage.py` checks the matched recorded inputs, compilation, controls and restoration of
+  all 88 material slots. `forest-coverage-v1/native-fixed-review.json` records the evidence and invalid adaptive
+  comparisons. `Sources/Belltower/landscape/forest-coverage-trial-v1.json` records current helper hashes and remaining
+  work. Motion, mip transitions and consistent Belltower gameplay performance remain required before promotion.
+  Neither alpha compensation nor a shorter fade alone meets the overall visual target.
+- Bounded forest-density study (2026-10-18): `belltower_forest_distribution_trial.py` stages eight west-facing
+  sectors, reducing their 52,986 cards to 41,137 with correlated retention. The kept cards retain exact positions,
+  heights, sizes, UVs and material. A smooth envelope returns retention to one at the study boundary. Eight private
+  control models have byte-identical OBJ geometry to the accepted models; the eight candidates are exact exported
+  subsets. `belltower_check_forest_distribution.py` checks actual OBJ data, topology, source hashes and all sixteen
+  native model compile records. Forty-eight versioned source files are installed, unreferenced by the saved map.
+  `capture-forest-distribution.cs.txt` derives from the verified viewport helper and restores eight model references,
+  original overrides and all 88 material slots. All variants hold the private alpha-coverage strength at zero and
+  use temporary ACES exposure 2. Two native views are in `forest-distribution-v1-native-{baseline,control,clumped}`.
+  The clumped candidate shows pale exposed terrain and is withheld. Its image controls also miss the strict 0.1
+  mean RGB8 gate (about 0.18 and 0.20); do not claim a clean isolated geometry acceptance comparison. A later
+  unchanged repeat after selecting Lowtide shifts brightness much more, despite matching recorded exposure bounds.
+  That repeat cannot calibrate the earlier active-tab batch. Resolve exposure consistency and investigate crown
+  shape/canopy-to-terrain continuity before another acceptance test; fewer cards alone have not met the visual goal.
+  `belltower_review_forest_distribution.py`, `forest-distribution-v1/native-review.json` and
+  `Sources/Belltower/landscape/forest-distribution-trial-v1.json` record the failed image gate and exact scope.
+  The other local chat was stopped and the editor idle before the brief foreground comparison. Lowtide was restored,
+  out of play and saved; all model/material/tone state restored. The saved Belltower scene and accepted shader remain
+  unchanged. Do not revive isolated-world capture loops to bypass document availability.
+- Preview-camera investigation (2026-10-19): the current engine is resolved through `FACEPUNCH_ENGINE`, including
+  the Windows user environment; the former D: Steam installation is gone. Offline installed-engine IL in
+  `camera-consistency-v1/engine-api.json` confirms that `InitializeRendering` copies post-processing from
+  `Scene.Camera` onto editor cameras. Main-camera selection excludes editor cameras and can fall back to a
+  non-main minimap camera. `inspect-preview-cameras.cs.txt` adds camera parent, orthographic state, priority and
+  main-camera flags to a read-only probe. After the Ares chat completed, the native Belltower probe confirmed the
+  orthographic Minimap Renderer as its fallback. `capture-preview-consistent.cs.txt` pins the existing viewport only
+  during synchronous rendering and restores/checks the pointer, tone, pose, projection, exposure, objects and editor
+  state. A synchronous exposure change alone did not update GPU history. Settling the active stopped viewport across
+  normal frames produced a strong native 0.35/2.0 exposure response. Two seconds still failed repeat consistency;
+  five-second baseline/control captures passed the strict 0.1 mean RGB8 gate in sky, forest, stone and plaster regions.
+  No Scene.Push scope or camera pin crosses an await. Hidden-document settling remains unverified.
+  `Sources/Belltower/lighting/capture-consistency-v1.json` records the native evidence and current helper hash.
+  The surface-finish trial reduced broad plaster peeling and calmed the masonry. Three fresh matched native views
+  passed sky/forest controls on 2026-10-20, and the nine reviewed materials were published through the editor.
+  `Sources/Belltower/materials/surface-finish-v1.json` records the assets and generator: plaster wear coverage 0.24;
+  rubble tint [1.04,1,0.90], contrast 1.04, weather 0.12. Texture pixels and shaders are unchanged. The later saved-scene
+  image confirms appearance qualitatively; it drifts about 1 RGB8 from the earlier candidate and does not pass the
+  strict cross-session photometric gate. Do not use it for a precise before/after measurement.
+  The forest-shapes trial replaces UVs in eight sectors without moving cards: irregular outlines help, but the result
+  still reads as repeated cards, so it remains withheld. The October 20 audit matched both trials' original guards
+  before publication: gate/clock/planter town mesh edits were outside their guarded inputs. The subsequent public
+  material, generator and saved planting changes intentionally invalidate those earlier guards. Preserve the
+  historical manifests; a future comparison needs an explicit new revision, not silently refreshed hashes.
+  The new `Sources/Belltower/generated/belltower-visual-target-oct19-v1.png` and its JSON are an ImageGen art
+  reference for warmer distinct masonry, localized plaster wear, balanced sunlight and varied woodland crowns;
+  they are not native screenshots or evidence of implemented graphics.
+- Constructed town gates (2026-10-19, user: "fake/plain/flat"): `belltower_gate.py` replaces each flat slab and three
+  continuous bars with fourteen bevelled boards, two leaves with rebated backing and an overlapping centre joint,
+  six hinge straps with barrels and rivets on each face, ring pulls, a sliding bolt, rear compression braces, a curved
+  timber lining and separate stone voussoirs. Timber UVs select seam-free strips of the existing CC0 scan.
+  `belltower_stage_gate.py` matched and removed exactly 48 old triangles per half from the installed meshes, then
+  appended 13,088 new triangles. All other OBJ lines and all VMDL physics are byte-identical, preserving firewood-v2
+  and lorry removal. One gate-only forged-iron material was added. The generator retains the old collision box.
+  `import-gate-v2.cs.txt` published the correction to the first pass through the native editor, using backups and
+  hash guards. The asset watcher compiled both halves; never force-compile these large town models.
+  `belltower_check_gate.py`, `Sources/Belltower/gates/town-gate-v2.json` and `gate-v2/verification.json` record checks.
+  Native west front/oblique and sunlit east views are in `output/belltower/quality/gate-v2-after/`; every capture
+  restored editor state. The first pass's centre daylight leak and overly high hinge positions were corrected.
+  The Belltower scene file was unchanged by the gate edit. The user moved into Belltower and requested that edit
+  during the earlier comparison slot. Match performance was not measured.
+- Circular tower clocks (2026-10-19, user: "the white around the clock is weird"): `belltower_clock.py` replaces the
+  four opaque square dial images and their square stone backing patches with circular enamel meshes and a profiled
+  bronze bezel mounted directly against the tower. The existing clock artwork, hour/minute marks and hand orientation
+  are unchanged; explicit UVs retain the original 80-inch artwork scale. No raster pixels or materials were edited.
+  `belltower_stage_clock.py` removed exactly 48 old triangles and appended 8,056 to the installed centre OBJ; all other
+  mesh lines, the VMDL, material mappings and collision remain byte-identical. `import-round-clocks-v1.cs.txt` published
+  that single OBJ through the editor, with a guarded backup. The watcher compiled it successfully without a forced build.
+  Native front and oblique comparisons in `output/belltower/quality/clock-v1-after/` show the square corners gone and
+  the bezel's edge/shadow against the masonry. `belltower_check_clock.py` checked all four exported circular edges,
+  source hashes, unchanged data and capture restoration; static stone controls passed the 0.1 mean RGB8 limit.
+  `Sources/Belltower/clocks/round-clock-v1.json` records acceptance. The saved scene and both gate meshes are untouched.
+- Worn stone planters (2026-10-20, user: flat/plain, edges too perfect): `belltower_planters.py` replaces the six
+  visible boxes with individual chipped, bevelled stones, mitred projecting coping, recessed nonflat soil, clods,
+  pebbles and one thin curved root. Existing CC0 stone/soil pixels are unchanged; private stone UVs avoid painted
+  mortar seams. Two planter-only materials and a private stone shader retain restrained normals and dry roughness.
+  `belltower_stage_planters.py` preserves every non-planter OBJ byte, including gates/firewood/lorry removal, and all
+  existing VMDL physics. Each half removes 36 triangles and adds 6,682. The old 40x40x28 collision box remains;
+  there are no new scene objects or colliders. Never force-compile the large town models.
+  A temporary lowering trial showed the old shrubs floating above the soil. Native undoable scene tools lowered
+  exactly six existing shrubs by eight inches and saved the scene. `belltower_map.py` keeps that placement on
+  regeneration (planter blob centre z36). All other authored scene properties are preserved. Native Save Scene also
+  refreshed same-path resource IDs, float text, renderer defaults and five generated prefab binding entries;
+  `belltower_check_planter_scene.py` audits each category and unchanged prefab overrides, rather than concealing
+  that serialization diff. Original scene/mesh manifests remain historical.
+  `belltower_check_planters.py`, `planter-v2/scene-revision.json` and `Sources/Belltower/planters/worn-planters-v2.json`
+  record preservation, actual exported geometry, native asset compilation and final placement. Four restored native
+  views in `output/belltower/quality/planter-v2-saved/` cover close, context, low angle and the shaded mirrored planter.
+  Match performance and moving-camera aliasing were not measured; this changes physical shape, not AA settings.
+- Garden bush grounding (2026-10-20, user: "floating bushes"): the beech asset's low outer leaves reach local z
+  -19.216661, while the central stem starts at z0.845722. The old crown/bounds placement left tall hedge stems
+  20.76 inches above the lawn, low borders 5.85 above it, parterre plants 5.21 above soil, and bed plants 3.77 above
+  their raised soil. Native vertex inspection is in `output/belltower/bush-grounding/`.
+  `belltower_detail.shrub(..., ground_z=...)` now embeds the central stem half an inch into its soil and adjusts only
+  vertical scale to retain the old canopy top. `belltower_map.py` supplies the lawn/soil height for 12 tall hedge
+  shrubs, 100 low hedge shrubs, 24 parterre plants and 108 raised-bed plants. Widths, x/y positions and yaw stay;
+  pots, planters, pergola foliage and other props retain their existing placement.
+  The shared editor repeatedly exited during startup before MCP became available. With no editor running, the
+  guarded closed-editor publisher replaced only 488 Position/Scale string values in the saved scene; every other
+  scene byte stayed intact. The original f92a810e... scene is archived; the resulting scene is a7c75cfe... .
+  `belltower_check_bush_grounding.py --offline` verifies the exact saved delta, root contact, canopy tops and unchanged
+  town models. The latest shared garden generator also produces identical geometry/collision with old versus new
+  shrub placement. Newer shop/stall/scarecrow/gazebo work that appeared while waiting was preserved with an explicit
+  input revision, not overwritten. Earlier planter/gate/clock evidence remains historical; the grounding diff proves
+  their assets and scene placements were untouched by this correction.
+  `Sources/Belltower/gardens/bush-grounding-v1.json` records the saved correction. Native visual verification is
+  still pending because of the startup exits. Do not rerun `native-apply.json`: the transforms are already saved.
+  When the editor is available, open the current scene, run `check-garden-grounding-after.cs.txt`, then capture the
+  four planned views with `capture-preview-consistent.cs.txt` and the current scene hash.
+- Woodland volume prototype (2026-10-20): `belltower_forest_volume_trial.py` stages one private shader and strength
+  0/0.42 materials against the eight private forest-shapes sectors. Atlas-derived crown coordinates and a derivative
+  frame perturb diffuse normals without adding triangles or texture samples. The shader compiled and materials
+  loaded natively. Four fixed native captures restored all model/material/camera/scene state, but the forest
+  candidate/control difference (0.01733 mean RGB8) was smaller than control/repeat variation (0.01797).
+  `Sources/Belltower/landscape/forest-volume-v1.json` records the unresolved ineffective result. These assets remain
+  private and unreferenced by the saved map; do not promote them or claim rounded canopy lighting.
+- The user asked for a new multiplayer map. Belltower is a walled hill town's market square, built by script the way
+  Ridgeback's buildings are (`Tools/map_kit.py`, with `Tools/building_textures.py`'s materials). The script's docstring
+  has the layout, the conventions and the plan axes. It writes:
+  - four models to `Assets/models/maps/belltower/`: `belltower_centre`, `_west`, `_east` (the west half's mirror) and
+    `_vista`;
+  - the scene, `Assets/scenes/maps/Belltower/belltower.scene`;
+  - the radar picture, `ui/minimaps/minimap_belltower.png`, drawn from the collision in Innocent Hotel's style.
+  Keep layout changes in the generator. When the editor is open, stage changes with the quality scripts and
+  publish them through native s&box tools; do not overwrite the open editor's scene or assets from Python.
+  `Sources/Belltower/editor/` holds the native import and capture method bodies as `.cs.txt` files: copy these to
+  the current MCP session exchange directory and run them with `run_csharp`. Scene import checks the current source
+  hash, preserves gameplay objects and scene properties, and refuses an open Belltower editor document. It saves
+  the source for the next load without replacing a running match.
+- Native visual pass (2026-10-14): `belltower_quality_sources.py` records original CC0 Poly Haven photographs and
+  checksums in `Sources/Belltower/scans/manifest.json`; `belltower_quality_materials.py` owns the scan-based materials.
+  The stone, neutral painted plaster, interior plaster and clay roof maps retain their original pixels. Exterior
+  and interior plaster UVs use different scales to preserve the photographed physical size.
+  - `belltower_relief.shader` uses the matching height maps for cobbles and rubble walls. The two-metre tiles use
+    UV multipliers 3.2512 and 2.032 respectively; apparent depth is 0.6 and 1.5 inches. Dry cobble mortar has a 0.7
+    roughness floor. The shader traces 10-28 height samples, retains base UV derivatives and fades the effect from
+    700 to 1800 units. It changes surface appearance without altering silhouettes or collision. Ashlar remains on
+    its existing shader: the supplied medieval_blocks_03 height map is flat and cannot supply useful relief.
+  - Stage the rubble height source with `belltower_quality_sources.py --only medieval_blocks_05 --out
+    output/belltower/quality/relief-v1-sources`; `import-relief.cs.txt` verifies its original MD5, imports it and
+    compiles the shader natively. Stage only the changed materials with `belltower_quality_materials.py --only
+    street_cobbles rubble`, then use `import-materials.cs.txt` and native material compilation. Material imports
+    replace source files atomically because the compiler can retain memory mappings on the previous file.
+    Native street, wall, mirrored-side and grazing-angle checks are in `saved-relief-v1/`; the accompanying timing
+    files measure RenderToBitmap including readback, not in-game FPS. Backups are in `before-relief-v1/`.
+    `compare_relief: true` alternates relief off/on/on/off using copies assigned only to the isolated capture scene.
+    In `relief-cost-check/`, pooled 32-sample medians added 0.18-0.36 ms in the street views and 0.04 ms in the hall
+    control. The larger shift between separate capture runs remains visible with relief disabled, so it is not a
+    measurement of the height-tracing cost. Full-game performance still needs a separate check.
+  - Wall material v3 (2026-10-18) supersedes the rubble scan/regular-block finish above with ImageGen limestone color
+    and height plus photographic climbing ivy. `Sources/Belltower/wall-v3/README.md` records the material workflow;
+    `generation.json` contains the exact built-in ImageGen prompts and saved source paths. The separate
+    `belltower_masonry_v3.shader` uses shared color/height UV selectors from `Tools/belltower_wall_quilt.py`, shallow
+    relief and height-derived normals. `belltower_quality_materials.py` owns both `rubble` and `ivy_climb`; older
+    material/front generators already delegate these definitions. Native captures are in `output/belltower/quality/wall-v3`.
+    The earlier wall-v2 buried-face cleanup remains in the map generator, with its existing collision and exterior foundations.
+  - `belltower_architecture.py` adds roof relief from the photographed height map, closes its perimeter to the roof
+    substrate, adds clay ridge caps, and builds shutter rails, tilted louvres and hinges. Cornices sit below the roof
+    surface. Council Hall piers have small bevels. `belltower_detail.py` uses smooth parasol gores and scalloped hems.
+  - `belltower_furniture.py` builds separate cart and crate boards, wheel felloes/spokes/tyres, raked bench slats,
+    cast-iron arms and feet, and rounded sacks with seams. Wood uses original 4K `brown_planks_03` maps at their
+    photographed one-metre scale; board UVs avoid scan seams. Lanterns have transparent glass around separate bulbs.
+    `belltower_architecture.street_door` adds bevelled raised panels, rails, stiles and brass fittings to 38 closed
+    street doors. Neither pass changes playable doorways or collision. Both halves now have 939,001 visual triangles;
+    the centre has 246,560 after the hall joinery and deck pass. All 94 placement/reachability checks and native model compiles passed. Native material
+    resource checks are in `props-v1-native-resources.json`; reviewed door captures are in `doors-v1-viewport/`.
+  - Bench arm placement v2 (2026-10-20): `belltower_furniture.bench_arm` separates the arms from the leg frames.
+    The 36 armrests on 18 benches move outward 4.9 inches; their grip centres are 1.1 inches from the ends,
+    so the grips meet the slat ends. Seats, backs, legs, braces, bolts and collision remain unchanged.
+    `belltower_stage_bench_arms.py` patches only the arm faces in both canonical OBJs and four existing bounded
+    imports. Native publication, current compiled-model checks, all 18 exported benches and native thumbnails
+    passed. The running game was preserved; no in-map screenshot was captured. See
+    `Sources/Belltower/benches/arm-placement-v2.json` and `output/belltower/bench-arms-v2/verification.json`.
+  - Bench rear-support clipping v3 (2026-10-21): `belltower_furniture.bench_back_support` replaces the old
+    steeper upright with a closed casting raked eight degrees with the slats. Its front has 0.04 inches of
+    clearance behind the back boards; its offset foot clears the last seat board and meets the seat carrier.
+    All 36 supports on 18 benches retain the old triangle count. `belltower_stage_bench_backrest.py` patches
+    only those faces in both canonical OBJs and their two existing bounded iron imports. Seats, back slats,
+    arm placement v2, bolts, collision and model descriptions are unchanged. Native publication and both
+    incremental model compiles passed. Five first-person captures from a running Belltower match reviewed
+    the rear, oblique rear, seat joint, front and mirrored rear. The test was stopped and the saved Belltower
+    editor document left open. See `Sources/Belltower/benches/backrest-v3.json` and
+    `output/belltower/bench-backrest-v3/in-game/`; these supersede v2's missing in-map bench check.
+  - Crate joinery v2 (2026-10-20, user: boxes look flat): `belltower_crates.py`, called by the furniture crate
+    helper, adds shallow physical cupping, worn chamfers, varied board depths, rebated corners, a recessed lid
+    under raised cleats, round nail heads and existing photographed end grain. The 66 shipping crates keep
+    their centres, orientation, stack height and original cover collision. No texture pixels or materials changed;
+    each half adds one mapping to the existing `bench_oak_endgrain.vmat`. `belltower_stage_crates.py` matched
+    60,456 old crate triangles per half and replaced them with 84,840; every non-crate OBJ byte and all VMDL
+    physics remain intact. Source assets were installed locally only after the editor had closed. The initial
+    prototype compiled and rendered as a native model thumbnail; final refined model compilation and map review
+    remain pending. Standalone resourcecompiler could not mount the required asset configuration; its zero-job
+    or configuration-error results do not validate these models. `Sources/Belltower/crates/joinery-v2.json` and
+    `output/belltower/crates-v2/verification.json` record this scope. The scene and all foliage were untouched.
+    This legitimate crate edit postdates the model hashes in the separate bush-grounding plan: retain it when
+    revalidating that plan, using the exact non-crate preservation proof. Do not regenerate the whole town.
+  - Facade profiles v1 (2026-10-15) replaces box cornices and window heads with three profiled variants,
+    bevels the surrounds, slopes the sills, varies some upper shutter angles, and divides wall coping into
+    individual bevelled stones. Ground-floor shutters and original collision bounds are preserved.
+    The centre now has 247,036 authored triangles; each half has 969,171. All 94 spot/reachability checks,
+    35 detail-geometry cases, and convex-hull/physics comparisons passed. Only the three visible OBJ files changed.
+    `Sources/Belltower/facades/manifest.json` records the accepted sources, checksums, compiled resources and six
+    same-camera comparisons in `facades-v1-before/` and `facades-v1-saved/`. The scene file, v9 indirect lighting
+    and v7 reflections are unchanged. Runtime performance has not been measured for this pass.
+    `import-facades.cs.txt` verifies backups and hashes and can resume a checked partial import. A Git status scan
+    temporarily denied replacement of an OBJ; it cleared naturally. Inspect the current hashes and locking process
+    before retrying. `verify-facades.cs.txt` uses the off-editor `source-geometry.json` count report and validates
+    loaded resources: this running engine's GetIndexCountForLod reports the first material's indices, not the total.
+    The full source triangle totals are independently counted and tied to the imported OBJ hashes.
+  - Garden props v2 (2026-10-15) is imported, natively compiled and reviewed as an incremental quality pass.
+    `belltower_gardens.py` closes the shed roof gaps, builds individual boards and braced doors with hardware,
+    adds slatted compost bins and stacked split logs, and replaces the wheelbarrow box with an open basin,
+    frame, legs and rounded wheel. Cut log faces reuse the existing Gunsmith Range oak end-grain material.
+    Each town half now has 996,123 authored triangles, 457 collision boxes and 116 hulls. All 94 placement and
+    reachability checks and 11 prop geometry checks passed. Garden collision, shared RNG state and scene props
+    are unchanged. Both native model compiles and material-load checks passed; the scene and lighting are unchanged.
+    Seven native baseline views are in `garden-v1-before/`; offline construction previews are in
+    `garden-v1-studio/`. Seven matching native captures are now in `garden-v1-saved/`. The shed's corner stiles and
+    bottom rails shared the cladding plane and showed depth-buffer artifacts. Garden v2 recesses the boards by
+    0.25 inches and moves the backing farther inward, preserving collision and silhouette bounds. Its 11 geometry
+    checks and three cladding/trim overlap checks pass; the two town meshes are installed from `models/garden-v2/`
+    after all 94 gameplay checks and collision comparisons. `garden-v2-trim-regression.json` proves the check rejects
+    all three v1 sheds and accepts v2. Two offline construction views are in `garden-v2-studio/`; seven matching
+    native views are in `garden-v2-saved/`. `Sources/Belltower/gardens/manifest.json` and
+    `garden-v2-saved/verification.json` record the accepted sources, native compiles and unchanged scene/collision.
+    The shed edge artifacts are resolved. Firewood still needs less faceted profiles and convincing bark/cut faces.
+    The wheelbarrow chassis correction is accepted in v3 below.
+    `garden-v1-checkpoint.json` records the rejected overlap. Do not restore the older facade models over these
+    changes. `garden-import-request.json` selects
+    the checked garden revision. `import-gardens.cs.txt` supports checked partial imports and preserves an unrelated
+    known play session; inspect hashes and the locking process before resuming any interrupted publication.
+    Garden v3 is accepted after native comparison (2026-10-15): its wheelbarrow chassis stays below the basin,
+    with four mounts and lowered braces.
+    The old generator is preserved in `garden-v3-before/source/`. The basin regression check catches 138 intruding
+    samples in v2 and none in v3. All 11 geometry cases, three shed trim checks and 94 gameplay checks pass;
+    collision and shared RNG state are unchanged. Each staged half has 996,387 triangles, 264 more than v2.
+    `garden-v3-studio/wheelbarrow.png` is an offline construction render; it has been reviewed but is not an engine
+    screenshot. Both checked v3 OBJ files are now installed, natively compiled and loaded. The wheelbarrow and
+    terrace views in `garden-v3-saved/` match the v2 camera/lighting metadata; the frame is visibly below the basin.
+    `Sources/Belltower/gardens/manifest.json` and `garden-v3-saved/verification.json` record acceptance, unchanged
+    collision and scene, and restoration to saved Spillway with play stopped. The v2 backups remain preserved.
+    `garden-v3-native/partial-import-state.json` is historical evidence from the earlier interrupted import.
+    Git text-diff readers held the west OBJ during that work. `.gitattributes` now disables text diffs only for
+    the two generated town OBJ files; scoped numstat completes with binary entries. The import still checks hashes
+    and publishes atomically; inspect a timed-out or locked operation before retrying it.
+    A separate offline firewood trial is in `Tools/belltower_firewood_trial.py`; it does not replace that pinned
+    garden generator. The original built-in ImageGen bark, cut-face atlas and split-fibre albedos are preserved as
+    `Sources/Belltower/generated/firewood-{bark,cuts,split}-v1.png`, with prompts and provenance in matching JSON.
+    The trial has 34 irregular logs, 27 split, with rounded bark, growth rings and lengthwise fibres. It uses 8,024
+    triangles per pile versus 1,768 before. `firewood-v1-studio/geometry-checks.json` verifies closed outward surfaces,
+    bounds at both studio and garden placements, safe atlas UVs and unchanged shared RNG. The accepted assets,
+    production generator and collision are unchanged. `Sources/Belltower/gardens/firewood-trial-v1.json` records
+    the reviewed same-camera Blender comparison at exposure -1.2. These are construction renders, not engine
+    captures. Surface normal maps, whole-map integration and native visual/performance validation remain pending.
+  - `belltower_interiors.py` replaces the hall's box furniture with pegged trestles, separate eased boards,
+    breadboard table ends, drawer fronts, recessed archive doors, and bronze fittings. Its oak floor and ceiling
+    use staggered individual boards; the ceiling beams have softened edges. Both stair openings stay clear, and
+    the deck vertices remain inside the original slabs. The centre retains its 403 collision boxes and 56 hulls.
+    `hall-v2-deck-checks.json` records the bounds checks; `hall-plaster-native-results.json` records native imports
+    and successful compiles. `council-hall-target-v1.png` and `.json` preserve the ImageGen design reference.
+  - All eight exterior plaster colours now use `belltower_plaster.shader`. It blends the clean two-metre scan
+    with original 1.5-metre `rough_plaster_broken` photographs using continuous warped sampling, broad wear patches
+    and stronger weathering near the base. Coverage is 0.34; normal and roughness maps follow the same blend.
+    The production material generator owns these definitions. The earlier triangular sampling trial was rejected
+    for visible seams. `hall-plaster-streaming/` contains native captures with material and DDGI textures resident.
+  - `belltower_window.shader` supplies reflected glass with a parallax room behind windows and shopfronts. The shop
+    shelf image was generated with the built-in ImageGen tool; original output and prompt are preserved in
+    `Sources/Belltower/generated/shop-shelves-v1.png` and `.json`. It is an asset texture, not a gameplay screenshot.
+  - Window boxes now use small intersecting geranium clusters and folded hanging ivy; balcony bougainvillea also
+    has depth. `window-plants-v1.png` and `.json` preserve the built-in ImageGen atlas and prompt. The plant shader
+    samples its original RGBA directly, including the alpha channel. Native shader, material and model compiles
+    passed, and `output/belltower/quality/foliage-v1/` contains reviewed cafe and street views. The two halves each
+    gained 888 visual triangles; all 94 gameplay checks passed and collision is unchanged.
+  - `belltower_quality_models.py` stages the three town models, checks all 94 spots and reachability, and compares
+    convex collision geometry and VMDL physics before native import. This pass preserved gameplay collision.
+  - `belltower_quality_foliage.py` selects 1,600 cloud oak trees from the landscape painter's crown plan. It respects
+    roads, buildings, yards and existing trees, and places each tree on the rendered terrain. These have no colliders,
+    use automatic LOD, and cast shadows only near town. The deterministic scene group is in
+    `Sources/Belltower/landscape/trees.json`; its dry-oak package is `facepunch.treeoakdrymediuma#289352`.
+  - Distant woodland v8 (2026-10-15) adds 320,000 town-facing tree cards in 88 sector meshes, 640,000 triangles.
+    These are visual only, with no collision or shadow casting. The original generated RGBA tree atlas is preserved
+    in `Sources/Belltower/generated/forest-trees-v1.png` with its prompt/provenance. `belltower_forest.shader` uses
+    diffuse lighting and the landscape B/C/D palette and slope normals, averaged over a 128-unit crown footprint.
+    Generated leaf detail modulates that colour; distance fade is 30,000-52,000 units. Single cards avoid the bright
+    crossed-card seams. The v8 pass was reviewed against same-session baseline captures at the valley, west ridge
+    and terrace, then saved natively. It improves the nearby canopy; the far valley still needs refinement.
+    `Sources/Belltower/landscape/forest.json` is the accepted native group, and `forest-manifest.json` records its
+    source/asset hashes. `belltower_map.py` includes that cache when regenerating; staging trials are excluded.
+    `belltower_quality_forest.py` stages placement, models and materials. Import with `import-forest.cs.txt`, compile
+    the material and verify with `verify-forest.cs.txt`. `apply-forest.cs.txt` is only for the first reviewed save;
+    it refuses an existing group. Future replacements must update the existing group rather than adding another.
+    `forest-v8-saved/` contains fresh saved-scene captures and the scene comparison; `audit-forest-sources.py --saved`
+    verifies all 267 inputs, all 88 current compiled models, 640,000 triangles and the matching regeneration cache.
+    The native save also refreshed per-process resource IDs/two prefab child mappings and wrote the new false
+    ZombiesOnly default; town geometry/collision, transforms and other scene values were preserved. The v9 indirect
+    light and v7 reflection assets are unchanged. Editor performance was sampled with play stopped; gameplay
+    performance remains unverified and the overall AAA quality goal remains open.
+  - The landscape pass replaces rectangular field rows with larger, warped Voronoi parcels, reduces crop-colour
+    contrast and varies woodland coverage continuously at its edges. Crop choice is sampled at each parcel's fixed
+    site, so the same parcel keeps its crop across scanlines and texture zones. All four colour/kind maps are 4096px;
+    normal maps are 2048px. The tree plan follows the same revised parcels and retains the 1,600-tree budget.
+    `output/belltower/quality/landscape-v2-preview/` contains comparisons before the woodland addition. Distant
+    fields and the near retaining walls still need refinement for the overall quality goal.
+  - Offline canopy candidates (2026-10-15) have not changed the accepted landscape. `belltower_canopy_trial.py`
+    stages procedural variants; `belltower_photographic_canopy.py` uses the original built-in ImageGen RGBA atlas
+    `Sources/Belltower/generated/canopy-crowns-v2.png`. Its JSON preserves the edit prompt and provenance; the v1
+    original is also retained. The atlas alpha is unchanged, including occasional alpha=1 pixels in the gaps.
+    Natural oak/holm/beech/willow crowns use premultiplied linear filtering; planted trees keep the accepted painter.
+    The first photo trial had straight overlap cuts from intersecting analytic domes. V2 layers whole crowns by
+    summit height with world-coordinate tie breakers. `canopy-photo-v2-checks.json` verifies input-order invariance,
+    matching tile edges, unchanged planted trees and all four species; the check rejects the original painter.
+    `canopy-photo-v2-review.json` records the reviewed swatch, 2048px zone B and 1024px zone C comparisons. Coverage
+    in the matching grove is 79.87% versus the accepted 80.87%. Ellipsoid shadows remain approximate, and distant
+    texture detail/repetition still need full-resolution and native review. All candidates stay under quality output;
+    the accepted landscape generator, live textures, tree placement and scene are unchanged.
+    The complete 4096px candidate is now in `canopy-photo-v2-full/`. All four normal maps match the accepted files
+    exactly, and zone A's colour/kind maps are also identical. `offline-review.json` records the full-size review,
+    source checks and pixel comparisons; the broad far-field woodland patterns still need improvement.
+    `belltower_quality_canopy.py` stages eight colour/kind textures and two material copies under a separate
+    `materials/belltower/vista/canopy-photo-v2/` resource path. It preserves every other material setting and all
+    accepted inputs. `import-canopy-trial.cs.txt` validates sources, dependencies and the allowlist, imports only
+    missing or identical trial files, and supports inspected partial resumption. It has not run natively yet.
+    Compile both trial materials, then run `verify-canopy-trial.cs.txt` to check all loaded texture dimensions.
+    The capture helper's `--canopy-trial` temporarily overrides the vista and existing woodland materials together,
+    prewarms 4096px colour maps for both baseline and candidate, and restores exact renderer snapshots afterward.
+    Its import, resource verification and new material-override branch still require native validation. Review
+    matching valley, west-ridge and terrace views before changing any accepted landscape input or manifest.
+    `check-native-script-types.py` type-checks the six garden/canopy/camera method bodies against the installed
+    .NET 10 engine assemblies without executing them. `native-script-types/report.json` records the matching
+    script hashes and zero compiler diagnostics. This confirms API compatibility, not native rendering or restoration.
+  - Stage landscape textures with `belltower_vista_paint.py --out <output directory>` (four CPU threads), then
+    `belltower_quality_landscape.py --source <same directory>`. The latter checks the bundle and writes the native
+    import manifest. `import-landscape.cs.txt` verifies all staged and destination hashes before writing; compile
+    `materials/belltower/vista/vista_land.vmat` afterward. Backups are in `before-landscape-v2/`. Stage matching trees
+    with `belltower_quality_foliage.py --out <output directory>` and review with the capture script's staged_landscape
+    and landscape_resource settings before saving. `Sources/Belltower/landscape/textures.json` records the accepted
+    source hashes; lighting manifests include these texture inputs as well as the tree group.
+  - Lighting uses the photographed Kloppenheim sky, a warm sun at pitch 34/yaw -63, an ACES exposure range of
+    1.05-2.2, and native indirect lighting across a 28x39x5 grid (5,460 probes; 4,806 active in v9). Three 256px reflection cubemaps use
+    Baked mode. `Sources/Belltower/lighting/` preserves the volumes, probes, source hashes and bake light settings;
+    `belltower_quality_lighting.py` imports a reviewed native bake into that cache for future scene regeneration.
+    The saved scene uses daylight-v9 indirect light and the three accepted daylight-v7 reflections. These
+    `.vtex_c` textures have no uncompiled source; the narrow `.gitignore` exceptions are intentional. One town volume covers world bounds
+    (-1480,-2400,2) to (1880,2400,450), density 8, strength 2, normal bias 20 and view bias 30. The revised vertical
+    spacing reaches the upper hall; no extra local hall volume is used. Fresh saved-scene views and the menu image
+    are in `output/belltower/quality/hall-plaster-final/`. The v9 bake includes the revised hall joinery, timber decks
+    and worn plaster, and completed both lighting passes. It retains the v7 reflections. `daylight-v9-save/` verifies
+    that only the three indirect-light texture paths changed in the saved scene. The source manifest records local
+    geometry, shaders and textures, including the landscape and height maps.
+  - Use `Sources/Belltower/editor/capture-viewport.cs.txt` with the persistent Belltower editor document. It captures
+    one bitmap per call, dispatches render hooks, and explicitly applies the scene's post-process volume to the
+    viewport camera. A hidden tab can have no `Scene.Camera` while another map is playing. It records the requested
+    camera exposure settings and preserves the selected document and game state while restoring its camera transform.
+    It uses the persistent document's hidden `editor_camera` directly, without selecting its tab. Mark material
+    textures used at mip size 2048 and all three indirect-light textures at their full dimension before a short
+    streaming wait; then mark the DDGI system dirty and update its volume buffer synchronously. Hidden documents
+    do not tick normally: missing prewarm can produce black shadows or blurred textures in offscreen captures.
+    Do not disable global texture streaming for this capture. Use saved-scene captures for final
+    verification. Do not revive the older isolated-scene capture/benchmark loops. `scene.Push()` changes global
+    `Game.ActiveScene`: use only synchronous scopes and never keep one across `await`.
+    `look_trial` can temporarily compare the Tonemapping mode and exposure bounds, then restore the serialized
+    component and camera settings. Eleven native images in `look-v1-*` were reviewed: AgX visibly improves the pale
+    surfaces, but exposure bounds and compensation produced nearly identical pixels despite changed camera metadata.
+    `look-v1-review.json` records matched cameras, pixel differences, exact component restoration and the unchanged
+    saved scene. Effective rendered exposure remains unverified; do not treat metadata as proof. Local engine IL
+    shows editor rendering can copy post-processing from `Scene.Camera` again, and native tone-map parameters cross
+    into the renderer; the cause is not confirmed. Inspect both cameras/native settings and use a deliberately
+    separated fixed-exposure comparison in the next coordinated window. No look changes have been saved.
+    `capture-camera-state.json` confirms separate main and editor cameras with valid native tone-map systems.
+    The staged capture helper records `NativeExposureAfterRender`; `--sync-main-postprocess` is an opt-in diagnostic
+    that updates both cameras and restores the main camera's prior exposure values. This new branch has not run
+    natively yet. `aces-fixed-low` and `aces-fixed-high` use 0.35 and 2.0 bounds to make the next comparison decisive.
+    The latest helper also sets horizontal FOV and bitmap dimensions after its streaming wait and restores those
+    projection values afterward. The installed SceneViewportWidget resets projection each editor frame, as confirmed
+    independently by Cerro Blanco's capture work and the local source. This helper renders synchronously after setup;
+    the garden v3 native captures validate its `Projection` metadata and reported native exposure of 1.05-2.2.
+    The fixed-exposure/main-camera diagnostic and canopy override still await native validation. The read-only camera
+    probe reads `IsSceneEditorCamera` as a field, matching the installed engine IL. Its updated missing-document
+    branch compiled and ran natively without changing the active game or document. Belltower was closed; open it
+    in the next coordinated slot before capture. `direct-camera-read-unwrapped-final/` preserves that result.
+    Fresh CLI connections using direct `tools/call` succeeded where this chat's `call_tool` wrapper calls timed out.
+    `editor_check.py --direct-call --cleanup-exchange` selects that route and removes only its own script and empty
+    exchange directory. `capture_views.py` uses those options. `direct-route-status/` and `direct-route-console/`
+    confirm the correct project, successful C# compile and another chat's active Cerro Blanco game; they do not
+    grant an editor slot. Copy fresh helpers from source for the next coordinated window.
+    The helper and capture runner also accept `--pid` to pin the verified editor when test clients are running;
+    the connection checks that PID, editor kind and project before dispatch. PID 15884 was verified for the v3 slot.
+    `network-static-audit/report.json` inspects the saved scene against enum values read from the running engine.
+    Its three reflection probes, indirect light and static visual hierarchy use Snapshot mode without excluded
+    flags. The lighting/forest regeneration caches agree after normalizing texture references from Id/Path objects
+    to paths; no saved fields were changed. This is source-level evidence, not a two-client rendering check.
+  - `Sources/Belltower/visual-target/west-street-target-v1.png` is an ImageGen design reference. Actual native captures
+    are under `output/belltower/quality/`. The AAA quality goal remains open: distant painted fields, repeated facade
+    detail and interior dressing still need work. The Council Hall's black column blotches, cafe plinth speckle
+    and terrace parapet artifacts were isolated to baked indirect light. The denser daylight-v5 town volume and
+    completed second bounce resolve the large artifacts in fresh saved-scene captures; small residual speckles under
+    furniture and awning edges remain. Local hall volume experiments were rejected after checking exterior views.
+    Capture errors preserve inner stacks. Native parallel `ComputeProbeRelocation` can race the engine's unlocked
+    `ResourceSystem.RegisterWeak` dictionaries, then break rendering throughout the process. Do not retry that path.
+    `bake-editor-lighting.cs.txt` calls trace and relocation methods sequentially on the main thread, yielding
+    between rows. It uses the persistent editor scene and the updater's own scene world.
+    `DDGIProbeUpdaterCubemapper.RunAsync` replaces GeneratedIrradianceTexture for its
+    second pass: fetch the current texture after the await before saving, or only the first bounce is preserved.
+    The importer requires a completed two-pass `bake-result.json` before it updates the accepted cache. The dense
+    town bake currently uses a 600-second cancellation limit and a longer connection timeout. A cancelled bake must
+    never be published. In the v8 recovery, Quality GGX reflection filtering faulted the GPU in
+    `envmap_filtering_cs.shader_cs`; preserve the accepted v7 reflections and do not repeat that capture path.
+    `daylight-v8-gpu-crash/` preserves the diagnostics and unaccepted reflection. Apparent hangs can also be native
+    asset compilation or resident-resource reloads; inspect progress before terminating an editor. A later lobby
+    startup stall in PID 16792 was `BuildNetworkedFiles` / `LargeNetworkFiles.AddFile` hashing multiplayer assets on
+    the main thread. Disk reads kept advancing; it recovered after about seven minutes without a restart. The
+    stack, asset inventory and recovery record are in `startup-recovery/editor-stall-16792*`.
+- The town is mirror-symmetric. Red Team spawns on the west road inside the town wall, Blue Team on the east. Three
+  lanes join them:
+  - North: Market Street, with the market cross in the middle. Bomb site A is at its east end.
+  - Middle: West and East Street, through the square. The Town Hall and its belltower stand on the square, with the
+    council hall upstairs.
+  - South: the terrace, above the gardens (48 lower). Bomb site B is in the east gardens.
+  - Between the lanes are alleys, the Bakery and Dairy, the Inn and Tavern, and the church. The east half is repainted
+    in cool colours (`EAST_PAINTS`), so each side reads as its team's.
+- The church's three square-facing windows (2026-10-21) use `Tools/belltower_church_windows.py`: recessed timber
+  sashes, curved heads, individual tinted glass panes, eased stone surrounds and sloped projecting sills. The front
+  cornice stops either side of the large arch instead of cutting across it. `dress` opts into this only on the church's
+  `+n` face; opening dimensions and the original two-inch glass collision slabs are unchanged.
+  `belltower_stage_church_windows.py` replaced only 225 original visual triangles with 5,436. The centre VMDL redirects
+  three bounded imports to private copies and adds `church-windows-v1/windows.obj`; all original bounded imports,
+  including the rebuilt fountain, remain unchanged. The three private glazing materials reuse the existing coated
+  glass shader without editing it. Native compilation and exterior/interior captures succeeded. Applied-state and
+  verification records are in `Sources/Belltower/windows/church-windows-v1.json` and `output/belltower/church-windows-v1/`.
+- Houses nobody enters are one collision box each. The open buildings have doorways and no doors, because bots can't
+  open doors. Roofs are 42 degrees, over the navmesh's 40, and every attic is filled with its roof's hull.
+- Market Street's two lorries (one each half, plan (-+900, 1290)) came out on 2026-10-19 (the user: "remove this truck
+  from belltower it looks awful"). `lorry()` and its call are gone from `belltower_map.py`.
+  - The installed halves weren't regenerated (the generator's other inputs have moved on since they were built).
+    `output/belltower/lorry-removal/find_lorry.py` built the lorry alone with the generator's own code and found its
+    330 triangles a half in the installed OBJs, by their written vertex positions and material. `stage_lorry_removal.py`
+    dropped those faces (the vertices stay, unused) and the lorry's 6 `PhysicsShapeBox`es a half (it had no hulls), and
+    `Sources/Belltower/editor/import-lorry-removal.cs.txt` published them, refusing any file changed since staging. The
+    originals are in that folder's `stage/before/`.
+  - No Retakes sightline crossed a lorry and no spot stood on one (`check_lorry_gameplay.py`). Market Street's north
+    lane is more open without its cover.
+  - Checked in an isolated editor scene: no collision at bed, cab or roof height where either stood, and the street's
+    view down to the market cross. Not yet seen in a match.
+  - The file watcher compiled both halves. Don't `Compile( true )` them by hand: a forced compile of `belltower_west`
+    stalled the editor and it closed (2026-10-19), as the Railhead notes warn.
+- The square's oak in each north corner (plan (-+560, 450), Facepunch's medium oak) came out on 2026-10-25 (the user's
+  screenshot: "is it out of place? remove if so"). Its trunk stood 90 from the side house's shopfront and 100 from the
+  north house's, and its crown (~336 across) went ~6 ft into both, over their shop doors and windows.
+  - Its call is gone from `street_props` (it used its own seeded RNG, so nothing else moves on a rebuild).
+  - `output/belltower/square-tree-removal/stage_square_tree.py` took the two "Oak tree" objects out of the scene and
+    each trunk's 7-sided hull out of `belltower_{west,east}_hulls_wood.obj`; nothing else in those files changed.
+    `Sources/Belltower/editor/import-square-tree-removal.cs.txt` published them (refuses while Belltower is open in
+    the editor), and the watcher recompiled both halves. Originals are in that folder's `stage/before/`.
+  - The scene's hash changed, so an older stage guarded on Belltower's scene hash refuses until it's staged again.
+  - Checked in an isolated editor scene (`check-square-tree-gone.cs.txt`): no collision at either trunk, the shopfronts
+    still hit, and a view of the cleared corner (`square-corner-after.png`). Not yet seen in a match.
+- Coopered casks (v3, 2026-10-25, the user: the barrels looked "too perfect/round"). The old `Detail.barrel` was a
+  48-sided tube curving in like a pill at both ends, its lid flush with the rim, thick black bands, every stave one shade
+  and every barrel identical; v2's clock-frontage pair still had twenty equal staves. All 23 casks a side are now
+  `Tools/belltower_barrels_v3.py`'s, as a cooper builds one:
+  - staves of real widths (2.6-4.4 in) on one gentle arc, each its own shade (four tints of the furniture's oak scan),
+    with V joints, standing ~1.6 in proud of a recessed head of 4-6 boards, their end grain and inside bevel showing;
+  - 4 or 6 thin flat steel hoops (`sh_hoop`) with a riveted lap, rusted at the bottom or all over on some (a darkened
+    `sh_rust`), a bung in one stave;
+  - each cask slightly oval, slightly leaning and seeded by where it stands (`seed_for`), so no two match.
+  - Its seven materials (`materials/belltower/barrels-v3/`) are existing pictures in their own tints: no new textures.
+  - Drawn only: the ten-sided wood hulls stay. ~5.5k triangles a cask against the old 1,870 (127k a side), in three
+    bounded imports a side (`models/maps/belltower/barrels-v3/<side>_<n>.obj`); the v2 import node is gone.
+  - `Tools/belltower_stage_barrels_v3.py` took the old casks out of every import by matching their faces against each
+    generator's template at the hull's centre (24,192 iron, 966 lid and 14,112 stave triangles from the bounded
+    imports, 51,450 from the canonical record, a side), keeping every other line byte for byte. Two groups had casks
+    standing into each other (centres 20.6 and 23.9 in apart): `V3.NUDGED` moves the third cask of each until they're
+    27 apart, hull and all (`belltower_stage_barrels_v3_nudge.py`), both spots checked clear of the map's collision and
+    every neighbouring pair ~1 in apart. `belltower_map.barrel` draws the same casks (checked against the published).
+  - Published with `Sources/Belltower/editor/import-barrels-v3.cs.txt` and `-nudge.cs.txt` (hash-guarded, no scene or
+    play change); the file watcher compiled the halves. Checked in isolated native renders
+    (`capture-barrels-v3.cs.txt`, views in `output/belltower/barrels-v3/captures/config.json`): the market trio, the
+    clock pair, the yard and tavern groups and the east market. Not yet seen in a match.
+- It's in `GameUtils.MainMenuMapOrder` and `IsMatchReadyMap`. So the menus, Quick Play, the map vote and Ranked offer it
+  with every mode but battle royale. Ranked plays it as Defuse, because the scene lists `bomb_defusal`.
+  - Team spawns: 12 a side on the spawn roads. Deathmatch and Gun Game spawn players at any active spawn point,
+    whatever its team, so the team spawns are off in those modes (`GameModeObject` with Inverse).
+  - Free-for-all spawns: 33 round the town, on only in Deathmatch and Gun Game.
+  - Retakes spawns, tagged like Refinery's (`retakes,<site>,<role>`). Each site has Red planters and defenders and
+    Blue attackers. `ActiveBombSiteSelector` turns on the round's site. The mode's `TeamSpawnAssigner` puts one Red
+    player on a `planter` spawn, and `SpecialWeaponAllocator` gives that player the C4.
+    - No Red spawn can see a Blue one at either site, standing or crouched (checked against the script's collision on
+      2026-10-01). The spawn deaths the user had came from every spawn being switched off (see Retakes and Defuse
+      rounds).
+  - Buy zones on the spawn roads, callouts for every area, the play area, and a player clip over the south parapet, so
+    nobody jumps off the drop. A catch floor under the lowest land (`CATCH_FLOOR_Z`) stops anything thrown over the
+    walls.
+  - `MapSpawnSettings` turns off map spawn points and navmesh spawns: every spawn is placed.
+- `ObjectiveSpot` (`Code/Maps/ObjectiveSpot.cs`) is a map's own place for an objective. Domination uses a map's spots
+  when it has at least three, named by their labels. Hot Zone uses them whenever there are any. Otherwise both fall back
+  to the spawn points, which on Belltower would put flags A and C in the spawns.
+  - Belltower's flags: A in West Street, B in the square, C in East Street.
+  - Its Hot Zones: Market, Council Hall, Square, Gardens, West Street and East Street.
+  - Cash Grab's three points: the Market's cash is taken to the gardens, the Gardens' to the market, and the Square's
+    up to the Council Hall.
+- The land round the town (2026-10-02, the user's goal of an AAA look, after a reference picture of an Italian hill
+  town): `Tools/belltower_vista.py` shapes it, and `belltower_map.py` writes it through `Vista.write_land`:
+  `belltower_vista.obj` / `.vmdl`, one mesh with shared vertices (~338k triangles), drawn only, with no collision and
+  no shadows. The old flat-shaded vista, with its farm buildings and trees, is gone.
+  - Forced perspective (`SCALE`, `scale`, `apparent`, `real_place`): past 1200 out from the walls, a point d out is
+    drawn as if it were scale( d ) times as far from the town's middle: 1.07 at 3000, 2.6 at the river and 8 at the
+    land's edge, so 2.3 km of land plays a landscape 18 km deep. Patterns (fields, rows, districts) are laid out at the
+    apparent place, and things (trees) are drawn round, at their real size over the scale.
+  - Its lowest point is -5409. The catch floor is at `CATCH_FLOOR_Z` (-6500), and `belltower_map.py` asserts the land
+    stays above it.
+  - The current fog is `GradientFog`, alpha 0.6 from 2000 to 70000, falloff 0.75, height 25000, with vertical falloff
+    1.2. Native overview captures use a ZFar of 100000 so the distant landscape remains visible.
+- `Tools/belltower_vista_paint.py [--size N] [--zones abcd] [--out <dir>] [--sheet <png>]` paints the land's textures
+  into `Assets/materials/belltower/vista/` with numba, from the land's own heights and slopes. A full run at 4096 takes
+  about 3 minutes, numba's first compile included. `--preview <dir> [--views name ...]` renders the town's views
+  (`belltower_vista.PREVIEW_VIEWS`) with the painted textures, per pixel as the shader picks the zones, with the town
+  flat-coloured; with no `--zones` it paints nothing. On 2026-10-02 those renders from the terrace and the gardens
+  showed wooded hills with clearings, a patchwork of fields in the valley and blue haze towards the far hills. None of
+  it had been seen in the engine at that time. The 2026-10-14 quality pass subsequently inspected it in native captures.
+  - Four nested zones, A by the walls out to D at the horizon (texels of 1.9, 3.9, 17.8 and 46 units at 4096), each a
+    colour JPG, a kind PNG (grass, soil or stone) and a normal JPG, plus three tiling detail textures and
+    `vista_land.vmat`.
+  - What it paints: districts of irregular fields (warped, stretched Voronoi cells, their crops by the land: plain,
+    hill farms, vines, uplands), with hedges, tracks, ditches or trees between; olive terraces; vineyards; woods; scrub
+    and rock on the steepest slopes; the river.
+  - Every tree is a spheroid crown, shaded per channel by the sun and the sky, with its sun shadow (the sun is to the
+    west-south-west, so shadows fall east-north-east). Crowns smaller than a texel are averaged into the ground.
+  - `shaders/hc1_vista.shader` picks the zone by how far out from the town a point is (Chebyshev), blends the zones
+    over 12% of each, adds the detail textures near the walls (fading from 700 to 2600 out) and sets the roughness by
+    kind.
+- `Tools/belltower_vista_props.py` builds the vista's buildings and trees, drawn to the vista's forced perspective
+  (`World.k_at`): a walled hill town with its gate, a villa with its walled garden and cypress avenue, a village,
+  farms, chapels, and cypresses and pines. `belltower_map.py` writes it (`belltower_vista_props.obj` / `.vmdl`, ~53k
+  triangles) as the scene's "Vista Props", drawn only, with no collision and no shadows.
+  - The painter grounds it (`World.paint_data`): the yards (a town's paving and kitchen gardens, a farm's beaten earth,
+    the villa's parterre, gravel), the white roads out of the gate and down the avenue (`winding_road`), and the
+    buildings' and trees' shadows. It clears its own painted trees off all of that (`clear_crowns`). `--no-props`
+    leaves it all out.
+  - After changing the props, run `belltower_vista_paint.py` (the repaint, ~1.5 min), then `belltower_map.py`.
+  - First checked in the painter's previews (2026-10-02), then in native engine views during the 2026-10-14 pass.
+- `Tools/belltower_sky.py` is the legacy generated sky. The current scene uses the original photographed
+  `kloppenheim_05_puresky_hdri_4k.exr` through `materials/belltower/sky/afternoon_scan.vmat`.
+- `Tools/belltower_finishes.py` draws the houses' finishes, like the lime render (`plaster_<colour>`, anchored at the
+  ground: rising damp, salts, splashed mud, render blown off). `Tools/belltower_fronts.py` draws the shutters, windows,
+  doors, shop signs, railings, plants and painted lettering, as decal paints at their real size in the project's own
+  fonts.
+- Three houses in four have painted window surrounds (cornici, `belltower_map.SURROUNDS`): a pale band round a
+  coloured house's windows, grey stone round a pale one's, each with a little hood over its head that throws a line of
+  shadow (`dress`). They're drawn only, with no collision. Checked in the script's flat previews (2026-10-02).
+- The gutters and downpipes are copper's brown oxide (`copper_brown`, a second colour of building_textures' copper
+  sheet): the tower roof's verdigris read as bright teal along every eave. The market stalls' counters are two tiers
+  of slatted crates on a pallet (`crate_counter`), drawn over the stall's own collision box, so the cover is the same.
+- Market-stall canvas (2026-10-20, user: red/white canopy too straight): `belltower_stall_canvas.py` supplies a shallow
+  sag between the existing posts, small corner tension folds and a soft curled valance. Continuous cloth UVs bend
+  the existing eight-inch stripes over the shape. `stall` delegates only its roof/flap to this helper; the counters,
+  produce, posts, RNG sequence and gameplay collision are identical. `belltower_stage_stall_canvas.py` surgically
+  replaced 72 old fabric triangles per half with 16,848; every unrelated OBJ byte and the VMDLs/MTLs are unchanged.
+  Both OBJs were imported through the native editor with guarded backups. The editor subsequently closed; final
+  resource compilation and after screenshots remain unverified. `Sources/Belltower/props/stall-canvas-v1.json` and
+  `output/belltower/canopy-cloth-v1/` record the pending check, native import and preservation evidence. Do not infer
+  native visual acceptance from the old, flat before images or force-compile the large town models.
+- Some street doors have terracotta pots with clipped bushes beside them (`door_pot`: building_textures' `clay_pot`,
+  the beech bush scaled down). Each has a collision box the pot's size.
+- Its look (the user: it "doesn't look AAA", the textures and the low-poly plants, 2026-09-29):
+  - `Tools/belltower_materials.py` retains the older procedural canvas and produce materials. Material names owned
+    by `belltower_quality_materials.py` delegate to those photographed definitions so regeneration preserves them.
+    The cobbles and flagstones also use scans. `--out <dir> --sheet <jpg>` stages the older painter's output elsewhere.
+    `g_flRoughnessScaleFactor` is an exponent, so values below 1 make the material rougher.
+  - `Tools/belltower_detail.py` has the props and the material each paint uses (`MATERIALS`, `TILES`):
+    - the café's bistro tables and chairs under gored parasols with scalloped valances;
+    - Blue café spacing (2026-10-21): `belltower_cafe_spacing.py` translates three eastern seating groups and
+      removes the fourth, leaving 43 inches between the closest canopy edges. The red café is unchanged.
+      The main generator and `belltower_quality_models.py` apply this after mirroring the east half. The surgical
+      import changed only the blue café's render faces and four table hulls; native physics checks found the
+      three new table tops at 29 inches and clear ground at all four former locations. Successful compilation,
+      import receipts and matching before/after captures are under `output/belltower/cafe-spacing-v1/` and
+      `output/belltower/quality/cafe-spacing-v1-{before,after}/`.
+    - the stalls' crates of produce;
+    - the foliage: Facepunch's cloud oaks and beech bushes, which the scene's `__references` list.
+  - A crate of produce is a low, lumpy mound under a tiling picture of the heaped fruit (`produce_<kind>`: two layers
+    packed hexagonally, dark gaps, stalk ends, apples' and onions' streaks running from the stalk). Up to six whole
+    fruit lie on top, drawn with `produce_skin`, their kind's skin alone. The pile's picture has each fruit's roundness
+    in its normals, which would count twice on a round fruit.
+  - Round things (fruit, the furniture's bars) have a normal per point (`map_kit.Model.polygon`'s `normals`), so they
+    shade smoothly.
+  - Checked only in Cycles renders of a run into scratch (2026-09-29). Assets got the new models and materials on
+    2026-10-02.
+- Every run checks all 94 spawn, objective and cash spots:
+  - `check_spots`: room for a player and a floor under each spot;
+  - `check_reach`: a way to walk there from the spawn roads. It uses a 2.5D grid of the collision's level tops, kept 16
+    from anything in the way like the navmesh, and stands in for the navmesh while the editor is busy. `--preview <dir>`
+    also writes its picture (`reach.png`).
+  - On 2026-09-28 both passed. The Council Hall and the Inn's and Tavern's upper floors are joined to the streets.
+- The menus' picture (`ui/maps/belltower.png`) is a native 1920x1080 capture of the tower, square and fountain.
+  `import-map-art.cs.txt` validates the PNG dimensions and preserves the original before importing it in the editor.
+  The generator only writes its old placeholder if no map image exists.
+- Fountain carvings (2026-10-21): `belltower_fountain_ornaments.py` supplies four solid limestone lion masks,
+  four upper lilies and eight basin lilies, following `output/belltower/fountain-ornament-concept-v1/`.
+  The old ellipsoids used a reflected frame without reversing winding, so their exterior faces were culled.
+  The replacement checks transformed winding, uses one connected, closed 18,000-triangle lion sculpt and
+  rounded leaf sections for the lilies. The bronze outlets meet the existing water spline at local `(0,10,42)`.
+  `belltower_fountain.py` delegates its ornament calls to this helper; water, masonry and collision are unchanged.
+  The sculpt source is signature-checked in `Sources/Belltower/props/fountain-ornaments-v2/lion-*.npz`.
+  After changing the sculpt, run `python Tools/belltower_bake_fountain_lion.py --prepare`, then background
+  Blender with `--factory-startup --threads 2 --python Tools/belltower_bake_fountain_lion.py -- --blender`.
+  This prepares source geometry; Blender is not a game dependency. The signature includes a bake-version tag.
+  `belltower_stage_fountain_ornaments.py` performed the one-time legacy upgrade, removing exactly 17,832
+  triangles and adding 121,164, while preserving every unrelated canonical OBJ byte and all existing materials.
+  The centre VMDL now uses 42 bounded render imports (at most 65,000 triangles each) under
+  `models/maps/belltower/fountain-ornaments-v2/centre/`, retaining its material remaps and physics nodes.
+  The guarded native import and successful incremental compile are in
+  `output/belltower/fountain-ornaments-v2/revision4/`. Native before/after views of the lion, lily and whole
+  fountain are in `output/belltower/quality/fountain-ornaments-v2-{before,after}/`; camera, exposure,
+  scene objects and editor state were restored. The first three construction revisions were not published.
+- Fountain bell quality (2026-10-21): `Tools/belltower_bell.py`, called by `belltower_fountain.py`, owns the smooth cast
+  profile, hollow inner shell, rounded crown loops and dedicated `materials/belltower/bell-v2/` bronze. A guarded native
+  import replaced only 2,394 old bell triangles with 30,564, preserving every other centre OBJ byte, the timber yoke,
+  collision, scene, water and shared bronze fittings. Materials and centre model compiled successfully; the new materials
+  were confirmed loaded and visually checked in live Belltower. `Sources/Belltower/fountain/bell-v2.json` links the receipts.
+- Theater doesn't record it: there's no MapInstance for playback to load (`MatchRecorder.CanRecord`).
+- To play it: `dev_mode team_deathmatch belltower` (any mode's prefab name or ident).
+- The 2026-10-14 pass checked native street, square, landscape and interior captures, successful asset/code compilation,
+  and the 94-spot collision/reachability checks. A short live performance sample preceded the 1,600 landscape trees;
+  it is not a benchmark for the final map. Full bot, mode and runtime navmesh validation remains separate work.
+
+## Hotload: no lambdas in explicit IGameEventHandler<T> methods
+- s&box's hotloader can't re-link static lambdas inside explicit generic interface methods
+  (`void IGameEventHandler<T>.OnGameEvent`), so after any hotload they throw "Unable to find matching substitution for
+  a static method" every time the event fires. Keep those methods lambda-free: forward to a named method
+  (`=> DropOnKill( eventArgs );`, see `EquipmentDropper`), with any `[After<>/Before<>]` attributes left on the
+  interface method.
+
+## Hotload: editor code can't use a type new to the game code
+- Editor tools that name a type added to the game code in the same change break the hotload. The editor assembly
+  compiles against the new game code, then fails to load ("Enrollers register event for tools": TypeLoadException),
+  and the new game assembly never goes live: the match plays on with the old code.
+  Reach the new type by reflection (`Editor/Hc1M16OpticQa.cs` reads `ManualOffset.OpticSightLines` that way), or add
+  it in one hotload and the tool in the next.
+- Fixing the editor file alone doesn't bring the game code in: change any game file (touching it is enough) so the
+  game assembly rebuilds.
+- A C# `record` in editor code failed after s&box's codegen ("type not found"). Use a class.
+
+## Play-start stalls in the editor (network file hashing, 2026-10-15)
+- The user saw the editor stall for 300+ seconds on most play starts. `GameNetworkManager.OnStart` creates a lobby on
+  every play start, and the engine then runs `BuildNetworkedFiles` on the main thread. It reads every file a joining
+  client could download and takes a CRC64 of each (`LargeNetworkFiles.AddFile`). A file counts if it's compiled (`_c`),
+  `.scss` or `.ttf`, or if it matches hc1.sbproj's `Resources` patterns. Those patterns are also what a publish uploads.
+  - `WildcardMatch` ignores case, and its `*` crosses folders. The game's file system mounts Code as well as Assets,
+    so `/UI/*` sent Code/UI's .razor and .cs files.
+  - `/weapons/*` took in every source file under Assets/Weapons: 1.26 GB of DMX, 790 MB of PNG, WAVs, .blend, FBX and
+    SMD files.
+  - With the old patterns it was 18,639 files and 5.84 GB a play start. The recorded stalls lasted about 6-7 minutes
+    (`output/belltower/quality/startup-recovery/editor-stall-16792*`).
+  - Since 2026-10-15 the patterns are `/ui/*.png|jpg|svg`, the fonts, and the swb icon PNGs the swb prefabs name by
+    path. That's 9,840 files and 3.64 GB, nearly all of it compiled assets clients need. Since 2026-10-17 only the
+    SCAR-H's (`weapons/swb/scarh/scarh.png`) is left: the other five swb guns (Colt, L96A1, Remington 870, Revolver,
+    Veresk) were unused and were removed. The SCAR-H still uses `weapons/swb/hands` (its viewmodel's gloves and
+    sleeves) and `sounds/swb/animations` and `clip`, and the game uses the swb code, muzzle effects and suppressed
+    shots, so those stay.
+  - The engine adds the patterns to its list on every play start and never clears it, so the old ones apply until
+    the editor restarts.
+  - Don't put a folder-wide pattern back. List the raw files that code loads by path.
+- Since 2026-10-15 editor play makes no lobby (the user asked for it): `GameNetworkManager` joins the local player
+  offline, as `IsMultiplayer` false does (the firing range's scene). So editor play skips the scan and the cloud
+  references below.
+  - `hc1_editor_lobby 1` (saved) makes editor play host again from the next play start, with the scan.
+  - The editor's Start Hosting still hosts. Start it in the main menu before a map loads, as for the second-instance
+    tests (see Map changes with players connected). Hosting partway through an offline match hasn't been tried.
+  - Ranked makes its own lobby, so it's unchanged. A custom game started in the editor plays offline unless the
+    ConVar is on.
+  - Only `Game.IsEditor` changes: a real game hosts as before.
+  - Compiled with dotnet, not yet tried in the editor.
+- After the lobby comes up, the engine adds the scenes' 51-52 cloud references to the ServerPackage table, which took
+  10-20 s each time.
+- Every map but Reef Hall builds its navmesh at load. The 23:28 stall's stack had the navmesh's load in its chain.
+- Two of the last eight GPU crashes (VK_ERROR_DEVICE_LOST, 2026-10-14 and 15) faulted in the engine's
+  `envmap_filtering_cs`. That's the reflection probes' filtering, which runs for every realtime probe as a map loads:
+  Reef Hall has 14, Lowtide, Railhead and Cerro Blanco 11, Riverdale 9, Boxyard 7 and Ares 4. Belltower's three are
+  baked. Earlier crashes faulted in the UI's `ui_cssbox_batched` (2) and `foliage` (1).
+- On 2026-10-14 sessions rewrote map OBJs while the user played. Loading those maps then recompiled the models on
+  demand: `lowtide_finish.vmdl` six times in an hour, each taking 4-15 minutes.
+
+## Testing in-game without input
+Dev console commands (`Code/GameLoop/DevCommands.cs`): `dev_quickplay`, `dev_zombies [map]` (e.g. `innocent`),
+`dev_zombie_hit [damage] [head]` (hits the nearest zombie as you through `ZombieAI.OnDamage`, default 1000; head 1 for a
+headshot), `dev_give <weapon>`, `dev_force_aim 1`,
+`dev_no_damage 1`, `dev_reload`, `dev_aim_offset x y z` (live, not saved), `dev_aim_info`,
+`dev_optic <name>` (fits an optic and saves it to the loadout), `dev_optic_correction x y z` (live, not saved),
+`dev_corner [radius] [side]` (moves you to the nearby spot where corner slicing cants the gun most, and logs the cant),
+`dev_force_move 1` / `-1` (walks forward/back without input; reset to 0 after), `dev_legshot [damage]` (a hardcore
+leg hit on yourself, default 1 damage, for testing the limp), `dev_fall [damage]` (fall damage on yourself, default 10),
+`dev_jumps [count]` (jumps again the moment you land, for testing jump stamina), `dev_prone [count] [interval]` (presses
+Prone that many times, default 6 at 0.2 s, logging prone stamina), `dev_mantle` (mantles the ledge you're looking
+at, as if you'd pressed Jump while moving at it, and logs the plan or why there's none), `dev_use` (presses E on whatever
+you're looking at), `dev_escape` (presses Escape as the next update starts, `DevEscapeSystem`: the bridge runs
+commands at any point in the frame, and setting `Input.EscapePressed` straight from one often came too late),
+`dev_menu <route>` (opens a main menu page), `dev_click <class[.class]> [n]` (clicks the nth
+visible UI element with those classes, e.g. `dev_click squad-cog`), `dev_scene <path>` (loads a scene while playing),
+`dev_thumbnails <weapon> [filter] [probes]` (writes the gunsmith's attachment pictures to the data folder),
+`dev_language <uk|us|fr|de|es|pt|it|pl|ru|ua|tr|ja|ko|zh|tw>` (switches and saves the game's language; "uk" is
+English (UK), so Ukrainian is "ua"), `dev_text_missing` (logs the text shown
+in English since the language was last set), `dev_voices_sample` (made-up rows in the HUD's list of who's talking;
+again to take them off).
+Bots and battle royale (`Code/GameLoop/Bots/BotDevCommands.cs`): `dev_mode <mode> [map]` (e.g. `dev_mode battle_royale
+flatgrass`), `dev_bots [count] [radius]`, `dev_bots_clear`, `dev_bot_styles` (each bot's play style and move),
+`dev_perf [frames]` (logs frame and bot times),
+`bot_lod_off 1` (turns the bots' savings off to compare; respawn the bots after), `dev_zone_next` (skips the zone's
+hold or shrink), `br_bots <n>` (bots in the next battle royale, saved; 0 = the mode's 40) and `br_map <scene path>`
+(the hub's map pick, saved). `dev_mode battle_royale ridgeback` starts one on Ridgeback.
+The bridge's held `Jump` input doesn't reach the pawn's fixed-update movement, so use `dev_jumps` rather than
+simulate_input.
+
+## Play areas ("Return to the AO", `PlayArea`)
+- A map scene can mark its play area with `PlayArea` zones (Belltower, Depot, Edinburgh, Motel and Refinery do). A
+  player outside all of them for 5 s is killed (`PlayerPawn.UpdatePlayArea`). A scene with none has no limit.
+- A scene's GameObjectSystems outlive `Scene.Load`, so `PlayAreaSystem` counts only live play areas, and each one leaves
+  the list when it's disabled. It used to keep them: once a play session had loaded one of those scenes (the one open
+  in the editor when play started, say), every later map counted as outside the area, and on Flatgrass the player died
+  5 s after every spawn. Fixed 2026-09-29, and checked live in the user's match: no more kills after the hotload.
+- `UpdatePlayArea` runs on the host, which used to judge only its own pawn: a client could stand outside the area
+  forever. Since 2026-10-01 the host judges every real player's pawn (`OnFixedUpdate`, bots excluded).
+- 1v1 and 2v2 Skirmish on a big map use their arena's circle instead of the map's zones (see Skirmish).
+
+## Weapon mount (`PlayerPawn.WeaponMount.cs`)
+- Aim at a ledge, a sill, a wall's top or a crate and the crosshair shows MOUNT (`CrosshairHud`); the mount key rests
+  the gun there, with less recoil and sway, until you move, jump, crouch, go prone, sprint or press it again.
+- The user (2026-10-19): "the mount system definitely doesnt work properly it hardly ever shows the mount option". The
+  probe looked for a top at one point 43 ahead of the eye. Standing against cover, a wall's or sill's top runs from
+  about 16 to 38 ahead, so it found the floor behind it, or nothing.
+- Now `FindMountTop` (static, so it can be checked in a scene of its own) traces down every 3 from 12 to 40 ahead and
+  takes the nearest flat top between `minTop` and `maxTop` (the old heights: 23-64 over your floor, within 28 under
+  the eye):
+  - A top under `minTop` is floor: a top less than `MountMinRise` (14) over the last floor is a stair or a slope going
+    up, so no mount.
+  - Starting inside something (a wall over sill height) or finding something above `maxTop` ends the search.
+  - A sloped trace hit (a bevelled edge) carries on to the flat of the top. The muzzle line must be clear to 16 past it.
+- `output/weapon-mount/mount-probe-checks.cs.txt` builds cover in an isolated scene and compares the new probe with the
+  old one, standing and crouched. On 2026-10-19 all 20 cases passed: the new one mounts on a 12-thick waist wall, an
+  8-deep sill with the wall above, a 2-deep rail, a crate and a deep wall (the old one only the last two), and neither
+  mounts on stairs, a 30-degree ramp, a tall wall, a low box or a wall 50 ahead.
+- The prompt still only shows while aiming (`CanUseWeaponMount` needs the `aiming` tag). Not yet tried in a match.
+- 2026-10-25, the user: MOUNT "shows at the wrong times and doesnt actually work", and the bind "might be on the noclip
+  one" (their screenshot: MOUNT at the hip in an empty alley).
+  - `CrosshairHud`'s BuildHash didn't hash the mount state, so the prompt stayed as it was at the last rebuild (aiming
+    in or out): MOUNT left up at the hip, and MOUNTED never shown, so a mount looked like it did nothing. It hashes
+    `MountState()` and `MainHUD.IsHudEnabled` now.
+  - The ticks that skip `UpdateWeaponMount` (dead, mantling, pipe climbing) clear the mount (`ClearWeaponMount`).
+  - A press probes for itself instead of waiting for the 0.09 s probe, and mounting plays the support's footstep at
+    0.35, heard only by the shooter (`PlayMountSound`).
+  - Mount was MOUSE5 and the editor-only Noclip MOUSE4: the hint shows both side buttons as the same mouse glyph, and
+    the back one toggled noclip, which also blocks mounting. Mount is MOUSE4 now and Noclip is N (`Input.config`).
+  - Built with dotnet and compiled in the editor (0 errors), not yet tried in a match.
+
+## Picking up dropped guns (`PlayerPawn.Using.cs`)
+- E first tries the usual trace, then `FindDroppedEquipmentInView`: the dropped gun closest to the middle of your
+  view, within `PickupReach` (96) and about 30 degrees of your aim, with a clear line of sight. A gun lying flat on the
+  floor is too thin to hit with the trace. `DroppedEquipment` (`Code/Weapons/DroppedWeapon.cs`) centres its collider
+  and marker on the world model's bounds (`Center`).
+- Dropped guns can't stand up (2026-10-14; the user saw an AK-74M balanced upright on its magazine and stock). The
+  collider was a box of the bounds, which rests stably on its narrow bottom, so a gun that fell upright (a bot's
+  drop from its hand pose, the Identity-rotation swaps) stayed standing. Guns, pistols and knives now get a
+  `HullCollider` (`RidgedProfile`): the box's sides kept for the middle half of the height, then a ridge along the
+  bottom and top on a log spiral of 4 facets a slope, so on every facet but the sides the centre of mass hangs past
+  the facet's edge (at least 0.45", 0.6" on the wide RPK/Vepr-12/Kastov 762). The ridges sit 0.2 of the half-width
+  off the middle, the side picked at random, so a dead-level drop still falls. Grenades, the bomb and the like keep
+  the box. Checked offscreen in the engine's physics: the old box stood up in 2-6 of 12 drops per gun, the hull lay on
+  a side in all of them for 8 guns. Not yet seen in a match or with a second machine.
+- Guns on the floor wear the build they were dropped with (2026-10-25, the user: "guns on the floor dont show camos and
+  attachments"). They used to be the bare `EquipmentResource.WorldModel` on the root, with no attachment points.
+  - The host sets `DroppedEquipment.Build` (synced) to the dropped gun's `Equipment.HolderBuild` (see Other players'
+    guns, below). Bots' are none, or their suppressor (`BuildCode( resource, MuzzlePart )`).
+  - Every machine clones the gun's `WorldModelPrefab` under it, not networked (`UpdateModel`), sets `sight`/`muzzle` 0 as
+    `Equipment.CreateWorldModel` does, and fits the build with `ApplyBuild`. Only the cash bag and the drone (no prefab)
+    keep the bare root model. The collider and `Center` come from that prefab's renderer (`FloorBounds`), so the
+    M700 is sized from w_m700 (its .equip's WorldModel is v_m700) and the 1911 by its renderer's child offset.
+  - Picking one up still gives the picker's own saved build (or the factory gun from a bot's), as before.
+  - Checked offscreen in the editor: an M4 dropped with the saved build got all 7 parts and the camo on all 9 renderers.
+    Not yet seen in a match, nor a client's drop over the network.
+- Other players' guns, in their hands and holstered, wear their own build (2026-10-25, the user asked after the floor
+  guns). Every machine used to fit its own saved loadout to every gun it drew (`ApplyAttachments` in
+  `Equipment.CreateWorldModel` and `MountPoint.Mount`), so everyone's guns wore the viewer's parts and camo.
+  - `Equipment.FitHolderBuild` (`Equipment.Build.cs`) fits the world model and the holstered copy. The local player's
+    own gun (`IsOwnBuild`: its owner's Client is `Client.Local`) still gets this machine's saved loadout. Anyone else's
+    gets `HolderBuild`: the build its holder shares for its slot (`Client.SharedPrimaryBuild` / `SharedSecondaryBuild`,
+    sent from the gun in their hands each second), if it's for that gun, else the factory gun. Bots (player-pawn ones
+    too) and knives share nothing, so they show the factory gun.
+  - A shared build can arrive after the gun is drawn (a new spawn's class, a part changed mid-match), so the Client's
+    `OnSharedBuildChanged` (a `Change` on both properties) fits that player's world models and holstered copies again
+    in place (`RefitHolderBuild`, `EquipmentMountPoints.RefitHolderBuilds`). An empty build refits to the factory gun.
+  - Only what's drawn changed. A gun's gameplay effects (recoil, rate, magazine, suppressed sound) still read the
+    loadout of the machine that works them out, as before. A first-person spectator still sees the spectated player's
+    viewmodel in their own build: its sight alignment (`ManualOffset`) reads the local optic.
+  - Checked offscreen in the editor: a fake other player sharing an M4 with only a suppressor had only that fitted
+    (the viewer's own M4 has 7 parts and a camo); sharing nothing took it back to the factory gun, and sharing it again
+    put the suppressor back. Not yet seen in a match with a second player.
+
+## Movement speeds (`PlayerGlobals`, `PlayerPawn.GetWishSpeed`)
+- The user asked for faster movement that feels like Black Ops Cold War's (2026-10-13: "make the sprint/movement speeds
+  etc faster it should feel cold war"). No mode, menu or text names it; it's only the feel.
+- `PlayerGlobals`' code defaults are live (no scene or prefab overrides them):
+  - WalkSpeed 250 (was 220), SprintingSpeed 330 (260), CrouchingSpeed 120 (100), SlowWalkSpeed 115 (100), ProneSpeed
+    60 (50).
+  - BaseAcceleration 11 (9). Friction, the other accelerations and JumpPower 290 are unchanged.
+- A gun's SpeedPenalty (0, 20, 30 or 40) comes off the walk in full and off the sprint by half, then WeightSlowdown,
+  wounds, perks and the flashbang scale it. On the ground each tick accelerates, then applies friction, so at 50 Hz a
+  walk tops out at 86% of its wish speed (friction 7) and the other gaits at 92% (friction 4). Real top speeds:
+  - a rifle (penalty 40): walk ~181 u/s (4.6 m/s, was ~155), sprint ~285 (7.2 m/s, was ~221);
+  - no penalty: walk ~215 (was ~189), sprint ~304 (was ~239);
+  - crouch ~110, slow walk ~106, prone ~55.
+  - A walk is at full speed in ~0.14 s (7 ticks; it was ~0.2 s).
+- Copies that have to change with them: `GunsmithStats` (`WalkSpeed`, `SprintSpeed`, `CrouchSpeed`, `ProneSpeed`, for
+  DETAILS and COMPARE) and the bots' `PlayerWalkSpeed` / `PlayerSprintSpeed` (`LightweightCombatBot.Brain`). Bots'
+  walks stay capped at 180 by `MaxShoulderedSpeed`, so only their sprint got faster.
+- A vault carries a sprint through it up to `VaultMaxSpeed` 310 (`PlayerPawn.Mantle.cs`, was 260).
+- Left as they were: the footsteps' cadence (`PlayerFootsteps.GetStepFrequency`), the guns' sprint-out times (each
+  gun's real figure), `IsNoisy`'s 180, and the viewmodel's bob range.
+- The legs' clips play at their own pace (players don't set `move_rate`, see Leg animation speeds), so a player's feet
+  slide more than they did.
+- Compiled with dotnet, not yet checked in-game.
+
+## Jump stamina (`PlayerPawn.Movement.cs`)
+- Like CS2's, which the user asked for: each jump takes 15% of the jump speed left (`JumpFatigueCost`), so jumping
+  again as you land goes 100%, 85%, 72%, 61%, 55% of full speed (about 50, 36, 26, 19, 15 units high), never below
+  55% (`MaxJumpFatigue`). It wears off only on the ground, at 0.375/s: a full jump again ~0.4 s after one jump,
+  ~1.2 s after many. Owner-side only (the pawn moves itself); bots don't jump.
+
+## Landing on slopes and stairs (`CharacterController.CategorizePosition`)
+- The user (2026-10-19): "when i jump onto stairs i end up like levitating/gliding". Most maps' stairs collide as a slope
+  (a wedge hull or an inclined deck under the steps). Landing on one while moving uphill, the controller's slide turns
+  the fall into motion along the slope, which rises. The rule "rising faster than 40 u/s never lands" then kept the
+  player airborne: no ground friction or stepping, held by air control at a steady float up the stairs (on a 32° ramp,
+  44 u/s up and 70 along).
+- Now rising only counts as leaving the ground if it's away from the surface touched (`Velocity · normal > 40`), which on
+  level ground is the same test. For `JumpLandingGrace` (0.2 s) after a `Punch` (a jump) the old rule stands, so a jump
+  straight into a steep slope still leaves it.
+- `output/stairs-mantle/` has the trials (in an isolated editor scene, driving the real input and movement code):
+  - `ramp-glide.cs.txt`: 23°, 32° and 40° stair ramps. Before, jumping onto the 32° and 40° ones at a sprint left the
+    player airborne against them for 84-124 ticks (1.7-2.5 s); after, 0-11 (the grace).
+  - `collider-stairs.cs.txt`: Collider's four flights on its own collision models (5 ticks to 0).
+  - `stairs-mantle-checks.cs.txt`: stepped (per-step box) stairs and two real ledges. The mantle never starts on stairs
+    and still does on the ledges. Its "on the 4th step" rows start the player inside a step; their airborne ticks are
+    that, not a glide.
+  - `Tools/SlideChecks/JumpLandingChecks.cs.txt` still passes (7287 checks, 189 simulations).
+  - Not yet tried in a match.
+
+## Prone stamina (`PlayerPawn.Movement.cs`)
+- The user could spam prone ("like there's no stamina"). It now works like CS's crouch speed: each drop costs 0.2
+  `ProneFatigue` and each get-up 0.3 (`ToggleProne`, the Prone key and Jump), wearing off at 0.2/s. Up to 0.35
+  (`ProneFatigueFree`) nothing changes, so a drop and a get-up every second or two never slow. Past it, every stance
+  change slows (`StanceChangeRate`, the lerp of `_smoothEyeHeight`, 10/s fresh). At 1 it's down to 30% dropping (flat in
+  ~1 s, not 0.3) and 15% getting up (past crouch height in ~0.6 s, fully up in ~2 s). Mashing the key (4-5 presses a
+  second) holds the eye between about -31 and -20 within 1-1.5 s (simulated, not measured). At a press a second the
+  bob stays near-full, a pace a person could keep up.
+- `ProneFatigue` is `[Sync]`, so every machine slows the body's height the same way (the hitboxes follow DuckLevel).
+- Getting up is `IsGettingUp` until the eye passes crouch height: crouch speed and no sprinting, so a slow get-up isn't a
+  sprint with a 24-unit capsule. A Jump press that gets you up is spent on that: it no longer also jumps off the floor.
+- Forced prone (fall knockdown, Zombies' downed) costs nothing. Not yet checked in-game; `dev_prone [count] [interval]`
+  presses it through the same path and logs the capsule height and fatigue.
+
+## Sprint and fire (`PlayerPawn.IsPullingTrigger`)
+- Firing breaks a sprint (unless aimed), but only a press the gun takes counts (`WeaponInputAction.IsTakingInput`).
+  It used to go by the raw button.
+  - Fire held through a respawn (clicking past the deathcam) is ignored by the new gun until it's let go
+    (`RunningWhileDeployed`), so the gun wouldn't shoot, but the raw button still stopped every sprint.
+  - The user found they had to shoot before they could sprint (2026-10-02).
+  - A click in the class menu doesn't count either.
+  - Aim is the exception (`Aimable.TakesInputHeldThroughDeploy`): right-click held through a weapon switch aims the gun
+    switched to (the user, 2026-10-12). Not in toggle-aim mode, where the held press would toggle it. So aim held
+    through a respawn is blocked until release (`PlayerPawn.HasReleasedAimSinceRespawn`). The owner's respawn RPC
+    clears aim/scope tags and each weapon's cached input, including a reused pawn's inventory. Deploy events reset only
+    the deployed weapon's input; the first locally controlled update still handles deployment before possession.
+    Native MCP checks covered held and toggle aim, new and reused pawns, scope/tag cleanup, delayed possession,
+    death, and preserving held aim through ordinary weapon switches (19 checks, 2026-10-13).
+- A new pawn's gun can be deployed before the pawn is possessed (`OnClientRespawn`'s RPC comes after), so the deploy
+  event never noted the held button. `WeaponInputAction` now works it out on its first update as the owner's
+  (`_heldInputChecked`).
+- Compiled offline, not yet checked in-game. To check: die, hold fire through the respawn with W and Shift down. You
+  should sprint, and the gun should only fire once fire is pressed again.
+
+## Mantling (`PlayerPawn.Mantle.cs`)
+- The user (2026-10-01): "currently i just sort of hop over larger objects". Jump while moving forward at a ledge 28-84
+  over the floor you're on (mid-thigh to ~2.1 m) and you climb onto it, in place of the jump. Lower than 28 is a step or a
+  jump. Holding Jump in the air catches a ledge within 84 of the current feet, capped at 112 above the floor
+  (`MaxJumpMantleHeight`), unless you're falling faster than 250 u/s. The actual jump must bring the hands into reach;
+  the former floor + 94 ceiling rejected Lowtide's 102-inch containers even at the jump's apex.
+- `PlanMantle` finds the ledge: a body box traced `MantleReach` (20) ahead finds a wall facing you within ~53 degrees,
+  then a thin probe climbs its face in 6-unit steps for solid with free space above it (so a rail or an overhang works),
+  and a trace down finds the top, which must be level enough to stand on (normal z 0.7).
+  - A top no deeper than 24 (`VaultMaxDepth`: walls, fences, sandbags, rails) with a floor within 160 below on the other
+    side (`VaultMaxDrop`, ~4 m) is vaulted over. A deeper top, or a parapet over a long drop, is climbed onto, and the
+    crouched body has to fit there. A jumping grab above the standing reach always climbs onto the top and requires
+    that room; it cannot become a fast vault over a high wall.
+  - The body goes over tucked: 36 high for a vault (the eye 28 down), so a vault goes through a window-sized gap, and
+    48 for a climb (the eye 16 down, `MantleEyeOffset`, synced).
+  - Before it starts, the whole path (up, then over, overlapping) is traced with the tucked box at 16 points. If that's
+    blocked it tries straight up and then over, and if that's blocked too there's no mantle.
+- The owner then moves the pawn along the path (`UpdateMantle`, smoothstepped), with the controller's velocity set to
+  match. Anything that moves it more than 8 units off the path (a teleport, a death) ends it.
+  - Timing: the rise takes 0.12 + 0.004h + 0.0001h^2 s for h units: 0.33 s for the lowest ledge, 0.46 s waist high,
+    0.69 s chest high, 1.2 s for 84. A vault goes over at your speed, 150-310 u/s, and you carry on at that speed; a climb
+    at 150, leaving at half that. A waist-high vault takes about 0.55 s, an 84 climb about 1.35 s.
+    High jumping grabs use the full floor-to-ledge height for the rise's effort, bring the legs over only after the
+    rise, and move over at 90. The native 102-inch container check completes its pull-up in about two seconds.
+- Never climbed: people (`player`, the bots' `movement` and zombies' `enemy` boxes), doors (`MapMover.DoorTag`), glass,
+  player clips (a window's), and the Ridgeback's trees and hedges (clutter bodies, by the shape's `clutter` tag).
+- While mantling: no shooting or aiming (the `no_shooting` / `no_aiming` tags, and an aim already held is cancelled),
+  no sprinting and no inspect. The gun swings down and to the right (`ViewModel.MantlePosition` / `MantleAngles`), the
+  camera dips 6 degrees and rolls 3 in first person (`CameraController.ApplyMantleTilt`), and the crosshair's lines go,
+  all eased by `MantleBlend` on every machine. Other players see the airborne pose with the body tucked (the duck from
+  the eye offset): there's no climbing clip.
+- Sounds (`PlayMantleSound`, broadcast): a hand on the ledge at the start (the surface's footstep at 0.6), the feet on
+  the top at the end of a climb, and a vault's landing is always heard, even off a drop too short for a fall's sound.
+- Native validation (2026-10-20) is in `output/mantle-reach/`: 13 collision cases and a production movement simulation
+  reproduce the old failure and complete a jump onto a 102-inch container after the fix. Standing grabs, insufficient
+  jumps, 114-inch high cubes, taller walls, blocked roofs, distant cover and player clips are rejected. Low cover and
+  vault timings match the baseline. All 27 stair approaches still avoid mantling; both real low-ledge controls climb.
+  These isolated physics checks match Lowtide's closed-container collision dimensions and preserve the editor's
+  scene/play state; a first-person Lowtide playthrough is not recorded. Hold forward and Jump to try a jumping grab,
+  or look at a low ledge and run `dev_mantle` for a standing check.
+
+## Sliding (`PlayerPawn.Slide.cs`)
+- The user asked for sliding (2026-10-13), after the Cold War speeds (see Movement speeds). Press Duck while sprinting
+  on the ground: you drop onto a hip and slide on. A tap is enough; letting go of Duck doesn't end it.
+- Retuned the same day to feel like Modern Warfare III (2023)'s (the user: "not fast enough", "fast to initiate,
+  longer", "doesnt feel fluid yet"):
+  - The drop: the eyes go down at 24/s (`SlideDropRate`; a stance change's 10), most of the way in ~0.1 s, and the gun
+    eases in at 16/s (`SlideBlend`, out at 7/s).
+  - The push: the sprint's speed plus 115 (`SlideBoost`), at least 340 (`SlideStartFloor`) and at most 430
+    (`SlideMaxSpeed`). It needs 180 u/s over the ground (`SlideMinStartSpeed`).
+  - Friction (`SlideFriction`, a crouch's is 4) starts at 0.12, holds for 0.35 s, then eases up to 1.6 over 0.7 s, so
+    the slide keeps its speed early and bleeds it late. It ends under 180 (`SlideEndSpeed`, about where a sprint
+    picks up) or at 1.5 s (`SlideMaxTime`). Almost no steering (`SlideAcceleration` 1.5).
+  - Simulated (50 Hz, flat ground): a rifle's ~285 sprint slides off at 400, is at ~370 half a second in, and goes
+    1.14 s and ~375 units (9.5 m). From 200: 340, 1.04 s, ~300 units. With no gun penalty (~304): 419, 1.16 s, ~395
+    units. The first version went 345 u/s, 0.86 s and 195 units.
+  - Shortened a little the same day (the user: "little bit less distance"): it went 1.32 s and ~430 units (11 m),
+    with friction held 0.4 s, then up to 1.4 over 0.8 s.
+  - Duck pressed again 0.15 s or more into it (`SlideCancelDelay`) cancels it: you stand straight up (the press doesn't
+    crouch until Duck is let go, `_slideCancelHeld`) and, holding Run, sprint on.
+  - Duck tapped or held during a moving jump slides as you land (`_slideOnLanding`, updated 2026-10-18 after the user
+    reported timing-dependent failures). Running momentum (at least 180 u/s) accepts the request even after Run is
+    released or crouching ends the sprint flag. Jump and Duck on the same tick queue a landing slide, including out
+    of an active slide; Jump takes priority over Duck cancelling that slide. More airborne Duck presses keep the
+    request. It has no airborne timeout; the old 0.25 s `SlideLandingBuffer` was already removed on 2026-10-15.
+    `TrySlideOnLanding` runs immediately after controller movement, so ground contact starts the slide before the next
+    tick's crouch friction. Landing during the 0.4 s cooldown keeps the request until it clears, provided enough
+    momentum remains. Toggle sprint intent survives the airborne crouch. Prone, climbing, death, movement restrictions
+    and slow walking clear the request; landing too slowly only crouches.
+  - A toggled sprint the slide stopped picks up again within 0.5 s of it ending (`ResumeSprintAfterSlide`, in
+    `GetWantsToSprint`); Run pressed during the slide takes that back.
+  - Another can start 0.4 s after one ends (`SlideCooldown`; it was 0.8).
+- Slopes: on the ground it gets half of gravity's pull along the slope (`ApplySlideSlope`, `SlideSlopeHelp`), so
+  downhill carries it further and uphill stops it sooner.
+- What ends it:
+  - Jump: a jump that keeps the speed. Prone: down flat. Duck again: the cancel above.
+  - Leaving the ground, slowing under 180, or the time running out.
+  - Death, a knockdown, mantling, the drone's tablet, planting, being downed.
+  It comes up crouched while Duck is held, else standing.
+- While sliding:
+  - The eye is at -24 (`SlideEyeOffset`; a crouch's -16), and `IsCrouching` holds for movement. Footsteps are silent
+    and the movement capsule stays crouched.
+  - The gun dips a little back, in and down (`ViewModel.SlidePosition`), less as it's aimed, eased by `SlideBlend`,
+    with no walk bob. No inspect.
+  - Nothing tilts: the user had the gun's 14-degree cant and the camera's 5-degree roll taken out (2026-10-13, "remove
+    the tilt").
+  - It ends the sprint, so the gun can fire 0.25 s after the slide starts (the sprint-out time), or at once aimed.
+- A crouch now stops a sprint (`!IsCrouching` in `CanSprint`). Before, crouch and sprint could be held together.
+- Third-person slide (`ThirdPersonSlidePose`, 2026-10-13): a procedural pose applied after animation by
+  `PlayerSlideAnimationSystem`, using `SlideBlend` on owners and proxies. Hips lower onto the right side, the right
+  leg extends forwards and the left tucks outwards. Two-bone IK preserves thigh/shin lengths and keeps ankles above
+  the floor during the transition; weapon and look animations stay active. Bone GameObjects carry the gun and
+  holstered equipment with the pose, and clothing is merged again. Only the main body receives it; prone, knockdown,
+  climbing and ragdolls take precedence. The main body's locomotion inputs fade out during a slide, so it no longer
+  plays a crouch run. Supports the human's ankle_L/R and the legacy soldier's l_foot/r_foot skeletons.
+- A scrape sound is still missing. The drop plays the floor's landing sound at 0.7 (`PlaySlideSound`, broadcast).
+- `dev_slide` sets your speed to a rifle's sprint where you're looking and slides, logging the speed or why not.
+- Compiled with dotnet; `Tools/SlideChecks` checks the production pose's limb lengths, transition continuity and
+  floor clearance across yaw, scale and stance, including unreachable IK targets. Not yet checked in-game: the
+  editor stalled while this was added.
+- Jump/landing regression checks (2026-10-18): `Tools/SlideChecks/JumpLandingChecks.cs.txt` runs the production
+  `BuildInput`, acceleration and movement against collision in an isolated native-engine scene, restoring input,
+  time and sprint settings. All 189 jump/slide simulations and 7,287 assertions passed at 30/50/120 Hz, covering
+  takeoff/apex/landing timing, taps/holds/repeated presses, released Run, hold/toggle sprint, jump fatigue,
+  slide-jump-slide chains, cooldown retention, movement guards and grounded slide cancellation. Native compilation
+  passed with zero errors. Report: `output/jump-slide-validation/checks.json`. Match feel still needs the user's check.
+
+## Bot slides (`LightweightCombatBot.Slide.cs`, 2026-10-14)
+- Bots occasionally slide after at least 0.3 s above 225 u/s, on a clear, straight route with at least 300 units ahead.
+  Floor and body sweeps exclude stairs, drops, walls and other soldiers. Rushers and flankers do it more often;
+  anchors and marksmen rarely do. Each decision is spaced 1.2-2.4 s apart, with an 8-16 s cooldown after a slide.
+- The push is the player's +115 (340-430 u/s), with the same 0.12-to-1.6 speed decay and 1.5 s maximum. Navigation
+  keeps handling position and avoidance. Slides stop early for a blockage or missing floor, then restore the previous
+  route, speed and acceleration. Combat freeze and death cancel them. A slide ends sprinting, retaining the 0.25 s
+  sprint-out before firing; the body faces its travel direction while the eyes/gun can track a target.
+- Host-synced `IsSliding` drives `SlideBlend` on every machine. Eyes and collision height lower to 40. Locomotion fades
+  out and `ThirdPersonSlidePose` runs before the weapon mount and support arm; bot LOD avoids creating bone objects.
+  Native live matches on Lowtide and CerroBlanco showed natural slides around 350 units long and the gun still in hand.
+  Ten native state checks covered entry, recovery, cooldown, collider/eye height, navigation restoration and combat
+  freeze. The existing 45,816 slide geometry checks pass. No multiplayer client was attached for this validation.
+- The user: "bots look weird when they slide" (2026-10-16). Aiming while sliding, `FinishWeaponPose` shouldered the
+  gun at the logical eye (`EyePosition`, `SlideEye` 40 up), but the slide pose puts the hips 13 up and leans the body
+  back, so the visible head is several units lower and the gun would hang over and ahead of the face. It now sights at
+  the posed right eye (`PosedEye`, the `eye_R` bone after the pose) and blends the shouldered hand in by `SlideBlend`,
+  so the gun comes up with the drop instead of snapping. Prone keeps `EyePosition` and full weight. Compiled with dotnet
+  only (the editor was closed); not yet rendered or seen in a match, so whether this was what looked weird is unconfirmed.
+
+## Battle royale (Warzone, `Code/GameLoop/Rules/BattleRoyale/`)
+- Solos on Flatgrass (the user's first pick, for its size) or Ridgeback (below), picked on the hub's Battle Royale
+  screen (`br_map`, `BattleRoyaleMatch.GetMaps`: Flatgrass, then every scene whose GameModes list the mode): players and
+  bots all against each other (`GameUtils.IsBattleRoyale` is part of `IsFreeForAllMode`, so bots are `Team.Unassigned`),
+  no respawns, and the last one standing wins. Flatgrass leaves the mode out of its list, so it's only reached from the
+  hub (or `dev_mode`). Ridgeback lists only this mode and isn't a match map, so it's in no other map list.
+- `battle_royale.prefab`: Waiting (starts with one player) → Preparing (10 s, frozen: `RespawnPlayers` lands everyone,
+  `BattleRoyaleDeploy` drops the bots in, 3 a tick) → Play Game (`BattleRoyaleFight` starts the zone; 20 min cap) →
+  Game Over (6 s) → Post Game (15 s, `KillGameOnEnd`: the end screen, then the menu). There's no map vote.
+- `BattleRoyaleMatch` (root) counts who's alive, keeps each player's placing (`Placements`, synced) and ends the match
+  when one is left, or 8 s after the last real player is out. Drop points (`TryGetDropPoint`) are spread over the first
+  circle, only where `LightweightBotManager.IsWalkable` holds (all Flatgrass's own spawns are on its roof). The first
+  circle is the scene's `BattleRoyaleArea` (centre and radius) if it has one, else sampled from the whole navmesh.
+  Players spawn at drop points too (`BattleRoyaleSpawnAssigner`).
+- `SafeZoneManager` (root): six phases of hold then shrink (`GetPhase`, about 9.5 min), each circle inside the last and
+  on walkable ground, the last closing to nothing. Only the circles and times are synced; every machine works out the
+  moving zone. Outside it, once a second, players and bots take `DamageFlags.Zone` damage (2 to 25 HP/s): it's never
+  a hardcore one-shot or a bot's instant kill, and it holds off health regen, which would outpace it otherwise.
+- Bots (`LightweightCombatBot.BattleRoyale.cs`): `HeadForZone` comes before fighting when a bot is in the gas, or outside
+  the next circle while it closes or will before the bot could walk in (45 s spare for the most cautious, 10 s for the
+  most aggressive). They shoot on the way. With no `AwayFromAction` in battle royale, bots fight each other anywhere,
+  so the field thins out; they hunt whoever's within 2500, players and bots alike, else roam toward the next circle, and
+  don't chase anyone, or investigate a noise, out in the gas.
+- HUD: `BattleRoyaleRadar` in the minimap's corner (the zone and next circle turning with the view, alive, kills, the
+  zone clock) and `BattleRoyaleHud` (the gas warning, the zone's news, your placing once you're out). The end screen
+  reads "VICTORY" or "12TH PLACE" and lists the top ten. After death the freecam starts where your view was.
+- The end screen (`EndOfMatchScreen`) couldn't be clicked and showed no cursor (the user, 2026-10-05). It's inside
+  MainHUD, whose `pointer-events: none` and `cursor: none` its children inherit, so `.eom-screen` turns them back on, as
+  ClassSelect does. Any clickable panel inside MainHUD needs the same.
+- Its CONTINUE only hid the screen until the match sent everyone to the menu, so where a match ends that way
+  (`KillGameOnEnd`, battle royale, not ranked) it's PLAY AGAIN, which the user asked for, beside LEAVE GAME.
+  - PLAY AGAIN starts the same mode on the same map as the map vote's mode cards do (`MatchLauncher.LeaveAndStart`).
+    Meanwhile `KillGameOnEnd.IsLeaving` keeps the end of Post Game from loading the menu over it.
+  - LEAVE GAME goes to the menu at once.
+  - Ranked and the map-vote modes keep CONTINUE.
+  - Written without s&box or dotnet, so it hasn't been compiled. Not yet checked in-game.
+- Performance with lots of bots (`BotSystem`, all undone by `bot_lod_off 1`): bots far from every viewer look less
+  often, share their lists of the living, re-route less, have no bone objects (the gun follows the hand bone,
+  `FollowHands`), and skip muzzle flashes and blood nobody could see (`ShouldShowEffect`, judged by on-screen size, so a
+  scope counts), and shots further off than their sound carries (`CanHear`, the sound's own `Distance`, 330 m for most
+  guns). Close bots are untouched.
+- A big map's navmesh can still be building after the scene loads, so the first circle, the bots' drop-in and the zone's
+  start all wait for `Scene.NavMesh.IsGenerating` to clear (`EnsureFirstCircle`, `SpawnSomeBots`, `StartZone`).
+
+## Reef Hall (multiplayer map, `Tools/reefhall_map.py`)
+- The user asked for an aquarium map for 10-15 players, built as close to 1:1 as possible from five reference pictures
+  (2026-10-01): the rotunda round its central tank, the entrance lobby, the control room behind the big panoramic tank,
+  the filter hall and the glass tunnel. No rooms beyond those, except connectors in the same style. The look is modern
+  concrete, dark metal, glass, blue tank light and warm downlights: no neon, nothing military.
+- Built by script like Belltower (`Tools/map_kit.py`). The script's docstring has the layout and conventions. It writes:
+  - one model per room, plus the tanks' insides with no collision, to `Assets/models/maps/reefhall/`;
+  - the scene, `Assets/scenes/maps/ReefHall/reefhall.scene`, rewritten whole on every run (change the layout in the
+    script, not in the editor);
+  - the radar picture, `ui/minimaps/minimap_reefhall.png`.
+  The materials are `Tools/reefhall_materials.py`'s (`Assets/materials/reefhall/`, drawn with numpy).
+- Layout: Red Team spawns in the lobby (west), Blue Team in the control room (east). Three lanes join them:
+  - Middle: the West and East Galleries, lined with small tanks, into the Rotunda. The Rotunda's ring balcony (z 208)
+    is reached by two curved stairs and by the upper galleries.
+  - North: the Filter Hall, with its two glass filter columns, the catwalk and the mezzanine. Bomb site A is its east
+    half.
+  - South: the Tunnel Hall, a glass barrel vault under a tank, with a sunken aisle (z -40). Bomb site B is its east
+    half.
+  - Between: the Rotunda's north and south passages, and four service corridors.
+- Modes: the scene lists TDM and Defuse. Domination's flags are A (west), B (Rotunda) and C (east). Its Hot Zones and
+  Cash Grab points are the halls (`ObjectiveSpot`). It also has deathmatch spawns (28) and Retakes spawns per site.
+- Every run checks all 89 spawn, objective and cash spots (room, floor, a walk from both spawns), as Belltower's does,
+  and that no Retakes Red spawn can see a Blue one (railhead_map's `check_retakes_sight`).
+- The padded transport cases (blue padded panels in a brass frame, `crate` / `crate_stack`) came out on 2026-10-12,
+  everywhere they stood, with their cover and collision. The user: "they look awful". Each room still draws the random
+  numbers the cases did (`skip_cases`), so nothing else in it moved.
+  - Without the stack at (700, -1200) in the Tunnel Hall, site B's Red planter at (700, -1440) could see a Blue
+    attacker in the Rotunda. It's at (850, -1440) now.
+  - The baked navmesh (2026-10-02) still leaves out the cases' footprints. That's harmless: bots path round empty
+    floor. It goes when the navmesh is next baked.
+  - Not yet seen in-game.
+- Tank glass: `shaders/hc1_tank_glass.shader`, one material per tank (`rh_tank_glass_<tank>.vmat`, with the tank's
+  surface height and depth). It reads the depth behind the pane and puts the water in between:
+  - Beer-Lambert absorption by the water path, and the water's own scattered light;
+  - moving caustics and light shafts;
+  - a little refraction, a glass reflection, and acrylic's green at a glancing angle.
+  The panes are 8 thick with the `glass` surface: they stop bullets and players, and bots can't see through them.
+  Railings' glass panels are 1 thick, so rounds go through.
+  - It finds what's behind the pane with `Depth::GetWorldPosition( screen pixel )`, which returns the absolute world
+    position. It used to invert the normalised depth itself, which read every pixel as far away, so from a few metres
+    off every tank looked solid blue (fixed 2026-10-02).
+  - Absorption is kept low (`g_vWaterAbsorb` 0.006/0.0012/0.0006 per inch, turbidity 0.0006): the references' water is
+    clear right to the tanks' backs.
+- The reef in each tank is the script's own (`rock`, `rock_arch`, `CORAL_KINDS`, `kelp`, `sea_grass`): the big tanks
+  get a rock arch, as the references' do. The tanks' insides come to about 1 million triangles in all.
+- Light: each tank's lamps (`COOL`) are over its water, and a window 120 or more wide also throws its blue into the room
+  (`SPILL`, a light on the room side). Every wall light (`sconce`) has a small unshadowed warm light just off it
+  (`SCONCE`, radius 130), so it washes its wall as in the references. `build_mirrored` collects them.
+- `hc1_reefhall_views [filter] [exposure]` (`Editor/Hc1ReefHallQa.cs`) renders the views to compare with the
+  references into `output/reefhall/`, and `hc1_reefhall_shot name e n z e n z [fov]` one view, eye and target in plan.
+  Offscreen renders skip post-processing and screen-space reflections, so the floor's gloss doesn't show in them.
+  Run in play mode, they render the play scene, with its bots and the floors' gloss.
+- Each room against its reference (2026-10-02):
+  - Control room: the panorama is four panes between 64-wide concrete pillars, with a concrete lintel over them. The
+    ceiling has a coffer with a warm cove and downlights round it, and the consoles are steel.
+  - Filter Hall: each column stands on a concrete base under a steel cap with gunmetal bands, and a pipe rises from
+    it to the ceiling. Concrete pilasters with wall lights stand on the south wall between the doors. Downlight lines
+    run over the floor and the catwalk.
+  - Rotunda: six steel columns stand round the drum, and its lid is a dark disc (`lamp_lid`; `ring=True` adds the old
+    white LED ring, which glared). The ceiling's cove round the drum is `rh_frosted_lit`: `rh_led_cool` glared white.
+  - Lobby: the coral display's corals sit on the mound's surface and round its foot.
+- Control-room consoles (2026-10-14): `reefhall_map.console` delegates to `Tools/reefhall_consoles.py`.
+  The three banks now have satin worktops, cabinet access doors and vents, keyboards, trackballs, physical button
+  panels and chamfered monitor housings with rear vents/cables. The full-width glowing desk and white base strip
+  are gone. Sixteen LCDs sample four quadrants of the ImageGen atlas in
+  `materials/reefhall/consoles/rh_console_screen_atlas.png`, with self-illumination 0.85. The source prompt is in
+  `Sources/ReefHall/consoles/screen-atlas-prompt.txt`; preserve the atlas when rebuilding materials.
+  - `Tools/reefhall_console_refresh.py --out output/reefhall/consoles/staging` stages just the Control model and
+    the console materials. Import through the editor when it is open; it does not rewrite the scene or other rooms.
+  - The whole Control model is 130,726 triangles after the monitor-back pass below; its original 122 collision boxes and 41 hulls are byte-for-byte
+    equivalent. All three banks keep their placement and cover height. The other rooms, tank model and lights
+    are unchanged. Cabinet vent bands share a tessellated front plane instead of overlapping thin decal geometry.
+  - Materials and model compiled through native MCP. Checked five offscreen engine views, including front/detail,
+    rear and room overview, in `output/reefhall/consoles/`. These renders do not reproduce full gameplay postprocessing.
+    The menu kept running and the existing Reef Hall scene tab was not edited.
+  - Monitor backs (2026-10-14): the user picked a mix of ImageGen concepts 1 and 2. `Tools/reefhall_monitors.py`
+    builds eight charcoal/slot-vent monitors and eight graphite/perforated monitors with aluminium stands, in
+    paired runs across the three banks. Their rounded shells, recessed vents/ports, VESA plates, tilt barrels,
+    rounded feet, service labels and curved cable pairs are actual geometry. Fine shared polymer and brushed-metal
+    normal/roughness maps are generated by `reefhall_console_refresh.py` alongside the six `rh_monitor_*` materials.
+    The LCD faces/UVs, desk surfaces, lights and collision are unchanged. Import staged materials/textures before
+    the Control OBJ/MTL/VMDL through the editor when open. The screen atlas is not regenerated.
+    All seven resources (six materials plus Control) compiled through native MCP; four offscreen engine captures
+    and the geometry/collision report are in `output/reefhall/consoles/monitor-backs/`. The captures use a temporary
+    visual scene, destroyed afterward, and do not reproduce a live match's full postprocessing. No editor scene
+    tab or play state was changed by this pass.
+- The lobby's west wall (Red Team's spawn side) has three pairs of glass entrance doors, as close as could be got to the
+  user's picture of them (2026-10-08). They used to be self-lit frosted panels (`frosted_door`). Now:
+  - Each pair (`door_pair`, `DOOR_PAIRS` n -197.5, 0 and 197.5) has dark grey anodised frames (`rh_anodised`) with
+    4.5" stiles and 6" rails, and clear glass (`rh_glass`). It also has stainless pull bars on the meeting stiles, a
+    closer's cover on the head and a threshold (`rh_stainless`), all in an anthracite portal (`rh_portal`).
+  - The picture's doors look about 3 m tall, so they're drawn at 1.25 times a real 95" leaf (`DOOR_S`).
+  - Frosted vinyl on the glass (`rh_film`, alpha tested): two wavy lines across both leaves and a plain jellyfish on
+    each right leaf. `reefhall_materials.film` draws the film as one picture across the pair (`FILM_W`, `FILM_H`,
+    `FILM_WAVES`, `FILM_JELLY`). `door_pair` maps each leaf's glass onto its share of it (`uv_quad`), so the waves run
+    on from one leaf into the other.
+  - The wall round them is satin cladding with shadow gaps (`clad`, `rh_panel` / `rh_panel_b`), with a downlight and a
+    warm wash over each pair.
+  - Between the pairs stand tapered bronze planters (`bronze_planter`, 46" tall) with dracaenas (`dracaena`: strap
+    leaves in `rh_leaf`). Each planter has a metal hull.
+  - The doors are shut for good: one glass box fills each opening. Behind them is a closed gallery (`door_gallery`,
+    `DOOR_GALLERY` e -3200..-2920, n -400..400), there only to be seen through the glass:
+    - four tanks in its back wall and one in each end wall, stocked like the rest;
+    - a dark column, and a raised planter with a dracaena, behind each pair;
+    - cool lights, so every pair shows blue from the lobby.
+    It has no spots. The navmesh stops short of it, and the minimap leaves it out.
+  - Checked only in offline Cycles renders of the OBJs with their textures (a scratch wrapper round
+    `railhead_render.py`, with the tank glass as tinted water and no fish). Not yet seen in the engine.
+- `map_kit.write_text` retries the final rename for up to 10 s: the editor or OneDrive can hold a file being replaced.
+- Doorways have no doors, since bots can't open doors. The lobby's glass entrance doors are shut for good (above).
+- The Rotunda's curved stairs (`round_stair`) had both side faces pointing into the steps, so the near side was
+  culled. The user saw the alcove tank through the stair (2026-10-12). Now the inner side faces the centre and the
+  outer side away from it. A check of every face's normal against the steps' solid found 0 of 210 facing in (104
+  before). Not yet seen in-game.
+- `map_kit.write_obj` now reads `tile_overrides` before `BT.tile_units`. Before, `dict.get`'s default called
+  `tile_units` even for an overridden paint, which fails for paints `building_textures` doesn't know.
+- Never let the editor compile a vmdl whose OBJ has no faces: it hangs for good, with one thread at 100% and nothing
+  logged. The service rooms have no tanks, so `reefhall_service_tanks` was an empty OBJ.
+  - On 2026-10-01 it froze the editor until Windows killed it.
+  - On 2026-10-02 it froze every editor start, at the startup asset compile.
+  - Now `map_kit.write_model` writes no empty model and deletes any old one (`is_empty`, `delete_model`), and
+    `write_scene` leaves out a room's Tanks object when it has none.
+
+### Reef Hall's animals (`TankFauna`, `hc1_fish.shader`, `Tools/reefhall_fauna.py`)
+- The user asked for realistic fish in every tank, suited to it, alone, in small groups and in schools, that never
+  swim into the glass, rocks, plants or each other (2026-10-02). They sent pictures of 14 species. All but one are
+  here, life size, in real colours, alongside the grey reef sharks and manta rays from before:
+  - blue tang, yellow tang, copperband butterflyfish, red lionfish, regal angelfish, mandarinfish;
+  - white-spotted puffer, blue-green chromis, yellow-and-blueback fusilier, Banggai cardinalfish;
+  - Indo-Pacific sergeant, Moorish idol and ocellaris clownfish.
+  The freshwater angelfish is left out: every tank is a reef. The Filter Hall's two glass columns are sand filters, so
+  they hold no fish.
+- They're scenery: each machine runs its own, nothing is networked, and nothing runs on a dedicated server.
+- `Tools/reefhall_fauna.py` builds the 15 animals (lofted bodies, lens-shaped fins, colours painted with numpy from
+  where each texel is on the fish) into `Assets/models/maps/reefhall/fauna/`, with `fauna_species.json` (each one's
+  reach, height, length and nose). Its docstring has the sizes and the texture layout. `--preview <dir>` renders them.
+  How each species swims is its `SPECIES` entry: speed, turn rate, response, climb, bank, depth band (`low`/`high`, a
+  share of the water's height; `above`, inches over the sand), how often it goes to a rock, a home's radius, how often
+  and how long it hovers, its group and spacing, and its tail and fin beats.
+- `shaders/hc1_fish.shader` swims them in the vertex shader:
+  - A fish's wave runs from head to tail, growing towards the tail. A ray flaps its wings, the wave running back.
+  - The pectorals (the texture's U 0.5-0.58 strip) scull from their roots.
+  - TankFauna drives each one's `SwimPhase`, `SwimAmount`, `FinPhase` and `FinAmount` (`SwimDriven` 1): the tail beats
+    harder when it speeds up or turns and barely when it hovers, when the pectorals scull instead.
+- `Code/Maps/TankFauna.cs` (one per tank's water) moves them. Each species is a `Groups` entry, "key=value" pairs
+  (`Species.Parse`), written by `reefhall_map.fauna_spec`.
+  - The water is a box or an upright cylinder, less a glass tube (the tunnel) and the tank's rocks, coral and kelp
+    (`Obstacles`: cones, which kelp's negative taper widens upwards).
+  - Groups: `solo`, `pair`, `shoal` (loose, milling) or `school` (tight, aligned). A group follows an invisible leader
+    that turns more slowly than its fish and keeps the whole group's room clear. Each fish holds a drifting place round
+    it, so the group keeps a loose shape and turns together. Where a group doesn't fit, its fish live alone.
+  - Lone fish and leaders swim to points they can reach in a straight line: in their depth band, or beside a rock
+    (`rocks`), near a home (`home`: the clownfish's and Banggai cardinals' patch of reef). On arriving, some hover
+    for a while (`pause`), turning slowly to look about.
+  - Steering: back towards the depth band and home, away from the walls, glass, sand and rocks within a soft margin,
+    and away from other fish (the smaller gives way, and every fish keeps well clear of a shark or a ray; leaders take
+    their group out of a big animal's way). It feels ahead, and when that's blocked it looks round a fan for the open
+    way nearest where it wants to go and turns into it, slowed down. Turns ease in and out (`response`), and pitch and
+    bank are limited per species, so big animals turn wide and slow.
+  - Hard limits: each body keeps its reach clear of the water's edges and the rocks, and a move that would end deeper
+    in is taken back. `Separate` then pushes any two bodies that overlap apart (a segment from nose to tail with its
+    half-thickness and half-height each, `BodyLine`), the smaller one most, never into glass or rock.
+  - Past `FarDistance` from the camera a tank updates 4 times a second, and small fish aren't drawn past
+    `CullDistance` (260 lengths, 800-3000).
+  - In the editor nothing is culled (`Scene.IsEditor`): its view is the editor's camera, which the scene can't see.
+    The scene's `Scene.Camera` there was the minimap's capture camera (`MinimapRenderer`, 7500 over the map), so every
+    tank counted as far off and only the sharks and rays showed (the user: "wo sind die fische?", 2026-10-02). That
+    camera is no longer a main camera (`IsMainCamera` false).
+  - The fish are life size, so most are 2-6" long: from the middle of a gallery they're specks, and they're best
+    seen from the glass.
+- `reefhall_map.py` stocks each tank by its size (`fauna_class`: small, mid, big, huge), from that class's mixes
+  (`FAUNA_SMALL` ... `FAUNA_HUGE`), neighbours taking different ones. A group shrinks until it has open water in its
+  band (`FAUNA_ROOM`, `free_share`); a species with none is swapped for a small one that fits. The scene has 74 stocked
+  tanks and 1439 animals (since the door gallery's six tanks, 2026-10-08): 6 sharks, 3 mantas, 492 chromis, 218
+  sergeants, 176 fusiliers, 156 Banggai cardinals, 109 yellow and 71 blue tangs, 78 clownfish, 33 mandarins, 32 Moorish
+  idols, 19 copperbands, 18 puffers, 15 regal angels and 13 lionfish.
+- `hc1_fauna_check [seconds]` (in play mode: it reads `Game.ActiveScene`) runs every tank that long at once and logs:
+  how far any body comes into glass or rock, how often two bodies overlap (and which kinds), fish stuck outside their
+  hovers, and each species' mean speed against its cruise.
+- Checked with `hc1_fauna_check 20` in play mode on 2026-10-02 (68 tanks, 1363 animals, about 545,000 fish-steps a run):
+  - No body came more than 0.010 into glass or rock (none of the steps over 0.05).
+  - 60-120 fish-steps a run had two bodies overlapping by over 0.05 (about 0.02%), at most 0.35 deep, all in the dense
+    chromis, sergeant and fusilier schools.
+  - 0-1 fish stuck (`Check` counts one that swam under 15% of its cruise outside its hovers): a slow puffer.
+  - Mean speeds near cruise: chromis 4.2 (cruise 4.3), fusiliers 12.4 (13.6), mantas 21-26 (30.3), sharks 28-29
+    (42.7: they slow in their wide turns), Banggai cardinals 1.0 (1.4), mandarins 0.7 (1.0).
+  - Every tank's step together took 1.24 ms, all of them close up and none skipped. In play only the near tanks run every
+    frame.
+  - The check needs a scene whose tanks are the current ones. With two editors open on the project (both answer the
+    bridge, in turn), one kept a stale scene resource with the old 45 tanks that `load_scene` and `recompile_asset` didn't
+    refresh. Loading a copy of the scene under another name did.
+- `hc1_reefhall_views` / `hc1_reefhall_shot` make their camera the scene's main camera while they render, since
+  TankFauna culls the small fish and slows the far tanks by the distance from `Scene.Camera`. The renders on 2026-10-02
+  showed the lionfish by its rock, a chromis school, fusiliers and a tang in a lobby tank, and the sharks and a manta
+  in the control room's panorama.
+- Checked in the editor on 2026-10-02:
+  - The navmesh is baked (`reefhall_scene_data/navmesh/baked.navdata`). `get_navmesh_path` reaches all 88 spawn,
+    objective and cash spots from both team spawns, and every level: the Rotunda's, lobby's and control room's
+    balconies, the office, the Filter Hall's catwalk and mezzanine, the tunnel's aisle and the upper galleries.
+  - A TDM with 9-10 bots of every play style: they fought across the map, and the frame took 9.65 ms (p50).
+  - Renders of every view against the references, in and out of play mode.
+- The menu picture (`ui/maps/reefhall.png`) is an editor capture of the Rotunda from its balcony
+  (`hc1_reefhall_shot art 700 -300 272 -300 300 260 90`).
+- Not yet checked: the fish seen by a player in a match (swimming, the schools' turns, the shader's tail beat), sightlines
+  with players, and the cost of the 394 lights and the tanks' ~1.1 million triangles on a slower machine.
+
+## Railhead (multiplayer map, `Tools/railhead_map.py`)
+- Reference-led fire extinguishers (2026-10-25): `Tools/realistic_extinguisher.py`, delegated by
+  `railhead_dress_detail.extinguisher`, supplies the smooth tank, rolled base seam, curved printed label, two levers,
+  valve/gauge, safety pin/seal, rubber hose/nozzle, mounting bracket and pictogram sign. The approved image and
+  image-generated UV atlas are recorded in `Sources/Railhead/props/extinguisher-v2/`. Six complete legacy assemblies
+  were replaced in the published east/west dressing meshes; the generator also upgrades its unpublished wing placements.
+  Each is 7,430 triangles. `models/props/extinguisher-v2/extinguisher.vmdl` is the reusable wall assembly, foot at Z=0.
+  The guarded native import retained every unrelated OBJ byte and the exact physics nodes; the saved scene and user's
+  camera/play state were preserved. Both dressing models and the standalone prop compiled, and all nine materials loaded.
+  `railhead_check_extinguisher.py` and `output/railhead/extinguisher-v2/validation.json` record the checks; native matched
+  before/after and close views are in `output/railhead/quality/extinguisher-v2-{before,after}/`.
+- The user asked for a new AAA map, made without the editor or MCP (2026-10-03). Railhead is Hohenwald Hauptbahnhof
+  (Hohenwald Hbf, a made-up city), a German terminus at 14:03 on 3 October. It's built by script like Belltower and
+  Reef Hall (`Tools/map_kit.py`), from these scripts:
+  - `railhead_station.py`: the structure. It has a real terminus's figures (its docstring has them):
+    - 760 mm platforms and standard gauge;
+    - a shed of two 30.5 m iron-and-glass spans, like Frankfurt's and Leipzig's;
+    - the sandstone head building with its vaulted booking hall and gallery;
+    - the footbridge, the platform canopies, the cab roads' arcades, the goods sheds on their loading banks and the
+      signal box.
+    - The footbridge's inside handrail ran its whole length, so it crossed the top of each stair at waist height (the
+      user's screenshot, 2026-10-05). It now stops at each stair's opening and turns into the stair's handrails,
+      which run on 6 over the deck to meet it. It has no collision, so it never blocked anyone.
+    - Each footbridge stair's upper flight starts at its landing (z 106), and nothing filled the space under it. From
+      under the bridge you could walk into it between the parapets, and see out through the flight's undrawn underside
+      (the user's screenshot, 2026-10-05). Now that space is solid (a collision box), closed by a concrete face at the
+      deck's end under the girder. The hall's gallery stair was already walled in.
+    - The wings' doors from the concourse had arches up to 220, over the wings' ceiling (208), so each arch's head
+      opened into the ceiling slab, whose edges aren't drawn: the sky showed through it (the user's screenshot,
+      2026-10-05). The doors now end at 200 and the windows at 204 (`WING_DOOR_CROWN`, `WING_WINDOW_CROWN`). The info
+      sign that hung in the doorway, where its ceiling plate looked to float, hangs 60 further in (n 1420), its rod
+      going up behind the arch.
+    - The footbridge's and the platform canopies' lights were boxes whose whole underside glowed (48 by 8 on the
+      bridge); the user found them blocky (2026-10-05). They're now `luminaire`s: slim surface-mounted LED battens
+      (1.5 m by 75 by 60 mm aluminium, chamfered, with end caps) whose lit part is a narrow opal lens.
+  - `railhead_props.py`: the track and its equipment, the rolling stock, containers, furniture and yard clutter. Its
+    docstring has each prop's API, conventions and triangle and collision budget.
+    - Track: UIC 60 rail, crossovers, buffer stops, Ks signals and the overhead line.
+    - Rolling stock: two-car double-deck EMUs, a locomotive and coaches, and wagons.
+      - The EMU (`emu`) was a low single-deck unit until 2026-10-05, when the user asked for it to look like a picture
+        of a German double-deck regional train: a raked, wrap-round windscreen under a black visor, headlight clusters,
+        grilles either side of an automatic coupler, two decks of windows, a light grey stripe low down and a grey roof.
+        It's 4.63 m tall (182.3) and still 1540 over the couplers, with its open doors where the old one's were. Its
+        visors show the departures board's trains in dot-matrix LEDs drawn as geometry (`EMU_FONT`, `destinations`):
+        RE München at Gleis 3, RE Nürnberg at Gleis 4. The picture's operator logo was left out.
+      - The luggage cart got round tyres on rims, a plank deck, a drawbar fork with a towing eye, slatted crates,
+        strapped suitcases and a kit bag (2026-10-05).
+      - Both were checked only in offline WebGL renders of the generators' output with the map's textures, not in the
+        engine: rerun `railhead_map.py` to rebuild the models.
+    - The grey car parked at each cab road's south end (n -900) is `suv` (2026-10-05, from the user's picture of a
+      modern crossover): a lofted body (`_suv_profile`) shaded smooth per part (`_Smooth`), black cladding and arch
+      flares, a honeycomb grille, an LED light bar with boomerang intakes, dark 19-inch alloys, roof rails, wrap-round
+      tail lights and German plates ("HW K 318", `PLATE_FONT`). No maker's badge. The taxis and the red and blue
+      cars are still the old `car`.
+    - The white van on the east and west cab roads (e ±1940, n -900) is `van` (2026-10-05, from the user's picture of
+      a modern large panel van): 5.99 m long, 2.04 m wide and 2.36 m tall. Like `suv`, it's lofted through
+      `_road_body`, which both share. It has:
+      - a steep windscreen over a short bonnet, and a grille of four bars leaning back between slim headlights;
+      - a black bumper and sill band, with a silver sill strip;
+      - a cab door, a sliding door with its rail, and glazed rear doors;
+      - tall black mirrors, steel wheels and vertical tail lights.
+      No maker's badge.
+    - The parked cars and vans sat on the station's ground level (z 0), 6 above the cab roads' carriageway, so they
+      floated. They now stand on it (`railhead_station.ROAD_Z`, -6), stand-ins included.
+    - Car paint is `railhead_materials.PAINTED` (`rw_car_grey` and five more): vmats only, a flat tint on
+      `materials/default/default_color.tga` with one roughness, since every texture's dirt and the trains' panel seams
+      looked wrong on a car. The signals' dark lenses and the lamps' opal glass are PAINTED too. The vmats were written
+      straight from `painted_vmat`; `railhead_materials.py` writes the same ones.
+    - Furniture and clutter: benches, machines, kiosks, shelters, hanging displays and signs, clocks, lamps, fences,
+      pallets, cars and vans.
+    - The concourse's bin stood 1.6" into its bench's end, its slots to the wall, and the booking hall's back-to-back
+      benches met at their backrests (the user saw the first, 2026-10-05). The bin is now at e 622 facing the
+      concourse, and the hall's benches are 24 apart like the platforms'. A check of every piece `use` places, by the
+      bounds of what it draws, found no other overlaps.
+    - The kiosks (`kiosk`; `railhead_map.KIOSKS`: the concourse's two, 100 by 80, and the centre platform's, 100 by
+      120) were rebuilt on 2026-10-05 after the user's picture of a modern station kiosk: "dont stop until its really
+      AAA like the img". The old one was a dark box with a hatch and coloured blocks for goods.
+      - The body: anthracite cladding (`rw_steel_dark`) in 24 in panels with shadow gaps, split at counter height, on
+        a recessed black plinth. On top, a fascia proud of the walls under a flat roof slab, with warm LED strips under
+        its overhang.
+      - The fascia reads "Kiosk" and "Zeitschriften · Getränke · Snacks" in white on the front and both ends. A pier
+        left of the window has line icons: a newspaper, a bottle and a crisp packet.
+      - Under the window, a light stone counter (`rw_kiosk_stone`) on vertical oak slats, with an LED strip under its
+        front edge. On the counter: a trailing pothos in a white pot (`_plant`, `VINES`), a card terminal and a pen
+        cup.
+      - Behind the counter, three bays of lit wood shelves on a warm white back: magazines, then sweets in trays and
+        crisp packets (foil pillows, `_packet`), then 0.5 l bottles (`_bottle`, lathed).
+      - The right end has a menu board and a framed poster, the left end the staff door, the back a louvred vent.
+      - Two lights each (`kiosk_lights`, in `lights()`): one in the window over the shelves, and a small one under the
+        counter washing the slats.
+      - `Tools/railhead_kiosk_art.py` draws the rw_kiosk atlas: the lettering, icons, menu, poster, the covers, packets,
+        labels and wrappers, and the card terminal's screen. It's plain Python (it reads the fonts' glyf outlines and
+        fills them itself), so it runs without numpy or PIL. The lettering is alpha-tested and self-lit, along with
+        the screen. railhead_materials lists the atlas (`ATLASES`, `OWN_SCRIPT`) but doesn't draw it. Its counter,
+        shelf, plant and bottle paints are PAINTED.
+      - The atlas's four PNGs aren't in the repository: the session that made them couldn't upload to its LFS store
+        (the storage host was blocked there). `railhead_map.py` draws them when they're missing (~12 s), so a run
+        brings them back. Commit them from a machine that can push LFS.
+      - Every name on it is a plain German word (REISEN, Chips, Wasser...): no real title, brand or logo.
+      - Checked only in offline WebGL renders of the generator's output with the textures, not in the engine. Rerun
+        `railhead_map.py` to rebuild the models.
+    - The snack machine on each outer platform (`vending_machine`, n 300 against the shed's wall) is a modern black
+      one, rebuilt on 2026-10-05 as close as it could be to the user's picture of one. It's 990 x 850 x 1830 mm:
+      - the glass door shows five shelves of four slots in their spirals, each slot's code (A1-E4) in white on the
+        dark rail under it: crisps, chocolate, biscuits and sweets in pillow packs (`_pillow`), four 500 ml cans and
+        a bottle of water (`_vlathe`);
+      - LED strips light the window's top and sides, the cabinet's top corners and the pick-up bay's PUSH flap;
+      - a brushed steel panel holds the touch screen ("SELECT YOUR ITEM", in English as in the picture), the keypad
+        (1-9, a red cross, 0, a green tick), the contactless reader under its LED and the card slot.
+    - Its pictures are the `rw_vending` atlas (`railhead_materials.vending`, `VENDING_GOODS`), the goods self-lit a
+      little as from the machine's LEDs (`VENDING_GLOW`). Every brand is made up. The picture's SunBite, Chunky,
+      Twisties, Mintel and Citra are real names or close to them, so those are SolBite, Chunko, Knotties, Mintle and
+      Citraze. The cabinet is `rw_satin_black` (PAINTED): `rw_black`'s scuffs read as dirt over a whole cabinet.
+      `VENDING_COLUMNS` is in both scripts: change them together. 5.4k triangles each.
+    - The atlas's four PNGs aren't in the repository: LFS uploads were blocked in the session that drew them, as for
+      the kiosk's. `railhead_map.py` draws them when they're missing (`railhead_materials.vending_missing`, ~15 s),
+      so a run brings them back with the models. Commit them from a machine that can push LFS.
+    - Checked only in offline textured software renders of its OBJ beside the picture, not in the engine. Rerun
+      `railhead_map.py` to rebuild the dressing models.
+    - `--preview <dir>` renders its showcase.
+  - `railhead_backdrop.py`: the city round the station. Its docstring has the layout and the sources.
+    - The play area's east and west walls are rows of five-storey Gründerzeit (1880-1910) tenements across the cab
+      roads (`edge_blocks`, the only backdrop model with collision). Each side is built in place, in its own colours,
+      so its shop signs read the right way round: don't mirror it.
+    - North: the Bahnhofsplatz with its tram stop, the hotel and office block facing the station, and the cab roads
+      running on north. The east cab road's view ends at a minster's twin spires (76 m), the west's at a brick hall
+      church (71 m).
+    - South: the line runs out in a cutting to a tunnel portal at n -8000. The cutting has a road overbridge
+      (n -3100) and a railcar depot, with a machine works, a gasholder, allotments, a village on the hill and woods
+      beside it.
+    - The Rotunde (`rotunda`, 2026-10-05) stands on the hill over the tunnel, in its park. Seen down the west cab road
+      past the goods shed, the hills there were one big flat-shaded green mass (the user: "the shitty green hill").
+      The user sent an AI-made picture of that view with a grand iron-and-glass hall there and sky above, and asked
+      for it "as close as possible".
+      - It's an exhibition rotunda like Vienna's of 1873 (108 m): a drum 107 m across on the line's axis
+        (`ROTUNDA`, centre n -10400), 51 m to its zinc cornice.
+      - The drum is 36 bays of two lights, iron framed (`rotunda_light`), with three tiers: tall arched windows
+        with tracery, a gridded clerestory, and a latticed frieze. Its roof is a low zinc cone with a glazed ring,
+        under 10 degrees so the rim stays its skyline from the streets.
+      - The south hills beyond the portal are gone (`south_z`): the park is level round it (`ROTUNDA_BASE`, 700),
+        then low farmland and woods roll to ~1300 out to the ring hills. Oaks ring the park, and three big trees by
+        the overbridge's west ramp (`ramp_trees`) frame its lower half from the cab road, as in the picture.
+      - Its paints are PAINTED (`rw_rotunda_glass`, `_iron`, `_panel`, `rw_zinc`), vmats only. 7k triangles; the
+        south model is 21.5k of its 80k.
+      - The user's screenshot was fitted from the station's arches and the vanishing point: eye (-1845, 1080, 58),
+        71.5 degrees horizontal, 3.3 east of south and 5.3 up (`VIEWS` `cab_west_south`). From there its rim is 15
+        degrees up and its centre 9 east of south, as in the picture.
+      - Checked only in offline textured renders of every model (a C rasteriser in a scratch session), from that
+        camera and from the east cab road, the footbridge, the throat, the portal and the air. Not seen in the engine;
+        rerun `railhead_map.py`.
+    - Round it all: a skyline of 55 m blocks out to ~600 m (the city's ground ends at 24500, `R0`), with a Baroque
+      onion dome, a 1970s office tower (104 m), a slab block, a brewery chimney and a water tower, then hills rising to
+      86 m by the world's edge (40000, ~1 km).
+    - 188 trees are Facepunch's cloud oaks and beech bushes, in the scene's `__references` as Belltower's are.
+    - The junctions' traffic signals (`traffic_light`) were black boxes with square red and green lamps, both lit (the
+      user: "these traffic lights look terrible", 2026-10-05). They're now German signals at RiLSA's sizes:
+      - a galvanised pole 114 mm across and 3.6 m tall;
+      - a head of three 200 mm lenses, each under its visor, in a black backplate with a white edge;
+      - one lens lit (`lit`: red at both junctions) and the others dark tinted glass (`rw_lens_*`).
+    - The candelabra's lanterns were glowing cubes, and the street lamps' undersides glowed too, at 14:03 on a sunny
+      day. The lanterns (`lantern`) now have four opal panes, iron corner posts and a pyramid roof, and every street lamp
+      is off (`rw_opal_glass`).
+    - Both were checked only in offline renders, not in the engine.
+    - `--preview <dir> [view ...]` renders its own 31 views, with the station from `railhead_station`.
+    - The map script lays the corridor's track, ballast and overhead line from the throat to 20 m into the tunnel,
+      and the depot's lead off track C (`depot_lead`). The depot pit's wall splays out from the bridge to `THROAT_E`
+      so the lead runs in beside it, and the lead's sleepers stop where C's are under them.
+  - `railhead_materials.py`: the rw_ paints, drawn with numpy into `Assets/materials/railhead/`, and their atlases
+    (`ATLASES`, `rect_uv`): signs, displays, posters, shop signs and the bronze lettering. The texts are German words,
+    generic train categories (RE, RB, S, IC) and made-up places, with no real operator's name, logo or clock.
+  - `railhead_sky.py`: Belltower's sky baked again with Railhead's sun (38 degrees up, 15 west of south: 14:03 summer
+    time on 3 October at 48 N, 11 E). The scene's sun takes the same angles.
+  - `railhead_preview.py`: flat-shaded views for `--preview`.
+- The map script dresses the station (where every train, sign, bench and lamp goes) and writes:
+  - the models, to `Assets/models/maps/railhead/`;
+  - the scene, `Assets/scenes/maps/Railhead/railhead.scene`, rewritten whole on every run (change the layout in the
+    script, not in the editor);
+  - the radar picture, `ui/minimaps/minimap_railhead.png`.
+  - `--preview <dir> [view ...]` writes the views and the reach grid's picture, and `--backdrop` puts the city in them.
+    With `--art` it also writes the menus' stand-in picture, `ui/maps/railhead.png`, from the aerial view. Replace that
+    with an in-engine capture.
+- The layout is mirrored across e = 0. Red Team spawns on the west cab road and Blue Team on the east. There are three
+  lanes:
+  - North: the concourse across the platforms' heads, with the booking hall behind it. Bomb site A is the concourse's
+    east end.
+  - Middle: the platforms under the shed, crossed by the footbridge. Trains stand at four of the six tracks.
+  - South: the platform ends under their canopies, the throat round the signal box, and the goods yards. Bomb site B is
+    in the east goods yard, among the containers.
+- Modes: the scene lists TDM and Defuse.
+  - Deathmatch has its own spawns.
+  - Retakes has spawns per site, as Belltower's are.
+  - Domination's flags are on the outer platforms (A west, C east) and the centre platform (B).
+  - The Hot Zones and the Cash Grab points are `ObjectiveSpot`s.
+  - It's in `GameUtils.MainMenuMapOrder`, `IsMainMenuMap` and `IsMatchReadyMap`.
+- Every run checks all 97 spawn, objective and cash spots, as Belltower's does:
+  - room for a player and a floor under each;
+  - a walk to each from the spawns (`check_reach`, a 2.5D grid that stands in for the navmesh);
+  - that no Retakes Red spawn can see a Blue one.
+  On 2026-10-04 all three passed.
+- The navmesh:
+  - Its bounds stop at `NAV_TOP` (420): over the footbridge's deck, the highest floor anyone walks on, and under the
+    shed's roofs.
+  - The canopies' glass and the goods sheds' roofs are in `railhead_glass`, tagged `navskip`, which the NavMesh's
+    `ExcludedBodies` leaves out. On their own they'd be islands.
+  - Islands left below NAV_TOP are the roofs of the trains, the platform canopies, the footbridge, the wings' closed
+    upper storeys, and the kiosks and shelters. Nobody can reach them, and bots check their paths.
+- Theater doesn't record it: there's no MapInstance for playback to load.
+- To play it: `dev_mode team_deathmatch railhead`.
+- Made offline. When the editor next opened on the project (2026-10-04), it compiled the scene, the 15 models, the 68
+  materials (~275 MB of PNGs) and the sky with no errors.
+  - The log's one Railhead error, `Error loading resource file "prefabs/game_modes/team_deathmatch.prefab,
+    prefabs/game_modes/bomb_defusal.prefab_c"`, is harmless. The engine's dependency scan reads the scene's
+    `GameModes` metadata (`MapInformation`'s ", "-joined list) as a path, and every scene with two modes gets it.
+  - None of it was checked in the engine then. The AAA pass (below) checked the navmesh and the look.
+- The AAA pass (2026-10-16/17, the user's goal "get railhead AAA with a workflow"). Round 1 was a workflow of five
+  areas (materials, structure, props, dressing, backdrop), each building into its own stage
+  (`output/railhead/stage/<area>`, `railhead_map.py --stage DIR`) and judged from Cycles renders
+  (`railhead_render.py`), then merged into Assets and judged again from engine captures. The user then asked for no
+  more subagents, for the usage, so round 2 was done directly. What each area added:
+  - Materials (`railhead_materials.py`, `railhead_finish.py`, `railhead_scanned.py`):
+    - milky, sooty rolled roof glass;
+    - a light marble terrazzo in panels with brass strips and matte walking lanes, and a coursed sandstone ashlar.
+      Round 1's small chips mipped to a vinyl-like speckle; round 2's large Venetian chips, a quarter of them dark at
+      full colour on a darker matrix, read as gravel from 3 m in the engine. Round 3 (`TERRAZZO_CHIPS`,
+      `TERRAZZO_MATRIX`, `TERRAZZO_GROUND`): mostly light chips, the dark and red ones a scattering, ground part of the
+      way to a lighter matrix, so it's calm at a distance and still terrazzo close up;
+    - dressed stone in beds with iron blotches and chisel marks (round 2: it read as painted MDF);
+    - lime plaster (plain, sooted and dado) and a Reichsformat brick in cross bond (`railhead_finish.py`);
+    - riveted iron with rivet rows and chipping, and powder-coated steel;
+    - basalt ballast with dark voids, oil-soaked sleepers, paired granite kerbs and granite setts;
+    - the asphalt. Round 2 took its baked wheel paths back to two faint ones (`ASPHALT_WHEEL_PATHS`): with the
+      dressing's they read as four black scribbles a lane. Its sealed cracks are off (`SEALED_CRACKS` 0), as they
+      repeated down the road every tile.
+    - Tile sizes changed (paving 240, sandstone 192, steel 128, glass roof 192, kerb 96): rebuild the models after a
+      material change, since their UVs come from `paints()`.
+  - Structure (all drawn only: every station box and hull is as it was, east and west 322/38, centre 193/134, roof
+    0/142):
+    - `railhead_architecture.py`: one-casting shed columns with bases, capitals and spandrel brackets, the valley
+      girder's flanges and rivets, the canopies' structure, and the booking hall's pilasters, entablature, dado,
+      archivolts and doors. Its shapes come from `railhead_profiles.py`.
+    - `railhead_structure_detail.py` (round 2), after the engine captures showed a flat dark footbridge, blank white
+      stair parapets and plain punched wing fronts: the footbridge's riveted plate-girder sides, precast parapets
+      with V joints, the goods sheds' braced sliding doors on roller hangers, the wings' cab-road fronts (archivolts,
+      Lisenen, window surrounds, a dentilled cornice), and soot run-off on the shed's arcade.
+    - `railhead_ironwork.py` (bridge and column details) and `railhead_structure_paints.py` (parapets, roof sarking,
+      the footbridge's panels, the goods shed's doors).
+  - Props:
+    - `railhead_running_gear.py`: wheelsets and bogies for every rail vehicle.
+    - `railhead_roof_kit.py`: the EMU's roof equipment and cab doors.
+    - `railhead_vehicle_kit.py`: the road vehicles' set-in glazing, cab interiors and lamps.
+    - `railhead_ohl.py`: DB Re 200 overhead line and the Ks signals' fittings.
+    - `railhead_furniture.py`: street, platform and yard furniture.
+    - `railhead_prop_materials.py`: their materials, with the buffer stops', train's, ticket machine's and
+      luggage's own scripts.
+  - Dressing (`railhead_dress_detail.py`, `railhead_map.py`):
+    - a working station's wall kit: conduits, City-Light posters, a help point, signs and notice boards;
+    - gullies and manholes, more lights (168), and the cab rank with taxis, bollards and a taxi post.
+    - Two Retakes spawns at site A moved, so `check_retakes_sight` is 0 (it was 2).
+    - Small props collide, as everything drawn on the map does: benches, 1 m bins, bollards, lamp posts, a skip,
+      tyres, drums, the info pillars, and the bins beside the footbridge's stair openings.
+    - The cab roads' cycle stands (`railhead_dress_detail.cycle_stand`, four a side at n 1335) are one swept tube
+      now (`tube`: mitred rings, carried along without twist, smooth normals, u along it), in `rw_stainless`, with a
+      rosette at each foot (2026-10-25). They were 15 separate open rods in `rw_steel`, and the wedge each joint left
+      round the bend showed the paving through as white bands (the user's screenshot). Use `tube`, not a chain of
+      `rod`s, for anything bent. `Tools/railhead_stage_cycle_stands.py` swapped just their triangles in the
+      installed dress OBJs (it finds the old stands by vertex and refuses if any are missing). Checked in offscreen
+      editor captures (`output/railhead/cycle-stands-v2/after/`), where the probes don't render, so the metal reads
+      darker than it will in a match. Not yet seen in a match.
+  - Backdrop (`railhead_backdrop.py`, `railhead_backdrop_art.py`): the tenements' balconies, awnings and fascias,
+    the near shops, and a far city in place of grey boxes. The Rotunde card is rebaked in Cycles by
+    `railhead_rotunda_rebake.py` (one GPU render at a time, `output/railhead/stage/.gpu-lock`).
+- Rebuilding into Assets, in this order (A = the absolute path of Assets):
+  1. The materials: `railhead_materials.py [names]`, `railhead_finish.py --stage Assets --only`,
+     `railhead_structure_paints.py <A>`, `railhead_prop_materials.py --out <A>`, `railhead_buffer.py --out <A>`,
+     `railhead_train.py --out <A>`, the ticket machine's and luggage's scripts, `railhead_backdrop_art.py <A> --force`,
+     `railhead_sky.py` and `railhead_rotunda_rebake.py <A> --samples 128`. Run `railhead_finish` after
+     `railhead_ironwork`, which writes the old scanned brick.
+  2. `python Tools/railhead_map.py` (~10 min).
+  3. In the editor, `Sources/Railhead/editor/compile-stale.cs.txt` (run_csharp; `output/railhead/compile.json` picks
+     `only`, `limit` and `force`): the materials (in batches of ~80 under the CLI's timeout), then the models, then the
+     scene. The open editor's file watcher compiles each model and the scene as the build writes them.
+     - Don't force-compile the models. On 2026-10-17 that held the editor's main thread for over two minutes ("Stall
+       detected") on the 2.5 million triangles, and the editor closed and was reopened.
+     - Check them instead with `model-check.cs.txt`, which only loads the compiled models. It writes each one's
+       collision hulls (a box is a hull) and materials to `output/railhead/model-check.json`, to compare with the
+       build's counts and the vmdls' remaps. A remap whose `usemtl` group has no faces isn't in the compiled model
+       (the roof's `rw_steel`).
+     - The file watcher can compile a model from its new OBJ before its new vmdl is written. The check catches that.
+  4. `capture.cs.txt` (views in `output/railhead/captures/config.json`, textures at 1024) and `navmesh-check.cs.txt`.
+- An anchored paint (`ANCHORED`: its picture's foot at z 0) with a v scale (`TEXCOORD_SCALE`: the containers' 48 x
+  102 in walls) also needs a v offset of minus the scale (`g_vTexCoordOffset`, written by `vmat()`). The engine flips
+  v on import (1 - v) before `uv * g_vTexCoordScale + g_vTexCoordOffset`, so without it the picture started 48/102 up
+  the wall, and the bomb B container wore its rail's dark band and rust across its middle (z 48). Containers stand
+  only at z 0 and 102 (stacked), where the anchor holds.
+- An alpha-tested picture must be a power of two on both sides: the engine can't make the alpha-weighted mips of
+  `bd_vinyl`'s 256 x 384 ("Cannot filter non-power-of-two texture"), and the material fails. It's 256 x 512 now.
+- The open editor compiles a changed picture as it lands and holds it while it does, so writing one in place failed
+  (OSError 22). `railhead_materials.save_image` writes through a temporary file renamed over the picture, retried for
+  up to 10 s.
+- The indirect light (`Sources/Railhead/lighting`, `Assets/lighting/railhead/daylight-v3`: grid 30,21,8, intensity
+  2.4) was baked on 2026-10-14, before the AAA pass. To rebake: open Railhead in the editor (ask first: it's shared),
+  run `bake-lighting.cs.txt` (`output/railhead/quality/bake-config.json` names the folder), then
+  `python Tools/railhead_quality_lighting.py <folder>` and rebuild the scene.
+- Checked in the editor on 2026-10-17, after rounds 2 and 3:
+  - every compiled model matches the build (`model-check.cs.txt`);
+  - 37 views captured (`output/railhead/captures/round2`, the round 3 fixes in `round3`);
+  - the navmesh check found complete paths from both teams' first spawns to all 99 spawns, sites, objectives and cash
+    spots.
+  Not checked yet:
+  - a match played on it, its bots, and the modes' objects in play;
+  - the indirect light rebake.
+  Still open from the critique: the road vehicles' plain bodies, the EMU's flat red paint, and the yard's skip.
+- The cab roads' cars are off (2026-10-25, `railhead_map.ROAD_VEHICLES_ENABLED = False`): the user will rework them, so
+  their code and placements (`cab_road_vehicles`; `railhead_props.car`, `suv`, `van`) are kept. Set it True to bring
+  them back. Their collision was in the dressing models, not the scene, and the spot, reach and Retakes checks pass
+  without them (the taxi rank's lettering, posts and oil stains stay).
+- The head building wings' City-Light poster (Alpen east, Fahrrad west) and extinguisher are on the wing's inner wall,
+  the hall's side wall at e ±640.5 (`railhead_map.wing_wall_kit`, n 1540 and 1400), facing the cab road's door. They
+  were on the outer wall, which has no run wide enough between its door (`WING_DOOR`, 1430..1530) and windows: the
+  poster hung in the doorway (the user: "floating sign") and the extinguisher's sign in front of the window at 1380.
+  - Published on 2026-10-25 by a splice, not a rebuild: `output/railhead/wing-poster/stage_wing_poster.py` builds the
+    old and new pieces with the generator's own code, finds the old triangles in the installed dressing OBJs by
+    material and each corner's v/vt/vn text, drops them and appends the new ones, and its `--apply` refuses a file
+    that changed since staging. That day several sessions spliced the same dressing OBJs (the cycle stands, the
+    footbridge's signs, the cars), so stage from the files on disk, never HEAD or a copy read earlier.
+  - Checked in isolated-scene renders of both wings (`output/railhead/wing-poster/after/`), not yet in a match.
+- The platform bench (`Tools/railhead_bench.py`, 2026-10-25, the user: the armrest "looks quite low poly/blocky" and
+  the slat ends looked broken):
+  - The slats are eased boards (`slat`: 7 mm round edges, square-cut ends). rw_wood is a scan of planks with dark gaps,
+    so each face maps onto one plank of it (`PLANKS`: the picture's columns between the gaps), and the ends show end
+    grain (`rw_wood_end`, `railhead_prop_materials.write_bench`: the gunsmith range's oak end grain, tinted). Mapped by
+    world projection, every slat had a black line along it and across its end.
+  - The middle armrest is one swept casting (`armrest`): a rounded-square section along a spline from a foot plate on
+    the front slat, widening over the hand rest, into the backrest. It was four square bars with a gap at the bend.
+    `railhead_furniture.bench_details` draws it when the bench passes its backrest, else the old bars.
+- `railhead_buffer.bevel_box`'s eight corner triangles were drawn at points on the box's edges b from its corner, which
+  stood out past the bevels as shards and left the corners open (the user saw them on the slat ends). They now join
+  the broad faces' corners, so the box is closed. It's used all over Railhead's props (bins, cases, plates, the
+  vehicles' and trains' kit), which changed with it. The luggage trolleys' and the signal frame's own models
+  (`railhead_luggage`, `railhead_signal_frame`, written only when missing) still have the old corners.
+- The footbridge's ceiling battens hang from the undersides of the two purlins they cross
+  (`railhead_architecture.BRIDGE_PURLIN_D`); flush with the roof they ran through them. The platform canopies' battens
+  are one in each bay between the cantilevers (`railhead_station.CANOPY_BATTENS_N`, still over the canopy lights'
+  n), where they ran through the cantilevers, and the outer canopy's west line, which lay inside a purlin, hangs under
+  it (`railhead_architecture.canopy_purlins`).
+- The footbridge's notice frames are A3 on the steel panel under the handrail (deck + 11 to 28.5, under the brackets'
+  wall plates at 30.5). As A1 frames from deck + 22 they ran past the handrail onto the glass.
+- `railhead_map.py --stage DIR` also draws the radar picture into the stage.
+- Several sessions edit Railhead's generator and its installed OBJs at once, so publish a change as a splice, not a
+  rebuild: a rebuild would publish everyone's half-finished generator edits and drop their spliced faces.
+  `output/railhead/cars-bench-20261025/splice.py` builds the affected models twice from one code snapshot ("new", and
+  "old" with the change patched back at run time), takes the faces only one of them has, and applies just those to the
+  files on disk: every face, remap and collision box it removes must be there. `Sources/Railhead/editor/
+  import-staged.cs.txt` copies a publish list (`output/<folder>/publish.json`, the folder named in
+  `output/publish-target.txt`) into Assets, refusing any file changed since it was staged.
+  - Since 2026-10-25's extinguisher-v2 import, `railhead_dress_<side>.vmdl` renders
+    `extinguisher-v2/<side>-base.obj` plus `extinguisher-v2/<side>.obj`; `railhead_dress_<side>.obj` is the base plus
+    the extinguishers and isn't rendered. Splice into both.
+  - Never import every Tools module to freeze the snapshot: `railhead_rotunda_padding.py` pads
+    `Assets/materials/railhead/rotunda_impostor.png` at import (it happened on 2026-10-25 and was put back from git),
+    and `railhead_civic_asset.py` and `railhead_rotunda_bake.py` do work at import too.
+- Published on 2026-10-25 by that splice: the cars off (and off the radar picture), the bench, the corner fix, the
+  battens and the footbridge's frames. The six footbridge bins were left to the "Bridge sign overlap" session's own
+  splice. Checked in offscreen editor renders before and after (`output/railhead/cars-bench-20261025/captures/`), not
+  yet in a match.
+- The footbridge's bins (`railhead_map.footbridge_kit`, 2026-10-25, the user: "a lot of overlapping of signs and stuff
+  on railhead bridge"). The bin is railhead_props' double one, 40.2 wide (`BIN_HALF_WIDTH`), not the ~28 the code had
+  allowed for: the two centre-stair bins (e ±8) stood inside each other mid-bridge and 4 into both stair openings, the
+  outer stairs' bins stood in their stair's handrails, and every lid went 0.35 into the bridge's handrail.
+  - Now each stands 4 past its stair's parapet (the centre stairs' beyond their Gleis plate, e ±179.6) and 13.5 off
+    the panel, its back 1.15 in front of the handrail. Their `taken` entries are unchanged, so the notice frames are
+    the same 7 a side.
+  - Published by `output/railhead/bridge-bins/stage_bridge_bins.py` (both OBJs a side, and the bins' collision boxes in
+    the vmdls). `check_installed.py` there finds no dressing piece on the bridge cutting into its structure. Checked
+    in isolated-scene renders before and after (`output/railhead/bridge-bins/{before,after}/`), not yet in a match.
+  - From the bridge's north end a platform bracket clock (`outer_wall`, n -140, z 252, 90 past the glass) shows right
+    behind the Gleis 6 plate. It's a sightline, not an intersection, and was left as it is.
+
+## Lowtide (multiplayer map, `Tools/lowtide_map.py`)
+- Structural materials installed (2026-10-18): `Sources/Lowtide/structure/material-status.json`.
+  Both warehouse models use continuous generated timber with grain along each beam and
+  weathered painted cast iron. The original generated 1254px albedo is retained unchanged;
+  shallow numerical normals and dry roughness provide surface response. The uniformly
+  rusted iron trial was rejected after daylight review. Eighteen matched review captures,
+  six production views and six fresh-load views cover both banks, close beams/columns and
+  exterior ironwork. The four existing-slot remaps preserve geometry, collision and the
+  23 material slots per architecture model. `Tools/lowtide_structure.py` reproduces all
+  twelve resources; the canonical map writer applies it only to east/west architecture.
+  Column shaft normal checks pass on both banks. Warehouse indirect light was rebaked
+  as v5; only six saved texture references changed, and the saved scene reloads correctly.
+  Prior v4 provenance/textures are retained. Temporary review sources and raw bake outputs
+  are archived outside Assets. The Orion edit tab and Lowtide runtime map were restored.
+  Evidence is in `native-2026-10-18/structure-timber-v2`. Gameplay cost, temporal behavior,
+  broader cargo/foliage quality and overall AAA acceptance remain open.
+- Water reflection filter installed after static review (2026-10-18): read
+  `Sources/Lowtide/water/filter-status.json`. Nine native screenshots cover the
+  original one-mip capture and the current/filtered materials with the seven-mip
+  linear HDR pyramid. The selected filter scale is 0.08, keeping the waves and
+  shallow transparency while softening reflected architecture. Capture code
+  hotloaded with zero errors, and the unused review model/material loaded without
+  error. `lowtide_water.py` now preserves the selected shader/parameter; its writer
+  and capture transformation reproduce the installed files. Geometry, collision,
+  scene and original wave shader are unchanged. Ares stalled during loading after
+  the first review, then recovered. Native production readback confirms the selected
+  shader, and three fresh production captures were reviewed. Six editor checks pass:
+  visible, outside bounds, below plane, return, disable and reenable. The camera/tab
+  was restored and Ares play restarted. Six unused review files are archived outside
+  Assets. A fixed-view performance sample failed its camera-angle guard; do not use
+  its aggregate timings as Lowtide results. Gameplay cost, moving-camera temporal
+  behavior and multiple-view checks remain pending. Evidence and scripts are in
+  `native-2026-10-18/water-reflection`.
+- Warehouse floors installed (2026-10-18): read `Sources/Lowtide/floor/floor-status.json`
+  and `Sources/Lowtide/concrete/wear-status.json`. Both architecture models now select
+  the worn pine and concrete-use materials through four existing-slot remaps. Native
+  review covers 24 comparison images, six production views and six after the refreshed
+  lighting bake. The opaque timber shader uses ordinary RGB mips because the unchanged
+  1254px source atlas is incompatible with the engine's alpha-weighted mip filter.
+  `Tools/lowtide_floor_surfaces.py` preserves all 18 installed resources byte for byte;
+  map generation configures only the existing floorboards and concrete slots. Fresh
+  `lowtide_material_stage.py --current --output output/lowtide/quality-pass/<new-folder>`
+  reproduces all twenty installed files and verifies 286 collision footprints and twelve
+  mezzanine triangles. No render geometry, material-slot count or collision changes.
+  Both dressing models had corrupt compiled bounds; native full rebuilds restored finite
+  bounds and visible east cargo without changing their OBJ/VMDL sources. Warehouse DDGI
+  was then rebaked and saved as v4 (see lighting below). Evidence is under
+  `native-2026-10-18/warehouse-floor-current`; use `promotion.json` for installed hashes,
+  not the historical staging manifest. Orion play and the prior tab were restored.
+  Gameplay cost, temporal filtering, dark structural materials and broader cargo quality
+  remain open; these checks do not establish overall AAA quality.
+- Structural material diagnostic (2026-10-18): `Sources/Lowtide/structure/response-status.json`.
+  Nine lit comparisons tested a current standard shader with existing beam/iron textures,
+  first preserving their values, then increasing timber tint and roughness. This recovers
+  wood detail but exposes repeated plank seams on solid beams; columns still lose definition.
+  Neither trial is installed. Six unbound source/meta files were retired from Assets; staged
+  copies and evidence remain in `native-2026-10-18/structure-response`, with compiled caches
+  left alone. The first `review/` images used stale DDGI and are invalid material evidence;
+  use `review-lit/`. Individual long-grain beam faces and a close cast-iron audit are next.
+  When swapping DDGI texture paths, reactivate the existing volumes before viewport review:
+  valid loaded textures did not refresh the already-active editor volumes immediately.
+  Fresh loading of the saved Lowtide scene then confirmed the v4 bake on both banks without
+  reactivation; three loaded-scene views are in the floor pass's `lighting-persistence` folder.
+  Play-state status can report a runtime map different from the underlying edit tab. Record
+  both before stopping: this review restored the Orion tab and Riverdale runtime map separately.
+- Paving contact installed (2026-10-18): `Sources/Lowtide/paving/use-status.json`.
+  Native comparison covered close pipe outlets, a sunlit shed, both banks at player
+  height and a street-distance view. Ten matched images plus two fresh production
+  views are reviewed. Narrow settled grit and local moisture use the current 186
+  paving triangles, 1,616 wall-foot segments and 16 outlets; 216 interior samples
+  confirm that all 24 grate apertures remain clear in the data mask. Original stone
+  colour/PBR pixels and relief remain intact. All three production material slots
+  bind the new shader and 2048-square texture without overrides. No geometry,
+  collision, scene files, material slots or model remaps change; one texture lookup
+  is added. `lowtide_paving.py` preserves the extension on material regeneration.
+  After geometry changes, stage a fresh mask with `lowtide_paving_use.py --current
+  --output output/lowtide/quality-pass/<new-folder>`, then review/import through the
+  editor. Current-layout reproduction matches all five installed files. Temporary
+  review material is archived outside Assets. Belltower's edit tab was restored.
+  Gameplay cost and temporal stability remain unmeasured. Historical offline notes
+  below are superseded where this entry and the construction entry record installation.
+- Current construction composition (2026-10-18): read
+  `Sources/Lowtide/construction/recomposed-status.json`. The three window/door meshes
+  and the connected drainpipe/gutter mesh are recomposed against the installed grates
+  in `output/lowtide/quality-pass/native-2026-10-18/construction-recomposed`.
+  Each scoped component first reconstructs its pinned historical result, then matches
+  current corner positions, UVs and normals. All 12,336 grate triangles and both banks'
+  92 paving triangles remain exact. Current material libraries include the grate slots.
+  This composition is now installed: 20 matched native comparison images and five fresh
+  production views were reviewed. All four compiled meshes match the reviewed geometry,
+  indices and materials, and all 24 grates pass a fresh native readback. Canonical map/finish
+  generation calls `Tools/lowtide_construction.py`; component reproduction preserves
+  glass, thresholds and collision. The pass adds 287,048 source triangles and no material
+  slots. Temporary review assets are archived outside Assets. Scene/VMDL/collision files
+  are unchanged; Spillway's edit tab and the user's stopped play state were restored.
+  Controlled gameplay performance and temporal stability remain pending: mixed-scene
+  profiler samples are invalid. This does not establish overall AAA quality.
+- Street grates (2026-10-18): native checks have resumed at the user's request. Read
+  `Sources/Lowtide/drainage/grate-status.json`. All 24 flat-backed grates were replaced
+  with beveled cast frames, open bars, lower supports and ten-inch recessed wells.
+  Only eight original paving triangles were cut around the apertures; collision remains
+  intact. `Tools/lowtide_grates.py` supplies geometry, generated cast-iron PBR materials
+  and canonical paving cuts, called by `lowtide_finish.py` and `lowtide_map.py`.
+  The 15 imported files add 8,756 source triangles and two finish material slots.
+  Native model readback verifies all 24 slots, bars and cleared paving openings.
+  A full native compile was necessary for the west model: its incremental compile reported
+  success while retaining the old paving. The full compile finished after the CLI timeout;
+  inspect actual output/readback before retrying. Four native views now verify both sizes,
+  both banks, sun/shade and player height; all 24 native floor traces retain support at z=0.
+  Native code compilation has zero errors. Lowtide's camera was restored and Spillway play
+  started as requested; the Veridant tab was left open without edits by this pass. Gameplay cost is unmeasured.
+  See `native-2026-10-18/grates/review` for the reviewed captures. The existing
+  `native-2026-10-18/grate-before.png` shows Spillway and is not grate evidence.
+  Historical finish and east/west OBJ stages now predate these grates/holes: recompose
+  their scoped faces against current models; do not overwrite these changes with snapshots.
+- Current checkout/offline rebase (2026-10-18): use `C:\sbox-projects\hc1\forked-shooter-main`.
+  The former D: checkout is now a compatibility junction. Read
+  `Sources/Lowtide/construction/checkout-status.json` before using the historical candidates below.
+  Four candidate sets were rebuilt under `output/lowtide/quality-pass/rebase-2026-10-18`: the close
+  sacks, sack distance alternatives, paving contact and `water-filter-gentle`. All 264 sack shapes/placements match the reviewed
+  components, with 742,742 unrelated triangles retained in the current base models. Paving preserves
+  the current rotated wetness function; its mask, material and metadata reproduce the earlier layout.
+  Water preserves the newer wave/shoreline shader and allocation-saving capture changes. Its filter
+  scale is 0.08 at the current 0.22 base roughness; 0.35 blurred the synthetic fixture excessively.
+  The isolated capture build passes with no warnings/errors; all four water files reproduce exactly.
+  Six current CPU views per material pass were reviewed. 566 protected live files are unchanged.
+  The six distance meshes reuse the exact reviewed components with current material libraries. All
+  528 reduced bodies pass geometry checks, preserving 742,742 unrelated triangles per detail level.
+  The complete prop batches total 1,157,222 / 958,694 / 818,774 triangles across the three levels;
+  that is a 17.2% / 29.2% aggregate reduction, not a frame-time result. The original component previews
+  remain applicable to those identical shapes/pixels; native switching and grouping are not configured.
+  Sacks remain uninstalled. Water has since been installed after native static review,
+  with runtime verification pending as recorded above. Paving contact has been rebuilt and
+  accepted natively against the installed construction (see above). Native checks resumed
+  at the user's request; recheck current hashes before integrating stages. The other historical bundles
+  still need current-source integration checks; native appearance, temporal behavior,
+  gameplay cost and persistence remain unverified. The old master-check result is historical evidence.
+- Offline water reflection filtering (2026-10-15): `Sources/Lowtide/water/filter-status.json`
+  records a separate candidate for the one-mip, level-zero planar reflection path. A bounded
+  seven-mip linear HDR Box pyramid supplies roughness/UV-footprint filtering. The reviewed scale
+  is 0.35; the first full-strength trial blurred away too much reflected architecture. Existing
+  capture lifecycle, camera guards, waves and optics are preserved. Four staged files reproduce
+  byte for byte and 560 protected live files are unchanged. Isolated C# API compilation passes
+  with no warnings/errors; it is not a sandbox/native shader compile or an engine hotload.
+  Six synthetic CPU fixture views are reviewed, not screenshots or map-quality acceptance.
+  The 960x540 colour target gains 1,380,960 bytes and up to six downsample passes; actual GPU cost
+  is unmeasured. Native appearance, temporal stability, lifecycle, shader compilation and canonical
+  integration were pending in this historical stage; the current installed entry supersedes it. Stage keys include Assets/ and Code/; apply the
+  scoped capture diff after fresh before-hash checks, never overwrite later code from its snapshot.
+- Offline paving contact (2026-10-15): `Sources/Lowtide/paving/use-status.json` records
+  a separate material candidate with narrow settled grit at saved wall feet and local moisture
+  near 16 drain outlets. Original stone colour/PBR pixels and nine-millimetre relief are unchanged.
+  One numerical 2048-square RGB mask adds one texture lookup; no geometry, collision, model remaps
+  or material slots change. All five staged files reproduce byte for byte, 557 protected live files
+  are unchanged, and 12,000 atlas samples, 228 excluded-surface cases and 4,692 moisture texels pass.
+  Six matched CPU context views have been inspected. Native shader compilation, appearance,
+  filtering, cost, canonical integration and persistence were pending in this historical stage; see the current installed entry.
+  Use `output/lowtide/quality-pass/paving-use/stage` for later scoped review; its moisture positions
+  reference the composed drainage junction candidate. This does not establish overall AAA quality.
+  A separate 98-material / 41-PNG repeated-border audit found no further confirmed padding defect:
+  the bridge decking and distant shipyard have bounded UVs; the known drain fix is now installed.
+- Offline drainage junction repair (2026-10-15): `Sources/Lowtide/drainage/junction-status.json`
+  supersedes the isolated drain geometry stage below. Context views exposed warehouse hoppers
+  embedded in the cornice and shed gutters crossing hopper mouths. The composed candidate has
+  20 warehouse pipe offsets/scuppers, 16 lowered shed receivers, eight pierced gutters moved
+  beyond the coping, and folded roof aprons with supporting wall brackets. The shared material
+  mapping correction is unchanged. Only `lowtide_finish.obj` changes: +111,936 triangles against
+  live production, including +16,432 beyond the earlier drain candidate; no new material slots.
+  Geometry reconstruction/reproduction, checked closed shells, 488 exterior rain-path rays and
+  20,272 clearance samples against the saved east/west architecture pass. The sampled minimum
+  upper pipe/hopper clearance is 0.671 inches; the grid is not an exhaustive intersection proof.
+  Eight clipped CPU context views use neutral architecture and matching corrected metal on both
+  versions. All 556 protected live files remain unchanged. Native appearance, shader compilation,
+  geometry/shadow cost, canonical integration and persistence were pending at staging; see the current construction entry for installed checks.
+  Use `output/lowtide/quality-pass/drain-junctions/stage` for later native review; copying the older
+  drain-only OBJ over it restores the junction defects. No overall AAA acceptance is claimed.
+- Offline drainage construction and material mapping (2026-10-15): read
+  `Sources/Lowtide/drainage/construction-status.json`. The candidate replaces 36 capped/blocky
+  drains with curved hollow outlets, tapered open hoppers, socket profiles and wall fixings.
+  It adds 95,504 triangles to `lowtide_finish`; the other 71,642 triangles remain unchanged.
+  Close CPU previews exposed a separate material defect: the two drain materials sampled the
+  padded borders of the 2048-square steel atlas. The staged shader limits repeats to the original
+  1254-square source at its authored 24-inch scale, preserving all colour/normal pixels. It also
+  corrects those shared slots on gutters, grates and anchors, independently of the geometry.
+  Six comparison sheets separate the mapping fix from the shape change. Manifold, aperture,
+  source-pixel, reconstruction and reproduction checks pass; 556 protected live files are unchanged.
+  Native shader compilation, map roof/gutter connections, distance appearance and geometry/shadow
+  cost remain unverified. No canonical hook, live promotion or overall quality acceptance is applied.
+  Keep the user's offline restriction; use `Tools/lowtide_drain_construction.py` and
+  `Tools/lowtide_drain_review.py` for this separate candidate.
+- Offline sack detail candidates (2026-10-15): `Sources/Lowtide/sacks/lod-status.json` records
+  818- and 288-triangle alternatives to the unchanged 1,570-triangle close sack. They retain the
+  close body's positions, UVs and normals, with extra samples around its pinched corners. The
+  medium mesh retains simplified closed seam shells to preserve their visible lines.
+  All 528 exported reduced bodies are closed; nine CPU comparison sheets cover 320/160/80-pixel
+  features and approximate mip filtering. Six staged model alternatives include their unchanged
+  material libraries. These are geometry candidates, not configured native LODs or FPS results:
+  the dressing/fleet models aggregate many props, so grouping, transitions and budgets still need
+  native review. `Tools/lowtide_sack_lods.py` changes no live assets or canonical generator.
+- Offline sewn cargo sacks (2026-10-15): read `Sources/Lowtide/sacks/construction-status.json`.
+  The separate candidate in `Tools/lowtide_sack_construction.py` replaces 264 rounded-block sacks
+  with pinched sewn ends, a side hem, local gathers and finer continuous cloth UVs. Existing jute
+  pixels, cover bounds, collision, materials, placements and unrelated prop faces remain intact.
+  All exported bodies/thread shells are closed with valid normals/UVs; three components reproduce
+  byte for byte. Six matched CPU views are in `output/lowtide/quality-pass/sack-construction/final-preview`.
+  The preview's local shadow adapter fixes a half-pixel depth mismatch; sloped-plane checks verify it.
+  These three dressing/fleet OBJ copies do not overlap the other construction/material candidates.
+  They add 382,800 triangles: native appearance, textile filtering and measured gameplay cost remain
+  open, including whether distance reduction or instancing is required. No live import or canonical
+  generator change is applied. Native acceptance is still required before installation.
+- Offline warehouse concrete use (2026-10-15): read `Sources/Lowtide/concrete/wear-status.json`.
+  `Tools/lowtide_concrete_wear.py` stages collision-aware dust, short rubber deposits and traffic
+  polishing for both ground floors. Twelve layout routes avoid the saved cargo/column footprints;
+  colour images, geometry, collision and live resources remain unchanged. The v2 mask replaces
+  the first review's continuous tire lines. Checks cover 3,474 route samples, 8,192 atlas samples,
+  36 excluded-surface cases and 32 untouched floor cases. Eight files reproduce byte for byte,
+  with 561 protected live files unchanged. The six CPU material views and two layout diagrams
+  have been reviewed; this modest candidate still needs native shader, lighting, filtering and
+  performance checks. `Tools/lowtide_material_stage.py` combines it with the timber floor in
+  `output/lowtide/quality-pass/material-integration/manifest.json`: 20 files, four existing-slot
+  remaps across two models. Independent VMDL copies overwrite each other; apply only the four
+  remaps after native acceptance, preserving later model/LOD edits. Canonical generation and
+  a refreshed warehouse DDGI bake were pending at staging. The 2026-10-18 installed entry supersedes these limitations; gameplay cost and temporal checks remain open.
+- Offline warehouse floor (2026-10-15): read `Sources/Lowtide/floor/floor-status.json`.
+  `Tools/lowtide_warehouse_floor.py` stages a separate worn pine material for both mezzanines.
+  Eight generated board scans remain unchanged; 25.4 cm boards run across the joists, with
+  staggered ends and small nails on their 110-inch grid. Shallow grain normals, dry roughness,
+  filtered joints and a muted tint replace the domestic-looking floor finish. The candidate
+  remaps only the existing floorboards slot: no added triangles, collision or scene changes.
+  Six matched CPU views, 100,000 layout samples, UV-derivative/mirror checks and 14 byte-identical
+  regenerated files pass; 560 protected live files are unchanged. This is an offline candidate,
+  not a native compilation or performance result. The staged VMDLs are review snapshots; after
+  native acceptance apply only their material remap, preserving any later LOD/material changes.
+  The canonical interior generator and warehouse DDGI bake still need integration after acceptance.
+  The 2026-10-18 installed entry supersedes this historical staging state. The overall visual goal remains open.
+- Offline construction detail levels (2026-10-15): Tools/lowtide_construction_lods.py prepares
+  two geometry alternatives for the combined window/door candidate without altering the close
+  version or live resources. The three affected models total 500,413 triangles at close detail,
+  411,421 at level 1 and 381,861 at level 2 (17.8% and 23.7% less geometry). All unrelated triangle
+  attributes are retained. Six component reproductions, 7,155 coverage/joint/clearance rays and
+  556 protected live-file hashes pass. Eighteen matched CPU views cover 300/160/80-pixel features.
+  Read Sources/Lowtide/construction/lod-status.json: these are profiling candidates, not configured
+  native LODs. ModelDoc switches, temporal appearance and gameplay cost remain unverified. The
+  warehouse halves are large aggregate models, so per-feature review sizes cannot be translated
+  blindly into one distance threshold. Profile full detail before choosing switching/grouping.
+- Offline combined construction set (2026-10-15): read Sources/Lowtide/construction/offline-status.json.
+  Tools/lowtide_door_construction.py stages bevelled boards, tapered straps, fixed hinge brackets,
+  pull handles and an open hasp staple for twelve closed door pairs on the four nearby sheds.
+  Generated green/red colour pixels are unchanged; explicit UVs fit complete boards to the geometry.
+  The doors add 39,988 triangles and no material slots. Exported coverage/clearance rays (18,568),
+  two byte-identical regenerations and 556 protected live-file hashes pass. Exact face replacement
+  preserves all other attributes, upper doors, open passages, thresholds, collision and scene data.
+  CPU before/after views are offline construction previews; native compilation/visual/performance
+  checks have not run. Sources/Lowtide/doors/construction-status.json records the evidence.
+  The door and window candidates both change the east/west OBJ files. Do not copy both independent
+  stages over each other: Tools/lowtide_construction_stage.py composes them into one verified set
+  under output/lowtide/quality-pass/construction-integration (175,112 extra triangles overall).
+  No canonical writer hook or live promotion is applied. Keep the user's offline restriction;
+  native review and the separate foliage persistence work remain pending.
+- Rejected offline brick relief (2026-10-15): Sources/Lowtide/brick/relief-status.json records the
+  fitted-mortar-v4 experiment. Even with denser tracing, grazing views stretch bright mortar edges
+  and rare first intersections are missed by up to 7.65 mm. Do not import it. Production brick,
+  colour images and weathering remain intact; the research and comparisons are retained in output.
+- Offline window construction candidate (2026-10-15): Tools/lowtide_window_construction.py stages
+  bevelled cast frames for 380 lower windows and missing curved heads for 586 upper windows.
+  Three OBJ candidates add 135,124 visual triangles with no new material slots. Panes, room UVs,
+  masonry, model definitions, collision and scene remain unchanged; 556 protected files, 9,440
+  coverage/clearance rays and three byte-identical regenerations pass. CPU before/after views are
+  construction previews, not native engine captures. Blender stalled before the scripts ran; the
+  owned attempts were stopped. No production import or canonical map-writer hook is applied yet.
+  Read Sources/Lowtide/windows/construction-status.json before resuming. The user requested offline
+  work; native visual/performance review and foliage persistence are deferred, not completed.
+- Container surface (2026-10-14): the six production materials now use `hc1_lowtide_container.shader`
+  for enamel roughness, base dirt, seam runoff and sparse oxide. Existing generated paint textures,
+  UVs, geometry, collision, scene and lighting are unchanged. The canonical container generator
+  emits the shader/materials; all 22 generated shader/material/texture files match production byte
+  for byte. Six material compilations, eight loaded slots and four reviewed production views pass;
+  536 protected files match. Camera and prior tab are restored, with no new native errors.
+  Evidence: `output/lowtide/quality-pass/container-surface/verification.json` and
+  `Sources/Lowtide/containers/surface-status.json`. The candidate import completed after the stall;
+  do not rerun it. This is a modest finish improvement, not completion of the overall AAA target.
+- Container construction (2026-10-14): `Tools/lowtide_container_detail.py` is called by the canonical
+  container builder. Four containers now have rounded sheet folds, bevelled frame/locking brackets
+  and 32 hollow corner castings. Roof/underplate corners stop around all 96 lifting apertures.
+  Exact face replacement preserves 322,708 unrelated triangles per dressing half. The two meshes
+  add 41,024 visual triangles overall; current material sources, all collision/model definitions,
+  scene and 526 protected files are unchanged. Native compilation/loading and four viewport views
+  pass. Exported-geometry rays confirm all 96 apertures; canonical collision regeneration matches.
+  Evidence: `output/lowtide/quality-pass/container-detail/verification.json`. The before/after manifests
+  supersede older whole-dressing-file hashes intentionally. Broad paint response and gameplay
+  performance are still open; the scene is not at the full AAA target.
+  For tab-sensitive QA, `capture-container-final.cs` activates the existing Lowtide session, captures
+  with play/state guards, and restores the camera and prior tab within one native call. This avoids
+  a scene-tab change between separate calls. It creates no temporary scene or offscreen renderer.
+- Paving relief (2026-10-14): `Tools/lowtide_paving_relief.py` produces numerical height,
+  normals and joint AO at nine-millimetre depth, retaining the existing generated granite colour,
+  roughness and atlas mapping. The candidate shader limits parallax by distance and pixel footprint.
+  It is installed in the production `lt_setts.vmat`. Native compile and four loaded 2048px bindings
+  pass; four actual-material viewport views are accepted. The 54 protected sources are unchanged.
+  Evidence is `paving-relief-production-verification.json` in the quality-pass folder. Read
+  `output/lowtide/quality-pass/paving-relief-pending.json` before proceeding. The built-in generated
+  `Sources/Lowtide/visual-target/quay-target.png` and its prompt are art references only.
+- Footbridge UV repair (2026-10-14): `Tools/lowtide_bridge.py` now compensates for the OBJ import's
+  V flip when selecting scanned board rows. The installed Fleet OBJ changes only 320 existing UV
+  records across 80 boards; 198 previous coordinates sampled edge padding and stretched the wood.
+  Vertices, normals, faces, other UVs, collision and generated texture images are retained. Native
+  model/material loading and compile passed during play without stopping it. Final walk and wide
+  viewport views are accepted, with 47 protected files unchanged. Evidence:
+  `output/lowtide/quality-pass/bridge-uv-*`; inspect the pending record before reapplying anything.
+  `SceneViewWidget.Session` redirects to GameSession during play, so ordinary editor-camera tools
+  can target the runtime camera. Keep existing-viewport capture guarded against play mode.
+- Shed weathering (2026-10-14): `Tools/lowtide_shed_weathering.py` reads the actual shed facade
+  openings and bakes a separate 2048px contact/runoff/lime mask: 16 mirrored elevations and 32 sills.
+  `hc1_brick.shader` applies it only at the four sheds' exterior wall bounds/normals; four brick/stone
+  materials bind it. Brick, masonry and facade generators preserve these inputs. All eight staged
+  files survived the interrupted reload; 46 protected geometry/scene/roof/source files are unchanged.
+  After restart, four native material recompiles, loaded texture/strength checks and three normal
+  viewport views passed with no fresh errors. Scene and camera are preserved. Evidence:
+  `output/lowtide/quality-pass/shed-weathering-*`. The change is deliberately modest; broader finish
+  and controlled gameplay performance remain open. Do not move a loaded shader's compiled cache:
+  the earlier cache move caused missing-resource reload errors even though shader compilation passed.
+- Slate response (2026-10-14): roofs now use `hc1_slate.shader`, a charcoal tint [.40,.44,.48],
+  broad runoff variation aligned to the roof pitch, stronger split-stone normals and shallow joint AO.
+  `Tools/lowtide_roofs.py` reproduces the material/maps. The existing generated colour image and
+  roughness map are unchanged; no model, collision, scene or lighting-bake change. Six installed files
+  and 45 protected source files pass the scoped checker. Native shader/material compilation, all
+  three 2048px bindings and five existing-viewport views pass; scene and camera state are preserved.
+  Evidence: `output/lowtide/quality-pass/roof-response-*`, `check-roof-response.py`.
+  New shaders require `EditorUtility.CompileShader` before material compilation; asset Compile alone
+  does not create the shader combo. Gameplay performance, facade repetition and overall finish remain open.
+- Editor water rendering (2026-10-14): `LowtideWaterReflections` now registers editor reflection
+  commands on `Scene.Camera`, while retaining the viewport camera for reflection projection and
+  water exclusion. Engine `InitializeRendering` copies the main camera's render hooks onto editor
+  views; attaching only to the viewport camera hid the water without executing its replacement draw.
+  Game cameras retain their original registration route. Multiple perspective editor cameras fall
+  back to regular cubemap water to avoid duplicate draws through their shared hook. Native compile
+  and eight lifecycle assertions passed; overview, bank and quay captures are `water-*-fixed.png`
+  in quality-pass. Scene/play/camera state was preserved, with no new engine errors. This verifies
+  editor rendering, not a fresh gameplay or performance run. No water shader/material change.
+- Shed gables and ridges (2026-10-14): `Tools/lowtide_shed_details.py`, called by finish, adds eight
+  louvred circular vents with individual chamfered radial bricks and four formed metal ridge caps
+  with lap joints. It appends 14,784 visual triangles to Harbour Details, retaining all 71,946 prior
+  triangles, scene data, collision, other model sources and materials. Native compile, 384 vent
+  backing coverage samples and five existing-viewport views passed without console errors.
+  Evidence: `output/lowtide/quality-pass/shed-details-*`; finish is now 86,730 triangles.
+  A thin slate-course mesh was tried and rejected for ground-level aliasing, then removed from the
+  assets and canonical generator. `roof-*-after`, `roof-*-final` and `roof-relief-*` captures are
+  rejected experiments, not current verification. The original roof texture/panels are retained.
+  The rejected generator is archived only in output; do not reapply it. Older perimeter whole-file
+  hash reports predate this intentional additive pass. Broad roof material response, facade
+  variation, composition and controlled gameplay performance still need work.
+- Perimeter building closures (2026-10-14): `Tools/lowtide_perimeter.py` closes 42 omitted wall
+  sections in the mirrored background blocks and northern row. The two exposed quay ends have
+  30 sealed windows, masonry sills, cornices and loft vents. Finish calls this module on regeneration.
+  The scoped import appends 10,634 visual triangles to Harbour Details; all 61,312 existing finish
+  triangles, collision, other model sources and scene data are preserved. Native model compilation,
+  material checks, 2,300 facade coverage samples and normal viewport views passed; east/west quay
+  and northern roof corners no longer expose the missing building walls. The scene stays clean and
+  the user's camera is restored. Evidence: `output/lowtide/quality-pass/perimeter-*`.
+  Earlier strict whole-file geometry reports are historical baselines: tidal seam and perimeter
+  manifests record the later intentional changes. They do not certify the current hashes or a new
+  lighting bake. Architectural variation and controlled gameplay performance remain outstanding.
+- Canal surface weathering (2026-10-14): `Sources/Lowtide/visual-target/canal-biofilm-source.png`
+  is the unchanged built-in imagegen albedo, with full prompt beside it. Six masonry materials bind
+  it through `hc1_brick.shader`; world-space exterior/height masks exclude indoor walls and floors.
+  Brick/masonry generators preserve these inputs; finish shares masonry's granite definition.
+  The final `g_flTidalClay` adjustment to the old straight tide boundary compiled after restart;
+  six materials recompiled and resolve the generated 1254-square texture. Overview, east-close and
+  west-close captures (`live-*-biofilm-final`, `live-biofilm-*-final`) verify the exterior blend.
+  The first interior regression capture is invalid (black): render-target ResourceSystem.RegisterWeak
+  errors began during that capture,
+  before the later failed offscreen benchmark and editor exit. Use the normal editor viewport for
+  further checks; do not repeat the temporary-scene capture/benchmark loop. The replacement normal
+  viewport interior capture passed with no fresh global errors; controlled game performance remains
+  pending. A subsequent scoped mesh repair removes the raised tidal strip/cap: twelve vertex moves,
+  four UV adjustments and four cap triangles removed, with all other geometry/collision/scene data
+  preserved. All three meshes compiled; native east and west viewport views show the bright seam
+  gone. The wall generator matches the repaired geometry and UVs. Evidence is tracked separately in
+  `output/lowtide/quality-pass/tidal-seam-*`. The user's saved scene and camera were preserved.
+  Native compilation success alone is insufficient:
+  inspect texture bindings, rendered pixels and fresh global console errors too.
+- Static shadow caching (2026-10-14): `Tools/lowtide_static.py` marks nine named fixed world meshes
+  and 24 local lamp objects static (native flag 32768). Finish/marine/masonry scene patches preserve it.
+  Glass, water, trees, gameplay objects and the weather-controlled sun remain dynamic. Native reload
+  confirmed static render-object flags; an isolated moving-caster test confirmed shadows move while
+  the same static cache is reused. Only 33 scene Flags fields changed; no measured game-FPS claim yet.
+- Warehouse lighting update (rebaked 2026-10-18): `lowtide_finish.apply_scene` calls `Tools/lowtide_lighting.py` to
+  preserve the native bake in `Sources/Lowtide/lighting/warehouse-lighting.json`. Eighteen warehouse points
+  remain disabled; downward shadowed spots use 55/30 degree cones and 85% original colour. Two DDGI volumes
+  cover floor, walls and ceiling, with 1200 probes each, intensity4, contrast.85 and blend24. Keep their six
+  native `.vtex_c` files in `lowtide_scene_data/ddgi/warehouse-{east,west}-v5`; `.gitignore` narrowly exempts
+  these from the compiled-file rule and existing LFS rules cover them. The native public
+  `IndirectLightVolume.BakeProbes` method refreshed both volumes after the accepted floor/structure
+  materials and dressing cache repair; six fresh-load viewport views and stored-texture copies pass.
+  This v5 save changed only six texture references. The previous v4 save's collider/default and
+  resource/prefab serialization is retained. Generator lighting application
+  is idempotent against the saved scene. `bake-provenance.json` records the inputs and evidence;
+  v3/v4 provenance and textures remain available. Re-bake after static geometry, material, fixture or
+  daylight changes. Sun/sky/exposure/outdoor lights are unchanged. Controlled gameplay performance
+  and the overall visual-quality goal remain open.
+- The user asked for a new map and left the theme to Claude (2026-10-05). Lowtide is the warehouse quarter of a made-up
+  North German port at low tide, after Hamburg's Speicherstadt. Six-storey red-brick warehouses stand straight up out of
+  a tidal canal (a Fleet), with stepped gables, winch oriels under copper hoods, and loading doors up their fronts. The
+  tide is out, so the Fleet's bed is mud with a channel of water down its middle.
+- One script, built like Railhead's with `map_kit`, writes:
+  - the models, to `Assets/models/maps/lowtide/`:
+    - the Fleet: its bed, the bridges and the barge;
+    - the east half, and its mirror the west half, repainted by `WEST_PAINTS` (sooty brick, cream frames, red doors);
+    - the dressing, built in place for each side so number plates read the right way round;
+    - the glass, the water, and the backdrop: the Fleet running on north under a building, the harbour, its far shore
+      and a tug;
+  - the scene, `Assets/scenes/maps/Lowtide/lowtide.scene`, rewritten whole on every run (change the layout in the
+    script, not in the editor);
+  - the `lt_` materials, `Assets/materials/lowtide/*.vmat`. They're text only:
+    - tinted copies of the project's own materials (`LT_MATERIALS`: sooty, glazed and slimed brick, wet mud, the
+      water, painted doors, jute, tarred timber, steel grating);
+    - flat paints (`LT_PAINTED`).
+    So the map needs no new pictures;
+  - the radar picture, `ui/minimaps/minimap_lowtide.png` (the folder is `ui/Minimaps` on disk);
+  - with `--art`, a stand-in menu picture, `ui/maps/lowtide.png`.
+- Levels:
+  - The streets and quays are at z 0.
+  - The Fleet's mud is 128 below them at its walls, under the 156 drop that hurts, with level flats at -130 along both
+    walls.
+  - Its channel's bottom is at -146, with water at -137 (`BED_PROFILE`), and the bed falls away into the harbour at its
+    mouth.
+- Layout: mirrored across e 0, the Fleet's middle. Red Team spawns on the west square, Blue Team on the east one. The
+  play is e -2200..2200, n -1650..1450.
+  - North: the street in front of the north row, over the Fleet on a riveted plate-girder bridge with cast-iron lattice
+    railings and a lamp on each end post.
+  - Middle: the two warehouses (east e 240..1000, n -400..1150).
+    - Each is open on its ground floor, a whitewashed hall of cast-iron columns, and on a mezzanine over its north half
+      (z 176), reached by a timber stair up the east wall.
+    - The columns and beams (2026-10-12, the user: "this beam needs improvement", of a column built from a box, a
+      12-sided shaft, a band and a square cap):
+      - Each column is a Speicherstadt cast-iron one (`iron_column`, `lathe`): a chamfered base plate, a moulded base
+        (torus, cove and astragal), a shaft tapering 6 to 5 in radius, a neck ring, a bell capital and a cap plate
+        bolted to the timber above. Those on the mezzanine are slighter (5.2 to 4.4).
+      - They stand in two rows at e 500 and 740, n -120, 130, 396, 630 and 880 (the middle row was at 380, under the
+        mezzanine's edge).
+      - Each row carries a 16-inch square timber girder (`girder`, `GIRDER_W`) on a bolster with rounded ends
+        (`bolster`, a Sattelholz): under the ceiling's joists (z 324-340) the whole length, and under the mezzanine's
+        (z 132-148) from its edge north.
+      - About 1,600 triangles a column. Its collision is two boxes and three hulls; the bolts have none.
+      - Checked in offscreen renders in the editor (the base, the capital, the mezzanine), not in a match.
+    - Two ground-floor loading bays onto the Fleet have steel landings with stairs down into it. Two mezzanine bays look
+      over it, with a 37-high bar across each, which you can vault.
+    - Bomb site A is the east warehouse's ground floor under the mezzanine.
+    - Between the warehouses is the Fleet's bed, with a steel lighter (a Schute) lying on the mud. Its sides are 70-82
+      over the mud and 70 over its hold's floor, so you can mantle in and out.
+    - The hold (2026-10-12, the user: "textures glitching on lowtide"):
+      - Its floor was at -137, level with the channel's water plane, which runs on under the hull, so the two
+        flickered through each other. It's now 3 higher (`WATER_Z + 3`), and the cargo with it.
+      - Its plate was `rw_wagon_rust`, a freight wagon's side, whose overpainted panels showed as dark blocks. It's
+        `lt_hold_rust` now, Boxyard's `bx_rust` darkened and tiling at its real size (`lt_tile`: 48).
+      - The green patch was an opaque `lt_water` puddle, which came out.
+      - Only `lowtide_fleet` was regenerated. Not yet seen in the engine.
+  - South: the yards, each with a brick shed, and the harbour quay, crossed over the Fleet's mouth on a pony-truss
+    footbridge. Two level-luffing cranes stand on each quay, with a 200-high portal you can walk under. Bomb site B is on
+    the east quay, among the cargo under a crane.
+  - A cross street each side runs from the north street to the quay, past the spawn square.
+  - The alley beside each quay shed (e ±1950..2200, n -1050..-600) is closed off from the quay by a yard wall
+    (`alley_wall`, `ALLEY_WALL`, 2026-10-12; the user: "you shouldnt be able to go this way"). It's 132 high, too high to
+    mantle, with a shut pair of gates, a granite coping and a player clip over it. The way from the spawn square to the
+    quay is the cross street. Not yet seen in-game.
+  - A shut door at a wall's foot has a stone threshold in its recess (`leaves_shut`). The recess had no floor, so a pale
+    strip of sky showed in front of the doors (the user's screenshots, 2026-10-12). Not yet seen in-game.
+  - The granite plinth, the glazed brick bands at each floor and the cornice turn round a building's outside corners
+    (2026-10-12; the user's screenshot of the plinth stopping short of one: "this looks weird").
+    - A building's side walls (±e) run between its end walls (±n). Their mouldings stopped at the end walls' backs, 20
+      short of the corner, so bare brick and the plinth's cut end showed there.
+    - Now a side wall's plinth, bands and cornice band carry on past its run by the wall's thickness plus their own
+      depth, filling the corner square (`corner_reach`).
+    - The coping meets the end wall's, where it overlapped it on one side and left a notch on the other.
+    - `block` works out a building's corners from the fronts it draws (`corners`), and `speicher` passes the
+      warehouses' own.
+    - Only `lowtide_east` and `lowtide_west` were rebuilt (876 vertices moved in each; collision unchanged). Not yet
+      seen in-game.
+  - Six stairs go down into the Fleet: one from each warehouse ground bay, and a public one from each quay. Iron
+    ladders on its walls are dressing only.
+  - Those stairs are open steel stairs (`steel_stair`, 2026-10-13; the user's screenshot from the Fleet's bed: "issue
+    behind stairs on lowtide").
+    - They were boxes with no back or bottom faces, so from behind or below only the treads' tops showed, floating.
+      Their hull was solid down to the mud, an invisible wall behind and under them.
+    - Now each has two channel stringers from the landing to the mud, and grating treads with steel nosings. Every
+      face is drawn, and the handrail runs on the outer stringer.
+    - The collision is only the ramp under the nosings, so you can walk under a stair.
+    - Only `lowtide_east` and `lowtide_west` were rebuilt: only the stairs' grating, steel and rails changed. The spot,
+      reach and Retakes sight checks passed. Checked in offline renders of the OBJ from behind, below and the side,
+      not yet seen in-game.
+  - Mooring rings (2026-10-13, the user: "what is this trash on lowtide", of a black T on the Fleet's wall). Each was
+    two black boxes, every 230 along both walls. Now it's a ring as on Hamburg's Fleet walls (`mooring_ring`,
+    `MOORING_RINGS`):
+    - a granite ring stone set into the brick, 20 wide and 17 high, proud by 1.2 with bevelled edges. Its UVs map one
+      joint-free block of ashlar_grey's picture (`RING_STONE_PX`), so it reads as one stone;
+    - an eye bolt leaded into it, and a rusted wrought-iron ring (`lt_hold_rust`, 11 across) hanging from the eye,
+      its foot resting against the stone.
+    - Eight to a wall, clear of the ladders, the footbridge, the quay stairs and the bays' landings. Drawn only, with no
+      collision, about 570 triangles each.
+    - Only `lowtide_fleet` was rebuilt. Checked in an offline render of the generated mesh, not yet in the engine.
+- Modes:
+  - The scene lists TDM and Defuse, and the map is in `GameUtils`' three lists.
+  - It has deathmatch spawns and Retakes spawns for each site.
+  - Domination's flags: A in the west warehouse, B in the Fleet's channel, C in the east warehouse.
+  - The Hot Zones and the Cash Grab points are `ObjectiveSpot`s.
+- Every run checks all 91 spots with railhead_map's `check_spots`, `check_reach` and `check_retakes_sight`. The last two
+  now take another map's bounds and Retakes table. On 2026-10-05 all three passed.
+- The navmesh's bounds stop at `NAV_TOP` (300): over the mezzanines and under the warehouses' ceilings (352), above
+  which they're closed. The window panes' model is tagged `navskip`.
+- `map_kit` gained two things:
+  - `asset_file` finds an asset's file whatever its case. On Linux the scene's `scenes/maps/defusemap_01/game_setup.prefab`
+    is `DefuseMap_01/Game_setup.prefab`.
+  - A wall's arch skips a side painted None.
+- Made offline on 2026-10-05 and checked in software renders of the models with their textures, the reach grid and the
+  radar picture. It hasn't been opened in the editor: nothing has compiled, and the lighting, the navmesh, bots and the
+  modes' objects are all unchecked.
+- The radar and menu pictures are PNGs, kept in Git LFS, which this session couldn't push. Run
+  `python Tools/lowtide_map.py --art` once to write them.
+- To play it: `dev_mode team_deathmatch lowtide`.
+
+## Boxyard (multiplayer map, `Tools/boxyard_map.py`)
+- The user asked for the car to come out of Shipment and for real textures: "the whole map is basically solid colours"
+  (2026-10-08). Shipment is Facepunch's map, made in Hammer, so it can't be edited here, and the user said to remake it.
+  Boxyard is our own, on Shipment's layout. It's named Boxyard because "Shipment" is a Call of Duty map's name.
+  `Assets/scenes/maps/Shipment/Shipment.scene` is untouched.
+- Built by script like Belltower, Railhead and Lowtide (`map_kit`, with `railhead_props`' pallets and crates).
+  The script's docstring has the layout. It writes:
+  - the models, to `Assets/models/maps/boxyard/`: the yard (the floor, its markings and the perimeter wall), the
+    containers, the props, and the backdrop, which is drawn only;
+  - the scene, `Assets/scenes/maps/Boxyard/boxyard.scene`, rewritten whole on every run (change the layout in the
+    script, not in the editor);
+  - the radar picture, `ui/minimaps/minimap_boxyard.png`, and with `--art` a stand-in menu picture, `ui/maps/boxyard.png`
+    (a flat-coloured preview: replace it with an in-engine capture).
+- The materials are `Tools/boxyard_materials.py`'s, drawn with numpy into `Assets/materials/boxyard/` (its docstring has
+  each atlas's layout). Run it before the map script.
+  - Each container livery (red, blue and green in two variants, orange, grey) is a 4096 x 2048 atlas of the box's sides,
+    doors, front and roof at their real size: marine paint chalked by the sun, rust at the rails, castings and knocks, and
+    streaks below. The markings follow ISO 6346 (a made-up owner code ending in U, a serial with its real check digit,
+    22G1), with no real owner, lessor or logo.
+  - The open containers share one inside atlas: grey corrugated walls, a plywood floor.
+  - The rest: the yard's concrete slabs (16 ft, sawn joints, cracks, oil, rust and tyre marks), the wall's precast
+    panels, worn floor lines, galvanised and rusty steel, drums, a skip, an IBC's tank, and flat paints for the cones,
+    bins and rubber.
+- The yard is e -800..800, n -832..832 inside a 128-high wall of precast panels between steel H-posts, with two strands
+  of wire on top. Red Team spawns at the west end and Blue Team at the east. Three lanes:
+  - North, between the north row (two containers along the north wall, one open) and the north block. Bomb site A is
+    its east end, by the angled orange container.
+  - Middle, between the north and south blocks (two pairs of containers each, n ±288), with two containers at each
+    end by the spawns, one of them angled.
+  - South, between the south block and the south row. Bomb site B is its east end, among drums and pipes.
+- The containers are ISO 1CC 20 ft boxes at their real size (238.6 x 96 x 102). Their side walls' trapezoidal
+  corrugation is geometry, bend by bend, and the paint was drawn to match it. There are 18, and three of them have
+  another on top.
+  - Six are open, their doors swung back (115 degrees, one leaf of the south row's at 90), with their insides drawn and
+    walkable. Each has a dim fill light and its own reflection probe.
+  - Shipment's SWAT van is a closed grey container on B (508, -630): a van would have been the car again.
+  - Every container's top and the wall's top are player-clipped up to z 1000.
+- Props: a crate on a grounded pallet, a skip, crates, cones (one knocked over), two IBC totes,
+  205 l drums, wheelie bins, two stacks of rusty pipe, and a stack of pallets.
+- Forklifts (2026-10-14): the user retired the old Boxyard model from every map. Its geometry and collision were
+  removed from Boxyard and both Railhead yards, and its shared `railhead_props` generator and Stillhouse preview
+  reference were deleted. Use `Tools/lowtide_forklift.py` for future forklifts; preserve Lowtide's detailed model.
+- The backdrop (no collision) is the terminal round the yard: about 2,400 containers in stacks of up to five, with
+  roads between blocks, three gantry cranes and four light masts, all on concrete out to 6000.
+- Modes: the scene lists TDM and Defuse. It has deathmatch spawns (16), Retakes spawns for each site, Domination flags
+  (A west, B middle, C east), five Hot Zones and three Cash Grab points (`ObjectiveSpot`s). It's in `GameUtils`' three
+  map lists.
+- Every run checks all 76 spots with railhead_map's `check_spots`, `check_reach` and `check_retakes_sight`. On
+  2026-10-08 all three passed.
+- The navmesh's bounds stop at `NAV_TOP` (98), under the containers' roofs.
+- Made offline on 2026-10-08, without the editor, and checked in Cycles renders of the scene with its textures
+  (`railhead_render.py` with Boxyard's scene). Nothing has compiled, and the lighting, the navmesh, bots and the modes'
+  objects are all unchecked.
+- To play it: `dev_mode team_deathmatch boxyard`.
+
+## Cerro Blanco (multiplayer map, `Tools/cerroblanco_map.py`)
+- The user asked for a map as close as possible to MWII's Valderas Museum in looks and layout, under another name
+  (2026-10-07). They sent four pictures: the courtyard with its round boulder planter and the stage with a piano, the
+  South Gallery's portico with its red sculptures, an overhead of the courtyard (banners, hedges) and the South Gallery
+  close up. Cerro Blanco is the Museo Cerro Blanco, a made-up art museum on a white hill over a Mexican town. Its text is
+  made-up Spanish, with no Call of Duty name or marking.
+- Built by script like Belltower, Railhead and Lowtide (`map_kit`), from three scripts:
+  - `cerroblanco_materials.py` draws the museum's own materials with numpy into `Assets/materials/cerroblanco/`.
+    Its docstring has each one:
+    - cleft-cut travertine walls and honed, filled cross-cut travertine paving, on a 30-inch module;
+    - off-white enamelled panels for the upper floors;
+    - four exhibition banners with abstract pictures;
+    - the museum's name in bronze letters, and the South Gallery's name in grey ones.
+    Run it before the map script (`cerroblanco_materials.py [name ...]` redraws only those). The open editor compiles
+    each map as it lands and holds the next one's file, so its saves go through a temporary file and retry the rename
+    for up to 10 s.
+  - `cerroblanco_parts.py` has the pieces:
+    - the walls, glazing, stairs, railings and curved walls;
+    - the round boulder planter, the red sculptures and the bronze sphere (and the stage, `P.stage`, now unused);
+    - benches, cafe tables under parasols, banners and the sign.
+  - `cerroblanco_map.py` lays them out and writes:
+    - the models, to `Assets/models/maps/cerroblanco/`: the buildings, the grounds, the dressing, the glass, the
+      canopies, and the backdrop (the hills and their trees, drawn only);
+    - the scene, `Assets/scenes/maps/CerroBlanco/cerroblanco.scene`, rewritten whole on every run (change the layout in
+      the script, not in the editor);
+    - the flat paints and `cb_glass` (text-only vmats);
+    - the radar picture, `ui/minimaps/minimap_cerroblanco.png`;
+    - with `--art`, a stand-in menu picture, `ui/maps/cerroblanco.png` (a flat-coloured preview: replace it with an
+      in-engine capture).
+  - `--preview <dir>` and `--views <dir>` write flat-shaded views (`VIEWS`) for comparing with the pictures.
+    Trees aren't drawn in them.
+- The museum stands round its courtyard: travertine below and warm off-white panels above (grey joints), with flat roofs
+  and parapets.
+  - The rotunda is the entrance hall, two drums in the white panels, as in the pictures:
+    - The lower drum (to `ROT_TOP`, 352) has a 3 x 3 gridded window towards the courtyard (`ROT_WIN`, 186-320) over a
+      band of panels, with the ground floor glazed under it, and a second window to the west.
+    - A smaller drum is set back on its roof (`ROT_UP`: radius 290, about three quarters of the lower's, up to 540).
+      Its walls are 26 deep (`ROT_UP_WALL`), and its twelve 1.5:1 windows (`ROT_UP_WIN`, 424-488) are set into them,
+      so their reveals show. It has a glazed lantern on top. The roofs round it are a pale membrane (`P.ROOF`,
+      `cb_roof`).
+  - The cafe's upper room (the GLASS ROOM callout, `cafe_upper`) is over its south half, the block behind where the
+    pictures' stage is, at the galleries' height, as in the pictures:
+    - Over the courtyard, a curtain wall of 11 x 6 milky, pale green-white panes (`CAFE_GRID`, `P.FRIT`, `cb_glass_frit`)
+      in white mullions. The frit is glass.shader's rough glass (roughness 0.45, AlbedoAbsorption 0.9), so ~40% of its
+      colour is lit and the rest is the room blurred through. Plain `cb_glass` there read black.
+    - A skylight with a white curb and bars (`CAFE_SKYLIGHT`), a roof unit with a fan, two plinths and a picture
+      inside, and a door and a window from the terrace.
+    - The terrace is the cafe's roof north of it (`CAFE_UP`, 340), still up the stair from the courtyard.
+    - The pictures' large 2 x 2 window at that block's north end is left out.
+  - The West Gallery (two storeys, an L, a stair inside) is on the courtyard's west side. Its east front has the
+    pictures' curved balcony (`west_balcony`): a slab along the first floor with a rounded south-east corner, a steel
+    rail, slim columns and a canopy, with five banners hanging from it (`BALCONY_BANNERS`). On the courtyard's east side
+    are the cafe (its roof a terrace, up a stair from the courtyard), the North Gallery (two storeys) and the East Hall,
+    with its mezzanine.
+  - The South Gallery (one tall storey) closes the courtyard's south side. Its front is the pictures' (`south_front`):
+    - an enclosed balcony box in white panels over the entrance, its south-west corner rounded, on fat round columns;
+    - over it a flat white roof on slim columns, open in louvres at its east end;
+    - "galería sur" in grey letters on the wall under the balcony (`P.lettering`, `cb_label_sur`, drawn by
+      `cerroblanco_materials.labels`);
+    - a travertine planter of shrubs against the glass west of the entrance.
+    All of it but the columns and the planter is in the canopies' model, out of reach.
+  - In front of it, on the south plaza, the two red sculptures: a tall curved spike with a fin on a travertine block
+    (`spire_sculpture`, two bowed steel sheets) and box beams welded into a zigzag beside a post (`zigzag_sculpture`).
+    A smaller zigzag stands in the east garden.
+    - The spike's sheets are crescents in section. Their normals come from each ring's own tangent: from the ring's
+      middle they pointed into the concave face, which then drew inside out (only its edges showed).
+  - In the courtyard, which has no trees (they hid the rotunda, where the pictures' courtyard is open):
+    - the round two-tier planter with its boulders, seven low plants round its rim and a rounded beech shrub on top;
+    - the hedges, benches and the cafe's tables.
+    - The pictures' stage along the cafe's west wall, with its grand piano, speakers and cases, came out on 2026-10-09
+      at the user's ask ("remove the piano area"). `P.stage` is still in the parts script, unused. The STAGE callout
+      went with it.
+  - The backdrop is the hills and their trees. The low-poly town on the slopes below (170 boxes with tiled roofs) came
+    out on 2026-10-09 too, at the user's ask ("the low poly buildings").
+  - The hedges (`P.hedge_box`) are Facepunch's `beech_hedge_96x128` (its mesh is 48 x 141 x 90, `HEDGE_SIZE`), cut to
+    length in a travertine trough with a honed coping, over a clipped core box that is their collision.
+  - The stone's colours are within a few per cent of each other (`TRAVERTINE`, the honed stone's jitter), so from a
+    distance the walls read as one even cream, as in the pictures, not a checkerboard. The panels are a warm off-white
+    (212, 207, 198) and the sculptures signal red (`RED`).
+  - The paving and the honed stone (2026-10-09). The user found the floor "too bright" and not good enough: a near-white
+    cream (mean 225, 214, 193) that the sun blew out, blurry wood-like bands, a checkerboard from slab to slab, harsh
+    dark grout, dark specks, and a repeat every 10 feet. Now they're honed, filled cross-cut travertine after years
+    outdoors (`honed_face`):
+    - A warm beige (`PAVING`, mean about 186, 174, 152: an albedo of ~0.45-0.5), whose beds show as soft clouds of
+      ivory and walnut. Each slab is cut from its own part of the block (`strata`, `sample_strata`), turned any of the
+      eight ways.
+    - Small filled pores in a greyer cement, most in the porous beds, a few lost and open; a fine grain and sparkles of
+      calcite; weathering, grime by the joints, a few spills and paths worn by feet.
+    - 3/16-inch sanded grout a shade under the stone, eased and chipped arrises, and each slab a hair proud or out of
+      level.
+    - The paving tiles every 240 inches (8 x 8 slabs, 4096 px, `PAVE_TILE`, `PAVE_SIZE`; `P.TILED[PAVE]` 240), the same
+      17 px an inch as the other stone.
+    - Checked in the script's lit sheet and at full resolution, not in the engine: the editor was closed when it was
+      written.
+  - The materials script saves each picture through a temporary file and retries for 10 s
+    (`cerroblanco_materials.save_image`), and the map script writes the radar and menu pictures through it.
+  - The banners (`BANNERS`) read the right way round: `banner` swapped them for a viewer's left and right
+    (fixed 2026-10-08).
+- The sky is its own (`Tools/cerroblanco_sky.py`, on belltower_sky's code): cloudless and deep blue, as in the
+  pictures, baked with the map's sun. `--width 2048 --supersample 1` is plenty for a gradient.
+- The clear glass (`cb_glass`) is rw_glass with a museum's low-e tint (0.78, 0.84, 0.85): it passes ~80% of the light,
+  a little cool, so the rooms behind it read darker than the sunlit outside and its reflections show.
+  - What it reflects comes from the probes (`PROBES`): one per room and the courtyard (priority 1), and `GROUNDS_PROBE`
+    over the whole play area (priority 0, reach 20000, far 60000), which gives the outside of every pane the sky, the
+    hills and the town.
+  - Without the grounds' probe, the panes outside every room's and the courtyard's box (the rotunda's front, the upper
+    drum, the galleries' outer windows) had no probe and read flat grey. The courtyard's box runs to e 496, past the
+    Glass Room's curtain wall (e 489), so those panes reflect the courtyard.
+  - Checked offscreen in the editor on 2026-10-09, with the probes forced (`CreateTexture`, then `RenderCubemap`, by
+    reflection), from the forecourt, the courtyard, the stage (since removed) and the South Gallery: the panes show the dark rooms and
+    the sky, and the frit and the balustrades are unchanged.
+- Offline renders (railhead_render through Blender's Cycles, with the scene's sky and the models'
+  textures) were compared with the pictures on 2026-10-08: the courtyard and stage, the West Gallery's balcony and
+  banners, and the South Gallery's front with its sculptures from the pictures' angle.
+- Red Team spawns on the forecourt at the north, by the car park and the museum's sign. Blue Team spawns on the south
+  plaza, past the portico.
+  - The car park has no cars: the user had them taken out (2026-10-09). Its asphalt, bays, kerbs, island and trees
+    stay. The eight cars, SUVs and van were railhead_props' (`R.use`), ~33,800 of the dressing's ~50,700 triangles.
+    Without them the spot checks still pass. The editor recompiled the dressing; it hasn't been seen in-game.
+- Three lanes:
+  - West: the West Garden's lawns, the West Gallery, then the garden circle round its bronze sphere (bomb site B) and
+    the south-west lawns.
+  - Middle: the rotunda and the courtyard, then the South Gallery.
+  - East: the promenade, the cafe and its terrace, the North Gallery, then the East Hall (bomb site A), the covered
+    walkway and the east terrace.
+- Modes:
+  - The scene lists TDM and Defuse, and it's in `GameUtils`' three map lists.
+  - It has deathmatch spawns (35, one in the Glass Room) and Retakes spawns for each site.
+  - Domination's flags: A at the rotunda, B in the courtyard, C at the South Gallery.
+  - Hot Zones and Cash Grab points are `ObjectiveSpot`s.
+- Every run checks all 96 spots with railhead_map's `check_spots`, `check_reach` and `check_retakes_sight`. On
+  2026-10-09 all three passed.
+- The navmesh's bounds stop at `NAV_TOP` (300): over the first floors (180) and under the roofs (330-360). The glass and
+  the canopies are tagged `navskip`.
+- Made offline on 2026-10-08. On 2026-10-09 the editor compiled every model, material and the scene with no Cerro
+  Blanco errors in its log, and the user played a match on it.
+  - The scene was loaded offscreen in the editor (a `new Scene()`, its objects deserialised from the file, the game
+    modes' prefabs left out): all 359 renderers loaded, none of them an error model.
+  - Renders from there (a camera with the scene's tonemapping and bloom) were compared with the pictures: the overhead,
+    the courtyard and stage, the West Gallery's balcony and the South Gallery's front. They led to the even stone, the
+    courtyard without trees, the planter's plants and the brighter red.
+  - The rotunda's drums and the Glass Room compiled on 2026-10-09 with no errors, and were compared offscreen with the
+    pictures from the courtyard, the stage and overhead.
+  - When a run adds a material, a model can compile before it ("Missing vmat"): `recompile_asset` the vmat, then the
+    vmdls.
+  - Played in the editor on 2026-10-09 (`dev_mode team_deathmatch cerroblanco`; starting play stalled the editor for
+    about 5 minutes first):
+    - The navmesh generated in play, with complete paths from Red Team's spawn to the Glass Room, the cafe's terrace
+      and Blue Team's spawn.
+    - 9-10 bots fought a TDM across it: 48 kills in the first 3 minutes.
+    - The rotunda's drums and the museum's sign were seen from the forecourt, and the Glass Room from inside (its
+      panels, the curtain wall with the sky through it, the plinth, the door to the terrace).
+  - The modes' objects were checked on a navmesh generated offscreen in the editor on 2026-10-09 (the scene's colliders
+    in a `new Scene()`, with the scene's agent, excluded tags and bounds):
+    - All 81 spawns (team, deathmatch and Retakes), both bomb sites, the Domination flags, the six Hot Zones and the
+      three cash and extraction points are on it, with complete paths from both team spawns.
+    - 40 random navmesh points in each bomb site and buy zone: all reachable from both spawns, except a few in Blue
+      Team's buy zone. Those are on top of the spire sculpture's travertine block (76 high, with a 4-high lip round it)
+      and a bench (32), which only mantling reaches. Bots check their paths, as on the other maps.
+    - The scene's mode objects match Belltower's: 2 bomb sites, 2 buy zones, 9 `ObjectiveSpot`s, 3 cash and 3
+      extraction points, and the same `GameModeObject` filters.
+  - Defuse was played in the editor on 2026-10-09 (`dev_mode bomb_defusal cerroblanco`, 5 v 5 with bots), through six
+    rounds of about a minute each:
+    - Both bomb sites were active (A in the East Hall, B at the garden circle). Red Team spawned on the forecourt with
+      the C4.
+    - The C4 was planted on site A by a bridge script. That was the player's own `DefuseC4`, deployed and started by
+      reflection: `CanPlant` held, and the planted bomb spawned. The HUD showed DEVICE ARMED 0:40, team chat
+      "Leon (A SITE) Planting bomb", and Blue Team's bots closed on it.
+    - It went off at 0:00, and the next round started 5 s later.
+    - Bots never defuse, on any map: `Code/GameLoop/Bots` has no defuse logic.
+    - While the win banner was up, every hit threw a NullReferenceException in `DamageIndicator.OnHit`. MainHUD takes
+      the indicator off for the banner, and `Current` still pointed at the deleted panel. Fixed the same day; the fix
+      hasn't been seen in a match.
+  - Not yet checked: a Retakes, Domination, Hot Zone or Cash Grab match played on it.
+- Visual upgrade in progress (2026-10-15, `Sources/CerroBlanco/`):
+  - `Tools/cerroblanco_quality_materials.py` and `cerroblanco_quality_geometry.py` stage their outputs under
+    `output/cerroblanco/stage`. Import and apply with the native scripts in `Sources/CerroBlanco/editor`; copy these
+    scripts into the current sbox-cli exchange directory before `run_csharp`. They require Cerro Blanco to own the
+    editor window and play to be stopped.
+  - The retained imagegen travertine source and courtyard target, with their prompts, are under
+    `Sources/CerroBlanco/generated`. The material's relief/normal/roughness are artistic derivatives of that source,
+    not measured scans. `cerroblanco_stone.shader` varies each slab's cut and orientation, fades close relief with
+    distance, and attenuates its analytic bevel below a pixel to avoid dotted distant joints.
+  - Three render-only detail models add sills, thresholds, coping, drains, stair nosings and gallery fixtures. The
+    dressing renderer uses `quality-v1/cerroblanco_dressing_v2.vmdl`; its original collider stays. The corrected
+    picture UVs show 22 individual artworks, and the hedge core is recessed under the leaf silhouettes.
+  - The accepted first lighting pass has 28 gallery/soffit spotlights and a 34 x 27 x 6 indirect-light grid (5,508
+    probes). Both native bake passes completed. Irradiance, distance and relocation textures are saved under
+    `Assets/lighting/cerroblanco/daylight-v1/`; these compiled textures are explicitly tracked. Relocation is serial
+    on the main thread, and Scene.Push scopes must never cross an await.
+  - Eleven real room/courtyard static reflections are compiled, assigned and saved under
+    `Assets/lighting/cerroblanco/daylight-v1/reflection_*.vtex_c` (512-square cubes, eight mips). Retain these ready-to-load
+    copies and the panorama sources. Do not enable realtime probes or call EnvmapProbe.Bake/CubemapRendering.Filter
+    on this driver. Captures reapply position, rotation, FOV 90 and square CustomSize before every render; the editor
+    otherwise resets its camera between frames. AO is temporarily disabled during capture and restored afterward.
+    ACES inverse/sky calibration has 0.055% channel disagreement and less than 0.1% clipped pixels on every face.
+  - Native checks pass all 96 spawn/objective floor, clearance and connected-path checks, with no missing models or
+    materials. The extraction checks subtract the intentional 32-inch trigger-center offset. Offline comparisons
+    also confirm the six model collision descriptions and all 546 spawn/objective/collision components are unchanged.
+    A local TDM test spawned the player and nine moving bots, with nav ready and the player camera selected. Three
+    short 1920x1080, 8x MSAA samples ran at 77-88 FPS with no sample hitches; exterior draw counts reach 3,555 and
+    remain a performance caveat. Samples are editor measurements, not a standalone benchmark. Shared Aimable and
+    bot SpotScratch hotload errors appeared during the test; no Cerro asset errors or compile failures were reported.
+    Play/network are stopped and `output/cerroblanco/test-state.json` records restored settings.
+  - Twelve final native views are in `output/cerroblanco/final`; the courtyard is the saved menu preview. Exterior
+    glass still needs its coated-glass comparison. `Tools/cerroblanco_quality_glass.py` stages a candidate under
+    `output/cerroblanco/glass-stage`, retaining source under `Sources/CerroBlanco/glass-v1`; it is not published yet.
+    The candidate applies the same adjustable dielectric reflectance to lighting, transmission and depth shading.
+  - `Tools/cerroblanco_quality_state.py` exports the saved editor visual state into
+    `Sources/CerroBlanco/quality-state.json`; the base map generator reapplies it so regeneration retains these
+    materials, details and lighting. Export it again after accepting further editor changes. Its preservation check
+    is idempotent and leaves the base collision/gameplay components unchanged.
+- Fit-out, landscape and panels (2026-10-15, the user's "get blanco map AAA"), on top of the quality pass:
+  - `Tools/cerroblanco_art.py` draws the shows into `materials/cerroblanco/fitout/` (about 4 minutes; `--only text
+    signs letters` skips the paintings):
+    - 16 made-up works: portraits for ROSTROS, seascapes for MAREAS, plateau landscapes for TIERRA ROJA, charcoal
+      studies for FORMA Y VACÍO (a torso and a pierced reclining figure, under mats) and two colour fields. Each is
+      flat shapes painted over with brush dabs that follow its edges, bristle streaks and a canvas weave; its normal
+      and roughness come from the same strokes.
+    - Each show's wall text in Spanish, the works' labels, the room plates, the wayfinding panels, the cafe's menu,
+      the opening hours, the green SALIDA exit signs and the galleries' names for the façades.
+    - `layout.json` there holds every rectangle on the sheets, for the fit-out's UVs.
+  - `Tools/cerroblanco_fitout.py` dresses the rooms. `cerroblanco_map.build()` records the walls, stairs, plinths and
+    pictures as it builds them (`Log.recording`), and the fit-out works from those:
+    - It hangs works with frames and labels in the clear runs of the rooms' walls and down both sides of the
+      freestanding display walls. Each gets a warm spot on the ceiling aimed at it (`Art Lights` in the scene, 72
+      with the wall texts' own).
+    - On the ceilings: lighting tracks with spot heads, diffusers, detectors and cameras. By the doors: exit signs
+      over the ones out, room plates beside them. Each room also gets an extinguisher and a return grille.
+    - Benches and vitrines, with collision, kept clear of every spot, stair, plinth and the map's own collision.
+    - The lobby: banners hung in the rotunda, a mobile in its clerestory, queue stanchions, screens on the desk.
+    - The cafe: the espresso machine, grinder, pastry case, pendant lights, menu board, and cups on the tables.
+    - Outside:
+      - wall lights by the doors, the façade lettering, and blinds behind half the upper windows;
+      - wayfinding totems, agaves in pots and pole lights on the promenade (with collision);
+      - cameras, downpipes and the roofs' plant;
+      - bike stands and three flags on the forecourt.
+    - The bike stands (`bike_stand`, 2026-10-25; the user saw seams at every bend) are Sheffield stands at their real
+      size: one 48 mm stainless tube swept in a piece (`P.sweep`), 700 mm long and 800 mm tall with 150 mm bends,
+      root-fixed into the paving, a metre apart in a row ending at e 1040. They were ten six-sided bars each, 18 wide.
+      Base plates were tried: the paving's relief (`cerroblanco_stone.shader`) buries anything within about 0.4 of
+      the ground, so plates showed only as slivers. Drawn only, as before. Published by splicing just their faces into
+      the installed `cerroblanco_fitout_fine.obj` (`output/cerroblanco/bike-stands-20261025/stage_stands.py`), and
+      checked in offscreen editor renders there, not yet in a match.
+    - Two models: `cerroblanco_fitout` (with collision) and `cerroblanco_fitout_fine` (drawn only).
+    - The façade banners (`banners()`) are drawn in the fine model. The glass install (`cerroblanco_glass.install`)
+      had rebuilt the buildings' model without them. The quality pass overrides the buildings' materials by slot, so
+      a new paint in that model would shift every override.
+  - `Tools/cerroblanco_landscape.py` replaces the backdrop:
+    - It keeps the old lie and adds detail on it: rolling ground, gullies, limestone outcrops, ridges and the sierra.
+    - It's a tensor grid 100 apart near the play. Every quad is one material, `cbf_land.vmat` on
+      `cerroblanco_land.shader`, which height-blends the terrain's dry meadow, meadow, dirt and rock by a painted
+      1024 splat (`land_splat.png`: R green, G dirt, B rock, A broad light and dark), so the ground has soft edges
+      instead of a paint per quad. The splat's texels follow the grid's three zones (`map_axis`, the shader's MapAxis).
+      Painting it adds ~25 s to a run; `--preview <dir>` writes it and its views.
+    - The woods are `Tools/cerroblanco_trees.py`'s alpha-tested cards cut from Belltower's generated tree atlas
+      (`forest-trees-v1.png`, three tints): ~6,000 trees and ~5,700 scrub, facing the play, in their own model, which
+      casts no shadows (`Backdrop Woods`), plus 300 cloud oaks. The old crown loop still draws its random numbers
+      (`BLOB_DRAWS`) into nothing, so the oaks stay where they were.
+  - `Sources/CerroBlanco/shaders/cerroblanco_panel.shader` draws the enamelled panels (`quality-v1/cb_panel.vmat`,
+    written by `cerroblanco_quality_materials.py`):
+    - each panel a little tilted and pillowed, so a façade reflects the sky unevenly, as real panels do;
+    - open joints box-filtered over the pixel's footprint (a fine tone from afar, not dotted lines), and faint rain
+      streaks under some of them.
+  - `cerroblanco_stone.shader` filters its joints the same way. The paving is warmer and darker (`0.93 0.91 0.86`),
+    with ±7.5% between slabs and one slab in twelve from a denser bed (`g_flSlabVariation`, `g_flOddSlabs`).
+  - The quality details' trims (`cerroblanco_quality_geometry.py`) are pale anodised (`cb_white`) or stone, at least
+    1.5 tall: copings, sills, heads and the cladding trim were sub-inch black lines that dashed and outlined every
+    roof. Thresholds are honed stone; the stair and threshold grooves are gone. The plinth and skirting follow the
+    floors (`floored()`), so none crosses the cafe or a two-storey façade.
+  - The forecourt's three flags hang from outrigger arms, facing north, with soft folds.
+  - Lighting (2026-10-17, after a critique of the captures): the rooms' fills at half (their patches in
+    `quality-state.json`), the indirect light at 1.1, the art spots 2.7x brighter and narrower (13/28), and the
+    exposure's range up to 4.5 so interiors adapt (it was 3: in-game the galleries were grey and evenly lit).
+  - How it's published:
+    - `cerroblanco_map.py --stage <dir>` writes everything under a folder laid out as Assets.
+    - `Tools/cerroblanco_publish.py` copies what differs into Assets, with `--scene` for the scene. It leaves out the
+      accepted glass and the unused base glass and dressing render models.
+    - It lists what it copied, in compile order, for `Sources/CerroBlanco/editor/compile-v2.cs.txt`.
+    - `capture-isolated.cs.txt` renders `output/cerroblanco/captures-v2/config.json`'s views into the config's
+      `folder`. It uses an isolated scene, so the open scene is untouched. The probes keep their saved textures, and
+      it updates the indirect light by hand.
+    - `navmesh-check-v2.cs.txt` paths both teams' first spawns to every spot in an isolated scene.
+    - `Tools/cerroblanco_compare.py <before> <after>` makes side-by-side sheets.
+  - Every run of the map script passes all 96 spots, the reach check and the Retakes sight check with the fit-out's
+    collision in.
+  - Another session reworked the hedges and bollards in place (the dressing_v2 OBJ, hedge fill objects in the
+    scene). Before a scene publish, run `cerroblanco_quality_state.py` so the staged scene keeps them, and diff the
+    staged scene against the saved one; the stage's `cb_panel.vmat` and panel shader must match Assets' newer ones.
+  - Status (2026-10-17): published and compiled with no failures; every model loads with valid materials. Isolated
+    captures (`captures-v2/after-v3`, `after-v4`) were reviewed, and the navmesh check passed 98 of 98 paths. Captures
+    pin exposure (4 outdoors, 5 indoors), above the game's; nothing of this pass has been seen in a match yet. The
+    critique's other findings are still open: doorways' black reveals, the art's look, sparse rooms and roofs, the
+    indirect light not covering the spawns or site B, the sierra's colour, and the perimeter wall.
+- Tree pits (2026-10-25, the user's screenshot of a black square under a tree). `cerroblanco_parts.tree` drew each
+  paved tree's "steel grate" as a flat `cb_black` 60-inch square, while the medium oak's trunk flare is 79 across where
+  it meets the paving (`TRUNK_FLARE`, cut from the models' triangles in the editor), so the roots spilled over it.
+  - Now `tree_pit`: soil (`soil`, 0.4 over the paving) inside a 4-wide honed travertine kerb 1.0 over it, its inside a
+    foot clear of the flare, rounded up to 6: 108 square for the full-size medium oaks, 96 at scale 0.9, 60 for the
+    small oaks. No collision (a 1-inch step). All 20 paved trees have one, with nothing else within 5 feet of them.
+  - Published by `Tools/cerroblanco_tree_pits.py`, a splice of `quality-v1/cerroblanco_dressing_v2.obj` only, as the
+    bollards' was: it removes exactly the 20 old squares and appends the pits; the vmdl (which already remaps `soil`
+    and `cb_honed`) and both colliders are unchanged. The base dressing OBJ, which only collides, still has the
+    squares. Checked in isolated-scene renders (`output/cerroblanco/tree-pits/after/`), not yet in a match.
+- The garden circle's lawns (bomb site B, `cerroblanco_map.lawn_quarter`, 2026-10-24): each quarter's grass runs up to
+  the two cross paths, its straight sides parallel to them, in a honed kerb (8 wide, 3 high) on all four sides. They
+  were annulus sectors with radial sides, so a wedge of gravel, widening outwards and with no kerb, lay between each
+  lawn and its path (the user: "the grass shouldnt stop where it is"). The gravel is now only the walk round under the
+  hedge (474-540). Drawn only, like the old lawns. `Tools/cerroblanco_stage_garden_lawns.py` swapped just those
+  triangles in the installed `cerroblanco_grounds.obj` (it finds the old lawns by vertex and refuses if any are
+  missing); its materials and slots are unchanged. Checked in isolated-scene captures
+  (`output/cerroblanco/garden-lawns/{before,after}/`), not yet in a match.
+- The bronze spheres (2026-10-24, the user's screenshot: "this looks bad"): the garden circle's (r 58) and the South
+  Gallery's (r 40) were near black and faceted. `cb_bronze` was a flat paint at metalness 0.9 tinted (92, 66, 40): as a
+  metal its colour is its reflectance, about a tenth, so it mirrored the garden dimly and had no lit side, and the
+  sphere was 24 x 12.
+  - `Tools/cerroblanco_bronze.py` makes it patinated outdoor bronze: a tiling 2048 x 1024 texture set (umber to tobacco
+    browns, soft grey-green run-off down it, a few rubbed spots; metalness 0.55 in the patina, 0.92 where worn,
+    roughness ~0.44) on complex.shader with `F_METALNESS_TEXTURE`, and `sphere()`, 64 x 32 with UVs once round and once
+    pole to pole. `bronze_sphere` calls it, and `cerroblanco_map.write_materials` writes the material through it
+    (`CB_PAINTED`'s BRONZE entry is only the previews' colour). The busts use the same material.
+  - Published by `output/cerroblanco/bronze-sphere/stage_bronze_sphere.py`, which swapped just the spheres' faces in the
+    installed `quality-v1/cerroblanco_dressing_v2.obj` (1056 out, 7936 in) and refuses a file changed since staging.
+    The hulls are unchanged. Checked in isolated captures (`output/cerroblanco/bronze-sphere/{before,after2}/`), not yet
+    in a match.
+- Ground-floor windows under an upper floor end at `GROUND_HEAD` (150), under the slab (2026-10-25, the user's
+  screenshot: "this looks a bit mad"). Twelve of them (the West and North Galleries', and the East Hall's beside its
+  mezzanine) took `glass()`'s default head of 190, over the first floor's top (180), so a 10" strip of glass, with the
+  ground outside seen through it, ran along the foot of the upper rooms' walls. Give a new one there `z1=GROUND_HEAD`.
+  - The fit-out took each strip for a door out of the upper room and hung an exit sign over it. A wall face lists every
+    opening up the wall, so every ground-floor door and window also got a sign and a room plate from the room over it:
+    stray signs at 159 over the 150-high windows, one over the cafe's inside door to the North Gallery, and a second sign
+    on each ground-floor door out. `door_fittings` now takes only openings that start at the room's floor: 30 exit signs
+    and 34 plates, from 57 and 51.
+  - Published by `Tools/cerroblanco_stage_window_heads.py` and `Sources/CerroBlanco/editor/import-window-heads.cs.txt`:
+    the buildings model (and its collision boxes), the three detail models, two new pane models and the scene's
+    Breakable Glass group (359 panes from 392; the panes renumber, so their ids shift) from a fresh build, each checked
+    to be the old build's before; the stray signs and plates taken out of the installed `cerroblanco_fitout_fine.obj`,
+    every other line kept. The import puts the same glass group into an open, unchanged Cerro Blanco document. Its
+    panes asked for the two new models before they had compiled and got error models until those were compiled again.
+  - Checked in isolated renders (`output/cerroblanco/glass-strip/after/`): the upper walls meet the floor along an
+    unbroken skirting, the façades' ground windows end under a stone band like their neighbours. Not yet in a match.
+- To play it: `dev_mode team_deathmatch cerroblanco` (or `dev_mode bomb_defusal cerroblanco`).
+
+## Riverdale (multiplayer map, `Tools/riverdale_map.py`)
+- The user asked for a new AAA nuclear reactor map "as close as possible" to two reference pictures (2026-10-14): a
+  reactor hall round a glowing cyan fuel pool (crane with "RIVERDALE NUCLEAR" and "SWL 125 T", mast in the pool,
+  glass control room upper left with a stair, B1/B2 blocks, slogans and the logo on the far wall, water purification
+  tanks, cases with the logo), and a wet plant yard at sunrise (A1 with "> REACTOR HALL", B1 with a stair up to a
+  double door, the UNIT 1 containment dome, two cooling towers, a red container "02", barriers, a forklift, pipes,
+  snowy mountains and pines). Riverdale Nuclear, its "A" logo (a triangle with an orbit swoosh, drawn by
+  `riverdale_materials.logo`) and every marking are the map's own.
+- Scripts, run in this order:
+  - `Tools/riverdale_materials.py`: the rv_ materials in `Assets/materials/riverdale/` (numpy, Boxyard's helpers):
+    formwork concrete, the hall floor, the wet yard with puddles, grating, yellow and grey steel, pipe jacketing, the
+    pool liner, glowing fuel racks, hazard stripes, cases, and three atlases: lettering (`LETTERS`, white on alpha,
+    tinted by `rv_letters_dark` / `_light`), signs (`PLATES`: the caution sign, UNIT banners, placards) and the control
+    room's screens (`SCREENS`, self-lit). `rv_pool_water` is Reef Hall's `hc1_tank_glass.shader` looking down.
+  - `Tools/riverdale_sky.py`: a golden morning on belltower_sky's code, the sun 16 degrees up 33 degrees north of east
+    (riverdale_map's SUN_PITCH, SUN_YAW), warm at the horizon, more cumulus near the sun. ~2 min.
+  - `Tools/riverdale_map.py [--preview <dir>] [--views ...] [--no-scene] [--no-models] [--art]`: everything else, with
+    `riverdale_parts.py` (pipes with bends, railings that add player clips, stairs on one wedge hull, tanks, jersey
+    barriers, cases, atlas quads, lamps that add point lights), `riverdale_hall.py` (the hall) and
+    `riverdale_backdrop.py` (domes, towers, terrain, pines, the tower crane, outer blocks; drawn only). The scene is
+    rewritten whole on every run.
+- Layout (plan e, n, z inches; mirrored across e 0; play e -2300..2300, n -1750..2450): Red spawns west, Blue east.
+  - The hall (e -1000..1000, n -200..2000, roof 1000): deeper than wide so its south end frames the reference. Pool R
+    520 round (0, 900), water at -30, liner to -520, racks and a lit mast in it; railing round it clipped to the roof.
+    Upper level at 288: a control room on each side wall (n 660..1200, glass on its pool and south sides) on columns,
+    a stair from the south deck (n 160..580) to a landing, walkways along the side and north walls, the B1/B2 blocks
+    (n 1300..1640) flush with it. Crane girders at n 840/960, z 836. Doors: west/east (annexes), south (yard apron),
+    two north (lane). Tanks south-east, logo cases south-west.
+  - Annexes on the hall's sides: A1 east (the reference's), A2 west, south faces with the sign, louvre, hazard jambs.
+  - Yard: C1 in the middle (core with an upper room, wings and stairs both sides, a pipe bridge to the hall), the
+    turbine annex south of it with generators either side breaking the south lane's sightline, a turbine block with
+    its sign on each yard's south edge, containers (east red 02, west blue 04), barriers, the forklift
+    (`lowtide_forklift`), cases, light masts.
+  - Spawn buildings B1 (east) / B2 (west): a stencilled wing, a stair up to a double door into an upper room, against
+    the boundary building. The hero yard view is from C1's east stair looking east (VIEWS "yard_reference").
+  - North lane between the hall and the perimeter wall, under a pipe rack; courts north of the annexes.
+  - Sites: A on the hall's east deck under the east control room, B in the east yard round the red container.
+- Backdrop (`riverdale_backdrop.py`): UNIT 1 dome at (4400, -1150) and UNIT 2 at (-4400, -1150), over each yard's far
+  end and clear of the B1/B2 spawn building, with the logo, name, red banner (17 degrees round from the logo) and
+  beacons on the face towards their yard, vent stacks, auxiliary blocks and pipe bridges; cooling towers at
+  (±10300, 4160) and (±14240, 2150), placed so the east yard's view finds them over A1; a heightfield ring of forested
+  hills and snowy massifs (the ridge field blurred round the ring, snow painted per quad: per triangle it made rows of
+  white teeth); 2600 pines from 6000 out (nearer, they stood over the roofline as black spikes). Domes and towers cast
+  no shadows (the low sun would put the yards in their shade).
+  - Its gravel ground is a ring round the play area (whose own ground runs 400 past its edges). It used to be one slab
+    over the whole map at z -30..-24, which capped the fuel pool (water at -30): from the deck the pool read as an
+    opaque teal sheet, the cyan lamps lighting the slab's top.
+- The look (`look_object`, `HAZE`): AO, a warm grade, a vignette, bloom (0.32 over 1.15), screen-space reflections and
+  ACES with auto exposure 1-2.5; volumetric haze in the hall (0.35) and a light one over the yards (0.06).
+- The pool's light (2026-10-15, the user in a match: "riverdale pool lighting is mad bright"). It read as a white
+  sheet with glare blobs round its rim. Now:
+  - water scatter 0.03/0.32/0.46 and deep 0.006/0.10/0.20, shafts 0.35, caustics 0.9 (were 0.1/0.95/1.35,
+    0.02/0.3/0.55, 0.7 and 1.4). The shafts add up to 2.1 times the scatter, so they were most of the white;
+    the scatter was already down from 2.9 blue;
+  - the 24 lamp strips at the waterline (`rv_lamp_cyan`) glow 3 (was 14: those were the blobs), the racks 2.5 (8),
+    the mast's core (`rv_cyan_glow`) 2 (6);
+  - the 8 pool lamps under the water 0.10,0.42,0.52 and the 6 glow lights over it 0.05,0.27,0.38, about half, as they
+    light the haze over the water.
+  - Checked in the offscreen captures (`pool_close`, `hall_reference`): deep teal water with the racks and mast seen
+    through it. Not yet seen in a match: the materials recompiled into the user's running one, the lights only come
+    with the next load of the map.
+- Checks (`check_spots`, `check_reach`, `check_retakes_sight`) pass for all 95 spots.
+- `Sources/Riverdale/editor/` (run each with the native MCP's run_csharp, `{"path": ...}`):
+  - `compile-stale.cs.txt` force-compiles every riverdale material, model and the scene whose sources are newer than
+    their compiled files. The file watcher misses some of a run's rewrites (the backdrop's 35 MB OBJ, the flat paints),
+    and `CompileIfNeeded` doesn't look at a model's OBJs.
+  - `capture.cs.txt` renders the views offscreen into `output/riverdale/captures/` without touching the open scene,
+    as `config.json` there says (`views`, `width`, `height`, `settle_frames`, `stream_frames`, and `hide`: objects
+    to leave out by name). It marks every texture used at full size and waits ~3 s first: straight after loading the
+    lettering sampled low mips and read as black blobs. A capture that overlaps an asset reload can show a green sky;
+    run it again. Long captures (1920x1080, several views) can outlast the CLI's timeout.
+- The menus' picture, `ui/maps/riverdale.png`, is the capture's `map_art_hall` view (1920x1080): the hall from the
+  south deck, the crane, the far wall and the glowing pool. `--art` would overwrite it with the old flat-shaded stand-in.
+- Checked in those renders on 2026-10-14 against the references: the hall (crane lettering, the logo and slogans in
+  the bays between the far wall's pilasters, the glowing pool with its racks), both yards (A1/A2, the domes' faces,
+  TURBINE BUILDING, the containers), the control rooms, the north lane, the court and the aerial. Not yet played: no
+  match, bots, navmesh or modes have run on it.
+- The AAA pass (2026-10-16 and 17, the user: "get riverdale AAA with a workflow"). A first round's agents wrote
+  `riverdale_facades.py` (the yard buildings' faces), `riverdale_yard.py` (ground detail and clutter, drawn only) and
+  `Sources/Riverdale/lighting/` (its README has the bake). An overnight pass whose session isn't on record then published
+  it all and added:
+  - the baked light, revision `daylight-v1`: three indirect volumes (yard, hall, pool) and twelve static reflection
+    cubes, kept in `Sources/Riverdale/lighting/*.json` for regeneration (`.gitignore` lets their `.vtex_c` in);
+  - box colliders for the big pipes and the yard props ("Pipe Solids", "Yard Prop Solids": `riverdale_parts.PIPE_SOLIDS`,
+    `riverdale_collision_scene.py`, `riverdale_merge_collision.py`);
+  - `RiverdaleGratingStabilizer` (`Code/Map/`): an opaque, mip-filtered grating in place of the shimmering alpha-tested
+    one (`riverdale_grating_stable.py`);
+  - cooling-tower vapor (`riverdale_vapor.py`). Its report says gameplay routes from both spawns reach both sites.
+  - The backdrop's trees split into 16 render-only sectors (`riverdale_spatial_verify.py`): the sector models are in
+    `models/maps/riverdale_sectors/`, but the saved scene still draws the unsplit tree models.
+- Round 2 (2026-10-17), from fresh offscreen captures:
+  - The hall's walls were blotched light and dark: the hall volume's probes are ~10 ft apart on 80 ft walls. Rendering
+    with the fog, then the indirect light hidden showed it was the light, not the haze. The hall volume's NormalBias
+    70, ViewBias 100 and RuntimeIntensity 2.1 (were 20, 30 and 1.8) smooth it with no re-bake, and keep the floors
+    neutral (at 90/120 a red lamp tinted the walkway pink). Set in the saved scene and `indirect.json`.
+  - The turbine buildings' three steam lines left the wall 28 in out, so each elbow met the next and every line read as
+    a closed loop. They now leave at one height as a bank 46 in out, on a channel bracketed off the wall with clamp
+    bands (`yard_side`), and their colliders moved with them. The jacketing (`jacketing`) is duller: roughness 0.54
+    (was 0.38), softer oxidation and grime. It read as chrome.
+  - The court's transformer (`transformer`): a lid flange, skids and stiffeners, two banks of 14 panel radiators a side
+    on headers, three shedded HV and four LV porcelain bushings (`rv_porcelain`), an oil bund with gravel. Plinth and
+    tank collision unchanged.
+  - The control rooms' back walls on the upper walkway (`riverdale_hall.control_back`): a supply duct, a cable tray, a
+    distribution board, a notice board, an extinguisher, the door's frame and plate, a camera.
+  - The blurry console buttons in captures are the capture's 1024 texture cap, not the atlas.
+- How to change it now:
+  - `riverdale_map.py` builds on Railhead's prop and container code (`railhead_props`, `lowtide_container`, ...), which
+    other sessions change. So a fresh build differs from the published yards in places nobody meant to touch (on
+    2026-10-17, ~13k triangles of `rw_steel_dark`). Don't publish a whole rebuild over them. `Tools/riverdale_splice.py`
+    takes the change as the difference between two builds (without and with it, `--baseline` / `--current`) and
+    applies just that to the published OBJs, refusing if any face it removes isn't there.
+    `Tools/riverdale_build_models.py` builds the models with the backdrop stubbed out (~5 min), from a source
+    dir ahead of Tools for the baseline. It imports that dir's modules first: `riverdale_materials` puts Tools back at
+    the front of `sys.path`.
+  - `Tools/riverdale_merge_pipe_solids.py` carries a staged scene's "Pipe Solids" into the saved scene and checks that
+    nothing else changes. The saved scene round-trips through `json.dumps( indent=2 )` byte for byte (CRLF kept).
+  - `Sources/Riverdale/editor/editor_call.py` is a short native connection (`--direct-call --script <cs.txt>`).
+    `capture.cs.txt` takes `"set": [{ "object", "property", "value" }]` to try a component's value on its copy.
+- To play it: `dev_mode team_deathmatch riverdale`.
+
+## Riverside (Zombies map, `Tools/riverside_map.py`)
+- The user asked for a Zombies trailer park map "as close to this img as possible" (2026-10-15). The picture is a night
+  view down the muddy lane of a Florida trailer park:
+  - the RIVERSIDE TRAILER PARK sign with GOOD TIMES / BIGGER TOMORROW under it and STILL HERE sprayed below, and a porch
+    trailer strung with lights;
+  - SPEED LIMIT 15, a chain-link dog run with TRAILER PARK PEOPLE TOO, an open cooler (SOME THINGS SHOULD STAY
+    FORGOTTEN) and a teddy;
+  - burning drums, the LUCKY STOP (BEER • SNACKS • FUEL • SURVIVAL) and its shed's FUEL FOOD GUNS A BETTER TOMORROW?,
+    NO PLACE BETTER in red neon, a wrecked pickup;
+  - a guard tower's searchlight, a raised trailer with SAFE HIGHER STRONGER and a ladder, a boarded camper with a
+    bloody handprint, a water tower (RIVERSIDE STICKS TOGETHER), pines and palms, a full moon in broken cloud.
+  Every name and slogan is the picture's own made-up one. Its game HUD and weapon name aren't copied.
+- Scripts, run in this order (each docstring has the details):
+  - `Tools/riverside_materials.py [names] [--scale 0.25] [--out <dir>]`: the rs_ materials in
+    `Assets/materials/riverside/` (surfaces at real size, siding and board tints, chain-link, tree cards, flat paints)
+    and three atlases: `rs_lit` (self-lit signs and windows), `rs_signs` and `rs_paint_*` / `rs_blood`. The spray paint,
+    brush lettering and the neon script are drawn from strokes (`STROKES`, `SCRIPT`), not a font.
+  - `Tools/riverside_sky.py`: a moonlit cloudy night (the moon 3 degrees west of north, 15 up, drawn big as in the
+    picture, in a gap in the clouds).
+  - `Tools/riverside_map.py [--preview <dir>] [--views ...] [--no-models] [--art]` with `Tools/riverside_parts.py` (the
+    trailers, porches, store pieces, poles and wires, fences, props, vehicles, signs, towers and trees). It writes the
+    models to `Assets/models/maps/riverside/`, the scene `Assets/scenes/maps/Riverside/riverside.scene` (rewritten
+    whole) and the radar picture. `--preview` renders flat night views from the picture's camera.
+- Levels (plan e, n, z): the pad (z 96, spawns, the office, the dog run, the camper), the terrace (z 96, the porch
+  trailer and the sign), the flats (z 0, the park), and the levee (z 96, along the river on the east, the stilted
+  trailer). The south ramp, the north ramp and the stairs by the store join them in a loop to run zombies round.
+- The picture's camera is `REF_EYE` (60, -420, pad + 124), 1.5 degrees east of north and 7 down, 80 across. Things were
+  placed from their bearing and distance in the picture. Its eye is about twice a standing player's over the ground (it
+  sees over the camper's roof), so a timber watch deck stands there (`watch_deck`, `DECK`: 5 ft up, rails on three
+  sides, sandbags along its front, steps up its back): a player standing on it sees the picture's view. The `player`
+  capture view is from the pad.
+- The guard tower's searchlight throws a visible beam (`riverside_parts.beam_cone`, `rs_beam`,
+  `shaders/hc1_light_beam.shader`), drawn in the patches model so it casts no shadow. A new shader needs
+  `EditorUtility.CompileShader` before its vmat compiles.
+  - Redone on 2026-10-15 (the user: "this light needs work its awful"). It was a textured additive cone at intensity
+    0.9: at night's exposure it blew out to a solid milky cone with hard edges, cut through the trailer it was aimed
+    past, and pointed down while the lamp housing pointed level.
+  - Now the cone is only a closed proxy (a truncated cone, outward normals) to shade inside. The shader takes each
+    pixel's ray once (on the proxy's far side: its normal facing away from the eye), works out where the ray is inside
+    the cone analytically, clips that at the opaque scene's depth (no depth test), and marches 24 steps of single
+    scattering through it:
+    - the light spreads from a virtual source behind the 8" lens (`LAMP_LENS`), 2.5 degrees to 1/e^2 (`BEAM_ANGLE`, a
+      searchlight's near-collimated beam; at 4.5 it faded out before the ground), with a flat-topped soft profile,
+      falling as one over the distance squared;
+    - Henyey-Greenstein forward scattering (g 0.45), so it's brighter looking up the beam; looking into the lamp is
+      capped (`min( sum, 6 )`) but still dazzles;
+    - slowly drifting lumpy haze (value noise), and the scene's fog between the eye and the beam dims it.
+  - The pool where it lands is lit by the same shader: any surface the eye sees inside the cone gets Lambert light
+    (normal from the neighbouring pixels' depth) over an assumed muddy albedo (`g_flPoolIntensity` 150,
+    `g_vPoolAlbedo`). It lights a zombie in the beam too, but casts no shadows.
+  - There's no SpotLight for it any more. In s&box a spot as narrow as the beam lights nothing (offscreen tests: 3.5
+    degrees lit nothing even 200 from the ground, 10 degrees did), and its quadratic falloff had died out 25 m away
+    even at 75 times the brightness. The old one also sat inside the lamp housing with shadows on.
+  - The cone's world-space geometry is in its material, so `riverside_map.py` writes `rs_beam.vmat`
+    (`riverside_materials.beam_vmat`) with the models; the materials script no longer does.
+  - The lamp housing points at the target (`guard_tower(..., aim=)`). The target is `(-410, 730, 0)`, down the lane
+    towards the entrance: every ray of the old one at `(-1100, 900)`, centre included, went through a lowland trailer's
+    roof. A scratch check (rays inside 6 degrees against the solid models' collision) found the new one clear.
+  - Checked in offscreen captures (`capture.cs.txt`'s `beam_side`, `beam_under`, `beam_tower`, `beam_lane`,
+    `beam_pool` and `reference`), not yet in a match.
+- The wrecked pickup in the lane came out on 2026-10-15 (the user: "remove this car its trash"). `riverside_parts.pickup`
+  is still there, unused.
+- The sky's cloud bodies are lighter than the clear sky behind them (moonlit grey-blue), as in the picture; drawn darker,
+  they vanished. The scene's sky tint is 3.4.
+- Zombies only: the scene lists only `zombies.prefab` and sets `MapInformation.ZombiesOnly` (the Sewage map's flag),
+  which `MatchLauncher.ZombiesMaps` reads. It isn't in `GameUtils`' match maps, so Quick Play, Ranked, the playlists
+  and the map vote don't offer it.
+  - `ZombieSpawnPoint` (`Code/Maps/`): `ZombiesRoundSystem.TryFindSpawnPosition` takes a map's own points first, 600-3200
+    from the nearest player, unseen ones first. Riverside has 16, inside the gaps in the perimeter fence (the gaps are
+    clipped for players).
+  - `ZombiesStationSpot` (`Kind`, `Order`): `PlaceBuyStations` stands each kind at the map's spots, lowest Order first:
+    the weapon crate in the store, the workbench by the office, wall weapons on the office, the shed and a levee
+    trailer, ammo boxes on the pad and the levee.
+- `MapFire` (`Code/Maps/MapFire.cs`): dressing fires (the drums, the burning trailer, a far fire across the river) with
+  `FireParticles`' flames, smoke and embers and a flickering light. Each machine draws its own; it doesn't spread or
+  hurt. It runs in the editor too (`ExecuteInEditor`), so the scene view and captures show it.
+- `WorldWind.Velocity` is in metres per second: "18,-30" blew every flame sideways. The scene's is 0.45,-0.75.
+- The signs read in the engine after tuning: the `rs_lit` atlas's self-illumination is 4.5, the Lucky Stop board's
+  mask is low (the lamps over it light it), and the bulbs and lamps are 5-7 bright. Brighter, they bloomed over the
+  lettering close up.
+- Checked:
+  - all 28 spawn and station spots (room, floor, reach) with railhead_map's checks;
+  - offscreen in the editor (`Sources/Riverside/editor/navmesh-check.cs.txt`): a generated navmesh has complete paths
+    from the first player spawn to all 16 zombie spawns, 7 station spots and 8 player spawns. The isolated scene used
+    the default bounds, not the scene's custom ones;
+  - offscreen captures (`capture.cs.txt`, views in `output/riverside/captures/config.json`), compared with the
+    picture. The menu picture `ui/maps/riverside.png` is the `map_art` capture. `compile-stale.cs.txt` compiles what the
+    file watcher missed.
+- The burning trailer is charred (`rs_siding_burnt`), with soot blown up its walls from the windows.
+- Played once in the editor (2026-10-15, round 1 only):
+  - The Zombies match started on it, the 8 zombies of round 1 came at the player along the lanes, and the stations
+    stood at their spots. No Riverside errors in the log. A player standing on the watch deck sees the picture's view.
+  - The office's wall weapon floated 40 over the pad: its spot is against the office's wall, so the floor trace
+    started inside it and took its start for the floor. `PlaceBuyStations` now keeps a spot's own height when the
+    trace starts solid. Compiled with dotnet, not seen in a match.
+  - Not yet checked: later rounds, downs and revives, buying at the stations, and the frame time with 97 point lights
+    (8 shadowed) and 15 fires.
+
+## Ares (multiplayer map, `Tools/ares_map.py`)
+- Pipe end closures (2026-10-27): all 16 wall-service runs now have smooth dished heads, closing the 32 missing
+  end faces. `ares_pipework.pipe_run` includes them in future generation. The installed repair appends only
+  17,472 head triangles to the active base OBJ, retaining every prior byte and the complete ModelDoc/physics.
+  See `Sources/Ares/pipe-end-fix/README.md` and `installed.json` for native captures and verification.
+- Formed pressure doors (2026-10-26): `Tools/ares_airlock.py` now exports `ares_pressure_formed.pressure_door`,
+  following `Sources/Ares/pressure-doors-v3/concept-v1.png`. All three hatches have true recessed pressings and
+  service pulls, rolled/chipped edges, cast spindle clamps, a seated gasket, recessed wheel and new private PBR maps.
+  The hall uses the unchanged v2 base import plus the three v3 door imports; its complete physics suffix is preserved.
+  See `Sources/Ares/pressure-doors-v3/README.md` and `installed.json` for scope, validation and guarded import details.
+- Pressure-door rebuild (2026-10-20): `Tools/ares_airlock.py` replaces the six-box wing/cargo hatches with chamfered
+  pressure frames, rubber seals, two recessed coated-metal leaves, six locking dogs, hex pivots, kick plates, a
+  three-spoke release wheel, inspection port and pressure/control display. Warning stripes are confined to the
+  threshold. The wheel is at z 58 and controls at z 39..80, providing human scale within the large cargo-size doors.
+  - `wing()` and `concourse()` call `pressure_door()`; all three assemblies remain inside their original collision
+    envelopes. Existing `ar_ext_*`, `ar_rubber`, `ar_rover_white` and screen materials are reused without changing
+    any material source. Painted light hardware keeps the wheel and clamps readable in the dim rooms.
+  - `Tools/ares_airlock_refresh.py` removes only the 216 old hatch triangles and appends 3,954 new triangles to the
+    installed hall OBJ, preserving all previous stair/console edits. It adds eight existing-material aliases to the
+    hall's MTL/ModelDoc remaps and leaves the complete physics definition unchanged. The hall is now 27,654 triangles.
+    Reproduce the migration from `--source-root output/ares/airlocks-20261020/before`, not the installed new hatches.
+  - `Sources/Ares/airlocks/import.cs.txt` publishes only the hall OBJ/MTL/VMDL through the editor, followed by native
+    VMDL compilation. `output/ares/airlocks-20261020/` contains backups, scope hashes, staged sources and native
+    captures of both wings, the cargo door and an angled view. This is a visual rebuild of the existing sealed doors;
+    the scene, collision, lights and active editor/play state are preserved by the workflow.
+- Stair surface fix (2026-10-20): all four 28-step flights had yellow nosing fronts coplanar with the steel tread
+  fronts, and yellow ends on the stringers. These different materials fought for the same pixels as the camera
+  moved. `stair()` now omits the hidden steel front and yellow end/bottom faces. The grating stops two inches
+  behind the front edge, where the nosing ends; the nosing meets the riser at top-1.5 and finishes at top+0.125.
+  - `Tools/ares_stair_refresh.py` stages those edits in the installed hall OBJ, preserving earlier console UVs,
+    all unrelated geometry and every collision source. It is a migration of the original stair geometry; reproduce
+    from `--source-root output/ares/stairs-20261020/before`, not from the already repaired installed mesh.
+  - Import via `Sources/Ares/stairs/import.cs.txt` in the CLI exchange directory, then compile `ares_hall.vmdl`.
+    This only refreshes a model asset and does not switch scenes or change play state. After this pass the hall was 23,916
+    triangles (896 hidden/conflicting triangles removed). Materials, stair ramps, scene and gameplay are unchanged.
+  - `output/ares/stairs-20261020/` holds backups, source hashes, geometry counts and native moving-camera captures
+    for the hall and wing stairs. An independent planar-face audit found 672 overlapping quad pairs between
+    hazard and steel/grating within the flights before the repair, and zero afterward.
+- Animated processing core (2026-10-20): `ar_plasma.vmat` uses `shaders/hc1_ares_plasma.shader`. The existing
+  turbulence texture moves upward and around the column through a gently curling field, with broad dark amber
+  pockets and brighter moving detail. The two noise layers and curl wrap at the mesh's U=0/2 cylindrical seam.
+  - `ares_materials.plasma_vmat()` preserves the settings: brightness 1.8, rise 0.018, swirl 0.008, flow height 180,
+    warp 0.055, dark areas 0.85 and pulse 0.03. The pulse combines two slow periods and stays within +/-3 percent.
+    It runs in the GPU material using engine time, in both editor and play; no game component or network update.
+  - `Sources/Ares/plasma/` holds the staged shader, guarded two-asset import and isolated native capture scripts.
+    Import compiles the shader before replacing the material, then compile `ar_plasma.vmat` with the native tool.
+    The plasma textures, core geometry, glass, collision, scene and actual lights are unchanged. The generator
+    still writes the original turbulence textures, so material regeneration retains the animated shader.
+  - Captures and source preservation hashes are in `output/ares/plasma-20261020/`. Motion previews can constrain
+    exposure on their isolated scene copy; that comparison setting is never written to the map. The user's active
+    editor scene is never switched by the capture helper; its isolated scene is destroyed in `finally`.
+- Control displays (2026-10-20): eight built-in ImageGen panels replace the placeholder bars/noise. The original
+  atlas, full prompt and provenance are in `Sources/Ares/screens/`. `ares_materials.py ar_screens` resamples that
+  source into the existing 2048x1024, four-column/two-row atlas; it must not redraw the old placeholders. Screens
+  use roughness 0.65, no specular and self-illumination 0.75 to keep the schematics readable.
+  - Corrected the eight sloped consoles' mirrored UVs. Four pump readers now use the coolant tile on their fronts
+    and steel on the edges. Both Red Planet signs are centred at z 163: the picture spans 135..191, above the
+    monitors' top at 130; its backing stops at 191.5 below the gallery underside at 192.
+  - `Tools/ares_screen_refresh.py` stages only those OBJ vertex/UV/material edits. It is a one-time migration;
+    reproduce from `--source-root output/ares/screens-20261020/before`, not the already migrated installed meshes.
+    Import with `Sources/Ares/screens/import.cs.txt` in the CLI exchange directory, then compile the screen material
+    and three models. Backups, geometry counts, preservation hashes and native captures are in
+    `output/ares/screens-20261020/`. Both control rooms were checked in the engine. Scene and collision are unchanged.
+- Exterior colony rebuild (2026-10-19): `Tools/ares_outpost.py`, called by `ares_map.backdrop()`, replaces the
+  luminous dome atlases, window-grid spires and plain blocks outside the play area. Habitats now have matte
+  insulated shells, geometric ribs, dark observation windows, human-sized airlocks and supported pressure links.
+  The atmosphere processors are shorter pressure-vessel skids with access decks, ladders, manifolds and instrument
+  masts; service buildings have folded shoulders, rooftop exchangers and piping. Radiator banks and small shielded
+  route markers complete the exterior. Signs use an upright, independently mapped atlas.
+  - `python Tools/ares_materials.py outpost` generates eight private `ar_ext_*` materials. It does not redraw the
+    facility's shared paints. Rebuild the mesh with `ares_map.py --backdrop-only [staging-dir]`.
+  - `Sources/Ares/editor/outpost-import.cs.txt` imports the staged sources through the editor. Backups, hashes,
+    staged assets and captures are in `output/ares/outpost-20261019/`. The completed backdrop is 203,000 triangles,
+    drawn only; the terrain's 107,576 and the boulders' 11,760 triangles retain identical positions, UVs and normals.
+    Source hashes also check the scene, facility models and previous materials. No frame-time benchmark.
+    Habitat, processor and observation-window views were checked in the engine with no new compile errors. An
+    isolated capture with settled exposure refreshed `ui/maps/ares.png`; the user's scene, play state and camera
+    were restored/preserved.
+- Martian terrain pass (2026-10-19): the plain uses broad, low swales instead of metre-scale noise sampled below
+  the mesh spacing. The cliff has a wider weathered shoulder, and the far range uses smooth bounded noise instead
+  of folded noise that produced pointed peaks. Smaller, partly buried rocks replace the oversized boulders.
+  - `ar_regolith` and `ar_rock` have muted ochre/taupe colours and gentler normals. `ar_terrain.vmat`, generated by
+    `Tools/ares_materials.py ar_terrain`, uses `shaders/hc1_ares_land.shader` to blend them continuously by slope, with
+    world-space dust and triplanar bedrock. Terrain triangles all use this material; whole-face rock/dust selection
+    exposed the grid as hard zigzag borders. Boulders retain `ar_rock`.
+  - `python Tools/ares_map.py --backdrop-only [staging-dir]` rebuilds just `ares_backdrop`, preserving the facility,
+    scene and menu images. This terrain pass produced 133,646 triangles (107,576 terrain), before the colony rebuild
+    above, drawn only. No frame-time measurement.
+  - Native editor import/compile: `Sources/Ares/editor/terrain-import.cs.txt` (copy into the CLI exchange directory).
+    Backups, staged assets, hash checks and before/after captures are in `output/ares/terrain-20261019/`.
+    In the sampled plain (e -5000..5000, n 2700..7000, 80-unit samples), the 95th-percentile slope fell from 34.9 to
+    3.9 degrees. Ground, window and cliff views were checked in the editor; assets compiled with no new errors.
+    The Ares scene file and edit/play state were preserved.
+- The user asked for a map on Mars "as close to this img as possible" (2026-10-14), from a reference picture of an
+  atmosphere-processing plant:
+  - the ATMOS PROCESSING column glowing orange through its glass, in a dark steel hall ringed with galleries;
+  - a leaning window wall onto the red plain with habitat domes, spired towers and two moons;
+  - the facility's posters and banners (ARES FACILITY, HUMANITY FURTHER, HABITAT B, RED PLANET REAL PROGRESS) and
+    black hard cases stencilled MARS / BIGGER / CLEANER / BRIGHTER.
+  It's indoors and pressurised, so it has the game's normal gravity (the user said so). Nothing in the scene changes
+  gravity. ARES FACILITY and its red triangle mark are the picture's made-up company.
+- Built by script like Boxyard, from three scripts (each docstring has the details):
+  - `Tools/ares_materials.py`: the ar_ materials drawn with numpy into `Assets/materials/ares/`, its atlases (cases,
+    signs, lit door signs, screens, plasma, domes) and flat paints. Run it first. `names` redraws only those.
+  - `Tools/ares_sky.py`: a Martian evening (near black overhead, a rust haze at the horizon, stars, a sun with the
+    blue halo of a Martian sunset). Written with belltower_sky's EXR writer and wrapping.
+    - The moons are drawn far bigger than Phobos and Deimos really look (3 and 1.7 degrees across), as in the picture.
+    - They sit low in the north-north-west, so from the menu picture's view they hang in the window's top right.
+  - `Tools/ares_map.py`: the models (`ares_hall`, `ares_reactor`, `ares_dressing`, `ares_glass` and `ares_backdrop`;
+    the last two are drawn only), the scene (`Assets/scenes/maps/Ares/ares.scene`, rewritten whole on every run) and
+    the radar picture.
+- Layout (plan e, n; mirrored across e 0; floors at z 0 and galleries at G 208):
+  - The Atmos Hall, e -1100..1100 and n -720..720, 720 high. The column stands in its middle on a 16 high plinth.
+    - A ring catwalk runs round the column at G, with a bridge from it to each side gallery.
+    - Galleries run round all four sides. The north one, the observation deck, runs along the window and is bomb
+      site A at its east end.
+    - A stair in the void beside each side gallery, and a glass-fronted control room under each side gallery.
+  - The window wall leans out 14 degrees (`LEAN`): mullions every 200, a glass collision slab, cheeks against the
+    side walls. Outside, the land falls away from a cliff under the window.
+  - The wings: SECTOR 03 in the west (Red Team spawns there) and HABITAT B in the east (Blue Team).
+    - Each is double height, with an L of mezzanine along its north and inner walls and a stair up its outer wall.
+    - Three doors lead into the hall: the floor's middle door, the side gallery's SECTOR 03 / HABITAT B door, and
+      the north door onto the observation deck.
+    - A blast screen inside each middle door stops a sightline from site A through the door into the spawn.
+  - The cargo concourse runs along the whole south side (n -1400..-752, 320 high). Its middle is clear; the rover and
+    its collision were removed on 2026-10-15. Bomb site B is the cargo bay at its east end.
+- Lanes: north is the observation deck and the wings' north mezzanines; middle is the hall floor past the column, with
+  the ring and bridges over it; south is the concourse.
+- Modes: the scene lists TDM and Defuse. It has 32+4 deathmatch spawns and Retakes spawns per site. Domination is A in
+  the west wing, B by the column and C in the east wing. Hot Zone and Cash Grab spots are `ObjectiveSpot`s.
+  `GameUtils` lists it (menus, Quick Play, vote, Ranked).
+- Every run checks all 93 spots, as Boxyard's checks do. All pass: room and floor, reach, and no Retakes pair in sight.
+- Checked offscreen in the editor on 2026-10-14, in an isolated scene (the editor's own was left alone):
+  - A navmesh generated with the scene's agent and bounds: 186 of 186 paths complete from both spawns to every spot.
+    The only islands are roofs, case tops and points inside the column.
+  - Traces: the column is solid at radius 170 at every height. The window, wing windows and control-room glass
+    block. A railing's top rail blocks players, and you can shoot between its rails.
+  - Renders: `Sources/Ares/editor/capture.cs.txt`, with views in `capture-config.json`, writes to `output/ares/`. Its
+    `art` view writes the menu picture, `ui/maps/ares.png`, from `ares_map.ART_VIEW` on the south-east gallery,
+    framed like the reference picture.
+  - Offline, `railhead_render.py` renders it in Cycles with `SCENE` pointed at ares.scene (a scratch wrapper).
+- Learned making it:
+  - The editor's file watcher missed the new folders: assets reported "no source file". Register them with
+    `Editor.AssetSystem.RegisterFile` in a run_csharp script, then compile vmats, then vmdls, then the scene.
+  - OBJs rewritten while the editor was stalled compiled into a fresh `_c` identical to the old one (same hash), so
+    renders showed the old mesh. Register the .obj and .mtl again with `RegisterFile`, then `Compile( true )` the vmdl,
+    and compare the `_c`'s hash before and after.
+  - A 768 px normal map failed to compile ("GenerateMips HemiOctIsoRoughness_RG_B"), and every model using its
+    material failed with it. Keep normal maps a power of two.
+  - The engine ignores a mesh with a point 90000 out ("ignoring mesh"), so the land stops 60000 out (`WORLD_EDGE`)
+    and rises there so its rim never shows.
+  - `map_kit.Model.oriented_box` needs right-handed axes. Left-handed ones draw the box inside out, and its collision
+    fails map_kit's angle assert.
+  - The original plasma at self-illumination 12 blew the whole view out under bloom. It was reduced to 2.4 before
+    the animated shader above replaced it. The scene currently uses bloom 0.135 over 2.5 and auto exposure 1.7-3.35.
+  - Point lights in the engine are far dimmer than Cycles shows them: the lights here are 2.5-3.2 times white.
+- Not yet checked: a match played on it (bots, every mode's objects, spawns), its frame time with 102 point lights (10
+  with shadows), and any sound (it has no ambience).
+
+## Veridant (multiplayer map, `Tools/veridant_map.py`)
+- Spa windows (2026-10-25): `Tools/veridant_spa_windows.py` replaces the nine
+  flat opaque/emissive spa panes with recessed masonry openings, bronze frames,
+  glass and shallow furnished rooms with folded linen curtains. The two facade
+  faces and old window/fixture faces are removed only from the active buildings
+  base OBJ; `spa-windows-v2/spa-facades.obj` supplies 43,420 replacement triangles.
+  Original OBJ indices, other imports and the complete physics suffix remain.
+  `spa()` retains the original two collision boxes and four lamp identities;
+  those lamps are now below the sills, with their native scene positions saved.
+  Only those four scene Position properties changed from the immediate backup.
+  `configure()` preserves `vr_spa_` materials. Final stage-v4, thirteen successful
+  native compiles and three reviewed captures are recorded in
+  `Sources/Veridant/spa-windows-v2/README.md` and its installed receipt.
+- Pergola flowers (2026-10-24): `veridant_parts.bougainvillea()` delegates to
+  `Tools/veridant_bougainvillea.py` for branching vines, folded green leaves and
+  small shaded pink bracts. The six old atlas cards (24 triangles) are removed
+  from a byte-preserved `pergola-flowers-v2/foliage-base.obj`; the foliage VMDL
+  also imports `pergola-flowers-v2/flowers.obj`. Original foliage indices, atlas,
+  scene and collision are preserved. `configure()` keeps the `vr_bv_` material
+  overrides. Final stage-v5, native compile receipts and front/angle captures
+  are documented in `Sources/Veridant/pergola-flowers-v2/README.md`.
+- Garden table planter shrub (2026-10-24): the single olive at (-470,740,148)
+  now uses `Tools/veridant_planter_shrub.py` with the installed beech shrub's
+  authored mesh/material, finer branches, embedded roots and textured soil.
+  The canonical foliage OBJ and active `pergola-flowers-v2/foliage-base.obj`
+  both replace precisely 466 old triangles with 2,972; retained bytes and index
+  mappings are preserved. Scene and physics stay unchanged. Native compilation,
+  live material checks and matched captures passed. See
+  `Sources/Veridant/planter-shrub-v1/README.md` and its installed receipt.
+- Lounger upholstery realism (2026-10-24): `Tools/veridant_lounger_soft.py` adds
+  crowned and compressed foam, irregular cloth outlines, smooth seam pulls,
+  piping/stitches and rounded, subtly varied teak sections. The existing lounger
+  generator delegates to it, and all eight dedicated lounger imports plus the
+  reusable prop are updated through their existing `lounger-v2` resource paths.
+  Model documents, physics, scene, shared map OBJs and other prop imports retain
+  their hashes. Final publication: `output/veridant/lounger-v3/stage-v3/manifest.json`.
+  Seven materials and three models compiled; garden and rooftop captures were
+  reviewed. See `Sources/Veridant/lounger-v3/README.md` and the validation receipt.
+- Bistro tables (2026-10-24): `Tools/veridant_table.py` supplies the 128-segment honed stone top with a 3 mm eased
+  edge, a 64-segment bevelled pedestal base and a 32-segment stem. All 11 published tables retain their 30-inch
+  diameter, 29.5-inch height, 1.5-inch slab thickness, placements and collision. The tabletop's own material uses
+  restrained relief and UVs inside one limestone panel; OBJ import flips V, so source V=.75 becomes engine V=.25.
+  Scoped imports and native mesh/UV/rim checks are in `output/veridant/table-v2/`; the reviewed final view is
+  `output/veridant/quality/table-v2-complete/angled.png`. Resolve current VMDL render imports when patching: the
+  dressing now uses `chair-v2/dress-base.obj`. These OBJs contain interleaved vertex tables; append new tables
+  after all retained bytes so existing vertex, UV and normal indices keep their original meaning.
+- West bar doorway clearance (2026-10-24): `shelves_beside_doors()` keeps shelving
+  outside the cafe entrances at N=-80 and N=100 and lounge entrance at N=-390,
+  using the wall's shared 60x96 inch doorway definitions plus 4 inch jamb margins.
+  The active buildings render import is `lounger-v2/veridant_buildings-base.obj`;
+  its shelf correction and the canonical OBJ retain subsequent lounger work.
+  `stage-v5-index-repair` restores the original OBJ index allocation while keeping
+  face/material records unchanged. Sparse patches must append new tables after
+  all original tables, including declarations after faces. Native compile and
+  27 doorway collision rays passed; final evidence is in
+  `output/veridant/door-obstruction/validation.json` and
+  `output/veridant/quality/door-obstruction-after-repaired/cafe-south.png`.
+- Bistro chair clearance correction (2026-10-24): `Tools/veridant_chair.py` now
+  routes the rear uprights behind the backrest and around the seat. Rear mounting
+  spacers replace the collars that pierced the wicker. All 12 instances use the
+  two `models/maps/veridant/chair-v3/chairs-*.obj` imports, at 4,480 triangles each.
+  The chair-v2 base and current lounger import remain. See
+  `Sources/Veridant/chair-v3/README.md` and `output/veridant/chair-v3/after/` for
+  front, rear and side close-ups. Scene placement, materials and physics are preserved.
+- Bistro chair rebuild (2026-10-24): `Tools/veridant_parts.chair()` delegates to
+  `Tools/veridant_chair.py`; all 12 published chairs now have curved wicker panels,
+  rounded bound edges and smooth tapered steel legs. `veridant_materials` generates
+  the 1024px wicker PBR maps. The dressing model references two six-chair imports
+  and `models/maps/veridant/chair-v2/dress-base.obj`; physics and scene placements
+  are preserved. See `Sources/Veridant/chair-v2/README.md` and the final stage-v8
+  manifest. Existing Veridant OBJs interleave tables and faces: append new table
+  declarations after all old data, since inserting before the first `usemtl`
+  shifts indices in later declarations. Final editor captures are under
+  `output/veridant/chair-v2/final/`.
+- Inland hillside image backdrop (2026-10-24): `Tools/veridant_inland_vista.py` removes the remaining box villas and
+  polygon trees after the bay-impostor pass. Three distinct photographic sectors from one RGBA atlas (288 triangles total,
+  radius 14000) replace the earlier enlarged picture. Each keeps equal world scale per image pixel; uniform vertical
+  translations match the ridge heights. `mainland_arc()` derives the bearings from the actual coast at that radius
+  (currently -140.945 to 73.831 degrees), preventing scenery from being placed offshore. The horizon shader blends
+  adjacent image samples in texture space, preserving full interior coverage; only the two outer ends fade into haze.
+  ModelDoc flips the OBJ's V coordinates, so shader atlas samples use top-down PNG row order directly.
+  `Tools/veridant_vista_ground.py` builds a closed rolling mainland outside the play rectangle with separate cliff faces,
+  smoothly shaded normals, a continuous grass/soil material and 180 photographic scrub clumps (720 triangles). A coarse
+  backing extends to radius 60000 so elevated inland views cannot expose the sea behind low photographic valleys.
+  Clipped triangles interpolate their original plane, and scrub bases sample those actual triangles. There is no photo
+  projected on the ground. The two backdrop meshes total 32,438 triangles, down from 164,312 (80.3% fewer); FPS is unmeasured.
+  The near sea wall/riprap and original bay/boat cards remain byte-for-byte. No scene, physics, water, camera, lighting,
+  probe or gameplay changes were made. `veridant_backdrop.build()` applies the replacement; the material generator's
+  `impostors` command writes its five materials and two exact generated PNGs. Active shaders are
+  `hc1_veridant_horizon_v4.shader` and `hc1_veridant_scrub_v3.shader`. Sources, both built-in imagegen prompts, alpha
+  measurements and native scripts are in `Sources/Veridant/inland-vista-v1/distance-fix/`; published textures are
+  `materials/veridant/vista/inland-v1.png` and `inland-scrub.png`. The guarded native import atomically replaces existing
+  sources to avoid overwriting files mapped by the model compiler. Final stage: `output/veridant/inland-vista-v1/distance-fix/stage-v26/`;
+  original meshes remain in the parent run's `before-assets/`. Native shader/material/model compiles and 13 isolated
+  captures passed (`distance-fix/after-v26/`). Verification measured less than 0.05% per-sector pixel-scale variation
+  and zero internal cracks across 766 ground boundary edges; the source scene and stopped play state were preserved.
+- West bar door clearance (2026-10-24): the cafe's two west entrances and the lounge's west entrance were hidden
+  behind the continuous wooden backs of `counter_shelves`. `shelves_beside_doors` splits complete shelf units,
+  bottles and LED strips around the shared wall-opening definitions, with 4 in of jamb clearance. Only those two
+  assemblies were patched in `veridant_buildings.obj` (3,432 triangles replaced by 1,926); all unrelated OBJ bytes,
+  materials and physics sources were retained at publication. This task did not write the scene or physics sources.
+  Native compilation and 27 collision rays across the three openings passed; a matched screenshot verifies the
+  doorway in the user's picture. An optional player-box sweep timed out and is not claimed as passed. Other capture
+  attempts overlapped unrelated shared asset recompiles. `Sources/Veridant/door-clearance-v1/installed.json` and
+  `output/veridant/door-obstruction/validation.json` record the import and verification.
+- Pine planter bushes (2026-10-24): the north terrace's leaning stone pine now has 12 grounded beech bushes
+  (`facepunch.beech_bush_small#145429`, also used on Belltower), replacing its 15 crossed grass clumps. Only the
+  exact 120 old grass triangles were removed from `veridant_foliage.obj`; the tree and collision stay.
+  `Tools/veridant_planter_bushes.py` defines the varied placement and root embed, and `veridant_map.py` retains
+  the instances and package reference on regeneration. Saved native scene group: `Veridant/Pine planter beech bushes`.
+  Before/after captures and the scoped verification are in `output/veridant/planter-bushes-v1/`.
+- Distant bay image impostors (2026-10-18): `Tools/veridant_impostors.py` replaces the headland, castle/town and
+  anchored boats with two generated RGBA textures in `Assets/materials/veridant/vista/` (`headland.png`, `boats.png`).
+  The headland is a fixed curved strip (96 triangles); the yacht and nine sailboats have separate fixed quads at
+  their anchorages (20 triangles). The mainland, near shore and sea stay in 3D. The two backdrop models went from
+  346,103 to 164,312 triangles (52.5% fewer); no frame-rate benchmark was taken.
+  `veridant_backdrop.build()` applies the replacement by default; `build(impostors=False)` retains the old mesh
+  construction below. `veridant_materials.py impostors` writes the two materials. Their custom shader reads the
+  PNG alpha directly, uses diffuse lighting without flat-panel specular, and retains native fog/depth coverage.
+  For this scoped import, `--stage output/veridant/impostors/stage --source
+  output/veridant/impostors/before-assets/Assets/models/maps/veridant` used the actual original meshes so retained
+  geometry/UVs did not get regenerated. Native import/compile scripts and the built-in imagegen prompts are in
+  `Sources/Veridant/impostors/`. Compile the shader before its materials. Veridant's existing sea/pool materials
+  were recompiled against the current water shader to clear stale checkerboard rendering; their sources were not
+  edited. Four engine captures are in `output/veridant/impostors/after/`; the scene file and the user's active
+  Spillway scene/play state were preserved. Original assets are in `output/veridant/impostors/before-assets/`.
+- The user asked for a multiplayer map "as close to this img as possible" (2026-10-15). The picture is a Mediterranean
+  cliffside resort at sunset after rain:
+  - a wet courtyard round a dark reflecting pool with a boulder;
+  - on the left an operations building with a pergola, ivy and a SECURE / EXPLORE / CONTROL banner;
+  - behind the pool a gallery lounge and a colonnaded cafe with a roof terrace;
+  - on the right the VERIDANT RESORT pylon, an uplit olive in a planter, a grand stair with LED nosings, a furled
+    burgundy umbrella and a stone pine;
+  - black and olive military cases about the courtyard, a tarp over a railing in the foreground;
+  - the bay: the sun on the horizon, a superyacht, sailboats, and a cliffed headland with a castle on its summit.
+  Veridant Resort, its three-wave mark and every marking are the picture's made-up names.
+- Built by script like Belltower and Riverdale (`map_kit`). Run in this order:
+  - `Tools/veridant_materials.py [names] [--out <dir>]`: the vr_ materials, drawn with numpy (boxyard's and
+    riverdale's helpers) into `Assets/materials/veridant/`.
+    - `painted derived tints` rewrites only the text vmats: the flat paints (`PAINTED`), the tinted copies of another
+      surface's maps (`DERIVED`) and the surfaces' tints and roughness exponents (`SURFACE_TINT`, `ROUGH_EXP`), which
+      change a surface without redrawing its maps.
+    - `g_flRoughnessScaleFactor` is an exponent: the wet paving's 1.45 makes it glossier.
+  - `Tools/veridant_sky.py`: the sunset panorama, an 8192-wide EXR on belltower_sky's code. `--width 2048 --no-write
+    --preview <png>` shows it as the hero view sees it in about 20 s.
+    - The editor took about four minutes to compile the 18 MB EXR, during which the shared editor was frozen (it
+      happened once during the user's match). Rebake only when nobody is playing.
+  - `Tools/veridant_map.py [--preview <dir>] [--views ...] [--no-scene] [--no-models] [--no-backdrop] [--art]`, with:
+    - `Tools/veridant_parts.py`: the resort's pieces on riverdale_parts (stairs with LED nosings, glass and steel
+      railings, the tarp, lamps, olives, palms, the stone pine, cases, the pylon, furniture);
+    - `Tools/veridant_backdrop.py`: what's seen round the resort, drawn only, in two models: the land (179k triangles,
+      39 MB) and what stands on it (167k, 44 MB). map_kit writes each polygon's own vertices, so one model came to
+      100 MB: the land's cells are single quads and the clumps five-sided domes to keep both under GitHub's 50 MB
+      warning. They are:
+      - the sea, and the land as polar meshes;
+      - the headland as its own mesh along its crest. Its limestone bosses and crags come from point-sampled noise
+        (`vnoise`, `vridged`); its ledges are off (at the mesh's spacing they read as stripes from the promenade).
+        Its outcrops are sampled in 3D (`vfbm3`), so they're round in the view rather than
+        streaks down the flank. Its steep sea cliffs are bare grey rock, with ~5,300 maquis clumps and ~260 stone pines
+        on its skyline;
+      - the summit's castle and village, the town on the headland's north shore, the superyacht and sailboats;
+      - garden terraces with olive groves rising behind the resort's walls.
+    - The scene is rewritten whole on every run: change the layout in the script, not in the editor.
+- Layout (plan e, n, z inches; the play area e -1750..1900, n -1350..1000). Levels: the ground (0), 128 (the cafe's
+  roof, the garden terrace, the north terrace, the operations building's balcony and lobby, the lounge's gallery) and
+  192 (the east terrace). Red Team spawns on the seafront promenade (west), Blue Team in the entrance forecourt (east).
+  Three lanes:
+  - North: the promenade's stair to the garden terrace, the north terrace (bomb site A, with the stone pine, the bar and
+    the umbrella), the head of the grand stair, the east terrace, down to the forecourt.
+  - Middle: through the cafe (or over its roof) into the courtyard round the pool, then the colonnade under the east
+    terrace to the forecourt. The grand stair and the reception's inner stair climb to the north terrace.
+  - South: the gardens (bomb site B among the olive groves at their east end) to the east plaza, or through the
+    operations building's hall and up its stair to the lobby and the balcony.
+- Modes: the scene lists TDM and Defuse, and it's in `GameUtils`' three map lists (after Collider). It has 36
+  deathmatch spawns, Retakes spawns for each site, Domination flags (A the cafe, B the courtyard, C the east terrace),
+  Hot Zones and three Cash Grab points (`ObjectiveSpot`s).
+- The picture's camera is `HERO`: on the east terrace behind its glass, (801, -40, 256), looking west 9.6 degrees down,
+  74 degrees across.
+- Checks:
+  - Every run checks the 97 spots with railhead_map's `check_spots`, `check_reach` and `check_retakes_sight`: all pass.
+  - `Sources/Veridant/editor/navmesh-check.cs.txt` (run_csharp) generates the navmesh in an isolated editor scene and
+    paths from the first Red and Blue spawns to every spawn, site, objective and cash point: 99 of 99 Complete.
+    `Scene.Deserialize` doesn't apply the scene file's navmesh settings, so the script sets them from the JSON.
+- Garden hedges (2026-10-18, the user's "use the bushes from cerroblanco"):
+  - The eight low borders and five tall screens use Cerro Blanco's Facepunch
+    `models/sbox_props/shrubs/beech/beech_hedge_96x128.vmdl` instead of visible `vr_hedge` boxes. `garden_hedge`
+    in the map generator places 88 overlapping, opposed leaf sections under `Veridant/Beech Hedges`;
+    `write_scene` records `facepunch.beech_hedge_96x128#145491` so regeneration retains the cloud dependency.
+  - The original garden collision boxes, surfaces and all other dressing geometry stay. The live dressing OBJ
+    lost only its 156 hedge triangles; its VMDL and physics sources are unchanged. The model compiled, all 88
+    instances load with valid materials, and the generator's 97 spot, route and Retakes checks pass.
+  - `output/veridant/cerroblanco-bushes/` holds the pre-change sources, staging manifest and reviewed native
+    tall-hedge, low-border and garden overview captures. The scene was saved through the editor.
+- Terrace stone pine: `veridant_parts.stone_pine` delegates to `Tools/veridant_stone_pine.py`. The old flat dark disc
+  and oversized foliage planes are replaced with branching limbs and 13 separate mountain-pine sprays from
+  `facepunch.pine_shrub_wide#145484`; their exported mesh/provenance is in `Sources/Veridant/stone-pine-v2/`.
+  `veridant_map.configure` preserves its cloud material override and `write_scene` pins that dependency. The scoped
+  splice (`Tools/veridant_stage_stone_pine.py`) replaced 606 triangles with 30,310 and retained the other 41,946 foliage
+  triangles exactly; no collision or scene transforms changed. Native import/verification scripts are under
+  `Sources/Veridant/editor/*stone-pine-v2*`; reviewed map captures and checks are in `output/veridant/stone-pine-v2/`.
+- Player clips: a clip's BoxCollider turned to its rail's heading (`K.yaw_rotation( yaw - 90 )`) lies along its local
+  x, so its Scale is ( length, thickness, height ). Checked in the engine: with the length on y every path through the
+  terraces came back Partial. Riverdale and Riverside write ( size[1], size[0], size[2] ), which lays each of their
+  clips across its rail.
+- Light and exposure, matched to the picture region by region (its colours against offscreen renders):
+  - The engine's exposure runs at about twice belltower_sky's design scale: at a fixed exposure of 4.0 the sky showed
+    the colours it was designed for at 2.0. So the sky is baked for 1.1 and the tonemap holds 2.1-2.4.
+  - The sky still reads about a fifth darker in the engine than in its own preview (the fog over it), so the SkyBox2D's
+    Tint is 1.32.
+  - The lamps (`veridant_parts.WARM` and the rest) were first 1.75,1.10,0.58: the pylon and the grand stair read twice
+    the picture's brightness, and renders with the lamps off showed the lamps gave most of it. They're about 0.56 of
+    that now, so the light pools stay pools. The pylon is lit from its foot only, as in the picture. 108 point lights,
+    5 with shadows.
+  - The fog is a neutral mauve-grey (`FOG_COLOUR`): a pink one turned the headland brown.
+- `Sources/Veridant/editor/` (run each with the native MCP's run_csharp, `{"path": ...}`):
+  - `register.cs.txt` registers and compiles the materials, then the models, then the scene;
+  - `compile-stale.cs.txt` force-compiles anything whose source is newer than its compiled file;
+  - `capture.cs.txt` renders the views in `output/veridant/captures/config.json` offscreen, without touching the open
+    scene. A view with `"art": true` also writes the menu picture, `ui/maps/veridant.png`. `fixed_exposure` pins the
+    tonemap, and `disable` switches off components by type name (diagnostics: "PointLight", "DirectionalLight").
+    `config.main.json` has the hero, menu, sea and aerial views and `config.play.json` views from where players stand
+    (the Red spawn, the terraces, the gardens, the forecourt): copy one over `config.json`.
+    `compare_reference.png` there is the picture beside the hero view.
+- The user played a TDM on it in the editor for a couple of minutes on 2026-10-15 (Red Team, with bots); the log showed
+  no errors. Not yet checked: the other modes' objects in a match, a second client, and its frame time with the
+  backdrop and 108 point lights.
+
+## Orion (multiplayer map, `Tools/orion_map.py`)
+- The user asked for a map as close as possible to their picture of a rocket launch facility at golden hour after rain
+  (2026-10-15; kept as `Sources/Orion/v2/reference.png`). Orion Aerospace, its planet-and-orbit mark, ORN and every
+  marking are the map's own. `Sources/Orion/README.md` has the build steps and the look's settings.
+- v2 (2026-10-15) replaced a first build. v1's tools and editor scripts are in `Backups/orion_v1/`; its models,
+  materials and DDGI bake were moved out of `Assets` to `output/orion/v1_assets/` on the building machine (never
+  committed, and not needed: nothing references them).
+- The picture's view is a shifted lens (its verticals are parallel): a level camera at plan `0,-560,400` looking due
+  north, 75 degrees across, rendered 1536 x 1356 and cropped to 1536 x 1024 with the horizon 346 down.
+  `Sources/Orion/v2/compare.py` renders it and prints matched patches against the picture. A pitched camera doesn't
+  frame it the same way.
+- Scripts, in order: `Tools/orion_textures.py` (the `oa_` materials; the concrete's grain is
+  `Sources/Orion/v2/concrete-grain.png`), `Tools/orion_sky.py` (Belltower's sky code with a glow round the low sun and
+  the picture's thin clouds painted in as a 2D layer: the ray-marched heaps read as cartoon puffs, so they're off),
+  `Tools/orion_map.py --stage` (with `Tools/orion_parts.py` and `Tools/orion_backdrop.py`). Each runs offline into
+  `output/orion/v2/` (ignored), then the files are copied into `Assets` and compiled with
+  `Sources/Orion/v2/editor/compile.cs.txt` until Stale is 0.
+- Layout: Red Team spawns in the west court behind Launch Control 01, Blue Team in the east court behind Fuel
+  Processing. Bomb site A is the launch deck, B the wet cargo yard. Every run checks all 93 spots (room, floor, reach,
+  no Retakes pair in sight).
+  - Launch Control's upper east side stops on the line of sight from the overlook through its front corner (a wedge
+    fills the corner), so nothing of the tower shows past the corner and the sun glows beside it as in the picture.
+  - B3 has a wedge on its south-west whose west face runs at 144 degrees (`B3_FACE_BEARING`): the picture sees B3's
+    face at an angle, its lettering and joints sloping down to the right. The fuel lines run along that face, then
+    south to the overlook's north wall; the low ones are a kerb you step over or mantle.
+  - The skyline of the hills is the picture's, measured by bearing (`orion_backdrop.SKYLINE`): past 15000 the land
+    climbs to it at the far edge. No cone trees: at that size they read as a picket fence.
+- Light: no baked indirect light. Flat ambient (`SkyColor` 0.15), which has no occlusion, so screen-space AO is
+  strong (intensity 1, radius 220) and walls in shade use the darker concrete (`oa_wall_dark`). Soft lavender fills
+  stand for the south sky on the shaded faces (`LC face fill`, `ORION face fill`, the warm `B3 face wash`).
+  Exposure auto 1.0-1.2, sky tint 2.6, ColorGrading 5300 K at 0.5, ColorAdjustments saturation 1.1 (its Contrast works
+  in linear HDR space: 1.1 crushed every shadow to black).
+  - Auto exposure settles at its cap. The cap was 1.6, but the captures the look was tuned with had stopped at about 1.2
+    before settling, so a match was a third brighter than they showed. `compare.py` now renders 160 frames first
+    (`--settle`), and the cap is 1.2.
+  Reflections: the sky's compiled cube as a static CustomTexture probe (tint 1.8), plus probes only inches deep over
+  the wet floors open to the sky (`WET_FLOORS`, stepped down where the floor's mirror image meets buildings). Those use
+  their own cube, `oa_sky_wet` (`orion_sky.py --wet`: the sky with the low sun's glitter as a band, `WET_BAND`), so the
+  floors show warm streaks towards the sun. SSR is off: the engine's SSR swapped the near yard's sky for the slabs' own
+  colour. The cubes are copied to `Assets/lighting/orion/reflection_{sky,wet}_<hash>.vtex_c`, named by their content
+  so a running editor loads a new one; `.gitignore` lets both in.
+- The gantries are dark steel with a faint warm glow (`orion_textures.GLOW`) and seven lamps a floor. Past 12000 out,
+  gentle slopes and everything past 22000 wear `oa_hill_far` (woods, dry grass, earth) instead of rock.
+- The captures render with the scene's ACES tonemapper; since 2026-10-17 the player camera picks AgX (see Shared camera
+  look), so a match is tone-mapped differently. Not compared yet.
+- Steam (copies of the gun smoke prefab) is unlit, so it glows against the low sun instead of going dark.
+- Don't move or delete assets a running match uses. When v1's textures were moved out from under the user's Orion
+  match (2026-10-15), the renderer reloaded them every second until the editor ran out of video memory and stalled.
+- Player clips: `write_scene` sizes each railing clip ( length, thickness, height ) under its rail's heading turned
+  90 degrees. The ( size[1], size[0], size[2] ) it first copied from Riverdale laid every clip across its rail: each
+  stair's rail walled the stair off at its middle, and only the in-editor navmesh check caught it (the offline reach
+  check ignores clips).
+- Checked: the offline spot checks, every asset compiling, the user playing a match on v2 in the editor (all ten models
+  loaded, no error models), and the in-editor navmesh check (`Sources/Orion/v2/editor/navmesh-check.cs.txt`: complete
+  paths from both team spawns to all 95 spots, again after the 2026-10-16 round and the 2026-10-17 one).
+- Against the picture (2026-10-17, capture `v4f` at settled exposure, `Sources/Orion/v2/compare.py`; README's State
+  has the table): all twelve patch medians (the shaded faces, the yard's three bands, the sky by the sun and overhead,
+  the hills, the deck front, Launch Control's lower wall, the terrace) are within 4 levels of the picture's. Still
+  unlike it:
+  - the floors are satin with a few glassy puddles where the picture's are mirror-wet with long warm streaks (the
+    terrace's brightest tenth 105 against 165), and the deck front's puddles are too bright (179 against 118);
+  - the hills are dark woods and fields with no town or lights;
+  - the gantries are an evenly lit orange lattice, not dark steel picked out by small lamps;
+  - Launch Control, the deck front's arcade and B3's pipe bank are simpler builds.
+  Not yet checked: a second client and the frame time.
+
+## Ridgeback (battle royale map, `Assets/scenes/maps/Ridgeback/`)
+- The second battle royale map, a base to build on: a valley about 1.2 km across in a ring of mountains, on an s&box
+  Terrain (61440 units square, 2048 samples, 30 units apart; heights -2000 to 11000). North is +X, as on the radar.
+  The only building so far is the Town House, by Town's crossroads (see Ridgeback buildings). Otherwise the sites are
+  flat pads and named markers.
+- `Tools/ridgeback_map.py` builds the terrain (`ridgeback.terrain`, heights and ground painting) and, with `--scene`, the
+  starting scene (refused if it exists, since the scene is hand-edited after that). `--preview <png>` draws a shaded map
+  with the sites, roads, the river and slopes over 40 degrees in red, plus `<png>_ground.png` in the ground's colours.
+  Change the layout there (SITES, HILLS, RIVER, ROADS) and re-run it. A re-run replaces the whole terrain, including
+  anything sculpted or painted in the editor. Saving the scene in the editor also rewrites the terrain in the blob
+  format (`ridgeback.terrain` plus its maps in `ridgeback.terrain_d`); the script deletes the stale `_d` when it writes.
+- Ground: six materials drawn by `Tools/terrain_textures.py` into `Assets/materials/terrain/` (meadow, meadow_dry, dirt,
+  gravel, rock, scree: tileable colour, roughness, height, AO and normal maps plus the `.tmat`). The painting rules are
+  `ridgeback_map.paint`: green or dry meadow by sun, height and nearness to the river, scree up high, dry/scree/rock by
+  slope, then the sites, roads and river bed over them. The splat keeps each sample's two strongest materials, and the
+  shader height-blends them. A material change from one sample to the next shows the 30-unit grid as blocks, so blends
+  have to be several samples wide.
+- Grass: `Tools/ridgeback_grass.py` writes `Assets/models/grass/` (four geometry clumps with three LODs each, the blade
+  atlas and `grass.vmat` on `shaders/hc1grass.shader`) and `ridgeback_grass.clutter`. The scene's "Grass" object is a
+  ClutterComponent in Infinite mode: every machine scatters grass in 512-unit tiles round its own camera (radius 3) on
+  meadow and meadow_dry ground only (`TerrainMaterialScatterer`, by the dominant material). The shader has its own
+  breeze. Between 1000 and 1450 units out it sinks the clumps into the ground and shades them towards the ground's
+  colour, so keep the fade's end inside TileSize x TileRadius (the script asserts it). It's visual only: no collision,
+  and bots see through it. Measured in play in the editor (2026-09-26): 0.5-0.8 ms a frame with it on against off, at
+  Density 26 (441 clumps a tile). Scattering a tile takes ~0.3 ms, and the engine does at most 8 tiles a frame.
+- Clutter's GPU culling follows the scene's active camera (the editor viewport, in the editor), so a `capture_view`
+  from a temporary camera elsewhere shows no grass. For captures, generate a temporary NotSaved ClutterComponent in
+  Volume mode round the spot, or frame the viewport.
+- Far grass: `ridgeback_grass_far.clutter` (the scene's "Far Grass", Infinite, 1024-unit tiles, radius 5) scatters about
+  a sixth as many clumps of wider blades (`FAR_CLUMPS`). They rise out of the ground where the grass sinks and sink again
+  4000-5000 units out (`FAR_FADE`, ~127 m). Beyond that the meadow and dry meadow ground is painted the clumps' mean
+  colour (`ridgeback_grass.ground_colour` x `GROUND_MATCH`, applied by `terrain_textures.match_grass`), so the field
+  doesn't turn dark where the grass ends. That's how big open-world shooters do it: dense grass near, sparse cheap clumps
+  further out, and ground that matches beyond. Its cost was lost in `dev_perf`'s noise (2026-09-27).
+- Trees: `Tools/ridgeback_trees.py` plans every tree, bush and hedge from the terrain's own fields (`ridgeback_map`'s
+  heights and painting) and writes them into `ridgeback_trees.clutter` for `PlannedScatterer`
+  (`Code/Maps/PlannedScatterer.cs`), which places a planned list (`Placements`: 7-byte records of entry, x, y, yaw and
+  scale) and only traces each spot's ground height. `--preview <png>` draws the plan over the ground map.
+  - Facepunch's cloud oaks (dry ones on dry ground), beech and pine bushes and beech hedges: 5449 in all (2339 oaks,
+    2437 bushes, 673 hedge pieces).
+  - Woods round Lumber Camp, along the valley's rim, on the hills and the river's banks; copses and lone trees in the
+    valley; bushes along the woods' edges, under the trees and on the banks; the Farm's hedged fields and two roadside
+    hedges, with gates and an oak every 14-26 m. Nothing on the roads, pads, runway or river bed.
+  - The mountains above the woods are bare. Facepunch's low-poly `vista_oak`s were tried up there and taken out: they
+    read as dark balls on the rock faces.
+  - Trees and hedges collide (the models' own physics, as static bodies tagged "clutter" with no GameObject), so they
+    stop bullets and bots' sight, and the navmesh goes round them. Hit code checks `hitObject.IsValid()`, and bullets
+    hitting them get a wood surface (`DamageEvent.GetImpactSurface`). The bushes' models have no physics, so bots and
+    bullets go through them.
+- "Trees" is a ClutterComponent in Volume mode, which is baked: after re-running the script, press Generate on it and
+  save the scene. The instances are stored in the component (a blob in `ridgeback.scene_d`), and every machine,
+  a dedicated server too, rebuilds their rendering and collision from that on load. Disabling the component clears
+  them (`OnDisabled` calls `Clear`), so never save it disabled.
+  - Baked instances ignore the .clutter's per-entry CastShadows and EnablePhysics (`ClutterLayer.PopulateFromStorage`
+    gives each a bare `ClutterEntry`): every model casts shadows, and every model with physics collides.
+  - Before Generate, check that no entry's model `IsError`. A cloud package that isn't mounted loads as an error model,
+    and mounting it under the clutter crashed the GPU (2026-09-27). The editor installs the packages named in the
+    .clutter's `__references` into `.sbox/cloud/` at startup.
+- What the trees cost: clutter batches have no distance culling and use at most four LODs
+  (`ClutterBatchSceneObject.MaxLods`), so every tree in view is drawn, the far ones at LOD 3 (the oaks' LOD 4 goes
+  unused). The worst view is from Radio Hill's top looking north over the whole valley. There, measured with
+  `dev_perf 600` in play in the editor (2026-09-27, before the vista oaks came out), the trees took the frame from
+  6.5 to 11.3 ms (p50): the oaks ~3 ms, the bushes and hedges ~1.2 ms and the vista oaks ~0.5 ms.
+- The sun's shadows reach `r.shadows.csm.distance` from the camera, not the camera's far clip. That's s&box's own
+  graphics setting (15000 by default, 20000 on the developer's machine), so only trees within ~500 m cast into the
+  cascades. In s&box's source the cascades are fitted in managed code (`ShadowMapper.Directional`), which only reads
+  that ConVar, so `SceneDirectionalLight.SetCascadeDistanceScale` doesn't shorten them.
+- Layout (east, north): Town (centre), Farm (NW), Airfield (N, a runway pad), Lumber Camp (NE), Quarry (SW, a pit with
+  32-degree walls), Military Base (SE), Radio Hill (S, flat top 1350 up), West Camp and East Crossing. A river runs
+  west to east through gorges in the ring, with a bed that only falls eastward and 24-degree banks. Eight roads join
+  the sites, fording the river.
+- The river's water (`Tools/ridgeback_river.py`, 2026-09-28) is 21 strips (`models/maps/ridgeback/river/river_NN`)
+  along `ridgeback_map.RIVER`, 22-38 over its bed, in the scene's "River" group. They're tagged `water`, with no
+  collision or shadows, so players wade through.
+  - The script fits the strips to the terrain the editor has, exported by `ridgeback_river_export`
+    (`Editor/RidgebackRiverTools.cs`, into `output/river/`). It replaces only that group in the scene.
+  - `ridgeback_river_validate` checks the depths in the running scene.
+  - `shaders/ridgeback_river.shader` scrolls two normal maps downstream and fades the water out over the shallows, by
+    the depth behind it. The strips are 1240 wide, and the banks cut them off.
+  - Its material's keys were `TextureNormalA` / `TextureNormalB`. The shader has no inputs by those names, so the water
+    drew with flat default normals and no ripples. Since 2026-10-04 the keys are `NormalA` / `NormalB`: a vmat's
+    texture key is the name in the shader's `CreateInputTexture2D`. Not yet seen in-game.
+- Everything in the valley is walkable (under 40 degrees, the navmesh's `AgentMaxSlope`) except a few small spots: pads
+  and roads are cut and filled at 22/20 degrees at most (`terrace`), and the mountains past the foothills are the
+  walls. The map's edges have invisible walls (`Map Bounds`), and the river gorges lead out to them.
+- The scene: the terrain, grass, sun, sky, fog, `battle_royale.prefab`, `game_setup.prefab`, a bot manager, a spawn at
+  each site (the fallback while there are no drop points; Town's is first, so `IsOnMainNavMesh` paths to it), the
+  buildings (under "Buildings") and a `BattleRoyaleArea` (the first circle, radius 24000 on the valley). The navmesh has
+  custom bounds (±28500), whose corners take in ledges up in the mountains that nobody can reach: a circle sampled from
+  the navmesh would stretch to them, hence the area. The navmesh doesn't update in the editor by itself.
+- The ground and grass were checked in play (2026-09-26), and the far grass and trees on 2026-09-27. Loading the map
+  in a running game (`dev_mode battle_royale ridgeback`) takes ~18 s, with or without the trees. Play starts in the
+  editor often stall first: 50-90 s before the trees, 80-160 s with them (2026-09-27, each time ending just before
+  "Added new 51 cloud reference(s) to ServerPackage table"). One stalled before the grass existed. The cause isn't
+  known.
+- Not yet checked in-game: long navmesh paths for `IsOnMainNavMesh`, drop points and the zone. The name is a working
+  name.
+
+## Ridgeback buildings (`Tools/ridgeback_buildings.py`)
+- Built by script, like the rest of the map. Each building is one model made of boxes, and its collision is the same
+  boxes, so what you see is what stops players, bots and bullets. Frames, sills, surrounds, shutters, gutters and
+  downpipes are only for the eye, so they don't catch shots through a window.
+- The first is the Town House: a two-storey village house of rendered brick under a clay tile roof, 42 by 30 feet.
+  - It has three doors (front, back and side). Each floor has two front rooms, with a kitchen and the stair hall behind.
+    A straight stair runs along the hall's back wall.
+  - Every doorway has a door, and the windows are glazed casements with shutters (see Doors and Windows below).
+  - It stands ~660 units north-east of Town's crossroads (world -1615, -2040; yaw 87.5), facing west onto the Airfield
+    road. That's the one spot near the crossroads on bare earth that faces a road.
+- The script writes:
+  - `Assets/models/buildings/<name>/`: the render OBJ, the roof's collision OBJ and the vmdl, and beside them the door
+    leaves (`_door_outer`, `_door_inner`), the pane (`_pane`) and three broken panes (`_pane_broken_<n>`), each an OBJ
+    and a vmdl with no collision of its own;
+  - `Assets/prefabs/buildings/<name>.prefab`: a ModelRenderer and a static ModelCollider, with the doors, the panes and
+    the windows' clips as children ("Doors", "Windows", "Window Clips");
+  - `Assets/prefabs/buildings/glass_shatter.prefab`: the shards a breaking pane throws.
+- ModelDoc reads an OBJ as Y-up, so model (X, Y, Z) is written as OBJ (Y, Z, X). The script's docstring has the model
+  and plan axes.
+- Materials come from `Tools/building_textures.py` (`Assets/materials/buildings/`): lime render, whitewash, concrete,
+  floorboards, quarry tiles, clay roof tiles, painted wood, board shutters, brick and galvanised metal. They're drawn
+  with numpy like the ground's. The UVs are world-scale, so a brick is a brick's size on any wall.
+- The roof's collision is one convex hull from the upper ceiling to the tiles, plus a box under each verge. So there's
+  no attic floor for the navmesh to find (a walkable island nobody could reach). The roof's 42 degrees are steeper than
+  the navmesh's 40, so nothing walks on it, and drop points (`Scene.NavMesh.GetRandomPoint`) can land in the rooms but
+  never on the roof.
+- The stair needs room at both ends, because the navmesh keeps 16 from every wall and drop:
+  - With 6 at its foot and 28 at its top it was an island. Now it has 40 at its foot.
+  - The stairwell's low wall along the upper hall stops a step short of the top, so the top step opens onto the hall
+    as well as the landing.
+- Surfaces:
+  - Walls, plinth, steps and the ground floor are "default" (concrete footsteps, the generic bullet impact). The upper
+    floor and the stair are "wood", and the roof "ceramic".
+  - Its "default" walls stop rounds, like all masonry (see Wallbangs), while its doors (1.375-1.75 of wood) and glass
+    let them through.
+- Doors: 3 outside (painted green, 1.75 thick) and 7 inside (varnished, 1.375), four-panel leaves with lever handles.
+  - Each is an object in the prefab with a `TerrorTown.FuncDoorRotating` (Innocent Hotel's door type) and a wooden box
+    collider that moves with it. It swings 90 degrees away from whoever opens it (`OpenAwayFromActivator`) in 0.9 s,
+    and shuts in 0.75 s.
+  - Its origin is on the hinge line, 42 over the floor. Its sounds play there, inside the leaf, so they aren't
+    occluded (an occlusion trace would always find the leaf).
+  - `check_swings` stops the script if any door, opened either way, would meet anything drawn or another door's swing.
+  - Bots open the doors in their way (`MapMover.FindDoorAhead`). Doors are left out of the navmesh (the `door` tag),
+    so paths go through the doorways.
+  - The sounds are synthesised by `Tools/building_sounds.py`, like the kill sounds, so there are no samples: the latch
+    and a hinge creak opening, a creak shutting, then the leaf's thud and the latch. A re-run keeps the `.sound` events.
+  - A player who joins while a door is open gets it wrong: `MapMover.OnStart` takes the snapshot's open transform as the
+    shut one. That's MapMover's, so Innocent Hotel's doors do it too. Not fixed.
+- Windows: two casement sashes of three panes each, 18 windows and 108 panes.
+  - Each pane is an object of its own with a `Facepunch.BreakableGlass` (`Code/World/BreakableGlass.cs`), tagged
+    `glass`. A bullet, a blast or a thrown grenade breaks it.
+  - A broken pane leaves one of three jagged rims in the sash, picked by the object's id so every machine shows the same
+    one. It plays `glass_break.sound` and throws its shards (`glass_shatter.prefab`): the engine's glass-impact chunk
+    sprites (`impact.glass.chips`) at the size of a pane's pieces, falling under real gravity and resting where they land.
+  - The panes' colliders (0.5 thick) tile the whole opening, frame and sashes too, so nothing gets through a window
+    without breaking a pane.
+  - Map objects aren't network objects, so whoever breaks a pane sends the break through a static RPC keyed by the
+    GameObject's id: the shooter, the host for bots and blasts, a grenade's owner. The host tells a player who joins
+    later which panes are broken, and the between-round cleanup puts them back.
+  - Glass doesn't stop anything:
+    - A round through a pane breaks it and goes on, and isn't a wallbang (`Shootable`).
+    - Sight checks and blasts leave glass out (the bots', `Spotter`, player markers, the flashbang, `Explosion`).
+    - Bots' shots break the panes on their line (`BreakableGlass.BreakAlong`).
+    - A blast breaks the panes it reaches with no wall in between (`BreakInBlast`).
+    - A grenade faster than 120 u/s breaks the pane in its way and carries on (`BreakAhead`, from
+      `BaseGrenade.OnFixedUpdate`).
+- One object tagged `playerclip` holds a 3-thick box in each window opening, so nobody climbs in or out through a
+  broken window. The player's CharacterController traces against it. Bullets, sight checks, the shards and grenades
+  (the collision rules' grenade/playerclip pair) pass it.
+- `PLACEMENTS` says where each building stands:
+  - `--measure` reads the ground under each from `ridgeback_map`'s terrain and prints the floor height (10 units over
+    the highest ground), each doorstep's height, the nearest road, and any grass ground under the footprint. Grass is
+    scattered on meadow and dry meadow and would grow up through the floor.
+  - `--place` writes them into ridgeback.scene: a prefab instance each under the "Buildings" object, which it replaces,
+    leaving the rest of the scene as it was. Close the scene in the editor first, or saving it there puts the old
+    buildings back.
+  - Re-run `--place` whenever a prefab gains objects, so each one has a fixed id in the scene
+    (`__PrefabIdToInstanceId`): the doors' and panes' RPCs find them by id.
+  - `--preview <png>` renders flat-shaded views, and a plan of each storey with the glass, the clips and every door shut
+    and open both ways.
+- The Town House's floor is at z 156.8, over ground 136-147. None of its footprint is grass ground (dirt, with dry
+  meadow only in the margin), and no tree stands within 1500. Its doors have two steps down (6 and 12 below the
+  floor) to ground 15-20 below it.
+- Checked offscreen on 2026-09-28, in a scene of its own in the editor:
+  - Renders of the outside, the rooms and the stair, and of the house on the real terrain.
+  - A navmesh with the scene's agent settings reaches every room on both floors from all three yards, with none on
+    the roof, the porch roof or in the attic. That was before the doors, which the navmesh leaves out.
+  - Renders of the doors shut, the front door opened inwards and the back door outwards, the glass and the broken
+    panes' rims, with every door's and pane's component loaded as set.
+- Not checked in a match: the map's own navmesh, bots using the house and its doors, bullets, the grass beside it and
+  the light indoors. Nor has glass been broken in play: the shards (an offscreen scene doesn't run particles), the
+  sounds and the clips.
+
+## Rain (`Weather`, `RainView`, `Code/World/`)
+- Weather progression update (2026-10-14, the user reported Lowtide always staying clear and asked for slight changes
+  during matches): outdoor matches sample one wet match in each randomized block of four per map on the host, for
+  the process's lifetime. This keeps the 25% share and permits at most six consecutive clear matches between blocks.
+  - Fair-weather cloud cover changes smoothly over 5-8 minutes, with at most 11% daylight shading. Lowtide's cloud
+    drift uses the synced match clock and its density follows the seeded cover profile.
+  - Half of drizzle/steady fronts are already present; the others arrive 1.5-5 minutes into play. Rain builds over
+    two minutes, starts easing off at 8-14 minutes of match time, and clears over three minutes. Cloud comes ahead
+    of the rain and clears after it. The visual look approaches its target over 90 seconds.
+  - Lowtide blends its moving coastal sky smoothly into a grey deck, using a private runtime material copy. Other
+    maps retain the existing overcast material. Clear weather keeps a lightweight view, releases all rain effects,
+    restores calm wind and leaves the authored sky asset unchanged.
+  - Verified in native-engine isolated scenes: 4000 match choices kept exactly 1000 wet matches; all 256 tested seeds
+    varied smoothly; clear/rain/clear created 0/3/0 particle effects; authored sky, sunlight and calm wind restored.
+    Lowtide renders at 49% and 51% overcast showed a continuous sky transition. C# and material compilation passed.
+  The older notes below describe the original system; the timing and sampling above supersede them.
+- The user asked for the maps to rain sometimes (2026-10-08). A quarter of matches rain (`Weather.RainChance`). Of those,
+  a quarter are drizzle, two fifths steady rain and the rest showers.
+  - Drizzle is 0.2-0.8 mm/h and steady rain 2-6 mm/h, each wandering about 30% over minutes.
+  - Showers come 10-90 s in, then last 3-8 minutes with dry gaps of 3-10 minutes. Most are moderate; a few reach
+    40 mm/h. The sky stays overcast in the gaps.
+  - Rain comes with a front's wind (`WorldWind`, on the calm's heading): 2-4 m/s in drizzle, 3-6 m/s in rain, gustier
+    in showers.
+  - A map with no sky (Reef Hall) never rains.
+- The host rolls it once the map has loaded (`Weather.Ensure`, from `GameMode.OnStart`). Only the kind, a seed and the
+  time are synced: every machine works the rate out from them (`Weather.Schedule`).
+- Each machine that draws makes a `RainView` round its own camera. Nothing in it is networked.
+  - Drops (`RainDropParticles`, up to 10,000 in three rings out to 900): sizes from Marshall and Palmer's spread for
+    the rate, each at its size's terminal speed (4 m/s at 1 mm, 8.7 at 4 mm), drifting with the wind's gusts. More of
+    them show the harder it rains (`ActiveShare`: 800 at 1 mm/h, 2,100 at 5, 5,500 at 25).
+  - How a drop is drawn (2026-10-09, the user: "the rain looks a little fake"):
+    - a streak as long as it falls in 1/60 s, one frame at 60 fps (it was ~45 ms, then 1/30 s);
+    - blurred by an eye's depth of field (a 4 mm pupil focused at 15 m), so a near drop is a soft, wide streak;
+    - never under a pixel and a half wide (it was two), and fainter by as much as it's widened, so a far drop is a
+      faint thread and a near one a clear streak;
+    - each a little brighter or dimmer than the next (0.55-1.45), as drops catch the light differently;
+    - covering at most 35% of what's behind it (`MaxAlpha`; it was 60%).
+    - The middle and far rings hold 10 and 70 times fewer drops to the cubic unit than the near one, so each of their
+      drops is drawn 1.6 and 2.4 times as strong (`Layers`' weight), far short of the 10 and 70: past 15-20 m nobody
+      makes out single drops, and the fog does the rest. At 2.5 and 5.6 the far ones read as bright threads.
+  - Their colour (2026-10-09, the user: "it has like white lines coming down"). The drops were a light grey (0.75),
+    about 3.4 times as bright as the overcast horizon they fell against, so they read as white lines. Water shows what's
+    round it: a drop refracts the scene behind it upside down through ~165 degrees, half sky (1-1.67 of the horizon in
+    `rain_sky.py`'s sky) and half wet ground (0.32), plus a few per cent reflected.
+    - So each is drawn in a share of the rain's haze (`RainView.Haze`: the fog's horizon grey, lit by lightning as the
+      fog is): drops 0.85 (`DropShade`), splashes 1.0 and the puddles' rings 1.3, whose tilted crests reflect sky
+      higher up.
+    - A drop is a little darker than the sky round it and a little brighter than a dark wall behind it, never white.
+  - The user asked for no rain on the camera: no drops on the lens or the screen, no screen-space pass. Everything is in
+    the world.
+  - Shelter (`ShelterGrid`): 32-unit columns round the camera, each probed with a trace down and one up. Drops show only
+    over open sky and above where they'd land, so none fall indoors, under a roof or through a floor. A hit on the
+    map's sky brush or its lid counts as sky.
+  - Splashes (`RainSplashParticles`): a crown for each drop over 1 mm that lands on open, level ground in view
+    (`DropFlux`: about 730 a square metre a second at 5 mm/h).
+    - Within a core radius every drop gets one, and past it, out to 900, a share (r0 / r)², each drawn stronger for the
+      ones it stands for (`CoreRadius`). That comes to 30,000 a second (`SplashBudget`): at 5 mm/h every drop within
+      ~3 m. It was 2,500 a second within ~13 m, by a made-up curve.
+    - A crown spreads to 5-9 times its drop's width and is gone in 25-110 ms, bigger and longer for bigger drops. Each
+      particle's `TimeScale` runs its age 0-1 over its own life, under the effect's Lifetime of 1, so a short-lived one
+      doesn't hold its slot.
+    - Places tried that aren't open ground in view are skipped, and the budget is raised by the share that are.
+  - Rings on the puddles (`RainRippleParticles`): a ring for each drop over 0.5 mm that lands on a puddle's water in
+    view, flat on the water (the sprite renderer's `Particle` alignment, anisotropic filtering).
+    - It starts in a random wet cell of the puddle's shape (`RainPuddles.WetOrder`), on the ground's slope there
+      (`Water.PointAt`), and spreads at a capillary wave's ~0.2 m/s, with two fainter ripples inside its crest.
+    - It fades over 0.2-0.6 s (bigger drops longer), sooner where the water's edge is near: `PuddleShapes` (generated by
+      `Tools/puddle_textures.py`, `--code-only` from the height maps it wrote) says how far round each cell is under
+      water at each fill.
+    - At most 6,000 a second: past a distance a share (reach / d)² of the drops get one, drawn stronger.
+  - Sound (`Tools/rain_sounds.py`, synthesised): light (2 mm/h) and heavy (20 mm/h) loops crossfaded by the rate
+    (`MixWeights`). They get quieter the less open sky there is round you, and a loop of rain on a roof plays while one
+    is over you. Light rain sits 5.5 dB under the walk on concrete and heavy rain at about its level.
+  - The look (`RainLook`), easing in over 20 s:
+    - the sky becomes an overcast panorama (`Tools/rain_sky.py`, `materials/weather/overcast_sky.vmat`), swapped at
+      halfway, and darkens in heavy rain;
+    - the sun drops to a third of its light in drizzle and about a seventh in a downpour, and goes grey;
+    - the fog closes in to rain's visibility (8 km dry, ~3.3 km at 5 mm/h, ~1.6 km at 25 mm/h);
+    - the reflection probes lose the clear sky's blue.
+    Every value is put back when it clears. Cloud maps' baked lighting isn't changed, so their shadows stay.
+- Fire: rain wets dead grass (`Weather.FuelWetting`, on the host). A tenth of a millimetre slows a grass fire, and
+  about half a millimetre stops it running (`FireFuels.HeadRate`). Thermite still burns.
+- `dev_weather [clear|drizzle|steady|showers] [mm/h]` (host) sets it. With a rate it holds at that rate; with none it
+  follows the kind's schedule. With no arguments it logs the weather now.
+- It has rained before the match too (`Schedule.RainStart`): a front's rain set in 10 minutes to 2 hours earlier. Seven
+  showery matches in ten had a shower in the hour before, ending 5 minutes to an hour before the start. The puddles go
+  by that history.
+- Thunder and lightning (the user asked for them after the rain, 2026-10-08). `Weather.Schedule.Strikes` lists the
+  match's flashes from the seed, so every machine has the same ones. Nothing new is synced.
+  - A shower that peaks over 12 mm/h is a thunderstorm's. Its cell drifts past at 6-14 m/s, closest 0.5-6 km off when
+    the rain's heaviest. It flashes from 5 minutes before its rain to 3 after, mostly in its middle: half a flash to
+    three a minute, by its peak. Three in five flashes stay in the cloud.
+  - One steady rain in three has storms embedded far off: a flash every 3-6 minutes, 6-15 km off, four in five in the
+    cloud. Drizzle has none.
+  - The flash (`Schedule.FlashAt`): a ground strike is 2-5 return strokes 35-85 ms apart, each gone in tens of
+    milliseconds, with the channel glowing between them. One in the cloud is 3-6 softer pulses over half a second.
+    `RainLook.Apply` lights the sky, the sun's sky light, the sun a little, and the fog a bluish white with it.
+  - The thunder comes when its sound gets there, at 338 m/s (cool, wet air), from the strike's foot, or from the cloud
+    6 km over a flash in it. Past 18 km none is heard (refracted up over the listener); the flash still shows.
+  - It plays from the strike's bearing, low over the horizon for a ground strike and up in the cloud for one in it,
+    0.6 placed (a long channel, not a point). It follows the camera's place, with no distance falloff or occlusion,
+    and indoors it's 0.4 as loud.
+  - Three sets, by distance: near under 2 km (the crack and the tearing of the near channel), mid 2-6 km (a peal) and
+    far past that (a low rumble). Within its set the level goes as (reference / distance)^0.43, the mix's squeeze.
+  - `Tools/thunder_sounds.py` synthesises them (`sounds/weather/thunder_{near,mid,far}`, 3, 3 and 4 takes), after Few's
+    model: a tortuous channel at two scales (~80 m runs, then ~4 m ones turning 16 degrees), each bit an N-wave as long
+    as its radius gives, summed by its arrival time. On the way: ISO 9613-1 air absorption (11 C, 95% humidity), the
+    ground's reflection, a refraction shadow, and the echoes off the land 11-13 dB under. Its docstring has the rest.
+  - Levels (K-weighted, loudest 50 ms): near -18, mid -23.5 and far -28, against the walk on concrete's -36. They're
+    rough real levels (~100-105 dB(A) at 1 km, ~90 at 3.5 km, ~80 at 9 km), squeezed 0.43 times like the rest of the
+    mix. Near thunder keeps some 2-4 kHz; far thunder is all under ~500 Hz. A take is 15-24 s.
+    `--preview <wav>` plays every take over the heavy rain loop.
+  - `dev_thunder [metres] [cloud]` (this machine only) strikes that far off where you're looking, 1500 m to the ground
+    by default. It only shows while it rains.
+- Puddles (`RainPuddles`, run by `RainView`). Nothing is networked: where a hollow lies, its size and depth and how much
+  ground drains into it come from the seed and the place, and how full it is from the rain's history.
+  - The map is cut into 220-unit cells out to 1700 round the camera. A cell has a hollow 1 time in 4 on paving and nearly
+    1 in 2 on bare earth. It must be level (normal z 0.985), open to the sky, not water or a moving body, with the ground
+    level and the same at 8 points round it.
+  - Paving is "default", concrete, stone and tile (`WorldSounds.Classify`'s masonry and tile). Bare earth is dirt, gravel
+    and mud. Grass, wood, metal and water have none.
+  - Paving's are 20-140 units across and 5-25 mm deep, draining 3-12 times their area. Mud's are 40-180 across and 10-60
+    mm deep, draining 4-15 times theirs.
+  - How full: dg/dt = 2 (k Rrun + sqrt(g) (R - s)) / Hd, where g is the share of the volume that's full, and sqrt(g) of
+    the depth (a bowl). Paving holds the first 0.5 mm, then sheds 85%. Earth soaks 8 mm/h when dry, down to 1 mm/h as
+    its top 3 mm wet (Horton). Seepage is 0.5 mm/h through paving and 1.5 into earth.
+  - So drizzle puddles paving over hours and never earth, steady rain fills paving's in about a quarter of an hour, and a
+    shower puddles both within minutes. They drain over hours.
+  - Each is a decal (`decals/weather/puddle_{paving,mud}_{0-2}`, from `Tools/puddle_textures.py`). Its height map is
+    the hollow, and `CoverageAmount` is the water's share of its depth, so the edge follows the hollow's contours as it
+    fills. The water halves the paving's albedo; muddy water is silt-brown. Its surface is a flat mirror (roughness
+    0.02). Puddles fade in over 1.5 s, and out over the last 300 units. At most 192 at once, 6 cells probed a frame.
+  - `dev_puddles [fill]` (this machine only) holds every puddle at a share of its depth, 0-1; with none, or below 0,
+    they follow the rain again. Puddles only show while it rains.
+- Not modelled: wet surfaces (beyond the puddles), splashing through puddles, rain on the gun or the screen (see
+  above), and a setting to turn it off. Theater doesn't record it.
+- Made offline on 2026-10-08 and compiled with dotnet. The editor hasn't loaded it: nothing has been seen or heard
+  in-game. To check: `dev_weather steady 5` on Belltower and Railhead (the sky, the fog, no drops under the shed's roof,
+  the splashes, the roof's sound), the frame time with 6000 drops, and a second machine seeing the same weather.
+  - The editor compiled the thunder's WAVs and events and the puddles' decals on 2026-10-08 with no errors. To check:
+    `dev_thunder` at 500, 3000 and 10000 m (the flash, the delay, the direction, the levels against a gunshot),
+    `dev_puddles 0.3` and `1` on paving and on earth (the shapes, the edge following the hollow, the mirror), and a
+    showers match's first storm. Whether the height map should be read as linear rather than sRGB wasn't checked.
+  - The drops' blur, weights and variance, the splashes' flux and the puddles' rings (2026-10-09) compiled with dotnet,
+    with the editor's match running, and haven't been seen. To check: `dev_weather steady 5` and `25` (the streaks near
+    and far, the splashes' density, the rings filling the puddles, not past their edges), and the frame time with
+    10,000 drops, 3,000 splashes and 3,000 rings.
+  - The drops' haze colour, shorter streaks and lower far weights (2026-10-09, after the user's "white lines") compiled
+    with dotnet and haven't been seen. To check: the streaks against the sky and against a dark brick wall (neither
+    white nor black lines), a lightning flash lighting them, and whether they still show at all in drizzle.
+
+## Bullet drop (real exterior ballistics on hitscan shots, Warzone only)
+- Only in Warzone (Battle Royale): a game mode has drop if it has the `BulletDrop` rule (`battle_royale.prefab`'s root).
+  The user wants the main game's shots dead straight along the sights, and plans to come back to this system later.
+- Shots still hit instantly, but they follow the real bullet's path: `Shootable.ApplyBallistics`
+  (`Shootable.Ballistics.cs`) starts the shot `SightHeight` below the eye and follows the arc in straight segments
+  (25 m, then 100 m past 300 m) to the first one that meets something. It traces from there, and damage falloff counts
+  the path already travelled. Gravity drop is scaled by the cosine of the aim angle (rifleman's rule). No time of flight
+  or lead (`Trajectory.TimeAt` has it if that's wanted).
+- `Code/Weapons/Ballistics.cs` is a point-mass RK4 solver (ICAO sea-level air) with the standard G1/G7 drag tables and a
+  sphere table for buckshot. One trajectory per load is cached, to 1500 m. It was checked against FM 3-22.9 (M855) and
+  the AK/RPK/AKS-74U manuals' tables to within about 2 cm.
+- Per-gun data are real loads and real sights, with no tuning: `MuzzleVelocity` (m/s), `DragFunction`,
+  `BallisticCoefficient` (the published BC in lb/in²), `SightHeight` (in) and `ZeroRange` (the doctrinal zero: M4, M16A4,
+  M16A2, MCX, L85A2 and HK416 M855 and SCAR-H M80 300 m, AKM/RPK/AK-15 PS 300 m, AKS-74U 7N6 275 m (sight "П"), AK-105, AK-12, AK-74M and RPK-16 7N6 300 m, MCX-SPEAR 6.8x51 300 m, M700 M118LR
+  100 m, 9 mm guns, the P90's SS190 and the MP7A1's DM11 100 m (the two PDWs zeroed like the SMGs; the MP7's own zero
+  wasn't found), pistols and buckshot 25 m). The battle zeros put the rifles 15–30 cm HIGH at 150–200 m. That's real,
+  not a bug. The P90's BC (G1 0.155) is an estimate: none is published for SS190. The AUG takes the M4's zero (M855,
+  300 m). The FAL's M80 is zeroed at 200 m, its rear sight's lowest setting (the battle zero).
+- The Kastov 762, Vityaz, RPK, Bizon, AK-105, Vepr-12, M16A4, P90, MP7A1, AUG, Uzi, FAL, M18, MCX, L85A2, HK416, AK-12, AK-15, AK-74M, MCX-SPEAR, M16A2 and RPK-16
+  take theirs from `kastov_prefabs.ballistics()` (`PS_BALLISTICS`); the other guns, including the patched 74u, have them set in the
+  prefab. Optics don't change `SightHeight` (a few cm at most), and barrel parts don't change `MuzzleVelocity`: their
+  length only moves the damage falloff (see the pipeline notes).
+- Each gun also has its bullet's `BulletDiameter` and `BulletLength` (mm, from the load's drawings; a buckshot ball's
+  length is its diameter), which set its supersonic crack (see Bullet cracks). The ported guns' come from
+  `kastov_prefabs.py` (`ballistics(..., bullet)`, the `*_BULLET` constants).
+- Near misses from drop still hit bodies, thanks to the box (see Bullet traces). Bots (`LightweightCombatBot`) do their
+  own traces, a line with no drop.
+
+## Bullet traces (`Shootable.DoTraceBullet`)
+- A bullet is a line through the world: walls, floors and props stop it only where its line meets them. Bodies
+  (players' and bots' hitboxes, zombies' capsules: `IsBody`) are found with a box of `max(BulletSize*1.75, 14)` units
+  (±7 in; the M700's is ±28 in), so near misses still hit them. The box counts only where it touches a body in the open:
+  `InTheOpen` needs a clear line from the bullet's path (a box trace's `EndPosition`) to the point of contact
+  (`HitPosition`), so a body hidden behind a corner the line passes isn't hit.
+- The whole trace used to be that box. It clipped wall edges up to 7 units off the line (the M700 28), so a shot aimed
+  just past a corner you stood close to hit the corner, with the impact effects in your face (the user's report). World
+  impacts also sat at the box's centre, ~7 units off the surface; they're on the surface now.
+- Checked in-game 2026-09-27 on Flatgrass: with the sights 3 units past a brick wall's edge, the old box hit the wall
+  5 units away, and a real shot now lands 523 units away. Bots' near misses hit the same hitboxes as before. Not
+  checked: a close shot straight into a wall, wallbangs, zombies and the M700.
+- Blood and flesh impacts go on the body (2026-10-12, the user: blood on bots "looks like its next to the npc").
+  - A near miss's impact went at the box's centre on the line (`EndPosition`), up to 7 units beside the body. Now
+    `SceneTraceExtensions.ThroughBody` moves it to where the box touched the body (`HitPosition`).
+  - Zombies are hit by their capsule (16 round their middle, well clear of the arms, legs and chest), so their impacts
+    were in the air. Code-built zombies now have `ModelHitboxes` on the driver (`SpawnZombie`): a hit on the capsule
+    takes the hitbox the line meets, else the nearest within a 32-unit box. The capsule still decides whether it's a
+    hit, and only traces that ask for hitboxes see them.
+  - A bot's blood moved any point over 32 from its chest to the chest, so leg and foot hits bled from the chest. Only
+    a point outside its body (24 round it, from its feet to 80 up) moves now.
+  - Compiled offline with dotnet, not yet seen in-game.
+
+## Wallbangs (`Shootable.ResolvePenetration`, `Shootable.Penetration.cs`)
+- The user (2026-09-29): no wallbangs through brick or thick walls, where a real round couldn't go. Codex rewrote the
+  penetration pass that day. Rounds used to go through anything up to 32 units thick (`PenetrationThickness`), any
+  wall in the game included.
+- Now the surface decides (`PenetrableDepth`), per object:
+  - Wood: a round crosses at most 4 units.
+  - Plastic: 2.
+  - Fabric, paper and cardboard: 1.
+  - Sheet metal (`metal.sheet`): 0.125.
+  - Glass: 3.
+  - Everything else stops it: `default`, ceramic, solid metal, dirt. s&box's core surfaces have no brick, stone,
+    concrete or plaster, so the maps' masonry is `default` (Belltower's `STONE`, the Ridgeback's walls).
+- The thickness is measured along the shot, back from an exit on the same collision shape. All the objects a round
+  crosses share one budget: `PenetrationThickness` clamped to 8 (so 8 for every gun).
+- A round stops at the first body it hits. Before, it could go on into a second one.
+- Glass is 3 because maps model a pane's collision thicker than real glass: Belltower's church windows are 2 units and
+  the Ridgeback's breakable panes 0.5. Codex's 1 stopped every shot at the church windows (fixed 2026-09-29). A
+  `BreakableGlass` pane still breaks and lets the round on, and that isn't a wallbang.
+- A thin partition authored as `default` stops rounds too, since its surface can't tell it from brick. A solid box
+  with a light surface is measured whole, so a thick prop box of fabric or sheet metal stops rounds (Belltower's lorry
+  tilt and cab did, before the lorries came out).
+- Codex reported it passing an offscreen engine test. Not checked in a match.
+
+## Incendiary grenade (thermite, `Code/Weapons/Grenades/Fire/`)
+- The user asked for "1:1 realistic fire" and picked real thermite over a molotov. The incendiary grenade is the
+  AN-M14 TH3 (`ThermiteGrenade`), with FM 3-23.30's figures. It keeps the molotov's files
+  (`Assets/Weapons/Throwable/Molotov_Cocktail/`, `molotov_grenade.equip`, already named "Incendiary Grenade").
+  - The M201A1 fuze burns 1.2-2 s from the throw (`MinFuze` / `MaxFuze`). Then 750 g of thermate burns for 40 s at about
+    2,200 C wherever the grenade has come to rest. There's no blast and no thrown flame.
+  - That's ~3 MJ (75 kW). About a third of it leaves the burning point as radiant heat (`FullRadiantPower` 24 kW), and
+    after the burn the slag pool gives 3 kW, cooling with a 20 s time constant.
+  - Within 16 units of the burning canister (`ContactRadius`) you're touching 2,000 C slag (300 kW/m²).
+  - Drops of molten iron fly off, 10 a second, mostly within 0.35 m and never past 1.5 m. Each lights what it lands on
+    with that fuel's chance (`SpatterIgnition`) and burns a foot it lands on.
+  - Thrown ~25 m: `Throwable.ThrowPower` 795 in `weapon_molotov_grenade.prefab`. The game's gravity is 800 u/s², and a
+    throw adds 100 up.
+  - The burnt-out canister lies there for 50 s, scaled black, then goes.
+- Nothing puts it out, smoke included (the user's choice). `SmokeGrenade`'s extinguish loop over `MolotovFireNode.All`
+  is inert now. `MolotovFireNode.cs` is only kept so that loop compiles; `MolotovGrenade.cs` is gone, and
+  `molotov_firenode.prefab` / `molotov_explosion.prefab` are unused.
+- `SurfaceFire` runs fire on the ground over a grid of 40-unit cells. There's one per scene, made by the host and
+  networked, with `DestroyBetweenRounds`.
+  - Fuels (`FireFuels`):
+    - Cured grass: terrain materials named `meadow_dry` (Ridgeback's dry meadow).
+    - Green grass: other terrain grass.
+    - Lawn: grass surfaces that aren't terrain, like Flatgrass's.
+    - Wood and fabric: by surface.
+    - Rock, earth, concrete and metal don't burn.
+  - Only cured grass carries a running fire, following these models:
+    - CSIRO's grassland model for the head fire's speed (fully cured, 9% moisture, `WorldWind`'s wind);
+    - FBP's length-to-breadth ellipse for the burnt area's shape;
+    - McArthur's slope rule;
+    - Byram's flame length.
+  - Each cell that lights works out when its 16 neighbours catch, and the earliest catches first.
+  - Green grass and lawn are under CSIRO's curing threshold, so only a lit patch of them burns. Wood burns where it's
+    lit for 90 s, fabric for 60 s.
+  - A wall 20 units high between cells stops the fire.
+  - The host sends each cell to every machine as it lights (`Receive`). Late joiners get a snapshot.
+- Heat (host, `SurfaceFire.Heat.cs`):
+  - Each burning cell radiates as a sheet of flame (60 kW/m²), and walls shade it. Inside the flames it's 84 kW/m².
+    Thermite radiates from its burning point.
+  - Damage is Eisenberg's thermal dose (flux^4/3 x time) at the legs, middle and head. The lethal dose (2375) takes 100
+    health, and under 1.6 kW/m² does nothing (`HarmlessFlux`). Standing in 1.4 m grass flames kills in about 7 s.
+  - The fire's traces, and the sparks' collisions, skip `playerclip`, as the grenade itself does (the collision rules'
+    grenade/playerclip pair). So heat, sparks and drops of iron go through an open window's player clip (the Town
+    House's).
+- Burns aren't hits:
+  - Players and bots take them as `DamageFlags.Burn`, and zombies with the tag `burn`.
+  - No blood, flinch, knockback or hitmarker, no hardcore one-shot on bots, and Zombies' armour plates don't absorb
+    them.
+  - They hold off health regen, and the damage indicator points at the heat.
+  - The kill goes to the thrower (`FireSource`), even after they respawn. A burning zombie pays only the kill.
+- Bots step out of heat that hurts before anything else (`LightweightCombatBot.AvoidFire`). They go to the nearest spot
+  150-450 units off with under half the harmless flux (`SurfaceFire.HeatAt`, which isn't shaded by walls).
+- Fire or burning thermite within 128 units stops an instant defuse (`AllowInstantDefuse`, `SurfaceFire.IsBurningNear`).
+- Burnt ground:
+  - Terrain grass is painted with `materials/terrain/burnt.tmat` in the terrain's control map, and the grass clutter
+    there goes with it.
+  - The control map belongs to the terrain resource, which the editor shares and saves, so every texel is put back when
+    the fire goes (between rounds, or when the scene closes). Don't save the terrain while ash is on it.
+  - Other ground gets `decals/fire/burnt_patch.decal`, and where thermite burnt out `thermite_scorch.decal` (60 units:
+    slag and drops of iron). At most 600 scorch decals.
+- Scripts make the assets:
+  - `Tools/fire_textures.py`: the burnt terrain material and both decals.
+  - `Tools/thermite_sounds.py`: `thermite_ignite` and the 8 s `thermite_burn` loop.
+  - The grass fire's crackle is the old `molotov_fire_loop.sound`.
+  - The particles are built in code (`FireParticles`) from the engine's flame, smoke, spark and glow sheets.
+- Not yet checked in-game.
+
+## Flashbang (`FlashbangGrenade`, `FlashbangEffect`, `hc1_flashbang.shader`)
+- The user asked for a real flashbang ("1:1 to real life"), keeping the after-effects they liked (the glare, muffled
+  hearing and ringing), plus moving slower and being unsteady.
+  - The first version (2026-09-28) kept the white faint: 0.3 at most, gone in half a second. On 2026-09-29 the user
+    found it "just a really small white thing". They asked for a proper flash of white, disorientation, and the blur the
+    original flashbang had close up.
+  - The original whited the whole screen out for 2.4 s (1.2 s of it solid), under a strength-10 bloom that smeared the
+    view. It had 4 s of glare and muffle, for anyone within 750 units (19 m) with it within ~70 degrees of their view,
+    however far off.
+- `FlashbangGrenade.Measure` works out what reaches the player being viewed, sense by sense (`FlashExposure`; 1 is 6 ft
+  away looking straight at it). The figures are NIJ's measurements of a MK141 (2003: at 6, 9 and 12 ft, ~90 million
+  candela, 178 dB less 9 dB per doubling of the distance, and 0.162 bar falling with the distance to the power 1.46):
+  - Vision: the light in the eyes, direct (inverse square, less the further off the view's centre, none past 100
+    degrees) plus what the walls, floor and ceiling throw back (`Bounced`, 18 rays), so indoors, looking away still
+    dazzles. The strength is the light's logarithm (`SightDecades` 2), gone at 100 times less than at 6 ft: about 18 m
+    looking straight at it in the open. The eyes still get ~2,400 lux-seconds there, a full-power camera flash (guide
+    number 60) from 2 m. Until 2026-09-29 it was gone at 40 times less (11.5 m).
+  - Hearing: 178 dB at 6 ft down to 160 dB, where the ringing starts (about 7 m in the open), 12 dB less round a wall.
+  - Balance: the blast's overpressure down to 0.035 bar (about 5 m in the open), halved round a wall.
+  - Nothing past 750 units. Glass passes the light, not the bang or the blast. Traces skip people, bodies, triggers,
+    player clips and grenades.
+- `FlashbangEffect` (on the scene's camera, local only) plays it out. A flash that reaches a sense harder than what's
+  left of the last one starts that sense over. At strength 1: white 4 s (1.4 s of it solid), sight 5 s (the M84's
+  "approximately five seconds"), blur and glare 6 s, deaf 2 s then muffled until 8 s, ringing 10 s, and dazed 5 s.
+  Closer, up to 1.3 times as long.
+  - The white (`FlashbangOverlay`, a ScreenPanel at ZIndex 200, over the HUD) is flash blindness.
+    - It's solid from strength 0.6 up (`FullWhite`): 4.6 m looking straight at it in the open, nearer looking away,
+      further indoors, where the walls' light counts too.
+    - It holds for up to 1.5 s (1.4 s at 6 ft), then thins out over 0.4 + 2.2 x strength seconds.
+    - Less light gives a fainter white, (strength / 0.6)^0.8, that goes sooner.
+  - The blur: the afterimage's CommandList grabs the frame with its mips. The shader takes 17 taps over a disc: the
+    engine's 16-tap Poisson disc plus the middle, each tap read from the mip level about a third of the radius across.
+    - The radius is up to 2% of the screen's height (`MaxBlur`). There's none below strength 0.2, and all of it from 1.
+    - At strength 1 it clears from 2.15 s to 6 s, so the sharpness comes back last.
+    - The blast's daze blurs it up to half that on its own, so a flashbang going off close behind you blurs the view too.
+  - The afterimage: the same CommandList, at `AfterPostProcess` (order 10000), keeps the frame the flash lit and screens
+    it onto the view, fading over the sight's time. If the flash was on screen, its fireball's spot burns in bright,
+    then stays as a dim, purplish blot for as long again.
+  - The glare: a Bloom (threshold 0, Strength up to 4) and a ChromaticAberration on the camera's child "Flashbang",
+    which win over the camera's own; the mode is the camera's own bloom's (Additive). The engine adds about Strength / 2
+    times the blurred view (6 mips at Strength / 12), so the view is up to three times brighter. It comes up under the
+    white and shows as the white thins.
+  - Hearing: temporary deafness (`Deafness`, `Code/GameLoop/Audio/Deafness.cs`), and the ringing
+    (`sounds/player/ear_ringing.sound`, see Ordnance and handling sounds).
+    - `DeafnessProcessor` on the Game mixer (as the acoustic reflex is): world sound up to 36 dB quieter and
+      low-passed down to 250 Hz at full deafness, easing back on a log scale as the level falls. Voice chat, music, UI
+      and radio aren't touched. The ringing plays on the master mixer, so it isn't muffled with the rest.
+    - It replaced the stock "weird.4" DSP on the master mixer (2026-10-16, the user: flash and stun grenades "should
+      do temporary deafness"), which was an effect preset rather than a hearing loss, and muffled the ringing and UI.
+    - The Flashbang is the only tactical that deafens: the M84 is the stun grenade, and the Decoy (in the
+      `M84_Stun_Grenade` folder) only plays gunfire. Blasts (HE, C4) don't deafen yet.
+    - Compiled with dotnet, not yet heard in-game.
+  - Balance: the blast upsets the inner ear. It comes on over 0.15 s rather than jerking the view.
+    - Every gait is up to 30% slower (`MoveSpeedScale`, in `PlayerPawn.GetWishSpeed`).
+    - The aim wanders up to 2.5 degrees (`SwayDegrees`, `CameraController.ApplyFlashSway`). The owner moves their own
+      pawn, and on their machine they're the one being viewed, so only they need that.
+    - The view rolls to and fro up to 4 degrees (`RollDegrees`, `CameraController.ApplyFlashRoll`). Only the camera
+      rolls, about where it looks, so the aim doesn't move.
+- A trace keeps at most 8 tags to leave out (`WithoutTag` / `WithoutTags`) and silently drops any more, so
+  `FlashbangGrenade.Solid` leaves out 7, with room for glass.
+- Offscreen renders (`RenderToBitmap`) skip post-processing and the UI, so the glare and the white can't be seen there.
+  The afterimage's CommandList does run, so the blur should show.
+- A shader can't be compile-checked offline: the install's `resourcecompiler.exe` fails on s&box shaders ("without
+  buffer"). The blur was checked by copying the shader into `Assets/shaders` under another name and running
+  `recompile_asset` on it. The new names (`FlashBlur`, `g_vBlurTaps`) were in its `.shader_c`. Then the copy was deleted.
+- Bots aren't flashed. The prefab's `EffectLifeTime` key is left over and ignored.
+- Checked offscreen on 2026-09-28: the exposure with real traces in a test scene (the ranges above, walls and glass),
+  and the afterimage and the spot in renders. The glare and the white were set from the engine's bloom maths and a
+  preview, not seen. The 2026-09-29 white, blur and roll compiled and hotloaded into a running game, but haven't been
+  seen yet. None of it has been checked in-game yet.
+
+## Smoke grenade (`smoke_particles.prefab`, `SmokeSimulation`)
+- Colour: the user saw the smoke grenade's cloud come out dark navy, almost black, in an Innocent Hotel room (2026-10-01). A
+  screening smoke grenade's HC smoke is white-grey; only coloured signal smoke is anything else.
+- The sprite (`smoke1.vtex`, from a cloud package) is a neutral light grey, about 0.8, and the tint was white. The cause
+  was the renderer's `Lighting`. In the engine's `sprite_ps.shader`, a lit sprite gets the dynamic lights plus either
+  baked light (a lightmap or light probes) or, if it has neither, the scene's flat `AmbientLightColor`. A cloud map's
+  rooms are lit by baked light the sprites don't receive, so the smoke got only the sky's dark blue ambient.
+- The sprite renderer can't be part-lit, so the smoke is now unlit with a tint of 0.85 (`ParticleEffect.Tint`): about 0.7
+  of white with the texture. It's the same brightness everywhere, so in a dark spot it can look a little bright.
+- The fire's smoke (`FireParticles`, the thermite and grass fires) is still lit, since its own flames' light falls on
+  it. Indoors on a cloud map, away from the fire, it may darken the same way.
+- The user's next screenshot showed it white-grey in that room (2026-10-01).
+- Walls: in that screenshot the cloud showed on both sides of a wall pillar. The user: smoke shouldn't "phase through
+  walls". The effect's collision kept each puff's centre out of walls. But a puff is a camera-facing sprite up to 167
+  units across, which reached past them: from the other side of a wall, or past a pillar's edge, the part on your side
+  showed.
+  - Now `SmokeSimulation.OnAfterStep` keeps each puff to the room round its centre. It shrinks the sprite until it
+    reaches (0.47 of its width, smoke1.vtex's alpha edge) no more than 6 past the nearest surface, inside the renderer's
+    DepthFeather. It makes the puff denser by the area it lost (at most 2.5x and alpha 0.85), so a doorway, a corridor or
+    a corner still holds its smoke, in smaller puffs. A puff grows back at 30 units of reach a second.
+  - Floors count 32 further off (`FloorAllowance`). A puff sunk into the floor it's over looks like smoke lying on it,
+    and held strictly to the floor the cloud's base would be lumps.
+  - A probe is 26 rays out to 90: a level ring every 30 degrees and rings of 6 at 35 degrees up and down, turned
+    15 degrees from each other so a pillar or door jamb between two rays meets the next ring's, then straight up and
+    down.
+    - Each puff is probed when it's new, every 16 units it drifts and every second (doors), at most 10 puffs a frame.
+    - Between probes, the triangle inequality bounds its clearance: the probe's, less how far it has drifted since.
+    - New puffs go by the vent's own probe, taken every 0.25 s in `OnUpdate`.
+  - Why OnAfterStep: the engine runs the controllers' `OnParticleStep` (its `OnStep`) before it applies the
+    effect's Scale and Alpha curves, which would overwrite them. `OnAfterStep` is its `OnPostStep`, called from
+    `ParticleGameSystem` on the main thread once the threaded step is done, so the traces are safe there. Read from
+    Sandbox.Engine.dll's IL. `Particle.Size` is the sprite's full width: the renderer passes the shader Size / 2, which
+    scales a quad of ±10 by a tenth.
+  - Smoke now goes through player clips (an open window's) and bots' movement boxes, in the puffs' collision
+    (`CollisionIgnore`) and the probes.
+  - Compiled offline on 2026-10-01, not yet seen in-game. Things to check: smoke near a wall and a pillar from the
+    other side, a doorway, the cloud's base on open ground, and the frame time with several smokes out.
+- A volume renderer was tried on 2026-10-12 (`SmokeRendering`, `shaders/hc1_smoke.shader`, started by
+  `SmokeSimulation.OnStart`, with the prefab's sprite renderer off). It drew nothing in the engine: 200 puffs were
+  queued for the camera and none showed. The user saw a grenade on the floor with no smoke. So the sprite renderer is on
+  again and `OnStart` is commented out, until the volume renderer works. Its files are still there. Not yet seen in a
+  match: the prefab needs recompiling after the hotload.
+
+## Deaths (`DyingBody`, `DeathPlan`, `Code/PawnSystem/DyingBody.cs`)
+- The user asked for "more variance in the way people die", some "slowly" dropping, with "hyper realism". Every death
+  used to be a limp ragdoll at once, shoved by 5-20 times the damage (players) or 50 times the force (bots) on every
+  part.
+- `DeathPlan.Choose` picks how the body goes down from the killing hit and how the victim stood:
+  - Limp at once (`Drop`): head, neck and spine hits (the brain, brain stem or upper spine), blasts, falls, and anyone
+    prone, knocked down or in the air. Also 30% of chest hits, 10% of belly hits and 40% of hits with no hit location.
+  - `Buckle` (0.55-0.9 s): the knees give and the body folds forward (60%) or to a side. Most chest hits, half of
+    melee and arm hits.
+  - `Stagger` (0.8-1.2 s): someone moving faster than 120 u/s carries on the way they were going, then goes down. A
+    buckle on the move turns into one 40% of the time.
+  - `Slump` (1.6-2.6 s): sinks to the knees, head dropping, then slumps over. Most belly hits, some chest, arm and leg
+    hits; burns and the gas zone always (2.2-3.2 s).
+  - `SitBack` (1.1-1.6 s): the hips go back and they sit, then fall backwards. A quarter of belly hits, standing still.
+  - `LegGives` (0.8-1.3 s): the shot leg folds at once and they go down on that side. 65% of leg hits.
+  - Crouched: no stagger or sitting back, and 30% quicker.
+- It's the same on every machine: the dice are a hash of the victim's id and where the hit landed (a Guid's hash is
+  its bits; never a string's). For players the host picks the plan and sends it with `CreateRagdoll`'s RPC; for bots
+  every machine picks it from the kill it was sent, with its own smoothed `_moveVelocity`.
+- `DyingBody` does it all at the velocity level, so it doesn't depend on the physics' torque units:
+  - The body keeps the victim's velocity. The bullet jolts only the part it hit (1.2x the damage, 30-120 u/s along the
+    shot); a blast throws every part (3x the damage, 120-450 u/s, a little upward). A bullet doesn't knock anyone over.
+  - Weight: `GravityScale` is eased back in from 1 less the share the legs still hold, so the body sinks.
+  - Muscle tone: each joint's bend speed relative to its parent is damped, harder while there's tone. The arms go first
+    (the gun falls), then the legs, then the back and neck. Regions come from the bodies' bone names: the player
+    models' thighs are `l_hip` / `r_hip`, the citizen's `leg_upper_*`.
+  - Balance: the chest is held over the hips (a 1.5 Hz critically damped spring), easing out 16 units toward the way
+    it'll go over, so the body sinks upright and then topples that way instead of tipping stiff like a plank.
+  - While the body's still light its feet grip the floor (its sliding is damped); a stagger's hardly, so it runs on.
+  - At the end, gravity is put back and the component removes itself.
+- Every machine builds its own ragdoll, on a body that no other machine owns. `ModelPhysics.CreatePhysics` returns at
+  once on a proxy (read from Sandbox.Engine.dll's IL on 2026-09-30).
+  - Before the fix, a body under someone else's pawn or bot got no physics bodies. It stood in its bind pose (a T-pose)
+    until it was removed. The user saw it with a second instance on 2026-09-30.
+  - The Theater replays showed it on both machines: every host bot's corpse on the client, and every other player's
+    corpse on each machine. Only a machine's own bodies fell.
+- So the body leaves its parent first, then goes limp:
+  - `PlayerPawn.CreateRagdoll` unparents it before `SetRagdoll`.
+  - `LightweightCombatBot`'s `OnKill` unparents the renderer's object. It takes the dead, ragdoll and corpse tags it
+    had from the bot, and goes when the bot does (`OnDestroy`).
+  - A child object has no network object of its own: `GameObject.Network` goes by the parent chain. So on its own the
+    body is local, and each machine plays out the same DeathPlan.
+  - Only a network object's own transform is synced, not its children's, so nothing pulls the body back.
+- A zombie's driver is on the zombie's own networked object, so it can't leave it. On a client,
+  `ZombieAI.CreateLocalCorpse` makes a local copy of the driver, builds its bodies from the zombie's pose, and moves the
+  zombie mesh across. The host ragdolls the zombie itself, as before.
+- The Theater recorder keeps recording a bot's body after it leaves the bot (`MatchRecorder.Soldier.Leaver`). The
+  body's tracks stay under the bot's, and its `Parent` records the move, as a player's does.
+- The fix compiled offline on 2026-09-30 and hasn't been seen yet. To check it, watch a bot's corpse and another player's
+  from a second instance, and a zombie's.
+- Compiled on 2026-09-29. None of it has been seen, in-game or offscreen: the tone rates, support curves and balance
+  are first guesses from the design, to tune by watching.
+
+## Kill sounds (`KillSounds`, `Tools/kill_sounds.py`)
+- The user asked for satisfying kill sounds. The player being viewed hears a kill-confirm for each enemy they kill: a
+  short "thwack" (`sounds/ui/kill/kill_confirm.sound`), or for a headshot kill the same with a bright metal ping
+  (`kill_confirm_headshot.sound`). `Tools/kill_sounds.py` synthesises both (its docstring has the layers), and
+  `--preview <wav>` writes a demo. A re-run rewrites the WAVs but keeps the `.sound` events, which may be tuned.
+- Players and bots: `MainHUD`'s KillEvent handler calls `KillSounds.OnKill`. Every machine gets every KillEvent, so it
+  checks the killer is the viewer and the victim an enemy player or bot. Zombies raise no KillEvent, so
+  `ZombieAI.ShowHitmarker` plays it on a kill (`OnZombieKill`).
+- Kills within 3 s of each other (the medals' rapid-kill window) climb 0, 2, 4, then 7 semitones (`KillSounds.Steps`),
+  in step with the double, triple and fury kill medals. The viewer's death starts it again. Zombie kills don't climb.
+- It plays on the UI mixer, so Settings' UI volume sets it. It replaces upstream's `KillSound` component, which no
+  prefab used. Upstream's long, boomy `sounds/kill_sound.wav` and `sounds/guns/kill.wav` are still in Assets, unused.
+- Not yet checked in-game.
+
+## Menu nav click (`Tools/ui_sounds.py`)
+- The gunsmith header's PLAY sounded like s&box's stock click (`ui.button.press`, Kenney's `drop_002`), and the user
+  asked for a custom one (2026-09-29). The header's navigation click is `sounds/ui/menu/ui_nav_tab.sound`:
+  - `Tools/ui_sounds.py` synthesises it. It's a rifle's selector lever clicking into its next detent, about 0.15 s, and
+    the script's docstring has the layers.
+  - There are three takes, picked at random, all equally loud. They sit 2 dB over the stock click, by K-weighted
+    loudness.
+  - It plays on the UI mixer through the event's `DefaultMixer`, so Settings' UI volume sets it.
+  - A re-run rewrites the WAVs but keeps the `.sound` event.
+- Where it plays:
+  - The gunsmith plays it for every header link (`GunsmithPanel.GoToMenu`).
+  - The main menu's nav tabs play it as they're pressed (`.gnav-item:not( .active ):active`'s `sound-in` in
+    MainMenuRoot.razor.scss), all but the tab you're on. PROFILE's tab now gets `active` like the others (it was
+    `selected`), so that rule covers it.
+  - The hub's squad card plays it for its cog and the privacy options in the cog's menu (`HubSidebar.ClickSound`).
+    The user heard the stock click there and wanted the menus' sounds to match. The card's INVITE FRIENDS, LEAVE and
+    ALL FRIENDS use the menus' press (below).
+- The rest of the menus use `ui_button_press` / `ui_button_hover` (see World sounds), which replaced s&box's stock
+  `ui.button.press` / `ui.button.over`. Upstream's `ui_press` and `ui_action` went on 2026-09-30:
+  - `sound-in: ui_press` (Buttons.scss, the map vote, the mode and map cards) is `ui_button_press`;
+  - `.action:active`'s `ui_action` is `ui_nav_tab`;
+  - Domination's and Hot Zone's capture cues (`DominationFlag`, `HardpointZone`) play `ui_button_press` and
+    `ui_nav_tab`.
+  Upstream's events set no mixer, so they went to the default one (Game, which the SFX slider sets). Nothing plays them
+  now, nor upstream's `ui_hover`.
+- Not yet heard in-game.
+
+## Knife throwing (`Melee.Throw.cs`, `ThrownKnife.cs`, 2026-10-14)
+- With either the Trenchknife or M9 Bayonet equipped, primary attack swings and secondary attack throws the held knife.
+  Both prefabs already list Attack1 and Attack2; the melee component routes secondary input to the throw without asset changes.
+- The host releases it after a 0.18 s wind-up, using the player's replicated eyes and inherited movement velocity.
+  Defaults: 1600 u/s forward, 80 u/s upward, 100 damage. Holstering, dying, freezing, climbing or mantling before release cancels it.
+- `ThrownKnife` sweeps a 2-unit radius through hitboxes with scene gravity. The first impact deals melee damage once
+  and turns it into a normal `DroppedEquipment` pickup. The throw consumes the carried knife and switches weapons;
+  E or walking over the landed knife recovers it. A flight times out after 8 s; pickups use the existing round cleanup and lifetime.
+- A disabled Equipment component on the projectile retains the resource and thrower after the carried weapon is removed,
+  preserving its kill-feed icon, knife reward and Gun Game attribution. Only the host creates the projectile and deals damage;
+  the throw RPC accepts only the host or the owning player.
+- Validation: offline build and the editor's code compiler passed with zero errors. Live host checks on Railhead passed
+  for both knives: frozen-player rejection, holster cancellation, duplicate rejection, visible flight, one 100-damage hit,
+  weapon switching, recovery and a normal melee swing after recovery. Screenshots and results are in `output/knife-throw/`.
+  A runtime Attack2 injection through WeaponInputAction also passed with only the knife enabled: empty hands after release,
+  impact and recovery. The native Bridge's frame input helper did not reach fixed-step weapon input, so that check used
+  Input.SetAction plus the actual fixed-step handler. A separate remote-client session remains untested.
+- Releasing the last held knife calls PlayerPawn.Holster directly; PlayerInventory.HolsterCurrent reaches a null Deploy call.
+
+## World sounds (`WorldSounds`, `Tools/world_sounds.py`)
+- The user asked which of s&box's default sounds the game used, then for them to be replaced with sounds as close to
+  the real thing as possible, and for every sound to be made that way from now on (2026-09-29): "ultra real 1:1 or
+  close enough". Replaced so far: bullet impacts, knife strikes and the knife's swing, grenade bounces, footsteps,
+  running steps and landings, and the menus' press and hover.
+- `Tools/world_sounds.py` synthesises them from the physics of each event, with no samples. Its docstring has every
+  layer and why.
+  - It writes `sounds/world/impacts/bullet_<material>`, `sounds/world/knife/knife_<material>` and `knife_swing`,
+    `sounds/world/grenades/{frag,can}_<floor>`, `sounds/world/footsteps/{step,run,land}_<floor>` and
+    `sounds/ui/menu/ui_button_{press,hover}`: WAVs and a `.sound` event per set.
+  - A re-run rewrites the WAVs but keeps an existing event, which may have been tuned. Its takes are seeded, so a re-run
+    writes the same WAVs.
+  - `--compare <wav>` plays s&box's stock sound, then the new one, for each set (decoded from the s&box install or the
+    project's Assets), and `--preview <wav>` every take, with walks, runs, bursts and bouncing grenades. `--out <dir>`
+    writes somewhere else, to try changes.
+- Impacts: masonry, tile, metal, sheet metal, glass, wood, plastic, dirt, grass, fabric and flesh. Footsteps: concrete,
+  tile, wood, metal, dirt and grass. The script's octave spectra were compared with s&box's own recordings, which
+  showed the first version had almost no low end.
+- The metal impacts were redone on 2026-10-19, after the user played Ares (decks, galleries and the column are the
+  `metal` surface): "sounds like im playing table tennis". They rang like a steel target hung on chains: a pitched
+  ~1.4 kHz "ping" 0.25 s long over plate modes decaying in up to 0.28 s, 64-72% of the sound after the first 50 ms,
+  only 20 dB down after 0.55-0.78 s.
+  - Now steelwork built into a structure (`structural_modes`): 64 dense, pitchless bending modes, each dying in
+    T60 = 2.2 / (f x loss) with a built-up structure's loss factor of 1-2.5%, weak under the plating's coincidence
+    frequency (~1 kHz). A bright crack and a short clank, the frame's brief thud and lead splashing. One take in five
+    ricochets (it was two), quieter.
+  - Sheet metal the same way, with a panel's loss of 2-6%: a short "pank".
+  - The non-ricochet takes are 20 dB down after 80-100 ms, with 6-11% of the sound after 50 ms. In an 800 rpm burst
+    the level drops 17 dB between rounds, where it dropped 4.6 dB. Metal sits at -13 dB, 2 dB over masonry (it was -11).
+  - Only the metal and sheet metal WAVs and their events' volumes were replaced (`--out` to a scratch folder, then
+    copied in), so the other sets' files weren't touched. Compiled in the editor, not yet heard in a match.
+- The metal footsteps and grenade bounces were redone on 2026-10-20 (the user, on Ares: "running on the floor ... just
+  constant pinging ... maybe too loud"). Ares's whole floor, the ground slab and the decks, is the `metal` surface.
+  - Each step rang a hung plate on 16 sparse modes for up to a second (half its sound after the first 50 ms, a pitched
+    line 28 dB over the spectrum round it). A sprint steps every 0.25 s (`PlayerFootsteps`), so the rings overlapped
+    and the level only dropped 13 dB between steps.
+  - Now a boot on a deck (`soft_strike_modes`): a rubber heel's few ms of contact barely reach the plate's upper modes,
+    and a plate on its frame or slab, with the boot on it, damps the rest (loss 2.5-5%). A hollow clank, 3-4 dB more
+    than concrete at 250-500 Hz, 20 dB down there by 60-100 ms. Its pitched line is 10-14 dB (concrete's 10.5), and a
+    sprint goes quiet between steps.
+  - A steel deck is now 2 dB over concrete (it was 4): walk -34, run -28, land -24.
+  - Grenades on metal had the same ringing plate, 0.4-0.65 s long. They now use `structural_modes` (loss 1.5-3%): a
+    bright clank, 20 dB down in ~80 ms.
+  - Only the step, run, land, frag and can metal WAVs and their events' volumes were replaced, the same way. The old
+    files are in this session's scratch only. Compiled in the editor, not yet heard in a match.
+- Ricochets were redone the same day (the user, on Ares: "in the distance i hear pews like im in an action movie").
+  - One masonry take and one metal take in five had a whine mixed in: a tonal glide from 2.6-4.3 kHz down an octave
+    over half a second, the movie "pyeeow". It played on any hit, at any angle, as far as impacts carry (~76 m).
+  - A real round only skips off a hard face struck at a grazing angle, and breaks up on the rest. It leaves at
+    250-500 m/s away from where it struck, so it's Doppler-shifted down from the start. The gliding scream needs it to
+    come at you and pass close.
+  - The impacts have no whine now. `bullet_ricochet` (its own set, -30 dB, heard to 1500 units) is a tumbling slug's
+    buzzing wake. It's shifted down, falls 10-20% as it slows, and is audible ~150-190 ms (the old one 570 ms).
+    Its tonal line is 10-12 dB over the spectrum round it (the old 16-21).
+  - `WorldSounds.BulletRicochet` plays it beside the impact (`Shootable.CreateImpactEffects` for your own rounds,
+    `BulletFlyby.PlayImpact` for everyone else's and bots'). It needs a grazing hit: under 15 degrees on metal and
+    10 on masonry or tile. The chance is 0.6 times (1 - angle / critical). The dice are a hash of where it struck, to
+    the nearest 4 units, so every machine mostly agrees.
+  - Checked in the editor on Ares's edited scene (`run_csharp`, real traces): on the steel floor 25-36% ricochet at
+    2-8 degrees, 11% at 12, 4% at 14 and none from 20 up. The editor compiled the code (0 errors) and the sounds.
+    Not yet heard in a match.
+- Levels are real ones against each other, by K-weighted loudness:
+  - Masonry impacts stay at s&box's generic impact; the rest are set relative to it.
+  - Walking on concrete stays at s&box's; the other floors follow real footfalls: a steel deck 2 dB over concrete,
+    grass 10 dB under it. s&box had grass 21 dB under.
+  - A run is 6 dB over a walk, and a jump's landing 4 dB over a run.
+  - The press sits with `ui_nav_tab`, and the hover 2 dB over s&box's. They're on the UI mixer, so the UI slider
+    sets them now, not the SFX one.
+- `WorldSounds.Classify` sorts a surface by its name, then its base surfaces' names. "default", which most of a map's
+  walls are, is masonry. Water, snow, mud, carpet and anything unrecognised keep their own surface's sounds, and so
+  does a set whose event hasn't compiled. On terrain, `SurfaceAt` takes the ground material's surface under the hit,
+  as `FireFuel` does.
+- Where they play:
+  - `Shootable.CreateImpactEffects` plays `WorldSounds.BulletImpact`. Bodies (hitboxes, zombies) sound like flesh
+    whatever their colliders' surface is. A living player's body plays nothing there, because
+    `PlayerPawn.BloodImpactSound` (now `bullet_flesh`) plays it on every machine; before, a hit played both. That no
+    longer plays for fall damage.
+  - `PlayerFootsteps` plays the run while sprinting. Someone else's steps are now occluded: s&box's weren't.
+  - `PlayerPawn.PlayFallSound` traces the floor and plays its landing (`LandSound` is the fallback). It's louder the
+    faster you land: volume times speed / 300, from 0.6 to 2 (a jump lands at ~280 u/s).
+  - Every `"ui.button.press"` / `"ui.button.over"` (Sound.Play and scss `sound-in`) is now `"ui_button_press"` /
+    `"ui_button_hover"`.
+  - Knives (2026-09-30):
+    - `Melee.CreateImpactEffects` broadcasts `WorldSounds.KnifeImpact`, so everyone nearby hears the strike. It used to
+      be the surface's stock bullet sound, and only the swinger heard it.
+    - A knifed player plays `WorldSounds.KnifeFlesh` on every machine instead of the bullet's thwack
+      (`PlayerPawn.Health`, by `DamageFlags.Melee`).
+    - The swing is `WorldSounds.KnifeSwing` ahead of the prefab's `SwingSound` (upstream's, 19 dB louder, heard to
+      5000 units), which stays as the fallback.
+  - Grenades (2026-09-30): `BaseGrenade` is a collision listener. On the thrower's machine (it simulates the grenade)
+    each bounce broadcasts `WorldSounds.GrenadeBounce` for the grenade's `Body` (`HEGrenade`: Frag, the rest: Can) and
+    the surface, scaled by `BounceVolume` (speed^1.2, none under ~1 m/s, at most 2x), at most one every 0.06 s. Once
+    the events have compiled, `OnStart` turns off the Rigidbody's own collision sounds (`EnableCollisionSounds`).
+    Whether that also silences the engine's sound for the surface it hits wasn't checked: listen for a double knock.
+  - Doors (2026-09-30): `prefabs/Door.prefab` (Refinery's doors and the test scenes') played HL2's door sounds from a
+    cloud package. It now plays the Ridgeback buildings' synthesised ones (`sounds/buildings/door_open`, `door_swing`
+    as it starts to shut, `door_close` when it's shut; see Ridgeback buildings). Innocent Hotel's doors are the cloud
+    map's own and keep its sounds.
+- Still s&box's, upstream's or not there at all:
+  - Zombies' buy chime (upstream's `buy.sound`). Nothing real to match it to. The zombies' voices are synthesised now
+    (see Zombie voices).
+  - The upstream guns' shots and reloads (M4A1, MP5, SCAR-H, USP, M700, Spaghelli, 1911), and the grenades' pins
+    and throws: upstream's own recordings, not CoD's or s&box's. Their blasts, dry fire and draws are synthesised now
+    (see Ordnance and handling sounds).
+  - The cash bag's and the streak drone's draw (upstream's `weapon_switch`): neither is a gun or a grenade.
+  - Impacts are heard by everyone within ~76 m, when the round gets there and the sound has come back (see Bullet
+    cracks). The shooter's machine plays them where its rounds struck; the others find them by a short trace at the
+    round's end.
+  - Bots' shots make no impact effects, only the sounds, and bots make no footsteps.
+- The editor has to compile the new WAVs and events. They were made without it (2026-09-29, the knife and grenade sets
+  2026-09-30), so none of it has been heard in-game. The code compiled offline with dotnet.
+
+## Ordnance and handling sounds (`Tools/ordnance_sounds.py`, `Tools/handling_sounds.py`)
+- The user asked for some of the default s&box and CoD sounds to be changed "so we're unique", "ultra realistic"
+  (2026-10-01). Both scripts synthesise from the physics of each event, with no samples, the way `world_sounds.py` does
+  (and on its helpers). Each docstring has every layer, its source figures and why. A re-run rewrites the WAVs (seeded,
+  so the same ones) and keeps an existing `.sound` event, which may have been tuned. `--preview <wav>` plays every take;
+  `--out <dir>` writes somewhere else.
+- `ordnance_sounds.py`:
+  - The M67 frag (`frag_blast_near`, `_far`), the 9 kg C4 charge (`c4_blast_near`, `_far`) and the M84 flashbang
+    (`flashbang_bang`), from Kinney-Graham blast waves (Friedlander pulses), Whitham N-waves for the fragments passing,
+    the fireball's roar, debris and soil coming down, echoes and the rumble.
+  - The ear overloads on a bang, so it's soft-clipped (`master`, `BANG_DRIVE`), and the tail goes in after at its own
+    level against the bang. A millisecond bang can't reach a rifle shot's loudness, so the blasts play at full volume:
+    5.5 dB over a rifle 15 m away for the frag, 12 dB for the C4 at 40 m.
+  - The far sets are the bang dulled by the air and the echoes round the listener. `BlastSound`
+    (`Code/Weapons/Grenades/BlastSound.cs`, on `he_explosion.prefab` and `c4_explosion.prefab`) plays the far set past
+    `FarDistance` (1600 for the frag, 4000 for the C4; `FAR_DISTANCES` holds the same), and either one arrives when the
+    sound gets there (`GunshotAudio.PlayDelayed`). The flashbang's bang is delayed the same way; its flash isn't.
+  - The C4's explosion had a `Facepunch.SoundEmitter`, a type that doesn't exist (the library's is
+    `Sandbox.Audio.SoundEmitter`), so it was probably silent.
+  - The smoke grenade's hiss: `smoke_ignite` (the fuze and the composition catching) and `smoke_burn` (a seamless 8 s
+    loop, `.wav.meta` loop true), on two emitters in `smoke_particles.prefab`. The loop fades in over 1.4 s and out from
+    65 s to 70 s, with the emission.
+  - The ear ringing after a flashbang (`sounds/player/ear_ringing`, stereo, 10 s): `FlashbangEffect` sets the handle's
+    volume itself, so its level is in the file.
+- `handling_sounds.py`:
+  - Dry fire (`sounds/guns/handling/dryfire_{rifle,ak,pistol}`, each gun's `DryFireSound`): an AR's hammer, an AK's
+    heavier hammer in a stamped receiver (the Kastov 762, RPK, AK-105, Vityaz, Bizon and Vepr-12), and a pistol's. The
+    ported guns' come from `kastov_prefabs.py` (`Prefabs.dry_fire`). The Kastov-74u keeps its own.
+  - Draws (`draw_{rifle,pistol,grenade}`, `DeploySound`) where upstream's `weapon_switch` was: the M4A1, M700, MP5,
+    SCAR-H and Spaghelli (a rifle off its sling), the USP, USP-SD and 1911 (out of a Kydex holster), and the grenades,
+    the C4 and the recon drone (out of a pouch; `build_recon_tactical.py` writes the drone's). The ported guns keep their
+    own raise sounds.
+  - Brass (`sounds/world/casings/brass_{rifle,pistol}_<floor>`): a case's ring modes, its chatter as it lands, and the
+    floor's part. `SpentCasing` plays one on every bounce over 25 u/s (`WorldSounds.CasingBounce`, `CasingVolume`, as
+    loud as the speed into the floor gives), by its `Brass` (the 9 mm casing prefab is Pistol). Its old `BounceSound`
+    (upstream's `shell_case_bounce`) stays the fallback for floors we have none for.
+  - Hits to the head (`sounds/player/hits/helmet_hit`, `head_hit`, the player prefab's `HeadshotWithHelmetSound` and
+    `HeadshotSound`): an aramid composite helmet's crack, and a bare head's. They sit just over a flesh hit (-22.5), and
+    reach 2500 units. Upstream's reached 13000 and were 7-10 dB over a flesh hit.
+- Levels are the K-weighted loudness of the loudest 50 ms, against the walk on concrete (-36), with real differences
+  squeezed 0.43 times like the rest of the mix: the dry fire ~8 dB over a step, a draw ~4.5 dB, a case on concrete 3 dB
+  (tile and steel louder, earth and grass far quieter, a pistol case 1.5 dB under a rifle case).
+- Made on 2026-10-01 with the editor open, which compiled the WAVs and events as they were written. The code compiled
+  offline with dotnet. Nothing has been heard in-game yet.
+
+## No start sting
+- The user didn't like the noise when a game starts, so on 2026-09-28 the music sting
+  (`sounds/music/round_intro/round_start.sound`) came out: the `Facepunch.PlaySound` component that played it in every
+  game-mode prefab, and Zombies' call in `StartNextRound`. Don't put them back.
+- The radio's ~2 s RoundStarted voice line is off too (2026-09-30, the user: "i dont like the talking when i first spawn
+  in"): its `Facepunch.PlayRadio` component is disabled (`__enabled: false`) in all nine game-mode prefabs that had one.
+  Don't turn it back on.
+- Still there: the same sting when a Zombies power-up is picked up (`ZombiesRoundSystem`).
+
+## No radio voice lines
+- The user had every radio voice line deleted (2026-10-05): the 39 events and 118 MP3s in `sounds/radio/`, and
+  `radio_sounds/terrorist.radio` and `counter_terrorist.radio`, which listed them.
+- `RadioSounds.Play( team, RadioSound )` does nothing now, and the radio menu's callouts (`Play( team, category,
+  sound )`) only put their text in team chat ("Planting bomb", "Defusing the bomb"). Don't put the playback back.
+  - Compiled files are git-ignored, so a machine that had the lines keeps its compiled `.radio_c` and `.sound_c` after
+    a pull, and a compiled file with no source still loads. Without the playback, those can't play.
+  - Delete the leftover `Assets/radio_sounds/` and `Assets/sounds/radio/` folders locally to tidy up.
+- The callers stay, so nothing else changed: `PlayRadio` (in the game-mode prefabs), `PlayRadioOnKill`, the
+  grenade throw's call in `Throwable`, the Radio volume slider and the Radio key (the radio menu, `Radio.razor`, is
+  already out of MainHUD). Not compiled or checked in-game.
+
+## Cloud sessions can't upload LFS files
+- From a cloud session the network policy refuses `github-cloud.s3.amazonaws.com`, where GitHub keeps LFS objects
+  (2026-10-05, and earlier for Railhead's atlases). Every `.wav`, `.png`, `.mp3`, `.fbx` and compiled model or
+  texture goes through LFS (`.gitattributes`), so a cloud session can't commit new ones. Downloads work
+  (`git lfs pull --include=<path>`). Deleting LFS files works too: it's only a commit.
+- So when the user asked for the remaining s&box, original-project and CoD sounds to be replaced (2026-10-05), they
+  called it off rather than have the WAVs go into plain git. The audit found what's left:
+  - CoD rips: all 16 ported guns' shots, suppressed shots, reloads and raises (~530 events), the Kastov-74u's unvoiced.
+  - The original project's: the M4A1, MP5, SCAR-H, USP, USP-SD, M700, Spaghelli and 1911 shots and reloads, the swb
+    suppressed shots, the swb guns' sounds, the C4's beeps and `loot_box`, the cash bag's and drone's draw
+    (`weapon_switch`), the drone's flight loop, Zombies' buy chime and power-up sting, and the spent-casing fallback
+    bounce (`shell_case_bounce`).
+  - s&box's own, by name: `impact-bullet-generic` (swb's impact fallback), `footstep-concrete-land` (the player's
+    `LandSound` fallback), `impact-melee-metal` (`grenade.surface`), `explosion_small` (`tec/explosion_med_tec`),
+    `countdown.beep` (`c4_planting_beep`), and the soundscape's `birdchirp`.
+
+## HUD look (`MainHUD`, 2026-10-05, restyled 2026-10-08, redone 2026-10-09)
+- The user asked for the HUD to look different (2026-10-05), and for the weapon list to show only while switching
+  weapons. They turned down two looks with dark plates under the HUD: grey boxes over a pale map (2026-10-08), then
+  charcoal plates in the menus' look ("i dont like the hud ui at all it needs a total revamp", 2026-10-09).
+- So the HUD has no plates. It's crisp white Dinish text, icons and thin bars straight on the world, each with a tight
+  dark halo (`$hud-halo`), so it reads over a pale floor and a dark one. The bars run on dark tracks with a darker edge.
+  `Hud.scss` has the palette: `$hud-accent` is MenuPage.scss's `$menu-accent`. `$hud-plate` is only for the kill feed
+  and the octocopter's feed.
+  - Bottom left, `Vitals`:
+    - health's number (38 px) left and armour's (blue) right, with the helmet's icon;
+    - one 8 px bar for health, with ticks at each quarter and a ghost of what a hit took off, which drains 0.35 s later;
+    - armour's 4 px bar under it;
+    - health is white, amber under 60% (`hurt`) and red under 30% (`low-health`), where the bar pulses. With no armour
+      the armour side dims (`no-armor`).
+  - Bottom right, `Ammo`:
+    - on top, the lethal and tactical equipment carried, each kind once with "×2" for two and its key;
+    - the weapon's name and its fire mode (icon, FULL-AUTO, SEMI-AUTO or BURST, and the key that switches it), an orange
+      rule, then the magazine's rounds (54 px), the chambered round raised in orange, and the reserve under them;
+    - a thin bar for the magazine under it all.
+    It's amber at a quarter of a magazine or less and red when empty. A knife or grenade shows its name alone.
+  - The weapon list (`WeaponInfoComponent`), over the ammo: each slot's names and pictures, right-aligned, with its key.
+    The slot in hand is white at full strength with an orange bar at its right, and the others dimmer. Each grenade is
+    its own Equipment, so a kind carried twice is one row with "×2" (`EquipmentRow.Count`).
+    - It shows only for 2.2 s after a switch (`ShowSeconds`): a new weapon in hand, a pickup, or the switch inputs
+      themselves. Those are the slot keys, the wheel and the gamepad's NextSlot / PrevSlot.
+    - It fades out but keeps its space, so nothing round it moves.
+  - Top centre, `RoundStateDisplay`, only while Score (Tab) is held: your team's score, the clock and the enemy's, each
+    team on a block of its colour and the clock on a dark one with an orange underline. The mode's name sits under it in
+    spaced capitals, and Hot Zone's countdown under that. Free-for-all shows the clock only. `DefuseObjectiveHud` is at
+    104 px to clear the strip.
+- State classes are set in `Tick` with `SetClass`, since a `<root class="@(...)">` doesn't take a class off again.
+  `EquipmentRow`'s `is-active` was a `<root class>`, so a row could stay lit after a switch.
+- Checked on 2026-10-09 in a browser mockup of the real SCSS (flattened with Sass, rendered in headless Chromium at
+  1920x1080) over the user's Cerro Blanco and Lowtide screenshots, in every state, and compiled with dotnet. Not yet seen
+  in a match.
+
+## No per-frame rebuilds in the HUD (2026-10-17)
+- A Razor panel rebuilds when its `BuildHash` changes. Don't hash `Time.Now`, and don't call `StateHasChanged` from
+  `Tick`: either one rebuilds the panel every frame. Hash what the panel shows, rounded as it shows it. Set anything that
+  moves every frame (sway, radar positions, a draining bar) in `Tick` on an `@ref`'d panel's `Style`.
+- What the engine does (sbox-public's `Panel.TickInternal`): BuildHash, then the render, then the children's Tick, then
+  `OnAfterTreeRender`, then this panel's Tick, all before layout. A razor `style` attribute only sets the properties it
+  lists. So a style set from code survives a rebuild. A rebuild that makes new panels (a hotload) needs the "last set"
+  caches reset in `OnAfterTreeRender`.
+- The minimap only rebuilds when what's on the radar changes. Each icon and label is a `MinimapIconMarker` /
+  `MinimapLabelMarker` (`UI/HUD/Minimap/MinimapMarkers.cs`) that places itself every frame. The transform it builds is
+  the one the CSS parser made from the old style string.
+- `GunsmithPanel.IsAnyOpen` and `PauseMenuPanel.IsAnyOpen` read sets kept in OnEnabled/OnDisabled, so they don't search
+  the scene several times a frame for the cursor code. The cursor's 3-4 call sites a frame are left as they were.
+- Rain (`RainView`): the drops, splashes and rings exist only while rain falls, and go after 2 s dry. Only the active
+  share of drops is made (`_dropCover`). `RainLook.Apply` and the puddle decals only write values that changed.
+  `Weather` checks `HasSky` once a second while there's no view.
+- New fields reach a running match through a hotload as defaults: null lists, 0 instead of NaN. Make such lists lazily
+  (`??=`).
+- Compiled with dotnet, 0 errors. None of it has been seen in a match: the radar, the scope, the death cam, voices,
+  ammo, the kill feed, and rain starting and stopping (a Showers match).
+
+## Damage indicator (`DamageIndicator`, `PlayerPawn.IndicatorSource`)
+- The user, shot in the back, saw the red bar for a hit from the front, from where nobody could stand (2026-10-05). The
+  bar pointed from the camera at the damage's `Position`. For a bullet (players' and bots'), a blade or a zombie's
+  claw, that's where it struck you, or your own middle, inches from your own eye: no direction at all.
+  - A round from behind that clipped the arms or the gun held out in front landed ahead of the eye, so it showed as
+    a hit from the front.
+  - A fall counted you as your own attacker, and showed a hit from the front too.
+- `IndicatorSource` now gives the bar where the damage came from:
+  - bullets and blades: back along the round's path (`Force` is its direction);
+  - a zombie's claw, which has no direction: the zombie;
+  - blasts and burns: their `Position`, the blast's centre or the heat's source, as before;
+  - falls and damage you did yourself: none.
+- `DamageIndicator.OnHit` also shows nothing for a source straight over or under the view.
+- Compiled nowhere (no s&box SDK in the session that wrote it), not yet seen in-game.
+
+## Scoreboard over the HUD (`Scoreboard.razor.scss`)
+- The scoreboard's root panel survives Razor's early return while closed. Since 2026-10-18 it defaults to
+  `display: none`, and its full-screen background and backdrop blur apply only under `Scoreboard.visible`.
+  Keep those effects off the base selector: otherwise joining a game blurs and darkens the class picker and world.
+- The user saw the medals (double kill and the rest) drawn over the scoreboard. Held open, it's now over the rest of the
+  HUD, at z-index 2000: over MainHUD's `.center-layer` (the medals, 1700) and `CrosshairHud` (the crosshair and hit
+  markers, 1500). It was 100.
+- A higher z-index draws over a sibling that comes later in the markup: the medals are before the scoreboard in
+  MainHUD.razor, and they drew over it.
+- The Return to the AO countdown (`PlayAreaOverlay`) and the drone prompt (`DeployedPawnOverlay`), both 99999, still
+  show over it.
+- Not yet seen in a match.
+- Its look (2026-10-27, the user: "scoreboard needs to look better"). It was slate blue-grey, unlike the rest of the game.
+  Now it's in the menus' look:
+  - a charcoal sheet with the menus' orange line along its top, Chakra Petch for words and the HUD's Dinish for every
+    number (the clock, team scores, positions, stats);
+  - each team's heading a band of its colour from a 4px edge, fading off to the right (`Scoreboard.TeamBand`);
+  - your row marked in orange, as the HUD marks what's yours; dead players' names and stats dimmed;
+  - each team's leader (first in its roster with a score) gets the HUD's crown (`ScoreboardRow.IsLeader`);
+  - the voice channel picker is the menus' segmented choice, the picked one in orange; the player details popup matches.
+  - Headings are capitals through the translation tables (`Tr( "PLAYERS" )`, `Tr( column.ToUpperInvariant() )`: an
+    ALL-CAPS key shows its translation in capitals, with Turkish's İ), not CSS `text-transform`.
+  - Checked in a browser mockup of the real SCSS (`output/scoreboard-redesign/20261027/mockup.py`, sass and headless
+    Chrome, before and after) and parsed in the engine with no warnings. Not yet seen in a match.
+
+## Usage stats for the dev (`UsageStats`, `dev_usage`)
+- The user (Leon, the dev) wants to see which guns, attachments, camos and perks players use, to know what to change.
+  Each human life in a mode with classes counts once, on the player's own client (`PlayerPawn.OnClientRespawn` →
+  `UsageStats.CountLife`), `PlayerLoadout.ClassSwapWindow` (5 s) after spawning, so a class picked just after spawning
+  counts. The stats are s&box's, and their global totals add every player's up. They're all `use-...`:
+  `use-lives`, `use-gun-<weapon>`, `use-att-<weapon>-<part>` (part file names repeat across weapons),
+  `use-camo-<camo>|none|custom`, `use-perk-<perk>`, and `use-kill-<weapon>` (sent from `WeaponStatsRule`).
+- `dev_usage [filter]` prints them from the published game's global stats (`GetGlobalStats( "verarp.razedtest" )`, since
+  `Stats.Global` reads 0 in the editor) and writes `usage.csv` to the data folder. On 2026-09-29 it read 97 global
+  stats from the editor, and no `use-` ones yet: they only start once a build with this is published.
+- `WeaponStatsRule` now skips bots, as `PlayerStatsRule` does: the host owns bot pawns, so every bot kill was going to
+  the host's `kills-<weapon>` and weapon XP.
+
+## Camos (the gunsmith's Customize tab)
+- Duplicates: on 2026-09-29 the user saw the same camo twice in Standard (`120c0e08` and `120c0e08-e7cd-...`, next to
+  each other since the list is by name). 24 parts that were exact copies of another (same category, same image bytes,
+  same material) went to `Backups/duplicate_camos/`, keeping the friendly-named twin: the GUID-named sapphire, emerald,
+  gold2 and alien sets, `7e6b133c_animated` (= gold_animated), `120c0e08`, `custom_png` (= mycamo), and the "Seamless Test"
+  `04834e09-...fea_seamless`. Animated versions with a different material (e.g. `magma_fast` / `magma_slow`) aren't copies.
+- A compiled file with no source still loads: `1a_seamless.gnsmth_c` ("1a (Seamless Test)", a plain camo on `1.png`,
+  whose `.gnsmth` was deleted in June) showed as a second "1" in Standard. It and its `1a_seamless.vmat_c` are in
+  `Backups/duplicate_camos/` too. To find more: a `.gnsmth_c` in Assets with no `.gnsmth` beside it (the
+  `*.generated.vtex_c` in `camos/` have no source by design).
+- Mastery: the user wants different mastery camos, to pick later, so the tab reads "No mastery camos" meanwhile. Diamond
+  and Mastery (`diamond.gnsmth`, `mastery.gnsmth`) stay as Standard camos (Camoflague, levels 30 and 100); their
+  MasteryCamo versions are in `Backups/mastery_camos/`.
+- Solid colours are paint, like Cerakote: `ApplyAttachments` gives a Camoflague part with no texture or material a flat
+  texture of its `CamoTint` (`FlatTexture`), so it takes the texture path (the colour replaces the gun's, over its
+  normal and AO, with the satin finish). As a tint it multiplied the gun's dark colour, which barely showed, and turned
+  the FAMAS's lighter magazine lime.
+- The custom colour (the Solid tab's "Enable custom colour") is paint too, in the finish picked (`ApplyCustomFinish`:
+  flat metalness and roughness from `FinishMetalness` / `FinishRoughness`). Below full opacity `CustomPaintTexture`
+  blends it over the material's own colour map, read back once with `GetPixels` at its first mip no more than 512
+  across; if that can't be read it's flat paint.
+- The camo tiles are `@key`ed by part: without it, switching tabs reused the tiles, and a tile kept the
+  `background-image` its new style left out, so the Solid tab showed the Standard tab's first pictures.
+
+## HUD markers under the gun (`ViewModelMask`)
+- The user saw the bomb sites' A and B markers drawn over their gun while aiming, and wants the gun on top. The
+  markers are UI, which draws after the whole scene, so every `MarkerSystem` marker (bomb sites, teammates, pings) is
+  masked out where the first-person gun covers the view instead.
+- Every frame, `ViewModelMask` draws the viewer's viewmodel again, with its own materials, into a half-size depth
+  target: the gun, its parts and the arms (`Client.Viewer.PlayerPawn.CurrentEquipment.ViewModel`). It's a CommandList
+  on the main camera at `Stage.AfterTransparent`. `shaders/hc1_viewmodel_mask.shader` turns that depth into a mask
+  texture (white open, black gun), and `MarkerSystem` sets it as its own `mask-image` (Luminance, 100%).
+- Only surfaces that write depth cover the markers. Reticles and lens glass (`m4_optic_lens.shader`) don't, so markers
+  show through a red dot's or holo's window, the iron sights' aperture and see-through magazines. A magnified optic's
+  picture (3dscope) writes depth, so it hides them.
+- It only runs while there are markers (`ActiveMarkers.Count > 0`), because it draws the viewmodel a second time.
+- Don't draw the markers before the gun instead: the viewmodel is the overlay layer, drawn between AfterSkybox and
+  AfterTransparent, and all UI (EarlyUI too) comes later. Markers drawn earlier would go through tonemapping, bloom and
+  TAA.
+- Checked offscreen on 2026-09-28: a ScreenPanel's grid of test squares was hidden behind an overlay-layer box and a mini
+  red dot's housing, and showed through the red dot's window, edge to edge. An offscreen scene draws no UI unless its
+  internal `Scene.PreRender` runs before `RenderToBitmap`.
+- In the user's Ridgeback match, the mask found the AUG and the arms, and the frame drew as normal. It hasn't been seen
+  in-game over a gun with markers on screen.
+
+## Teammate glow (`TeammateOcclusionGlow`, `hc1_teammate_occlusion.shader`)
+- Living teammates (players and bots) get a faint silhouette in their team colour only where the world hides them,
+  through the camera's `Highlight` and a private copy of the engine's highlight shader. `Sources/TeammateGlow/README.md`
+  has the build, install and checks.
+- 2026-10-27, the user: "bots not behind a wall but has glow". A single depth tap read the nearer surface at the
+  character's own edges (vest hem, belt, pockets) and on slopes, so streaks lit visible teammates. Now a pixel is hidden
+  only if the scene is nearer across its whole 3x3 neighbourhood, by ~1.5 pixels' world size (at least 0.25).
+- The first-person gun's overlay depth counted as cover, so a teammate behind your gun glowed over it. `UpdateShield`
+  (from `ViewModel.OnUpdate`) puts a transparent zero-width outline on the viewer's viewmodel while any teammate glow is
+  set up, so the gun blocks the glow. It draws whole models, so a red dot's window blocks it too.
+- Checked in isolated render fixtures (`visible-check.cs.txt`) and live in a Depot match (shield on, four glows), but no
+  teammate was in view there.
+
+## Teammate markers (Settings → Game → Hide Teammate Names)
+- The user asked for a setting that leaves only the circle over teammates' heads, on by default
+  (`GameSettings.HideTeammateNames`, stored inverted as `showTeammateNames`, like Corner Slicing).
+- With it on, `PlayerMarkerPanel` and `LightweightBotMarkerPanel` draw a teammate's dot only: no health, name or weapon
+  icons. A teammate carrying the bomb keeps the bomb icon. Enemy markers are unchanged.
+- The setting is in both panels' BuildHash, so switching it redraws them at once. Not yet checked in-game.
+
+## Voice chat (`Voices`, `PlayerVoiceComponent`)
+- The user asked for a list of who's talking and their team, not just a mic icon. That icon, the green rounded square
+  at the top right, is s&box's own (`MicOverlay` in the menu addon's `MenuOverlay`). s&box draws it over every game,
+  lit while your mic hears you, and a game can't hide it.
+- `Voices` (MainHUD's right column, above the weapon) has one plate per speaker, like the kill feed's:
+  - a level meter (`VoiceMeter`), the Steam avatar ringed in the team colour, the name, and the team's crest, then an
+    edge bar in the team colour at the screen edge;
+  - under the name, the team's name in its colour (or SPECTATOR), with chips for ENEMY (the other team from you),
+    SQUAD (your Steam party, as the scoreboard marks it) and DEAD (their body is still down). Free-for-all shows no team.
+- Your own row shows while your mic hears you (`Application.IsMicrophoneRecording`):
+  - `Voice.IsRecording` can't be used: it's only whether the mic is open, which is all the time without push-to-talk.
+    Your voice never plays back to you, so `LastPlayed` doesn't work either.
+  - It says YOU and who hears you, by `TeamVoiceChatFilter`'s rules: TEAM ONLY, PARTY ONLY, EVERYONE or NEARBY
+    (proximity voice). `TeamVoiceChatFilter.ActiveMode` settles Auto for both the filter and the row.
+- Other players' rows show while their voice has played in the last 0.4 s. The meter follows `Voice.Amplitude` (the
+  playing sound's) times 4, a gain not yet tuned against real speech. Your own row has no amplitude, so its bars sway at
+  a steady level.
+- Mutes:
+  - `Voice.ExcludeFilter` runs on the speaker's machine, but the scoreboard's voice mute is kept on the listener's, so
+    muting someone did nothing.
+  - `PlayerVoiceComponent.ShouldHearVoice` now drops a muted player's voice as it arrives: the engine asks it, with
+    `Rpc.Caller`, before playing.
+- `dev_voices_sample` adds made-up rows (you, a squadmate, a dead enemy, a spectator) to check the layout.
+- Not yet checked in-game. The list, the meter's gain and the mute fix compiled (2026-09-28), but nobody has talked with
+  them yet.
+
+## Reload times (`Reloadable`)
+- ReloadTime and EmptyReloadTime are when the gun is level again in its own reload clip, the user's "real numbers
+  only". The ported guns' come from their clips (see their sections). The old guns' were measured offscreen on
+  2026-09-28: the viewmodel's animgraph in a SceneModel, the gun bone back within 4 degrees and 0.6 of its idle pose,
+  relative to the camera bone.
+  - M4A1 1.95 / 2.4 s, MP5 1.95 / 3.3 s, M700 1.95 / 2.3 s, and the USP, USP-SD and 1911 1.4 / 1.5 s.
+  - The SCAR-H's own clip takes 4.45 s, empty or not.
+- The clips play at their own rate whatever ReloadTime is, so the timed reload sounds stay in step with them.
+- The Spaghelli loads shell by shell (`SingleReload`): 1.3 s a shell (the clip's loop) and 2.15 s for the first from
+  empty. After the last shell, `ReloadExitTime` (0.5 s) holds the reload while the closing clip brings the gun up, so
+  it can't fire before then. The shell's sound plays at 0.65 s, as the shell goes into the tube.
+- Some ported guns' declared times end 0.1-0.4 s before their clips level the gun: the Vityaz, Kastov 762, P90 and
+  the Bizon's non-empty reload. They weren't changed.
+
+## The ported guns' sounds (`ported_shots.py`, `suppressed_shots.py`, `ported_foley.py`)
+- The user asked for each gun worked on to have its CoD sounds moved towards the real thing, then (2026-09-30) for any
+  CoD or s&box sounds left to be changed. So every ported gun's shot, suppressed shot and reload foley is voiced from
+  its rip, bar the Kastov-74u's (another session's hand-tuned sounds). Each script's docstring has what the rips get
+  wrong and every step.
+- Open shots: the AK-105, M16A4 and Kastov 762 have their own scripts (see their sections). `Tools/ported_shots.py`
+  voices the Vityaz, Bizon, Vepr-12, P90, MP7A1, AUG, Uzi, FAL, M18, FAMAS, MCX, L85A2, HK416, AK-12, AK-15, AK-74M, MCX-SPEAR,
+  M16A2 and RPK-16 with `shot_voicing.py`'s steps, a `Voicing` each:
+  - pitch by the charge and the barrel: the 9 mm guns and the P90 2% up, the MP7A1 3%, the FAMAS 1%, the Vepr-12 1%
+    down, the FAL 2% down, the M16A2 2% up (as the M16A4's), the AUG, M18, MCX, L85A2, HK416, AK-12, AK-15, AK-74M, MCX-SPEAR and RPK-16 as ripped;
+  - a 40 Hz high-pass (the Uzi's 70), the lows eased 3-10 dB after the blast's first 20-50 ms, and the FAL's, Vepr-12's,
+    AUG's, Uzi's, HK416's, AK-12's, AK-15's, AK-74M's, MCX-SPEAR's, M16A2's and RPK-16's designed tails eased;
+  - the blast's 1.5-5 kHz up 2-5 dB for 20-25 ms (the dark Uzi's 1-6 kHz 7 dB for 30 ms);
+  - the ground reflection by the gun's length, and echoes from 35 ms to 1.4 s, as loud against the blast as the
+    muzzle's distance from the ear gives (0.4 s after the loudest 100 ms: -31.5 dB for the FAL to -36 for the P90).
+  - Loudness stays each rip's. A gun with one recording gets several takes with their own echoes (pitch 0.97-1.03).
+- Suppressed shots (`Tools/suppressed_shots.py`): the Kastov 762's, Vityaz's, Bizon's, AK-105's, M16A4's, P90's,
+  MP7A1's, AUG's, Uzi's, FAL's, FAMAS's, MCX's, L85A2's, HK416's, AK-12's, AK-15's, AK-74M's, MCX-SPEAR's, M16A2's and RPK-16's. The Vepr-12 and the M18 have none.
+  - As ripped they were levelled to each other, not to their guns: 1.4 dB (the Kastov) to 10.6 dB (the P90) under the
+    open shot, counting the SMG events' Volume 0.5. The Uzi's WAV was louder than its open shot's.
+  - A real suppressor takes about 20-25 dB off at the shooter's ear. Squeezed as the rest of the mix is (0.43 times,
+    see RPK), a suppressed shot sits 10 dB under its gun's voiced open shot (`SUPPRESSION_DB`), counting its event.
+  - Each is voiced with its gun's open-shot `Voicing`, but with no pitch change or presence lift (the can takes the
+    crack off) and the lows under 130 Hz eased 6 dB after 25 ms, which takes MW2019's designed thumps (the P90's, AUG's,
+    FAL's, FAMAS's and M16A4's) down 2-8 dB. Its echoes sit where the open shot's do.
+- Reload foley (`Tools/ported_foley.py`, on `foley_voicing.py`, as the RPK's): the Kastov 762's (its drum and xmag sets
+  too), Vityaz's, Bizon's, AK-105's, Vepr-12's, M16A4's, P90's, MP7A1's, AUG's, Uzi's, FAL's, M18's, FAMAS's, MCX's,
+  L85A2's, HK416's and AK-12's.
+  - Every set's loudest file but the Kastov's was louder than the gun's voiced shot, by up to 4.4 dB (the AK-105's bolt
+    pull).
+  - Now: a 90 Hz high-pass; the moves' lows under 250 Hz eased 6 dB (`MOVES`, by name; the Kastov's and FAMAS's files
+    are only numbered, so theirs are listed by number); and one gain per set, so its loudest 100 ms is 16 dB under the
+    shot. The sets came down 15-20.4 dB. Mono files stay mono.
+- The rips are in `Backups/{ported_shots,suppressed_shots,ported_foley}_rip/<gun>/`. Each script voices from them,
+  backing up any file that has no copy there yet, so a rerun writes the same files. After a re-rip, delete that gun's
+  backups first. Each gun's assets script (`kastov_sounds.py`, and `ak47_gunsmith.py` for the Kastov's drum and xmag
+  sets) calls them after writing those sounds. `ported_foley.py <gun> --list` shows which files count as moves, and
+  `ported_shots.py` / `ported_foley.py --preview <wav>` play the rip and then the voiced sounds.
+- Made offline on 2026-09-30 with the editor closed. The WAVs and the fire events need compiling, and none of it has
+  been heard in-game.
+
+## Gunshot audio (`GunshotAudio`)
+- The user: gunshots were "far too loud". The guns' sound events fell only 9 dB by 79 m and had occlusion off, so a
+  fight anywhere on the map sounded as if it was in the next room. `GunshotAudio.Play` now plays every shot, players'
+  and bots', with:
+  - the inverse-distance law: full level out to `ReferenceDistance` (160, ~4 m), then 6 dB down every time the distance
+    doubles (14 dB at 20 m, 26 dB at 80 m, 38 dB at 330 m), easing to silence over the last tenth of the event's
+    `Distance`;
+  - air absorption, which takes the top off a far shot, and occlusion, which muffles it through a wall;
+  - the blast's directivity: 6 dB quieter straight behind the muzzle, 2.5 dB off to the side.
+- The shooter's own shot plays at full level, nearly flat (`SpacialBlend` 0.15).
+- Compiled on 2026-09-29, not yet heard in a match.
+- Since 2026-09-30 anyone else's shot is heard when its sound gets there, at 340 m/s (`GunshotAudio.PlayDelayed`: 0.3 s
+  from 100 m). `PlayDelayed` plays an event as `Sound.Play` does, with `Sound.PlayFile`'s delay. The engine delays a
+  sound by holding back its samples, which it can only do once the file has loaded: a file played for the first time
+  that hasn't loaded yet plays at once.
+- Indoors (a roof within 1200 over the muzzle and walls within 800 round it, `RoomEnclosure`) every shot gets more of the
+  engine's own reverb (`Reverb` up to 1). A session on 2026-10-19 also played each shot again 65 ms and 145 ms later as
+  "room reflections" (`PlayRoomReflections`). The user, on Ares that day: "sounds like im playing table tennis, the
+  shots are so common". Copies that late are past the ear's echo threshold for a bang (~30 ms), so each was heard as
+  another shot: at 800 rpm (75 ms a round) the copies fell between the rounds, about three bangs a round. They were
+  taken out the same day. A real room's reflections come from every surface at once and blur into its reverb. Compiled
+  in the editor, not yet heard in a match.
+
+## Bullet cracks (`BulletFlyby`, `Code/Weapons/BulletFlyby.cs`)
+- The user asked for "hyper realistic supersonic cracks at the right distances and everything" (2026-09-30). A round
+  that passes someone is heard as it really is:
+  - A supersonic round's crack: its Mach cone sweeping over them, an N-wave a few hundred microseconds long.
+  - A subsonic round's whizz, within 6 m: the .45s, and the 9x18 Bizon.
+  - Then what it strikes, once it's got there and the sound has come back.
+  - The report from the gun comes at the speed of sound too (Gunshot audio), so downrange the crack comes first and the
+    gap grows with the range: the crack-thump soldiers judge a shooter's distance by.
+- Where and when:
+  - The crack leaves the path where the cone through the listener meets it, `miss / sqrt(M^2 - 1)` before the point
+    nearest them, at the Mach number the round had there (`TryShock`, solved by halving). So it's heard from there, not
+    from the gun.
+  - It arrives at the round's time of flight to that point plus the sound's way from it. The speeds along the path are
+    the load's (`Ballistics.Trajectory.Speed`, solved with the drop table), so a crack weakens and lengthens downrange.
+  - There's none beside or behind the gun, past where the round stopped, more than 100 m off the path, or where the
+    round is under Mach 1.03.
+- How loud and how long: Whitham's far-field N-wave, which measured small-arms cracks follow:
+  - overpressure `0.53 p0 (M^2 - 1)^(1/8) d / (b^(3/4) l^(1/4))`;
+  - length `1.82 M b^(1/4) d / (c (M^2 - 1)^(3/8) l^(1/4))`;
+  - for a bullet of diameter d and length l passing b away (at least 0.15 m).
+  - An M855 a metre away is ~985 Pa (154 dB peak) for ~106 us; 20 m away, 104 Pa (134 dB) for 224 us. A 9 mm round is
+    about as loud and twice as long, a duller snap.
+  - A full-scale sample stands for 356 Pa (`FullScalePascals`: the shots' mastering puts a full-scale sine at ~142 dB
+    SPL). So closer than about 3-5 m a crack is capped at full scale, well under a real one.
+  - The engine's distance falloff is off for it, but air absorption and occlusion are on.
+- Reflections: the ground under the listener, a ceiling over them and the nearest two walls (eight probes 30 m out, kept
+  for 0.25 s) each send a second crack (`PlayReflection`).
+  - Each is the crack that reaches the listener's mirror image in the surface, played from the mirror image of where it
+    left, and only if the wave's way to the surface is clear and the listener can see the spot.
+  - Hard surfaces send back 0.9 of the pressure. Grass sends 0.45, earth 0.6 and cloth 0.3, with a rounded front.
+  - Standing on hard ground, that's the real "double crack".
+  - Only the first pellet of a shot gets them.
+- The sounds are made at runtime, not recorded, and cached by name for the session (`SoundFile.FromPcm`,
+  `hc1/flyby/...`):
+  - Cracks: an N-wave drawn at 16 times 44.1 kHz and band-limited to 20 kHz (`MakeCrack`), in 21 lengths from 40 us,
+    20% apart.
+    - Each has a sharp, firm, spiked (turbulence focusing it) or rounded front. It's rounded more often the further it
+      came (`PickFront`: 10%, rising to 60% at 60 m).
+    - The soft front is only for grass and earth's reflections.
+  - Whizzes: band-passed noise heard through the Doppler shift as the round comes and goes (`MakeWhizz`). The level
+    grows with the speed cubed and the diameter, and falls with the miss: 0.05 of full scale at 1 m for a .45.
+- Networking:
+  - `Shootable.Shoot` records each pellet's path: from the aim ray to the last thing it met that wasn't glass, or its
+    full range. `SendFlybys` broadcasts up to four of them, unreliably (`DoFlybyEffects`, a `ByteStream`).
+  - Everyone but the shooter hears them pass. Everyone but the owner's machine, which played its own impact effects,
+    hears them strike.
+  - The shooter's own impacts are delayed the same way (`ImpactSoundDelay`).
+  - Bots' shots call `BulletFlyby.Pass` in their `DoShootEffects`, which now gets whether the shot hit. A miss flies on
+    to the gun's `MaxRange`.
+- The path is taken as straight from the aim ray to where the round stopped, so drop is left out (a few cm off at the
+  ranges a crack is heard). The bot's rounds leave from its muzzle.
+- Scattered tail (`PlayScatter`, 2026-09-30): the patches of ground, wall and ceiling the cone sweeps each throw a
+  little of it back every way, not only the mirror bounce. That's the rattle after a real crack.
+  - Each reflector is taken as a plane. Its energy is summed over a grid of patches round the path's point nearest the
+    listener: along the path and across it (up a wall), finest near the path. The ground's grid is 14 x 11 patches out to
+    60 m back, 120 m ahead and 30 m to each side.
+  - A patch of area A sends `s E cos i A cos o / (pi r^2)` to the listener r away, where E is the wave's energy there
+    (its own `TryShock`, 16 halvings) and s is the surface's scattering coefficient (`Reflector.Scatter`: hard ground
+    0.12, walls 0.25, earth 0.14, grass 0.1, cloth 0.05). That's Lambert's law. It arrives when the wave got there plus
+    r / c.
+  - The energy is binned by arrival into five windows (0-6, 6-20, 20-60, 60-180 and 180-600 ms after the direct
+    crack). Each window plays as one grain (`MakeScatter`): rounded cracks of the patches' mean length (soft off grass
+    and earth), coming at random ~6000 a second with Gaussian weights, fading over the window's own decay.
+  - Each grain plays from where its energy came from. The more evenly it comes from all round, the less it's placed
+    (`SpacialBlend` is the length of the energy-weighted mean direction).
+  - The tail is as loud against the direct crack as it really is, less the direct crack's share when that was capped.
+    Over hard ground it's 10-15 dB under the crack (K-weighted, loudest 100 ms), 17 dB at a 0.5 m miss. Most of it
+    comes within 50 ms, and at a 30 m miss it lasts ~150 ms.
+  - It's worked out for the first pellet only, and at most once every 60 ms (`TailInterval`). Surfaces aren't traced
+    past where the probes met them, so a wall is taken to run on ±30 m. Trees and props scatter nothing.
+- The ear's acoustic reflex (`AcousticReflex`, `Code/GameLoop/Audio/AcousticReflex.cs`, 2026-09-30): after a loud enough
+  sound the stapedius muscle stiffens the middle ear, which dulls what follows.
+  - It's set off by the crack's real energy over the ear's ~200 ms integration, whatever level the crack plays at: an
+    ~85 dB threshold, and full strength 25 dB over it. A 1 m miss is ~116 dB (full strength), 20 m ~100 dB and 100 m
+    ~91 dB.
+  - It starts 30 ms after a strong crack and 120 ms after a weak one, so the crack itself goes in whole. It peaks
+    ~60 ms after that and has let go within ~0.5 s.
+  - Cracks arriving within 50 ms of each other (a shotgun's pellets) add their energies.
+  - At full strength `ReflexProcessor` takes up to 15 dB off the lows: ~13 dB at 500 Hz, 9 at 1 kHz, 5 at 2 kHz and
+    under 2 above 4 kHz. It's two first-order low shelves at 2 kHz on the Game mixer (every world sound: the reports,
+    impacts, footsteps and the tails). The UI, music, radio and voice mixers aren't the character's ears, so they're
+    left alone. It's added the first time a crack sets it off, and at rest it passes the sound through untouched.
+  - The latency, twitch times and threshold are textbook figures, first guesses to tune by ear.
+  - Not modelled: the reflex from the player's own shots, a nearby report or explosions. It would dull the mix after
+    every shot the player fires, a big change to how the guns sound, so it's left for the user to decide.
+- `Tools/bullet_cracks.py` replicates the crack synthesis and levels offline, and `python Tools/bullet_cracks.py <wav>`
+  writes an M855's cracks at 1-50 m with each front. `--scenes <wav>` writes an M16A4 fired from 100 m and 300 m
+  missing by 0.5-30 m. Each scene has the crack, its ground reflection and the ground's tail, then the report, at the
+  game's levels and delays. It plays twice: first without the tail and the reflex, then with them. It prints how loud
+  each part is.
+  None of it has been heard in-game: not the levels, the reflections, the tail, the reflex, the whizz, or the delayed
+  reports and impacts.
+- Checked against the report (2026-09-30, `--scenes`; the user asked whether it really sounds right), K-weighted, loudest
+  100 ms:
+  - Before the tail and the reflex: fired from 100 m, a 1 m miss's crack was 9 dB over the report, and from 300 m
+    19 dB. In the field it's roughly 15-25 dB and 25-35 dB. The crack's energy is Whitham's; the report's real level at
+    range is the uncertain part, +-5 dB.
+  - Close in, the gap is because a crack is only 4-6 samples long at 44.1 kHz, so full scale holds its energy down, and
+    0.5 m and 1 m misses sound the same. A soft clipper doesn't help (tried: under 1.5 dB, since band-limiting so short
+    a wave puts its peak back). From ~10 m out it's within a few dB of real.
+  - With them, from 100 m the reflex is at 0.66-0.72 of full when the report arrives, 150-180 ms after the crack, and
+    takes 4.4 dB off it (at a 30 m miss 0.46, 3.9 dB). A 0.5-3 m miss's crack is now 13.5-13.9 dB over the report,
+    10 m 7 dB, 30 m 1 dB.
+  - From 300 m the report comes ~0.5 s after the crack, when the reflex has let go (0.08), so the gap is as it was:
+    +19 dB at 1 m.
+  - The lever left, the user's call as it changes the whole mix: the reports' level. `GunshotAudio` holds the shooter's
+    own level out to 4 m, and a real rifle's blast in front is roughly 7-10 dB under what the shooter hears.
+  - The game has no reverb for `ReverbEnabled` to use, so the tails and reflections are the only room the cracks get.
+
+## Weapon fire rates and bots
+- The SCAR-H's BaseDamage 36 is the M4's 20 scaled by muzzle energy: M80 at its prefab's 792 m/s is 2,989 J, and the
+  M4's M855 at 905 m/s is 1,646 J. So in hardcore a body hit at full damage always kills (see Hardcore hit locations).
+  The FAL's 41 is the same sum for M80 from its longer barrel (840 m/s, 3,362 J).
+- `Shootable.FireRate` holds real-world cyclic rates (MP7A1 950, P90 900, MCX 850, HK416 850, MCX-SPEAR 850, M4 800, M16A4 and M16A2 800 in semi and
+  three-round burst, MP5 800, Vityaz 750, AUG 715, Kastov-74u 700, AK-12 and AK-15 700 (and a two-round burst), RPK-16 700, L85A2 690, Bizon 680, FAL 675, SCAR-H 600, RPK 600,
+  Kastov 762 600, AK-105 600, AK-74M 600, Uzi 600, Vepr-12 450 in semi).
+  Shots are scheduled with carry-over (`_nextShotTime`), so any RPM fires exactly; don't tune values to the 50 Hz tick.
+  Part effects on the rate: `GunsmithAttachmentEffects.FireRate` (AR barrel gas length, the Action slot's buffers) and
+  `Shootable.SuppressorFireRateScale` (see Fire rate and fire modes in the gunsmith).
+- Bot AI (sight/hearing, reaction, aim error, movement, bursts, reloads) is in `Code/GameLoop/Bots/LightweightCombatBot.Brain.cs`.
+  Each bot name keeps its rolled Skill, its `Habits` (see Play styles) and its kills/deaths/score for the match (`LightweightBotManager`
+  `_roster`, reused by `SpawnBot`). Every life is a new bot object and bodies last 15 s, so the scoreboard shows one row
+  per name (`Scoreboard.ScoreboardBots`). Bot and zombie bodies are tagged `ragdoll` (the player's
+  `CharacterController.IgnoreLayers`, so players walk through them instead of snagging) and `corpse` (footsteps). Teams are 5v5 (`BotFillRule` MinPlayerCount 10 / MaxTeamSize 5).
+- Each bot name is issued a gun on its first life and keeps it all match (`BotIdentity.Weapon`, `RollWeapon`): half
+  get rifles, three in ten SMGs, one in five an LMG, the RPK or the RPK-16 (a fire team's automatic rifleman). Each category's share is split
+  between its guns, so a new gun doesn't change the mix. The pool (`WeaponPool`) is every non-WIP Primary rifle, SMG or
+  LMG: the M700 is left out because bolt-action doesn't suit the bots' bursts. Its world model, BaseDamage with falloff,
+  rate, magazine, reload times, shot sound and flash come from the gun's own prefabs (`WeaponShootable`,
+  `ReadWeaponStats`). `WeaponResource` is set before `NetworkSpawn`, so clients get it in the spawn snapshot.
+- The host can add/kick bots from the scoreboard (`LightweightBotManager.AddBot` / `KickBot`, `CanManageBots`). They're a
+  per-team adjustment on top of `BotFillRule` (up to `MaxTeamBots` 12), gone next match. Modes with `TeamScoring` list
+  both teams on the scoreboard even when one is empty (`Scoreboard.ListsBothTeams`): kicking a team's last bot used to
+  take its heading, and so its Add Bot, off the scoreboard.
+- The user wants the fight to come to them: real players are the bots' objective, other bots second. Enemy bots always
+  hunt a real player (`PickHuntTarget`); the player's teammates go for the enemy bots nearest the players, or move up
+  with them (`RegroupPoint`). Further than `ActionRadius` (2500) from every player, bots don't chase each other or go
+  after noises. Navmesh spawns are around the players (`TryGetNavSpawn`: enemies ~`PreferredSpawnDistance` 2000 away,
+  out of sight if possible, teammates at half that, all within `MaxSpawnDistanceFromPlayers` 3000), not anywhere on
+  Flatgrass's ~32000-unit navmesh.
+- A real player's bot teammates are support, so the player gets the kills: against enemy bots their aim error is
+  x`SupportAimErrorScale` (2.5) and their reaction x`SupportReactionScale` (1.5) (`IsSupporting`). Enemy bots, and
+  every bot's aim at real players, are unaffected.
+- A bot covering a threat it can't see (last seen, a noise, a callout, being shot) looks at `_watchPoint`
+  (`UpdateWatchPoint`): the threat if it's in view, else as far along the navmesh route there as it can see, or the shut
+  door in front. Aiming straight at the threat through walls looked like a wallhack (the user's report).
+- Navmesh islands (Flatgrass's building roof, sealed rooms) can't be walked to: `GoTo` checks the path and holds
+  instead, a contact up there is only watched (`_contactUnreachable`), and `TryGetNavSpawn` needs a Complete path to the
+  player. Map spawns and the fallback team spawns need one to a team spawn (`IsOnMainNavMesh`, cached per point). All
+  190 of Flatgrass's own map spawns are on that roof, so bots never use them there. Before that, bots spawned on the
+  roof and never came down, and bots going after them piled up underneath. Players still spawn there.
+- Living bots have the player's movement box (`AttachMovementBox`: a local "Collider" child tagged `movement`,
+  32x32x64, made on every machine and removed on death), so players can't walk through them. Shots and sight checks
+  skip `movement`. Bots move on the navmesh, which ignores players, so `WaitForPlayer` stops a bot for 0.5 s at a time
+  when a player is in its next stride instead of letting its box shove them.
+- Bots keep apart (the user saw them "all grouped up together" on Innocent Hotel). The whole hotel is inside the hearing
+  and callout ranges, and each team leaves one wing by the same corridors, so every sighting or burst sent a team to one
+  point in a bunch. Bots after the same enemy, noise, callout or last sighting each take their own spot (`PickFreeSpot`:
+  the usual one unless a teammate is on it or headed there, else one up to `SpotSpread` 500 off), and `KeepInterval`
+  eases a bot off behind a teammate going its way, keeping an `Interval` of 200 (~5 m). Not yet checked in-game.
+- Real players first, and no bunching (2026-09-29, the user: bots "end up clumped up together rather than their main
+  objective being to take out real players"). Bot-on-bot fights drew every bot in earshot to one spot. Now:
+  - A real player counts as half their distance (`PlayerPriority` 0.5) when a bot picks whom to fight
+    (`FindVisibleEnemy`) or which noise to go after (`Listen`). Fighting a bot, it turns on a real player it can see
+    within twice that bot's distance.
+  - Bots' gunfire draws other bots only within half of `HearingRange` (`BotGunfireDraw`). A real player's is heard at
+    the full range.
+  - A callout about a bot reaches only the caller's two nearest teammates (`FireTeamSize`), as in a fire team. A
+    callout about a real player still reaches everyone in `CalloutRange`.
+  - While every real player is dead and a respawn is coming (`BotSystem.AwaitingRespawn`: a `Respawner` is active),
+    bots don't go after each other or noises (`AwayFromAction`). Round modes have no active respawner, so it's off.
+  - A bot closes on an enemy to its own spot at fighting range (`EngageSpot`, kept until the enemy moves 250), not onto
+    the enemy, and strafes away from a teammate beside it (`NearestTeammateSide`).
+  - Hunt guesses keep half their uncertainty apart from each other (`HuntSpot`), and in Hot Zone and Domination bots
+    spread over the zone (`ObjectiveSpot`).
+  - Teammates spawn at least `MinSpawnDistanceFromTeammates` (400, ~10 m) apart, and a spot within twice that scores
+    lower (`TryGetNavSpawn`). At 150 a team's reinforcements came in as a bunch.
+  - Compiled on 2026-09-29, not yet watched in a match.
+- Suppressors (the user asked for some bots to have them): about one soldier in four is issued one of the gunsmith's
+  Muzzle-slot suppressors for their gun (`RollMuzzle`, `SuppressorShare`, kept all match in `BotIdentity.Muzzle`). It's
+  fitted on the bot's world model, its shots use the gun's suppressed sound, and the flash comes from the gun's
+  `DischargeMuzzle`. A bot's gun keeps its suppressor on the floor (`DroppedEquipment.Build`), but picked up it has none.
+  - A flash shows on some shots only, by the gun's `MuzzleFlashChance` (through a suppressor, its suppressed one), as
+    for a player's gun. Bots used to flash on every round.
+  - A suppressed shot is heard only within `SuppressedHearingRange` (800, ~20 m), players' included
+    (`PlayerPawn.TimeSinceSuppressedShot`). Before, bots never heard a suppressed player.
+- Fire discipline (`RollString`, `PauseAfter`), after FM 3-22.9: past `ControlledPairRange` (1600, ~40 m) single aimed
+  rounds, one every 0.8-1.4 s plus 4 ms a metre; within it, controlled pairs (two presses 0.2-0.32 s apart by skill);
+  under `CloseQuarters` (600, ~15 m) short bursts of 2-4 (SMGs 2-5). An LMG gunner fires 3-5 round bursts at every
+  range (3-6 up close), then pauses 1.4-2.4 s at range. Burst-only guns fire one burst a pull. Before, bots fired 3-7
+  round bursts under 13 m and 2-4 under 33 m, a quarter to half a second apart: five to eight rounds a second at anyone
+  in view (the user: gunshots "far too often").
+- Turns (the user: bots "run forward and then slow right down and then slow turn"). s&box's NavMeshAgent steers
+  straight at the route's next corner and changes velocity no faster than its Acceleration. The prefab's 250 u/s² took
+  1.3 s to turn 90 degrees and 1.8 s to turn back, and a bot faced its velocity, so its body swung round just as
+  slowly. Three fixes, not yet watched in-game:
+  - `MoveAcceleration` (800, set on the agent in `ConfigureComponents`, overriding the prefab) makes a 90-degree turn
+    take 0.4 s.
+  - With nothing to watch, a bot faces along its route (`RouteAhead`: `GetLookAhead( RouteLookAhead 160 )`, ~0.7 s
+    ahead), so it turns into corners.
+  - `Hunt` stays after one enemy for 20-30 s (`PickHuntTarget`, `_huntTarget`), and its spot follows them from the
+    same side (`HuntSpot`, `_huntGuess`). While roaming it keeps its goal until it gets there (`KeepRoaming`). Before,
+    it guessed a new enemy and spot every 5-9 s, which was a turn in the middle of a run.
+- Sprinting and awareness (2026-09-29, the user: "i never see any bots running to get the sprint to fire penalty",
+  and round a corner they were "standing still or slowly moving forward instead of like real people who sometimes dont
+  have the full situational awareness"). Bots used to move at 195-230 everywhere, gun carried but free to fire. Now:
+  - A bot walks and sprints at a player's speeds with its gun (`ReadGaits`): a walk of 250 less the gun's
+    SpeedPenalty, at most 180 (under `MaxShoulderedSpeed` 190), and a sprint of 330 less half the penalty, both slowed
+    by WeightSlowdown (see Movement speeds). The M16A4 (penalty 40) walks at 180 and sprints at 310. A NavMeshAgent
+    loses nothing to friction, so a bot's sprint is ~8% faster than a player's with the same gun (~285).
+  - With no enemy in view it sprints, gun carried, and walks with the gun up only near where it's going
+    (`ApproachSpeed`: `Lerp( 700, 150, Aggression )`, about 620 for the most cautious and 220 for the most
+    aggressive). Getting somewhere it must (`UrgentSpeed`: out of the heat, into the zone) it sprints unless an enemy
+    is in view. Where it's going is often a guess, so it can come round a corner at a run.
+  - Faster than 190 it's sprinting (`IsSprinting`):
+    - It can't fire until 0.25 s after (`SprintOutTime`, a player's "no_shooting" time).
+    - It notices enemies in a 90-degree cone (`SprintFieldOfView`; 120 otherwise). At the corner of its eye it sees
+      only within 350 and 80 degrees (700 and 100 otherwise).
+    - It doesn't hear footsteps.
+    - It looks along its route, not at the threat it's covering.
+    - Caught at a run it stops and gets the gun up, rather than running on into a strafe.
+  - Footsteps are heard only half of `FootstepHearingRange` (550) through a wall. From further off, bots faced the
+    corner a player would come round before they came round it.
+  - A callout takes 0.8-2 s to be taken in (`HearCallout`, `TakeInCallout`) and lands 200 plus a tenth of the distance
+    off. Before, every teammate knew at once, to within 200, where a bot had just seen someone.
+  - A hunt's guess at an enemy (`HuntSpot`) is 500-1200 off them, never closer (it was 200).
+  - Bodies on the human model (`citizen_human_male`) aren't driven through the ring below: their graph picks walk, run
+    and sprint clips by speed, so a bot there gets its true velocity and `move_style` Run, as a player's body does.
+    Clamped to the ring, a sprinting bot's legs jogged.
+  - Live in the user's match since a hotload on 2026-09-29, but not yet watched.
+- Play styles and moving in a fight (2026-09-29, the user: bots "are often just stood still rather than moving and
+  shooting, running and then not shooting", and "behaviour should be unique, as real players would be").
+  - Each soldier gets a `BotStyle` and its own `BotHabits` (`LightweightCombatBot.Style.cs`), rolled with its gun and
+    kept per name (`BotIdentity.Habits`). The gun weights the style, as players pick a gun that suits how they play:
+    - `Rusher`: pushes to close range, quick strafes, quick crouches mid-fight, straight after anyone who ducks away.
+      Most SMGs.
+    - `Flanker`: closes in and hunts round one side (`EngageSpot`, `HuntSpot`), and moves to a spot out of sight every
+      two or three strings.
+    - `Rifleman`: middle range; strafes, plants and steps up, and moves spot every few strings.
+    - `Anchor`: fights from further back, peeks either side of its spot, crouches to shoot, backs off when rushed,
+      searches only half way, and holds each spot it reaches while hunting for 2-5 s. Most LMGs.
+    - `Marksman`: long range, planted (often crouched) single aimed shots, moves after two or three, holds spots 3-6 s.
+    - Aggression now comes with the style. Each bot also rolls its own range, strafe rhythm and pace, how long it
+      plants, how often it crouches, how patient it is and which side it likes to peek.
+  - In a fight a bot always has a move on, and fires through all of them (`Manoeuvre`, `NextMove`):
+    - a strafe (mostly back the other way, a player's A-D);
+    - a plant of at most about a second, for an aimed shot (never two in a row, more often for recruits);
+    - a push in at an angle, or a step back;
+    - a new spot to the side after `RelocateAfter` strings or a hit.
+    Before, each 0.6-1.5 s it rolled a strafe or stood still (recruits three times in four), and it stood through every
+    reload. Now a reload is spent strafing or backing off. Closing in is at the gun's walk, gun up (it was 138).
+  - Running: a bot that notices someone at a sprint lets the sprint go `SprintBreak` (0.18-0.35 s) later, before it
+    has registered them, instead of running on at full tilt with its gun down. It goes after someone who ducked out of
+    sight at a walk (the keenest used to run at 207, gun down).
+  - Moving costs aim: at a 180 walk, 1.7x the error for a recruit and 1.4x for a veteran (`AimError`). That's why the
+    holders plant.
+  - `dev_bot_styles` logs every living bot's style, habits, gun and current move.
+  - Crouching (2026-10-19, the user: bots "crouch spam erratically" and snap between standing and crouching):
+    - A plant used to roll its own crouch and last 0.15-1.3 s, so bots bobbed down and up every second or two (a
+      rusher's 0.15-0.35 s plants had a 35-70% crouch). Now a crouched plant lasts at least the drop plus 1-1.6 s (rusher),
+      1.3-2.4 s (rifleman, flanker) or 1.8-3.2 s (anchor, marksman), and after getting up a bot waits 3.5-7 s before it
+      crouches again (`Plant`, `_crouchRest`). A rusher crouches on 8-20% of plants. Being hit still ends the plant.
+    - Every machine eases the stance from the synced `IsCrouching` (`CrouchBlend`, `UpdateStance`): down in 0.35 s, up
+      in 0.45 s, smoothstepped. The graph's `duck`, the eye (`BotPronePose.EyeOffset( float, ... )`) and so the
+      shouldered gun follow it. The movement box still changes at once. A slide doesn't sink it (its own pose does).
+    - Compiled with dotnet and in the editor (0 errors). Not yet watched in a match.
+  - Compiled and hotloaded into the user's match on 2026-09-29, not yet watched.
+
+## Skirmish (1v1 / 2v2): bot fill and the arena (`SkirmishArena`)
+- The user (2026-10-01): 1v1 Skirmish filled to 5v5 with bots, and big maps should have bounds on the small modes.
+- Bot fill: `gunfight_1v1.prefab` and `gunfight_2v2.prefab` had `BotFillRule`'s 5v5 defaults. They now fill to their
+  size (MaxTeamSize 1 / 2, MinPlayerCount 2 / 4), and `WaitForPlayers` skips at 2 / 4. As a backstop, `BotFillRule`
+  never fills a side past the mode's `TeamAssigner.MaxTeamSize`. The other modes' assigners take 5 or 10 a side,
+  so they're unchanged.
+- The arena (`Code/GameLoop/Rules/SkirmishArena.cs`, on both prefabs; Radius 1000, ~25 m, for 1v1 and 1300, ~33 m, for
+  2v2):
+  - It's only used where the teams' spawns are further apart than 2.2 radii (`BigMapSeparation`). That means Belltower
+    (4093) and Flatgrass (8315), but not Innocent Hotel (1993).
+  - The host picks it once, after `GamemodeInitializedEvent` and once the navmesh has built. Before the event,
+    `GameModeObject` hasn't switched off other modes' objects yet, and Belltower's Retakes spawns made its teams' spawns
+    look about half as far apart.
+  - Candidate middles: the map's `ObjectiveSpot`s (Belltower's fight places), the midpoint between the teams, and 8
+    random navmesh points round it. Each must have a complete navmesh path from a team spawn, which rules out roofs and
+    other islands.
+  - Its spawns are a ring at 0.72 of the radius (16 tries, kept between 0.45 and 0.85 out and 220 apart). Each one has
+    standing room, and a route to the middle that stays inside the circle and is under twice the straight line. A
+    middle needs at least 6.
+  - It's scored on the spawns, plus one for each spawn with another across the ring that it can't see. It picks at
+    random among the best 3, so a map isn't always fought over in the same spot.
+  - Anyone spawned before it was picked is moved in (`MoveEveryoneIn`): a player outside is respawned, and a bot
+    outside is removed for the fill to bring back inside.
+- Spawning: `GameUtils.GetSpawnPoints`, `TeamSpawnAssigner` and the bots' `GetSpawnTransform` all go to the arena first
+  (`SkirmishArena.Settled`). `PickSpawn` puts each side as far from the enemy as the ring allows, out of their sight,
+  near a living teammate, and never on someone.
+- Bounds:
+  - A player outside the circle gets the play area's "Return to the AO" and is killed after 5 s (`SkirmishArena.Contains`,
+    in `PlayerPawn.UpdatePlayArea`).
+  - Every point a bot heads for is pulled 96 inside the edge (`NavPoint` → `SkirmishArena.Clamp`).
+  - The radar draws the circle in the UI's amber (`Minimap.razor`'s `.arena`, `MinimapRenderer.FromWorldRadar` with
+    `clamp: false`).
+- If no candidate fits, it logs a warning and the match uses the whole map. Compiled offline (2026-10-01), not yet
+  checked in a match. To check: a 1v1 and a 2v2 on Belltower should have one bot per enemy slot, the ring on the
+  radar, the warning outside it, and bots staying inside.
+
+## Retakes and Defuse rounds (`BotFillRule.RestartRound`)
+- The user (2026-10-01): in Retakes on Belltower they spawned among the enemies and died at once. After the first fix
+  below they still did ("the spawns are terrible").
+- The real cause was `ActiveBombSiteSelector`. Each round it switches on the spawns tagged with that round's site and
+  switches off the rest, but it found them with `GetComponentsInChildren`, which only returns enabled components (as
+  does `Scene.GetAllComponents`: the scene's index only holds active ones). So the first round at the other site
+  switched every spawn off, and they stayed off for the rest of the match.
+  - With no spawns, `TeamSpawnAssigner` falls back to the Unassigned team's (Belltower's deathmatch spawns, off in
+    Retakes) and then to the world's origin, and the bots' `GetSpawnTransform` to the origin too. So both teams,
+    players and bots, spawned on one spot: open ground in the middle of Belltower. Every Retakes map had it.
+  - It now goes through every spawn (`Scene.Components.GetAll( FindMode.EverythingInSelfAndDescendants )`), leaving
+    those under an object the mode switched off, and warns if the site has none for a team.
+- Bots were also never reset between Retakes rounds. They stood where the last round left them, and in the first round
+  where the Waiting state's spawns put them. Belltower's Blue spawn road is beside both bomb sites, so a Red player
+  could spawn among them.
+- Now every round mode (Defuse and Retakes, `BotFillRule.IsRoundMode`) starts each round afresh:
+  - `RespawnPlayers` calls `RestartRound` before respawning the players. It clears the last round's bots, so they
+    don't count in the players' spawn picks.
+  - 0.1 s later the full roster comes back at this round's enabled spawns.
+- `ClearBots` disables each bot before destroying it. A destroy only happens at the end of the frame, and the players'
+  spawn picks in that frame would still find them.
+- Once a round is under way (its bomb handlers are active), a late join or a state change doesn't refill a round mode's
+  bots (`UpdatePlayerCount` returns), so teammates killed earlier in the round stay dead.
+- A bot's spawn point (`LightweightBotManager.GetSpawnTransform`) is one nobody stands on (within
+  `OccupiedSpawnRadius`, 48) where there is one. Retakes places a whole team on as few points as it has players.
+- Compiled offline, not yet checked in a match. To check it, play several Retakes rounds on Belltower until the site
+  changes: each team should start at that site's spawns.
+
+## Spawn camping: bots' spawns flip (`LightweightBotManager.TryGetUncampedSpawn`)
+- The user (2026-10-12): "i can spawn camp bots on lowtide". Bots came in at their own 12 team spawns whatever stood
+  over them, so a player in their square shot each one as it appeared.
+- Where a bot spawns at its team's spawns (the scripted maps: `MapSpawnSettings` with navmesh spawns off), each one is
+  scored for danger (`SpawnDanger`) against every living enemy, player or bot:
+  - 2-4 for an enemy within 1200 (~30 m, `CampedRadius`), seen or not, more the closer;
+  - 1 for one that can see a body standing there (a ray to its chest or head) from within 3000 (~76 m,
+    `WatchedRange`), 2 if they're facing within 60 degrees of it.
+- A bot takes one of up to five safe spawns (danger 0), best by `GetSpawnScore` first. When none is safe, the team's
+  spawn flips, as in CoD (`TryGetFlipSpawn`):
+  - The pool is every spawn on the map that isn't switched off for another reason: this mode's (the enemy team's
+    too), plus those a `GameModeObject` left off for other modes (`OffForAnotherMode`). So on Lowtide, Belltower,
+    Railhead, Boxyard, Cerro Blanco and Reef Hall, the 16-36 deathmatch spawns round the map. Innocent Hotel has no
+    deathmatch spawns, so there it's the other wing's team spawns.
+  - Not Retakes' spawns (the `retakes` tag), nor one a map switched off itself. It also has to be free, at least
+    `MinSpawnDistanceFromTeammates` from a teammate, and on the main navmesh.
+  - Maps with navmesh spawns on (Flatgrass, Refinery, Edinburgh, Depot, Motel, Shipment) spawn bots round the players
+    first (`TryGetNavSpawn`), so this only runs there when that finds nothing.
+  - Scored by the nearest enemy's distance (up to 4000), a little for a teammate within 1500, and -3000 within 1000 of
+    the enemy team's spawns. The best 24 get the danger check, which stops at three safe ones.
+  - It takes a random one of the safe ones. With none, it takes the least dangerous, but only if that's less camped
+    than the team's own best; otherwise the team's least camped spawn.
+- Free-for-all already picks from every spawn, so it only gets the danger ranking. No flip in round modes (Defuse,
+  Retakes, 1v1 and 2v2 Skirmish: `IsRoundMode`), and nothing changes with no enemy alive.
+- Players' spawns (`TeamSpawnAssigner`) are unchanged. They already score enemies' distance and sight, but only
+  within their own team's spawns.
+- Compiled offline with dotnet (2026-10-12), not yet checked in a match. To check: a TDM on Lowtide
+  (`dev_mode team_deathmatch lowtide`), standing in the bots' spawn square (Red's at y 1620-2020 in the scene, Blue's
+  at -1620 to -2020) or watching it from the cross street. They should come in at the deathmatch spawns away from you.
+
+## C4 detonation (`DemolitionBlast`, `c4_explosion.prefab`)
+- The user (2026-10-01): the bomb's explosion "doesnt look very realistic, it should be really destructive, not just a
+  little grenade style effect". It was a puff of smoke, a small flipbook flame, a flare and glowing shrapnel. Those
+  children are gone; the old prefab is in `Backups/c4_explosion_old/`.
+- `DemolitionBlast` (`Code/Weapons/Grenades/DemolitionBlast.cs`) builds the blast in code on every machine, from the
+  engine's own sheets, sized from the real charge:
+  - 9 kg of C4 (`ChargeKg`) is ~12 kg of TNT (`TntEquivalence` 1.34). On the ground its blast acts like ~22 kg in the
+    open (`SurfaceBurstFactor` 1.8, `EquivalentKg`).
+  - The detonation's flash (`explosion_03`, additive), then a fireball ~8 m across: measured HE fireballs scale as
+    ~3.4 m per kg^(1/3) of TNT. It's 11 `explosion_01` sprites in a dome, full size in 50 ms, white-hot for ~0.1 s,
+    then orange, then soot that rolls up (`FireballParticles`).
+  - The ground's own dust: a burst thrown up with the chunks (`explosion_02` on soil, `smoke_burst_c` on masonry), and
+    the base surge, a ring of 24 puffs driven along the ground that stops 9-15 m out and hangs for 7-10 s
+    (`BlastCloudParticles`).
+  - A column of soot, then dust, fed for 3 s and rising 15-25 m, which drifts with `WorldWind` and thins out over
+    24-34 s.
+  - Up to 80 chunks of the ground (`rock_chunks_01`, a shape per sheet sequence: `Particle.Sequence` reaches the
+    shader) and a spray of grit, thrown 10-45 m/s. They fly under real gravity (9.81 m/s², not the players' 800 u/s²)
+    with quadratic drag for a stone of their size (`DebrisParticles`), bounce, and lie there for 14-22 s.
+  - 60 hot sparks, a light that flares with the flash and fades with the fireball, and a 10 m scorch
+    (`burnt_patch.decal`) under the old 9 m `grenade_scorchmark` decal.
+  - The dust and the chunks take the ground's colours, by `WorldSounds.Classify`: soil, grass, wood or masonry.
+  - Loose rigidbodies within 25 m in the open are thrown, ~12 m/s at 3 m and ~2 m/s at 10 m. Each machine throws the
+    ones it simulates.
+  - The view shakes when the blast reaches the viewer, by Kinney and Graham's peak overpressure there
+    (`OverpressureKpa`): as hard as it goes inside ~6 m, a jolt at 30 m (~9 kPa), a faint thump at 100 m.
+- The host also breaks every `BreakableGlass` pane the blast reaches in the open, out to 1 psi (`WindowBreakKpa`,
+  ~37 m; `DemolitionBlast.BreakWindows`, from `TimedExplosive.Explode`). Damage is still the bomb site's
+  (`BombSite.GetExplosionDamage`).
+- The explosion object lasts 40 s (`DestroyAfter`) so the column can thin out, and goes at the round's cleanup
+  (`DestroyBetweenRounds`).
+- Lit sprites go dark on cloud maps (see Smoke grenade), so every sprite is unlit, with its colour in its tint.
+- Not seen yet: it compiled offline with dotnet, and nothing has been looked at in the engine. To tune by eye: the
+  fireball's size and how long it glows, the surge's and column's density, the chunks' tint, the light's brightness and
+  the shake.
+
+## s&box 26.10.02: bool anim parameters can't be set true (`AnimBools`, `Tools/animgraph_flags.py`)
+- After the 2026-10-02 s&box update the user saw no first-person reload animations, no pistol kick, and bots gliding
+  with their legs up in the air pose. Every `SkinnedModelRenderer.Set( name, true )` reaches the graph as false.
+  Floats, ints, enums, vectors and rotations are fine.
+- The cause is engine commit #5893 ("Simplify managed anim parameter storage", 2026-09-30):
+  - Parameters now go to native code as an `AnimVariant`, and a bool is built as
+    `new Vector4( value ? BitConverter.Int32BitsToSingle( 1 ) : 0f, ... )`.
+  - The JIT folds that constant, a denormal float, through a double. A thread with denormals-are-zero set (the
+    engine's) folds it to 0.
+  - Reproduced offline on 2026-10-02 against the installed Sandbox.Engine.dll (`scratchpad/dazt`, `_controlfp_s`
+    with `_DN_FLUSH`): `(AnimVariant)true` came out all zeroes, `(AnimVariant)1` (an int) didn't.
+  - The replays show it: bots' `b_grounded` and IK enables false all life, where 2026-10-01's were true.
+- Facepunch fixed it in sbox-public #6000 (commit 4c1a4f98, 2026-10-03): the bool picks `value ? 1 : 0` as an int
+  before `Int32BitsToSingle`, which isn't folded. On 2026-10-03 the installed build (25681412, the 2026-10-02 update)
+  didn't have it yet: `scratchpad/dazt` still got all zeroes for `true`, and Steam had no update waiting.
+  To check a build offline, convert `true` with the installed Sandbox.Engine.dll's `AnimVariant` on a thread with
+  denormals-are-zero set (`_controlfp_s` `_DN_FLUSH`), with tiered compilation off: the fixed one gives `01 00 00 00`.
+- Until then our graphs' bools are enums (2026-10-04, the user asked for a fix that didn't wait for the update). An int
+  set at runtime gets through, and the engine turns an int into an enum value without the bool's constructor
+  (`AnimVariant.TryConvertTo`: the int as a byte). Ints reached the graphs all along (`holdtype`).
+  - `Tools/animgraph_flags.py` makes each bool parameter a `CEnumAnimParameter` with the options "false" and "true", in
+    that order, keeping its default and its auto-reset. Its conditions compare it with 0 and 1 (`m_nType` 2) and its
+    selectors go by the enum (`SelectionSource_Enum`), so a bool selector's two children stay where they were. A bool
+    used anywhere else is left a bool, with a warning. Its docstring has the rest.
+  - 221 flags in 31 graphs: the 16 ported guns' viewmodel graphs (the Kastov-74u's too: it's the pipeline's output,
+    and its prefab wasn't touched), the throwables', the six swb guns', `human_player` and `rigged_human` (the legacy
+    player models and the robot).
+  - `kastov_animgraph.py` converts the graphs it writes while `animgraph_flags.ENABLED` is set, so a rerun keeps them.
+  - s&box's own viewmodels (the M4A1, MP5, M700, Spaghelli, USP, USP-SD, 1911 and both knives) come from cloud
+    packages, whose graphs are compiled only. Their graphs were decompiled with Source2Viewer-CLI into
+    `Assets/animgraphs/viewmodels/` (six: the 1911 uses the USP's, the knives the trench knife's) and converted, and
+    the nine viewmodel prefabs use them (`animgraph_flags.VIEWMODELS`, `--import`).
+- The game sets every flag with `AnimBools.SetBool` and reads it with `GetFlag`:
+  - `SetBool` sends 0 or 1 as an int, read from an array so the JIT can't fold a constant 1 into the constructor.
+  - `GetFlag` reads a converted flag with `GetInt`: `GetBool` can't read an enum.
+  - Every anim flag the game code sets or reads goes through them (13 files). The editor's QA tools set them with
+    `SetBool` and read the one they check with `GetInt`, since editor code can't use a game method from the same
+    hotload.
+- A bool parameter in a graph we don't have gets the same int. That's the engine's human graph (`citizen_human_male`),
+  which the players' and bots' bodies use: `ik.hand_*.enabled`, `b_jump`.
+  - The engine turns the int into a bool through the broken constructor (`int > 0`), yet it has come through. In the
+    user's match on 2026-10-04 (replay `20261004_192134`), the bodies' hand IK read back true from the native graph
+    from the hotload at 19:17:56, where it had read false all match before. Why isn't known, so it may not hold.
+  - Where that graph's default is true (`b_grounded`), `SetBool` resets the parameter (`Parameters.Reset`) instead,
+    since a default comes from native code. That fixed the floating bots (`AnimationHelper.IsGrounded`, bots, zombies'
+    fallback, `IdleAnimator`, `OperatorPreview`).
+- Checked: the editor recompiled every converted graph with no errors (2026-10-04, `sbox-dev.log`), and the replay
+  above. Not yet seen: the first-person guns' reloads, fire kick, deploy, sprint, jump and the M18's slide lock.
+- A replay recorded before the conversion keeps its flags as bool tracks, which don't bind to a converted graph's enums.
+  Only `rigged_human` bodies (the legacy player models) have any there: the bodies' engine graph is unchanged, and the
+  first-person gun is driven from the actions.
+- Once an s&box build with #6000 is installed: `python Tools/animgraph_flags.py --revert` (the bools come back),
+  `--unpin` (the nine prefabs go back to their models' own graphs; the copies can then go), and `ENABLED = False` in
+  `animgraph_flags.py`. `SetBool` and `GetFlag` work on bools too and can stay.
+
+## Leg animation speeds (human bots and legacy `rigged_human.vanmgrph`)
+- Current human bots use `animgraphs/human_bot.vanmgrph` (2026-10-13, the user: bots' legs look like the animation plays
+  too fast). It copies the installed 26.10.13 human graph, retaining its engine subgraphs. Only the minimums of the four
+  `_human_{walk,run,crouch,sprint}_rate_per_inch` parameters differ: zero instead of their fixed calibration defaults.
+  The engine graph fixes both minimum and maximum to the default, so writing a lower rate there silently clamps it back.
+- `LightweightCombatBot.UpdateHumanGaitRates` caches those defaults per graph, then limits each rate times actual
+  ground speed with `GaitRateLimit`: 1.1 walking, easing up to 1.25 at a sprint (2026-10-14). Slow movement keeps the authored proportional rate and restores it after slowing
+  down. True move/wish velocities still select direction and gait. Renderer playback stays 1, preserving weapon and
+  look timing. Install the bot graph before setting movement inputs: changing a renderer's graph clears its parameters.
+- Checked in the native engine: 23 checks across 0-600 u/s, plus actual animated foot samples and rendered standing,
+  strafing, sprinting and crouching poses (`output/bots/gait`). At 180 u/s, a strafe's left-foot cycles fell from 25 to 15
+  over ten seconds (about 40% slower); slow walking and crouching retained their cadence. Live Railhead bots use the new
+  graph and cap. Code and graph compile cleanly. When refreshing this copy after an engine update, preserve the four
+  open parameter ranges and recheck the lower-body cycles.
+- Faster strides (2026-10-14, the user: bots don't run properly at the new speed): `BotStridePose` runs after animation,
+  before the weapon is fitted. Above 90 u/s it eases the stride up to 1.5 at 270; only the travel direction is stretched.
+  A small hip drop and two-bone IK preserve thigh/shin lengths. Targets are clamped in the floor plane first, so the
+  boots retain their animated height even when a longer step is out of reach. Clothing is merged again; the gun follows
+  the resulting hand. Slow movement, crouching, prone and slides retain their own poses. Pose work is culled below
+  16 screen pixels outside 1200 units. Movement sampling now responds at 20/s and discards teleport velocity.
+  Native live samples showed about 40% more planted-foot travel; the live slide's weapon mount error was below 0.001 units.
+  `output/bots/movement` contains the preview, native measurements and slide checks; limb lengths and ankle heights
+  were checked across the animated cycle. This reduces foot drift within the rig's available reach; it is not foot locking.
+- The legacy graph below is still used by other models; its bot cadence cap also follows `GaitRateLimit`.
+- The lower-body Blend2Ds ("Stood Lower Body", "Crouched Lower Body"; X = move_y, right, Y = move_x, forward) put each
+  clip at the velocity its planted feet carry the body: walks ~33 u/s, jogs 93 sideways, 103 ahead, 91 back and
+  81,90 / -65,86 / 62,-71 / -67,-62 diagonally, the sprint 178, the crouch walks 31-39. They used to sit at 60/150/200
+  (crouch 50/75), 1.4-2.5x faster than they step, so the feet slid: a bot strafing at 126 u/s stepped like one at ~70
+  (the user: bots "glide along the floor when strafing").
+- Past the outer ring (the jogs, and the sprint ahead) the blend holds the ring's clips, and the float param
+  `move_rate` plays them faster. It's a CSpeedScaleAnimNode ("Move Rate") between the grounded state and the
+  stood/crouched state machine, so only the legs speed up; default 1. Bots set it in `LightweightCombatBot.UpdateAnimation`
+  to the square root of speed over `RingReach`, capped at 1.1 walking / 1.25 sprinting, with move_x/move_y clamped to the ring.
+  `BotStridePose` then lengthens the steps within the rig's reach. The old full speed-up (the strafe's jog at 1.36x, the hunting
+  sprint at 1.29x: 220-260 steps a minute) kept the feet planted but looked like the bots ran faster than they moved
+  (the user's report): a runner goes faster mostly by lengthening the stride, which the clips can't.
+  `StoodClipRing` / `CrouchedClipRing` copy the graph's ring: change them together.
+- `BotStridePose` supplies bounded stride warping outside the graph. `CFootLockAnimNode` could pin
+  planted feet, but the player models define no feet or leg IK chains (only `left_arm_IK`).
+- Players don't set `move_rate` yet, so a player past the ring (a rifle's ~181 walk sideways, the ~285-304 sprint, a
+  ~110 crouch, since the faster gaits of 2026-10-13) slides, more than before. Inside the ring their legs match better than they did.
+- Bots animate from their smoothed movement (`UpdateMoveVelocity`), not `Agent.Velocity`, which is zero on clients: in
+  multiplayer every bot glided on idle legs there.
+- Between the walks and the jogs the blend still under-steps ~15%: its cycles are synced, and a walk cycle (1.33 s) is
+  nearly twice a jog's (0.73 s).
+- Measured from the FBXs in `Assets/models/animations/temp_import/unarmed` (headless Blender, 1 m = 39.37 u, which
+  matches the model's `ScaleAndMirror` 0.3937 on centimetres): the planted toe against the pelvis, three ways that agreed
+  within ~10%, and against the model root (the clips are in place), within 2% of the pelvis figures. walk_E shuffles, so
+  only the stroke between its extremes finds its ~33. s&box imports each FBX's take (AnimationStack LocalStart..LocalStop),
+  not Blender's action range, which can run on with frozen frames (walk_W: 101 frames for a 41-frame take).
+- The legacy graph's original foot-speed calibration has not yet been checked in-game.
+
+## First-person body (`PlayerBody.FirstPersonBody`)
+- A second body drawn only for the viewer, so they see their legs: 6.175 behind the pawn's origin, with no shadows.
+  The main body is hidden in first person by the `viewer` tag (`PlayerBody.OnUpdate`, the camera's RenderExcludeTags).
+- The legacy player models hid its upper body with procedural spine bones in player.prefab (spine1, spine3). The
+  players are now the human model (`MilitaryUniform.HumanModelPath`), whose skeleton those bones don't touch, so the
+  whole body showed, and walking forward leaned its face and eyes into view (the user's report, 2026-09-29).
+- `MilitaryUniform.ShowLegsOnly` (from `PlayerBody.UpdateFirstPersonBodyVisibility`) hides its Head (with the eyes and
+  jaw), Chest and Hands bodygroups and turns off every garment that covers neither the legs nor the feet (helmet,
+  shirt, vest, gloves). The trousers and boots stay. It holds through a re-dress (`Refresh`).
+- Checked in the user's match on 2026-09-29, on a fresh spawn: the body's mesh mask 0 (the trousers and boots hide the
+  legs and feet), the trousers and boots on and the other garments off. A body dressed before the code hotloaded in had
+  every garment off, since it had no record of what it wore; a respawn fixed it. Not yet seen from the camera.
+
+## Prone body and first-person legs (`PlayerPawn.Prone.cs`, `ThirdPersonPronePose`, 2026-10-16)
+- The user: "when i prone i should be able to see my legs like cod", with a picture of Black Ops 6's supine prone
+  (lying on the back, aiming over the legs). Players had no lying pose: prone was the crouch clip with the eyes at -40,
+  and the first-person body was hidden.
+- The body lies along `ProneYaw` (feet to head, `[Sync]`, owner-set). The view turns freely within `ProneFreeArc` (45)
+  of it; past that the body pivots after it at `ProneTurnRate` (90/s); a look further round than `RollOverAngle` (110,
+  a quick look behind) rolls it onto its back (`IsSupine`, `[Sync]`), looking along the body at the feet. Turning back
+  past 70 rolls it face down again. `ProneBlend` follows the eyes' stance rate and `SupineBlend` takes `RollTime` (0.4 s),
+  on every machine.
+- The camera stays at the lying head: `PlaceHeadForProne` moves the `Head` object (rest 9,0,60) along `ProneYaw`
+  instead of the view, so a roll leaves the head where it was. `ProneEyeTarget` is where the eyes end up.
+- `ThirdPersonPronePose` (applied in `PlayerSlideAnimationSystem`, to the body and the first-person body): pelvis and
+  legs tipped 87 degrees along the heading and spun about their length for the back; the chest propped up (bisected)
+  until, with the eyes at the camera, the pelvis is 5.5 over the floor; head and arms keep their animated aim, shifted
+  to the lying neck and shoulders; the legs laid out straight by two-bone IK, knees to the floor face down and up on the
+  back, face-down toes turned back. `ShoulderGun` then brings the third-person gun up to the eye with the bots' hand IK
+  (pistols held out, none while reloading). Locomotion and duck fade out by `ProneBlend`, so crawling has no leg motion.
+- The first-person legs show once `ProneBlend` reaches `FirstPersonLegsBlend` (0.9). On the back they lie ahead of the
+  camera at the bottom of the view.
+- The movement box is still the standing 32x32 square, so the lying legs can go into walls: behind you face down, ahead
+  of you on your back.
+- Checked offscreen on 2026-10-16 (an isolated scene in the editor): face down lies under the camera, the eyes within
+  1.2 of it, and looking back along the body the legs fill the bottom of the view. The on-the-back render isn't valid:
+  a turned root there kept its old animation frame, so render it with the root unturned and `proneYaw` 180. The leg IK
+  and `ShoulderGun` came after: compiled with dotnet only (the editor closed), not yet rendered or seen in a match, nor
+  on a second machine. In such a render, give the test body `CreateBoneObjects` or the gun won't follow the hand.
+
+## First-person grime: blood and dirt on the gun and gloves (`FirstPersonGrime`, 2026-10-16)
+- The user: "blood should go onto my gun when ive been shot and dirt when ive been prone in dirt etc".
+- `FirstPersonGrime` (on the local pawn, made by `PlayerPawn.OnUpdate`, not networked) keeps a `Grime` for the hands
+  (sleeves and gloves) and one per gun (`For( equipment )`), cleaned at each new life:
+  - Blood from `DamageTakenEvent`, by damage / 40 (0.4-1.5): arm or hand hits put most on (hands 0.45, gun 0.3), body
+    hits less (0.25, 0.18), leg hits little; a blast adds the ground's dirt. It dries over `BloodDryTime` (90 s): wet
+    glossy red to matte brown-black.
+  - Dirt from the ground under the hands while prone or sliding (`GroundOf`: soil, mud, sand, gravel, grass, concrete
+    dust, grease, by the surface's name, else `WorldSounds.Classify`): `DropDirt` going down, `CrawlRate` crawling,
+    `LyingRate` lying still, the gun half the hands' (`GunShare`). The colour follows what was added last.
+  - Rain outdoors (a trace up) rinses it (`RainWash` per mm/h) and wets it (mud, gloss); lying in water or snow
+    washes it fast.
+- It's drawn as a second skin over every renderer in the viewmodel (`GrimeSkin` marks it): the same model, bone-merged
+  to the gun's renderers, or for the sleeves and gloves posed by `ViewModelClothing` (`Follow`, kept out of its
+  cloth-material swap). Every slot wears `materials/effects/hc1_grime.vmat` (`shaders/hc1_grime.shader`) but lenses,
+  reticles, see-through and hidden pieces (`CamoMaterialRules`). The shader pushes the skin 0.012 out along its normals,
+  draws splashes, pooled stains, dust patches and grains in the model's own space, and is see-through elsewhere.
+  The gunsmith's camo and hidden-piece passes skip `GrimeSkin` renderers.
+- `dev_grime [blood] [dirt] [ground] [dry]` sets it on the local hands and gun in hand.
+- Blood appearance revision (2026-10-21, user: circular spots look terrible): `Splashes` replaces opaque spherical
+  spots with randomly oriented lobed shapes, tails, satellites, noisy edges and varied thickness. Three scales add
+  clustered spray; accumulated stains have broken coverage. Wet blood is darker crimson with restrained gloss,
+  drying to brown. Dirt, gameplay accumulation/drying/washing, material exclusions and clothing materials are unchanged.
+  The canonical shader was published through the native editor, compiled with `EditorUtility.CompileShader`, then
+  `materials/effects/hc1_grime.vmat` compiled successfully. Authoring/QA: `Sources/Effects/firstperson-grime/`.
+  Native before/final Kastov74u renders (same camera and seed, light/heavy/dry/clean/dirt) and receipts are in
+  `output/firstperson-grime-fix-20261021/`; clean/dirt-only RGB RMS differences are below 0.02/255. Disposable QA
+  scenes were destroyed and Belltower's selection, saved state and stopped play state preserved. The independent
+  shirt-model render does not exercise `ViewModelClothing.Follow`; do not treat it as a posed clothing integration test.
+  Live match checks remain: hip/ADS on several guns, optics staying clear, sleeves/gloves following the hands,
+  no z-fighting or lag when turning, third-person gun clean (`dev_grime 0.7 0.6 soil`, `dev_grime 0 0.8 mud`).
+
+## First-person clothing (`ViewModelClothing`, `Code/Weapons/ViewModelClothing.cs`)
+- Clothing surface revision 4 (2026-10-21, user: material still looks wrong): first-person army-shirt slots use
+  `materials/operators/first_person/v4/shirt.vmat`; gloves retain v2. V3's coarse weave was baked into the
+  albedo and read as pebbled leather even with its normal layers disabled. Four cleaned colour regions retain
+  the camo print/stitches while removing that relief; the right sleeve's false painted highlight was removed.
+  The v4 shader uses filtered fold normals and a separate 256-square analytic cotton height map. Fine threads
+  sample model coordinates captured before standard vertex processing, with triplanar height and surface-gradient
+  bump shading so their scale is independent of the narrow cuff UV islands. Texture streaming includes this map.
+  `Sources/Clothing/firstperson-v4/imagegen-prompts.json` records exact built-in edit prompts and raw sources.
+  Clean/fibre builders and guarded native imports preserve the rejected colour-filter experiment; do not replay
+  earlier one-shot stages over the final profile. `output/firstperson-clothing-v4-20261021/applied-report.json`
+  records final hashes and checks. Native bright/dim close-ups and the production Field Operator `Dress` check
+  passed (v4 shirt, v2 gloves, body tint retained, bare arms hidden). The shared editor stayed stopped/saved;
+  these are private engine previews, not a live-match check of this revision. Geometry/animation are unchanged.
+- Clothing surface revision 3 (2026-10-21, user: sleeve still pixelated): army-shirt first-person slots now use
+  `materials/operators/first_person/v3/shirt.vmat` and `shaders/viewmodel_fabric_v3.shader`; gloves retain v2.
+  Four separately authored, registered UV regions give sleeves approximately 2.45x the native linear pixel
+  density of the v2 whole-atlas crop; cuff regions gain 3.13x and 4.94x. Generated source sizes and exact prompts
+  are recorded under `Sources/Clothing/firstperson-v3/` and `output/firstperson-clothing-v3-20261021/`.
+  `Tools/build_firstperson_clothing_v3.py` stages these sources and filtered fold normals; native publication
+  resamples only for compiler dimensions and does not count that conversion as new detail. Region sampling
+  uses remapped UV gradients and feathered boundaries. Streaming requests include all four region textures.
+  Fixed-camera native v2/v3 comparisons cover both sleeves and the cuff; a read-only check of the actual live
+  Belltower `ViewModelClothing` confirms the v3 material, shader and all nine valid loaded texture bindings.
+  `live-after/camera_screenshot.png` is an actual in-game capture. No scene/play/camera edits were required.
+- Clothing surface revision 2 (2026-10-21, user: blurry sleeves still not improved):
+  `ViewModelClothing.Materials.cs` assigns authored `materials/operators/first_person/v2/shirt.vmat` and
+  `gloves.vmat` to the army-shirt and fingerless-glove slots. The renderer retains its outfit tint and skin slots.
+  `shaders/viewmodel_fabric_v2.shader` adds independently repeating fine normals/roughness variation, 16x
+  anisotropic filtering and explicit cutout clipping. Active first-person clothing renews its texture-streaming
+  requests in `LateSetup`, including when the materials are already cached.
+  - `Tools/build_firstperson_clothing_v2.py` and `Sources/Clothing/firstperson-v2/` record the sources and native
+    publication/QA. Imagegen's base atlases were natively 1254 square, converted to 2048 for compiler mip filtering;
+    this conversion is not a claim of newly resolved 2K detail. Fine weave is a separate repeating texture.
+    Original coverage and tint masks are retained. Reconstruct the exported packed normal's Z from XY; treating
+    all three exported channels as an RGB source normal exaggerates the surface. The engine's single-channel AO
+    readback returned black; the new material uses a neutral AO fallback, not that unreadable black map.
+  - Native shader/material and C# compilation passed. Native close-ups and the actual production `Dress` routine
+    on an isolated Field Operator verified both v2 material bindings, tint/skin preservation and hidden bare arms.
+    Evidence: `output/firstperson-clothing-v2-20261021/native-r5/` and `dressing-proof.json`. This did not run a live
+    match or alter the shared Belltower scene/play state; do not label these captures live gameplay.
+- The user (2026-10-08): "when holding a gun i dont see my clothes on my arms". Every viewmodel's arms are
+  `v_first_person_arms_human.vmdl`, bare skin whatever the outfit.
+- `Equipment.CreateViewModel` adds a `ViewModelClothing` to the viewmodel (`Fit`). Once the body wears a uniform
+  (the human model with a `MilitaryUniform`), it dresses the arms:
+  - It hides the arms' own mesh: their `arms` bodygroup goes to its last, empty choice, and comes back when it undresses.
+  - In its place it draws a copy of the body (a "Clothing" child of the arms), dressed by its own `MilitaryUniform` in
+    the body's style and pieces: the shirt's sleeves, the gloves (the Tactical and Desert Operators' tints too), and the
+    skin where nothing covers it (the Military Operator's bare hands).
+  - The Head, Legs and Feet bodygroups are hidden, and so is every garment with no arm, hand or finger bones (helmet,
+    balaclava, trousers, boots).
+  - It's drawn on the overlay layer with no shadow, like the arms, so `ViewModelMask` counts it as the gun.
+  - It checks the body every 0.5 s and dresses again when the style changes (an outfit pick reaching the host).
+  - It follows the arms' Enabled, so it goes while the tablet flies the drone, and with the developer menu's Toggle
+    View Model.
+- Why not sleeves over the first-person arms: their forearm is 0.2-0.35" thicker than the body's, so the body's
+  garments poked through. The body's own arms keep its garments fitted as in third person.
+- The pose, in `ICameraSetup.LateSetup` (new: after PostSetup, so after `SwbArmsRetarget` and the tablet's, the
+  defuse kit's and the throwables' arm posers):
+  - The arm and finger bones (the two skeletons share their names and axes) take the first-person arms' model-space
+    transforms as they are.
+  - The torso has no first-person bones. It's held behind the eyes, as a body's is: the body's eye centre (between
+    eye_L and eye_R) at the camera, facing the way it looks, and every bone off the arms in its bind pose from there.
+    So neck_0 is 4.5 behind the camera and 7.4 under it, and the chest about 87 degrees under the view.
+    - It used to put spine_2 half way between where each clavicle put it. The ported guns' clips swing the clavicles
+      about, and the user saw their clothes in the camera aiming and reloading aimed with the M18 (2026-10-09). The
+      M18's clips bring the clavicles 4" forward aimed and 8" in its reloads, which put that torso's eyes 1.4" and
+      6.1" in front of the camera, and the shirt's collar and shoulders across the view. Even at the hip its eyes were
+      3-4" ahead on the FAL, Uzi and P90.
+    - The clavicles still take the first-person arms' own, so the sleeves are where they were. The shirt stretches
+      between the neck and the shoulders, all under the view: across eight guns' clips no shoulder joint comes into a
+      120-degree view (the nearest, the FAL's, is 45 degrees under its centre).
+    - Every camera in the scene runs `ICameraSetup`, so only a main camera places the body (not a scope's lens, the
+      minimap or the gunsmith's thumbnails).
+  - The forearm's twist bones take the hand's turn about the forearm as the citizen's constraints do (twist0 none, twist1
+    two thirds), and the elbow helper sits half way between the upper arm and the forearm.
+  - It goes in as bone overrides in model space plus the world transforms, as `SwbArmsRetarget`'s does. Garments are
+    posed from the same pose (not bone-merged a frame behind), and a garment bone the body lacks keeps its bind pose
+    against the torso.
+- The camo pass (`GunsmithLoadoutManager`) skips it, as it skips the arms: it leaves any renderer under a
+  `MilitaryUniform`.
+- Not on the gunsmith's stage or in Theater (no owner), nor on the legacy player models.
+- Compiled offline with dotnet (2026-10-08), with the editor closed. Nothing has been seen in-game. To check: the
+  sleeves and gloves on each outfit at the hip, aiming, reloading and sprinting; that the first-person arms' longer
+  bones don't stretch the elbows or wrists; the cuffs against the gloves; whether the shirt's collar, the vest or the
+  chest shows when looking down or sprinting; and the hands on the tablet and the defuse kit.
+  - The torso held at the camera compiled with dotnet on 2026-10-09, with the editor closed. To check: the M18 aimed and
+    reloading aimed, and a rifle's sprint and reloads, for the collar, the shoulders and stretched sleeves.
+- `hc1_vm_clothing [weapon] [style] [view]` (`Editor/Hc1ViewModelClothingQa.cs`) renders a gun's viewmodel offscreen
+  with the clothing at the hip, aimed, and through aimed and hip reloads, into `output/vm-clothing/` (view 0 the eye,
+  1 from behind and above, 2 from the left, 3 from the right), and logs each garment's bone nearest the eye.
+- Camera movement (2026-10-14): the camera places the viewmodel in `OnPreRender`, when its renderers can still have
+  the previous frame's `SceneModel.Transform`. Using that cached transform for the eye added the movement to the
+  torso again when the renderer caught up, stretching the shirt and vest through the camera on AK-74u jumps.
+  `ViewModelClothing.Apply` now uses the renderers' current `WorldTransform`, carries the arms' cached model-space
+  pose into that space, and synchronises each clothing SceneModel before writing its overrides. This is shared by
+  every weapon. Native isolated checks passed for 42 viewmodels and all five outfits: hip, ADS, reload, sprint and
+  jump poses, rising/falling, translation and rotation, and four renderer update orders (33,600 movement samples).
+  The maximum clothing pose drift was 0.000221 units. Screenshots, results and the `run_csharp` regression script
+  are in `output/viewmodel-jump-clipping/`; the user's scene and play state were kept during validation.
+
+## Third-person sprint carry (`ThirdPersonSprintPose`, 2026-10-14)
+- The shared `ThirdPersonSprintPose` runs after animation for bots (`FinishWeaponPose`) and players
+  (`PlayerSprintAnimationSystem`). The original fixed weapon-origin pose was rejected visually: stocks floated across
+  the shoulder, grips were too low, and inherited elbows made the arms awkward. The replacement anchors each gun's
+  actual buttstock pad at the upper right chest (`6, rightShoulder.y + 1.5, 1` in the animated chest frame).
+  `BotWeaponPose.ButtstockContact` uses the active stock meshes, excluding hidden gunsmith stocks; combined meshes
+  use the rear model bound and a pad centre 1.5 units below the bore.
+- The carry retains the animated torso lean and bob but follows only 25% of shoulder yaw, avoiding a sideways swing
+  every other step. Its base angles are `20,50,-10`; it rotates farther about the pad only when a grip exceeds an arm's
+  reach, refining the angle to avoid five-degree jumps. Both arms use downward anatomical elbow poles and retain
+  their original lengths. Carry yaw stays within 75 degrees of the chest even while looking sideways. The rendered
+  skeleton's root supplies the facing so the carry and bone transforms use the same frame. Intermediate poses fit
+  both grips within reach and move the stock around the torso; `Fit` uses the pad contact and shoulder-relative front
+  plane for this carry, with side clearance for long stocks. The right-hand socket's height is
+  calibrated against the gun's bore and index knuckle; the native M4 and imported rifles have different model origins.
+- The carry blends in over 0.18 s and out over 0.22 s, with eased arm targets. Players use synced `IsSprinting`, excluding
+  aiming; bots use their smoothed, replicated ground speed over 190, since `NavMeshAgent.Velocity` is zero on clients.
+  Reloads, crouch, prone, slides and other player stance poses have priority. Pistols, melee and the drone tablet are excluded.
+- The gripping hand carries the gun, the support hand follows its actual grip, and arm bone objects and clothing follow
+  the final pose. Players retain their authored `HoldGameObject` offset. The gun's temporary grip correction is reset
+  before each frame and restored on cancellation, stance/reload changes, weapon changes, and the final fade frame.
+- Replacement checked in native 26.10.13 fixtures: 3,744 poses across all 24 bot guns (full running cycles, fade in/out,
+  and looking 45 degrees to each side), and 12 player activation/state checks including migrated sockets and mount
+  restoration. Hand/mount errors and arm-length changes stay below 0.0001 units; the stock-pad gap stays below
+  0.001 units. Both project compilers succeed. M4/AUG stride and transition renders, a nine-weapon gallery including
+  the Vepr-12, and the replacement reports are in `output/third-person-sprint/revision/`; older outputs in
+  the parent folder describe the rejected pose and are not evidence for the replacement.
+
+## Third-person left hand (world models' `LeftHandIK`, players and bots)
+- `rigged_human.vanmgrph` had no IK, so the world models' `LeftHandIK` points did nothing. The left hand followed the
+  rifle clip and missed short handguards (the user saw bots' hands off the Kastov-74u). The graph now ends in a
+  two-bone IK on the left arm (`ik.hand_left.enabled/position/rotation`, faded over 0.3 s). Its chain, `left_arm_IK`,
+  comes into the three player vmdls from `models/player/prefabs_v2/prefab_ikdata.vmdl_prefab`. The chain's default
+  target bone has to exist (`l_hand`).
+- The IK matches the target's rotation. `LeftHandIK` is where the wrist (the `l_hand` bone) goes and how the hand
+  turns, in world-model space: position alone left the hand hanging under the handguard. Players get it through
+  `Equipment.UpdateIkHands` (the body's AnimationHelpers), and bots through `LightweightCombatBot.UpdateLeftHandIk`.
+  Players turn it off for the whole reload, so the reload clip can take the hand to the magazine. Bots turn it off only
+  while that clip plays (1.67 s, `ReloadClipSeconds`): their reloads run 1.7-8 s, and for the rest of one the hand hung
+  off the gun (the user saw bots' front hands off their guns, 2026-09-29).
+- Every long gun but the AUG (below) uses the same rotation (`-0.6308,0.3714,-0.448,0.5133`): the rifle clip's
+  cupped hand, turned 20 degrees so the fingers wrap the handguard's right side. The wrist sits:
+  - 3.5 left of the handguard's right side;
+  - 1.19 under its bottom;
+  - about 3.9 behind where the index finger should reach.
+- The Kastov family's points come from `kastov_prefabs.py` (`world_left_hand`, `WORLD_LEFT_HAND_ROTATION`).
+- The Steyr AUG's left hand holds its vertical foregrip, not a handguard, so it has its own rotation
+  (`Prefabs.world_left_hand_rotation`, `0.0176,-0.1819,-0.0435,0.9822`) at `0.25,1.56,0.01`. Both come from fitting
+  the player's hand (the wrist, four knuckles and the thumb's base, in the rifle clip) onto the first-person hand on
+  the grip, then 1 further back, so the clip's curled fingers wrap the grip's front. With the shared rotation (at
+  `1.2,2.6,1.6`) the hand held the barrel. Checked 2026-09-28 in offscreen renders of both teams' models: the IK
+  reaches the point exactly, the fingers round the grip's front and the thumb round its back. Not checked in a match.
+- Checked 2026-09-27 in offscreen renders of both teams' models holding all eleven long guns (the Spaghelli in its
+  Shotgun hold type), but not in a match. The Vepr-12 came later: its point (`6.9,2.8,1.84`, at the handguard's front,
+  by the rules above) hasn't been rendered. It holds the Rifle hold type. Nor has the M16A4's (`5.7,2.19,2.68`, the
+  middle of the handguard, where the first-person hand holds it), the P90's (`-2.5,2.84,-1.55`, under the frame's
+  front, where the first-person hand holds it), the MP7A1's (`-0.9,2.29,2.47`, under the receiver's front, where
+  the first-person hand holds it), the Uzi's (`-0.13,2.59,1.8`, under the lower receiver's front, where the
+  first-person hand holds it), the MCX's (`4.2,2.735,2.49`, under the handguard where the first-person hand holds
+  it, by the rules above), the L85A2's (`-0.62,1.76,1.33`, where the first-person hand holds the handguard), the
+  HK416's (`4.97,2.47,2.57`, where the first-person hand holds the handguard, by the rules above), the AK-12's
+  (`6.9,2.55,2.23`, the same, by the rules above), which the AK-15 shares, the AK-74M's (`6.9,2.7,2.27`, the
+  same), the MCX-SPEAR's (`4.2,2.574,2.702`, where the first-person hand holds the handguard, by the rules
+  above), the M16A2's (`5.7,2.23,2.21`, on its round handguard, the same) or the RPK-16's (`6.9,2.5,2.03`, the same). The FAL's (`6.4,2.37,2.16`, where the first-person hand holds the handguard) was
+  rendered on both teams' models on 2026-09-28: the IK reaches it exactly, with the thumb along the handguard's left
+  side and the fingers round its right.
+- Pistols, knives and grenades have no `LeftHandIK`, so the IK stays off for them.
+- A fitted foregrip doesn't move the hand, so the hand and the grip overlap.
+
+## Bots aiming in (shouldered guns, `LightweightCombatBot`)
+- The citizen graph's rifle pose only carries a gun at the hip (and lowers it after 1.1 s stood still), and it has no
+  aiming clip, so bots never looked like they aimed (the user's report, 2026-09-29).
+- In a fight the host sets `IsAimingIn` (synced): from seeing an enemy until 2 s after losing sight of them, and not
+  while reloading. Every machine then shoulders the gun in `UpdateAnimation`. It doesn't while the reload clip plays
+  or when the bot moves faster than 190 u/s: at a sprint (see "Sprinting and awareness" above; its walk is under 190).
+  - The right hand's IK (`ik.hand_right.*`, `ShoulderedHandIk`) holds the gun level along the aim, with the right
+    eye (`eye_R_forward`) on its sight line.
+  - `EyeOnGun` takes that line from the model's bounds: half a unit under the top of the gun, clamped to 1.5-5 over
+    the bore. It sits `ButtToEye` (8) in front of the butt.
+  - `aim_body` goes to weight 1, and `aim_head` drops 20 degrees (`ShoulderedHeadDrop`), so the head comes down
+    onto the stock while the eyes stay on the target.
+  - The left hand follows the gun through its usual IK.
+  - A cheek weld: after animation the head cants 20 degrees, right ear down (`ShoulderedHeadCant`, `BotHeadCant`,
+    from `FinishWeaponPose`).
+    - Upright, with the right eye on the gun's centreline, the face went through the stock and the receiver. The user
+      saw a bot's nose and cheek in its FAMAS's carry handle (2026-10-12).
+    - It turns the head's bones about the line of sight through the right eye, so the eye stays on the sights and the
+      IK is unchanged. The jaw swings off the stock, and the neck turns to meet the head. The helmet and the other
+      garments merged onto the body follow it (`MergeBones`).
+    - It scales with the head drop, so it comes and goes with the shoulder. It's skipped where nobody would see it
+      (`BotSystem.ShouldShowEffect`: within 800 of the viewer, or big enough on screen).
+- `hc1_bot_grip_preview [gun] [dress] [headDrop] [buttToEye] [side] [pitch] [yaw] [speed] [crouch] [reloadTime] [cant]`
+  renders the bot's body holding each gun in its pool into `output/bot-grip/<gun>.png`: carried and shouldered, from
+  its left, front and right, then two rows of close-ups round the shouldered head.
+  - It logs how far each hand misses its IK target, where the butt sits against the right shoulder, and the face's
+    vertices inside the gun (`face inside=`). That count takes in concave spaces round the gun, such as under a carry
+    handle, so judge by the close-ups.
+  - headDrop, buttToEye, side and cant try other shouldered poses.
+  - On 2026-10-12 the dressed renders posed the clothes with the body.
+- Tuned 2026-09-29 with those renders:
+  - A longer `ButtToEye` (9, head upright) poked the stock out behind the head.
+  - A shorter one (5-7), or the gun set right of the eye, put the Kastovs' and the RPK's handguards out of the left
+    hand's reach.
+  - Now every gun's butt sits at the shoulder. The hands miss by 0.03-0.05, except the AK-105 (0.59) and the RPK
+    (0.78), whose hands still sit on the handguard.
+  - Not yet seen in a match.
+- The cant checked in the whole pool's renders on 2026-10-12, against the same renders with `cant` 0:
+  - The face's vertices inside the gun went down on every gun: the AUG from 5199 to 1386, the MP5 5468 to 1950, the
+    M4A1 3958 to 1026, the FAL 5992 to 3130, the L85A2 3990 to 662, the RPK 5233 to 2607, the HK416 2130 to 297.
+  - On the FAMAS the face sits behind and left of the carry handle's rear post. The headset's mic boom crosses the
+    post, and its ear cup rests on the stock. Some guns' receivers still touch the chin a little (the FAL's).
+  - The left hand missed by 0.00 on every gun, and the right hand by the same with the cant on and off.
+  - The right hand's IK misses by more than the tuning above found, on the AK-pattern guns most: the AK-105 4.45, the
+    AK-74M 4.54, the RPK 4.66, the FAL 3.71, the Vityaz 3.22, the 74u 3.04, the Bizon 2.97, the Kastov 762 2.63.
+    `BotWeaponPose` then fits the gun to the hand (its mount error is 0). That came from a change after 2026-09-29,
+    not the cant. Whether it shows in a match hasn't been looked at.
+  - Not yet seen in a match.
+
+## No Call of Duty names or markings
+- The user's rule (2026-09-26): nothing players see may come from Call of Duty, so the game isn't a CoD clone. That
+  means no CoD names for weapons, attachments, perks, modes, streaks or camos, and no CoD writing, numbers, logos or
+  QR codes on textures. Weapons go by their real-world names (AK-47, AKS-74U, PP-19-01 Vityaz, RPK, PP-19 Bizon,
+  AK-105, Vepr-12, M16A4, FN P90, MP7A1, Steyr AUG A3, Uzi, FN FAL, SIG Sauer M18, SIG Sauer MCX Virtus, L85A2,
+  HK416 A5, AK-12, AK-15, AK-74M, SIG Sauer MCX-SPEAR, M16A2, RPK-16) and
+  attachments by plain descriptions ("Vented Suppressor").
+- Renamed:
+  - Zombies perks: Juggernog → Iron Tonic, Speed Cola → Bolt Soda, Double Tap → Hot Shot, Quick Revive → Second Wind,
+    Stamin-Up → Fleet Foot (`ZombiesPerk`, `ZombiesBuyStation.PerkName`). Their art (`Assets/Perks/<perk>_*`,
+    `ui/zombies/perks/<perk>.png`) was redrawn with the new names.
+  - Zombies power-ups: Max Ammo → Resupply, Insta-Kill → One-Hit Kills, Double Points → Point Boost, Nuke → Clean
+    Sweep. The Mystery Box is the Weapon Crate.
+  - Multiplayer perks: Flak Jacket → Blast Vest, Ghost → Off the Grid, Lightweight → Light Load, Ninja → Soft Step,
+    Sleight of Hand → Deft Hands.
+  - Modes: Hardpoint → Hot Zone, Gunfight → 1v1 / 2v2 Skirmish. Scorestreaks are Streak Rewards (Kills or Score). The
+    Dark Matter camo is Violet Storm.
+- Stored names stay, because scenes, prefabs, cookies and saved loadouts hold them: the mode idents `hardpoint`,
+  `gunfight_1v1` and `gunfight_2v2`, the `Hardpoint*` and `Scorestreak*` classes, `UseScorestreaks`, the `Scorestreak`
+  input action (titled "Streak Reward"), the `.perk` files (perks are saved and checked by ResourceName, `HasPerk`),
+  the `weapons/kastov/...` paths and the `darkmatter` camo files. Players only ever see the new names.
+- Textures: `Tools/texture_markings/` (its README has the rules) takes the writing, numbers, logos, QR codes and labels
+  off the ripped guns' and parts' textures. `specs/*.json` lists every region it covers, and `cleaned.json` each map's
+  pixel hash before and after, so `clean.py --check` finds a map that's back to the rip's. The converters clean
+  again after a re-rip (`markings.after_rip()`). The MWII optics' decal sheets are hidden (`hidden.vmat`) and their
+  textures deleted. A new port goes through the README's steps before it ships: `after_rip()` leaves a material with
+  no spec as ripped, without a warning. The M16A4 has `specs/m16.json`, the Vepr-12 `specs/vepr12.json`, the P90
+  `specs/p90.json`, the MP7A1 `specs/mp7.json`, the AUG `specs/aug.json`, the Uzi `specs/uzi.json`, the FAL
+  `specs/fal.json`, the M18 `specs/m18.json`, the MCX `specs/mcx.json`, the L85A2 `specs/l85a2.json`, the HK416
+  `specs/hk416.json` (Ready or Not's made-up maker, HaKa, and HK's and Magpul's markings) and the AK-12
+  `specs/ak12.json` (Kalashnikov's stamps and the sights' and magazine's numbers), the AK-15 `specs/ak15.json`, and the AK-74M
+  `specs/ak74m.json` (Kalashnikov's stamps and sight numbers, and Zenit's markings on its B-13 mount), and the MCX-SPEAR
+  `specs/spear.json` (SIG's, Lancer's and Magpul's markings), the M16A2 `specs/m16a2.json` (Colt's markings), and the RPK-16 `specs/rpk16.json` (Kalashnikov's stamps and the
+  rear sight's numbers).
+- Still CoD's: the ported guns' and parts' models, animations and sounds, and the Zombies numbers (the crate's 950, the
+  perk prices, the points for kills). Only the names and markings have changed. The sounds of every ported gun but the
+  Kastov-74u have been voiced towards the real thing: shots, suppressed shots and reloads (see RPK and The ported
+  guns' sounds).
+
+## Theater (match replays: `MatchRecorder`, `TheaterController`)
+- The user asked for a Theater that doesn't lag, or else for it to be commented out and hidden. It was rewritten to
+  stay light and kept: PROFILE (Barracks) → Theater (`/theater`, `TheaterPage`) lists the replays, and WATCH REPLAY
+  sets the `theater_replay` cookie and loads `scenes/theater_playback.scene`.
+- Recording (`MatchRecorder`, a `[RequireComponent]` of `GameMode`) runs on every machine that plays a match, so each
+  player keeps their own replays. Settings → Game → Theater Recording turns it off (`GameSettings.TheaterRecording`,
+  stored inverted, on by default); it replaced the `hc1_theater_no_record` ConVar. Battle royale, Zombies, dedicated
+  servers and scenes without a MapInstance aren't recorded.
+  - Only soldiers go in: every player's and bot's renderers (body, clothes, guns), from spawn until the body is removed.
+    A living body records the anim graph parameters the game has set (playback runs them through the same graph at the
+    frame rate), and a dead one its ragdoll's key bones. The map isn't recorded: the sidecar names the MapInstances.
+  - 15 captures a second (`SampleRate`), at the end of the frame (`ISceneStage.End`). A player's body leaving its pawn,
+    and a corpse coming to rest, restart that soldier's blocks (`Restart`), so a corpse's remaining time is constants.
+  - A soldier's first capture sets up its tracks (reflection and generic recorders in the engine, the costly part), so
+    soldiers who spawn together wait (`AdmitWaiting`, 2026-10-17): each capture takes new ones, players first, each with
+    a capture of its own, while it's within 3 ms (`AdmitBudgetMicroseconds`), and always one. Those held back spawn a
+    capture or a few later in the replay, and one that dies first isn't recorded.
+  - Anim graph parameters playback can set are found once per graph (`GetGraphParameters`): finding them throws for the
+    rest, which every 2 s for every body was a source of spikes. Build codes are worked out once a capture per gun,
+    no longer, since nothing announces a build changing (a level-up, a camo colour).
+  - It stops 3 s after the end-of-match screen or the map vote (30 minutes at most, or when the scene unloads), and
+    under 20 s isn't saved. The log line "Theater: stopped after ..., N captures, X us on average, Y us at most" is the
+    recorder's own cost.
+  - Saving is one job on a worker thread (`MatchRecorder.Write`), never the main thread (it used to fall back to the
+    main thread when the worker task was cancelled, which also happens when play stops). `TheaterReplays.WriteClip`
+    serialises each life as a clip of its own through one reused `Utf8JsonWriter`, and `TheaterClipJson` lays its entry
+    into the file's Tracks, so the whole clip is never one string (a 141 MB file was 282 MB in UTF-16). It also puts back
+    what .NET's default encoder escapes and the engine's `Json.Serialize` doesn't ('+' in the base64 samples, quotes), so
+    the file is byte for byte what `Json.Serialize` wrote; names with letters outside ASCII stay escaped (the same JSON).
+    A clip not laid out as expected is written whole instead. Pruning runs on the worker too.
+    - `dotnet run --project Tools/TheaterJsonChecks` checks the splicing against .NET's serializer with the engine's
+      options (300 random clips byte for byte, Unicode, 600 lives, line feeds, bad layouts). In the editor,
+      `Sources/Theater/editor/check-writeclip.cs.txt` (run_csharp) compares `WriteClip` with `Json.Serialize` on a saved
+      replay, with times and allocations. Not run yet (2026-10-17).
+  - Each living soldier's actions, for the first-person gun (`TheaterReplays.Actions`, `CaptureActions`), at each
+    capture: what's in their hands (a player's `CurrentEquipment`, each time it changes, with its build code from
+    `ExportWeaponBuildCode`; a bot's `WeaponResource`), and when they start and stop aiming (the "aiming" tag, a bot's
+    `IsAimingIn`), sprinting (players only), reloading (`Reloadable.IsReloading`, a bot's `IsReloading`) and running
+    dry. All of it is state every machine is sent. Shots come from the shot effects every machine plays
+    (`MatchRecorder.NoteShot`, from `Shootable.DoShootEffects`, `Melee.DoEffects` and the bot's `DoShootEffects`),
+    with whether they were suppressed. None of it is in the clip: the viewmodel isn't a soldier's renderer, and the
+    body graph's `b_attack` and `b_reload` triggers are spent by the end of the frame.
+  - The recorded build is the one the gun is drawn with on the recording machine (`Equipment.FitHolderBuild`): its own
+    player's saved build, anyone else's shared one (`HolderBuild`), as it was when they drew the gun. Bots' guns have
+    none. Before 2026-10-25 every player's gun wore the recording machine's saved build, and so did the replay's.
+- Files (`TheaterReplays`), in the data folder: `replays/<yyyyMMdd_HHmmss>.movie` (the MovieMaker clip), `.json` (the
+  sidecar: maps, mode, date, length, who recorded it, and each life's track, name, team and spawn, death and removal
+  times) and `.actions` (the actions, by life track, with the builds listed once). The newest 20 from the last 7 days
+  are kept (`Prune`, run by the page and after each save; it also deletes `.actions` left without a `.movie`), and a
+  `.movie` with no sidecar is deleted once it's an hour old. The old Theater's `UnknownMap_*.movie` files are in the old
+  `razed` ident's data folder, not this project's (`razedtest`).
+- Playback (`TheaterController`) loads the MapInstances again (120 s timeout), parses the clip on a worker thread and
+  drives the scene's MoviePlayer itself (`IsPlaying` false, `Position` set every frame).
+  - Reading is one job on a worker thread (`TheaterReplays.ReadClip`), never the main thread. It parses the file's bytes
+    with a `Utf8JsonReader` given the engine's comment handling and depth (512), skipping a byte order mark. It used
+    `ReadAllText`, a string twice the file's size, which `Json.Deserialize` copied back to UTF-8, and fell back to
+    parsing on the main thread when the worker task was cancelled (only once play has stopped). Every saved replay
+    (11, 3-30 MB) parsed to the same JSON from bytes as from text (2026-10-17, offline).
+    `Sources/Theater/editor/check-readclip.cs.txt` (run_csharp) compares the two in the engine, with times and
+    allocations. Not run yet. The `.actions` (under 150 KB) are still read as text.
+  - Don't hand the MoviePlayer the MovieClip itself: MovieMaker evaluates every track of a clip every frame, and a long
+    match has tens of thousands. `TheaterClip` (an `IMovieClip`) lists only the lives within 0.5 s of the current time
+    (`SetTime`) and disables the objects of those it drops. `ListAllTracks` is on only while the player creates every
+    life's objects, once, on load.
+  - The anim graphs run at the replay's speed (`SceneModel.PlaybackRate`; 0 when paused, but 1 for 0.35 s after a seek
+    so the soldiers take their new poses). `ISceneStage.End` clears ragdoll bones left on a body after seeking back to
+    when it was alive, and puts each bot's gun back in its hand: bots have no bone objects, so the gun is on a
+    `WeaponHold` that `BotSystem.FollowHands` moves, and its recorded place lags the replayed hand.
+  - `TheaterOverlay` is the HUD: the followed soldier on top; the timeline (`TheaterTimeline`, with the soldier's deaths
+    marked), ±10 s skips and speeds from 0.25x to 4x below. Space pauses, F switches between following and freecam, A/D
+    change soldier, the right mouse button looks around, and the wheel sets the follow distance or the freecam speed
+    (freecam: WASD, E up, Q down, Shift fast, Alt slow). Escape leaves for the Theater page (`OnUpdate`).
+  - First person (the user asked for it): X (the spectators' Change View, `SpectatorMode`) or the HUD's button
+    switches between it and following from behind, and from freecam it follows in first person
+    (`ToggleFirstPerson`). The view is the body's "eyes" attachment, looking along the recorded `aim_body`, at the
+    player's field of view, and the soldier's renderers draw only their shadows. While they're dead it follows from
+    behind. The right mouse button and the wheel do nothing in first person.
+    - `TryGetEyes` takes the attachment in the body's space and places it with the body's transform. In world space
+      it goes by the SceneModel's transform, which trails the MoviePlayer's moves: offscreen, where nothing ticks, it
+      stayed where the body had been.
+    - Players' `aim_body` has their view's pitch; bots' may stay level.
+  - The first-person gun (`TheaterViewModel`, the user asked for it) is the held weapon's own viewmodel prefab, arms
+    and all, placed at the camera each frame, and fitted with the recorded build (`GunsmithLoadoutManager.ApplyBuild`:
+    while it fits, `_fitting` makes the loadout getters return the build's attachments, camo, finish and reticle
+    rather than the saved loadout's). `ViewModel` works without an `Equipment`: its camera setup returns early, so
+    `TheaterViewModel` sets its anim graph as `ViewModel` would from the actions and the replayed body:
+    - deploy when the replay plays through a switch, `b_deploy_skip` when a seek lands on one;
+    - `b_attack` and the muzzle flash, smoke and spent case for each shot played through (the flash and smoke rolled
+      as `DischargeEffectState` rolls them, as that isn't recorded; the gun's own fire mode, as a switch isn't);
+    - the reload (a shell at a time, timed from the gun's `Reloadable`, for a shell-by-shell one), `b_empty`, sprint
+      (a bot's from its speed over 190), jump, the walk's bob at the footsteps' pace, and the lag as the view turns;
+    - aiming: `ironsights_weight` over `AimTime`, the sights lined up as `ManualOffset` works it out for the fitted
+      optic and rail, and the field of view narrowed by the gun's `AimFovOffset` (a magnified optic's as
+      `Equipment.GetAimFovOffset`);
+    - the SCAR-H's own parameters and sprint pose (`ViewModel.IsScarH`, `ScarHAimOffset`, `ScarHSprint*`);
+    - its camera bone moves the view, scaled by the View Bob setting. Its animations run at the replay's speed.
+    - A replay recorded before the actions existed has no `.actions`: the gun is the one found in the soldier's hand
+      (its world model matched to a weapon's `WorldModelPrefab`), idle, wearing the viewer's saved build (a bot's
+      none).
+    - Not there: the crosshair and the hit markers, sounds (no replay has any), a magnified optic's picture in the lens
+      (`OpticZoom` is the live camera's), grenades' pull and throw, and the SCAR-H's slow-walk bob.
+- Not in replays: shots (bar the first-person gun's), tracers, muzzle flashes (bar the first-person gun's), impacts,
+  sounds, grenades, dropped guns, doors, the kill feed and the score. Per-slot materials (`Materials.SetOverride`:
+  camos, reticles, and parts that hide a piece of the gun, like the MP5 barrels' `HiddenWeaponMaterials`) aren't
+  recorded either, so replayed world guns have no camo and can show hidden pieces (the first-person gun is fitted
+  afresh, so it has them).
+- Checked in-game 2026-09-27: the Theater page (empty list) and the settings switch. On 2026-09-28 and 29 the user
+  recorded matches on Flatgrass and watched a replay. From the log and the files:
+  - a 15-minute TDM (182 lives) came to 36 MB, at 1.4 ms a capture on average and 57 ms at most;
+  - a 20-minute Deathmatch (1,100 lives) came to 141 MB.
+  - Other logged matches had a capture at most of 160-410 ms (2026-09-30), and 286 ms on 2026-10-17.
+- Not yet checked: playback's frame time, and first person in-game (the first-person gun compiled on 2026-09-29, and
+  needs a new match recording to show fire, reloads and aiming). The 2026-10-17 recording and loading changes compiled
+  with dotnet and hotloaded into the editor with no errors, but no match has been recorded with them and no replay
+  loaded: neither the log line's average and maximum nor a replay made or loaded with them has been seen.
+
+## Recon drone (`Tools/build_recon_drone.py`, `Tools/build_recon_tactical.py`)
+- The user asked for an extremely realistic military recon drone, made in Blender and optimised for the game
+  (2026-10-08). It's a Raven-class hand-launched small UAS after the RQ-11B's published figures and photographs, at
+  real size: 1.37 m span, 0.91 m long. It has:
+  - an olive pod with a gimballed camera ball (EO and IR windows) on a lipped collar under its nose;
+  - a parasol wing on a pylon: a flat centre panel and two outer panels at a steep dihedral, with no ailerons;
+  - a pusher motor at the pylon's rear, with its two-blade prop just behind the wing;
+  - a boom to a rudder and an elevator.
+  Its markings are its own (orange tape squares, red and green joint marks, "RZ 04172" on the fin, a label and
+  barcode on the pod): no maker's name, logo or designation.
+- It replaced the old "RAZED AER-03" model and its 49 cm handheld copy. One model serves the hand-launched Recon Drone
+  tactical (`weapons/recon_drone/`: the view model, world model and airborne prefabs, and the .equip's WorldModel) and
+  the UAV streak reward (`prefabs/scorestreaks/recon_drone.prefab`). The old materials, textures, OBJs and
+  `recon_*_handheld.vmdl`s are gone.
+- `build_recon_drone.py` (Blender 5.1: `blender -b --factory-startup --python Tools/build_recon_drone.py`) writes
+  `Assets/models/recon_drone/`. Its docstring has the parts, units and axes.
+  - Every part is a loft of an analytic shape, F(a, b). Its UVs are (a, b) in the part's rectangle of one 2048 atlas,
+    so every LOD maps the same texture.
+  - Cycles bakes facts about each texel (part, position, normal, edges, noise, AO) and numpy paints the colour,
+    roughness, metalness, AO and normal maps, one material (`recon_drone.vmat`, complex.shader).
+  - The finished maps are bled into the gaps between the UV islands. Unbled, the gaps were black, and the poles'
+    sliver triangles drew black streaks on the nose cap and the pod's tail.
+  - Stages: `DRONE_STAGES` (geometry, preview, bake, textures, export, beauty; default all), `DRONE_TEX` and
+    `PREVIEW_DIR` (renders go outside the project by default). The bake isn't kept between Blender runs, so textures
+    need geometry and bake in the same run. A full run takes about 2 minutes.
+  - The body's three LODs are 3886, 1228 and 418 triangles, the prop's two 420 and 96. `asset-info.json` has each
+    LOD's count and bounds, and the prop's hub.
+  - The prop is `recon_propeller.vmdl`, with its origin on its hub, so the game can spin it about x
+    (`Rotation.FromRoll`). Every prefab puts it at the hub, `-5.512,0,2.283` in the drone's space.
+- `build_recon_tactical.py` writes the tactical's four prefabs, its .equip and its icon:
+  - The hand holds the pod's belly under the wing, `GRIP` (3.9 forward, 2.3 under the origin):
+    `ThrowableViewModelGrip`'s ItemCenterHeight -2.3 and ItemOffset `-3.9,0,0`, and the world model's root at
+    `-3.9,0,2.3`.
+  - The icon (`ui/weapons/recon_drone.svg`) is the aircraft from above, nose up, at 153 px a metre, in the same
+    viewBox as before.
+- At real size the streak drone, orbiting 1400 out at 1800 up (`ReconDroneVisual`), is a speck, as a real one is.
+- Checked: Blender renders, and offscreen renders of the compiled model in the editor (2026-10-08). The editor compiled
+  the vmdls and the vmat with no errors, and the compiled model's bounds match the export. Not checked in-game: the
+  first-person hold (at real size the wing may fill the bottom fifth of the screen), the third-person hold and the
+  flight.
+
+## Recon octocopter (`ReconOctocopter`, flown from a tablet)
+- The user sent a photo of a soldier with a big grey coaxial multirotor and asked for a recon drone "where u fly from a
+  tablet too tho like a normal recon drone" (2026-10-08). It's the Recon Octocopter, a Tactical (Price 750) beside the
+  hand-launched Recon Drone.
+  - The aircraft is the photo's kind, Inspired Flight's IF800 Tomcat (dronefly.com, volatusdrones.com,
+    advexure.com, thedronegirl.com): a coaxial X8 of ~10 kg, four arms with a pair of 26-inch props on each, the
+    upper and lower props turning opposite ways, and a zoom camera on a gimbal under the nose.
+  - The photo's "IF" lettering and round logos aren't reproduced: its markings are its own, with no maker's name.
+- `Tools/build_recon_octocopter.py` (Blender 5.1, `blender -b --factory-startup --python ...`) writes
+  `Assets/models/recon_octocopter/`. It's built like the Raven, with `build_recon_drone.py`'s helpers (lofts, baked
+  facts, numpy-painted atlases). Its docstring has the parts, axes and stages (`OCTO_STAGES`, `OCTO_TEX`,
+  `PREVIEW_DIR`).
+  - The airframe (12168, 4208 and 1492 triangles), the gimbal ball (440, 144), the props (`_prop_ccw`, `_prop_cw`:
+    990, 266) and a spinning prop's blur (`_disc`, 576).
+  - The ground station, `recon_tablet` (3634, 1062): a rugged 10.1-inch tablet between two thumbsticks, with grip
+    handles, button pads and two paddle antennas. Its screen shows a standby page drawn by the script, with no brand.
+  - `asset-info.json` has the hubs and their spin, the gimbal's pivot and lens, the skids' height and the tablet's
+    grips, in inches. The models and materials compiled in the editor on 2026-10-08.
+- `Tools/build_octocopter_equipment.py` writes `Assets/weapons/recon_octocopter/` from those figures: the airborne
+  prefab, the view model (vm_c4's arms, with `TabletViewModel`), the world model, the weapon prefab (`ReconTabletLink`
+  on Attack1), the .equip and the icon `ui/weapons/recon_octocopter.svg`, which the radar also uses. Every guid is a
+  uuid5, so a rerun writes the same files.
+- How it's flown:
+  - Attack1 with the tablet out sets the drone down ~1.8 m ahead (`ReconTabletLink.LaunchDistance`) on level ground
+    with room to climb, or shows NO ROOM TO LAUNCH. It spools up for 1.2 s, climbs to a 2.5 m hover and links.
+  - Linked, the mouse turns the camera (slowed by the zoom; the gimbal slews 180 degrees a second, pitch -20 to 90
+    down), WASD flies relative to the camera's heading, Jump climbs, Duck descends, and Duck held at the ground lands.
+    Run is sport mode. Attack1 / Attack2 or the wheel zoom.
+  - Use goes back to the body, and the drone holds where it is. Attack1 again links to it.
+  - The operator also comes back on any hurt, a flashbang that reaches them (`FlashbangGrenade`) or death. On death,
+    and with the battery empty, it lands by itself.
+- The flight (`ReconOctocopter.Fly`, `UpdateAttitude`) is position-hold, as a GPS drone's: the sticks command a
+  velocity, and the airframe tilts into the thrust that needs, drag included.
+  - 12 m/s cruise, 18 m/s sport, 7 m/s² acceleration, 5 m/s climb and 3 m/s descent, at most 35 degrees of tilt and
+    120 m over the take-off point. Drag is ½ρCdA/m for ~0.13 m² and ~9 kg.
+  - The airframe turns after the camera at up to 120 degrees a second. It slides along what it touches, and a hit
+    over 200 u/s (`CrashSpeed`) takes integrity.
+  - The battery lasts 90 s (`BatterySeconds`). That's a game limit: the real aircraft flies 40 minutes and more.
+- The camera: 62 degrees wide at 1x, zoom 1x, 2x, 4x, 8x, 16x and 30x.
+  - The host scans its picture twice a second. A living enemy in frame, unhidden, and within `SpotRange` x the zoom is
+    marked for the operator's team on the radar and as a marker, and stays marked a second after it's last seen
+    (`Reveals`, read by `PlayerMarker`, the bots' radar icon). Off the Grid hides from it.
+  - `SpotRange` 3600 (~92 m) at 1x is the Johnson criterion: 6 line pairs across a person on a 1080p sensor at 62
+    degrees.
+- The operator stays in their body and keeps it possessed. `Link()` makes a feed camera on the drone (IsMainCamera,
+  Priority 50, the body camera's post-processing copied) and turns off only the body's camera component.
+  - The body's AudioListener stays on, so they hear the world from where they stand, as a real ground station's feed
+    has no sound.
+  - The body stands or crouches where it was (`PlayerPawn.IsPilotingDrone` stops the movement, use, inventory and ping
+    input) and can be shot. Their legs-only body is off: from up there they're seen whole.
+  - The drone itself isn't drawn in its own feed (2026-10-09). The pilot's machine owns it and tags it `own_drone` while
+    the feed is up, which the feed camera leaves out. Other players still see it, and it still casts its shadow.
+    - The user saw something "clipping" while flying it. The lens hangs under the nose, inside the rotors' reach. Counted
+      from the OBJs: tilted 20-35 degrees into a flight, the front props come into the 62-degree picture 7" from the
+      lens. With the camera turned faster than the airframe follows (120 degrees a second), or looking back, the arms and
+      the props fill it. Tilted with the camera looking up, the nose is 0.8" from the lens, through the near plane (1).
+    - Built with dotnet. Not yet seen in-game.
+  - MainHUD hides its HUD, markers, minimap and round strip, and `ReconOctocopterFeed` draws the feed's display: the link and
+    recording, battery, heading tape, altitude, speed, distance, tilt, field of view, a box on each contact, zoom steps,
+    warnings and key hints. Holding the tablet unlinked, it says what Attack1 does. Its 22 texts are in all ten tables.
+- Damage (host): 60 integrity (`MaxIntegrity`), from bullets and blasts through `IDamageable`. The operator's teammates
+  can't hurt it; the operator can. Destroyed, it throws sparks, falls tumbling and lies as a wreck for 15 s.
+  - One drone a station: when it's destroyed, or lands with an empty battery or no operator, the tablet is taken out
+    of the operator's inventory. A new launch retires an operator's last drone.
+  - It goes at the round's cleanup and at a score reset.
+- Every machine spins its rotors (`ReconRotor`) and plays their sound.
+  - The hub (`recon_octocopter_hub`) looks the same turning, so it's always drawn. The blades are drawn under `BlurRpm`
+    (240) and a flat disc over it.
+  - The user found the disc "a fake white ring" (2026-10-09). It was a texture of each radius's blade share, with a
+    bright ring where the tips' white stripes were. The stripes are gone from the blades and the disc's textures with
+    them.
+  - The disc's look is worked out by `shaders/hc1_rotor_blur.shader` from the prop's real chord, twist and sweep: each
+    point darkened by the share of the time a blade covers it, seen edge-on or face-on. While the eye can still follow
+    the blades, each leaves a fading trail (ω x 0.025 s, `Persistence`). They fuse into an even, faintly see-through
+    disc between 20 and 50 blade passes a second (at hover's 2,900 rpm they pass 97 times). `ReconRotor` sets its
+    `RotorSpin`, `RotorTrail` and `RotorFusion` each frame, and the shader takes where the blades are from the disc,
+    which turns with the rotor.
+  - Written with the editor closed: the shader, the hub and the new props haven't compiled, and none of it has been
+    seen. If the disc draws as an error, check the editor's log for the shader.
+- The rotor sound (`Tools/octocopter_sounds.py`, `sounds/drones/octocopter_rotors`): an 8 s loop at hover, synthesised
+  from how a coaxial multirotor makes its noise. Its docstring has every layer and why.
+  - The blade-pass tone (96.7 Hz at 2,900 rpm) and its harmonics, the lower props harsher. The pairs' crossing tone
+    at twice that. Broadband swelling at the blade-pass rate. The motors' 676 and 1,352 Hz.
+  - Each prop is trimmed ~1% apart and wanders ~0.4%, so the tones beat. Every frequency is a whole number of cycles in
+    the loop, so it has no seam.
+  - ~70 dB(A) at 10 m, so ~80 at 3 m, squeezed like the rest of the mix: 7.5 dB over the walk on concrete at 120
+    units, heard to 6000 (152 m). `UpdateSound` plays it at the rotors' speed over hover (0.3-1.4) and its cube for
+    the volume. `--preview <wav>` plays a flight.
+- Game limits besides the battery:
+  - The play area (`PlayArea`, Return to the AO) isn't applied to the drone, only to the body.
+  - Bots don't shoot at drones.
+  - What goes by `Scene.Camera` goes by the feed camera while it's linked: the bots' level of detail (`BotSystem`),
+    a blast's near or far sound (`BlastSound`, though it's heard from the body) and Reef Hall's fish. Screen shakes
+    don't reach the feed (it has no `ScreenShaker`).
+- Made offline on 2026-10-08 with the editor closed after the models compiled. The code built with dotnet (0 errors),
+  but the prefabs, the .equip, the sound and the code haven't loaded in the editor. On 2026-10-09 the user flew it in
+  a match (its spinning props and the clipping above are theirs). Not yet checked otherwise:
+  the tablet's first-person and third-person holds (`TabletViewModel.HoldPosition`, `HoldPitch`, `WristOffset` and the
+  world model's grip are first guesses), the flight, the feed's display, spotting, damage and the sound.
+
+## Nano Drone (`Tools/build_recon_nano.py`, `Tools/build_nano_equipment.py`)
+- Added 2026-10-10, continuing the user's tiny helicopter scout request. Generic markings, no manufacturer's branding.
+  `Assets/weapons/recon_nano/recon_nano.equip` is a purchasable Tactical item (500). The normal class/loadout picker
+  discovers it. In a locally hosted match, `dev_give recon_nano` gives and equips its recon tablet.
+- Primary fire releases it from the right hand, then opens its feed after 0.65 s. `ReconTabletLink.HandLaunch` uses
+  the current eye position and aim, including crouch/prone. It sweeps the whole aircraft from the hand to the release
+  and checks overhead clearance. It needs no level ground or octocopter-sized pad. A blocked launch keeps the station.
+  `TabletViewModel` briefly lifts the right hand off the tablet for the release.
+- `ReconOctocopter` flies both aircraft. The nano prefab sets its camera/flight/damage values; the octocopter keeps
+  its original defaults. Main and tail `ReconRotor` components turn inside fixed mounts, with the tail's local Z
+  pointing along the aircraft's -Y. Main hover RPM 4800; tail 4.2 times faster. Both use the existing analytic rotor
+  blur at their own radius (`RotorScale`, no folding yoke).
+- Geometry: a roughly 250 mm dark composite helicopter, a 190 mm main rotor, slender boom, tail fin/tailplane,
+  36 mm tail rotor and stabilised nose camera with two sensor windows. Solid parts share a 1024 px baked PBR atlas.
+  Body, camera, two props, two hubs and two discs are separate OBJ/ModelDoc models with LODs. Modelling is metres,
+  X forward/Y left/Z up; export is inches in ModelDoc's OBJ Y-up convention. `asset-info.json` gives their transforms.
+- Flight: cruise 6 m/s, sport 10 m/s, acceleration 4 m/s², climb 2 m/s, descent 1.5 m/s, 28° tilt, 60 m ceiling above
+  release and 120 s battery. These are game settings. It has 10 integrity; a bullet or a hard impact can destroy it.
+  The flight box includes every rotating rotor tip and the tail. `ReconFlightMath.RotatedHull` encloses it at the
+  actual yaw/tilt. Turning into a wall is refused, and a hull that starts inside a solid does not tunnel through it.
+- Tablet: WASD moves relative to camera yaw, mouse aims, Jump/Duck climb/descend, Run uses sport speed, wheel or
+  primary/secondary fire steps 1x/2x/4x zoom, Use returns to the body. Primary fire on its tablet reconnects to the
+  same aircraft. The body stays vulnerable and hears sound from its own position. Spotting, team contacts, landing,
+  loss of the operator, battery retirement and round cleanup use the existing recon controller. Only the matching
+  aircraft's station resource is removed when it is lost. Its minimap uses the helicopter icon.
+- Sound: `Tools/nano_sounds.py` synthesises an original 8 s loop, main blade-pass 160 Hz and tail 672 Hz. The quiet
+  level is baked into the PCM, with event volume 1, so the flight's volume control preserves it. It is 15 dB below
+  the octocopter mix at its reference distance, with attenuation to 18 m, pitch/thrust from flight and
+  a small occlusion radius. `.wav.meta` enables looping. No sampled manufacturer audio.
+- Rebuild with background Blender 5.1 (`--factory-startup`); the builder refuses an existing open file. It loads the
+  octocopter's mesh/bake/export helpers into a private module and changes no octocopter assets. Then run
+  `Tools/nano_sounds.py` and `Tools/build_nano_equipment.py` with Python. The equipment script shares the existing
+  tablet/arms, remaps every copied prefab ID and writes stable import IDs while preserving existing ones.
+- Offline validation: `Tools/check_recon_nano.py` checks meshes/UVs/normals, all model and prefab references (including
+  the installed SDK cache for the human arms), full rotor sweeps within the collision hull, textures, audio, metadata
+  and equipment wiring. `Tools/ReconChecks/ReconChecks.csproj` links the actual C# helper and installed s&box math
+  types to test optics, rotated bounds and standing/crouching/prone/pitched-view release positions. The game C#
+  project builds with zero errors. Previews are in `output/recon-nano/`.
+- Made with no MCP or editor. When the editor next opened (2026-10-12) it compiled the models, materials, textures,
+  prefabs, the .equip and the sound, each leaving a compiled file. Nothing has been seen in-game: the flight, the hand
+  release, the rotor blur at its size, the sound and network play.
+
+## Campaign robot (`Tools/build_campaign_robot.py`)
+- The user asked for a humanoid robot for the campaign, made in Blender (2026-09-28). The script builds it in Blender
+  5.1 and writes everything to `Assets/models/campaign/robot/`:
+  - `combat_robot.fbx` and `.vmdl`: one mesh of rigid armour parts;
+  - the paint, `combat_robot.vmat` and `combat_robot_light.vmat`, and the self-lit optics, `combat_robot_glow.vmat`,
+    `_glow_amber` and `_glow_cyan`;
+  - one 2048 texture atlas: a `_color` map per paint scheme, and shared `_rough`, `_metal`, `_ao` and `_normal`
+    (OpenGL normals, as s&box reads them);
+  - `combat_robot_hitboxes.vmdl_prefab` and `combat_robot_physics_shapes.vmdl_prefab`, metal copies of the soldiers'
+    (below);
+  - `combat_robot.blend`, a copy of the build scene.
+- The skeleton is the CT soldier's (`ct_side_player_01_V2.fbx`, rigged_human), exported unchanged. So the vmdl takes the
+  soldiers' animation list, weight lists, ragdoll joints, game data, IK and attachments from
+  `models/player/prefabs_v2/`, and `rigged_human.vanmgrph`. Every part is rigid on one bone. ModelDoc drops bones with
+  no skinned vertices, so there's geometry on exactly the 72 bones the soldier keeps (`KEEP_BONES`).
+- The hitboxes and ragdoll shapes are the soldiers' with the `metal` surface instead of `flesh`. A shot's impact effect
+  and sound come from the surface it hits (`Shootable.CreateImpactEffects`, `GetImpactSurface`), so on flesh the robot
+  bled. Metal is three times as dense (2700 against 900), so the corpse is three times as heavy and the death impulse
+  (`OnKill`) gives it a third of the speed.
+- Material groups (`SkinnedModelRenderer.MaterialGroup`):
+  - the default: gunmetal armour, red optics;
+  - `amber` and `cyan`: the optics only;
+  - `light`: pale grey armour, dark stencils, cyan optics.
+  The markings are the robot's own: "07" and "RZ" stencils, "RZ-07" on the back, orange bands and hazard stripes.
+- Running it: `blender -b --python Tools/build_campaign_robot.py`, or in a running Blender
+  `exec(compile(open(p).read(), p, "exec"), {"__file__": p, "__name__": "__main__", ...})` with optional globals:
+  - `ROBOT_STAGES`: comma-separated, default all: `geometry`, `preview` (workbench shots), `bake`, `textures`,
+    `export`, `beauty` (Cycles renders). Later stages alone pick up the robot an earlier run left in that Blender
+    session. Baking again needs `geometry` first: export parents the mesh to the rig.
+  - `PREVIEW_DIR`: where the preview and beauty renders go. The default, `%TEMP%/combat_robot_preview`, is outside the
+    project.
+  - `ROBOT_TEX`: the atlas size (2048).
+  Geometry to export takes about 50 s in a running Blender.
+- The build empties the open .blend (`reset_scene`). It refuses unless the file is new, an earlier build (the scene's
+  `combat_robot_build` property) or `combat_robot.blend`, or `ROBOT_FORCE_RESET` is set. `bpy.data.is_dirty` can't
+  tell: scripted edits don't set it.
+- Textures: Cycles bakes facts about every texel into float images (part and surface, position, normal, the parts' own
+  UVs, noise, edges, AO, cavity), and numpy paints the atlas from them (`compose`). Scratches are plane cuts through
+  the robot (`scratch_lines`), at least a texel wide: noise ridges came out as dotted lines or wavy contours.
+- The bot: `Assets/prefabs/bots/hc1_combat_robot.prefab` is `hc1_combat_bot.prefab` with the robot's body, no
+  `MilitaryUniform`, sparks for `BloodEffect` and `BotName` "RZ-07"; the same health, gun and tuning. Its
+  `TeamBaseModels` is empty, so `ApplyTeamModel` keeps the prefab's model instead of dressing a soldier.
+  `LightweightCombatBot`'s legacy-skeleton path does the rest: the gun on `r_hand` at `HandHoldOffset`, the left
+  hand's IK on `left_arm_IK`, the ragdoll from the model. Place it in a scene, or make it a `LightweightBotManager`'s
+  `BotPrefabPath` (the manager then names each one from its soldier roster).
+- Campaign is locked in the menu (`HubModeRail`) and has no mode yet, so nothing spawns the robot.
+- Offscreen renders in the editor: textures stream in, so a render straight after loading is blurry. Call
+  `Texture.MarkUsed( 4096 )` on the materials' textures and wait a few seconds first. In a `new Scene()` that isn't
+  ticking, set a GameObject's transform before creating its components, or its SceneObjects never get it.
+- Checked 2026-09-28 in offscreen renders of an isolated scene in the editor: the model compiles, its 72 bones match
+  the soldier's, the 54 animations and the graph play, the ragdoll has 16 bodies and 15 joints, and the 21 hitboxes,
+  the four material groups and the textures work. The metal copies compile (the compiled model has `metal` and no
+  `flesh`). Not yet checked: the bot prefab in a match (spawning, fighting, the gun in its hand, dying), the metal
+  impacts and the heavier ragdoll.
+
+## Forest Base crown LODs (2026-10-20)
+- Eight fir OBJ sources installed with complete near-source needles in LOD1 and coverage-selected distant islands. Horizon A retained byte-identically after rejected candidates. No scene, modeldoc, texture or collision changes.
+- Source/audits/limits: Tools/FORESTBASE.md and output/forestbase/crown-integration.json. Source geometry savings are not measured GPU/FPS savings. Current native acceptance and full reference fidelity remain unfinished.
+
+## Native HC1 reconnection (2026-10-20)
+- The running 26.10.02 engine verified this task's reachable root as `C:\Users\mimi-\OneDrive\Dokumente\S&box Projects\hc1`; the documented C:\sbox-projects checkout is absent on this host. Do not infer another checkout. Native MCP is advertised at http://127.0.0.1:7269/mcp in the engine log. No sbox-cli is installed under the registered FACEPUNCH_ENGINE or PATH here.
+- Fixed 40 Bridge editor compiler errors from newer helper files expecting missing shared methods: `ClaudeBridge.Compatibility.cs` supplies the contracts; the existing version/error detector are exposed to the same assembly. Native compile after restart passed: 0 errors, 12 Bridge warnings, 68 game warnings, 4 game-editor warnings.
+- Initial hotload failed loading a stale game assembly. Subsequent startup hit locked existing compiled shader files (3dscope, then hc1water). With the process confirmed closed and no unsaved scene, compiled project shader caches were moved to recoverable backups, never source shaders. Startup rebuilt 94 shader binaries, including all 16 Forest Base shaders. This is output-file evidence, not visual/performance acceptance.
+- Startup continues rebuilding dependent resources for other maps and has not yet reached current-map visual acceptance. Diagnostics/backups: `output/forestbase/editor-reconnect-20261020/`; current evidence: `output/forestbase/native-current-20261020/`. Do not launch another editor over an in-progress initialization.
+
+## Forest Base current native checks (2026-10-20)
+- Native editor restored and current code compiles with 0 errors. The rock shader needed an explicit reload after startup to remove cached error rendering. All 18 main/fir models report current imports.
+- Fixed command service cargo overlapping the east entrance stair: center (600,480)→(600,250), five box origins move, 84,068 Logistics triangles/96 boxes/four hulls preserved. Only Logistics OBJ/ModelDoc change; scene/layout unchanged. Native 24 paths, 22 stair directions, 32 spawn checks, six boundary probes, four vehicle rays and 112 sampled spawn rays now pass.
+- The raster adds 210 separate stair-clearance samples; retain interior-tread connectivity false negatives as diagnostics, and use the native controller for actual traversal.
+- Current 1080p offline TDM with 13 bots/one player is NOT a performance pass: ~619 ms instantaneous frame time with repeated special-dependency recompiles and visible equipment shader errors. Source references and materials such as scout_reticle remain out-of-date even after successful forced compilation. Resolve the dependency loop before clean benchmarking. No 600-frame or remote-client acceptance.
+- Editor left stopped on a visible clean Forest Base tab; test camera/window/damage protection removed. Data: output/forestbase/stair-clearance-integration.json and native-current-20261020/. Full reference fidelity remains unfinished; continue native investigation and visual work, not another unlimited offline-only pass.
+
+
+### Forest Base shader follow-up — 2026-10-20
+- Native forced builds did not clear special-dependency mismatches in the original process; an identical fresh-name control material was current. A clean restart with compiled shaders present made the original optic reticle, Forest grass, rock and waterfall materials current. Material sources were unchanged. This supports stale process state; the exact native cache is unproven.
+- The editor subsequently crashed four times with native access violation c0000005. The inspected minidump points to rendersystemvulkan.dll +0x25c6ab. Waiting for bootstrap, empty tabs, Forest Base alone and -vulkan_disable_pipeline_cache did not establish a stable editor. Missing other-map source textures are logged; causality is unproven. Do not repeat blind restarts or claim a fresh FPS test.
+- bridge_compile_shader/bridge_shader_compile_status now expose native Success/Skipped/byte/program counts and running/terminal state; bridge_shader_diagnostics checks actual loaded shader/schema. Native C# compilation passed with zero errors. No arbitrary C# evaluator was added.
+- Probe Assets files were archived, original scene-tab preferences restored, saved Forest Base SHA remains 1b102b227cb555d661aa7adac7e5d7b962040147e4ac80022ecaad1da869c2b5. Waterfall ribbons candidate is staged only, not installed or visually accepted.
+- Evidence: output/forestbase/dependency-repair-20261020/investigation-status.json and Tools/FORESTBASE.md. Installed engine 26.10.02; asked user to check a Steam update after verifying newer official release notes. No engine update has been installed or promised as a fix.
+
+
+### Forest Base native game comparison and source install — 2026-10-20
+- Correction: installed CLI exists at <FACEPUNCH_ENGINE>/bin/managed/sbox-cli.exe; read --skill sbox-cli. Temporary bridge shader-build tools were archived and removed. Use native run_csharp exchange scripts for uncovered operations.
+- Executables changed at 04:23 UTC; native CLI game PID 33040 reported 26.10.13a. Root .version remains stale 26.10.02. Use instance_status for current running version. The previous four editor crashes were before this newer executable was used.
+- A stable CLI-owned local game inspected the actual Forest Base visual groups (629 models, zero model errors) using the real camera Sandbox profile at 1080p, no lobby/actors/bots. Native waterfall, overview and entrance comparisons accepted separated water ribbons plus six map-only sun/sky/fog values. Original materials, textures and all geometry/collision preserved. Source changes installed; updated editor PID 5092 is starting for installed verification.
+- Tools/forestbase_map.py matches the six lighting fields; forestbase_flow_motion_audit.py accepts actual camera manifests/regions and records image hashes. All 28 protected core and 85 protected material/texture source hashes pass. See output/forestbase/native-waterfall-ribbons-20261020 and Tools/FORESTBASE.md. Isolated 11.78 ms frame /11.23 ms GPU sample has no actors; do not report it as match FPS. Full objective remains incomplete.
+
+
+### Forest Base project relocation and verified continuation — 2026-10-20
+- User confirmed current root: C:/Users/mimi-/Documents/S&box Projects/hc1. The former OneDrive folder contained remaining pieces of an incomplete move. Copied 16,071 missing files (5,437,651,470 bytes), using exclusive creation and retaining originals; no existing destination file was overwritten. All 375 copied Code/Library files match SHA-256; 28 protected Forest core hashes match. Evidence: output/forestbase/project-relocation-20261020/.
+- Steam was stopped; started it with -silent. Native editor PID 29888 reports 26.10.13a, correct new root, current Forest Base tab, stopped play, no dirty scene, and successful compilers with zero errors. The failed pre-copy launch's 1,273 cascading diagnostics are historical. Do not recreate missing classes: original sources were recovered.
+- The moved files were not all indexed as local source/compiled pairs. Registered 838 supported Forest assets; then registered grass/default texture dependencies and rebuilt forest_grass/shore_grass. The two captured overview passes show the red grass error disappearing. A broad all-Assets registration exceeded its CLI timeout and is NOT claimed complete. Use targeted dependencies and inspect state before retrying timed-out changes.
+- Installed shader-only wet-ground revision: localized puddles, rough aggregate between pools, less extreme smoothing/blackening. Native watcher compiled ten variants in 4.65 seconds. Fixed-pose native entrance/overview comparisons and an actual TDM player view verified the installed shader. No map geometry, collision, material or texture source changes in this revision. See output/forestbase/ground-patches-integration.json.
+- First 600-frame native offline TDM sample at confirmed 1920x1080, fixed entrance view: one player + nine bots during both measured windows; 16.675 ms mean engine frame cadence (~60), p99 20.35 ms, max 36.17 ms, one >33.3 ms. Native GPU counter averaged 26.11 ms; target 90 FPS was not met. CPU/GPU counters are recorded separately, not added or converted into a claimed GPU frame rate. This single-view editor test is not a multi-view, remote-client or full performance acceptance.
+- Console still reports missing first-person shirt/glove PNG source paths; equipment appearance and those dependencies remain to investigate. No repeated special-dependency messages were in the queried runtime buffer. NoDamage and temporary viewport were restored; editor remains stopped on clean Forest Base. Full reference fidelity, forest/prop/facade quality, broad movement/escape coverage and optimization remain unfinished.
+
+
+### Forest Base roof finishes — 2026-10-20
+- Current confirmed project remains C:/Users/mimi-/Documents/S&box Projects/hc1. The active native editor is PID 32080, 26.10.13a, stopped on clean Forest Base; all C# compilers report success/zero errors. It was launched with Windows Start-Process. Do not restart a live editor merely because its attached CLI's startup wait elapsed.
+- Barracks and Command now use a flat asphalt/bitumen PBR roof surface, welded lap seams, folded edge caps and screened corner drains. Existing HVAC cover has service doors, latches, condenser fins and attached conduits. Both sheds retain corrugated roofs. Broader, slightly raised seams replaced a first native pass that shimmered.
+- Source: Tools/forestbase_rooftops.py, hooks/material mapping in forestbase_map.py, new materials/forestbase/roof_deck.vmat, two OBJ/MTL/ModelDoc sets. Both models and the material are natively compiled/current. Exact serialized PhysicsShapeList tails are unchanged, as are the saved scene and unrelated protected model sources. Existing material slot counts stay 23/20. Added geometry: 1,816 Barracks +1,852 Command triangles. No new texture sources or scene objects.
+- Accepted native evidence: output/forestbase/rooftops-integration.json and rooftops-stage-20261020/final-*.png, including the close roof view. The isolated full-map visual scene has 629 models and zero model errors. This is not a new match-performance or remote-client result; the earlier 600-frame sample predates the roof revision. Full forest/props/facade/reference quality and complete gameplay/performance acceptance remain unfinished.
+
+
+### Forest Base native forest grounding — 2026-10-20
+- Confirmed Documents HC1 project, editor PID 32080 / 26.10.13a. Corrected eight tree roots buried beneath the visible Vista rock escarpment and relocated eight existing far-north infill trees onto native-surveyed bare eastern soil. Retained all original crown scales/rotations. Six moved trees use the existing far variant at their new distance; no new renderer or texture files. Global wider/shorter proportions were previewed and rejected.
+- Applied in the live editor, explicitly marked the session dirty, and saved with native save_scene. Current scene SHA-256: 2b9ae5afae174ad7b02be33e6ebc7b783abe14249313e7aae1d5f84584a05796. Native save adds defaults, asset Path/Id records and component migrations; an engine-normalized baseline comparison proves all other scene content unchanged (752 serialized nodes, 525 trees). All 16 roots hit native visible ground and sit four inches below it.
+- Tools/forestbase_forest.py applies Tools/forestbase_grounded_trees.json after floor fitting, guarded by expected original positions; generator parity passes for all 525 trees (maximum coordinate error 0.007286 inches). Re-survey after landscape geometry changes. Stage audit requires SciPy; current bundled Python lacks it, so dependency is installed outside the project at C:/Users/mimi-/.codex/tmp/hc1-python-deps (PYTHONPATH).
+- Native saved-source views: forest-proportions-stage-20261020/final-{compound,waterfall,entrance}.png, 629 models, zero model errors. C# successful/zero errors, stopped clean scene. Evidence: output/forestbase/forest-grounding-integration.json. Maximum declared triangle delta from six existing model-variant changes: 61544; no new match performance claim. Full reference fidelity, movement/escape coverage and multi-view/remote-client acceptance remain unfinished.
+
+
+### Forest Base flood lighting and fixture aim — 2026-10-20
+- Native source scene d53d6691a8fdf850c4f88d2c4aca0b4190315ab4a946203e6616ea4beb2db13b in the confirmed Documents HC1 project. Eleven existing flood heads/light directions now point down 40 degrees (was 58), radius 950in (was 760), with spot RGB x1.8 and point RGB x1.15. Reduced cool daylight/sky fill/tint and darker fog color make the existing warm floor pools more visible; fog distances/density, light counts and shadow settings are unchanged.
+- Only source assets changed: ground.obj and Forest Base scene; generator forestbase_map.py matches all 36 light colors and eleven flood poses. Exactly 39 scene nodes changed; all other scene content matches. Ground topology/material slots stay unchanged (10,052 triangles, 14 collision boxes, 6 hulls), exact serialized PhysicsShapeList preserved. Only vertices, face normals and world-projected UVs within 70in of existing lamp heads differ. Ground imported/current with no reported compile failure; the explicit asset_compile observation timed out, so current asset_info and loaded model were inspected instead of blindly recompiling.
+- Native saved-source overview/entrance/waterfall and near fixture/interior views have 629 model renderers and zero model errors. Offline native TDM loads at actual 1920x1080, one PlayerPawn + nine lightweight bots, 719 models, zero model errors. This is a load/render check, not a performance acceptance. Evidence: output/forestbase/flood-lighting-integration.json; flood-lighting-stage-20261020/final-*.png and tdm-entrance-1080p.png.
+- New FPS sampling could not be validated: Vulkan repeatedly reports no swapchain image/present/fence waits. perf_overview has only 2–3 frames and zero-second timing windows, so its counters are invalid for map FPS. Existing measurement window was shown/active and resized/restored; editor was not restarted. All temporary runtime settings were restored, viewport/camera removed, play stopped, clean scene, C# compile success/zero errors. The earlier 600-frame sample predates current roofs/forest/lighting and is not current acceptance.
+- Generic foliage shader candidate was previewed with real twig alpha/PBR inputs but thinned aggregate crowns; rejected and deleted via native Asset.Delete after archiving. Original tree materials remain installed. Full reference fidelity, prop/console finish, exhaustive movement/escape coverage, valid multi-view performance and remote-client checks remain unfinished.
+
+
+### Forest Base waterfall shore and spray — 2026-10-20
+- Current scene SHA-256 8cbf8990611f17e70814d43f5a6d0ea931509b145367c668420813228dc05f52; confirmed Documents HC1 root, editor PID 32080 / 26.10.13a, clean/stopped with successful C# compile and zero errors. Native Vista and shore_bank imports report current/no failures.
+- Corrected the exposed rectangular front rim: widened the nonplayable pool-bank opening from plan E[-220,1080], N[2850,4150] to E[-420,1280], N[2650,4150]. The outer slope meets the forest floor tangentially; its scan UVs and dry soil color now continue across the join. Inner bank follows the shared unchanged water-mesh contour (86% inset), with cubic easing that covers the water polygon edge. Source coverage passes at 96 edge samples, minimum bank-over-water edge height 6.791 inches. The opaque water mesh itself, falling sheets and all other 17 material geometry groups are unchanged.
+- Rebuilt existing shore stones on the revised slope and adjusted 24 existing shore grass transforms. All other 752-node scene content is identical to the native saved baseline. Native ground traces hit for all 24 grass roots, burial 1.057..2.340 inches. Fresh generator parity passes all 620 scenery instances (max 0.007286 inches). Tree count remains 525. Vista now 111,666 triangles (48 fewer), 21 material slots, no collision; ModelDoc and material table unchanged. No new renderer or texture sources.
+- Existing mist shader now advects distinct detail phases, retains low-density wisps, and uses the engine sprite-style depth feather at rock/water intersections. Native isolated valid-material probe confirms animation and softer intersections; initial empty-material checker probe was rejected. No fluid-simulation claim. Mist shader SHA-256 82cecf64a9770d0df4b494a7b401585468d3c7bae1b54281c5fa8449ccfeeba1. Falling-water shader remains 4a234f051858bcd9fb7c486e192a117b16fe0faa4b9cc63ac656344c676bed46.
+- Evidence: output/forestbase/impact-mist-integration.json, impact-mist-stage-20261020/installed-audit.json and final-{front,basin,basin-side,compound,waterfall,entrance}.png. The source group patch avoided re-exporting the distant cliff after each bank iteration; patch-shore.py checks 96 actual water-edge points. Final source model/scene is actually installed and rendered (629 models, zero model errors), with no preview transform/material overrides.
+- Full AAA/reference finish, complete movement/escape/perch tests, current valid multi-view match performance and remote-client acceptance remain unfinished. No new FPS result: the previous native Vulkan presentation stall is still an open diagnostic, and was not restarted or relabeled as map performance in this pass.
+
+
+### Forest Base lower closure and unstuck guard — 2026-10-20
+- Confirmed Documents HC1 root, native editor PID 32080 / 26.10.13a, stopped/clean with all compilers successful and zero errors. Saved scene SHA-256 c50bc70cbf3154287b6e5ee821bb719672c16ff0286573536bb6a70591c0d3d2. Eight existing walls extended to -1088in and two lower caps added at [-1120,-1024]; 64in wall overlap and 20in main/entrance overlap. Original nine IDs, XY footprint and ceiling preserved. Scene diff contains only 16 wall fields and two new clip objects; all visuals/spawns unchanged, 754 objects/629 renderers. Generator and exact source-partition audit updated.
+- Actual CharacterController recovery previously escaped in 11/32 forced wall overlaps and all 32 forced ceiling overlaps. The shared controller now rejects free unstuck destinations whose root ray crosses playerclip from the last known clear root, honoring original ignore/rule settings. After hotload: 96 forced overlaps, zero escapes/unresolved. Stance growth under ceiling and ordinary-prop recovery with/without history: 96 additional trials, zero escapes/unresolved; explicit playerclip ignore preserved.
+- Post-guard native MoveTo: 7,392 boundary-only cases across joins/heights/directions/step modes, zero solid starts/escapes; 3,072 saved-map cases from all 32 spawns, zero solid starts/escapes and 32 floor hits. Source partition verifies floor/ceiling closure for radius 0 and 16. These are controlled probes, not exhaustive gameplay/network proof. Forced overlaps do not establish a reachable old escape route from normal play; arbitrary teleports, mantle/perch/explosion and remote-client acceptance remain open. Shared controller applies to other maps too. Evidence: output/forestbase/closed-boundary-integration.json.
+- Graphics/reference quality and valid current multi-view performance remain incomplete. No new FPS claim.
+
+
+### Forest Base cascade relief and canopy width — 2026-10-20
+- Confirmed Documents HC1 project. Current native editor PID 31124 / 26.10.13a is stopped on clean Forest Base, C# successful/zero errors. Prior editor and Steam were absent. Cold launch before Steam logged on stalled at SteamAPI_Init; the empty startup process was replaced after Steam login, using verified AppID 590830 in child SteamAppId/SteamGameId and engine working directory. Do not restart a live editor during its asset scan; this cold scan/bootstrap took several minutes.
+- Installed waterfall shader de1591b5736b80abf9a7e559b872e72686967a176dcf5d688e8f13364b18fc6e: existing dense grid has up to 5.2in moving normal relief (including recalculated clip position), varying channel centres/widths and advected edges, finer froth patterns and denser core aeration. No mesh/texture/material-path/collider/renderer added. Native material compile passes; loaded material/shader have IsError false. Three installed 1920x1080 views plus three timed fixed-camera captures verify appearance/animation. Editor Time.Now is zero here; pixels change, but this does not measure direction or prove fluid simulation. Source remains visibly below reference/AAA quality. Evidence: output/forestbase/water-volume-integration.json.
+- Accepted width-only +18% for 444 dimensional adult/middle/far/understory trees, retaining exact heights/roots/rotations/models/materials and all 81 saplings. Saved natively; source generator ASPECTS/understory match. Scene SHA-256 1c92c90503530224d3af848159a218d473e777a197d6d96cd1f6bdd4f06b6347. Source audit: 444 scale fields plus two unused prefab-map entries regenerated by native save. An independent unchanged-prefab native Deserialize/Serialize yields exactly the same two maps; all other scene content identical. Fresh parity for all 620 scenery instances: max position error .007286in, max scale error .000821 (unchanged Rock 104); pre-existing .001 scale tolerance retained, each actual width-plan change verified to .00001. No new tree, model, material or texture.
+- Official foliage-shader preview still thinned crowns with original alpha/reference, no grazing fade and no distance alpha relaxation; rejected, archived and deleted through native Asset.Delete. Original complex twig materials retained. Native GetIndexCountForLod counts the first material mesh in this build (fir_a 15834 = source bark), not aggregate tree triangles. No stale-tree mismatch demonstrated; fir_a asset_info has actual source path/current import. Width increases projected canopy area/overdraw; full-match effect remains unmeasured. Evidence: output/forestbase/canopy-width-integration.json; canopy-width-stage-20261020/installed-hd-*.png.
+- Fresh editor now returns nonzero native performance windows (e.g. 37 frames/2.02s), but the saved 54.72ms editor diagnostic has two scene tabs, no controlled player viewport and no aggregate GPU timing. It is not match FPS or a canopy before/after benchmark. The earlier Vulkan stall is historical to that process; valid current multi-view TDM performance still needs measurement. No restart was used to relabel old timing. Full reference finish, gameplay-edge coverage and remote networking acceptance remain unfinished.
+
+
+### User requested essentials only — 2026-10-20
+- Stop expanding graphics scope for now. Saved scene remains 1c92c90503530224d3af848159a218d473e777a197d6d96cd1f6bdd4f06b6347. Latest native compile succeeded/zero errors; TDM started with one player/nine bots and actual 1920x1080 test viewport. Additional bot probe returned zero; no 15-actor result or new FPS acceptance claimed.
+- Editor process ended with Source2Shutdown. Temporary runtime camera/window and non-saved NoDamage state are discarded. EditorLobby was false before/during test. No scene/source change during this test. Evidence: output/forestbase/current-performance-stage-20261020/minimal-handoff.json. Further comprehensive work is deferred following the user's request to do only essentials for now.
+
+
+### Targeted brightness fix — 2026-10-20
+- User reported map too dark. Increased sun RGB to (.75,.82,.92), sky fill (.20,.23,.28), sky tint (.30,.36,.45); map tone exposure 1..2, compensation +.15. Applied/saved through native editor and matched in forestbase_map.py. Native entrance/compound/waterfall plus two indoor views checked: 629 models/zero errors. Play resumed with updated lighting; C# zero errors, scene clean. Evidence: output/forestbase/brightness-fix-20261020/integration.json. This is a narrow requested fix; comprehensive goal remains paused.
+
+
+### Forest Base reference transport cases and forklift — 2026-10-21
+- Replaced the old crate visuals with 201 hard transit cases in 20 reference paint variants, true handle wells, latches and corner guards. Two-high cover stacks become three flatter cases at the same overall height. Three shared PBR atlases, no new scene objects. All five affected chunk PhysicsShapeList tails and hull OBJ files match the original byte for byte. See Tools/forestbase_cases.py and output/forestbase/transit-cases-20261021/.
+- Rebuilt the existing southeast forklift from the next user reference: worn yellow body with wheel cutouts, smooth seat cushions facing the forks, steering wheel/controls, C-channel mast/chains/hydraulics, tapered forks, roof LED work lights and static caged amber beacon. Kept its position (1130,-860,0), yaw -25, original body/tire physics and the new transit cases. No PointLight or runtime component added. Tools/forestbase_forklift.py; output/forestbase/forklift-reference-20261021/integration.json and after.png.
+- Installed through native HC1 PID 23084 only. All updated model/material assets report compiled/current, no compile failures. Native final capture: 629 models, zero model errors. Generator layout stats updated; final logistics 168314 triangles (+12540 over the transit-case revision). This is a static visual/collision-data check, not a new match performance benchmark. The broader AAA goal remains paused. No scene JSON was edited; preserve unrelated unsaved editor changes.
+
+
+### Forest Base FB/027 transport truck reference — 2026-10-23
+- User explicitly requested file-only work without the editor. No S&box connection, launch or editor UI was used. Rebuilt all four standard transport trucks from the new first-image reference: cab panes/doors, angular fenders, olive worn PBR paint, upright readable FB/027/chevrons, continuous tarp straps/buckles/grommets, exposed slatted gates, perforated exhaust, entry steps, roof stowage and shoulder tread. Static lamp/beacon materials only; no lights/components added.
+- Tools/forestbase_truck.py refines only the non-APC truck branch. Existing APC refinement remains intact. Patched only the matching truck triangles in motor/workshop/yard source meshes; Counter comparison proves every other face unchanged. Existing ModelDoc physics tails and collision hull files retained. Final triangles: motor 96086, workshop 76752, yard 140320. Layout statistics updated. Backups and reproducible audit/install scripts: output/forestbase/truck-reference-20261023/.
+- Offline Blender 5.2 preview uses the actual exported OBJ and PBR images, not an editor capture. Corrected nonperiodic cloth UV repeats and eight reversed end-cap fan normals; final canvas 6226 triangles, no reversed normals, median normal agreement .999799. Source Python syntax and all installed source/material paths verified. S&box resource compilation, native appearance and performance remain unverified until editor use is permitted. Broader goal stays paused.
+
+### Forest Base FB/041 APC reference follow-up — 2026-10-23
+- User requested the detailed first-image APC in place of the old simple visual and still requires file-only work. Refined Tools/forestbase_apc.py: octagonal sloped turret, recessed optic lenses/sunshade, open muzzle brake and bore walls, turret hardware, exposed wheel lugs/flanges, thick shovel blade and pick head, pouch straps/buckles, smaller correctly oriented FB/041 markings and revised metal/rubber finishes. Reused the existing generated armor source; no new image-generation call. Offline Blender preview uses the actual exported mesh/PBR textures, not an engine screenshot.
+- Surgically replaced only the matching APC faces in yard.obj at plan (-900,-995,0). APC 41194 -> 44980 triangles; yard 140320 -> 144106. Face Counter audit preserves every non-APC face, including the latest FB/027 truck revision. yard.mtl and yard.vmdl remain byte-identical, preserving all physics; no scene, runtime light or component changes. Installed 23 owned APC material/texture source files; preserved compiled caches and asset metadata. Layout yard count updated.
+- Evidence/backups/scripts: output/forestbase/apc-reference-20261023/{audit.json,integration.json,stage.py,install.py,render.py,apc-preview.png}. Python syntax, installed bytes/hashes and private material texture references verified. No S&box editor connection/launch/UI used. Engine compilation, native appearance and performance remain pending; broader goal remains paused.
+
+### Rear-yard FB/041 cargo truck reference — 2026-10-23
+- Rebuilt the specific existing truck beside the fence from the new rear-quarter reference, still without the editor. forestbase_map.py selects the reference profile only at plan (-1360,-840), yaw -20. forestbase_truck.py retains the standard FB/027 geometry for the other three trucks; forestbase_truck041.py adds rear curtain gathers/centre seam, rear gate ribs/catches/locking rods, lamp housings, tow hardware, rear wheel fenders/mudflaps, wheel lugs and FB/041 markings. Removed this variant's roof cargo cage in favour of a low roof hatch. Canvas mesh has deeper diagonal folds and a squarer shoulder profile.
+- Built-in image_gen generated a flat weathered olive canvas scan; retained source and prompt in output/forestbase/truck041-reference-20261023/{canvas-source.png,texture-prompt.txt}. Filtered fine weave contrast and normal strength before private PBR export to reduce subpixel sparkle. 34 new private source files in materials/forestbase/truck041; existing truck/APC materials byte-preserved. Generator source for the other three trucks compares identically by face/UV/normal Counter.
+- Surgically replaced only this truck's triangles in yard.obj (42650 -> 59738); yard 144106 -> 161194. Counter audit proves all other faces including the new APC preserved. yard.vmdl changes only the eleven truck material remap destinations; exact PhysicsShapeList tail unchanged. MTL, scene, collision hulls and runtime lighting unchanged; updated layout yard triangle count. Other motor/workshop models and all original truck/APC material sources hash-preserved.
+- Reproducible stage/install/render scripts, backups, audit.json and integration.json in output/forestbase/truck041-reference-20261023/. Offline rear-quarter truck-preview.png uses the actual OBJ/PBR sources. Python syntax, all private texture references, installed bytes/hashes and smooth-normal direction checked (minimum dot .465645). No native S&box connection, launch or UI used; engine compilation, native appearance and match performance remain unverified until editor use is allowed. Broad goal stays paused.
+
+### Motor-shelter FB/041 cargo truck reference — 2026-10-23
+- User requested the next truck under the open shelter from the first reference. Selected the existing motor-pool truck beside the container at plan (-901.6,-555), yaw 90. Uses the deeper folded canvas, rear curtain/gate hardware, rear fenders/mudflaps and FB/041 finishes of the rear-yard version, retaining the roof luggage cage and adding a strapped/slatted tan roof case. Added a shelter profile to forestbase_truck.py and location selection in forestbase_map.py.
+- Unique shelter_truck_* material slots reuse the existing materials/forestbase/truck041 sources without changing the other truck in the same motor chunk. Replaced only this truck's triangles (42650 -> 60422); motor 96086 -> 113858. Exact face/UV/normal Counter comparison proves all other motor faces preserved. ModelDoc adds eleven remaps; exact physics tail retained. Existing yard/workshop models and all truck/truck041/APC material sources hash-preserved. Other truck generator profiles match the previous source; layout motor triangle count updated.
+- Backups, stage/install/render scripts, audit.json, integration.json and actual-mesh offline truck-preview.png are in output/forestbase/shelter-truck041-reference-20261023/. Python syntax, installed hashes, material paths and smooth-normal direction verified. No new textures or runtime lights/components. No S&box connection, launch or editor UI used; native compilation/appearance/performance remain pending. Broad goal remains paused.
+
+### Entrance river repeated white foam correction — 2026-10-25
+- User screenshot shows the ten entrance-river overlays repeating the same bright scratch-like current mask. waterfall_current.vmat previously shared forestbase_foam.shader with bright impact foam; every overlay sampled the same local UV phases. Created a dedicated forestbase_current.shader and changed only this material binding. The new shader uses world-anchored north/south advection, warped coordinates, two rotated/nonmatching texture scales, subdued grey-green foam, roughness .72, soft boundaries and opacity capped at .14 with no alpha clip. Existing shared waterfall/impact/basin/river shaders, meshes, collisions and lighting were not edited. No texture sources added.
+- forestbase_water.py regeneration now retains the dedicated current shader. Backups and offline audit: output/forestbase/river-foam-fix-20261025/. Direct3D HLSL core syntax compilation passes with engine-only wrappers stubbed; this is not a native s&box compile. Numerical sampling of ten actual overlay placements at four times yields maximum alpha .087843, per-patch mean .000258..007468, distinct patterns and zero-alpha boundaries. Source syntax/material path checked. No editor connection/launch/UI used under the user's continuing restriction. Native shader registration/compilation and visual appearance remain unverified; no in-engine after screenshot or animation/performance claim. Broad goal remains paused.
