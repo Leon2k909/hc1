@@ -18,7 +18,7 @@
     shader) and a spray of grit, thrown 10-45 m/s. They fly under real gravity (9.81 m/s², not the players' 800 u/s²)
     with quadratic drag for a stone of their size (`DebrisParticles`), bounce, and lie there for 14-22 s.
   - 60 hot sparks, a light that flares with the flash and fades with the fireball, and a 10 m scorch
-    (`burnt_patch.decal`) under the old 9 m `grenade_scorchmark` decal.
+    (`burnt_patch.decal`).
   - The dust and the chunks take the ground's colours, by `WorldSounds.Classify`: soil, grass, wood or masonry.
   - Loose rigidbodies within 25 m in the open are thrown, ~12 m/s at 3 m and ~2 m/s at 10 m. Each machine throws the
     ones it simulates.
