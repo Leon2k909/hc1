@@ -1,0 +1,21 @@
+if (!Game.IsPlaying || Game.ActiveScene?.Source?.ResourcePath != "scenes/maps/depot/depot.scene") throw new Exception("Expected running Depot.");
+var system=Facepunch.BotSystem.Current;
+var flags=System.Reflection.BindingFlags.NonPublic|System.Reflection.BindingFlags.Instance;
+object Read(string key)=>typeof(Facepunch.BotSystem).GetField(key,flags).GetValue(system);
+var frames=((System.Collections.Generic.List<float>)Read("_frameMs")).ToArray();
+var bots=((System.Collections.Generic.List<float>)Read("_botMs")).ToArray();
+if ((int)Read("_sampleTarget")!=0 || frames.Length!=900) throw new Exception("Sample not finished: "+frames.Length);
+var sorted=frames.OrderBy(x=>x).ToArray();
+float P(float q)=>sorted[(int)(q*(sorted.Length-1))];
+var scene=Game.ActiveScene;
+return new {
+    Utc=DateTime.UtcNow,Frames=frames.Length,FrameMs=new {Average=frames.Average(),P50=P(.5f),P95=P(.95f),P99=P(.99f),Max=sorted.Last(),Over33Ms=frames.Count(x=>x>33.333f),Over50Ms=frames.Count(x=>x>50)},
+    GameAssembly=typeof(Facepunch.BotDevCommands).Assembly.FullName,
+    BotMs=new {Average=bots.Average(),Max=bots.Max(),Thinking=(double)Read("_thinkTotal")/frames.Length},
+    BytesPerFrame=(long)Read("_bytes")/(double)frames.Length,
+    MinBots=(int)Read("_minBots"),MaxBots=(int)Read("_maxBots"),
+    Gc=new {Gen0=Read("_gen0"),Gen1=Read("_gen1"),Gen2=Read("_gen2")},
+    Screen=Screen.Size.ToString(),CameraPosition=scene.Camera.WorldPosition.ToString(),CameraAngles=scene.Camera.WorldRotation.Angles().ToString(),
+    PlayerPosition=Facepunch.Client.Local?.PlayerPawn?.WorldPosition.ToString(),
+    FrameSamples=frames,BotSamples=bots
+};

@@ -1,0 +1,7 @@
+if(Game.IsPlaying) throw new Exception("Stop the benchmark first.");
+var before=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(Project.Current.GetRootPath(),"output/depot-performance-20261027/runtime-settings-before.json")));
+Facepunch.DevCommands.NoDamage=before["NoDamage"].GetValue<bool>();
+var views=Editor.SceneEditorSession.All.Where(s=>s.Scene?.Source?.ResourcePath=="scenes/maps/depot/depot.scene"&&s.OnFrameTo?.Target is Editor.Widget)
+    .SelectMany(s=>((Editor.Widget)s.OnFrameTo.Target).GetDescendants<Editor.SceneRenderingWidget>()).ToArray();
+foreach(var view in views) view.FixedSize=Vector2.Parse(before["FixedSize"].GetValue<string>());
+return new {Facepunch.DevCommands.NoDamage,RestoredViews=views.Length,FixedSizes=views.Select(v=>v.FixedSize.ToString()).ToArray()};
