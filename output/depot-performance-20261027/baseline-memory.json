@@ -1,0 +1,432 @@
+{
+  "ProcessMiB": 15949.9,
+  "ManagedHeapMiB": 2418.6,
+  "AllocatedMiBPerSecond": 12.3,
+  "GcPauseMsLastSecond": 8.33,
+  "GcLastSecond": {
+    "Gen0": 2,
+    "Gen1": 0,
+    "Gen2": 0
+  },
+  "HeapAtLastGc": {
+    "HeapMiB": 2557.4,
+    "FragmentedPercent": 5.6,
+    "CommittedMiB": 2574,
+    "Gen0MiB": 0.7,
+    "Gen1MiB": 1.3,
+    "Gen2MiB": 1575.3,
+    "LargeObjectsMiB": 979.8,
+    "PinnedObjects": 1,
+    "PendingFinalizers": 386
+  },
+  "VideoMemory": {
+    "UsedMiB": 7025.7,
+    "BudgetMiB": 10378.4
+  },
+  "TexturePool": {
+    "UsedMiB": 5580.7,
+    "LimitMiB": 10150,
+    "PinnedMiB": 744.7,
+    "PendingStreamingRequests": 0
+  },
+  "Allocations": {
+    "Seconds": 5,
+    "AllocatedMiB": 58.5,
+    "Collections": {
+      "Gen0": 7,
+      "Gen1": 1,
+      "Gen2": 0
+    },
+    "PauseTotalMs": 26.22,
+    "PauseMaxMs": 4.63,
+    "FramesWithPauseOver2Ms": 7,
+    "ByType": [
+      {
+        "Type": "System.Threading.TimerQueueTimer",
+        "KiB": 4792.1,
+        "Count": 46
+      },
+      {
+        "Type": "DelayPromiseWithCancellation",
+        "KiB": 4473.3,
+        "Count": 43
+      },
+      {
+        "Type": "System.Action",
+        "KiB": 3435.4,
+        "Count": 33
+      },
+      {
+        "Type": "Sandbox.UI.Styles",
+        "KiB": 2498.4,
+        "Count": 24
+      },
+      {
+        "Type": "Sandbox.Rendering.RendererSetup",
+        "KiB": 2186.1,
+        "Count": 21
+      },
+      {
+        "Type": "<GetDescendants>d__22`1[Editor.EditorToolButton]",
+        "KiB": 1871.1,
+        "Count": 18
+      },
+      {
+        "Type": "System.Threading.Tasks.Task",
+        "KiB": 1769.7,
+        "Count": 17
+      },
+      {
+        "Type": "System.String",
+        "KiB": 1545.6,
+        "Count": 14
+      },
+      {
+        "Type": "Replica`1[System.Threading.Tasks.RangeWorker]",
+        "KiB": 1354,
+        "Count": 13
+      },
+      {
+        "Type": "Entry[]",
+        "KiB": 1348.4,
+        "Count": 13
+      },
+      {
+        "Type": "System.Collections.Generic.List`1[Editor.Widget]",
+        "KiB": 1249.2,
+        "Count": 12
+      },
+      {
+        "Type": "Enumerator[Topten.RichTextKit.TextLine]",
+        "KiB": 1249.2,
+        "Count": 12
+      },
+      {
+        "Type": "Replica`1[System.Collections.IEnumerator]",
+        "KiB": 1046.4,
+        "Count": 10
+      },
+      {
+        "Type": "Enumerator[Topten.RichTextKit.FontRun]",
+        "KiB": 1041,
+        "Count": 10
+      },
+      {
+        "Type": "Slot[System.Threading.Tasks.TaskReplicator+Replica][]",
+        "KiB": 936.9,
+        "Count": 9
+      },
+      {
+        "Type": "Enumerator[Editor.Widget]",
+        "KiB": 832.8,
+        "Count": 8
+      },
+      {
+        "Type": "Enumerator[Topten.RichTextKit.TextEffect]",
+        "KiB": 832.8,
+        "Count": 8
+      },
+      {
+        "Type": "ContingentProperties",
+        "KiB": 832.8,
+        "Count": 8
+      },
+      {
+        "Type": "Editor.Widget[]",
+        "KiB": 832.8,
+        "Count": 8
+      },
+      {
+        "Type": "System.Threading.Tasks.IndexRange[]",
+        "KiB": 832.8,
+        "Count": 8
+      },
+      {
+        "Type": "Native.QObject[]",
+        "KiB": 623.9,
+        "Count": 6
+      },
+      {
+        "Type": "Frame[]",
+        "KiB": 520.5,
+        "Count": 5
+      },
+      {
+        "Type": "System.Runtime.CompilerServices.StrongBox`1[System.Int32]",
+        "KiB": 520.5,
+        "Count": 5
+      },
+      {
+        "Type": "System.Runtime.CompilerServices.StrongBox`1[System.Int64]",
+        "KiB": 520.5,
+        "Count": 5
+      },
+      {
+        "Type": "Sandbox.Renderer[]",
+        "KiB": 520.5,
+        "Count": 5
+      },
+      {
+        "Type": "InternalPartitionEnumerator[Sandbox.SkinnedModelRenderer]",
+        "KiB": 519,
+        "Count": 5
+      },
+      {
+        "Type": "Enumerator[System.String]",
+        "KiB": 416.4,
+        "Count": 4
+      },
+      {
+        "Type": "Sandbox.SceneObjectEnumerator`1[Sandbox.VolumetricFogController]",
+        "KiB": 416.4,
+        "Count": 4
+      },
+      {
+        "Type": "System.Collections.Concurrent.ConcurrentQueueSegment`1[System.Threading.Tasks.TaskReplicator+Replica]",
+        "KiB": 416.4,
+        "Count": 4
+      },
+      {
+        "Type": "Entry[System.String][]",
+        "KiB": 312.3,
+        "Count": 3
+      },
+      {
+        "Type": "Sandbox.ModelRenderer[]",
+        "KiB": 312.3,
+        "Count": 3
+      },
+      {
+        "Type": "Entry[System.String,System.String][]",
+        "KiB": 312.3,
+        "Count": 3
+      },
+      {
+        "Type": "System.Threading.Tasks.SynchronizationContextAwaitTaskContinuation",
+        "KiB": 312.3,
+        "Count": 3
+      },
+      {
+        "Type": "System.Int32[]",
+        "KiB": 312.3,
+        "Count": 3
+      },
+      {
+        "Type": "<>c__DisplayClass42_0",
+        "KiB": 309.8,
+        "Count": 3
+      },
+      {
+        "Type": "<>c__DisplayClass69_0",
+        "KiB": 208.2,
+        "Count": 2
+      },
+      {
+        "Type": "DelegateEnumerator[System.String]",
+        "KiB": 208.2,
+        "Count": 2
+      },
+      {
+        "Type": "Sandbox.ScenePushScope",
+        "KiB": 208.2,
+        "Count": 2
+      },
+      {
+        "Type": "System.Collections.Generic.List`1[Sandbox.PostProcessLayer]",
+        "KiB": 208.2,
+        "Count": 2
+      },
+      {
+        "Type": "<>c__DisplayClass19_0`2[System.Object,System.Int32]",
+        "KiB": 208.2,
+        "Count": 2
+      },
+      {
+        "Type": "Sandbox.SceneTraceResult[]",
+        "KiB": 208.2,
+        "Count": 2
+      },
+      {
+        "Type": "Enumerator[System.UInt32]",
+        "KiB": 208.2,
+        "Count": 2
+      },
+      {
+        "Type": "<>c__DisplayClass43_0`2[Sandbox.SkinnedModelRenderer,System.Object]",
+        "KiB": 208.2,
+        "Count": 2
+      },
+      {
+        "Type": "<>c__DisplayClass23_0",
+        "KiB": 208.2,
+        "Count": 2
+      },
+      {
+        "Type": "System.IntPtr[]",
+        "KiB": 208.2,
+        "Count": 2
+      },
+      {
+        "Type": "IEnumerableWhereIterator`1[Sandbox.Command]",
+        "KiB": 208.2,
+        "Count": 2
+      },
+      {
+        "Type": "System.String[]",
+        "KiB": 208.2,
+        "Count": 2
+      },
+      {
+        "Type": "<get_Entries>d__13",
+        "KiB": 208.2,
+        "Count": 2
+      },
+      {
+        "Type": "System.UInt16",
+        "KiB": 208.2,
+        "Count": 2
+      },
+      {
+        "Type": "Rotation[]",
+        "KiB": 166.1,
+        "Count": 1
+      }
+    ]
+  },
+  "ResourceIndex": [
+    {
+      "Type": "SoundEvent",
+      "Live": 942,
+      "Max": 942
+    },
+    {
+      "Type": "GunsmithPart",
+      "Live": 907,
+      "Max": 907
+    },
+    {
+      "Type": "PrefabFile",
+      "Live": 589,
+      "Max": 589
+    },
+    {
+      "Type": "Clothing",
+      "Live": 200,
+      "Max": 200
+    },
+    {
+      "Type": "DecalDefinition",
+      "Live": 59,
+      "Max": 59
+    },
+    {
+      "Type": "EquipmentResource",
+      "Live": 45,
+      "Max": 45
+    },
+    {
+      "Type": "SceneFile",
+      "Live": 42,
+      "Max": 42
+    },
+    {
+      "Type": "Surface",
+      "Live": 23,
+      "Max": 23
+    },
+    {
+      "Type": "BaseAmmoResource",
+      "Live": 12,
+      "Max": 12
+    },
+    {
+      "Type": "TerrainMaterial",
+      "Live": 7,
+      "Max": 7
+    },
+    {
+      "Type": "PerkResource",
+      "Live": 5,
+      "Max": 5
+    },
+    {
+      "Type": "Soundscape",
+      "Live": 4,
+      "Max": 4
+    },
+    {
+      "Type": "ClutterDefinition",
+      "Live": 3,
+      "Max": 3
+    },
+    {
+      "Type": "RadioSounds",
+      "Live": 2,
+      "Max": 2
+    },
+    {
+      "Type": "TerrainStorage",
+      "Live": 1,
+      "Max": 1
+    }
+  ],
+  "WeakIndex": [
+    {
+      "Type": "SoundFile",
+      "Live": 1995,
+      "Max": 1995
+    },
+    {
+      "Type": "Model",
+      "Live": 314,
+      "Max": 314
+    },
+    {
+      "Type": "Texture",
+      "Live": 273,
+      "Max": 273
+    },
+    {
+      "Type": "Material",
+      "Live": 189,
+      "Max": 189
+    },
+    {
+      "Type": "AnimationGraph",
+      "Live": 13,
+      "Max": 13
+    },
+    {
+      "Type": "PhysicsGroupDescription",
+      "Live": 8,
+      "Max": 8
+    }
+  ],
+  "NativeResourceCache": [
+    {
+      "Type": "Texture",
+      "Live": 482,
+      "Max": 482
+    },
+    {
+      "Type": "Model",
+      "Live": 314,
+      "Max": 314
+    },
+    {
+      "Type": "Material",
+      "Live": 305,
+      "Max": 305
+    },
+    {
+      "Type": "PhysicsGroupDescription",
+      "Live": 27,
+      "Max": 27
+    },
+    {
+      "Type": "AnimationGraph",
+      "Live": 13,
+      "Max": 13
+    }
+  ]
+}

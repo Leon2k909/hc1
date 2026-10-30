@@ -1,0 +1,20 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var session=Editor.SceneEditorSession.Active;
+if(Game.IsPlaying||session.Scene.Source?.ResourcePath?.Equals("scenes/maps/collider/collider.scene",StringComparison.OrdinalIgnoreCase)!=true)throw new InvalidOperationException("Collider must be active and stopped.");
+var config=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/collider/automatic-door/authoring.json")));
+var scene=session.Scene;var obj=scene.Directory.FindByGuid(Guid.Parse(config["root"].GetValue<string>()));
+var door=obj.GetComponent<Facepunch.AutomaticSlidingDoor>();
+if(!door.IsValid())throw new InvalidOperationException("Controller missing from the authored root.");
+// Resolve references in this editor document; generic component JSON setters
+// can accept a reference without resolving it in the edited scene's context.
+door.LeftLeaf=scene.Directory.FindByGuid(Guid.Parse(config["left"].GetValue<string>()));
+door.RightLeaf=scene.Directory.FindByGuid(Guid.Parse(config["right"].GetValue<string>()));
+if(!door.LeftLeaf.IsValid()||!door.RightLeaf.IsValid())throw new InvalidOperationException("Both leaf references are required.");
+if(door.LeftLeaf.Id!=Guid.Parse(config["left"].GetValue<string>())||door.RightLeaf.Id!=Guid.Parse(config["right"].GetValue<string>()))throw new InvalidOperationException("Unexpected leaf binding.");
+foreach(var item in new[]{obj,door.LeftLeaf,door.RightLeaf}){item.NetworkMode=NetworkMode.Snapshot;item.Tags.Add("door");}
+door.LeftLeaf.LocalPosition=door.LeftClosedPosition;door.RightLeaf.LocalPosition=door.RightClosedPosition;
+scene.NavMesh.ExcludedBodies.Add("door");
+var from=obj.WorldTransform.PointToWorld(new Vector3(-20,0,64));var to=obj.WorldTransform.PointToWorld(new Vector3(20,0,64));
+var hit=scene.Trace.Ray(from,to).Run();
+if(!hit.Hit||!new[]{door.LeftLeaf.Id,door.RightLeaf.Id}.Contains(hit.GameObject.Id))throw new InvalidOperationException("The closed centre seam must be solid.");
+return new{Door=obj.Id,Left=door.LeftLeaf.Id,Right=door.RightLeaf.Id,ClosedSeamSolid=true,OpeningCentre=obj.WorldPosition.ToString(),LeavesTaggedForNavigation=true,SnapshotNetworking=true};

@@ -1,0 +1,27 @@
+var session = Editor.SceneEditorSession.Active;
+var scene = session.Scene;
+if (Game.IsPlaying || scene.Source.ResourcePath != "scenes/maps/depot/depot.scene") throw new Exception("Depot is no longer active.");
+var flags = System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance;
+var map = scene.GetAllComponents<MapInstance>().Single();
+var nativeMap = typeof(MapInstance).GetField("loadedMap", flags).GetValue(map) as SceneMap;
+var objects = scene.SceneWorld.SceneObjects.ToArray();
+var models = objects.Where(o => o.Model is not null).GroupBy(o => o.Model.ResourcePath).ToArray();
+var materials = models.SelectMany(g => g.First().Model.Materials).Where(m => m is not null && !m.IsError).DistinctBy(m => m.ResourcePath).ToArray();
+var files = FileSystem.Mounted.FindFile("maps/depot", "*", true).ToArray();
+var lightmaps = files.Where(f => f.Contains("lightmap", StringComparison.OrdinalIgnoreCase)).ToArray();
+var probes = scene.GetAllComponents<EnvmapProbe>().ToArray();
+var result = new {
+    Scene=scene.Source.ResourcePath, Map=map.MapName, map.IsLoaded, NativeMap=nativeMap?.MapName, Folder=nativeMap?.MapFolder,
+    SceneObjectTypes=objects.GroupBy(o => o.GetType().FullName).ToDictionary(g => g.Key,g => g.Count()),
+    Models=models.Select(g => new { Path=g.Key, Count=g.Count(), Materials=g.First().Model.Materials.Select(m => m.ResourcePath).ToArray() }).ToArray(),
+    Materials=materials.Select(m => new { Path=m.ResourcePath, Textures=new[] { "g_tColor","g_tNormal","g_tAmbientOcclusion","g_tMetalness","g_tMasks","g_tRoughness" }.Select(k => new { Name=k, Width=m.GetTexture(k)?.Width, Height=m.GetTexture(k)?.Height }).ToArray() }).ToArray(),
+    MountedFiles=files, MountedLightmaps=lightmaps,
+    Reflections=probes.Select(p => new { p.GameObject.Name, Data=p.Serialize() }).ToArray(),
+    Sun=scene.GetAllComponents<DirectionalLight>().Select(c => c.Serialize()).ToArray(),
+    Sky=scene.GetAllComponents<SkyBox2D>().Select(c => c.Serialize()).ToArray()
+};
+var path=System.IO.Path.Combine(Project.Current.GetRootPath(),"output/depot-comparison-20261027/native-content.json");
+System.IO.File.WriteAllText(path,Json.Serialize(result));
+return new { Path=path, SceneObjects=objects.Length, Models=models.Length, Materials=materials.Length, MountedFiles=files.Length, Lightmaps=lightmaps.Length,
+    ExampleMaterials=materials.Take(30).Select(m => m.ResourcePath).ToArray(), ExampleLightmaps=lightmaps.Take(8).ToArray(),
+    ProbeModes=probes.GroupBy(p => p.Mode.ToString()).ToDictionary(g => g.Key,g => g.Count()), session.HasUnsavedChanges, EditorScenePreserved=ReferenceEquals(session,Editor.SceneEditorSession.Active) };

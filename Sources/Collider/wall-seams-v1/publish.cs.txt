@@ -1,0 +1,73 @@
+// Record the verified correction and synchronize its single primary-stage file.
+var root=Sandbox.Project.Current.GetRootPath();
+if(root.TrimEnd('\\','/').Replace('\\','/').ToLowerInvariant()!="c:/sbox-projects/hc1/forked-shooter-main")
+    throw new InvalidOperationException("Wrong project");
+var output=System.IO.Path.Combine(root,"output/collider-wall-overlap-20261027");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(output,"stage/manifest.json")));
+string Hash(string path)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+var relative=manifest["relative"].GetValue<string>();
+if(relative!="models/maps/collider/collider_machine.obj") throw new InvalidOperationException("Unexpected target");
+var target=System.IO.Path.Combine(root,"Assets",relative);
+var after=manifest["after"].GetValue<string>();
+if(Hash(target)!=after) throw new InvalidOperationException("Installed mesh changed");
+// The import already proved that this task preserved every protected input.
+// Other tasks may now publish their own meshes. Record them without replacing
+// them; keep strict guards on this mesh's material table, ModelDoc and scene.
+var concurrent=new System.Collections.Generic.List<string>();
+foreach(var pair in manifest["protected"].AsObject())
+{
+    var actual=Hash(System.IO.Path.Combine(root,"Assets",pair.Key));
+    if(actual==pair.Value.GetValue<string>()) continue;
+    if(pair.Key!="models/maps/collider/collider_machine.mtl" && pair.Key!="models/maps/collider/collider_machine.vmdl" &&
+        pair.Key!="scenes/maps/Collider/collider.scene")
+    { concurrent.Add(pair.Key);continue; }
+        throw new InvalidOperationException("Protected asset changed: "+pair.Key);
+}
+foreach(var pair in manifest["sources"].AsObject())
+{
+    var expected=pair.Value.GetValue<string>();
+    if(pair.Key=="Tools/collider_map.py")
+    {
+        var reviewed=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(output,"source-review.json")));
+        if(reviewed["before"].GetValue<string>()!=expected || !reviewed["wallSeamImportAndBuildHookPreserved"].GetValue<bool>() ||
+            !reviewed["machineFunctionUnchanged"].GetValue<bool>()) throw new InvalidOperationException("Shared-source review failed");
+        expected=reviewed["after"].GetValue<string>();
+    }
+    if(Hash(System.IO.Path.Combine(root,pair.Key))!=expected) throw new InvalidOperationException("Source changed: "+pair.Key);
+}
+var source=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(output,"source-validation.json")));
+var audit=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(output,"installed-audit.json")));
+var validation=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(output,"native-validation.json")));
+var capture=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(output,"after/capture-report.json")));
+if(!source["success"].GetValue<bool>() || audit["overlaps"].AsArray().Count!=0 ||
+    validation["Checked"].GetValue<int>()!=68 || validation["Failed"].AsArray().Count!=0 ||
+    validation["MissingModels"].AsArray().Count!=0 || validation["MissingMaterials"].AsArray().Count!=0 ||
+    capture["AssetSourcesSHA256"][relative].GetValue<string>()!=after ||
+    !capture["SceneDirtyStatePreserved"].GetValue<bool>() || !capture["SelectedDocumentPreserved"].GetValue<bool>() ||
+    !capture["GamePreserved"].GetValue<bool>()) throw new InvalidOperationException("Acceptance evidence failed");
+var sceneHash=Hash(System.IO.Path.Combine(root,"Assets/scenes/maps/Collider/collider.scene"));
+if(sceneHash!=capture["SavedSceneSha256"].GetValue<string>() || sceneHash!=validation["SceneSha256"].GetValue<string>())
+    throw new InvalidOperationException("Scene changed since verification");
+var selected=Editor.SceneEditorSession.Active;var selectedDirty=selected?.HasUnsavedChanges;
+var gameId=Game.ActiveScene?.Id;var playing=Game.IsPlaying;
+var primary=System.IO.Path.Combine(root,"output/collider/stage/assets",relative);
+var primaryStatus="preserved-newer-stage";
+if(System.IO.File.Exists(primary) && Hash(primary)==manifest["before"].GetValue<string>())
+{
+    System.IO.File.Copy(target,primary,true);
+    if(Hash(primary)!=after) throw new InvalidOperationException("Primary stage verification failed");
+    primaryStatus="synchronized";
+}
+else if(System.IO.File.Exists(primary) && Hash(primary)==after) primaryStatus="already-current";
+if(!ReferenceEquals(selected,Editor.SceneEditorSession.Active) || selected?.HasUnsavedChanges!=selectedDirty ||
+    Game.ActiveScene?.Id!=gameId || Game.IsPlaying!=playing) throw new InvalidOperationException("Editor state changed");
+var result=new{Revision="collider-wall-seams-v1",Relative=relative,SourceSHA256=after,
+    SceneSHA256=sceneHash,BeforeTriangles=manifest["beforeTriangles"].GetValue<int>(),AfterTriangles=manifest["afterTriangles"].GetValue<int>(),
+    RemainingConcreteOverlaps=0,NativeChecksPassed=68,PrimaryStage=primaryStatus,
+    SceneAndCollisionPreserved=true,MaterialsAndTexturesPreserved=true,EditorStatePreserved=true,
+    ConcurrentOtherAssetsPreserved=concurrent,NativeChecksAt=validation["CheckedAt"].GetValue<DateTime>(),
+    Evidence="output/collider-wall-overlap-20261027",Screenshot="after/east-wall-oblique.png",CheckedAt=DateTime.UtcNow};
+var text=Json.Serialize(result);
+System.IO.File.WriteAllText(System.IO.Path.Combine(root,"Sources/Collider/wall-seams-v1/installed.json"),text);
+System.IO.File.WriteAllText(System.IO.Path.Combine(output,"published.json"),text);
+return result;

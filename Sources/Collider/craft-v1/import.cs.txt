@@ -1,0 +1,99 @@
+// Publish only the reviewed visual migration. Never replace or save the scene.
+var root = Sandbox.Project.Current.GetRootPath();
+if(root.TrimEnd('\\','/').Replace('\\','/').ToLowerInvariant()!="c:/sbox-projects/hc1/forked-shooter-main")
+    throw new InvalidOperationException("Wrong project");
+var output=System.IO.Path.Combine(root,"output/collider-detail-v3-20261027");
+var request=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(output,"import-request.json")));
+var stageRelative=request["stage"].GetValue<string>();
+if(!System.Text.RegularExpressions.Regex.IsMatch(stageRelative,"^output/collider-detail-v3-20261027/stage-v[0-9]+$"))
+    throw new InvalidOperationException("Invalid private stage");
+var stage=System.IO.Path.Combine(root,stageRelative);
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(stage,"manifest.json")));
+var selected=Editor.SceneEditorSession.Active;
+var selectedDirty=selected?.HasUnsavedChanges;
+var session=Editor.SceneEditorSession.All.SingleOrDefault(s=>
+    s.Scene.Source?.ResourcePath?.Equals("scenes/maps/collider/collider.scene",StringComparison.OrdinalIgnoreCase)==true);
+if(Game.IsPlaying || session is null)
+    throw new InvalidOperationException("Expected an existing stopped Collider document");
+var beforeScene=session.Scene.Id;var beforeGame=Game.ActiveScene?.Id;var beforeDirty=session.HasUnsavedChanges;
+string Hash(string path)=>System.IO.File.Exists(path)?Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant():null;
+void CheckGuards()
+{
+    foreach(var pair in manifest["protected"].AsObject())
+        if(Hash(System.IO.Path.Combine(root,"Assets",pair.Key))!=pair.Value.GetValue<string>())
+            throw new InvalidOperationException("Protected content changed: "+pair.Key);
+    foreach(var pair in manifest["sources"].AsObject())
+        if(Hash(System.IO.Path.Combine(root,pair.Key))!=pair.Value.GetValue<string>())
+            throw new InvalidOperationException("Generator changed: "+pair.Key);
+}
+CheckGuards();
+var entries=manifest["files"].AsArray();
+foreach(var entry in entries)
+{
+    var relative=entry["relative"].GetValue<string>();
+    if(!(relative.StartsWith("materials/collider/craft-v1/") && !relative.Contains("..")) &&
+       !new[]{"models/maps/collider/collider_structure.obj","models/maps/collider/collider_structure.mtl","models/maps/collider/collider_structure.vmdl",
+              "models/maps/collider/collider_machine.obj","models/maps/collider/collider_machine.mtl","models/maps/collider/collider_machine.vmdl"}.Contains(relative))
+        throw new InvalidOperationException("Unexpected target: "+relative);
+    if(Hash(System.IO.Path.Combine(stage,"assets",relative))!=entry["after"].GetValue<string>())
+        throw new InvalidOperationException("Stage changed: "+relative);
+    if(Hash(System.IO.Path.Combine(root,"Assets",relative))!=entry["before"]?.GetValue<string>())
+        throw new InvalidOperationException("Target changed: "+relative);
+}
+var marker="\t\t\t{\n\t\t\t\t_class = \"PhysicsShapeList\"";
+foreach(var name in new[]{"collider_structure","collider_machine"})
+{
+    var relative="models/maps/collider/"+name+".vmdl";
+    var originalDoc=System.IO.File.ReadAllText(System.IO.Path.Combine(root,"Assets",relative));
+    var stagedDoc=System.IO.File.ReadAllText(System.IO.Path.Combine(stage,"assets",relative));
+    var left=originalDoc.IndexOf(marker,StringComparison.Ordinal);var right=stagedDoc.IndexOf(marker,StringComparison.Ordinal);
+    if((left<0)!=(right<0) || (left>=0 && originalDoc[left..]!=stagedDoc[right..]))
+        throw new InvalidOperationException("Physics must remain byte-identical: "+name);
+}
+var completed=new System.Collections.Generic.List<string>();
+try
+{
+    foreach(var entry in entries)
+    {
+        var relative=entry["relative"].GetValue<string>();
+        var target=System.IO.Path.Combine(root,"Assets",relative);
+        var bytes=System.IO.File.ReadAllBytes(System.IO.Path.Combine(stage,"assets",relative));
+        System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target));
+        var backup=System.IO.Path.Combine(stage,"native-before",relative);
+        if(System.IO.File.Exists(target))
+        {
+            System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(backup));
+            System.IO.File.Copy(target,backup,false);
+        }
+        System.IO.File.WriteAllBytes(target+".finish-incoming",bytes);
+        System.IO.File.Move(target+".finish-incoming",target,true);
+        completed.Add(relative);
+    }
+    foreach(var relative in completed.OrderBy(p=>p.EndsWith(".vmdl")?3:p.EndsWith(".vmat")?1:0))
+        Editor.AssetSystem.RegisterFile(System.IO.Path.Combine(root,"Assets",relative));
+    CheckGuards();
+    foreach(var entry in entries)
+        if(Hash(System.IO.Path.Combine(root,"Assets",entry["relative"].GetValue<string>()))!=entry["after"].GetValue<string>())
+            throw new InvalidOperationException("Publication verification failed");
+}
+catch
+{
+    foreach(var relative in completed)
+    {
+        var target=System.IO.Path.Combine(root,"Assets",relative);
+        var backup=System.IO.Path.Combine(stage,"native-before",relative);
+        if(System.IO.File.Exists(backup)) System.IO.File.Copy(backup,target,true);
+        else System.IO.File.Delete(target);
+        Editor.AssetSystem.RegisterFile(target);
+    }
+    throw;
+}
+if(!ReferenceEquals(selected,Editor.SceneEditorSession.Active) || selected?.HasUnsavedChanges!=selectedDirty || session.Scene.Id!=beforeScene ||
+   Game.ActiveScene?.Id!=beforeGame || Game.IsPlaying || session.HasUnsavedChanges!=beforeDirty)
+    throw new InvalidOperationException("Editor state changed");
+var result=new{Revision=manifest["revision"].GetValue<string>(),Stage=stageRelative,
+    Imported=completed,PhysicsPreserved=true,SceneSourcePreserved=true,EditorStatePreserved=true,
+    SelectedScenePreserved=selected?.Scene.Source?.ResourcePath,
+    CheckedAt=DateTime.UtcNow};
+System.IO.File.WriteAllText(System.IO.Path.Combine(stage,"native-import.json"),Json.Serialize(result));
+return result;

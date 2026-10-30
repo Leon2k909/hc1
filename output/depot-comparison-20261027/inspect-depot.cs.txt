@@ -1,0 +1,27 @@
+var session = Editor.SceneEditorSession.Active;
+var scene = session.Scene;
+if (Project.Current.GetRootPath().TrimEnd('\\','/').Replace('\\','/').ToLowerInvariant() != "c:/sbox-projects/hc1/forked-shooter-main") throw new Exception("Wrong project.");
+if (Game.IsPlaying || !scene.Source.ResourcePath.Contains("depot")) throw new Exception("Expected stopped Depot.");
+var flags = System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance;
+object Info(Type type) => new {
+    Type = type.FullName,
+    Properties = type.GetProperties(flags).Where(p => p.DeclaringType == type).Select(p => new { p.Name, Type = p.PropertyType.FullName }).ToArray(),
+    Fields = type.GetFields(flags).Where(f => f.DeclaringType == type).Select(f => new { f.Name, Type = f.FieldType.FullName }).ToArray()
+};
+var objects = scene.GetAllObjects(true).ToArray();
+var renderers = scene.GetAllComponents<ModelRenderer>().Where(r => r.Model is not null).ToArray();
+var mats = renderers.SelectMany(r => r.Model.Materials).Where(m => m is not null).DistinctBy(m => m.ResourcePath).ToArray();
+var map = scene.GetAllComponents<MapInstance>().FirstOrDefault();
+object[] Look(string type) => objects.SelectMany(o => o.Components.GetAll<Component>(FindMode.EverythingInSelf))
+    .Where(c => c.GetType().Name == type).Select(c => (object)new { c.GameObject.Name, Data = c.Serialize() }).ToArray();
+return new {
+    Scene = scene.Source.ResourcePath, session.HasUnsavedChanges, Objects = objects.Length,
+    ComponentTypes = objects.SelectMany(o => o.Components.GetAll<Component>(FindMode.EverythingInSelf)).GroupBy(c => c.GetType().FullName).ToDictionary(g => g.Key,g => g.Count()),
+    ModelCount = renderers.Length,
+    Models = renderers.GroupBy(r => r.Model.ResourcePath).Select(g => new { Path = g.Key, Count = g.Count(), Example = g.First().WorldPosition.ToString(), Materials = g.First().Model.Materials.Select(m => m.ResourcePath).ToArray() }).ToArray(),
+    Materials = mats.Select(m => new { Path=m.ResourcePath, m.IsError, Textures=new[] { "g_tColor","g_tNormal","g_tRoughness","g_tRma","g_tMetalness","g_tAmbientOcclusion" }.Select(k => new { Name=k, Path=m.GetTexture(k)?.ResourcePath, Width=m.GetTexture(k)?.Width, Height=m.GetTexture(k)?.Height }).ToArray() }).ToArray(),
+    PostProcess = new[] { "Tonemapping","AmbientOcclusion","ColorGrading","ColorAdjustments","PostProcessVolume","IndirectLightVolume" }.Select(t => new { Type=t, Components=Look(t) }).ToArray(),
+    MapType=Info(typeof(MapInstance)), SceneMapType=Info(typeof(SceneMap)), SceneWorldType=Info(typeof(SceneWorld)),
+    MapFields = map is null ? null : typeof(MapInstance).GetFields(flags).Where(f => f.DeclaringType == typeof(MapInstance)).Select(f => new { f.Name, Type=f.FieldType.FullName, Value=f.GetValue(map)?.ToString() }).ToArray(),
+    Sessions = Editor.SceneEditorSession.All.Select(s => new { s.Scene.Name, Path=s.Scene.Source?.ResourcePath, s.HasUnsavedChanges }).ToArray()
+};

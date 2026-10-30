@@ -13,6 +13,27 @@
 						_class = "DefaultMaterialGroup"
 						remaps =
 						[
+{ from = "ar_pd_cassette.vmat" to = "materials/ares/pressure-doors-v3/cassette.vmat" },
+{ from = "ar_pd_kick.vmat" to = "materials/ares/pressure-doors-v3/kick.vmat" },
+{ from = "ar_pw_rubber.vmat" to = "materials/ares/pipework-v1/rubber.vmat" },
+{ from = "ar_pw_metal.vmat" to = "materials/ares/pipework-v1/metal.vmat" },
+{ from = "ar_pw_cast.vmat" to = "materials/ares/pipework-v1/cast.vmat" },
+{ from = "ar_pw_copper.vmat" to = "materials/ares/pipework-v1/copper.vmat" },
+{ from = "ar_pw_pipe.vmat" to = "materials/ares/pipework-v1/pipe.vmat" },
+{ from = "ar_pd_body.vmat" to = "materials/ares/pressure-doors-v3/body.vmat" },
+{ from = "ar_pd_panel.vmat" to = "materials/ares/pressure-doors-v3/panel.vmat" },
+{ from = "ar_pd_frame.vmat" to = "materials/ares/pressure-doors-v3/frame.vmat" },
+{ from = "ar_pd_steel.vmat" to = "materials/ares/pressure-doors-v3/steel.vmat" },
+{ from = "ar_pd_rubber.vmat" to = "materials/ares/pressure-doors-v3/rubber.vmat" },
+{ from = "ar_pd_accent.vmat" to = "materials/ares/pressure-doors-v3/accent.vmat" },
+{ from = "ar_pd_dark.vmat" to = "materials/ares/pressure-doors-v3/dark.vmat" },
+{ from = "ar_pd_labels.vmat" to = "materials/ares/pressure-doors-v3/labels.vmat" },
+{ from = "ar_pd_display.vmat" to = "materials/ares/pressure-doors-v3/display.vmat" },
+{ from = "ar_pd_glass.vmat" to = "materials/ares/pressure-doors-v3/glass.vmat" },
+{ from = "ar_pd_red.vmat" to = "materials/ares/pressure-doors-v3/red.vmat" },
+{ from = "ar_pd_green.vmat" to = "materials/ares/pressure-doors-v3/green.vmat" },
+{ from = "ar_pd_hazard.vmat" to = "materials/ares/pressure-doors-v3/hazard.vmat" },
+
 							{ from = "ar_bezel.vmat" to = "materials/ares/ar_bezel.vmat" },
 							{ from = "ar_brass.vmat" to = "materials/ares/ar_brass.vmat" },
 							{ from = "ar_concrete.vmat" to = "materials/ares/ar_concrete.vmat" },
@@ -56,7 +77,7 @@
 					{
 						_class = "RenderMeshFile"
 						name = "ares_hall"
-						filename = "models/maps/ares/ares_hall.obj"
+						filename = "models/maps/ares/pressure-doors-v2/hall_base.obj"
 						import_translation = [ 0.0, 0.0, 0.0 ]
 						import_rotation = [ 0.0, 0.0, 0.0 ]
 						import_scale = 1.0
@@ -66,7 +87,46 @@
 						parent_bone = ""
 						import_filter = { exclude_by_default = false exception_list = [ ] }
 					},
-				]
+{
+						_class = "RenderMeshFile"
+						name = "pressure_wing_west"
+						filename = "models/maps/ares/pressure-doors-v3/wing_west.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "pressure_wing_east"
+						filename = "models/maps/ares/pressure-doors-v3/wing_east.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "pressure_cargo"
+						filename = "models/maps/ares/pressure-doors-v3/cargo.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					}
+]
 			},
 			{
 				_class = "PhysicsShapeList"

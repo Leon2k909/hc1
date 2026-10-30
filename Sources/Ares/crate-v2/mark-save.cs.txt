@@ -1,0 +1,8 @@
+var root=Sandbox.Project.Current.GetRootPath();var folder=System.IO.Path.Combine(root,"output/ares/crate-v2");
+var receipt=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"integration.json")));
+var session=Editor.SceneEditorSession.Active;var scene=session.Scene;
+if(Game.IsPlaying||!string.Equals(scene.Source?.ResourcePath,"scenes/maps/ares/ares.scene",StringComparison.OrdinalIgnoreCase))throw new InvalidOperationException("Scene or play state changed.");
+var group=scene.GetAllObjects(true).Single(o=>o.Id==Guid.Parse(receipt["GroupId"].GetValue<string>()));
+if(group.Children.Count!=132||group.Children.Any(o=>o.Components.Get<ModelRenderer>()?.Model?.IsError!=false))throw new InvalidOperationException("Case group is incomplete.");
+session.HasUnsavedChanges=true;
+return new{MarkedForSave=session.HasUnsavedChanges,Cases=group.Children.Count,Scene=scene.Source.ResourcePath};

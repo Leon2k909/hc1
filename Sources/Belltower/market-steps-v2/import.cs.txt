@@ -1,0 +1,70 @@
+// Guarded publication of the market-cross treads only. No scene writes or play changes.
+var root=Sandbox.Project.Current.GetRootPath();
+if(!string.Equals(System.IO.Path.GetFullPath(root).TrimEnd('\\','/'),@"C:\sbox-projects\hc1\forked-shooter-main",StringComparison.OrdinalIgnoreCase))throw new InvalidOperationException("Wrong checkout.");
+var folder=System.IO.Path.Combine(root,"output/belltower/market-steps-v2");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"stage-v1/manifest.json")));
+if(manifest["revision"].GetValue<string>()!="belltower-market-steps-v2")throw new InvalidOperationException("Wrong revision.");
+var session=Editor.SceneEditorSession.Active;var playing=Game.IsPlaying;var game=Game.ActiveScene?.Id;var dirty=session.HasUnsavedChanges;
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+foreach(var group in new[]{"source_sha256","protected_sha256"})
+ foreach(var pair in manifest[group].AsObject())
+  if(Hash(System.IO.Path.Combine(root,pair.Key))!=pair.Value.GetValue<string>())throw new InvalidOperationException("Shared source changed: "+pair.Key);
+foreach(var pair in manifest["required_source_snippets"].AsObject())
+ foreach(var snippet in pair.Value.AsArray())
+  if(!System.IO.File.ReadAllText(System.IO.Path.Combine(root,pair.Key)).Replace("\r\n","\n").Contains(snippet.GetValue<string>().Replace("\r\n","\n"),StringComparison.Ordinal))throw new InvalidOperationException("Generator hook changed.");
+var allowed=new System.Collections.Generic.HashSet<string>{
+ "Assets/models/maps/belltower/belltower_centre.obj","Assets/models/maps/belltower/belltower_centre.mtl",
+ "Assets/models/maps/belltower/edge-realism-v1/centre.obj","Assets/models/maps/belltower/edge-realism-v1/centre.mtl",
+ "Assets/models/maps/belltower/belltower_centre.vmdl","Assets/materials/belltower/market-steps-v2/stone.vmat"};
+var files=manifest["files"].AsObject();
+if(files.Count!=6||!manifest["physics_bytes_exact"].GetValue<bool>()||!manifest["original_collision_hulls_exact"].GetValue<bool>())throw new InvalidOperationException("Missing scope proof.");
+foreach(var pair in files)
+{
+ if(!allowed.Contains(pair.Key))throw new InvalidOperationException("Unexpected target.");
+ var item=pair.Value;var target=System.IO.Path.Combine(root,pair.Key);var source=System.IO.Path.Combine(root,item["source"].GetValue<string>());
+ var before=item["before"]?.GetValue<string>();var after=item["after"].GetValue<string>();
+ if(Hash(source)!=after)throw new InvalidOperationException("Staged asset changed.");
+ if(before is not null&&Hash(System.IO.Path.Combine(root,item["backup"].GetValue<string>()))!=before)throw new InvalidOperationException("Backup changed.");
+ var current=System.IO.File.Exists(target)?Hash(target):null;
+ if(current!=before&&current!=after)throw new InvalidOperationException("Shared target changed: "+pair.Key);
+ if(pair.Key.EndsWith(".vmdl",StringComparison.Ordinal))
+ {
+  var a=System.IO.File.ReadAllText(System.IO.Path.Combine(root,item["backup"].GetValue<string>()));var b=System.IO.File.ReadAllText(source);var marker="_class = \"PhysicsShapeList\"";
+  if(a.Substring(a.IndexOf(marker,StringComparison.Ordinal))!=b.Substring(b.IndexOf(marker,StringComparison.Ordinal)))throw new InvalidOperationException("Physics changed.");
+ }
+}
+// Material definitions and aliases precede geometry, so automatic compiles see valid slots.
+int Order(string path)=>path.EndsWith(".vmat",StringComparison.Ordinal)?0:path.EndsWith(".mtl",StringComparison.Ordinal)?1:path.EndsWith(".vmdl",StringComparison.Ordinal)?2:3;
+var changed=new System.Collections.Generic.List<string>();
+try
+{
+ foreach(var pair in files.OrderBy(p=>Order(p.Key)))
+ {
+  var item=pair.Value;var target=System.IO.Path.Combine(root,pair.Key);var after=item["after"].GetValue<string>();
+  if(System.IO.File.Exists(target)&&Hash(target)==after)continue;
+  System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target));var incoming=target+".market-steps-incoming";
+  try
+  {
+   System.IO.File.Copy(System.IO.Path.Combine(root,item["source"].GetValue<string>()),incoming,true);
+   if(Hash(incoming)!=after)throw new InvalidOperationException("Incoming hash differs.");
+   System.IO.File.Move(incoming,target,true);changed.Add(pair.Key);
+  }
+  finally{if(System.IO.File.Exists(incoming))System.IO.File.Delete(incoming);}
+ }
+}
+catch
+{
+ foreach(var path in changed.AsEnumerable().Reverse())
+ {
+  var item=files[path];var target=System.IO.Path.Combine(root,path);
+  if(item["backup"] is null)System.IO.File.Delete(target);
+  else System.IO.File.Copy(System.IO.Path.Combine(root,item["backup"].GetValue<string>()),target,true);
+ }
+ throw;
+}
+foreach(var path in changed.OrderBy(Order))Editor.AssetSystem.RegisterFile(System.IO.Path.Combine(root,path));
+var preserved=ReferenceEquals(session,Editor.SceneEditorSession.Active)&&playing==Game.IsPlaying&&game==Game.ActiveScene?.Id&&dirty==session.HasUnsavedChanges;
+var result=new{ImportedFiles=changed,Blocks=manifest["geometry"]["blocks"].GetValue<int>(),PhysicsPreserved=true,OtherCivicPropsPreserved=true,EditorStatePreserved=preserved,InitialUnsavedChangesPreserved=dirty==session.HasUnsavedChanges};
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"native-import.json"),System.Text.Json.JsonSerializer.Serialize(result));
+if(!preserved)throw new InvalidOperationException("Editor state changed; inspect the completed import.");
+return result;

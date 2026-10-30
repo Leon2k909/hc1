@@ -13,12 +13,49 @@
 						_class = "DefaultMaterialGroup"
 						remaps =
 						[
-{ from = "vr_transport_olive.vmat" to = "materials/veridant/cases-v3/olive.vmat" },
-{ from = "vr_transport_black.vmat" to = "materials/veridant/cases-v3/black.vmat" },
-{ from = "vr_transport_rubber.vmat" to = "materials/veridant/cases-v3/rubber.vmat" },
-{ from = "vr_transport_gasket.vmat" to = "materials/veridant/cases-v3/gasket.vmat" },
-{ from = "vr_transport_steel.vmat" to = "materials/veridant/cases-v3/steel.vmat" },
-{ from = "vr_transport_label.vmat" to = "materials/veridant/cases-v3/label.vmat" },
+{ from = "vr_chair_authored.vmat" to = "materials/veridant/chair-v5/leather.vmat" },
+{ from = "vr_gate_stone.vmat" to = "materials/veridant/gates-v1/stone.vmat" },
+{ from = "vr_gate_stone_warm.vmat" to = "materials/veridant/gates-v1/stone_warm.vmat" },
+{ from = "vr_gate_stone_cool.vmat" to = "materials/veridant/gates-v1/stone_cool.vmat" },
+{ from = "vr_gate_mortar.vmat" to = "materials/veridant/gates-v1/mortar.vmat" },
+{ from = "vr_gate_paint.vmat" to = "materials/veridant/gates-v1/paint.vmat" },
+{ from = "vr_gate_hardware.vmat" to = "materials/veridant/gates-v1/hardware.vmat" },
+{ from = "vr_gate_plaque.vmat" to = "materials/veridant/gates-v1/plaque.vmat" },
+
+{ from = "vr_pool_coping.vmat" to = "materials/veridant/pool-v2/coping.vmat" },
+{ from = "vr_pool_coping_light.vmat" to = "materials/veridant/pool-v2/coping_light.vmat" },
+{ from = "vr_pool_coping_dark.vmat" to = "materials/veridant/pool-v2/coping_dark.vmat" },
+{ from = "vr_pool_joint.vmat" to = "materials/veridant/pool-v2/joint.vmat" },
+{ from = "vr_pool_liner.vmat" to = "materials/veridant/pool-v2/liner.vmat" },
+{ from = "vr_pool_rock.vmat" to = "materials/veridant/pool-v2/rock.vmat" },
+{ from = "vr_pool_rock_damp.vmat" to = "materials/veridant/pool-v2/rock_damp.vmat" },
+{ from = "vr_pool_rock_wet.vmat" to = "materials/veridant/pool-v2/rock_wet.vmat" },
+
+{ from = "vr_transport_alloy.vmat" to = "materials/veridant/cases-v4/alloy.vmat" },
+
+{ from = "vr_transport_black_edge.vmat" to = "materials/veridant/cases-v4/black_edge.vmat" },
+
+{ from = "vr_transport_olive_edge.vmat" to = "materials/veridant/cases-v4/olive_edge.vmat" },
+
+{ from = "vr_bench_teak.vmat" to = "materials/veridant/bench-v2/teak.vmat" },
+{ from = "vr_bench_teak_light.vmat" to = "materials/veridant/bench-v2/teak_light.vmat" },
+{ from = "vr_bench_teak_dark.vmat" to = "materials/veridant/bench-v2/teak_dark.vmat" },
+{ from = "vr_bench_endgrain.vmat" to = "materials/veridant/bench-v2/endgrain.vmat" },
+{ from = "vr_bench_concrete.vmat" to = "materials/veridant/bench-v2/concrete.vmat" },
+{ from = "vr_bench_steel.vmat" to = "materials/veridant/bench-v2/steel.vmat" },
+{ from = "vr_bench_recess.vmat" to = "materials/veridant/bench-v2/recess.vmat" },
+{ from = "vr_bench_rubber.vmat" to = "materials/veridant/bench-v2/rubber.vmat" },
+
+{ from = "vr_chair_cloth.vmat" to = "materials/veridant/chair-v4/cloth.vmat" },
+{ from = "vr_chair_piping.vmat" to = "materials/veridant/chair-v4/piping.vmat" },
+{ from = "vr_chair_walnut.vmat" to = "materials/veridant/chair-v4/walnut.vmat" },
+
+{ from = "vr_transport_olive.vmat" to = "materials/veridant/cases-v4/olive.vmat" },
+{ from = "vr_transport_black.vmat" to = "materials/veridant/cases-v4/black.vmat" },
+{ from = "vr_transport_rubber.vmat" to = "materials/veridant/cases-v4/rubber.vmat" },
+{ from = "vr_transport_gasket.vmat" to = "materials/veridant/cases-v4/gasket.vmat" },
+{ from = "vr_transport_steel.vmat" to = "materials/veridant/cases-v4/steel.vmat" },
+{ from = "vr_transport_label.vmat" to = "materials/veridant/cases-v4/label.vmat" },
 
 { from = "vr_table_honed.vmat" to = "materials/veridant/table-v2/honed.vmat" },
 
@@ -96,8 +133,8 @@
 					},
 {
 						_class = "RenderMeshFile"
-						name = "veridant_chairs_v2_0"
-						filename = "models/maps/veridant/chair-v3/chairs-0.obj"
+						name = "veridant_authored_chairs_0"
+						filename = "models/maps/veridant/chair-v5/chairs-0.obj"
 						import_translation = [ 0.0, 0.0, 0.0 ]
 						import_rotation = [ 0.0, 0.0, 0.0 ]
 						import_scale = 1.0
@@ -109,8 +146,8 @@
 					},
 {
 						_class = "RenderMeshFile"
-						name = "veridant_chairs_v2_1"
-						filename = "models/maps/veridant/chair-v3/chairs-1.obj"
+						name = "veridant_authored_chairs_1"
+						filename = "models/maps/veridant/chair-v5/chairs-1.obj"
 						import_translation = [ 0.0, 0.0, 0.0 ]
 						import_rotation = [ 0.0, 0.0, 0.0 ]
 						import_scale = 1.0
@@ -122,8 +159,8 @@
 					},
 {
 						_class = "RenderMeshFile"
-						name = "veridant_dress_transport_cases_0"
-						filename = "models/maps/veridant/cases-v3/veridant_dress-0.obj"
+						name = "veridant_authored_chairs_2"
+						filename = "models/maps/veridant/chair-v5/chairs-2.obj"
 						import_translation = [ 0.0, 0.0, 0.0 ]
 						import_rotation = [ 0.0, 0.0, 0.0 ]
 						import_scale = 1.0
@@ -135,8 +172,47 @@
 					},
 {
 						_class = "RenderMeshFile"
-						name = "veridant_dress_transport_cases_1"
-						filename = "models/maps/veridant/cases-v3/veridant_dress-1.obj"
+						name = "veridant_authored_chairs_3"
+						filename = "models/maps/veridant/chair-v5/chairs-3.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+
+
+
+
+
+{
+						_class = "RenderMeshFile"
+						name = "veridant_promenade_benches_v2"
+						filename = "models/maps/veridant/bench-v2/benches.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+
+
+
+
+
+
+
+
+{
+						_class = "RenderMeshFile"
+						name = "veridant_pool_v2"
+						filename = "models/maps/veridant/pool-v2/pool.obj"
 						import_translation = [ 0.0, 0.0, 0.0 ]
 						import_rotation = [ 0.0, 0.0, 0.0 ]
 						import_scale = 1.0
@@ -148,8 +224,8 @@
 					},
 {
 						_class = "RenderMeshFile"
-						name = "veridant_dress_transport_cases_2"
-						filename = "models/maps/veridant/cases-v3/veridant_dress-2.obj"
+						name = "veridant_closed_gates"
+						filename = "models/maps/veridant/gates-v1/gates.obj"
 						import_translation = [ 0.0, 0.0, 0.0 ]
 						import_rotation = [ 0.0, 0.0, 0.0 ]
 						import_scale = 1.0
@@ -161,8 +237,112 @@
 					},
 {
 						_class = "RenderMeshFile"
-						name = "veridant_dress_transport_cases_3"
-						filename = "models/maps/veridant/cases-v3/veridant_dress-3.obj"
+						name = "veridant_dress_cases_v4_0"
+						filename = "models/maps/veridant/cases-v4/veridant_dress-0.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "veridant_dress_cases_v4_1"
+						filename = "models/maps/veridant/cases-v4/veridant_dress-1.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "veridant_dress_cases_v4_2"
+						filename = "models/maps/veridant/cases-v4/veridant_dress-2.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "veridant_dress_cases_v4_3"
+						filename = "models/maps/veridant/cases-v4/veridant_dress-3.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "veridant_dress_cases_v4_4"
+						filename = "models/maps/veridant/cases-v4/veridant_dress-4.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "veridant_dress_cases_v4_5"
+						filename = "models/maps/veridant/cases-v4/veridant_dress-5.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "veridant_dress_cases_v4_6"
+						filename = "models/maps/veridant/cases-v4/veridant_dress-6.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "veridant_dress_cases_v4_7"
+						filename = "models/maps/veridant/cases-v4/veridant_dress-7.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "veridant_dress_cases_v4_8"
+						filename = "models/maps/veridant/cases-v4/veridant_dress-8.obj"
 						import_translation = [ 0.0, 0.0, 0.0 ]
 						import_rotation = [ 0.0, 0.0, 0.0 ]
 						import_scale = 1.0

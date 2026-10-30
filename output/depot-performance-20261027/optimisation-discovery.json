@@ -1,0 +1,34 @@
+{
+  "results": [
+    {
+      "tools": [],
+      "total": 401,
+      "hint": "Nothing matched 'optimi'. Every keyword must match, so try fewer or more general keywords - or an empty query to list all 401 tools."
+    },
+    {
+      "tools": [
+        {
+          "name": "get_profiler_stats",
+          "title": "Get Profiler Stats",
+          "toolset": "bridge_debug",
+          "description": "Read live engine performance counters (ported from Unity's get_profiler_stats): FPS, frame ms, GPU ms, bytes allocated, process memory, exception count, and per-category timings (update/physics/ui/render/network/gcPause) averaged over `frames`. Reads Sandbox.Diagnostics.PerformanceStats. Most meaningful during play (call start_play first) but populated in the editor too. Read-only.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "frames": {
+                "type": "integer",
+                "description": "Averaging window (frames) for the per-category timings. Default 60."
+              }
+            },
+            "required": []
+          },
+          "annotations": {
+            "readOnlyHint": true
+          }
+        }
+      ],
+      "total": 401
+    }
+  ],
+  "text": "get_component_type failed: Unknown argument 'type' - this tool takes name (string) (2 later calls not run)"
+}

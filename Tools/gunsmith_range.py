@@ -146,37 +146,6 @@ def level():
     return m
 
 
-def plate(model,outline,zoffset=0,paint="range_white",depth=.8):
-    # Convex plate in the Y/Z plane, facing the firing line (-X).
-    vertices=[p((x,y,z+zoffset)) for x in (-depth/2,depth/2) for y,z in outline]
-    count=len(outline)
-    faces=[list(range(count-1,-1,-1)),list(range(count,count*2))]
-    faces += [[i,(i+1)%count,(i+1)%count+count,i+count] for i in range(count)]
-    centre=np.mean(vertices,axis=0)
-    for face in faces:
-        points=[vertices[i] for i in face]
-        normal=np.cross(points[1]-points[0],points[2]-points[0])
-        if np.dot(normal,np.mean(points,axis=0)-centre)<0: points.reverse()
-        model.polygon(paint,points)
-    model.hull(vertices,"metal")
-
-
-def target():
-    m=K.Model()
-    box(m,(-.45,-9,0),(.45,9,31),"range_white","metal")
-    plate(m,[(-10,28),(10,28),(16,34),(16,51),(9,57),(-9,57),(-16,51),(-16,34)])
-    box(m,(-.45,-4,56),(.45,4,63),"range_white","metal")
-    head=[(7*math.cos(t),66+7*math.sin(t)) for t in np.linspace(0,math.tau,20,endpoint=False)]
-    plate(m,head)
-    # Black aiming marks are geometric paint patches; no external image dependency.
-    for radius,z,paint in ((9,44,"range_black"),(3,44,"range_orange"),(2.6,66,"range_black")):
-        face_x=-.48 if paint=="range_orange" else -.46
-        pts=[p((face_x,radius*math.cos(t),z+radius*math.sin(t))) for t in np.linspace(0,math.tau,28,endpoint=False)]
-        m.polygon(paint,pts[::-1],p((-1,0,0)))
-    configure(m)
-    return m
-
-
 def obj(name,key,position=(0,0,0),components=(),**kwargs):
     return K.game_object(IDS,name,key,position=position,components=components,**kwargs)
 
@@ -200,8 +169,8 @@ def scene():
     for distance,y in ((10,-450),(25,-150),(50,150),(100,450)):
         key=f"target/{distance}"
         objects.append(obj(f"{distance} m Target",key,(distance*METRE,y,4),components=[
-            component("Sandbox.ModelRenderer",key+"/renderer",Model=f"{RESOURCE}/range_target.vmdl",Tint="1,1,1,1"),
-            component("Sandbox.ModelCollider",key+"/collider",Model=f"{RESOURCE}/range_target.vmdl",Static=False),
+            component("Sandbox.ModelRenderer",key+"/renderer",Model=f"{RESOURCE}/range_target_v2/range_target.vmdl",Tint="1,1,1,1"),
+            component("Sandbox.ModelCollider",key+"/collider",Model=f"{RESOURCE}/range_target_v2/range_target.vmdl",Static=False),
             component("Facepunch.Gunsmith.FiringRangeTarget",key+"/target",DistanceMetres=distance,MaxHealth=100,Travel=70),
         ],tags="range_target"))
     return {"__guid":IDS("scene"),"GameObjects":objects,"SceneProperties":{
@@ -214,7 +183,7 @@ def scene():
 
 def main():
     materials()
-    for name,model in (("gunsmith_range",level()),("range_target",target())):
+    for name,model in (("gunsmith_range",level()),):
         count=K.write_model(OUT,RESOURCE,name,model)
         for suffix in (".vmdl",".obj"):
             metadata(OUT/f"{name}{suffix}")

@@ -1,0 +1,14 @@
+if (!Game.IsPlaying || Game.ActiveScene?.Source?.ResourcePath != "scenes/maps/depot/depot.scene") throw new Exception("Expected running Depot.");
+var scene=Game.ActiveScene;
+var scoring=scene.GetAllObjects(true).SelectMany(o=>o.Components.GetAll<Facepunch.TeamDeathmatchScoring>(FindMode.EverythingInSelf)).ToArray();
+if(scoring.Length!=1) throw new Exception("Expected one TDM scoring rule.");
+foreach(var rule in scoring) rule.Enabled=false;
+var player=Facepunch.Client.Local?.PlayerPawn;
+var initial=new {Facepunch.DevCommands.NoDamage,PlayerFrozen=player?.IsFrozen};
+Facepunch.DevCommands.NoDamage=true;
+if(player.IsValid()) player.IsFrozen=true;
+var session=Editor.SceneEditorSession.All.First(s=>s.Scene?.Source?.ResourcePath=="scenes/maps/depot/depot.scene"&&s.OnFrameTo?.Target is Editor.Widget);
+var viewport=((Editor.Widget)session.OnFrameTo.Target).GetDescendants<Editor.SceneRenderingWidget>().Single(w=>w.Visible);
+viewport.FixedSize=new Vector2(1920,1080);
+for(var i=0;i<4&&Facepunch.UI.ClassSelect.IsAnyOpen;i++) Facepunch.UI.ClassSelect.CloseAny();
+return new {Before=initial,ScoringRulesDisabled=scoring.Length,ViewSize=viewport.Size,ClassPickerOpen=Facepunch.UI.ClassSelect.IsAnyOpen};

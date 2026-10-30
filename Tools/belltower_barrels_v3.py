@@ -37,7 +37,7 @@ ROOT = Path(__file__).resolve().parents[1]
 STAVES = ('barrel_stave_a', 'barrel_stave_b', 'barrel_stave_c', 'barrel_stave_d')
 HEAD = 'barrel_head'
 HOOP = 'sh_hoop'               # black-painted steel with rust coming through (the Stillhouse map's hoops)
-RUST = 'barrel_hoop_rust'      # rusted through: the Stillhouse rust, darkened to old iron's brown
+RUST = 'barrel_hoop_rust'      # aged charcoal iron, with scattered brown corrosion and worn steel
 ENDGRAIN = 'barrel_endgrain'   # the stave ends: the range's oak end grain, weathered darker
 # Each private material is an existing picture set with its own tint, so no new textures.
 SCAN = {'TextureColor': 'materials/belltower/scans/brown_planks_03_diffuse_4k.png',
@@ -51,10 +51,10 @@ SOURCES = {'barrel_stave_a': (SCAN, (1.06, .94, .80), .85), 'barrel_stave_b': (S
                        'TextureNormal': 'materials/gunsmith_range/bench_oak_endgrain_normal.png',
                        'TextureRoughness': 'materials/gunsmith_range/bench_oak_endgrain_roughness.png',
                        'TextureAmbientOcclusion': 'materials/default/default_ao.tga'}, (.74, .67, .60), 1),
-           RUST: ({'TextureColor': 'materials/stillhouse/sh_rust_color.png',
-                   'TextureNormal': 'materials/stillhouse/rust_normal.png',
-                   'TextureRoughness': 'materials/stillhouse/rust_rough.png',
-                   'TextureAmbientOcclusion': 'materials/default/default_ao.tga'}, (.58, .47, .42), 1)}
+           RUST: ({'TextureColor': 'materials/stillhouse/sh_hoop_color.png',
+                   'TextureNormal': 'materials/stillhouse/hoop_normal.png',
+                   'TextureRoughness': 'materials/stillhouse/hoop_rough.png',
+                   'TextureAmbientOcclusion': 'materials/default/default_ao.tga'}, (.86, .88, .92), 1)}
 MATERIALS = {name: f'materials/belltower/barrels-v3/{name}.vmat' for name in SOURCES}
 MATERIALS.update({F.DARK: 'materials/belltower/furniture_wood_dark.vmat', HOOP: 'materials/stillhouse/sh_hoop.vmat'})
 HOOP_TILE = 64.0   # sh_hoop and sh_rust are drawn at 8 px an inch on 512 px
@@ -347,7 +347,7 @@ def vmat(name):
              '    shader "shaders/complex.shader"', '    F_SPECULAR "1"']
     lines += [f'    {key} "{path}"' for key, path in textures.items()]
     lines += [f'    g_vColorTint "[{t[0]:.2f} {t[1]:.2f} {t[2]:.2f} 1]"', f'    g_flRoughnessScaleFactor "{rough}"',
-              '    g_flModelTintAmount "1"', '    g_flMetalness "0"', '}']
+              '    g_flModelTintAmount "1"', f'    g_flMetalness "{.40 if name == RUST else 0}"', '}']
     return '\n'.join(lines) + '\n'
 
 

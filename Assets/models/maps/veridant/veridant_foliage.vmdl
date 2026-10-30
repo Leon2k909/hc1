@@ -13,6 +13,27 @@
 						_class = "DefaultMaterialGroup"
 						remaps =
 						[
+{ from = "vr_ivy_leaf.vmat" to = "materials/veridant/ivy-v2/leaf.vmat" },
+{ from = "vr_ivy_fresh.vmat" to = "materials/veridant/ivy-v2/fresh.vmat" },
+{ from = "vr_ivy_back.vmat" to = "materials/veridant/ivy-v2/back.vmat" },
+{ from = "vr_ivy_stem.vmat" to = "materials/veridant/ivy-v2/stem.vmat" },
+
+{ from = "vr_wall_herb_leaf.vmat" to = "models/sbox_props/shrubs/beech/beech_shrub.vmat" },
+{ from = "vr_wall_herb_leaf_light.vmat" to = "materials/veridant/shrub-volume-v1/leaf_light.vmat" },
+{ from = "vr_wall_herb_leaf_back.vmat" to = "materials/veridant/shrub-volume-v1/leaf_back.vmat" },
+{ from = "vr_wall_herb_stem.vmat" to = "materials/veridant/shrub-volume-v1/stem.vmat" },
+{ from = "vr_wall_herb_wood.vmat" to = "materials/veridant/shrub-volume-v1/wood.vmat" },
+{ from = "vr_wall_herb_flower.vmat" to = "materials/veridant/shrub-volume-v1/flower.vmat" },
+{ from = "vr_wall_herb_calyx.vmat" to = "materials/veridant/shrub-volume-v1/calyx.vmat" },
+{ from = "vr_wall_herb_soil.vmat" to = "materials/veridant/shrub-volume-v1/soil.vmat" },
+{ from = "vr_wall_herb_edging.vmat" to = "materials/veridant/shrub-volume-v1/edging.vmat" },
+
+{ from = "vr_courtyard_olive_twig.vmat" to = "materials/veridant/courtyard-olive-v2/twig.vmat" },
+{ from = "vr_courtyard_olive_soil.vmat" to = "materials/veridant/courtyard-olive-v2/soil.vmat" },
+{ from = "vr_courtyard_olive_mulch.vmat" to = "materials/veridant/courtyard-olive-v2/mulch.vmat" },
+{ from = "vr_courtyard_olive_herb.vmat" to = "materials/veridant/courtyard-olive-v2/herb.vmat" },
+{ from = "vr_courtyard_olive_herb_back.vmat" to = "materials/veridant/courtyard-olive-v2/herb_back.vmat" },
+
 
 { from = "vr_garden_planter_beech.vmat" to = "models/sbox_props/shrubs/beech/beech_shrub.vmat" },
 { from = "vr_garden_planter_soil.vmat" to = "materials/veridant/planter-shrub-v1/soil.vmat" },
@@ -43,7 +64,7 @@
 					{
 						_class = "RenderMeshFile"
 						name = "veridant_foliage"
-						filename = "models/maps/veridant/pergola-flowers-v2/foliage-base.obj"
+						filename = "models/maps/veridant/ivy-v2/foliage-base.obj"
 						import_translation = [ 0.0, 0.0, 0.0 ]
 						import_rotation = [ 0.0, 0.0, 0.0 ]
 						import_scale = 1.0
@@ -57,6 +78,59 @@
 						_class = "RenderMeshFile"
 						name = "pergola_flowers_v2"
 						filename = "models/maps/veridant/pergola-flowers-v2/flowers.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+
+{
+						_class = "RenderMeshFile"
+						name = "courtyard_olive_planting"
+						filename = "models/maps/veridant/courtyard-olive-v2/planting.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "wall_rosemary_0"
+						filename = "models/maps/veridant/shrub-volume-v1/rosemary-0.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "wall_rosemary_1"
+						filename = "models/maps/veridant/shrub-volume-v1/rosemary-1.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "veridant_ivy_v2"
+						filename = "models/maps/veridant/ivy-v2/ivy.obj"
 						import_translation = [ 0.0, 0.0, 0.0 ]
 						import_rotation = [ 0.0, 0.0, 0.0 ]
 						import_scale = 1.0

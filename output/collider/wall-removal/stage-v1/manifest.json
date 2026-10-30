@@ -1,0 +1,72 @@
+{
+  "revision": "collider-west-spawn-wall-removal-v1",
+  "walls_removed": 1,
+  "plan_bounds": [
+    -1524,
+    -1500,
+    -160,
+    160,
+    0,
+    164
+  ],
+  "files": {
+    "Assets/models/maps/collider/collider_structure.obj": {
+      "before": "eb32986e811c94423d60b8a9b008ab39581e4faf704d81d861a21b127414372e",
+      "after": "627525d95f0d677b0603cd6d2b74f016b35cd4287c38b8164b8eb6363eee0a99",
+      "source": "output/collider/wall-removal/stage-v1/Assets/models/maps/collider/collider_structure.obj",
+      "backup": "output/collider/wall-removal/stage-v1/before/Assets/models/maps/collider/collider_structure.obj",
+      "removed_face_lines": [
+        355921,
+        355922,
+        355923,
+        355924,
+        355925,
+        355926,
+        355927,
+        355928,
+        355929,
+        355930,
+        355931,
+        355932
+      ],
+      "removed_triangles": 12,
+      "all_other_obj_bytes_exact": true
+    },
+    "Assets/models/maps/collider/collider_structure.vmdl": {
+      "before": "9be39f52fd2bad5a2508a40d08a400c6ce7fcccbad82849a9cc09ac8cc79f523",
+      "after": "d1cdaa826c2609cab5d263d9ab264f9eea5b749a4cf46ed27762a9d3182d7900",
+      "source": "output/collider/wall-removal/stage-v1/Assets/models/maps/collider/collider_structure.vmdl",
+      "backup": "output/collider/wall-removal/stage-v1/before/Assets/models/maps/collider/collider_structure.vmdl",
+      "removed_collision_boxes": 1,
+      "removed_node": "{\n\t\t\t\t\t\t_class = \"PhysicsShapeBox\"\n\t\t\t\t\t\tparent_bone = \"\"\n\t\t\t\t\t\tsurface_prop = \"metal\"\n\t\t\t\t\t\tcollision_tags = \"solid\"\n\t\t\t\t\t\torigin = [ 0.0000, 1512.0000, 82.0000 ]\n\t\t\t\t\t\tangles = [ -0.0000, -90.0000, 0.0000 ]\n\t\t\t\t\t\tdimensions = [ 24.0000, 320.0000, 164.0000 ]\n\t\t\t\t\t},",
+      "all_other_modeldoc_bytes_exact": true
+    },
+    "Assets/ui/Minimaps/minimap_collider.png": {
+      "before": "b829ead1e27c329b27643e9be04cf10d528d725a1a226239016a79a9ce3d6f91",
+      "after": "67bfb44dfc335485474564dade016c0be78c3116a5869e361b19e5f5511986fe",
+      "source": "output/collider/wall-removal/stage-v1/Assets/ui/Minimaps/minimap_collider.png",
+      "backup": "output/collider/wall-removal/stage-v1/before/Assets/ui/Minimaps/minimap_collider.png"
+    }
+  },
+  "protected_sha256": {
+    "Assets/scenes/maps/Collider/collider.scene": "b45ae8848a9d8581e87c4d2369ac4829d9f6afbc8956350dc1b8d2aed304b27c",
+    "Assets/models/maps/collider/collider_structure.mtl": "498ef9ca9fa73d531d0f86c1b26f5a4b6d0224e825eb9c5a3fe8787ee5215831",
+    "Assets/models/maps/collider/collider_structure_hulls_metal.obj": "25ce86ff752cc120dfa1ca88a432d3c347d9332660fd10f09d2381501caece96",
+    "Assets/models/maps/collider/collider_detail.mtl": "4e9fba2794343db51f99b004c90a3533d88b7be1dd8f6c0e52bddf6ffd285fcc",
+    "Assets/models/maps/collider/collider_detail.obj": "14b303198df6b8a8a6dc41ad167b387a951e2447d6ee13e6350fb3e903378e0f",
+    "Assets/models/maps/collider/collider_detail.vmdl": "ae60c68b92df8555e15f84306a7428f32085edd5bbda85a4468152b3f5d69064",
+    "Assets/models/maps/collider/collider_glass.mtl": "74d7a3e4c50e513c887cba15c4592f6289c7e90f1dc3559a3e08fefd92199a74",
+    "Assets/models/maps/collider/collider_glass.obj": "77235fbd65d44896b218263bb5ab6e6e8f389babbc8792b90482d1636fdf85ba",
+    "Assets/models/maps/collider/collider_glass.vmdl": "b924e5913e91ea00382a0477397a440ae86d86dbeb7edca9703d5bde1bc30ef3",
+    "Assets/models/maps/collider/collider_machine.mtl": "1cd3baef308ac8955ac264e98fb44dcdc55ef81afdd613e9610ec933d88b6885",
+    "Assets/models/maps/collider/collider_machine.obj": "04622188a4d89ecec76bc9a410f3aeac630868ab3f10890446c7eb97449b9d9e",
+    "Assets/models/maps/collider/collider_machine.vmdl": "2c5144bf86db04d1b3a5cf28baf2026651dba2708f6bb816f4b763463b88dd6a"
+  },
+  "source_sha256": {
+    "Tools/collider_map.py": "16cb20bb2a7bd952b52ca4a0fb5909b9d39d72144ba64e90554ade0d1badeee7",
+    "Tools/collider_remove_west_wall.py": "ad99043b6611ad214835b8a4d8235790a217db1cc99c514da98975f9e9ad3ef1",
+    "Tools/map_kit.py": "cc60204c747d064cb1fecdb666b24c847ae89dc863c2533d3811a0445f22020d"
+  },
+  "generator_hook": "def wings(m):\n    # Upper slabs leave a 180x640 opening over each wing stair.\n    for s in (-1,1):\n        def mirrored(e0,e1,n0,n1,z0,z1,paint=\"co_floor\"):\n            lo,hi=sorted((s*e0,s*e1)); box(m,lo,hi,n0,n1,z0,z1,paint)\n        mirrored(1424,1700,-900,650,G-18,G)\n        mirrored(1700,1900,-900,-780,G-18,G)\n        mirrored(1700,1900,-140,650,G-18,G)\n        lo,hi=sorted((s*1710,s*1880))\n        D.stair(m,\"n\",lo,hi,-770,-140,0,G)\n        mirrored(1424,1900,-900,980,880,900,\"co_steel\")\n        mirrored(1400,1900,650,674,G,900,\"co_wall\")\n        mirrored(1424,1900,-350,350,544,560,\"co_floor\")\n        # The west approach is open; the east wing keeps its concrete screen.\n        if s>0: mirrored(1500,1524,-160,160,0,164,\"co_concrete\")\n        # The upper middle opening is glass: it needs no spawn cover in front of the displays.\n        for index,n in enumerate((-190,-65,65,190)):\n            for row,z in enumerate((G+125,G+203)):\n                monitor(m,(s*1880,n,z),(-s,0),112,66,(index+row)%4)\n        for n in (-55,95,245):\n            control_desk(m,s,n,G)\n        for index,n in enumerate((-220,-70,80,230)):\n            control_desk(m,s,n,560,collide=False)\n            monitor(m,(s*1880,n,738),(-s,0),118,74,index)\n        lamp(m,f\"upper control {s}\",s*1620,0,815,240,radius=620,power=4.2,axis=\"n\")\n        for z in (0,G):\n            for n in (-550,360,780):\n                lamp(m,f\"wing {s} {z} {n}\",s*1635,n,z+188,80,radius=550,shadow=False,power=5.5)\n        for n in (-650,480):\n            lamp(m,f\"wing top {s} {n}\",s*1770,n,610,80,radius=390,power=2.8)\n",
+  "radar_before_matches_published_pixels": true
+}

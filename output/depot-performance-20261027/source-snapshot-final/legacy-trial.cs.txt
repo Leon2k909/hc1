@@ -1,0 +1,17 @@
+if (!Game.IsPlaying || Game.ActiveScene?.Source?.ResourcePath != "scenes/maps/depot/depot.scene") throw new Exception("Expected running Depot.");
+var scene=Game.ActiveScene;
+var map=scene.GetAllComponents<MapInstance>().Single();
+var config=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(Project.Current.GetRootPath(),"Sources/Depot/performance-v1/legacy-trial.json")));
+var enabled=config["enabled"].GetValue<bool>();
+var objects=map.GameObject.Children.Where(o=>o.Name.StartsWith("ammo_",StringComparison.Ordinal)||o.Name.StartsWith("item_",StringComparison.Ordinal)||o.Name.StartsWith("charger_",StringComparison.Ordinal)).ToArray();
+var safe=new[]{"Sandbox.BoxCollider","Sandbox.ModelRenderer","Sandbox.SkinnedModelRenderer","Sandbox.MissingComponent","Sandbox.TextRenderer","Facepunch.WorldModel"};
+var report=objects.Select(o=>new {
+    o.Id,o.Name,o.Enabled,
+    Renderers=o.GetComponentsInChildren<ModelRenderer>(true).Count(),
+    Colliders=o.GetComponentsInChildren<Collider>(true).Count(),
+    Components=o.GetComponentsInChildren<Component>(true).Select(c=>c.GetType().FullName).Distinct().ToArray()
+}).ToArray();
+var unexpected=report.Where(r=>r.Components.Any(t=>!safe.Contains(t))).ToArray();
+if(unexpected.Length>0) throw new Exception("Unexpected functional components: "+Json.Serialize(unexpected));
+foreach(var obj in objects) obj.Enabled=enabled;
+return new { Enabled=enabled,Objects=objects.Length,Renderers=report.Sum(r=>r.Renderers),Colliders=report.Sum(r=>r.Colliders),Report=report };

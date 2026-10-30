@@ -1,0 +1,14 @@
+// Tools/collider_operators.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    TextureColor "materials/collider/chair-trial-v1/alloy_color.png"
+    TextureNormal "materials/collider/chair-trial-v1/alloy_normal.png"
+    TextureRoughness "materials/collider/chair-trial-v1/alloy_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_flMetalness "0.88"
+    g_flRoughnessScaleFactor "1"
+    g_vColorTint "[1 1 1 1]"
+    g_flModelTintAmount "1"
+}

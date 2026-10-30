@@ -200,12 +200,8 @@ def fountain_block(model, centre, half, low, high, paint=LIMESTONE, surface=None
 
 def market_steps(model, centre, surface=None):
     configure(model)
-    for r,low,high in ((100,0,12),(80,12,24),(60,24,36)):
-        model.cylinder(centre,r,low,high,{},sides=8,surface=surface,turn=math.pi/8)
-        inner = r-26
-        # The next step conceals this flat centre; jointed blocks form its tread.
-        model.cylinder(centre,inner+.5,low,high-.3,{'side':LIMESTONE,'top':LIMESTONE},sides=8,turn=math.pi/8)
-        polygon_ring(model,centre,inner,r,low,high,LIMESTONE,count=3,cap=True)
+    from belltower_market_steps import build
+    build(model,centre,surface)
     box_stone(model,(centre[0]-18,centre[1]-18,200),(centre[0]+18,centre[1]+18,212),cap=True)
 
 

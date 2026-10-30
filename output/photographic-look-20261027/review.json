@@ -1,0 +1,82 @@
+{
+  "installed": true,
+  "native_compile_errors": 0,
+  "native_profile_checks": {
+    "Profiles": [
+      {
+        "Path": "prefabs/player/cameras/default_player_camera.prefab",
+        "NativeLoad": true,
+        "CompiledPrefabClone": true,
+        "CopyValuesPreserved": true,
+        "CopyEnabledStatePreserved": true,
+        "CopyIdentityUnique": true
+      },
+      {
+        "Path": "scenes/theater_playback.scene",
+        "NativeLoad": true,
+        "CompiledPrefabClone": false,
+        "CopyValuesPreserved": true,
+        "CopyEnabledStatePreserved": true,
+        "CopyIdentityUnique": true
+      }
+    ],
+    "ShaderMaterialValid": true,
+    "BakedTextures": [
+      {
+        "Name": "irradiance",
+        "Width": 88,
+        "Height": 184,
+        "Valid": true
+      },
+      {
+        "Name": "distance",
+        "Width": 176,
+        "Height": 368,
+        "Valid": true
+      },
+      {
+        "Name": "relocation",
+        "Width": 11,
+        "Height": 23,
+        "Valid": true
+      }
+    ],
+    "EditorStatePreserved": true
+  },
+  "source_checks": {
+    "scene_preserved_outside_baked_volume": true,
+    "generator_profile_matches_saved_scene": true,
+    "generator_idempotent": true,
+    "python_sources_parse": true
+  },
+  "identity_controls": {
+    "after": {
+      "mean_absolute_rgb_8bit": 0.2714240740740741,
+      "percentile_99_rgb_8bit": 2.0
+    },
+    "repeat": {
+      "mean_absolute_rgb_8bit": 9.768518518518519e-05,
+      "percentile_99_rgb_8bit": 0.0
+    },
+    "zero": {
+      "mean_absolute_rgb_8bit": 0.00011805555555555556,
+      "percentile_99_rgb_8bit": 0.0
+    }
+  },
+  "reviewed_maps": [
+    "Ares",
+    "Belltower",
+    "Lowtide",
+    "Veridant",
+    "Boxyard"
+  ],
+  "camera_finish_shared_across_maps": true,
+  "new_baked_light_maps": [
+    "Ares"
+  ],
+  "full_match_and_controlled_gpu_benchmark_run": false,
+  "superseded_evidence": [
+    "first-trial: exposure had not settled"
+  ],
+  "timing_scope": "Offscreen rendering with readback only; no gameplay FPS claim."
+}

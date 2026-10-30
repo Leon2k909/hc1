@@ -1,0 +1,23 @@
+// Tools/veridant_courtyard_olive.py
+"Layer0"
+{
+    shader "shaders/foliage.shader"
+    F_ALPHA_TEST "0"
+    F_FOLIAGE_ANIMATION "0"
+    F_TRANSMISSIVE "1"
+    g_flTransmissionScale "0.32"
+    g_flWrapStrength "0.12"
+    g_flAmbientBoost "0"
+    g_flRimStrength "0"
+    g_flNormalVariation "0"
+    g_flGrassNormalUp "0"
+    TextureTransmissiveColor "[0.42 0.55 0.24 0]"
+    g_flRoughnessScaleFactor "1"
+    g_flMetalness "0"
+    TextureColor "materials/veridant/courtyard-olive-v2/leaf_back_color.png"
+    TextureNormal "materials/veridant/courtyard-olive-v2/leaf_back_normal.png"
+    TextureRoughness "materials/veridant/courtyard-olive-v2/leaf_back_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[0.85 0.95 0.9 1]"
+    g_flModelTintAmount "1"
+}

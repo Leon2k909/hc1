@@ -1,0 +1,64 @@
+// Publish the prepared authored chair after attaching to the existing editor.
+var root=Sandbox.Project.Current.GetRootPath();
+var expected=System.IO.Path.GetFullPath("C:/sbox-projects/hc1/forked-shooter-main").TrimEnd('/','\\');
+if (!String.Equals(System.IO.Path.GetFullPath(root).TrimEnd('/','\\'),expected,StringComparison.OrdinalIgnoreCase))
+    throw new Exception("Wrong project");
+var output=System.IO.Path.Combine(root,"output/veridant/chair-v5");
+var stageName=System.IO.File.ReadAllText(System.IO.Path.Combine(output,"publish-stage.txt")).Trim();
+if (!System.Text.RegularExpressions.Regex.IsMatch(stageName,@"^stage-v\d+$")) throw new Exception("Invalid stage");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(output,stageName,"manifest.json")));
+var session=Editor.SceneEditorSession.Active;
+var sceneId=session?.Scene?.Id;var unsaved=session?.HasUnsavedChanges;var playing=Game.IsPlaying;
+string Hash(string path)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path)));
+bool Equal(string a,string b)=>String.Equals(a,b,StringComparison.OrdinalIgnoreCase);
+string Local(string relative)
+{
+    var path=System.IO.Path.GetFullPath(System.IO.Path.Combine(root,relative));
+    if (!path.StartsWith(expected+System.IO.Path.DirectorySeparatorChar,StringComparison.OrdinalIgnoreCase)) throw new Exception("Out-of-project target");
+    return path;
+}
+foreach (var pair in manifest["files"].AsObject())
+{
+    var target=Local(pair.Key);var before=pair.Value["before"]?.GetValue<string>();
+    if (before is null ? System.IO.File.Exists(target) : !System.IO.File.Exists(target)||!Equal(Hash(target),before))
+        throw new Exception("Input changed; restage against the latest document: "+pair.Key);
+    if (!Equal(Hash(Local(pair.Value["source"].GetValue<string>())),pair.Value["after"].GetValue<string>())) throw new Exception("Staged source changed");
+}
+if (!manifest["files"].AsObject().ContainsKey("Assets/models/maps/veridant/veridant_dress.vmdl"))
+{
+    var modelDocument=System.IO.File.ReadAllText(Local("Assets/models/maps/veridant/veridant_dress.vmdl"));
+    for (var i=0;i<4;i++)
+        if (!modelDocument.Contains($"models/maps/veridant/chair-v5/chairs-{i}.obj")) throw new Exception("Chair import changed");
+}
+foreach (var pair in manifest["files"].AsObject())
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    var target=Local(pair.Key);System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target));
+    var temporary=target+".chair-v5-"+Guid.NewGuid().ToString("N")+".tmp";
+    try
+    {
+        System.IO.File.Copy(Local(pair.Value["source"].GetValue<string>()),temporary,false);
+        System.IO.File.Move(temporary,target,true);
+    }
+    finally { if (System.IO.File.Exists(temporary)) System.IO.File.Delete(temporary); }
+    if (pair.Key.StartsWith("Assets/",StringComparison.OrdinalIgnoreCase)) Editor.AssetSystem.RegisterFile(target);
+}
+var compiled=new System.Collections.Generic.List<object>();
+foreach (var relative in new[] { "materials/veridant/chair-v5/leather.vmat","models/maps/veridant/veridant_dress.vmdl" })
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    var path=System.IO.Path.Combine(root,"Assets",relative);
+    var asset=Editor.AssetSystem.FindByPath(path)??Editor.AssetSystem.RegisterFile(path);
+    if (asset is null) throw new Exception("Missing resource "+relative);
+    asset.Compile(true);await asset.CompileIfNeededAsync();
+    if (!asset.IsCompiled||asset.IsCompileFailed) throw new Exception("Compile failed "+relative);
+    compiled.Add(new { Path=relative,asset.IsCompiled,asset.IsCompiledAndUpToDate,asset.IsCompileFailed });
+}
+var model=Model.Load("models/maps/veridant/veridant_dress.vmdl");
+var report=new { Stage=stageName,Instances=manifest["instances"].GetValue<int>(),ModelIsError=model.IsError,
+    AuthoredMaterialPresent=model.Materials.Any(m=>m.ResourcePath?.Contains("chair-v5")==true),Compiled=compiled,
+    SourceSceneUnchanged=Editor.SceneEditorSession.Active?.Scene?.Id==sceneId,
+    UnsavedStateUnchanged=Editor.SceneEditorSession.Active?.HasUnsavedChanges==unsaved,PlayStateUnchanged=Game.IsPlaying==playing };
+System.IO.File.WriteAllText(System.IO.Path.Combine(output,"installed.json"),
+    System.Text.Json.JsonSerializer.Serialize(report,new System.Text.Json.JsonSerializerOptions { WriteIndented=true }));
+return report;

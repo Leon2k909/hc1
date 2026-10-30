@@ -1,0 +1,472 @@
+{
+  "date": "2026-10-27",
+  "project": "C:/sbox-projects/hc1/forked-shooter-main",
+  "map": "facepunch.depot",
+  "scope": "Local editor TDM; three fixed player views, one invulnerable stationary player, nine active bots, score completion disabled only during testing.",
+  "hardware": {
+    "cpu": "Intel Core i7-11700K",
+    "gpu": "NVIDIA GeForce RTX 5070"
+  },
+  "settings": {
+    "resolution": [
+      1920,
+      1080
+    ],
+    "anti_aliasing": "Multisample4x",
+    "upscaling": "Off",
+    "background_fps_cap_during_measurement": 0
+  },
+  "engine": "26.10.13c",
+  "game_assembly": "package.verarp.razedtest, Version=0.0.125.0, Culture=neutral, PublicKeyToken=null",
+  "measured_frames": 5400,
+  "all_pairs_have_matching_source_revisions": true,
+  "rows": [
+    {
+      "view": "pump",
+      "frames_per_run": 900,
+      "mean_frame_ms_before": 15.867527,
+      "mean_frame_ms_after": 15.666903,
+      "average_fps_before": 63.02,
+      "average_fps_after": 63.83,
+      "frame_time_change_percent": -1.26,
+      "p99_frame_ms_before": 26.4464,
+      "p99_frame_ms_after": 24.5526,
+      "hitches_over_33ms_before": 3,
+      "hitches_over_33ms_after": 0,
+      "snapshot_gpu_ms": {
+        "before": {
+          "AvgMs": 5.39,
+          "P50Ms": 5.32,
+          "P99Ms": 6.52,
+          "MaxMs": 6.56
+        },
+        "after": {
+          "AvgMs": 5.35,
+          "P50Ms": 5.23,
+          "P99Ms": 6.09,
+          "MaxMs": 6.4
+        }
+      },
+      "snapshot_main_thread_ms": {
+        "before": [
+          {
+            "Name": "Render",
+            "AvgMs": 6.52,
+            "MaxMs": 10.54
+          },
+          {
+            "Name": "Physics",
+            "AvgMs": 1.69,
+            "MaxMs": 4.36
+          },
+          {
+            "Name": "Update",
+            "AvgMs": 1.65,
+            "MaxMs": 3.22
+          },
+          {
+            "Name": "UI",
+            "AvgMs": 1.55,
+            "MaxMs": 2.76
+          },
+          {
+            "Name": "Editor",
+            "AvgMs": 1.23,
+            "MaxMs": 7.42
+          },
+          {
+            "Name": "Animation",
+            "AvgMs": 1.17,
+            "MaxMs": 2.4
+          },
+          {
+            "Name": "Particles",
+            "AvgMs": 0.61,
+            "MaxMs": 1.22
+          },
+          {
+            "Name": "Audio",
+            "AvgMs": 0.43,
+            "MaxMs": 1.35
+          }
+        ],
+        "after": [
+          {
+            "Name": "Render",
+            "AvgMs": 6.94,
+            "MaxMs": 12.49
+          },
+          {
+            "Name": "Physics",
+            "AvgMs": 1.79,
+            "MaxMs": 6.04
+          },
+          {
+            "Name": "Update",
+            "AvgMs": 1.69,
+            "MaxMs": 3.38
+          },
+          {
+            "Name": "UI",
+            "AvgMs": 1.56,
+            "MaxMs": 6.33
+          },
+          {
+            "Name": "Animation",
+            "AvgMs": 1.24,
+            "MaxMs": 2.37
+          },
+          {
+            "Name": "Editor",
+            "AvgMs": 1.2,
+            "MaxMs": 10.41
+          },
+          {
+            "Name": "Particles",
+            "AvgMs": 0.62,
+            "MaxMs": 1.12
+          },
+          {
+            "Name": "Audio",
+            "AvgMs": 0.49,
+            "MaxMs": 1.46
+          }
+        ]
+      },
+      "state_before": {
+        "Enabled": false,
+        "SuppressedCount": 0,
+        "PhysicsBodies": 89,
+        "ActiveMapRenderers": 187,
+        "ActiveErrors": 16
+      },
+      "state_after": {
+        "Enabled": true,
+        "SuppressedCount": 69,
+        "PhysicsBodies": 20,
+        "ActiveMapRenderers": 6,
+        "ActiveErrors": 0
+      },
+      "first_sample_utc": "2026-10-27T15:12:11.0110483Z",
+      "last_sample_utc": "2026-10-27T15:13:18.0050423Z"
+    },
+    {
+      "view": "stair",
+      "frames_per_run": 900,
+      "mean_frame_ms_before": 13.949117,
+      "mean_frame_ms_after": 13.170698,
+      "average_fps_before": 71.69,
+      "average_fps_after": 75.93,
+      "frame_time_change_percent": -5.58,
+      "p99_frame_ms_before": 19.9078,
+      "p99_frame_ms_after": 21.181099,
+      "hitches_over_33ms_before": 3,
+      "hitches_over_33ms_after": 3,
+      "snapshot_gpu_ms": {
+        "before": {
+          "AvgMs": 4.73,
+          "P50Ms": 4.63,
+          "P99Ms": 5.49,
+          "MaxMs": 5.63
+        },
+        "after": {
+          "AvgMs": 4.55,
+          "P50Ms": 4.45,
+          "P99Ms": 5.44,
+          "MaxMs": 5.63
+        }
+      },
+      "snapshot_main_thread_ms": {
+        "before": [
+          {
+            "Name": "Render",
+            "AvgMs": 5.48,
+            "MaxMs": 8.07
+          },
+          {
+            "Name": "Update",
+            "AvgMs": 1.5,
+            "MaxMs": 3.54
+          },
+          {
+            "Name": "UI",
+            "AvgMs": 1.32,
+            "MaxMs": 2.46
+          },
+          {
+            "Name": "Physics",
+            "AvgMs": 1.3,
+            "MaxMs": 3.4
+          },
+          {
+            "Name": "Animation",
+            "AvgMs": 1.04,
+            "MaxMs": 1.85
+          },
+          {
+            "Name": "Editor",
+            "AvgMs": 0.61,
+            "MaxMs": 5.55
+          },
+          {
+            "Name": "Particles",
+            "AvgMs": 0.51,
+            "MaxMs": 0.9
+          },
+          {
+            "Name": "Audio",
+            "AvgMs": 0.45,
+            "MaxMs": 1.36
+          }
+        ],
+        "after": [
+          {
+            "Name": "Render",
+            "AvgMs": 5.67,
+            "MaxMs": 7.49
+          },
+          {
+            "Name": "Update",
+            "AvgMs": 1.38,
+            "MaxMs": 2.28
+          },
+          {
+            "Name": "UI",
+            "AvgMs": 1.15,
+            "MaxMs": 1.72
+          },
+          {
+            "Name": "Physics",
+            "AvgMs": 1.1,
+            "MaxMs": 3.01
+          },
+          {
+            "Name": "Animation",
+            "AvgMs": 1,
+            "MaxMs": 1.6
+          },
+          {
+            "Name": "Editor",
+            "AvgMs": 0.48,
+            "MaxMs": 1.49
+          },
+          {
+            "Name": "Particles",
+            "AvgMs": 0.41,
+            "MaxMs": 0.64
+          },
+          {
+            "Name": "Audio",
+            "AvgMs": 0.33,
+            "MaxMs": 1.09
+          }
+        ]
+      },
+      "state_before": {
+        "Enabled": false,
+        "SuppressedCount": 0,
+        "PhysicsBodies": 89,
+        "ActiveMapRenderers": 187,
+        "ActiveErrors": 16
+      },
+      "state_after": {
+        "Enabled": true,
+        "SuppressedCount": 69,
+        "PhysicsBodies": 20,
+        "ActiveMapRenderers": 6,
+        "ActiveErrors": 0
+      },
+      "first_sample_utc": "2026-10-27T15:13:32.7815836Z",
+      "last_sample_utc": "2026-10-27T15:14:40.0876775Z"
+    },
+    {
+      "view": "upper",
+      "frames_per_run": 900,
+      "mean_frame_ms_before": 14.772532,
+      "mean_frame_ms_after": 13.735727,
+      "average_fps_before": 67.69,
+      "average_fps_after": 72.8,
+      "frame_time_change_percent": -7.02,
+      "p99_frame_ms_before": 20.7536,
+      "p99_frame_ms_after": 19.0354,
+      "hitches_over_33ms_before": 1,
+      "hitches_over_33ms_after": 0,
+      "snapshot_gpu_ms": {
+        "before": {
+          "AvgMs": 5.4,
+          "P50Ms": 5.31,
+          "P99Ms": 6.31,
+          "MaxMs": 6.43
+        },
+        "after": {
+          "AvgMs": 5.29,
+          "P50Ms": 5.2,
+          "P99Ms": 6.36,
+          "MaxMs": 6.47
+        }
+      },
+      "snapshot_main_thread_ms": {
+        "before": [
+          {
+            "Name": "Render",
+            "AvgMs": 6.85,
+            "MaxMs": 10.37
+          },
+          {
+            "Name": "Physics",
+            "AvgMs": 1.39,
+            "MaxMs": 2.7
+          },
+          {
+            "Name": "Update",
+            "AvgMs": 1.38,
+            "MaxMs": 2.16
+          },
+          {
+            "Name": "UI",
+            "AvgMs": 1.36,
+            "MaxMs": 3.06
+          },
+          {
+            "Name": "Animation",
+            "AvgMs": 1.04,
+            "MaxMs": 1.42
+          },
+          {
+            "Name": "Editor",
+            "AvgMs": 0.52,
+            "MaxMs": 1.62
+          },
+          {
+            "Name": "Particles",
+            "AvgMs": 0.4,
+            "MaxMs": 0.67
+          },
+          {
+            "Name": "Audio",
+            "AvgMs": 0.37,
+            "MaxMs": 1.64
+          }
+        ],
+        "after": [
+          {
+            "Name": "Render",
+            "AvgMs": 6.15,
+            "MaxMs": 8.74
+          },
+          {
+            "Name": "UI",
+            "AvgMs": 1.35,
+            "MaxMs": 2.26
+          },
+          {
+            "Name": "Physics",
+            "AvgMs": 1.19,
+            "MaxMs": 2.7
+          },
+          {
+            "Name": "Update",
+            "AvgMs": 1.14,
+            "MaxMs": 2.51
+          },
+          {
+            "Name": "Animation",
+            "AvgMs": 1.02,
+            "MaxMs": 2.01
+          },
+          {
+            "Name": "Editor",
+            "AvgMs": 0.52,
+            "MaxMs": 1.93
+          },
+          {
+            "Name": "Particles",
+            "AvgMs": 0.39,
+            "MaxMs": 0.62
+          },
+          {
+            "Name": "Audio",
+            "AvgMs": 0.37,
+            "MaxMs": 1.07
+          }
+        ]
+      },
+      "state_before": {
+        "Enabled": false,
+        "SuppressedCount": 0,
+        "PhysicsBodies": 89,
+        "ActiveMapRenderers": 187,
+        "ActiveErrors": 16
+      },
+      "state_after": {
+        "Enabled": true,
+        "SuppressedCount": 69,
+        "PhysicsBodies": 20,
+        "ActiveMapRenderers": 6,
+        "ActiveErrors": 0
+      },
+      "first_sample_utc": "2026-10-27T15:14:54.1785743Z",
+      "last_sample_utc": "2026-10-27T15:16:01.5941487Z"
+    }
+  ],
+  "aggregate": {
+    "mean_frame_ms_before": 14.863058666666667,
+    "mean_frame_ms_after": 14.191109333333333,
+    "fps_from_mean_frame_time_before": 67.28,
+    "fps_from_mean_frame_time_after": 70.47,
+    "frame_time_change_percent": -4.52
+  },
+  "change": {
+    "component": "Code/World/DepotMapCleanup.cs",
+    "legacy_objects_disabled": 69,
+    "renderers_in_disabled_objects": 183,
+    "colliders_in_disabled_objects": 69,
+    "visible_error_models_before": 16,
+    "visible_error_models_after": 0,
+    "per_frame_cleanup_work_added": false,
+    "all_original_scene_fields_and_identities_preserved": true
+  },
+  "preservation_checks": {
+    "CleanupCount": 69,
+    "LegacyObjectsRestoredWhenDisabled": 69,
+    "FunctionalPickupPreserved": true,
+    "ArchitectureSpawnsAndLightingPreserved": true,
+    "FloorTracesPreserved": true,
+    "FloorTraces": [
+      {
+        "Hit": true,
+        "Position": "-1192,112,888",
+        "Normal": "0,0,1"
+      },
+      {
+        "Hit": true,
+        "Position": "132,1060,888.0762",
+        "Normal": "0,0,1"
+      },
+      {
+        "Hit": true,
+        "Position": "-16,-764,1032",
+        "Normal": "0,0,1"
+      }
+    ],
+    "ActiveMapErrorModels": 0,
+    "BeforeBodies": 79,
+    "AfterBodies": 10,
+    "Probes": 55,
+    "Points": 82,
+    "Spots": 77,
+    "SceneHasUnsavedChanges": false
+  },
+  "native_compile_errors": 0,
+  "sha256": {
+    "Code\\World\\DepotMapCleanup.cs": "e42ae5440642ea74ce9cbfddd049737eaa2dacc8d9b6192196726e9afc8baa26",
+    "Assets\\scenes\\maps\\Depot\\Depot.scene": "ef16f0ec6df7a378d81d867580c5a806f03a8a3c6a39b7c737b0a941ec663a94"
+  },
+  "limits": [
+    "Editor measurements include editor overhead and other desktop applications; these are not standalone or remote-client results.",
+    "One 900-frame before/after pair per view; active bot combat is stochastic, so small FPS differences are not a statistically established gain.",
+    "GPU and main-thread category numbers are subsequent native two-second snapshots, separate from the 900-frame frame-time samples.",
+    "Earlier class-picker, map-transition, shader-compilation, hotload and incomplete runs are excluded from these results.",
+    "Depot remains excluded from IsMatchReadyMap; this pass does not certify its spawn layout or all game modes."
+  ]
+}

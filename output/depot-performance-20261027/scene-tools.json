@@ -1,0 +1,1166 @@
+{
+  "results": [
+    {
+      "name": "scene",
+      "description": "Open scenes - the game object hierarchy, creating and editing game objects and components, the editor camera and viewport screenshots",
+      "tools": [
+        {
+          "name": "add_component",
+          "title": "Add Component",
+          "toolset": "scene",
+          "description": "Add a component to a game object, optionally setting its properties in the same call. The user can undo this. Returns the component's id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "The game object's id, from scene_tree or find_game_objects."
+              },
+              "type": {
+                "type": "string",
+                "description": "The component type name, e.g. 'ModelRenderer'. get_component_type documents what exists."
+              },
+              "properties": {
+                "type": "object",
+                "description": "Optional json object of property values, e.g. {\"LightColor\": \"1,0.8,0.6,1\", \"Radius\": 512}."
+              }
+            },
+            "required": [
+              "id",
+              "type"
+            ]
+          },
+          "outputSchema": {
+            "type": "object",
+            "properties": {
+              "Id": {
+                "type": "string"
+              },
+              "Type": {
+                "type": "string"
+              },
+              "GameObject": {
+                "type": "string"
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "camera_screenshot",
+          "title": "Camera Screenshot",
+          "toolset": "scene",
+          "description": "Render a camera in the scene and return it as an image. Give any CameraComponent's id or its game object's id, or nothing for the scene's main camera. Works in edit and play mode - editor_camera_screenshot shows the editor viewport instead.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "camera": {
+                "type": "string",
+                "description": "A CameraComponent id or its game object's id. Empty uses the scene's main camera."
+              },
+              "width": {
+                "type": "integer",
+                "description": "Image width in pixels.",
+                "minimum": 16,
+                "maximum": 4096,
+                "default": 1280
+              },
+              "height": {
+                "type": "integer",
+                "description": "Image height in pixels.",
+                "minimum": 16,
+                "maximum": 4096,
+                "default": 720
+              },
+              "includeUi": {
+                "type": "boolean",
+                "description": "Include any UI the camera renders.",
+                "default": true
+              }
+            },
+            "required": []
+          },
+          "annotations": {
+            "readOnlyHint": true
+          }
+        },
+        {
+          "name": "create_game_object",
+          "title": "Create Game Object",
+          "toolset": "scene",
+          "description": "Create a game object in the active scene - empty or from a prefab, optionally with components. For putting a model in the scene, spawn_model is quicker. The user can undo this. Returns the new object's id for the other scene tools.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Name for the new object. Empty picks a sensible default."
+              },
+              "parent": {
+                "type": "string",
+                "description": "Parent game object id. Empty parents to the scene root."
+              },
+              "prefab": {
+                "type": "string",
+                "description": "Prefab asset path to instantiate, from asset_search."
+              },
+              "position": {
+                "type": "string",
+                "description": "World position as 'x,y,z'. Default origin."
+              },
+              "angles": {
+                "type": "string",
+                "description": "Rotation as 'pitch,yaw,roll'."
+              },
+              "scale": {
+                "type": "string",
+                "description": "Scale as 'x,y,z', or a single number for uniform."
+              },
+              "components": {
+                "type": "string",
+                "description": "Comma separated component type names to add, e.g. 'ModelRenderer,BoxCollider'."
+              }
+            },
+            "required": []
+          },
+          "outputSchema": {
+            "type": "object",
+            "properties": {
+              "Id": {
+                "type": "string"
+              },
+              "Name": {
+                "type": "string"
+              },
+              "Position": {
+                "type": "string"
+              },
+              "Components": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "Id": {
+                      "type": "string"
+                    },
+                    "Type": {
+                      "type": "string"
+                    },
+                    "GameObject": {
+                      "type": "string"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "delete_game_object",
+          "title": "Delete Game Object",
+          "toolset": "scene",
+          "description": "Delete a game object and its children. The user can undo this.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "The game object's id, from scene_tree or find_game_objects."
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "editor_camera_screenshot",
+          "title": "Editor Camera Screenshot",
+          "toolset": "scene",
+          "description": "Render what the editor scene camera sees and return it as an image - see the scene the way the viewport does. Move the view first with set_editor_camera.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "width": {
+                "type": "integer",
+                "description": "Image width in pixels.",
+                "minimum": 16,
+                "maximum": 4096,
+                "default": 1280
+              },
+              "height": {
+                "type": "integer",
+                "description": "Image height in pixels.",
+                "minimum": 16,
+                "maximum": 4096,
+                "default": 720
+              }
+            },
+            "required": []
+          },
+          "annotations": {
+            "readOnlyHint": true
+          }
+        },
+        {
+          "name": "find_game_objects",
+          "title": "Find Game Objects",
+          "toolset": "scene",
+          "description": "Search a scene's game objects by name substring, component type and/or tag. All filters are optional and combine - empty filters list everything. Returns each match with its hierarchy path and id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Case insensitive substring of the object's name."
+              },
+              "component": {
+                "type": "string",
+                "description": "Case insensitive substring of a component type name the object must have."
+              },
+              "tag": {
+                "type": "string",
+                "description": "A tag the object must have."
+              },
+              "scene": {
+                "type": "string",
+                "description": "Scene name or resource path from list_scenes. Empty for the active scene."
+              },
+              "limit": {
+                "type": "integer",
+                "description": "How many matches to return.",
+                "minimum": 1,
+                "maximum": 500,
+                "default": 100
+              }
+            },
+            "required": []
+          },
+          "annotations": {
+            "readOnlyHint": true
+          },
+          "outputSchema": {
+            "type": "object",
+            "properties": {
+              "Total": {
+                "type": "integer",
+                "description": "How many matched in total, beyond what's shown."
+              },
+              "Results": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "Name": {
+                      "type": "string"
+                    },
+                    "Id": {
+                      "type": "string"
+                    },
+                    "Path": {
+                      "type": "string",
+                      "description": "The object's place in the hierarchy, like 'Map/Props/Barrel'."
+                    },
+                    "Enabled": {
+                      "type": "boolean"
+                    },
+                    "Components": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "required": []
+                }
+              },
+              "Truncated": {
+                "type": "boolean",
+                "description": "True when the scene was too big to finish searching."
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "get_editor_camera",
+          "title": "Get Editor Camera",
+          "toolset": "scene",
+          "description": "The editor scene camera's transform - where the scene viewport is looking from. Position, angles (pitch yaw roll) and field of view.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {},
+            "required": []
+          },
+          "annotations": {
+            "readOnlyHint": true
+          },
+          "outputSchema": {
+            "type": "object",
+            "properties": {
+              "Position": {
+                "type": "string"
+              },
+              "Angles": {
+                "type": "string"
+              },
+              "FieldOfView": {
+                "type": "number"
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "get_game_object",
+          "title": "Get Game Object",
+          "toolset": "scene",
+          "description": "Everything about one game object - enabled state, tags, world transform, parent, children, and its components. Set includeComponentProperties to also get every component's serialized properties.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "The game object's id, from scene_tree or find_game_objects."
+              },
+              "includeComponentProperties": {
+                "type": "boolean",
+                "description": "Include the full serialized properties of every component, not just their types.",
+                "default": false
+              }
+            },
+            "required": [
+              "id"
+            ]
+          },
+          "annotations": {
+            "readOnlyHint": true
+          },
+          "outputSchema": {
+            "type": "object",
+            "properties": {
+              "Scene": {
+                "type": "string"
+              },
+              "Name": {
+                "type": "string"
+              },
+              "Id": {
+                "type": "string"
+              },
+              "Enabled": {
+                "type": "boolean"
+              },
+              "ActiveInHierarchy": {
+                "type": "boolean"
+              },
+              "Tags": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "Parent": {
+                "type": "object",
+                "properties": {
+                  "Id": {
+                    "type": "string"
+                  },
+                  "Name": {
+                    "type": "string"
+                  }
+                },
+                "required": [],
+                "description": "The parent. Null when parented to the scene root."
+              },
+              "WorldPosition": {
+                "type": "string"
+              },
+              "WorldRotation": {
+                "type": "string"
+              },
+              "WorldScale": {
+                "type": "string"
+              },
+              "Components": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "Type": {
+                      "type": "string"
+                    },
+                    "Id": {
+                      "type": "string"
+                    },
+                    "Enabled": {
+                      "type": "boolean"
+                    },
+                    "Properties": {
+                      "description": "The serialized properties. Null unless includeComponentProperties was set."
+                    }
+                  },
+                  "required": []
+                }
+              },
+              "Children": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "Id": {
+                      "type": "string"
+                    },
+                    "Name": {
+                      "type": "string"
+                    },
+                    "Enabled": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "get_selection",
+          "title": "Get Selection",
+          "toolset": "scene",
+          "description": "What's selected in the editor - the game objects and components the user (or you) has picked.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {},
+            "required": []
+          },
+          "annotations": {
+            "readOnlyHint": true
+          },
+          "outputSchema": {
+            "type": "object",
+            "properties": {
+              "GameObjects": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "Id": {
+                      "type": "string"
+                    },
+                    "Name": {
+                      "type": "string"
+                    }
+                  },
+                  "required": []
+                }
+              },
+              "Components": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "Id": {
+                      "type": "string"
+                    },
+                    "Type": {
+                      "type": "string"
+                    },
+                    "GameObject": {
+                      "type": "string"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "list_scenes",
+          "title": "List Scenes",
+          "toolset": "scene",
+          "description": "List the scenes open in the editor - name, resource path, type (scene, prefab or the running game session), whether it's the active tab, unsaved changes, and root object count.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {},
+            "required": []
+          },
+          "annotations": {
+            "readOnlyHint": true
+          },
+          "outputSchema": {
+            "type": "object",
+            "properties": {
+              "Scenes": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "Name": {
+                      "type": "string"
+                    },
+                    "ResourcePath": {
+                      "type": "string"
+                    },
+                    "Type": {
+                      "type": "string",
+                      "description": "Scene, Prefab, or Game for the running session."
+                    },
+                    "IsActive": {
+                      "type": "boolean"
+                    },
+                    "HasUnsavedChanges": {
+                      "type": "boolean"
+                    },
+                    "RootObjectCount": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "redo",
+          "title": "Redo",
+          "toolset": "scene",
+          "description": "Redo the last undone edit in the active scene.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {},
+            "required": []
+          }
+        },
+        {
+          "name": "remove_component",
+          "title": "Remove Component",
+          "toolset": "scene",
+          "description": "Remove a component. Give the component's id, or its game object's id plus a type name. The user can undo this. Removal applies at the end of the frame, so reading the object in the same batch still shows it.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "The component's id, or its game object's id."
+              },
+              "type": {
+                "type": "string",
+                "description": "The component type to remove, when id is a game object."
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "save_scene",
+          "title": "Save Scene",
+          "toolset": "scene",
+          "description": "Save the active scene to its file.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {},
+            "required": []
+          },
+          "outputSchema": {
+            "type": "object",
+            "properties": {
+              "Saved": {
+                "type": "string"
+              },
+              "HasUnsavedChanges": {
+                "type": "boolean"
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "scene_trace",
+          "title": "Scene Trace",
+          "toolset": "scene",
+          "description": "Trace a ray through the active scene's physics and report what it hits - find the floor, check line of sight, probe where something can be placed.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "from": {
+                "type": "string",
+                "description": "Ray start as 'x,y,z'."
+              },
+              "to": {
+                "type": "string",
+                "description": "Ray end as 'x,y,z'."
+              }
+            },
+            "required": [
+              "from",
+              "to"
+            ]
+          },
+          "annotations": {
+            "readOnlyHint": true
+          },
+          "outputSchema": {
+            "type": "object",
+            "properties": {
+              "Hit": {
+                "type": "boolean",
+                "description": "Whether the trace hit anything."
+              },
+              "StartedSolid": {
+                "type": "boolean",
+                "description": "Whether the trace started inside something solid."
+              },
+              "EndPosition": {
+                "type": "string",
+                "description": "Where the trace ended - the hit point, or the requested end on a miss."
+              },
+              "Normal": {
+                "type": "string",
+                "description": "The hit surface normal."
+              },
+              "Fraction": {
+                "type": "number",
+                "description": "How far along the ray the hit was, 0 to 1."
+              },
+              "Distance": {
+                "type": "number",
+                "description": "How far the trace travelled, in units."
+              },
+              "GameObject": {
+                "type": "object",
+                "properties": {
+                  "Id": {
+                    "type": "string"
+                  },
+                  "Name": {
+                    "type": "string"
+                  }
+                },
+                "required": [],
+                "description": "The game object hit. Null on a miss."
+              },
+              "Component": {
+                "type": "string",
+                "description": "The component type hit. Null on a miss."
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "scene_tree",
+          "title": "Scene Tree",
+          "toolset": "scene",
+          "description": "The game object hierarchy of an open scene - every object's name, id, enabled state and component types, nested like the editor's hierarchy panel. Use the ids with get_game_object to dig into a specific object.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "scene": {
+                "type": "string",
+                "description": "Scene name or resource path from list_scenes. Empty for the active scene."
+              },
+              "maxDepth": {
+                "type": "integer",
+                "description": "How many levels deep to descend. 0 for unlimited.",
+                "default": 0
+              }
+            },
+            "required": []
+          },
+          "annotations": {
+            "readOnlyHint": true
+          },
+          "outputSchema": {
+            "type": "object",
+            "properties": {
+              "Scene": {
+                "type": "string"
+              },
+              "ResourcePath": {
+                "type": "string"
+              },
+              "Objects": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "Name": {
+                      "type": "string"
+                    },
+                    "Id": {
+                      "type": "string"
+                    },
+                    "Enabled": {
+                      "type": "boolean"
+                    },
+                    "Components": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "Children": {
+                      "type": "array",
+                      "items": {},
+                      "description": "Child objects. Null when the depth limit or node budget cut them off."
+                    },
+                    "ChildrenNotShown": {
+                      "type": "integer",
+                      "description": "How many children weren't shown."
+                    }
+                  },
+                  "required": []
+                }
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "set_component",
+          "title": "Set Component",
+          "toolset": "scene",
+          "description": "Set properties on a component. Give the component's id, or its game object's id plus a type name. Values use the same serialized forms get_game_object shows - strings, numbers, 'x,y,z' vectors, colors as 'r,g,b,a', asset paths as strings. Everything validates before anything applies, and the user can undo it.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "The component's id, or its game object's id."
+              },
+              "properties": {
+                "type": "object",
+                "description": "A json object of property name to new value."
+              },
+              "type": {
+                "type": "string",
+                "description": "The component type to change, when id is a game object."
+              }
+            },
+            "required": [
+              "id",
+              "properties"
+            ]
+          },
+          "outputSchema": {
+            "type": "object",
+            "properties": {
+              "Id": {
+                "type": "string"
+              },
+              "Type": {
+                "type": "string"
+              },
+              "Applied": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "set_editor_camera",
+          "title": "Set Editor Camera",
+          "toolset": "scene",
+          "description": "Move the editor scene camera. Give a position and/or angles - anything left empty keeps its current value. Returns the resulting transform.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "position": {
+                "type": "string",
+                "description": "World position as 'x,y,z'."
+              },
+              "angles": {
+                "type": "string",
+                "description": "View angles as 'pitch,yaw,roll'."
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "set_game_object",
+          "title": "Set Game Object",
+          "toolset": "scene",
+          "description": "Change a game object - rename, enable/disable, reparent, move, rotate or scale. Only the arguments you give change; everything else stays. The user can undo this.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "The game object's id, from scene_tree or find_game_objects."
+              },
+              "name": {
+                "type": "string",
+                "description": "New name."
+              },
+              "enabled": {
+                "type": "boolean",
+                "description": "Enable or disable the object."
+              },
+              "parent": {
+                "type": "string",
+                "description": "New parent game object id, or 'root' for the scene root."
+              },
+              "position": {
+                "type": "string",
+                "description": "World position as 'x,y,z'."
+              },
+              "angles": {
+                "type": "string",
+                "description": "Rotation as 'pitch,yaw,roll'."
+              },
+              "scale": {
+                "type": "string",
+                "description": "Scale as 'x,y,z', or a single number for uniform."
+              }
+            },
+            "required": [
+              "id"
+            ]
+          },
+          "outputSchema": {
+            "type": "object",
+            "properties": {
+              "Id": {
+                "type": "string"
+              },
+              "Name": {
+                "type": "string"
+              },
+              "Enabled": {
+                "type": "boolean"
+              },
+              "Parent": {
+                "type": "object",
+                "properties": {
+                  "Id": {
+                    "type": "string"
+                  },
+                  "Name": {
+                    "type": "string"
+                  }
+                },
+                "required": [],
+                "description": "The parent. Null when parented to the scene root."
+              },
+              "Position": {
+                "type": "string"
+              },
+              "Angles": {
+                "type": "string"
+              },
+              "Scale": {
+                "type": "string"
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "set_selection",
+          "title": "Set Selection",
+          "toolset": "scene",
+          "description": "Replace the editor selection. Selecting something highlights it for the user - useful for showing them what you're talking about. An empty list clears the selection.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "ids": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Game object or component ids to select."
+              }
+            },
+            "required": [
+              "ids"
+            ]
+          }
+        },
+        {
+          "name": "spawn_model",
+          "title": "Spawn Model",
+          "toolset": "scene",
+          "description": "Create a game object with a ModelRenderer in one call - the fastest way to put a model in the scene. Optionally tint it, override its material, scale it and parent it. The user can undo this. Returns the new object's id.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "model": {
+                "type": "string",
+                "description": "Model asset path, e.g. 'models/dev/box.vmdl'."
+              },
+              "name": {
+                "type": "string",
+                "description": "The new object's name. Empty uses the model filename."
+              },
+              "position": {
+                "type": "string",
+                "description": "World position as 'x,y,z'."
+              },
+              "angles": {
+                "type": "string",
+                "description": "Rotation as 'pitch,yaw,roll'."
+              },
+              "scale": {
+                "type": "string",
+                "description": "Scale as 'x,y,z', or a single number for uniform."
+              },
+              "tint": {
+                "type": "string",
+                "description": "Tint color as 'r,g,b,a' (0-1 floats) or '#rrggbb'."
+              },
+              "material": {
+                "type": "string",
+                "description": "Material asset path to override every surface with."
+              },
+              "parent": {
+                "type": "string",
+                "description": "Parent game object id. Empty parents to the scene root."
+              }
+            },
+            "required": [
+              "model"
+            ]
+          },
+          "outputSchema": {
+            "type": "object",
+            "properties": {
+              "Id": {
+                "type": "string"
+              },
+              "Name": {
+                "type": "string"
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "spawn_models",
+          "title": "Spawn Models",
+          "toolset": "scene",
+          "description": "Create many model game objects in one call - each item takes the same fields spawn_model does. Use this to build big arrangements without a round trip per object. One undo step covers the whole batch. Returns the created ids.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "Model": {
+                      "type": "string",
+                      "description": "Model asset path, e.g. 'models/dev/box.vmdl'."
+                    },
+                    "Name": {
+                      "type": "string",
+                      "description": "The new object's name. Empty uses the model filename."
+                    },
+                    "Position": {
+                      "type": "string",
+                      "description": "World position as 'x,y,z'."
+                    },
+                    "Angles": {
+                      "type": "string",
+                      "description": "Rotation as 'pitch,yaw,roll'."
+                    },
+                    "Scale": {
+                      "type": "string",
+                      "description": "Scale as 'x,y,z', or a single number for uniform."
+                    },
+                    "Tint": {
+                      "type": "string",
+                      "description": "Tint color as 'r,g,b,a' (0-1 floats) or '#rrggbb'."
+                    },
+                    "Material": {
+                      "type": "string",
+                      "description": "Material asset path to override every surface with."
+                    },
+                    "Parent": {
+                      "type": "string",
+                      "description": "Parent game object id. Empty parents to the scene root."
+                    }
+                  },
+                  "required": [
+                    "Model"
+                  ]
+                },
+                "description": "The models to spawn."
+              }
+            },
+            "required": [
+              "items"
+            ]
+          },
+          "outputSchema": {
+            "type": "object",
+            "properties": {
+              "Count": {
+                "type": "integer"
+              },
+              "Created": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "Id": {
+                      "type": "string"
+                    },
+                    "Name": {
+                      "type": "string"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "undo",
+          "title": "Undo",
+          "toolset": "scene",
+          "description": "Undo the last edit in the active scene, exactly like the user pressing ctrl+z. Use it to back out of your own mistake.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {},
+            "required": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "scenefile",
+      "description": "Opening, switching and closing scene tabs",
+      "tools": [
+        {
+          "name": "close_scene",
+          "title": "Close Scene",
+          "toolset": "scenefile",
+          "description": "Close a scene tab. Refuses to throw away unsaved work unless you say so.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "scene": {
+                "type": "string",
+                "description": "Scene name or resource path. Empty for the active one."
+              },
+              "discardChanges": {
+                "type": "boolean",
+                "description": "Close even if the scene has unsaved changes.",
+                "default": false
+              }
+            },
+            "required": []
+          },
+          "outputSchema": {
+            "type": "object",
+            "properties": {
+              "Active": {
+                "type": "string"
+              },
+              "ActivePath": {
+                "type": "string"
+              },
+              "Open": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "open_scene",
+          "title": "Open Scene",
+          "toolset": "scenefile",
+          "description": "Open a scene from the asset system and make it the active tab. Already open scenes are just brought to the front. Play mode has to be stopped first - play_start then runs this scene.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "Scene asset path, like \"scenes/menu-main.scene\". asset_search finds them."
+              }
+            },
+            "required": [
+              "path"
+            ]
+          },
+          "outputSchema": {
+            "type": "object",
+            "properties": {
+              "Active": {
+                "type": "string"
+              },
+              "ActivePath": {
+                "type": "string"
+              },
+              "Open": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "switch_scene",
+          "title": "Switch Scene",
+          "toolset": "scenefile",
+          "description": "Switch to an already open scene tab, by name or resource path. list_scenes says what's open.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "scene": {
+                "type": "string",
+                "description": "Scene name or resource path, as list_scenes reports it."
+              }
+            },
+            "required": [
+              "scene"
+            ]
+          },
+          "outputSchema": {
+            "type": "object",
+            "properties": {
+              "Active": {
+                "type": "string"
+              },
+              "ActivePath": {
+                "type": "string"
+              },
+              "Open": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": []
+          }
+        }
+      ]
+    }
+  ],
+  "text": ""
+}

@@ -1,0 +1,18 @@
+var scene = Editor.SceneEditorSession.Active.Scene;
+var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
+object TypeInfo(Type type) => new {
+    Name = type.FullName,
+    Methods = type.GetMethods(flags | System.Reflection.BindingFlags.DeclaredOnly).Select(m => m.ToString()).ToArray(),
+    Properties = type.GetProperties(flags | System.Reflection.BindingFlags.DeclaredOnly).Select(p => new { p.Name, Type = p.PropertyType.ToString() }).ToArray()
+};
+return new {
+    Scene = scene.Source?.ResourcePath,
+    Game.IsPlaying,
+    Cameras = scene.GetAllComponents<CameraComponent>().Select(c => new { c.GameObject.Name, c.Id, c.IsMainCamera, c.Priority, c.Orthographic }).ToArray(),
+    Look = scene.GetAllObjects(true).Where(o => o.Name == "Look").Select(o => o.Serialize()).ToArray(),
+    Lighting = scene.GetAllComponents<IndirectLightVolume>().Select(c => new { c.GameObject.Name, Irradiance = c.IrradianceTexture?.ResourcePath, Valid = c.IrradianceTexture is not null && !c.IrradianceTexture.IsError }).ToArray(),
+    BasePostProcess = TypeInfo(typeof(BasePostProcess)),
+    GenericPostProcess = TypeInfo(typeof(BasePostProcess<>)),
+    Stages = Enum.GetNames<Sandbox.Rendering.Stage>(),
+    Sessions = Editor.SceneEditorSession.All.Select(s => new { s.Scene.Name, Path = s.Scene.Source?.ResourcePath, s.HasUnsavedChanges }).ToArray()
+};

@@ -1,0 +1,18 @@
+if (!Game.IsPlaying || Game.ActiveScene?.Source?.ResourcePath != "scenes/maps/depot/depot.scene") throw new Exception("Expected running Depot.");
+if (Screen.Size != new Vector2(1920,1080)) throw new Exception("Expected an actual 1920x1080 game view.");
+if (Facepunch.UI.ClassSelect.IsAnyOpen) throw new Exception("Close the class picker before sampling gameplay.");
+if (Facepunch.GameUtils.IsCombatFrozen) throw new Exception("Wait for active gameplay before sampling.");
+var botSystem = Facepunch.BotSystem.Current;
+if (botSystem is null) throw new Exception("No bot system.");
+var scene=Game.ActiveScene;
+var camera=scene.Camera;
+var context = new {
+    Utc=DateTime.UtcNow, Scene=scene.Source.ResourcePath, Screen=Screen.Size.ToString(),
+    GameAssembly=typeof(Facepunch.BotDevCommands).Assembly.FullName,
+    CameraPosition=camera.WorldPosition.ToString(), CameraAngles=camera.WorldRotation.Angles().ToString(),camera.FieldOfView,
+    PlayerPosition=Facepunch.Client.Local?.PlayerPawn?.WorldPosition.ToString(),
+    Bots=scene.GetAllComponents<Facepunch.LightweightCombatBot>().Count(),
+    NoDamage=Facepunch.DevCommands.NoDamage
+};
+Facepunch.BotDevCommands.Perf(900);
+return context;

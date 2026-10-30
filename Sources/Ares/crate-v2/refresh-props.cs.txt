@@ -1,0 +1,35 @@
+// Refresh only the task's private reusable meshes after the lid-corner check.
+var root=Sandbox.Project.Current.GetRootPath();var folder=System.IO.Path.Combine(root,"output/ares/crate-v2");
+var request=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"import-request.json")));
+var stage=request["stage"].GetValue<string>();
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,stage,"manifest.json")));
+var session=Editor.SceneEditorSession.Active;var game=Game.ActiveScene?.Id;var playing=Game.IsPlaying;var dirty=session.HasUnsavedChanges;
+if(playing||dirty||!string.Equals(session.Scene.Source?.ResourcePath,"scenes/maps/ares/ares.scene",StringComparison.OrdinalIgnoreCase))throw new InvalidOperationException("Scene state changed before prop refresh.");
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+var scenePath=System.IO.Path.Combine(root,"Assets/scenes/maps/Ares/ares.scene");var sceneHash=Hash(scenePath);
+var files=manifest["files"].AsObject().Where(p=>p.Key.StartsWith("Assets/models/props/ares/crate-v2/",StringComparison.Ordinal)).ToArray();
+foreach(var item in files)
+{
+    var target=System.IO.Path.Combine(root,item.Key);var source=System.IO.Path.Combine(root,item.Value["source"].GetValue<string>());
+    if(Hash(source)!=item.Value["after"].GetValue<string>()||(Hash(target)!=item.Value["before"].GetValue<string>()&&Hash(target)!=item.Value["after"].GetValue<string>()))throw new InvalidOperationException("Private case asset changed: "+item.Key);
+}
+var imported=new System.Collections.Generic.List<string>();
+foreach(var item in files)
+{
+    var target=System.IO.Path.Combine(root,item.Key);
+    if(Hash(target)!=item.Value["after"].GetValue<string>())
+    {
+        var backup=System.IO.Path.Combine(folder,stage,"before-refresh",item.Key);System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(backup));
+        if(!System.IO.File.Exists(backup))System.IO.File.Copy(target,backup,false);
+        var incoming=target+".crate-incoming";
+        try{System.IO.File.Copy(System.IO.Path.Combine(root,item.Value["source"].GetValue<string>()),incoming,true);System.IO.File.Move(incoming,target,true);}
+        finally{if(System.IO.File.Exists(incoming))System.IO.File.Delete(incoming);}
+        imported.Add(item.Key);
+    }
+    Editor.AssetSystem.RegisterFile(target);
+}
+var preserved=ReferenceEquals(session,Editor.SceneEditorSession.Active)&&game==Game.ActiveScene?.Id&&playing==Game.IsPlaying&&dirty==session.HasUnsavedChanges&&Hash(scenePath)==sceneHash;
+var result=new{Stage=stage,Imported=imported,EditorStatePreserved=preserved,SceneSha256=sceneHash};
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"prop-refresh.json"),System.Text.Json.JsonSerializer.Serialize(result));
+if(!preserved)throw new InvalidOperationException("Scene state changed during prop refresh.");
+return result;

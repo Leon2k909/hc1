@@ -1,0 +1,14 @@
+// Tools/ares_pressure_formed_materials.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    g_flMetalness "0.0"
+    g_flRoughnessScaleFactor "1"
+    TextureColor "materials/ares/pressure-doors-v3/cassette_color.png"
+    TextureNormal "materials/ares/pressure-doors-v3/paint_normal.png"
+    TextureRoughness "materials/ares/pressure-doors-v3/cassette_rough.png"
+    TextureAmbientOcclusion "materials/ares/pressure-doors-v3/cassette_ao.png"
+    g_vColorTint "[1 1 1 1]"
+    g_flModelTintAmount "1"
+}

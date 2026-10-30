@@ -1,6 +1,7 @@
-"""Curved, woven bistro chair at the original Veridant chair's scale.
+"""Veridant chair entry point and retained wicker material authoring.
 
-Render geometry only: retains the table's existing collision and clearances.
+The current upholstered walnut chair is built by veridant_chair_soft.
+Render geometry only: retains existing collision and table clearances.
 Local x faces the table, y is across the seat, z is inches above the floor.
 """
 import math
@@ -89,7 +90,7 @@ def _panel(model, outline, position, normal, front, thickness, paint):
              uv=[tuple(uv/4.), tuple(other/4.), tuple(other/4.), tuple(uv/4.)])
 
 
-def build_into(model, at, facing, z0=0., paint="vr_wicker"):
+def _woven_build_into(model, at, facing, z0=0., paint="vr_wicker"):
     f = unit(v(facing[0], facing[1], 0))
     s = np.cross((0, 0, 1), f)
     c = v(at[0], at[1], z0)
@@ -153,6 +154,11 @@ def build_into(model, at, facing, z0=0., paint="vr_wicker"):
             _tube(model,[centre-n*.84,centre-n*.255],.18,"vr_steel",12)
     for x in (-6.5,5.6):
         tube([(x,y,seat_z(x,y)-.54) for y in (-6.2,0,6.2)], .27, "vr_steel")
+
+
+def build_into(model, at, facing, z0=0., paint="vr_wicker"):
+    from veridant_chair_authored import build_into as build_soft
+    build_soft(model, at, facing, z0, paint)
 
 
 def wicker_surface(size=1024):

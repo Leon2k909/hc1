@@ -1,0 +1,3 @@
+if (!Game.IsPlaying) throw new Exception("Expected play mode.");
+for (var i=0;i<4&&Facepunch.UI.ClassSelect.IsAnyOpen;i++) Facepunch.UI.ClassSelect.CloseAny();
+return new {ClassPickerOpen=Facepunch.UI.ClassSelect.IsAnyOpen};

@@ -1,0 +1,151 @@
+// Visual-only isolated copies; the user's current document, play state and camera are preserved.
+var root = Project.Current.GetRootPath();
+var request = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(
+    System.IO.Path.Combine(System.IO.Path.GetDirectoryName(@"SCRIPT_PATH"), "request.json")));
+var label = request["label"].GetValue<string>();
+if (!System.Text.RegularExpressions.Regex.IsMatch(label, "^[a-z0-9-]+$")) throw new Exception("Invalid label.");
+var output = System.IO.Path.Combine(root, "output/photographic-look-20261027", label);
+System.IO.Directory.CreateDirectory(output);
+var previous = Editor.SceneEditorSession.Active;
+var before = new { Game.IsPlaying, Game = Game.ActiveScene?.Id, Scene = previous.Scene.Id, Dirty = previous.HasUnsavedChanges };
+var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
+var allowed = new System.Collections.Generic.HashSet<string> {
+    "Sandbox.ModelRenderer", "Sandbox.SkinnedModelRenderer", "Sandbox.DirectionalLight", "Sandbox.PointLight", "Sandbox.SpotLight",
+    "Sandbox.SkyBox2D", "Sandbox.SkyBox", "Sandbox.GradientFog", "Sandbox.HeightFog", "Sandbox.VolumetricFogVolume",
+    "Sandbox.EnvmapProbe", "Sandbox.IndirectLightVolume", "Sandbox.PostProcessVolume", "Sandbox.Tonemapping", "Sandbox.Bloom",
+    "Sandbox.AmbientOcclusion", "Sandbox.ColorGrading", "Sandbox.ColorAdjustments", "Sandbox.Vignette", "Sandbox.Sharpen",
+    "Sandbox.ScreenSpaceReflections", "Sandbox.FilmGrain", "Facepunch.PhotographicResponse"
+};
+void Filter(System.Text.Json.Nodes.JsonObject obj)
+{
+    if (obj["Components"] is System.Text.Json.Nodes.JsonArray components)
+        for (var i = components.Count - 1; i >= 0; i--)
+            if (!allowed.Contains(components[i]["__type"]?.GetValue<string>() ?? "")) components.RemoveAt(i);
+    if (obj["Children"] is System.Text.Json.Nodes.JsonArray children)
+        foreach (var child in children) Filter(child.AsObject());
+}
+var results = new System.Collections.Generic.List<object>();
+foreach (var map in request["maps"].AsArray())
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    var path = map["scene"].GetValue<string>();
+    var json = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root, "Assets", path))).AsObject();
+    var sourceHash = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(System.IO.Path.Combine(root, "Assets", path))));
+    foreach (var obj in json["GameObjects"].AsArray()) Filter(obj.AsObject());
+    if (map["gi_trial"]?.GetValue<bool>() == true)
+        json["GameObjects"].AsArray().Add(System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(
+            System.IO.Path.Combine(root, "output/photographic-look-20261027/ares-gi-v1/volume.json"))));
+    json["SceneProperties"]["NavMesh"]["Enabled"] = false;
+    json["SceneProperties"]["WantsSystemScene"] = false;
+    var scene = Scene.CreateEditorScene();
+    try
+    {
+        CameraComponent camera;
+        Facepunch.PhotographicResponse photo;
+        using (scene.Push())
+        {
+            scene.Deserialize(json);
+            var holder = new GameObject(false, "Photographic comparison camera");
+            camera = holder.Components.Create<CameraComponent>();
+            camera.IsMainCamera = true;
+            camera.FieldOfView = 80;
+            camera.ZNear = 1;
+            camera.ZFar = 120000;
+            camera.FovAxis = CameraComponent.Axis.Horizontal;
+            camera.CustomSize = new Vector2(1600, 900);
+            var tone = holder.Components.Create<Tonemapping>();
+            tone.Mode = Tonemapping.TonemappingMode.ACES;
+            var sharp = holder.Components.Create<Sharpen>(); sharp.Scale = 0.1f;
+            photo = holder.Components.Create<Facepunch.PhotographicResponse>();
+            holder.Enabled = true;
+            scene.EditorTick(.016f, .016f);
+        }
+        // Stream each map in turn, without retaining Scene.Push across an await.
+        foreach (var renderer in scene.GetAllComponents<ModelRenderer>().Where(r => r.Model is not null))
+        foreach (var material in renderer.Model.Materials.Where(m => m is not null && !m.IsError))
+            foreach (var key in new[] { "g_tColor", "g_tNormal", "g_tRma", "g_tRoughness", "g_tSelfIllumMask" })
+                material.GetTexture(key)?.MarkUsed(1024);
+        await Task.Delay(750, cancellationToken);
+        var preRender = typeof(Scene).GetMethod("PreRender", flags, null, Type.EmptyTypes, null);
+        var preCamera = typeof(Scene).GetMethod("PreCameraRender", flags, null, Type.EmptyTypes, null);
+        var post = scene.GetSystem<PostProcessSystem>();
+        var updatePost = typeof(PostProcessSystem).GetMethod("UpdateCamera", flags);
+        var sceneCameraProperty = typeof(Scene).GetProperty("Camera", flags);
+        var trialGi = scene.GetAllComponents<IndirectLightVolume>().Where(v => v.GameObject.Name == "Ares bounced lighting").ToArray();
+        foreach (var v in scene.GetAllComponents<IndirectLightVolume>())
+            foreach (var t in new[] { v.IrradianceTexture, v.DistanceTexture, v.RelocationTexture })
+                t?.MarkUsed(Math.Max(t.Width, t.Height));
+        var ddgiType = typeof(Scene).Assembly.GetType("Sandbox.DDGIVolumeSystem");
+        var getSystem = typeof(Scene).GetMethods().Single(m => m.Name == "GetSystem" && m.IsGenericMethodDefinition && m.GetParameters().Length == 0);
+        var ddgi = getSystem.MakeGenericMethod(ddgiType).Invoke(scene, null);
+        // Refresh only realtime probes; saved baked/custom reflections retain their resources.
+        using (scene.Push())
+        {
+            preRender.Invoke(scene, null);
+            preCamera.Invoke(scene, null);
+            foreach (var probe in scene.GetAllComponents<EnvmapProbe>().Where(p => p.Mode == EnvmapProbe.EnvmapProbeMode.Realtime))
+                typeof(EnvmapProbe).GetMethod("RenderCubemap", flags, null, Type.EmptyTypes, null)?.Invoke(probe, null);
+        }
+        using var bitmap = new Bitmap(1600, 900);
+        foreach (var view in map["views"].AsArray())
+        {
+            var name = view["name"].GetValue<string>();
+            var position = Vector3.Parse(view["position"].GetValue<string>());
+            var target = view["target"] is not null ? Vector3.Parse(view["target"].GetValue<string>()) : position + Rotation.From(Angles.Parse(view["angles"].GetValue<string>())).Forward * 1000;
+            var exposure = view["exposure"].GetValue<float>();
+            var variants = request["variants"]?.AsArray().Select(v => v.GetValue<string>()).ToArray() ?? new[] { "before", "after" };
+            foreach (var variant in variants)
+            {
+                var timings = new System.Collections.Generic.List<double>();
+                foreach (var volume in trialGi)
+                {
+                    volume.Enabled = variant == "after";
+                    volume.RuntimeIntensity = map["gi_intensity"]?.GetValue<float>() ?? 1f;
+                }
+                for (var frame = 0; frame < 100; frame++)
+                {
+                    cancellationToken.ThrowIfCancellationRequested();
+                    using (scene.Push())
+                    {
+                        camera.WorldPosition = position;
+                        camera.WorldRotation = Rotation.LookAt(target - position);
+                        camera.FieldOfView = view["fov"]?.GetValue<float>() ?? 80;
+                        photo.Strength = variant is "before" or "repeat" ? 0f : request["strength"]?.GetValue<float>() ?? .65f;
+                        if (request["grain"] is not null) photo.Grain = request["grain"].GetValue<float>();
+                        if (request["gi_contrast"] is not null)
+                            foreach (var v in trialGi) v.RuntimeContrast = request["gi_contrast"].GetValue<float>();
+                        if (variant == "zero")
+                            photo.LocalContrast = photo.HighlightDesaturation = photo.EdgeSoftness = photo.Aberration = photo.Grain = 0;
+                        foreach (var tone in scene.GetAllComponents<Tonemapping>())
+                        {
+                            tone.MinimumExposure = tone.MaximumExposure = exposure;
+                            tone.ExposureCompensation = 0;
+                            tone.Rate = 100;
+                        }
+                        sceneCameraProperty.SetValue(scene, camera);
+                        preRender.Invoke(scene, null);
+                        preCamera.Invoke(scene, null);
+                        updatePost.Invoke(post, new object[] { camera });
+                        ddgiType.GetMethod("MarkDirty", flags).Invoke(ddgi, null);
+                        ddgiType.GetMethod("UpdateVolumes", flags).Invoke(ddgi, null);
+                        var sw = System.Diagnostics.Stopwatch.StartNew();
+                        camera.RenderToBitmap(bitmap, false);
+                        timings.Add(sw.Elapsed.TotalMilliseconds);
+                    }
+                    await Task.Delay(16, cancellationToken);
+                }
+                var file = System.IO.Path.Combine(output, name + "-" + variant + ".png");
+                System.IO.File.WriteAllBytes(file, bitmap.ToPng());
+                results.Add(new { Path = file, Variant = variant, Scene = path, SourceHash = sourceHash,
+                    Position = position.ToString(), Target = target.ToString(), Exposure = exposure,
+                    OffscreenRenderMedianMs = timings.Skip(80).Order().ElementAt(10),
+                    Photo = photo.Serialize(), StagedIndirectLight = trialGi.Length > 0 && variant == "after", camera.EnablePostProcessing });
+            }
+        }
+    }
+    finally { scene.Destroy(); }
+}
+var preserved = ReferenceEquals(previous, Editor.SceneEditorSession.Active) && before.Scene == previous.Scene.Id
+    && before.Game == Game.ActiveScene?.Id && before.IsPlaying == Game.IsPlaying && before.Dirty == previous.HasUnsavedChanges;
+if (!preserved) throw new Exception("Editor state changed during capture.");
+return new { Captures = results, EditorStatePreserved = preserved, TemporaryScenesDestroyed = true };

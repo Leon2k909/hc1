@@ -445,7 +445,8 @@ def lantern_roof( m, top ):
 
 def lantern_post( m, name, base, h=132.0, light=True, radius=420 ):
     """ A promenade lamp post: a black steel column, a box lantern with lit glass. """
-    b = v( *base )
+    from veridant_lamp_placement import placed_base
+    b = v( *placed_base( name, base ) )
     P.cylinder( m, ( b[0], b[1] ), 4.5, b[2], b[2] + 10, "vr_steel", 10, top="vr_steel", surface=METAL )
     P.cylinder( m, ( b[0], b[1] ), 2.2, b[2] + 10, b[2] + h - 16, "vr_steel", 8, surface=METAL )
     top = b + UP * ( h - 16 )
@@ -602,14 +603,8 @@ def palm_pit( m, base, seed=0 ):
                             ( e - half + width / 2, n, width, ( half - width ) * 2 - .3 ),
                             ( e + half - width / 2, n, width, ( half - width ) * 2 - .3 ) ):
         P.bevel_box( m, ( ce, cn, z + height / 2 ), axes, ( sx, sy, height ), "vr_stone_light", bevel=.55 )
-    rng = np.random.default_rng( 12000 + abs( int( seed ) ) )
-    inner, cells = half - width + .2, 6
-    heights = rng.uniform( .32, .70, ( cells + 1, cells + 1 ) )
-    for i in range( cells ):
-        for j in range( cells ):
-            points = [ ( e - inner + 2 * inner * x / cells, n - inner + 2 * inner * y / cells, z + heights[x, y] )
-                       for x, y in ( ( i, j ), ( i + 1, j ), ( i + 1, j + 1 ), ( i, j + 1 ) ) ]
-            m.polygon( "vr_palm_mulch", points )
+    from veridant_palm_mulch import build_into
+    build_into( m, base, seed )
 
 
 def palm( m, base, h=380.0, seed=0, lean=( 0.0, 0.0 ), fronds=20, frond=150.0 ):
@@ -654,18 +649,9 @@ def palm( m, base, h=380.0, seed=0, lean=( 0.0, 0.0 ), fronds=20, frond=150.0 ):
 
 
 def ivy( m, at, right, w, h, seed=0, off=1.2 ):
-    """ Ivy hanging down a wall face from its top edge at at (the top middle), w wide and h down, in strands. """
-    rng = np.random.default_rng( abs( int( seed ) ) )
-    right = unit( right )
-    out = np.cross( right, UP )
-    top = v( *at )
-    count = max( 1, int( w / 26 ) )
-    for i in range( count ):
-        f = ( i + 0.5 ) / count - 0.5
-        hh = h * rng.uniform( 0.45, 1.0 )
-        ww = hh * 0.5
-        c = top + right * ( f * w + rng.normal( 0, 4 ) ) - UP * ( hh / 2 ) + out * ( off + rng.uniform( 0, 2.5 ) )
-        sheet( m, "vr_foliage", VM.FOLIAGE, VM.FOLIAGE_ATLAS, "ivy" if i % 2 else "ivy_2", c, right, UP, hh, ww, 0.0, True )
+    """Hanging ivy with individual curved leaves and connected branching shoots."""
+    from veridant_ivy import build_into
+    return build_into(m, at, right, w, h, seed, off)
 
 
 def bougainvillea( m, at, right, w, h, seed=0, off=2.0 ):
@@ -889,15 +875,9 @@ def lounger( m, c, facing, z0=0.0, surface=WOOD ):
 
 
 def bench( m, c, along, length=72.0, z0=0.0 ):
-    """ A stone bench with a teak seat. """
-    d = unit( v( along[0], along[1], 0 ) )
-    s = np.cross( UP, d )
-    b = v( c[0], c[1], z0 )
-    for sg in ( -1, 1 ):
-        obox( m, b + d * ( length / 2 - 8 ) * sg + UP * 8, d, ( 10, 16, 16 ), "vr_stone" )
-    for k in range( 4 ):
-        obox( m, b + s * ( -6 + 4 * k ) + UP * 17, d, ( length, 3.4, 2 ), "vr_timber" )
-    m.oriented_box( b + UP * 9, ( d, s, UP ), ( length, 18, 18 ), {}, STONE )
+    """ Rounded teak slats on anchored, lightly weathered cast supports. """
+    from veridant_bench import build_into
+    build_into( m, c, along, length, z0 )
 
 
 def bar_counter( m, lo, hi, z0, top=42.0, front="+e", surface=STONE ):

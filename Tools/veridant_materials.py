@@ -1051,10 +1051,10 @@ ROUGH_EXP = { "vr_paving": 1.45 }
 NORMAL_SIZE = { "vr_paving": 2048, "vr_cliff": 1024 }
 # Text-only materials over another surface's maps, tinted: the backdrop's distant cliffs.
 DERIVED = { "vr_soil": ( "vr_gravel", ( .60, .55, .48 ) ),
-            "vr_palm_mulch": ( "vr_gravel", ( .48, .31, .18 ) ),
+            "vr_palm_mulch": ( "palm-mulch-v1/soil-bark", ( 1.0, 1.0, 1.0 ) ),  # dedicated PNG material in build()
             "vr_cliff_far": ( "vr_cliff", ( 0.60, 0.62, 0.68 ) ), "vr_cliff_grey": ( "vr_cliff", ( 0.78, 0.83, 0.94 ) ),
             "vr_rock_dark": ( "vr_rock", ( 0.55, 0.54, 0.54 ) ) }
-NAMES = list( SURFACES ) + [ "foliage", "prints", "letters", "water", "glass", "painted", "derived", "impostors" ]
+NAMES = list( SURFACES ) + [ "foliage", "ivy", "prints", "letters", "water", "glass", "painted", "derived", "impostors" ]
 
 
 def all_paints():
@@ -1073,6 +1073,9 @@ def build( name, out ):
     elif name in SURFACES:
         c, r, h, ppi = SURFACES[name]()
         done[name] = write_surface( out, name, c, r, h, ppi, METALNESS.get( name, 0.0 ), normal_size=NORMAL_SIZE.get( name ) )
+    elif name == "ivy":
+        from veridant_ivy import write_materials
+        write_materials(out / "ivy-v2")
     elif name == "foliage":
         colour, alpha = foliage_atlas()
         save_rgb( out / "vr_foliage_color.png", colour )
@@ -1101,8 +1104,8 @@ def build( name, out ):
     elif name == "water":
         write_text( out / "vr_sea.vmat", water_vmat( ( 0.012, 0.030, 0.042 ), ( -5.0, 1.5 ), 420.0, 0.85, 0.07, 80.0, 6.0,
                                                      "the sea" ) )
-        write_text( out / "vr_pool.vmat", water_vmat( ( 0.030, 0.042, 0.038 ), ( 0.4, 0.15 ), 26.0, 0.22, 0.035, 28.0, 0.3,
-                                                      "the reflecting pool" ) )
+        from veridant_pool_detail import water_material
+        write_text( out / "vr_pool.vmat", water_material() )
         print( "wrote vr_sea, vr_pool" )
     elif name == "glass":
         write_text( out / "vr_glass.vmat", glass_vmat( ( 0.86, 0.88, 0.86 ) ) )
@@ -1114,6 +1117,10 @@ def build( name, out ):
         print( f"rewrote {len( set( SURFACE_TINT ) | set( ROUGH_EXP ) )} surface vmats" )
     elif name == "derived":
         for p, ( base, tint ) in DERIVED.items():
+            if p == "vr_palm_mulch":
+                from veridant_palm_mulch import write_materials
+                write_materials( out )
+                continue
             write_text( out / f"{p}.vmat", vmat( f"{RESOURCE_DIR}/{base}_color.jpg", f"{RESOURCE_DIR}/{base}_normal.jpg",
                                                  f"{RESOURCE_DIR}/{base}_rough.png", tint=tint ) )
         print( f"wrote {len( DERIVED )} derived materials" )

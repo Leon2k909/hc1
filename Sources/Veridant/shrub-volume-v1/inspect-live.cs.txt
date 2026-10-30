@@ -1,0 +1,22 @@
+// Read the installed renderer and material group; do not alter editor state.
+var session=Editor.SceneEditorSession.Active;
+if(session?.Scene.Source?.ResourcePath?.Equals("scenes/maps/veridant/veridant.scene",StringComparison.OrdinalIgnoreCase)!=true)
+    throw new InvalidOperationException("Keep the existing Veridant document active.");
+var renderers=session.Scene.GetAllComponents<ModelRenderer>()
+    .Where(r=>r.Model?.ResourcePath?.Equals("models/maps/veridant/veridant_foliage.vmdl",StringComparison.OrdinalIgnoreCase)==true).ToArray();
+if(renderers.Length!=1||renderers[0].Model.IsError)throw new InvalidOperationException("Foliage renderer is invalid.");
+var model=renderers[0].Model;
+var materials=Enumerable.Range(0,renderers[0].Materials.Count)
+    .Select(slot=>renderers[0].Materials.GetOverride(slot)??renderers[0].Materials.GetOriginal(slot)).ToArray();
+var expected=new[]{"models/sbox_props/shrubs/beech/beech_shrub.vmat",
+    "materials/veridant/shrub-volume-v1/soil.vmat","materials/veridant/shrub-volume-v1/edging.vmat"};
+foreach(var path in expected)
+    if(!materials.Any(m=>m is not null&&!m.IsError&&m.ResourcePath.Equals(path,StringComparison.OrdinalIgnoreCase)))
+        throw new InvalidOperationException("Missing live material: "+path);
+var vertices=model.GetVertices();
+var strip=vertices.Where(v=>v.Position.x>62&&v.Position.x<153&&v.Position.y> -762&&v.Position.y< -732&&v.Position.z<28).ToArray();
+if(strip.Length<1000||strip.Any(v=>!float.IsFinite(v.Position.x)||!float.IsFinite(v.Position.y)||!float.IsFinite(v.Position.z)))
+    throw new InvalidOperationException("The new strip is missing or has invalid positions.");
+return new{ValidModel=!model.IsError,Path=model.ResourcePath,Renderers=renderers.Length,
+    StripVertices=strip.Length,Materials=materials.Select(m=>new{Path=m.ResourcePath,m.IsError}).ToArray(),
+    session.HasUnsavedChanges,Game.IsPlaying};

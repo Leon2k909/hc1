@@ -1,0 +1,3 @@
+var s=Editor.SceneEditorSession.All.Single(x=>x.Scene.Source?.ResourcePath?.Contains("/collider/")==true);
+return new {TextRenderers=s.Scene.GetAllComponents<TextRenderer>().Count(),
+    Activate=typeof(Editor.SceneEditorSession).GetMethods().Where(m=>m.Name=="MakeActive").Select(m=>new{Method=m.ToString(),Parameters=m.GetParameters().Select(p=>new{p.Name,Default=p.HasDefaultValue?p.DefaultValue?.ToString():null}).ToArray()}).ToArray()};

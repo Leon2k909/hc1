@@ -1,0 +1,33 @@
+def case( m, e, n, z, heading, size=AM.CASE, front="front_text", side="side_logo", top="top_ribs", collide=True ):
+    """ A black hard case (CASE's proportions scaled to size: length, height, depth) on its own UVs, with edge trim and
+    latches. """
+    L, H, D = size
+    F = Frame( e, n, heading, z )
+    hl, hd = L / 2, D / 2
+
+    def uv( region, pts_st ):
+        return [ AM.region_uv( AM.CRATE, AM.CRATE_ATLAS, region, s, t ) for s, t in pts_st ]
+
+    # The long faces (+y front, -y back).
+    F.quad( m, "ar_crate", [ ( hl, hd, 0 ), ( -hl, hd, 0 ), ( -hl, hd, H ), ( hl, hd, H ) ], ( 0, 1, 0 ),
+            uv=uv( front, [ ( 0, 0 ), ( 1, 0 ), ( 1, 1 ), ( 0, 1 ) ] ) )
+    F.quad( m, "ar_crate", [ ( -hl, -hd, 0 ), ( hl, -hd, 0 ), ( hl, -hd, H ), ( -hl, -hd, H ) ], ( 0, -1, 0 ),
+            uv=uv( "front_plain", [ ( 0, 0 ), ( 1, 0 ), ( 1, 1 ), ( 0, 1 ) ] ) )
+    F.quad( m, "ar_crate", [ ( hl, -hd, 0 ), ( hl, hd, 0 ), ( hl, hd, H ), ( hl, -hd, H ) ], ( 1, 0, 0 ),
+            uv=uv( side, [ ( 0, 0 ), ( 1, 0 ), ( 1, 1 ), ( 0, 1 ) ] ) )
+    F.quad( m, "ar_crate", [ ( -hl, hd, 0 ), ( -hl, -hd, 0 ), ( -hl, -hd, H ), ( -hl, hd, H ) ], ( -1, 0, 0 ),
+            uv=uv( "end_plain", [ ( 0, 0 ), ( 1, 0 ), ( 1, 1 ), ( 0, 1 ) ] ) )
+    F.quad( m, "ar_crate", [ ( -hl, -hd, H ), ( hl, -hd, H ), ( hl, hd, H ), ( -hl, hd, H ) ], ( 0, 0, 1 ),
+            uv=uv( top, [ ( 0, 0 ), ( 1, 0 ), ( 1, 1 ), ( 0, 1 ) ] ) )
+    # Edge trim on the vertical edges and round the lid's seam, latches on the front.
+    t = 1.2
+    for sx in ( -1, 1 ):
+        for sy in ( -1, 1 ):
+            F.box( m, sx * hl - t, sx * hl + t, sy * hd - t, sy * hd + t, 0.0, H, "ar_gunmetal" )
+    seam = H * 0.72
+    F.box( m, -hl - 0.4, hl + 0.4, -hd - 0.4, hd + 0.4, seam - 0.6, seam + 0.6, "ar_gunmetal" )
+    for x in ( -L * 0.3, L * 0.3 ):
+        F.box( m, x - 1.6, x + 1.6, hd, hd + 1.0, seam - 3.0, seam + 2.0, "ar_brass" )
+    if collide:
+        F.box( m, -hl, hl, -hd, hd, 0.0, H, surface=PLASTIC )
+    return z + H

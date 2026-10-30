@@ -6,10 +6,10 @@
 
 <root class="scoreboard-columns">
     <label class="col placement">#</label>
-    <label class="col playername">@Tr( "Player" )</label>
+    <label class="col playername">@Tr( "PLAYER" )</label>
     @foreach ( var column in Columns )
     {
-        <label class="col stat @(column == "Points" ? "score-value" : column == "Balance" ? "balance-value" : "")" tooltip=@(Tr( column ))>@Tr( column )</label>
+        <label class="col stat @(column == "Points" ? "score-value" : column == "Balance" ? "balance-value" : "")" tooltip=@(Tr( column ))>@Tr( column.ToUpperInvariant() )</label>
     }
 </root>
 

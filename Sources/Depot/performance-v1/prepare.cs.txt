@@ -1,0 +1,10 @@
+if (!Game.IsPlaying || Game.ActiveScene?.Source?.ResourcePath != "scenes/maps/depot/depot.scene") throw new Exception("Expected running Depot.");
+var path = System.IO.Path.Combine(Project.Current.GetRootPath(),"output/depot-performance-20261027/runtime-settings-before.json");
+if (System.IO.File.Exists(path)) throw new Exception("Already prepared; inspect current state before retrying.");
+var session = Editor.SceneEditorSession.All.First(s => s.Scene?.Source?.ResourcePath == "scenes/maps/depot/depot.scene" && s.OnFrameTo?.Target is Editor.Widget);
+var viewport = ((Editor.Widget)session.OnFrameTo.Target).GetDescendants<Editor.SceneRenderingWidget>().Single(w => w.Visible);
+var before = new { Facepunch.DevCommands.NoDamage, viewport.FixedSize, viewport.Size };
+System.IO.File.WriteAllText(path, Json.Serialize(before));
+Facepunch.DevCommands.NoDamage = true;
+viewport.FixedSize = new Vector2(1920,1080);
+return new { Before = before, RequestedSize = viewport.FixedSize, ViewSize = viewport.Size };

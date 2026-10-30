@@ -1,0 +1,15 @@
+// Tools/ares_pressure_formed_materials.py
+"Layer0"
+{
+    shader "shaders/glass.shader"
+    F_GLASS_QUALITY "2"
+    F_DO_NOT_CAST_SHADOWS "1"
+    g_flTintColor "[1 1 1 0]"
+    TextureColor "[0.96 0.98 0.98 0]"
+    TextureRoughness "[0.10 0.10 0.10 0]"
+    TextureMetalness "[0 0 0 0]"
+    TextureTranslucency "[1 1 1 0]"
+    TextureNormal "materials/ares/pressure-doors-v3/flat_normal.png"
+    g_flRefractionStrength "1.001"
+    AlbedoAbsorption "0.06"
+}

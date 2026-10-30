@@ -1,0 +1,70 @@
+// Record the accepted local ceiling assets and synchronize only those stage files.
+var root=Sandbox.Project.Current.GetRootPath();
+if(root.TrimEnd('\\','/').Replace('\\','/').ToLowerInvariant()!="c:/sbox-projects/hc1/forked-shooter-main")
+    throw new InvalidOperationException("Wrong project");
+var output=System.IO.Path.Combine(root,"output/collider-ceiling-v1-20261027");
+var stage=System.IO.Path.Combine(output,"stage-v3");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(stage,"manifest.json")));
+var capture=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(output,"after-v3/capture-report.json")));
+var nav=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(output,"native-validation.json")));
+if(nav["Checked"].GetValue<int>()!=68 || nav["Failed"].AsArray().Count!=0 || nav["MissingModels"].AsArray().Count!=0 || nav["MissingMaterials"].AsArray().Count!=0)
+    throw new InvalidOperationException("Native checks must pass");
+foreach(var key in new[]{"NativeEngineCapture","FullTextureCapture","SceneDirtyStatePreserved","GamePreserved","SelectedDocumentPreserved"})
+    if(!capture[key].GetValue<bool>())throw new InvalidOperationException("Capture guard failed: "+key);
+string Hash(string p)=>System.IO.File.Exists(p)?Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant():null;
+var scenePath=System.IO.Path.Combine(root,"Assets/scenes/maps/Collider/collider.scene");
+var sceneHash=Hash(scenePath);
+if(sceneHash!=manifest["scene_sha256"].GetValue<string>() || sceneHash!=capture["SavedSceneSha256"].GetValue<string>() || sceneHash!=nav["SceneSha256"].GetValue<string>())
+    throw new InvalidOperationException("Source scene changed since review");
+var selected=Editor.SceneEditorSession.Active;var selectedDirty=selected?.HasUnsavedChanges;
+var game=Game.ActiveScene?.Id;var playing=Game.IsPlaying;
+var entries=manifest["files"].AsArray();
+foreach(var entry in entries)
+{
+    var relative=entry["relative"].GetValue<string>();
+    var hash=entry["after"].GetValue<string>();
+    if(Hash(System.IO.Path.Combine(root,"Assets",relative))!=hash || Hash(System.IO.Path.Combine(stage,"assets",relative))!=hash ||
+       capture["AssetSourcesSHA256"][relative]?.GetValue<string>()!=hash)
+        throw new InvalidOperationException("Asset differs from reviewed image: "+relative);
+}
+var model=Model.Load("models/maps/collider/collider_structure.vmdl");
+var materials=new[]{"ch_soffit","ch_housing","ch_lens"}.Select(p=>Material.Load("materials/collider/ceiling-v1/"+p+".vmat")).ToArray();
+if(model is null || model.IsError || materials.Any(m=>m is null || m.IsError))
+    throw new InvalidOperationException("Installed model and materials must be valid");
+var primary=System.IO.Path.Combine(root,"output/collider/stage/assets");
+var synced=new System.Collections.Generic.List<string>();
+var preserved=new System.Collections.Generic.List<string>();
+// The three model sources are an atomic logical group. Preserve a different
+// primary staged revision instead of mixing its ModelDoc with this OBJ/MTL.
+bool CanSync(System.Text.Json.Nodes.JsonNode entry)
+{
+    var current=Hash(System.IO.Path.Combine(primary,entry["relative"].GetValue<string>()));
+    return current is null || current==entry["before"]?.GetValue<string>() || current==entry["after"].GetValue<string>();
+}
+var modelEntries=entries.Where(e=>e["relative"].GetValue<string>().StartsWith("models/")).ToArray();
+var modelGroup=modelEntries.All(CanSync);
+foreach(var entry in entries)
+{
+    var relative=entry["relative"].GetValue<string>();
+    if(!CanSync(entry) || (relative.StartsWith("models/") && !modelGroup))
+    {
+        preserved.Add(relative);continue;
+    }
+    var target=System.IO.Path.Combine(primary,relative);
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target));
+    System.IO.File.Copy(System.IO.Path.Combine(stage,"assets",relative),target,true);
+    synced.Add(relative);
+}
+if(!ReferenceEquals(selected,Editor.SceneEditorSession.Active) || selected?.HasUnsavedChanges!=selectedDirty ||
+   Game.ActiveScene?.Id!=game || Game.IsPlaying!=playing || Hash(scenePath)!=sceneHash)
+    throw new InvalidOperationException("Editor state changed");
+var receipt=new {Revision="collider-ceiling-v1",Stage="output/collider-ceiling-v1-20261027/stage-v3",
+    CheckedAt=DateTime.UtcNow,Assets=manifest["files"],Geometry=manifest["geometry"],SourceSceneSha256=sceneHash,
+    NativeNavigationChecks=68,MissingResources=0,PhysicsPreserved=true,EditorStatePreserved=true,
+    NativeViews="output/collider-ceiling-v1-20261027/after-v3",PrimaryFilesSynced=synced,PrimaryFilesPreserved=preserved,
+    FreshLightingBake=false,MatchPerformanceBenchmarked=false};
+var serialized=Json.Serialize(receipt);
+System.IO.File.WriteAllText(System.IO.Path.Combine(root,"Sources/Collider/ceiling-v1/installed.json"),serialized);
+System.IO.File.WriteAllText(System.IO.Path.Combine(output,"published.json"),serialized);
+return new{Published=true,SourceSceneSha256=sceneHash,NativeNavigationChecks=68,Assets=entries.Count,
+    PrimaryFilesSynced=synced.Count,PrimaryFilesPreserved=preserved,EditorStatePreserved=true};

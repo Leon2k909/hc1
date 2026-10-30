@@ -18,9 +18,30 @@ CrosshairSettings
         flex-shrink: 0;
     }
 
+    // The settings beside the live preview (CrosshairPreview), which stays in view while they scroll. It drops under
+    // them on a screen too narrow for both.
+    .ch-body
+    {
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        gap: 16px;
+        min-height: 0;
+    }
+
+    .ch-native
+    {
+        flex-direction: column;
+        margin-top: 10px;
+        flex-shrink: 0;
+    }
+
     .ch-scroll
     {
         flex-direction: column;
+        flex-grow: 1;
+        flex-basis: 0;
+        min-width: 360px;
         max-height: 390px;
         overflow-x: hidden;
         overflow-y: scroll;

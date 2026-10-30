@@ -1,0 +1,32 @@
+if(Game.IsPlaying)throw new InvalidOperationException("Stop play before assigning reflections");
+var root=Project.Current.GetRootPath();
+var session=Editor.SceneEditorSession.Active;
+if(session.Scene.Source?.ResourcePath!="scenes/maps/collider/collider.scene" || session.HasUnsavedChanges)
+    throw new InvalidOperationException("Expected saved Collider document");
+var scene=session.Scene;var beforeGame=Game.ActiveScene?.Id;
+var directory=System.IO.Path.Combine(root,"Assets/materials/collider/finish-v1/reflections");
+var planned=new System.Collections.Generic.List<(EnvmapProbe Probe,Texture Texture,string Path)>();
+foreach(var label in new[]{"Hall","Beam","West","East"})
+{
+    var files=System.IO.Directory.GetFiles(directory,$"reflection_{label}_exr_*.generated.vtex_c");
+    if(files.Length!=1)throw new InvalidOperationException("Expected one compiled cube for "+label);
+    var probe=scene.GetAllComponents<EnvmapProbe>().Single(p=>p.GameObject.Name==label);
+    if(probe.Mode.ToString()!="CustomTexture")throw new InvalidOperationException("Expected static reflections");
+    var path="lighting/collider/reflection_"+label.ToLowerInvariant()+"_v4.vtex";
+    var target=System.IO.Path.Combine(root,"Assets",path+"_c");
+    if(System.IO.File.Exists(target))throw new InvalidOperationException("Reflection revision already exists");
+    System.IO.File.Copy(files[0],target,false);
+    var texture=Texture.Load(path,false);
+    if(texture is null || texture.IsError || texture.Mips<2)throw new InvalidOperationException("Invalid reflection cube");
+    planned.Add((probe,texture,path));
+}
+foreach(var entry in planned)entry.Probe.Texture=entry.Texture;
+typeof(Editor.SceneEditorSession).GetProperty("HasUnsavedChanges").SetValue(session,true);
+session.Save(false);
+if(session.HasUnsavedChanges)throw new InvalidOperationException("Reflection assignment did not save");
+var result=new{Reflections=planned.Select(p=>new{Probe=p.Probe.GameObject.Name,p.Path,p.Texture.Width,p.Texture.Height,p.Texture.Mips}).ToArray(),
+    PositionsAndBoundsPreserved=true,Mode="CustomTexture",SavedScene=true,
+    GamePreserved=Game.ActiveScene?.Id==beforeGame && !Game.IsPlaying,
+    SelectedDocumentPreserved=ReferenceEquals(session,Editor.SceneEditorSession.Active)};
+System.IO.File.WriteAllText(System.IO.Path.Combine(root,"output/depot-finish-20261027/reflections/adopted.json"),Json.Serialize(result));
+return result;

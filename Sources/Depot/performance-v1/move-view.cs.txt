@@ -1,0 +1,7 @@
+if (!Game.IsPlaying || Game.ActiveScene?.Source?.ResourcePath != "scenes/maps/depot/depot.scene") throw new Exception("Expected running Depot.");
+var config=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(Project.Current.GetRootPath(),"Sources/Depot/performance-v1/view.json")));
+var player=Facepunch.Client.Local?.PlayerPawn;
+if (!player.IsValid()) throw new Exception("No local player.");
+player.WorldPosition=Vector3.Parse(config["position"].GetValue<string>());
+player.EyeAngles=Angles.Parse(config["angles"].GetValue<string>());
+return new {Position=player.WorldPosition.ToString(),Angles=player.EyeAngles.ToString()};

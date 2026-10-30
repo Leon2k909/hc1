@@ -304,6 +304,7 @@ public sealed class ReconOctocopter : Component, Component.IDamageable, ICustomM
 			CameraPostProcess.Copy<Sharpen>( source.GameObject, _cameraObject );
 			CameraPostProcess.Copy<AmbientOcclusion>( source.GameObject, _cameraObject );
 			CameraPostProcess.Copy<Vignette>( source.GameObject, _cameraObject );
+			CameraPostProcess.Copy<PhotographicResponse>( source.GameObject, _cameraObject );
 			_feedColorAdjustments = CameraPostProcess.Copy<ColorAdjustments>( source.GameObject, _cameraObject );
 		}
 

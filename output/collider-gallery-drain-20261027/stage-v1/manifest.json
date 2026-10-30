@@ -1,0 +1,43 @@
+{
+  "revision": "gallery-drain-v1",
+  "files": [
+    {
+      "relative": "materials/collider/co_drain_frame.vmat",
+      "before": null,
+      "after": "3d9f6df8f21bc40887bc276f53de334da968a3590c3794b15c5e8754d1c5ee54"
+    },
+    {
+      "relative": "models/maps/collider/collider_detail.mtl",
+      "before": "4e9fba2794343db51f99b004c90a3533d88b7be1dd8f6c0e52bddf6ffd285fcc",
+      "after": "9ff783ca7a0238cbccd2d738379c5256d25cc8d888d317aa45dfe2aaa05ba82d"
+    },
+    {
+      "relative": "models/maps/collider/collider_detail.obj",
+      "before": "14b303198df6b8a8a6dc41ad167b387a951e2447d6ee13e6350fb3e903378e0f",
+      "after": "97a0691da28c76c30dbab55354aba013e22cdb8f45e8c77ae3bd57d63803f7c6"
+    },
+    {
+      "relative": "models/maps/collider/collider_detail.vmdl",
+      "before": "ae60c68b92df8555e15f84306a7428f32085edd5bbda85a4468152b3f5d69064",
+      "after": "84ef497f5240ebc609d7bb77b81377814af6ae15f5b135d69821673e0f57e9f5"
+    }
+  ],
+  "protected": {
+    "materials/railhead/rw_galvanised_color.png": "ad50b3b553325a13ae4a8a0119d9e066b99f1fa12a10760a676eeff98fa1ea37",
+    "materials/railhead/rw_galvanised_normal.png": "09e125b2fe2abb9b61297a853c973db9380f9f7def7a32c58184c1ec617de299",
+    "materials/railhead/rw_galvanised_rough.png": "c73d33ec239bc568b9d960ae4bc01805d9badd925ae847f32a368a04a73659ef"
+  },
+  "geometry": {
+    "before_triangles": 132960,
+    "removed_triangles": 288,
+    "added_triangles": 9280,
+    "after_triangles": 141952,
+    "retained_faces_and_attributes_preserved": true,
+    "collision_unchanged": true,
+    "old_junction_gap_inches": 8,
+    "new_junction_gap_inches": 0
+  },
+  "sources": {
+    "Tools/collider_gallery_trench.py": "d3ecaeee823b275863b53e4a8760b1b436b1fa00b33e49690fd26f2e39f613fc"
+  }
+}

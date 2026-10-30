@@ -1,0 +1,119 @@
+{
+  "status": "ready-for-user-review",
+  "originalStillUsedByMap": false,
+  "candidateCompiledInEngine": false,
+  "renderSessionCompleted": true,
+  "renderEvidence": {
+    "renderer": "Blender Cycles",
+    "nativeEngineScreenshot": false,
+    "sameCameraLightingScaleAndExposure": true,
+    "samples": 48,
+    "viewTransform": "AgX",
+    "exposure": 0.0,
+    "images": [
+      {
+        "variant": "before",
+        "view": "main",
+        "file": "before-main.png",
+        "eyeMetres": [
+          3.5,
+          -4.6,
+          3.3
+        ],
+        "targetMetres": [
+          0,
+          0,
+          0.85
+        ],
+        "lens": 54.0,
+        "width": 1400,
+        "height": 1050,
+        "sha256": "40ce13a15969e07e809341e7790f124093b625aa0ea6fa49572fe8cb93b06cc7"
+      },
+      {
+        "variant": "after",
+        "view": "main",
+        "file": "after-main.png",
+        "eyeMetres": [
+          3.5,
+          -4.6,
+          3.3
+        ],
+        "targetMetres": [
+          0,
+          0,
+          0.85
+        ],
+        "lens": 54.0,
+        "width": 1400,
+        "height": 1050,
+        "sha256": "580c4327dbd60c2a10a773805ba935924affb5fb6620f5932a9d8f7b7b628ede"
+      },
+      {
+        "variant": "before",
+        "view": "detail",
+        "file": "before-detail.png",
+        "eyeMetres": [
+          2.25,
+          -3.5,
+          1.85
+        ],
+        "targetMetres": [
+          0.35,
+          -0.55,
+          0.95
+        ],
+        "lens": 67.0,
+        "width": 1400,
+        "height": 1050,
+        "sha256": "115ae36eab0cfc607a886eb27384de6f594a0868c6dbe9272e04ae0fab15c403"
+      },
+      {
+        "variant": "after",
+        "view": "detail",
+        "file": "after-detail.png",
+        "eyeMetres": [
+          2.25,
+          -3.5,
+          1.85
+        ],
+        "targetMetres": [
+          0.35,
+          -0.55,
+          0.95
+        ],
+        "lens": 67.0,
+        "width": 1400,
+        "height": 1050,
+        "sha256": "f303d3c9581f362b87aae68f5e0d6a7ee9e2a3ca384bbb872e98a651f7023324"
+      }
+    ]
+  },
+  "geometryVerification": {
+    "originalAssetsUnchanged": true,
+    "identicalAuthoredCollision": true,
+    "variants": {
+      "before": {
+        "triangles": 2420,
+        "windingErrors": 0,
+        "minimumTriangleArea": 0.06313325193588594,
+        "finiteUVsAndNormals": true,
+        "validSourceMaterials": 6,
+        "meshSHA256": "b5cddbba6af2338bb7ecf9241262aabd2ed21947ba8d6fcc5ae07faaddc0ce2c"
+      },
+      "after": {
+        "triangles": 15568,
+        "windingErrors": 0,
+        "minimumTriangleArea": 0.0005174999999999408,
+        "finiteUVsAndNormals": true,
+        "validSourceMaterials": 6,
+        "meshSHA256": "ab625cc5c7e0d3cdf14d5d50fa8f56f476f91df45367f05ce999c8316c7f30c5"
+      }
+    },
+    "engineCompiled": false,
+    "usedBySavedMap": false
+  },
+  "userApproved": true,
+  "installedInMapSources": true,
+  "engineCompilation": "pending"
+}

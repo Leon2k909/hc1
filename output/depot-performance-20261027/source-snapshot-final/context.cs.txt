@@ -1,0 +1,25 @@
+var root = Project.Current.GetRootPath().TrimEnd('\\','/').Replace('\\','/');
+if (!string.Equals(root, "C:/sbox-projects/hc1/forked-shooter-main", StringComparison.OrdinalIgnoreCase)) throw new Exception("Wrong project.");
+var scene = Game.IsPlaying ? Game.ActiveScene : Editor.SceneEditorSession.Active?.Scene;
+return new {
+    Utc = DateTime.UtcNow, Game.IsPlaying,
+    Scene = scene?.Name, Source = scene?.Source?.ResourcePath, Screen = Screen.Size.ToString(),
+    EditorLobby = Facepunch.GameNetworkManager.EditorLobby,
+    NoDamage = Facepunch.DevCommands.NoDamage,
+    Networking.IsActive, Networking.IsHost,
+    Sessions = Editor.SceneEditorSession.All.Select(s => new {
+        s.Scene.Name, Path = s.Scene.Source?.ResourcePath, s.HasUnsavedChanges,
+        ViewType = s.OnFrameTo?.Target?.GetType().FullName,
+        Views = (s.OnFrameTo?.Target as Editor.Widget)?.GetDescendants<Editor.SceneRenderingWidget>().Select(w => new {
+            Type = w.GetType().FullName, w.Name, w.Visible, w.Size, w.FixedSize,
+            Scene = w.Scene?.Name
+        }).ToArray()
+    }).ToArray(),
+    Cameras = scene?.GetAllComponents<CameraComponent>().Select(c => new {
+        c.Id, c.GameObject.Name, c.Enabled, c.IsMainCamera, c.Priority,
+        Position = c.WorldPosition.ToString(), Rotation = c.WorldRotation.Angles().ToString(), c.FieldOfView
+    }).ToArray(),
+    Players = scene?.GetAllComponents<Facepunch.PlayerPawn>().Select(p => new { p.Id, Position=p.WorldPosition.ToString() }).ToArray(),
+    Bots = scene?.GetAllComponents<Facepunch.LightweightCombatBot>().Count(),
+    Map = scene?.GetAllComponents<MapInstance>().Select(m => new { m.MapName, m.IsLoaded, m.EnableCollision }).ToArray()
+};

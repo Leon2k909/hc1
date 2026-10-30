@@ -1,0 +1,203 @@
+{
+  "__guid": "b69fcfd3-22f0-4ee6-9ecc-3cdc702c59a8",
+  "__version": 2,
+  "Flags": 0,
+  "Name": "Automatic west lab door",
+  "Position": "0,1412,0",
+  "Rotation": "0,0,0.707106769,0.707106769",
+  "Scale": "1,1,1",
+  "Tags": "door",
+  "Enabled": true,
+  "NetworkMode": 2,
+  "NetworkFlags": 0,
+  "NetworkOrphaned": 0,
+  "NetworkTransmit": true,
+  "OwnerTransfer": 1,
+  "Components": [
+    {
+      "__type": "Facepunch.AutomaticSlidingDoor",
+      "__guid": "f9db721b-9719-4bac-b890-85b1d798bce4",
+      "__enabled": true,
+      "Flags": 0,
+      "ApproachDistance": 144,
+      "CloseDelay": 1.5,
+      "CloseTime": 1,
+      "Height": 192,
+      "LeftClosedPosition": "0,44,96",
+      "LeftLeaf": {
+        "_type": "gameobject",
+        "go": "0a6f178b-5fdf-4213-ae28-93784bc94b3a"
+      },
+      "OnComponentDestroy": null,
+      "OnComponentDisabled": null,
+      "OnComponentEnabled": null,
+      "OnComponentFixedUpdate": null,
+      "OnComponentStart": null,
+      "OnComponentUpdate": null,
+      "OpenTime": 0.65,
+      "RightClosedPosition": "0,-44,96",
+      "RightLeaf": {
+        "_type": "gameobject",
+        "go": "00a4ef0e-fb47-4603-b392-8026b7c32f2e"
+      },
+      "Travel": 91,
+      "Width": 176
+    }
+  ],
+  "Children": [
+    {
+      "__guid": "0a6f178b-5fdf-4213-ae28-93784bc94b3a",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Left sliding leaf",
+      "Position": "0,44.0000076,96.0000153",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.ModelRenderer",
+          "__guid": "30e2d893-0dba-4094-881a-18b171203fef",
+          "__enabled": true,
+          "Flags": 0,
+          "BodyGroups": 18446744073709551615,
+          "CreateAttachments": false,
+          "LodOverride": null,
+          "MaterialGroup": null,
+          "MaterialOverride": null,
+          "Materials": null,
+          "Model": {
+            "Id": "9e79b5c5-3a2c-457f-93ac-7c8e5a7bc954",
+            "Path": "models/maps/collider/automatic-door-v1/lab_door_leaf.vmdl"
+          },
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "RenderOptions": {
+            "GameLayer": true,
+            "OverlayLayer": false,
+            "BloomLayer": false,
+            "AfterUILayer": false
+          },
+          "RenderType": "On",
+          "Tint": "1,1,1,1"
+        },
+        {
+          "__type": "Sandbox.ModelCollider",
+          "__guid": "6aedf275-2fb3-4124-a52c-6f7baefe1c8a",
+          "__enabled": true,
+          "Flags": 0,
+          "ColliderFlags": 0,
+          "Elasticity": null,
+          "Friction": null,
+          "IsTrigger": false,
+          "Model": {
+            "Id": "9e79b5c5-3a2c-457f-93ac-7c8e5a7bc954",
+            "Path": "models/maps/collider/automatic-door-v1/lab_door_leaf.vmdl"
+          },
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "OnObjectTriggerEnter": null,
+          "OnObjectTriggerExit": null,
+          "OnTriggerEnter": null,
+          "OnTriggerExit": null,
+          "RollingResistance": null,
+          "Static": false,
+          "Surface": null,
+          "SurfaceVelocity": "0,0,0"
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "00a4ef0e-fb47-4603-b392-8026b7c32f2e",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Right sliding leaf",
+      "Position": "0,-44.0000076,96.0000153",
+      "Rotation": "0,0,1,0",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.ModelRenderer",
+          "__guid": "d98e538a-ca9d-44c3-a6a0-4bce500b6104",
+          "__enabled": true,
+          "Flags": 0,
+          "BodyGroups": 18446744073709551615,
+          "CreateAttachments": false,
+          "LodOverride": null,
+          "MaterialGroup": null,
+          "MaterialOverride": null,
+          "Materials": null,
+          "Model": {
+            "Id": "9e79b5c5-3a2c-457f-93ac-7c8e5a7bc954",
+            "Path": "models/maps/collider/automatic-door-v1/lab_door_leaf.vmdl"
+          },
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "RenderOptions": {
+            "GameLayer": true,
+            "OverlayLayer": false,
+            "BloomLayer": false,
+            "AfterUILayer": false
+          },
+          "RenderType": "On",
+          "Tint": "1,1,1,1"
+        },
+        {
+          "__type": "Sandbox.ModelCollider",
+          "__guid": "99a44ffe-c70b-4f25-ba22-e5acb42d50a6",
+          "__enabled": true,
+          "Flags": 0,
+          "ColliderFlags": 0,
+          "Elasticity": null,
+          "Friction": null,
+          "IsTrigger": false,
+          "Model": {
+            "Id": "9e79b5c5-3a2c-457f-93ac-7c8e5a7bc954",
+            "Path": "models/maps/collider/automatic-door-v1/lab_door_leaf.vmdl"
+          },
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "OnObjectTriggerEnter": null,
+          "OnObjectTriggerExit": null,
+          "OnTriggerEnter": null,
+          "OnTriggerExit": null,
+          "RollingResistance": null,
+          "Static": false,
+          "Surface": null,
+          "SurfaceVelocity": "0,0,0"
+        }
+      ],
+      "Children": []
+    }
+  ]
+}

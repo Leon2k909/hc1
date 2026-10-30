@@ -1,0 +1,392 @@
+{
+  "results": [
+    {
+      "Window": {
+        "Frames": 179,
+        "Seconds": 2
+      },
+      "Fps": 89.4,
+      "TargetFps": 90,
+      "TargetSource": "fps_max_inactive",
+      "LimitedBy": "fps_max_inactive",
+      "MeetingTarget": true,
+      "Rating": "Good",
+      "Frame": {
+        "AvgMs": 11.19,
+        "P50Ms": 11.11,
+        "P99Ms": 15.16,
+        "MaxMs": 21.3
+      },
+      "CpuWork": {
+        "AvgMs": 7.89,
+        "P50Ms": 7.51,
+        "P99Ms": 15.16,
+        "MaxMs": 21.3
+      },
+      "Gpu": null,
+      "CapWait": {
+        "AvgMs": 3.3,
+        "P50Ms": 3.44,
+        "P99Ms": 5.86,
+        "MaxMs": 6.11
+      },
+      "PerfHubWindow": null,
+      "Hitches": {
+        "Count": 0,
+        "OverMs": 22.2,
+        "WorstMs": 0
+      },
+      "Issues": [
+        {
+          "Severity": "Bad",
+          "Title": "GC pauses",
+          "Detail": "9.8 ms in the last second",
+          "MoreIn": "perf_memory"
+        },
+        {
+          "Severity": "Warning",
+          "Title": "Allocations",
+          "Detail": "31.7 MiB/s managed",
+          "MoreIn": "perf_memory"
+        }
+      ],
+      "MainThread": [
+        {
+          "Name": "Render",
+          "AvgMs": 5.19,
+          "MaxMs": 9.85
+        },
+        {
+          "Name": "Editor",
+          "AvgMs": 2.69,
+          "MaxMs": 10.95
+        },
+        {
+          "Name": "UI",
+          "AvgMs": 0.45,
+          "MaxMs": 0.8
+        },
+        {
+          "Name": "GcPause",
+          "AvgMs": 0.14,
+          "MaxMs": 3.68
+        },
+        {
+          "Name": "Animation",
+          "AvgMs": 0.14,
+          "MaxMs": 4.35
+        },
+        {
+          "Name": "Particles",
+          "AvgMs": 0.09,
+          "MaxMs": 0.23
+        },
+        {
+          "Name": "Async",
+          "AvgMs": 0.09,
+          "MaxMs": 6.64
+        },
+        {
+          "Name": "Input",
+          "AvgMs": 0.06,
+          "MaxMs": 0.33
+        }
+      ],
+      "GpuPasses": [
+        {
+          "Name": "VolumetricFog",
+          "AvgMs": 0.37,
+          "MaxMs": 0.39,
+          "Path": "RenderToSwapChain / VolumetricFog"
+        },
+        {
+          "Name": "Depth Of Field",
+          "AvgMs": 0.22,
+          "MaxMs": 0.56,
+          "Path": "Managed: AfterTransparent / Depth Of Field"
+        },
+        {
+          "Name": "DrawDepthOpaque",
+          "AvgMs": 0.12,
+          "MaxMs": 0.13,
+          "Path": "Sandbox.SceneSpotLight_Shadow / DrawDepthOpaque"
+        },
+        {
+          "Name": "OverlayWithoutDepth",
+          "AvgMs": 0.06,
+          "MaxMs": 0.06,
+          "Path": "RenderToSwapChain / OverlayWithoutDepth"
+        },
+        {
+          "Name": "Clustered Light Culling",
+          "AvgMs": 0.04,
+          "MaxMs": 0.05,
+          "Path": "RenderToSwapChain / Clustered Light Culling"
+        },
+        {
+          "Name": "DrawDepthOpaque",
+          "AvgMs": 0.03,
+          "MaxMs": 0.03,
+          "Path": "CSM Cascade 2 / DrawDepthOpaque"
+        },
+        {
+          "Name": "DrawDepthTranslucent",
+          "AvgMs": 0.03,
+          "MaxMs": 0.03,
+          "Path": "Sandbox.SceneSpotLight_Shadow / DrawDepthTranslucent"
+        },
+        {
+          "Name": "DrawDepthOpaque",
+          "AvgMs": 0.02,
+          "MaxMs": 0.03,
+          "Path": "CSM Cascade 1 / DrawDepthOpaque"
+        }
+      ],
+      "Memory": {
+        "ProcessMiB": 14968.2,
+        "VideoMemory": {
+          "UsedMiB": 4751,
+          "BudgetMiB": 11174
+        },
+        "AllocatedMiBPerSecond": 31.7,
+        "GcPauseMsLastSecond": 9.81,
+        "GcLastSecond": {
+          "Gen0": 4,
+          "Gen1": 0,
+          "Gen2": 0
+        }
+      },
+      "DrawCalls": 1252,
+      "Triangles": 2129050
+    },
+    {
+      "Window": {
+        "Frames": 179,
+        "Seconds": 2
+      },
+      "CpuWork": {
+        "AvgMs": 7.89,
+        "P50Ms": 7.51,
+        "P99Ms": 15.16,
+        "MaxMs": 21.3
+      },
+      "CapWait": {
+        "AvgMs": 3.3,
+        "P50Ms": 3.44,
+        "P99Ms": 5.86,
+        "MaxMs": 6.11
+      },
+      "Frame": {
+        "AvgMs": 11.19,
+        "P50Ms": 11.11,
+        "P99Ms": 15.16,
+        "MaxMs": 21.3
+      },
+      "FrameStdDevMs": 0.95,
+      "Hitches": {
+        "Count": 0,
+        "OverMs": 22.2,
+        "WorstMs": 0
+      },
+      "NotPresentedPercent": 0,
+      "Cap": {
+        "CappedBy": "fps_max_inactive",
+        "CapFps": 90,
+        "Display": "borderless",
+        "VSync": true,
+        "RefreshRate": 239.96,
+        "FpsMax": 0,
+        "FpsMaxMenu": 0,
+        "FpsMaxInactive": 90
+      },
+      "Categories": [
+        {
+          "Name": "Render",
+          "AvgMs": 5.19,
+          "MaxMs": 9.85
+        },
+        {
+          "Name": "Editor",
+          "AvgMs": 2.69,
+          "MaxMs": 10.95
+        },
+        {
+          "Name": "UI",
+          "AvgMs": 0.45,
+          "MaxMs": 0.8
+        },
+        {
+          "Name": "GcPause",
+          "AvgMs": 0.14,
+          "MaxMs": 3.68
+        },
+        {
+          "Name": "Animation",
+          "AvgMs": 0.14,
+          "MaxMs": 4.35
+        },
+        {
+          "Name": "Particles",
+          "AvgMs": 0.09,
+          "MaxMs": 0.23
+        },
+        {
+          "Name": "Async",
+          "AvgMs": 0.09,
+          "MaxMs": 6.64
+        },
+        {
+          "Name": "Input",
+          "AvgMs": 0.06,
+          "MaxMs": 0.33
+        },
+        {
+          "Name": "Update",
+          "AvgMs": 0.02,
+          "MaxMs": 0.05
+        },
+        {
+          "Name": "Audio",
+          "AvgMs": 0.01,
+          "MaxMs": 0.09
+        }
+      ],
+      "TotalScopes": 14,
+      "Scopes": [
+        {
+          "Name": "Render",
+          "AvgMs": 5.19,
+          "MaxMs": 9.85
+        },
+        {
+          "Name": "Editor",
+          "AvgMs": 2.69,
+          "MaxMs": 10.95
+        },
+        {
+          "Name": "UI",
+          "AvgMs": 0.45,
+          "MaxMs": 0.8
+        },
+        {
+          "Name": "Build Command Lists",
+          "AvgMs": 0.24,
+          "MaxMs": 0.42
+        },
+        {
+          "Name": "Tick Panels",
+          "AvgMs": 0.15,
+          "MaxMs": 0.38
+        },
+        {
+          "Name": "GcPause",
+          "AvgMs": 0.14,
+          "MaxMs": 3.68
+        },
+        {
+          "Name": "Animation",
+          "AvgMs": 0.14,
+          "MaxMs": 4.35
+        },
+        {
+          "Name": "Particles",
+          "AvgMs": 0.09,
+          "MaxMs": 0.23
+        },
+        {
+          "Name": "Async",
+          "AvgMs": 0.09,
+          "MaxMs": 6.64
+        },
+        {
+          "Name": "Input",
+          "AvgMs": 0.06,
+          "MaxMs": 0.33
+        },
+        {
+          "Name": "Update",
+          "AvgMs": 0.02,
+          "MaxMs": 0.05
+        },
+        {
+          "Name": "Tool Binds",
+          "AvgMs": 0.02,
+          "MaxMs": 0.13
+        },
+        {
+          "Name": "Tick Input",
+          "AvgMs": 0.02,
+          "MaxMs": 0.1
+        },
+        {
+          "Name": "Pre Layout",
+          "AvgMs": 0.02,
+          "MaxMs": 0.04
+        }
+      ]
+    },
+    {
+      "Renderer": "native",
+      "Resolution": "1024x1024",
+      "AntiAliasing": "Multisample4x",
+      "Upscaling": "Off",
+      "Issues": [],
+      "Counters": {
+        "ObjectsRendered": 1177,
+        "ObjectsPreCull": 3457,
+        "ObjectsTested": 12725,
+        "BaseObjectDraws": 995,
+        "AnimatableObjectDraws": 100,
+        "AggregateObjectDraws": 0,
+        "AggregateObjectsFullyCulled": 0,
+        "AggregateObjectDrawCalls": 0,
+        "AggregateIndirectSubmits": 0,
+        "AggregateIndirectFragments": 0,
+        "RenderBatchDraws": 605,
+        "TrianglesRendered": 2129050,
+        "DrawCalls": 1252,
+        "MaterialChanges": 233,
+        "ShadowMaterialChanges": 384,
+        "ShadowMaterialChangesAlphaTested": 0,
+        "InitialMaterialChanges": 362,
+        "InitialShadowMaterialChanges": 362,
+        "CopyMaterialChanges": 0,
+        "MaterialComputes": 648,
+        "FullMaterialSets": 648,
+        "SimilarMaterialSets": 16,
+        "TextureOnlyMaterialSets": 0,
+        "VfxEvals": 0,
+        "VfxRuleChecks": 544,
+        "ConstantBufferUpdates": 198,
+        "ConstantBufferBytes": 52512,
+        "UnbatchableMaterialDraws": 0,
+        "UniqueMaterials": 0,
+        "DisplayLists": 103,
+        "SceneViewsRendered": 5,
+        "RenderTargetResolves": 1,
+        "PrimaryContexts": 159,
+        "SecondaryContexts": 0,
+        "ObjectsCulledByVis": 0,
+        "ObjectsCulledByScreenSize": 151,
+        "ObjectsCulledByFade": 14,
+        "ObjectsFading": 56,
+        "ShadowedLightsInView": 0,
+        "UnshadowedLightsInView": 9,
+        "ShadowMaps": 0,
+        "GpuStatsSummary": "Checked pending presents 6,331 times; waited 0 times; abandoned 0 times\nTexture memory: 3,316 / 10,150 MB; in 6,593 textures (284 MB non-evictable)\nTextures created overall: 6,941; textures evicted: 0\nCommand stream pools: 149,504 bytes in base, 0 bytes in medium, 0 bytes in large (0 extra data fallbacks)\nVulkan Total Mem: 5,421.52 MB; Fragmentation: 307.72 MB; PMB mem: 31.46 MB; command buffers: 5,146\nVulkan pipelines: 75; pipeline layouts: 419\n",
+        "PendingStreamingRequests": 0,
+        "TexturePoolUsedBytes": 3478077976,
+        "TexturePoolLimitBytes": 10643046400,
+        "TexturePoolNonEvictableBytes": 298665636
+      },
+      "ManagedRenderer": null,
+      "PostProcessing": "no active camera"
+    },
+    {
+      "Position": "312.867065,457.33551,247.269867",
+      "Angles": "12.8002958,-139.500122,0",
+      "FieldOfView": 80
+    }
+  ],
+  "text": ""
+}

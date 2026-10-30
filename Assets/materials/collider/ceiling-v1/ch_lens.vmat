@@ -1,0 +1,20 @@
+// Tools/collider_finish.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    TextureColor "[0.72 0.77 0.78 1]"
+    TextureNormal "materials/default/default_normal.tga"
+    TextureRoughness "[0.52 0.52 0.52 0]"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_flMetalness "0.0"
+    g_flRoughnessScaleFactor "1"
+    g_vTexCoordScale "[1.00000000 1.00000000]"
+    g_vColorTint "[1 1 1 1]"
+    g_flModelTintAmount "1"
+    F_SELF_ILLUM "1"
+    TextureSelfIllumMask "[1 1 1 1]"
+    g_flSelfIllumBrightness "0.65"
+    g_flSelfIllumAlbedoFactor "1"
+    g_vSelfIllumTint "[1 0.97 0.90 1]"
+}

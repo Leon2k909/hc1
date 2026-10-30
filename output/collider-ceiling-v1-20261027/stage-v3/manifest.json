@@ -1,0 +1,71 @@
+{
+  "revision": "collider-ceiling-v1",
+  "stage": "output/collider-ceiling-v1-20261027/stage-v3",
+  "files": [
+    {
+      "relative": "materials/collider/ceiling-v1/ch_housing.vmat",
+      "before": null,
+      "after": "dc597f9b58e9a07a7c864f50beca54f12d5142b779c63ca21001a6507edf3eb2"
+    },
+    {
+      "relative": "materials/collider/ceiling-v1/ch_lens.vmat",
+      "before": null,
+      "after": "60c0b455d0fef7fa30740b1091b808a4751445d2b9c28bd279d0fb29f83f1d1c"
+    },
+    {
+      "relative": "materials/collider/ceiling-v1/ch_soffit.vmat",
+      "before": null,
+      "after": "7ea289919599edf4e6657e729243c731bf41390838fffdfb3dcf781584164d19"
+    },
+    {
+      "relative": "materials/collider/ceiling-v1/soffit_color.png",
+      "before": null,
+      "after": "35f54c0f70fa9daf6bc421110919d449d614d85aa5f4ba919acf434b91956fd7"
+    },
+    {
+      "relative": "materials/collider/ceiling-v1/soffit_normal.png",
+      "before": null,
+      "after": "73fff5aadfc7d24b3ce297c7938d2b4d82b8d61c1bca3e2d6fab51fb5e480bad"
+    },
+    {
+      "relative": "materials/collider/ceiling-v1/soffit_rough.png",
+      "before": null,
+      "after": "86b7b79fd2c433b32dd145d1620806dad587af50dc30b1aef57e95b4ea868375"
+    },
+    {
+      "relative": "models/maps/collider/collider_structure.mtl",
+      "before": "2a17b4d79d0ddde9695cc42449bc428f4059ecb73ccf9def7204606399ef6cee",
+      "after": "7d18e37e3362f894bd19552222196cd712b40bfacba40d86088baee803e9c99a"
+    },
+    {
+      "relative": "models/maps/collider/collider_structure.obj",
+      "before": "60998b820a4fd03837b2505869532dfffc1ee46333c4aa3fabbec9fdba2330e7",
+      "after": "a133f015b60588d28d4a1143de19c80ce4064c835ea51358fb665f6f702bbc35"
+    },
+    {
+      "relative": "models/maps/collider/collider_structure.vmdl",
+      "before": "cbcff0ad2aa41582d140af7625de1eff61e1867784d26196e3e919ea93907256",
+      "after": "7014b786fdbb47c0654512d7ffc75d15cadd81326fa0ab347149575375d5f895"
+    }
+  ],
+  "geometry": {
+    "before_triangles": 169073,
+    "removed": {
+      "ceiling_faces": 6,
+      "old_blocks_beams": 540
+    },
+    "added_triangles": 40074,
+    "after_triangles": 208601,
+    "exported_minimum_triangle_area": 0.008660254037833864,
+    "winding_errors": 0,
+    "fixtures": 36,
+    "ceiling_planes": 3,
+    "physics_preserved": true,
+    "unchanged_face_lines_preserved": true
+  },
+  "scene_sha256": "bf6a9feabd22b988276ec8cdb80f383e734e2ac733f38a4f923d404a14729802",
+  "generators": {
+    "Tools/collider_ceiling.py": "f8aa4fe8b5f3c67bd0e28d6616fbb2ddd70a7378ad23fe0443e8a1d1ac66de3d",
+    "Tools/collider_map.py": "56dcf5e39381b2f4fba943dabdd3db0172255fe153ed55bb27a505c644feafd8"
+  }
+}

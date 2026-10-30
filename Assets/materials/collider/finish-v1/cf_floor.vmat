@@ -1,0 +1,15 @@
+// Tools/collider_finish.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    TextureColor "materials/collider/finish-v1/hangar_concrete_floor_diff_2k.jpg"
+    TextureNormal "materials/collider/finish-v1/hangar_concrete_floor_nor_gl_2k.png"
+    TextureRoughness "materials/collider/finish-v1/hangar_concrete_floor_rough_2k.png"
+    TextureAmbientOcclusion "materials/collider/finish-v1/hangar_concrete_floor_ao_2k.png"
+    g_flMetalness "0.0"
+    g_flRoughnessScaleFactor "1"
+    g_vTexCoordScale "[2.43840000 2.43840000]"
+    g_vColorTint "[1.55 1.62 1.64 1]"
+    g_flModelTintAmount "1"
+}

@@ -1,0 +1,225 @@
+// Capture temporary surface/woodland trials in the existing saved Veridant document.
+// No scene creation, selected-document changes, frame callbacks or saved-map writes.
+// Pin Scene.Camera only inside a synchronous scope: InitializeRendering otherwise
+// copies post-processing from a fallback camera, including an editor minimap.
+var root = Sandbox.Project.Current.GetRootPath();
+var config = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root, "output/veridant/spa-windows-v2/capture-request.json")));
+var folder = config["directory"].GetValue<string>();
+var name = config["name"].GetValue<string>();
+if (!System.Text.RegularExpressions.Regex.IsMatch(folder, "^[a-z0-9-]+$") || !System.Text.RegularExpressions.Regex.IsMatch(name, "^[a-z0-9-]+$"))
+    throw new InvalidOperationException("Invalid capture destination.");
+var exposure = config["exposure"].GetValue<float>();
+var width = config["width"]?.GetValue<int>() ?? 1920;
+var height = config["height"]?.GetValue<int>() ?? 1080;
+var fov = config["fov"]?.GetValue<float>() ?? 80f;
+var settleMilliseconds = config["settle_ms"]?.GetValue<int>() ?? 0;
+if (!float.IsFinite(exposure) || exposure < .2f || exposure > 3f || !float.IsFinite(fov) || fov < 20f || fov > 110f || width < 64 || width > 2048 || height < 64 || height > 2048)
+    throw new InvalidOperationException("Invalid exposure or projection.");
+if (settleMilliseconds < 0 || settleMilliseconds > 5000) throw new InvalidOperationException("Invalid viewport settling duration.");
+var position = Vector3.Parse(config["position"].GetValue<string>());
+var rotation = Rotation.From(Angles.Parse(config["angles"].GetValue<string>()));
+var destination = System.IO.Path.Combine(root, "output/veridant/quality", folder);
+if (System.IO.File.Exists(System.IO.Path.Combine(destination, name + ".png")))
+    throw new InvalidOperationException("Choose a fresh capture name; existing evidence is preserved.");
+string Hash(string path) => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+var scenePath = System.IO.Path.Combine(root, "Assets/scenes/maps/Veridant/veridant.scene");
+var sourceHash = Hash(scenePath);
+if (sourceHash != config["expected_scene_sha256"].GetValue<string>())
+    throw new InvalidOperationException("The saved Veridant scene changed; review it before capture.");
+var previous = Editor.SceneEditorSession.Active;
+var gameId = Game.ActiveScene?.Id;
+var playing = Game.IsPlaying;
+var session = Editor.SceneEditorSession.All.Single(s => s.Scene.IsEditor && s.Scene.Source?.ResourcePath?.Equals("scenes/maps/veridant/veridant.scene", StringComparison.OrdinalIgnoreCase) == true);
+if (session.HasUnsavedChanges) throw new InvalidOperationException("This diagnostic requires the saved Veridant document.");
+if (settleMilliseconds > 0 && (!ReferenceEquals(previous, session) || playing))
+    throw new InvalidOperationException("Exposure settling requires the active, stopped Veridant document.");
+var scene = session.Scene;
+var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
+var cameraProperty = typeof(Scene).GetProperty("Camera", flags);
+if (cameraProperty?.GetSetMethod(true) is null) throw new InvalidOperationException("The installed engine no longer exposes the verified Scene.Camera setter.");
+var surfaceSlots=0; var forestSlots=0; var forestVariant="accepted";
+var trialManifests=new System.Collections.Generic.Dictionary<string,string>();
+var modelChanges = new System.Collections.Generic.List<(ModelRenderer Renderer, Model Original)>();
+var materialChanges = new System.Collections.Generic.List<(ModelRenderer Renderer, int Slot, Material Original)>();
+var rendererSnapshots = new System.Collections.Generic.Dictionary<ModelRenderer, string>();
+void StoreRenderer(ModelRenderer renderer)
+{
+    if (!rendererSnapshots.ContainsKey(renderer))
+        rendererSnapshots.Add(renderer, renderer.Serialize().ToJsonString());
+}
+var materials=new System.Collections.Generic.HashSet<Material>();
+using (scene.Push())
+{
+    foreach (var renderer in scene.GetAllComponents<ModelRenderer>().Where(r => r.Model?.ResourcePath?.Contains("models/maps/veridant/", StringComparison.OrdinalIgnoreCase) == true))
+        for (var slot = 0; slot < renderer.Materials.Count; slot++)
+            materials.Add(renderer.Materials.GetOverride(slot) ?? renderer.Materials.GetOriginal(slot));
+    foreach (var material in materials.Where(m => m is not null && !m.IsError))
+    {
+        foreach (var key in new[] { "g_tColor", "g_tNormal", "g_tRma", "g_tHeight", "g_tPlants", "g_tWearColor", "g_tWearNormal", "g_tWearData", "g_tCanopyColorB", "g_tCanopyNormalB", "g_tCanopyColorC", "g_tCanopyNormalC", "g_tCanopyColorD", "g_tCanopyNormalD" })
+            material.GetTexture(key)?.MarkUsed(2048);
+        foreach (var key in new[] { "g_tColorA", "g_tColorB", "g_tColorC", "g_tColorD", "g_tCanopyColorB", "g_tCanopyColorC", "g_tCanopyColorD" })
+            material.GetTexture(key)?.MarkUsed(4096);
+        foreach (var key in new[] { "g_tNormalA", "g_tNormalB", "g_tNormalC", "g_tNormalD" })
+            material.GetTexture(key)?.MarkUsed(2048);
+    }
+    foreach (var volume in scene.GetAllComponents<IndirectLightVolume>())
+        foreach (var texture in new[] { volume.IrradianceTexture, volume.DistanceTexture, volume.RelocationTexture })
+            if (texture is not null && !texture.IsError) texture.MarkUsed(Math.Max(texture.Width, texture.Height));
+}
+await Task.Delay(1000, cancellationToken);
+cancellationToken.ThrowIfCancellationRequested();
+if (!ReferenceEquals(previous, Editor.SceneEditorSession.Active) || Game.ActiveScene?.Id != gameId || Game.IsPlaying != playing
+    || !Editor.SceneEditorSession.All.Contains(session) || session.HasUnsavedChanges || Hash(scenePath) != sourceHash)
+    throw new InvalidOperationException("Editor state changed during streaming; no camera changes were made.");
+var camera = scene.GetAllComponents<CameraComponent>().Single(c => c.GameObject.Name == "editor_camera" && c.GameObject.Flags.HasFlag(GameObjectFlags.EditorOnly));
+var mainCamera = scene.Camera;
+var tone = scene.GetAllComponents<Tonemapping>().Single(c => c.GameObject.Name == "Look");
+var oldTone = new { tone.MinimumExposure, tone.MaximumExposure, tone.ExposureCompensation, tone.Mode };
+var toneSnapshot = tone.Serialize().ToJsonString();
+var oldCamera = new { camera.WorldPosition, camera.WorldRotation, camera.FieldOfView, camera.FovAxis, camera.CustomSize };
+var cameraSnapshots = scene.GetAllComponents<CameraComponent>().Select(c => new {
+    Camera = c, Serialized = c.Serialize()?.ToJsonString(),
+    ComponentEnabled = c.Enabled, c.IsMainCamera, c.Priority, c.Orthographic, c.EnablePostProcessing,
+    c.AutoExposure.Enabled,
+    c.AutoExposure.MinimumExposure, c.AutoExposure.MaximumExposure, c.AutoExposure.Compensation, c.AutoExposure.Rate
+}).ToArray();
+var objectIds = scene.GetAllObjects(true).Select(o => o.Id).ToHashSet();
+var updatePost = typeof(PostProcessSystem).GetMethod("UpdateCamera", flags);
+var post = scene.GetSystem<PostProcessSystem>();
+object captured = null;
+object restored = null;
+bool pinAttempted = false;
+System.IO.Directory.CreateDirectory(destination);
+try
+{
+    if (settleMilliseconds > 0)
+    {
+        tone.MinimumExposure = exposure;
+        tone.MaximumExposure = exposure;
+        tone.ExposureCompensation = 0f;
+        tone.Mode = Enum.Parse<Tonemapping.TonemappingMode>("ACES");
+        camera.WorldPosition = position;
+        camera.WorldRotation = rotation;
+        camera.FieldOfView = fov;
+        using (scene.Push())
+            foreach (var item in cameraSnapshots.Where(s => s.Camera.IsValid()))
+                updatePost.Invoke(post, new object[] { item.Camera });
+        // Allow the existing viewport's exposure history to advance normally.
+        // There is no Scene.Push, camera pin, temporary scene or callback here.
+        await Task.Delay(settleMilliseconds, cancellationToken);
+        cancellationToken.ThrowIfCancellationRequested();
+        if (!ReferenceEquals(session, Editor.SceneEditorSession.Active) || Game.ActiveScene?.Id != gameId || Game.IsPlaying != playing || Hash(scenePath) != sourceHash)
+            throw new InvalidOperationException("Editor state changed while exposure settled.");
+    }
+    using (scene.Push())
+    {
+        // The setter is a backing-field assignment in the recorded installed IL.
+        // Do not change IsMainCamera, Priority, enabled state or editor-camera flags.
+        pinAttempted = true;
+        cameraProperty.SetValue(scene, camera);
+        if (!ReferenceEquals(scene.Camera, camera)) throw new InvalidOperationException("Viewport camera pin failed.");
+        tone.MinimumExposure = exposure;
+        tone.MaximumExposure = exposure;
+        tone.ExposureCompensation = 0f;
+        tone.Mode = Enum.Parse<Tonemapping.TonemappingMode>("ACES");
+        camera.WorldPosition = position;
+        camera.WorldRotation = rotation;
+        camera.FieldOfView = fov;
+        camera.FovAxis = CameraComponent.Axis.Horizontal;
+        camera.CustomSize = new Vector2(width, height);
+        typeof(Scene).GetMethod("PreRender", flags, null, Type.EmptyTypes, null).Invoke(scene, null);
+        typeof(Scene).GetMethod("PreCameraRender", flags, null, Type.EmptyTypes, null).Invoke(scene, null);
+        updatePost.Invoke(post, new object[] { camera });
+        var ddgiType = typeof(Scene).Assembly.GetType("Sandbox.DDGIVolumeSystem");
+        var getSystem = typeof(Scene).GetMethods().Single(m => m.Name == "GetSystem" && m.IsGenericMethodDefinition && m.GetParameters().Length == 0);
+        var ddgi = getSystem.MakeGenericMethod(ddgiType).Invoke(scene, null);
+        ddgiType.GetMethod("MarkDirty", flags).Invoke(ddgi, null);
+        ddgiType.GetMethod("UpdateVolumes", flags).Invoke(ddgi, null);
+        if (!ReferenceEquals(scene.Camera, camera) || !camera.AutoExposure.Enabled
+            || MathF.Abs(camera.AutoExposure.MinimumExposure - exposure) > .001f || MathF.Abs(camera.AutoExposure.MaximumExposure - exposure) > .001f)
+            throw new InvalidOperationException("The fixed exposure or camera pin changed before rendering.");
+        using var bitmap = new Bitmap(width, height);
+        camera.RenderToBitmap(bitmap, false);
+        var native = typeof(CameraComponent).GetField("sceneCamera", flags).GetValue(camera);
+        var nativeTone = native.GetType().GetProperty("Tonemap", flags).GetValue(native);
+        object NativeValue(string property) => nativeTone.GetType().GetProperty(property, flags).GetValue(nativeTone);
+        if (!ReferenceEquals(scene.Camera, camera) || !Convert.ToBoolean(NativeValue("Enabled"))
+            || MathF.Abs(Convert.ToSingle(NativeValue("MinExposure")) - exposure) > .001f
+            || MathF.Abs(Convert.ToSingle(NativeValue("MaxExposure")) - exposure) > .001f
+            || MathF.Abs(Convert.ToSingle(NativeValue("ExposureCompensation"))) > .001f)
+            throw new InvalidOperationException("Native exposure or camera pin changed while rendering.");
+        captured = new {
+            Position = camera.WorldPosition.ToString(), Angles = camera.WorldRotation.Angles().ToString(), camera.FieldOfView,
+            FovAxis = camera.FovAxis.ToString(), Width = width, Height = height, camera.EnablePostProcessing,
+            TrialSurfaceSlots = surfaceSlots, TrialForestVariant = forestVariant, TrialForestSlots = forestSlots,
+            TrialModels = modelChanges.Count, TrialManifestSha256 = trialManifests,
+            RequestedExposure = exposure, NativeEnabled = NativeValue("Enabled"), NativeMinimum = NativeValue("MinExposure"),
+            ViewportSettledMilliseconds = settleMilliseconds,
+            NativeMaximum = NativeValue("MaxExposure"), NativeCompensation = NativeValue("ExposureCompensation"),
+            MainCameraIsViewport = ReferenceEquals(scene.Camera, camera),
+            PreviousMainName = mainCamera?.GameObject.Name, PreviousMainId = mainCamera?.Id,
+            PreviousMainWasOrthographic = mainCamera?.Orthographic, SourceSceneSha256 = sourceHash,
+            HelperSha256 = Hash(System.IO.Path.Combine(root, "Sources/Veridant/editor/capture-door-obstruction.cs.txt")),
+            EffectiveGpuExposureVerified = false
+        };
+        System.IO.File.WriteAllBytes(System.IO.Path.Combine(destination, name + ".png"), bitmap.ToPng());
+    }
+}
+finally
+{
+    // No await occurs after pinAttempted. Restore the scene camera first, even
+    // when rendering failed, then the tone, pose, projection and camera settings.
+    using (scene.Push())
+    {
+        if (pinAttempted) cameraProperty.SetValue(scene, mainCamera);
+        try
+        {
+            foreach (var item in modelChanges) if (item.Renderer.IsValid()) item.Renderer.Model = item.Original;
+            foreach (var item in materialChanges) if (item.Renderer.IsValid()) item.Renderer.Materials.SetOverride(item.Slot, item.Original);
+            tone.MinimumExposure = oldTone.MinimumExposure;
+            tone.MaximumExposure = oldTone.MaximumExposure;
+            tone.ExposureCompensation = oldTone.ExposureCompensation;
+            tone.Mode = oldTone.Mode;
+            camera.WorldPosition = oldCamera.WorldPosition;
+            camera.WorldRotation = oldCamera.WorldRotation;
+            camera.FieldOfView = oldCamera.FieldOfView;
+            camera.FovAxis = oldCamera.FovAxis;
+            camera.CustomSize = oldCamera.CustomSize;
+            foreach (var item in cameraSnapshots.Where(s => s.Camera.IsValid()))
+                updatePost.Invoke(post, new object[] { item.Camera });
+        }
+        finally
+        {
+            foreach (var item in cameraSnapshots.Where(s => s.Camera.IsValid()))
+            {
+                item.Camera.AutoExposure.Enabled = item.Enabled;
+                item.Camera.AutoExposure.MinimumExposure = item.MinimumExposure;
+                item.Camera.AutoExposure.MaximumExposure = item.MaximumExposure;
+                item.Camera.AutoExposure.Compensation = item.Compensation;
+                item.Camera.AutoExposure.Rate = item.Rate;
+            }
+        }
+    }
+    var mainRestored = ReferenceEquals(scene.Camera, mainCamera);
+    var toneRestored = tone.Serialize().ToJsonString() == toneSnapshot;
+    var camerasRestored = cameraSnapshots.All(s => s.Camera.IsValid() && s.Camera.Serialize()?.ToJsonString() == s.Serialized
+        && s.Camera.Enabled == s.ComponentEnabled && s.Camera.IsMainCamera == s.IsMainCamera && s.Camera.Priority == s.Priority
+        && s.Camera.Orthographic == s.Orthographic && s.Camera.EnablePostProcessing == s.EnablePostProcessing
+        && s.Camera.AutoExposure.Enabled == s.Enabled && s.Camera.AutoExposure.MinimumExposure == s.MinimumExposure
+        && s.Camera.AutoExposure.MaximumExposure == s.MaximumExposure && s.Camera.AutoExposure.Compensation == s.Compensation
+        && s.Camera.AutoExposure.Rate == s.Rate)
+        && camera.WorldPosition == oldCamera.WorldPosition && camera.WorldRotation == oldCamera.WorldRotation
+        && camera.FieldOfView == oldCamera.FieldOfView && camera.FovAxis == oldCamera.FovAxis && camera.CustomSize == oldCamera.CustomSize;
+    var objectsRestored = scene.GetAllObjects(true).Select(o => o.Id).ToHashSet().SetEquals(objectIds);
+    var statePreserved = ReferenceEquals(previous, Editor.SceneEditorSession.Active) && Game.ActiveScene?.Id == gameId && Game.IsPlaying == playing
+        && !session.HasUnsavedChanges && Hash(scenePath) == sourceHash;
+    var assetsRestored = rendererSnapshots.All(s => s.Key.IsValid() && s.Key.Serialize().ToJsonString() == s.Value);
+    restored = new { AssetsRestored = assetsRestored, MainCameraRestored = mainRestored, ToneRestored = toneRestored, CamerasRestored = camerasRestored,
+        ObjectsRestored = objectsRestored, EditorStatePreserved = statePreserved };
+    System.IO.File.WriteAllText(System.IO.Path.Combine(destination, name + "-restore.json"), System.Text.Json.JsonSerializer.Serialize(restored));
+    if (!assetsRestored || !mainRestored || !toneRestored || !camerasRestored || !objectsRestored || !statePreserved)
+        throw new InvalidOperationException("Capture restoration differs; inspect before continuing.");
+}
+var result = new { Capture = captured, Restoration = restored, ExposureImageComparisonStillRequired = true };
+System.IO.File.WriteAllText(System.IO.Path.Combine(destination, name + "-camera.json"), System.Text.Json.JsonSerializer.Serialize(result));
+return result;

@@ -193,6 +193,12 @@ public static partial class GameText
 		["Size - {0}px"] = ("Taille - {0}px", "Größe - {0}px", "Tamaño - {0}px", "Tamanho - {0}px"),
 		["Duration - {0}ms"] = ("Durée - {0}ms", "Dauer - {0}ms", "Duración - {0}ms", "Duração - {0}ms"),
 		["Preview Hit"] = ("Tester le marqueur", "Treffer testen", "Probar impacto", "Testar acerto"),
+		["Crosshair Off"] = ("Réticule désactivé", "Fadenkreuz aus", "Retícula desactivada", "Mira desativada"),
+		["Dark"] = ("Sombre", "Dunkel", "Oscuro", "Escuro"),
+		["Grey"] = ("Gris", "Grau", "Gris", "Cinza"),
+		["Light"] = ("Clair", "Hell", "Claro", "Claro"),
+		["Outdoor"] = ("Extérieur", "Draußen", "Exterior", "Exterior"),
+		["Loop"] = ("En boucle", "Wiederholen", "Repetir", "Repetir"),
 		["Reset Defaults"] = ("Réinitialiser", "Zurücksetzen", "Restablecer", "Redefinir"),
 
 		// Colour picker (also the gunsmith's and the emblem editor's)

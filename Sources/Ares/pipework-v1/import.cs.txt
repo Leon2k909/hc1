@@ -1,0 +1,117 @@
+// Publish pipe geometry and private finishes. Only five material aliases are
+// added to the current hall document; every other import and all physics remain.
+var root=Sandbox.Project.Current.GetRootPath();
+if(!string.Equals(System.IO.Path.GetFullPath(root).TrimEnd('\\','/'),@"C:\sbox-projects\hc1\forked-shooter-main",StringComparison.OrdinalIgnoreCase))throw new InvalidOperationException("Wrong checkout.");
+var folder=System.IO.Path.Combine(root,"output/ares/pipework-v1");
+var request=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"import-request.json")));
+var stage=request["stage"].GetValue<string>();
+var preview=request["preview"]?.GetValue<bool>()??true;
+if(!System.Text.RegularExpressions.Regex.IsMatch(stage,"^stage-[a-z0-9-]+$"))throw new InvalidOperationException("Invalid stage.");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,stage,"manifest.json")));
+if(manifest["revision"].GetValue<string>()!="ares-pipework-v1")throw new InvalidOperationException("Wrong revision.");
+var session=Editor.SceneEditorSession.Active;var playing=Game.IsPlaying;var game=Game.ActiveScene?.Id;var dirty=session.HasUnsavedChanges;
+if(playing||session.Scene.Source?.ResourcePath?.Equals("scenes/maps/ares/ares.scene",StringComparison.OrdinalIgnoreCase)!=true)throw new InvalidOperationException("Inspect the active scene before importing.");
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+var sourceScene=System.IO.Path.Combine(root,"Assets/scenes/maps/Ares/ares.scene");var sceneHash=Hash(sourceScene);
+foreach(var group in new[]{"source_sha256","protected_sha256"})
+ foreach(var pair in manifest[group].AsObject())
+ {
+  if(pair.Key=="Assets/scenes/maps/Ares/ares.scene")continue;
+  if(Hash(System.IO.Path.Combine(root,pair.Key))!=pair.Value.GetValue<string>())throw new InvalidOperationException("Shared input changed: "+pair.Key);
+ }
+foreach(var pair in manifest["required_source_snippets"].AsObject())
+{
+ var source=System.IO.File.ReadAllText(System.IO.Path.Combine(root,pair.Key)).Replace("\r\n","\n");
+ foreach(var part in pair.Value.AsArray())
+  if(!source.Contains(part.GetValue<string>().Replace("\r\n","\n"),StringComparison.Ordinal))throw new InvalidOperationException("Source hook changed.");
+}
+var files=manifest["files"].AsObject();var active=manifest["active_base"].GetValue<string>();
+var activeMtl=manifest["active_mtl"]?.GetValue<string>();
+if(!active.StartsWith("Assets/models/maps/ares/",StringComparison.Ordinal)||!active.EndsWith(".obj",StringComparison.Ordinal)||active.Contains(".."))throw new InvalidOperationException("Unexpected live mesh.");
+var document=manifest["document"].GetValue<string>();var liveDocument=System.IO.Path.Combine(root,document);
+var documentBytes=System.IO.File.ReadAllBytes(liveDocument);var documentText=System.Text.Encoding.UTF8.GetString(documentBytes);
+var originalDocument=System.IO.File.ReadAllText(System.IO.Path.Combine(folder,stage,"before",document));
+var marker="_class = \"PhysicsShapeList\"";
+if(documentText.Substring(documentText.IndexOf(marker,StringComparison.Ordinal))!=originalDocument.Substring(originalDocument.IndexOf(marker,StringComparison.Ordinal)))throw new InvalidOperationException("The hall physics changed; inspect first.");
+if(!documentText.Contains("filename = \""+active.Substring("Assets/".Length)+"\"",StringComparison.Ordinal))throw new InvalidOperationException("The active hall import moved; restage the pipe edit.");
+foreach(var pair in files)
+{
+ var path=pair.Key;
+ if((path!=active&&path!=activeMtl&&!path.StartsWith("Assets/models/maps/ares/pipework-v1/",StringComparison.Ordinal)&&!path.StartsWith("Assets/materials/ares/pipework-v1/",StringComparison.Ordinal))||path.Contains(".."))throw new InvalidOperationException("Unexpected target.");
+ var item=pair.Value;var target=System.IO.Path.Combine(root,path);var staged=System.IO.Path.Combine(root,item["source"].GetValue<string>());
+ var before=item["before"]?.GetValue<string>();var after=item["after"].GetValue<string>();
+ if(Hash(staged)!=after)throw new InvalidOperationException("Staged source changed.");
+ if(before is not null&&Hash(System.IO.Path.Combine(root,item["backup"].GetValue<string>()))!=before)throw new InvalidOperationException("Backup changed.");
+ var current=System.IO.File.Exists(target)?Hash(target):null;
+ if(current!=before&&current!=after)throw new InvalidOperationException("Target changed: "+path);
+}
+if(!preview)
+{
+ var trial=manifest["trial_document"].GetValue<string>();var previewBase=manifest["preview_base"].GetValue<string>();
+ if(Hash(System.IO.Path.Combine(root,previewBase))!=files[active]["after"].GetValue<string>())throw new InvalidOperationException("Trial mesh differs.");
+ var model=Model.Load(trial.Substring("Assets/".Length));
+ if(model is null||model.IsError)throw new InvalidOperationException("Compile and inspect the pipe trial first.");
+ foreach(var pair in manifest["materials"].AsObject())
+ {
+  var material=Material.Load(pair.Value.GetValue<string>());
+  if(material is null||material.IsError)throw new InvalidOperationException("A pipe material did not compile.");
+ }
+}
+var finalDocument=documentText;var aliasesAdded=0;
+if(!preview&&activeMtl is not null)
+{
+ foreach(var pair in manifest["materials"].AsObject())
+ {
+  var token="from = \""+pair.Key+".vmat\"";
+  var expected="{ "+token+" to = \""+pair.Value.GetValue<string>()+"\" }";
+  if(finalDocument.Contains(token,StringComparison.Ordinal))
+  {
+   if(!finalDocument.Contains(expected,StringComparison.Ordinal))throw new InvalidOperationException("An existing pipe alias changed.");
+   continue;
+  }
+  var index=finalDocument.IndexOf('[',finalDocument.IndexOf("remaps =",StringComparison.Ordinal))+1;
+  if(index<=0)throw new InvalidOperationException("No material remap list.");
+  finalDocument=finalDocument.Insert(index,Environment.NewLine+expected+",");aliasesAdded++;
+ }
+ if(finalDocument.Substring(finalDocument.IndexOf(marker,StringComparison.Ordinal))!=documentText.Substring(documentText.IndexOf(marker,StringComparison.Ordinal)))throw new InvalidOperationException("The material patch changed physics.");
+ if(finalDocument!=documentText)
+ {
+  if(!System.IO.File.ReadAllBytes(liveDocument).SequenceEqual(documentBytes))throw new InvalidOperationException("Hall changed before the material patch.");
+  var backup=System.IO.Path.Combine(folder,stage,"native-before-hall-"+Hash(liveDocument)+".vmdl");
+  if(!System.IO.File.Exists(backup))System.IO.File.WriteAllBytes(backup,documentBytes);
+  var incoming=liveDocument+".pipework-mats-incoming";
+  try
+  {
+   System.IO.File.WriteAllText(incoming,finalDocument,new System.Text.UTF8Encoding(false));
+   System.IO.File.Move(incoming,liveDocument,true);
+  }
+  finally{if(System.IO.File.Exists(incoming))System.IO.File.Delete(incoming);}
+  // Extra aliases with the old mesh remain valid. Publish them before the
+  // new OBJ so a background recompile never sees unresolved materials.
+  Editor.AssetSystem.RegisterFile(liveDocument);
+ }
+}
+int Priority(string path)=>path.EndsWith(".png",StringComparison.Ordinal)?0:path.EndsWith(".mtl",StringComparison.Ordinal)?1:path.EndsWith(".obj",StringComparison.Ordinal)?2:path.EndsWith(".vmat",StringComparison.Ordinal)?3:4;
+var imported=new System.Collections.Generic.List<string>();
+foreach(var pair in files.OrderBy(p=>Priority(p.Key)))
+{
+ if(preview&&(pair.Key==active||pair.Key==activeMtl))continue;
+ var item=pair.Value;var target=System.IO.Path.Combine(root,pair.Key);
+ if(System.IO.File.Exists(target)&&Hash(target)==item["after"].GetValue<string>())continue;
+ System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target));var incoming=target+".pipework-incoming";
+ try
+ {
+  System.IO.File.Copy(System.IO.Path.Combine(root,item["source"].GetValue<string>()),incoming,true);
+  if(Hash(incoming)!=item["after"].GetValue<string>())throw new InvalidOperationException("Incoming hash differs.");
+  System.IO.File.Move(incoming,target,true);imported.Add(pair.Key);
+ }
+ finally{if(System.IO.File.Exists(incoming))System.IO.File.Delete(incoming);}
+}
+foreach(var pair in files.OrderBy(p=>Priority(p.Key)))
+ if(!preview||(pair.Key!=active&&pair.Key!=activeMtl))Editor.AssetSystem.RegisterFile(System.IO.Path.Combine(root,pair.Key));
+if(System.IO.File.ReadAllText(liveDocument)!=finalDocument)throw new InvalidOperationException("The hall document changed during import; inspect the completed import.");
+var preserved=ReferenceEquals(session,Editor.SceneEditorSession.Active)&&playing==Game.IsPlaying&&game==Game.ActiveScene?.Id&&dirty==session.HasUnsavedChanges&&Hash(sourceScene)==sceneHash;
+var result=new{Stage=stage,ImportedFiles=imported,Preview=preview,Runs=16,MaterialAliasesAdded=aliasesAdded,OtherHallImportsPreserved=true,PhysicsBytesPreserved=true,SourceScenePreserved=true,EditorStatePreserved=preserved};
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,preview?"native-preview-import.json":"native-live-import.json"),System.Text.Json.JsonSerializer.Serialize(result));
+if(!preserved)throw new InvalidOperationException("Editor state changed; inspect completed import.");
+return result;

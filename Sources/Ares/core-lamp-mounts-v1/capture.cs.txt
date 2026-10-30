@@ -1,0 +1,140 @@
+// Ares in an isolated editor scene: its visual roots only (no game modes, no navmesh), its reflection probes rendered,
+// then each view of output/ares/core-lamp-mounts-v1/capture-config.json rendered with settle frames, to the config's
+// directory (relative to the project). Optional motion frames use actual elapsed time; exposure can be fixed for
+// comparison. Leaves the editor's own scene and play state alone, and destroys the isolated scene at the end.
+// Run it with sbox-cli's run_csharp (copy it into the session exchange directory as a .cs file). Views are in plan
+// coordinates ( east, north, z ), as Tools/ares_map.py's.
+var projectRoot = Sandbox.Project.Current.GetRootPath();
+var config = System.Text.Json.Nodes.JsonNode.Parse( System.IO.File.ReadAllText(
+	System.IO.Path.Combine( projectRoot, "output/ares/core-lamp-mounts-v1/capture-config.json" ) ) ).AsObject();
+var destination = System.IO.Path.Combine( projectRoot, config["directory"]?.GetValue<string>() ?? "output/ares" );
+System.IO.Directory.CreateDirectory( destination );
+var source = Editor.SceneEditorSession.Active?.Scene;
+var before = new { Game.IsPlaying, SceneId = source?.Id, GameSceneId = Game.ActiveScene?.Id };
+var visual = new System.Collections.Generic.HashSet<string>( StringComparer.OrdinalIgnoreCase ) {
+	"Sun", "Sky", "Fog", "Look", "Ares", "Lights", "Reflection Probes" };
+var root = System.Text.Json.Nodes.JsonNode.Parse( System.IO.File.ReadAllText( System.IO.Path.Combine( projectRoot, "Assets/scenes/maps/Ares/ares.scene" ) ) ).AsObject();
+var objects = new System.Text.Json.Nodes.JsonArray();
+foreach ( var item in root["GameObjects"].AsArray() )
+	if ( visual.Contains( item["Name"]?.GetValue<string>() ?? "" ) ) objects.Add( item.DeepClone() );
+root["GameObjects"] = objects;
+root["SceneProperties"]["NavMesh"]["Enabled"] = false;
+root["SceneProperties"]["WantsSystemScene"] = false;
+// Optional comparison exposure is applied only to this isolated copy, never to the user's scene.
+if ( config["exposure"] is { } exposure )
+{
+	foreach ( var item in objects )
+		foreach ( var component in item["Components"]?.AsArray() ?? new System.Text.Json.Nodes.JsonArray() )
+			if ( component["__type"]?.GetValue<string>() == "Sandbox.Tonemapping" )
+			{
+				component["AutoExposureEnabled"] = false;
+				component["ExposureCompensation"] = MathF.Log2( exposure.GetValue<float>() );
+				component["MinimumExposure"] = exposure.GetValue<float>();
+				component["MaximumExposure"] = exposure.GetValue<float>();
+			}
+}
+var scene = Scene.CreateEditorScene();
+var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
+// RenderToBitmap alone doesn't run the scene's render hooks: run them as the app does, so fog and lights update.
+var preRender = typeof( Scene ).GetMethod( "PreRender", flags, null, Type.EmptyTypes, null );
+var preCameraRender = typeof( Scene ).GetMethod( "PreCameraRender", flags, null, Type.EmptyTypes, null );
+var log = new System.Collections.Generic.List<string>();
+var motion = new System.Collections.Generic.List<object>();
+try
+{
+	CameraComponent camera;
+	using ( scene.Push() )
+	{
+		scene.Deserialize( root );
+		var holder = new GameObject( false, "Ares capture camera" );
+		camera = holder.Components.Create<CameraComponent>();
+		camera.ZNear = 4; camera.ZFar = 120000;
+		holder.Enabled = true;
+		scene.EditorTick( .016f, .016f );
+		preRender.Invoke( scene, null );
+		preCameraRender.Invoke( scene, null );
+	}
+	void ComparisonExposure()
+	{
+		if ( config["exposure"] is not { } value ) return;
+		var settings = camera.AutoExposure;
+		settings.Enabled = false;
+		settings.Compensation = MathF.Log2( value.GetValue<float>() );
+	}
+	var models = scene.GetAllComponents<ModelRenderer>().Select( r => new { r.GameObject.Name, Model = r.Model?.ResourcePath, Error = r.Model?.IsError ?? true } ).ToArray();
+	var renderCubemap = typeof( EnvmapProbe ).GetMethod( "RenderCubemap", flags, null, Type.EmptyTypes, null );
+	foreach ( var probe in scene.GetAllComponents<EnvmapProbe>() )
+	{
+		cancellationToken.ThrowIfCancellationRequested();
+		try { using ( scene.Push() ) renderCubemap?.Invoke( probe, null ); } catch ( Exception e ) { log.Add( "probe: " + e.Message ); }
+		await Task.Delay( 16, cancellationToken );
+	}
+	Vector3 World( System.Text.Json.Nodes.JsonNode p ) => new( p[1].GetValue<float>(), -p[0].GetValue<float>(), p[2].GetValue<float>() );
+	Vector3 Eye( System.Text.Json.Nodes.JsonNode view, float amount )
+	{
+		var from = World( view["eye"] );
+		return view["endEye"] is { } end ? Vector3.Lerp( from, World( end ), amount ) : from;
+	}
+	using var bitmap = new Bitmap( config["width"].GetValue<int>(), config["height"].GetValue<int>() );
+	foreach ( var view in config["views"].AsArray() )
+	{
+		cancellationToken.ThrowIfCancellationRequested();
+		var name = view["name"].GetValue<string>();
+		for ( var frame = 0; frame < config["settle"].GetValue<int>(); frame++ )
+		{
+			using ( scene.Push() )
+			{
+				camera.WorldPosition = World( view["eye"] );
+				camera.WorldRotation = Rotation.LookAt( World( view["target"] ) - World( view["eye"] ) );
+				camera.FieldOfView = view["fov"].GetValue<float>();
+				scene.EditorTick( .016f, .016f );
+				preRender.Invoke( scene, null );
+				preCameraRender.Invoke( scene, null );
+				ComparisonExposure();
+				camera.RenderToBitmap( bitmap );
+			}
+			await Task.Delay( 16, cancellationToken );
+		}
+		System.IO.File.WriteAllBytes( System.IO.Path.Combine( destination, name + ".png" ), bitmap.ToPng() );
+		var count = config["frames"]?.GetValue<int>() ?? 0;
+		if ( count > 0 )
+		{
+			var frameDirectory = System.IO.Path.Combine( destination, name + "-frames" );
+			System.IO.Directory.CreateDirectory( frameDirectory );
+			var timer = System.Diagnostics.Stopwatch.StartNew();
+			var previous = 0.0;
+			for ( var frame = 0; frame < count; frame++ )
+			{
+				cancellationToken.ThrowIfCancellationRequested();
+				var seconds = timer.Elapsed.TotalSeconds;
+				var delta = (float)Math.Clamp( seconds - previous, .001, .25 );
+				previous = seconds;
+				using ( scene.Push() )
+				{
+					camera.WorldPosition = Eye( view, (float)frame / Math.Max( 1, count - 1 ) );
+					camera.WorldRotation = Rotation.LookAt( World( view["target"] ) - camera.WorldPosition );
+					scene.EditorTick( delta, delta );
+					preRender.Invoke( scene, null );
+					preCameraRender.Invoke( scene, null );
+					ComparisonExposure();
+					camera.RenderToBitmap( bitmap );
+				}
+				System.IO.File.WriteAllBytes( System.IO.Path.Combine( frameDirectory, $"{frame:D3}.png" ), bitmap.ToPng() );
+				motion.Add( new { View = name, Frame = frame, Seconds = seconds } );
+				await Task.Delay( config["intervalMs"]?.GetValue<int>() ?? 75, cancellationToken );
+			}
+		}
+		log.Add( "wrote " + name );
+	}
+	var unchanged = Editor.SceneEditorSession.Active?.Scene?.Id == before.SceneId && Game.ActiveScene?.Id == before.GameSceneId;
+	System.IO.File.WriteAllText( System.IO.Path.Combine( destination, "capture.json" ), System.Text.Json.JsonSerializer.Serialize(
+		new { Before = before, SourceUnchanged = unchanged, Models = models, Frames = motion, CameraAutoExposure = camera.AutoExposure },
+		new System.Text.Json.JsonSerializerOptions { WriteIndented = true } ) );
+	return new { Before = before, SourceUnchanged = unchanged, Models = models, MotionFrames = motion.Count, Log = log };
+}
+catch ( Exception error )
+{
+	System.IO.File.WriteAllText( System.IO.Path.Combine( destination, "capture-error.txt" ), error.ToString() );
+	throw;
+}
+finally { scene.Destroy(); }

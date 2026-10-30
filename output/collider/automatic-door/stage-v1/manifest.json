@@ -1,0 +1,44 @@
+{
+  "revision": "collider-automatic-door-v1",
+  "files": {
+    "Assets/models/maps/collider/automatic-door-v1/lab_door_leaf.mtl": {
+      "source": "output/collider/automatic-door/stage-v1/Assets/models/maps/collider/automatic-door-v1/lab_door_leaf.mtl",
+      "after": "0c4ecd16ef510a989fd60c64bc57e5d2ce3a51f3eedfd8b6290d1c0b64d42469",
+      "before": null
+    },
+    "Assets/models/maps/collider/automatic-door-v1/lab_door_leaf.obj": {
+      "source": "output/collider/automatic-door/stage-v1/Assets/models/maps/collider/automatic-door-v1/lab_door_leaf.obj",
+      "after": "4b5c73acfc41ff9f91ec38a60367811c7b5140ce72371bdb1fa7e23bef961cb7",
+      "before": null
+    },
+    "Assets/models/maps/collider/automatic-door-v1/lab_door_leaf.vmdl": {
+      "source": "output/collider/automatic-door/stage-v1/Assets/models/maps/collider/automatic-door-v1/lab_door_leaf.vmdl",
+      "after": "8b4c34d4c03a5d1dfc5fd35626515dd6f3657d396ae37082796bc3c4431db9f6",
+      "before": null
+    }
+  },
+  "triangles_per_leaf": 1424,
+  "leaf_model": "models/maps/collider/automatic-door-v1/lab_door_leaf.vmdl",
+  "door_world_position": [
+    0,
+    1412,
+    0
+  ],
+  "door_world_yaw": 90,
+  "width": 176,
+  "height": 192,
+  "materials": {
+    "body": "materials/ares/pressure-doors-v3/body.vmat",
+    "panel": "materials/ares/pressure-doors-v3/panel.vmat",
+    "frame": "materials/collider/co_trim.vmat",
+    "dark": "materials/collider/co_rubber.vmat",
+    "kick": "materials/ares/pressure-doors-v3/kick.vmat",
+    "steel": "materials/collider/co_silver.vmat",
+    "rubber": "materials/collider/co_rubber.vmat"
+  },
+  "source_sha256": {
+    "Tools/collider_automatic_door.py": "f8d753ed98fefe4afc1b7ad090dbd3d9783ecc40c88e9503d62db80c938607aa",
+    "Code/World/AutomaticSlidingDoor.cs": "a2a95ac14af3305e59a57afe94369d9eeb06684a428c545348f86176f1103c5a"
+  },
+  "scene_sha256_before": "b45ae8848a9d8581e87c4d2369ac4829d9f6afbc8956350dc1b8d2aed304b27c"
+}

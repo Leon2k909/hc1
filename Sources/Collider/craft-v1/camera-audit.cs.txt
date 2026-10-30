@@ -1,0 +1,9 @@
+var s=Editor.SceneEditorSession.Active;
+var c=s.Scene.GetAllComponents<CameraComponent>().Single(x=>x.GameObject.Name=="editor_camera");
+var props=typeof(CameraComponent).GetProperties(System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic);
+var render=props.Where(x=>System.Text.RegularExpressions.Regex.IsMatch(x.Name,"Camera|RenderTarget|Anti|Multisampl|RenderScale",System.Text.RegularExpressions.RegexOptions.IgnoreCase)).Select(x=>new {x.Name,Type=x.PropertyType.FullName,Value=x.GetIndexParameters().Length==0?x.GetValue(c)?.ToString():null}).ToArray();
+var sceneProps=typeof(SceneCamera).GetProperties().Where(x=>System.Text.RegularExpressions.Regex.IsMatch(x.Name,"Anti|Multisampl|RenderTarget|RenderScale",System.Text.RegularExpressions.RegexOptions.IgnoreCase)).Select(x=>new {x.Name,Type=x.PropertyType.FullName,Writable=x.CanWrite}).ToArray();
+var methods=typeof(CameraComponent).GetMethods().Where(x=>x.Name.Contains("Render")).Select(x=>x.ToString()).ToArray();
+var settings=AppDomain.CurrentDomain.GetAssemblies().Select(a=>a.GetType("Sandbox.Engine.Settings.RenderSettings")).FirstOrDefault(t=>t is not null);
+var settingProps=settings?.GetProperties(System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic).Where(x=>System.Text.RegularExpressions.Regex.IsMatch(x.Name,"Anti|Multisampl|Quality|RenderScale",System.Text.RegularExpressions.RegexOptions.IgnoreCase)).Select(x=>new {x.Name,Type=x.PropertyType.FullName,Value=x.GetIndexParameters().Length==0?x.GetValue(null)?.ToString():null}).ToArray();
+return new {EditorProperties=render,SceneCameraProperties=sceneProps,CameraRenderMethods=methods,Settings=settingProps};

@@ -1,0 +1,56 @@
+var root = Project.Current.GetRootPath();
+var previous = Editor.SceneEditorSession.Active;
+var before = new { Game.IsPlaying, Game = Game.ActiveScene?.Id, Dirty = previous.HasUnsavedChanges };
+var flags = System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic;
+var copy = typeof(Facepunch.PhotographicResponse).Assembly.GetType("Facepunch.CameraPostProcess").GetMethod("Copy", flags)
+    .MakeGenericMethod(typeof(Facepunch.PhotographicResponse));
+var profiles = new System.Collections.Generic.List<object>();
+foreach (var path in new[] { "prefabs/player/cameras/default_player_camera.prefab", "scenes/theater_playback.scene" })
+{
+    var document = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root, "Assets", path)));
+    System.Collections.Generic.IEnumerable<System.Text.Json.Nodes.JsonNode> Walk(System.Text.Json.Nodes.JsonNode obj)
+    {
+        yield return obj;
+        foreach (var child in obj["Children"]?.AsArray() ?? new System.Text.Json.Nodes.JsonArray())
+            foreach (var descendant in Walk(child)) yield return descendant;
+    }
+    var roots = document["RootObject"] is not null ? new[] { document["RootObject"] } : document["GameObjects"].AsArray().ToArray();
+    var cameraRoot = roots.SelectMany(Walk).Single(o => o["Components"].AsArray().Any(c => c["__type"].GetValue<string>() == "Sandbox.CameraComponent"));
+    var scene = Scene.CreateEditorScene();
+    try
+    {
+        using (scene.Push())
+        {
+            if (path.EndsWith(".prefab", StringComparison.OrdinalIgnoreCase))
+                GameObject.Clone(path);
+            else
+                scene.Deserialize(new System.Text.Json.Nodes.JsonObject { ["GameObjects"] = new System.Text.Json.Nodes.JsonArray(cameraRoot.DeepClone()) });
+            var camera = scene.GetAllComponents<CameraComponent>().Single();
+            var source = camera.GameObject.GetComponent<Facepunch.PhotographicResponse>(true);
+            if (source is null || !source.Enabled || source.Strength != .65f) throw new Exception("Saved camera profile did not load.");
+            var target = new GameObject(false, "Native secondary camera copy check");
+            var enabledCopy = (Facepunch.PhotographicResponse)copy.Invoke(null, new object[] { camera.GameObject, target });
+            source.Enabled = false;
+            var disabledTarget = new GameObject(false, "Native disabled effect copy check");
+            var disabledCopy = (Facepunch.PhotographicResponse)copy.Invoke(null, new object[] { camera.GameObject, disabledTarget });
+            if (!enabledCopy.Enabled || disabledCopy.Enabled || source.Id == enabledCopy.Id || source.Id == disabledCopy.Id || enabledCopy.Id == disabledCopy.Id)
+                throw new Exception("Camera effect copying changed identity or enabled state.");
+            if (enabledCopy.Strength != .65f || enabledCopy.Grain != .012f || enabledCopy.Aberration != .3f)
+                throw new Exception("Secondary camera copy changed the profile.");
+            profiles.Add(new { Path = path, NativeLoad = true, CompiledPrefabClone = path.EndsWith(".prefab", StringComparison.OrdinalIgnoreCase),
+                CopyValuesPreserved = true, CopyEnabledStatePreserved = true, CopyIdentityUnique = true });
+        }
+    }
+    finally { scene.Destroy(); }
+}
+var material = Material.FromShader("shaders/hc1_photographic_response.shader");
+if (material is null || material.IsError) throw new Exception("Photographic shader material failed to load.");
+var resources = new[] { "irradiance", "distance", "relocation" }.Select(name => {
+    var texture = Texture.Load("lighting/ares/photographic-v1/" + name + ".vtex", false);
+    if (texture is null || texture.IsError) throw new Exception("Baked light texture failed to load: " + name);
+    return new { Name = name, texture.Width, texture.Height, Valid = true };
+}).ToArray();
+var preserved = ReferenceEquals(previous, Editor.SceneEditorSession.Active) && before.IsPlaying == Game.IsPlaying
+    && before.Game == Game.ActiveScene?.Id && before.Dirty == previous.HasUnsavedChanges;
+if (!preserved) throw new Exception("Verification changed the editor state.");
+return new { Profiles = profiles, ShaderMaterialValid = true, BakedTextures = resources, EditorStatePreserved = true };

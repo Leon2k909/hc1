@@ -118,6 +118,10 @@ NAV_TOP = 430.0                              # over the galleries, under the win
 def configure( model ):
     """ Points the ar_ paints at Ares's materials (atlases mapped 1:1 by their own UVs, the rest at their tile). """
     for paint in list( model.polygons ):
+        if paint.startswith( "ar_pd_" ) and paint in model.material_overrides:
+            continue
+        if paint.startswith( "ar_pw_" ) and paint in model.material_overrides:
+            continue
         if paint.startswith( "ar_" ):
             model.material_overrides[paint] = f"{AM.RESOURCE_DIR}/{paint}.vmat"
             if paint == "ar_tower":
@@ -292,6 +296,9 @@ def stair( m, axis, c0, c1, s0, s1, z0, z1, rails=( True, True ) ):
     # The ramp: a wedge from the foot's nosing to the head.
     pts = [ P( c, s, z ) for c in ( c0, c1 ) for s, z in ( ( s0, z0 ), ( s1, z0 ), ( s1, z1 ), ( s0, z0 + r * 0.5 ) ) ]
     m.hull( pts, METAL )
+    # The wedge already blocks players here; give its formerly open rear a skin.
+    from ares_stair_cladding import append_rear_closure
+    append_rear_closure( m, axis, c0, c1, s0, s1, z0, z1, landing_thickness=DT )
     if rails[0]:
         slope_rail( m, P( c0 + 1.5, s0, z0 + r ), P( c0 + 1.5, s1, z1 ) )
     if rails[1]:
@@ -376,38 +383,9 @@ def banner( m, region, top_centre, facing, width, height ):
 # The hard cases and props
 
 def case( m, e, n, z, heading, size=AM.CASE, front="front_text", side="side_logo", top="top_ribs", collide=True ):
-    """ A black hard case (CASE's proportions scaled to size: length, height, depth) on its own UVs, with edge trim and
-    latches. """
-    L, H, D = size
-    F = Frame( e, n, heading, z )
-    hl, hd = L / 2, D / 2
-
-    def uv( region, pts_st ):
-        return [ AM.region_uv( AM.CRATE, AM.CRATE_ATLAS, region, s, t ) for s, t in pts_st ]
-
-    # The long faces (+y front, -y back).
-    F.quad( m, "ar_crate", [ ( hl, hd, 0 ), ( -hl, hd, 0 ), ( -hl, hd, H ), ( hl, hd, H ) ], ( 0, 1, 0 ),
-            uv=uv( front, [ ( 0, 0 ), ( 1, 0 ), ( 1, 1 ), ( 0, 1 ) ] ) )
-    F.quad( m, "ar_crate", [ ( -hl, -hd, 0 ), ( hl, -hd, 0 ), ( hl, -hd, H ), ( -hl, -hd, H ) ], ( 0, -1, 0 ),
-            uv=uv( "front_plain", [ ( 0, 0 ), ( 1, 0 ), ( 1, 1 ), ( 0, 1 ) ] ) )
-    F.quad( m, "ar_crate", [ ( hl, -hd, 0 ), ( hl, hd, 0 ), ( hl, hd, H ), ( hl, -hd, H ) ], ( 1, 0, 0 ),
-            uv=uv( side, [ ( 0, 0 ), ( 1, 0 ), ( 1, 1 ), ( 0, 1 ) ] ) )
-    F.quad( m, "ar_crate", [ ( -hl, hd, 0 ), ( -hl, -hd, 0 ), ( -hl, -hd, H ), ( -hl, hd, H ) ], ( -1, 0, 0 ),
-            uv=uv( "end_plain", [ ( 0, 0 ), ( 1, 0 ), ( 1, 1 ), ( 0, 1 ) ] ) )
-    F.quad( m, "ar_crate", [ ( -hl, -hd, H ), ( hl, -hd, H ), ( hl, hd, H ), ( -hl, hd, H ) ], ( 0, 0, 1 ),
-            uv=uv( top, [ ( 0, 0 ), ( 1, 0 ), ( 1, 1 ), ( 0, 1 ) ] ) )
-    # Edge trim on the vertical edges and round the lid's seam, latches on the front.
-    t = 1.2
-    for sx in ( -1, 1 ):
-        for sy in ( -1, 1 ):
-            F.box( m, sx * hl - t, sx * hl + t, sy * hd - t, sy * hd + t, 0.0, H, "ar_gunmetal" )
-    seam = H * 0.72
-    F.box( m, -hl - 0.4, hl + 0.4, -hd - 0.4, hd + 0.4, seam - 0.6, seam + 0.6, "ar_gunmetal" )
-    for x in ( -L * 0.3, L * 0.3 ):
-        F.box( m, x - 1.6, x + 1.6, hd, hd + 1.0, seam - 3.0, seam + 2.0, "ar_brass" )
-    if collide:
-        F.box( m, -hl, hl, -hd, hd, 0.0, H, surface=PLASTIC )
-    return z + H
+    """An authored Ares case instance over the existing collision footprint."""
+    from ares_cargo_case import append_instance
+    return append_instance( m, e, n, z, heading, size, front, side, top, collide )
 
 
 def case_stack( m, e, n, heading, layers, seed=0, z=0.0, big=False ):
@@ -464,15 +442,9 @@ def console( m, e, n, heading, screen=0, z=0.0 ):
 
 
 def pipe_run( m, a, b, r, paint, bracket=120.0 ):
-    """ A pipe from a to b (plan points) with a steel bracket and a flange every so often. Drawn only. """
-    a, b = np.asarray( a, float ), np.asarray( b, float )
-    rod( m, a, b, r, paint, sides=10 )
-    length = float( np.linalg.norm( b - a ) )
-    along = ( b - a ) / length
-    for k in range( 1, int( length // bracket ) + 1 ):
-        p = a + along * bracket * k
-        half = np.abs( along ) * 1.2 + ( 1 - np.abs( along ) ) * ( r + 1.6 )
-        m.box( p - half, p + half, "ar_gunmetal" )
+    """ Drawn-only wall pipe with smooth tubes, bolted flanges and anchored hangers. """
+    from ares_pipework import pipe_run as detailed_pipe_run
+    return detailed_pipe_run( m, a, b, r, paint, bracket )
 
 
 def light_bar( m, e0, e1, n0, n1, z, paint="ar_led" ):
@@ -796,10 +768,8 @@ def reactor( m, glass ):
     # The flared lamp ring.
     lathe_uv( m, o, [ ( 150.0, 560.0 ), ( 224.0, 568.0 ), ( 224.0, 584.0 ), ( 150.0, 600.0 ) ], "ar_steel", sides=48, u_repeat=12 )
     ring_surface( m, o, 0.0, 150.0, 560.0, "ar_steel", sides=40, facing=-1.0 )
-    for k in range( 24 ):
-        a = 2 * math.pi * k / 24
-        p = np.array( ( 208 * math.cos( a ), 208 * math.sin( a ), 566.0 ) )
-        m.box( p - np.array( ( 4, 4, 1.2 ) ), p + np.array( ( 4, 4, 0.6 ) ), "ar_led_warm" )
+    from ares_core_lamps import flared_ring_lamps
+    flared_ring_lamps( m )
     cylinder_hull( m, o, 224.0, 560.0, 600.0, METAL, sides=20 )
     # The stack into the roof, and four big pipes from the lamp ring to the roof.
     lathe_uv( m, o, [ ( 110.0, 604.0 ), ( 110.0, HALL_TOP ) ], "ar_wall", sides=24, u_repeat=3 )
@@ -1027,9 +997,8 @@ def dressing( m ):
     sign_panel( m, "poster_redplanet", ( HALL_E - 1.0, -330.0, 163.0 ), ( -1, 0 ), 150.0, 56.0 )
     sign_panel( m, "poster_redplanet", ( -HALL_E + 1.0, 330.0, 163.0 ), ( 1, 0 ), 150.0, 56.0 )
     sign_panel( m, "poster_mars", ( 0.0, HALL_N0 + 1.0, G + 200 ), ( 0, 1 ), 200.0, 160.0 )
-    banner( m, "banner_humanity", ( -150.0, 620.0, 690.0 ), ( 0, -1 ), 80.0, 240.0 )
+    # The two HUMANITY FURTHER banners and their bars were removed at the user's request.
     banner( m, "banner_habitat", ( 900.0, 640.0, 690.0 ), ( 0, -1 ), 90.0, 270.0 )
-    banner( m, "banner_humanity", ( -HALL_E + 60.0, 120.0, 690.0 ), ( 1, 0 ), 90.0, 270.0 )
     sign_panel( m, "stripe_warning", ( 0.0, -RING_R1 - 4.0, G - DT - 6 ), ( 0, -1 ), 140.0, 19.0, back=None )
     lit_sign( m, "observation", ( 0.0, 600.0, 420.0 ), ( 0, -1 ), 192.0, 48.0 )
     for e in ( -80.0, 80.0 ):
@@ -1528,10 +1497,12 @@ def look_object():
     ] )
 
 
-def write_scene( written, light_list, probe_list ):
+def write_scene( written, light_list, probe_list, case_props=None ):
     world = K.game_object( ids, "Ares", "world", children=[
         model_object( title, f"world/{name}", name, collide, shadows )
         for name, title, collide, shadows in SCENE_MODELS if name in written ] )
+    from ares_cargo_case import scene_group
+    world["Children"].append( scene_group( ids, case_props ) )
     light_objects = [
         K.game_object( ids, name, f"light/{name}", K.to_world( position ), tags="light_point,light", components=[
             K.component( ids, "Sandbox.PointLight", f"light/{name}/light", Attenuation=1, FogMode="Enabled", FogStrength=1,
@@ -1666,6 +1637,8 @@ def write_scene( written, light_list, probe_list ):
     }
     from map_daylight import apply_profile
     apply_profile( scene )
+    from ares_lighting import apply_baked_lighting
+    apply_baked_lighting( scene )
     SCENE_FILE.parent.mkdir( parents=True, exist_ok=True )
     K.write_text( SCENE_FILE, json.dumps( scene, indent=2 ), newline=None )
     print( f"wrote {SCENE_FILE.relative_to( K.ROOT )}" )
@@ -1764,7 +1737,7 @@ def main():
 
     if not args.no_scene:
         write_minimap( solid )
-        write_scene( written, light_list, probe_list )
+        write_scene( written, light_list, probe_list, models["ares_dressing"].props )
 
 
 if __name__ == "__main__":

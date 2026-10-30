@@ -1,0 +1,29 @@
+var root=Sandbox.Project.Current.GetRootPath();
+if(!string.Equals(System.IO.Path.GetFullPath(root).TrimEnd('\\','/'),@"C:\sbox-projects\hc1\forked-shooter-main",StringComparison.OrdinalIgnoreCase))throw new InvalidOperationException("Wrong checkout.");
+var folder=System.IO.Path.Combine(root,"output/ares/stair-rear-wall");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"manifest.json")));
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+foreach(var group in new[]{"protected","source_sha256"})
+ foreach(var pair in manifest[group].AsObject())
+  if(Hash(System.IO.Path.Combine(root,pair.Key))!=pair.Value.GetValue<string>())throw new InvalidOperationException("Shared source changed: "+pair.Key);
+var files=manifest["files"].AsObject();
+foreach(var pair in files)
+{
+ if(!pair.Key.StartsWith("Assets/models/maps/ares/stair-rear-wall/",StringComparison.Ordinal)||pair.Key.Contains(".."))throw new InvalidOperationException("Unexpected target.");
+ var target=System.IO.Path.Combine(root,pair.Key);var source=System.IO.Path.Combine(root,pair.Value["source"].GetValue<string>());
+ if(Hash(source)!=pair.Value["sha256"].GetValue<string>())throw new InvalidOperationException("Staged asset changed.");
+ if(System.IO.File.Exists(target)&&Hash(target)!=Hash(source))throw new InvalidOperationException("Target already exists.");
+}
+foreach(var pair in files.OrderBy(p=>p.Key.EndsWith(".vmdl",StringComparison.Ordinal)?1:0))
+{
+ var target=System.IO.Path.Combine(root,pair.Key);
+ if(!System.IO.File.Exists(target))
+ {
+  System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target));
+  var incoming=target+".rear-wall-incoming";
+  try{System.IO.File.Copy(System.IO.Path.Combine(root,pair.Value["source"].GetValue<string>()),incoming);System.IO.File.Move(incoming,target);}
+  finally{if(System.IO.File.Exists(incoming))System.IO.File.Delete(incoming);}
+ }
+ Editor.AssetSystem.RegisterFile(target);
+}
+return new{Imported=files.Count,ExistingHallUntouched=true,SceneUntouched=true,CollisionAdded=false};

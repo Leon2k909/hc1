@@ -1,0 +1,61 @@
+// Capture ordinary camera faces; never call EnvmapProbe.Bake or CubemapRendering.
+// Those paths fault envmap_filtering_cs on this workstation's Vulkan driver.
+if(Game.IsPlaying) throw new InvalidOperationException("Stop play before capturing reflections");
+var root=Sandbox.Project.Current.GetRootPath();
+var session=Editor.SceneEditorSession.All.Single(s=>s.Scene.Source?.ResourcePath?.Equals("scenes/maps/collider/collider.scene",StringComparison.OrdinalIgnoreCase)==true);
+var scene=session.Scene;
+var beforeGame=Game.ActiveScene?.Id;
+var beforeSelected=Editor.SceneEditorSession.Active;
+var beforeDirty=session.HasUnsavedChanges;
+var camera=scene.GetAllComponents<CameraComponent>().Single(c=>c.GameObject.Name=="editor_camera" && c.GameObject.Flags.HasFlag(GameObjectFlags.EditorOnly));
+var oldPosition=camera.WorldPosition; var oldRotation=camera.WorldRotation; var oldFov=camera.FieldOfView;
+var oldSize=camera.CustomSize;var oldAxis=camera.FovAxis;var oldOrtho=camera.Orthographic;
+foreach(var label in new[]{"Hall","Beam","West","East"})
+{
+if(!new[]{"Hall","Beam","West","East"}.Contains(label)) throw new InvalidOperationException("Unexpected probe");
+var probe=scene.GetAllComponents<EnvmapProbe>().Single(p=>p.GameObject.Name==label);
+var position=label=="Beam"?new Vector3(1010,0,540):probe.WorldPosition;
+var directory=System.IO.Path.Combine(root,"output/depot-finish-20261027/reflections",label);
+System.IO.Directory.CreateDirectory(directory);
+var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic|System.Reflection.BindingFlags.Public;
+var rotations=new[]{new Angles(0,0,0),new Angles(0,90,0),new Angles(0,180,0),new Angles(0,-90,0),new Angles(-90,0,0),new Angles(90,0,0)};
+using(scene.Push())
+{
+    var ddgiType=typeof(Scene).Assembly.GetType("Sandbox.DDGIVolumeSystem");
+    var getter=typeof(Scene).GetMethods().Single(m=>m.Name=="GetSystem" && m.IsGenericMethodDefinition && m.GetParameters().Length==0);
+    var ddgi=getter.MakeGenericMethod(ddgiType).Invoke(scene,null);
+    ddgiType.GetMethod("MarkDirty",flags).Invoke(ddgi,null);
+    ddgiType.GetMethod("UpdateVolumes",flags).Invoke(ddgi,null);
+}
+try
+{
+    camera.WorldPosition=position; camera.FieldOfView=90;
+    using(scene.Push())
+    using(var bitmap=new Bitmap(512,512))
+    for(var face=0;face<rotations.Length;face++)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        camera.WorldRotation=Rotation.From(rotations[face]);
+        typeof(Scene).GetMethod("PreRender",flags,null,Type.EmptyTypes,null).Invoke(scene,null);
+        typeof(Scene).GetMethod("PreCameraRender",flags,null,Type.EmptyTypes,null).Invoke(scene,null);
+        typeof(PostProcessSystem).GetMethod("UpdateCamera",flags).Invoke(scene.GetSystem<PostProcessSystem>(),new object[]{camera});
+        for(var warmup=0;warmup<3;warmup++)
+        {
+            camera.WorldPosition=position;camera.WorldRotation=Rotation.From(rotations[face]);camera.FieldOfView=90;
+            camera.CustomSize=new Vector2(512,512);camera.FovAxis=CameraComponent.Axis.Horizontal;camera.Orthographic=false;
+            camera.RenderToBitmap(bitmap,false);
+        }
+        if(MathF.Abs(camera.FieldOfView-90)>.001f) throw new InvalidOperationException("The editor overwrote the reflection view");
+        System.IO.File.WriteAllBytes(System.IO.Path.Combine(directory,face+".png"),bitmap.ToPng());
+        var data=new {Position=position.ToString(),Faces=new[]{new {File=face+".png",camera.FieldOfView,Forward=camera.WorldRotation.Forward.ToString(),Right=camera.WorldRotation.Right.ToString(),Up=camera.WorldRotation.Up.ToString()}}};
+        System.IO.File.WriteAllText(System.IO.Path.Combine(directory,"face-"+face+".json"),System.Text.Json.JsonSerializer.Serialize(data));
+    }
+}
+finally{camera.WorldPosition=oldPosition;camera.WorldRotation=oldRotation;camera.FieldOfView=oldFov;camera.CustomSize=oldSize;camera.FovAxis=oldAxis;camera.Orthographic=oldOrtho;}
+var result=new {Probe=label,Position=position.ToString(),Faces=6,Directory=directory,CheckedAt=DateTime.UtcNow,
+    GamePreserved=Game.ActiveScene?.Id==beforeGame && !Game.IsPlaying,
+    SelectedDocumentPreserved=ReferenceEquals(beforeSelected,Editor.SceneEditorSession.Active),
+    DirtyStatePreserved=beforeDirty==session.HasUnsavedChanges};
+System.IO.File.WriteAllText(System.IO.Path.Combine(directory,"capture-report.json"),System.Text.Json.JsonSerializer.Serialize(result));
+}
+return new {CapturedProbes=4,CameraRestored=true,GamePreserved=Game.ActiveScene?.Id==beforeGame && !Game.IsPlaying,SelectedDocumentPreserved=ReferenceEquals(beforeSelected,Editor.SceneEditorSession.Active),DirtyStatePreserved=beforeDirty==session.HasUnsavedChanges};

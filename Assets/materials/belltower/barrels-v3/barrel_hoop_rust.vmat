@@ -3,12 +3,12 @@
 {
     shader "shaders/complex.shader"
     F_SPECULAR "1"
-    TextureColor "materials/stillhouse/sh_rust_color.png"
-    TextureNormal "materials/stillhouse/rust_normal.png"
-    TextureRoughness "materials/stillhouse/rust_rough.png"
+    TextureColor "materials/stillhouse/sh_hoop_color.png"
+    TextureNormal "materials/stillhouse/hoop_normal.png"
+    TextureRoughness "materials/stillhouse/hoop_rough.png"
     TextureAmbientOcclusion "materials/default/default_ao.tga"
-    g_vColorTint "[0.58 0.47 0.42 1]"
+    g_vColorTint "[0.86 0.88 0.92 1]"
     g_flRoughnessScaleFactor "1"
     g_flModelTintAmount "1"
-    g_flMetalness "0"
+    g_flMetalness "0.4"
 }

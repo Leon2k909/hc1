@@ -1,0 +1,752 @@
+[
+  {
+    "name": "pump",
+    "variant": "after",
+    "FrameMs": {
+      "Average": 20.161203,
+      "P50": 16.3367,
+      "P95": 33.8672,
+      "P99": 45.5787,
+      "Max": 922.8131,
+      "Over33Ms": 48,
+      "Over50Ms": 6
+    },
+    "BotMs": {
+      "Average": 0.7956658,
+      "Max": 11.1789,
+      "Thinking": 0.6040434444444449
+    },
+    "SourceChanges": [
+      "Assets\\shaders\\hc1_teammate_occlusion.shader"
+    ],
+    "CompilerActivity": [
+      "2026/10/27 14:58:21.5485\t[Generic] Compiling: shaders/hc1_teammate_occlusion.shader\t"
+    ],
+    "valid": false,
+    "ProcessActivity": [
+      {
+        "name": "System Idle Process",
+        "pid": "0",
+        "one_core_percent": 687.8
+      },
+      {
+        "name": "sbox-dev.exe",
+        "pid": "3696",
+        "one_core_percent": 507.3
+      },
+      {
+        "name": "Discord.exe",
+        "pid": "19076",
+        "one_core_percent": 73.3
+      },
+      {
+        "name": "dwm.exe",
+        "pid": "1844",
+        "one_core_percent": 44.6
+      },
+      {
+        "name": "Discord.exe",
+        "pid": "18676",
+        "one_core_percent": 41.2
+      },
+      {
+        "name": "System",
+        "pid": "4",
+        "one_core_percent": 29.5
+      },
+      {
+        "name": "brave.exe",
+        "pid": "16788",
+        "one_core_percent": 28.4
+      },
+      {
+        "name": "ChatGPT.exe",
+        "pid": "12804",
+        "one_core_percent": 22.3
+      },
+      {
+        "name": "AVCore.exe",
+        "pid": "8076",
+        "one_core_percent": 20.9
+      },
+      {
+        "name": "ChatGPT.exe",
+        "pid": "23204",
+        "one_core_percent": 18.2
+      },
+      {
+        "name": "CorsairCpuIdService.exe",
+        "pid": "7948",
+        "one_core_percent": 12.1
+      },
+      {
+        "name": "Corsair.Service.exe",
+        "pid": "4852",
+        "one_core_percent": 10.8
+      },
+      {
+        "name": "iCUE.exe",
+        "pid": "16576",
+        "one_core_percent": 10.8
+      },
+      {
+        "name": "discord_clips.exe",
+        "pid": "19784",
+        "one_core_percent": 8.1
+      },
+      {
+        "name": "ChatGPT.exe",
+        "pid": "22748",
+        "one_core_percent": 8.1
+      }
+    ],
+    "BytesPerFrame": 301831.49333333335,
+    "state": {
+      "Enabled": true,
+      "SuppressedCount": 69,
+      "PhysicsBodies": 20,
+      "ActiveMapRenderers": 6,
+      "ActiveErrors": 0
+    },
+    "start": {
+      "Utc": "2026-10-27T14:58:14.4461336Z",
+      "Scene": "scenes/maps/depot/depot.scene",
+      "Screen": "1920,1080",
+      "CameraPosition": "-1183,112,948.0413",
+      "CameraAngles": "Pitch = -0.00, Yaw = 0.00, Roll = 0.00",
+      "FieldOfView": 60,
+      "PlayerPosition": "-1192,112,888.0413",
+      "Bots": 9,
+      "NoDamage": true
+    },
+    "end": {
+      "Utc": "2026-10-27T14:58:41.1951557Z",
+      "Screen": "1920,1080",
+      "CameraPosition": "-1183,112,948.0413",
+      "CameraAngles": "Pitch = -0.00, Yaw = 0.00, Roll = 0.00",
+      "PlayerPosition": "-1192,112,888.0413"
+    }
+  },
+  {
+    "name": "pump",
+    "variant": "before",
+    "FrameMs": {
+      "Average": 18.37945,
+      "P50": 17.3916,
+      "P95": 26.5176,
+      "P99": 36.022102,
+      "Max": 67.5202,
+      "Over33Ms": 16,
+      "Over50Ms": 3
+    },
+    "BotMs": {
+      "Average": 0.6709521,
+      "Max": 11.7113,
+      "Thinking": 0.503131444444445
+    },
+    "SourceChanges": [
+      "Code\\PawnSystem\\Player\\TeammateOcclusionGlow.cs"
+    ],
+    "CompilerActivity": [],
+    "valid": false,
+    "ProcessActivity": [
+      {
+        "name": "System Idle Process",
+        "pid": "0",
+        "one_core_percent": 819.1
+      },
+      {
+        "name": "sbox-dev.exe",
+        "pid": "3696",
+        "one_core_percent": 355.4
+      },
+      {
+        "name": "Discord.exe",
+        "pid": "19076",
+        "one_core_percent": 78.2
+      },
+      {
+        "name": "Discord.exe",
+        "pid": "18676",
+        "one_core_percent": 64.3
+      },
+      {
+        "name": "dwm.exe",
+        "pid": "1844",
+        "one_core_percent": 43.0
+      },
+      {
+        "name": "System",
+        "pid": "4",
+        "one_core_percent": 34.2
+      },
+      {
+        "name": "AVCore.exe",
+        "pid": "8076",
+        "one_core_percent": 30.6
+      },
+      {
+        "name": "brave.exe",
+        "pid": "16788",
+        "one_core_percent": 25.8
+      },
+      {
+        "name": "ChatGPT.exe",
+        "pid": "23204",
+        "one_core_percent": 19.3
+      },
+      {
+        "name": "CorsairCpuIdService.exe",
+        "pid": "7948",
+        "one_core_percent": 12.2
+      },
+      {
+        "name": "ChatGPT.exe",
+        "pid": "12804",
+        "one_core_percent": 11.5
+      },
+      {
+        "name": "iCUE.exe",
+        "pid": "16576",
+        "one_core_percent": 8.4
+      },
+      {
+        "name": "MsMpEng.exe",
+        "pid": "4876",
+        "one_core_percent": 8.3
+      },
+      {
+        "name": "Corsair.Service.exe",
+        "pid": "4852",
+        "one_core_percent": 8.0
+      },
+      {
+        "name": "claude.exe",
+        "pid": "23848",
+        "one_core_percent": 6.7
+      }
+    ],
+    "BytesPerFrame": 282647.94666666666,
+    "state": {
+      "Enabled": false,
+      "SuppressedCount": 0,
+      "PhysicsBodies": 89,
+      "ActiveMapRenderers": 187,
+      "ActiveErrors": 16
+    },
+    "start": {
+      "Utc": "2026-10-27T14:58:56.0358824Z",
+      "Scene": "scenes/maps/depot/depot.scene",
+      "Screen": "1920,1080",
+      "CameraPosition": "-1183,112,948.0413",
+      "CameraAngles": "Pitch = -0.00, Yaw = 0.00, Roll = 0.00",
+      "FieldOfView": 60,
+      "PlayerPosition": "-1192,112,888.0413",
+      "Bots": 9,
+      "NoDamage": true
+    },
+    "end": {
+      "Utc": "2026-10-27T14:59:23.1574269Z",
+      "Screen": "1920,1080",
+      "CameraPosition": "-1183,112,948.0413",
+      "CameraAngles": "Pitch = -0.00, Yaw = 0.00, Roll = 0.00",
+      "PlayerPosition": "-1192,112,888.0413"
+    }
+  },
+  {
+    "name": "stair",
+    "variant": "after",
+    "FrameMs": {
+      "Average": 21.026133,
+      "P50": 14.7485,
+      "P95": 31.1052,
+      "P99": 86.8117,
+      "Max": 2000,
+      "Over33Ms": 43,
+      "Over50Ms": 23
+    },
+    "BotMs": {
+      "Average": 0.8755699,
+      "Max": 189.0506,
+      "Thinking": 0.6520400000000003
+    },
+    "SourceChanges": [],
+    "CompilerActivity": [],
+    "valid": true,
+    "ProcessActivity": [
+      {
+        "name": "System Idle Process",
+        "pid": "0",
+        "one_core_percent": 658.1
+      },
+      {
+        "name": "sbox-dev.exe",
+        "pid": "3696",
+        "one_core_percent": 284.4
+      },
+      {
+        "name": "MsMpEng.exe",
+        "pid": "4876",
+        "one_core_percent": 55.6
+      },
+      {
+        "name": "dwm.exe",
+        "pid": "1844",
+        "one_core_percent": 52.2
+      },
+      {
+        "name": "brave.exe",
+        "pid": "16788",
+        "one_core_percent": 47.7
+      },
+      {
+        "name": "Discord.exe",
+        "pid": "19076",
+        "one_core_percent": 46.5
+      },
+      {
+        "name": "System",
+        "pid": "4",
+        "one_core_percent": 33.4
+      },
+      {
+        "name": "claude.exe",
+        "pid": "23848",
+        "one_core_percent": 22.5
+      },
+      {
+        "name": "Discord.exe",
+        "pid": "18676",
+        "one_core_percent": 22.4
+      },
+      {
+        "name": "AVCore.exe",
+        "pid": "8076",
+        "one_core_percent": 16.7
+      },
+      {
+        "name": "brave.exe",
+        "pid": "18980",
+        "one_core_percent": 13.7
+      },
+      {
+        "name": "ChatGPT.exe",
+        "pid": "12804",
+        "one_core_percent": 13.5
+      },
+      {
+        "name": "CorsairCpuIdService.exe",
+        "pid": "7948",
+        "one_core_percent": 12.9
+      },
+      {
+        "name": "Corsair.Service.exe",
+        "pid": "4852",
+        "one_core_percent": 12.7
+      },
+      {
+        "name": "claude.exe",
+        "pid": "15016",
+        "one_core_percent": 12.6
+      }
+    ],
+    "BytesPerFrame": 3454373.4577777777,
+    "state": {
+      "Enabled": true,
+      "SuppressedCount": 69,
+      "PhysicsBodies": 20,
+      "ActiveMapRenderers": 6,
+      "ActiveErrors": 0
+    },
+    "start": {
+      "Utc": "2026-10-27T14:59:41.6346574Z",
+      "Scene": "scenes/maps/depot/depot.scene",
+      "Screen": "1920,1080",
+      "CameraPosition": "140.9877,1059.529,948.1",
+      "CameraAngles": "Pitch = 0.00, Yaw = -3.00, Roll = 0.00",
+      "FieldOfView": 60,
+      "PlayerPosition": "132,1060,888.1",
+      "Bots": 9,
+      "NoDamage": true
+    },
+    "end": {
+      "Utc": "2026-10-27T15:00:08.7450881Z",
+      "Screen": "1920,1080",
+      "CameraPosition": "140.9877,1059.529,948.1",
+      "CameraAngles": "Pitch = 0.00, Yaw = -3.00, Roll = 0.00",
+      "PlayerPosition": "132,1060,888.1"
+    }
+  },
+  {
+    "name": "stair",
+    "variant": "before",
+    "FrameMs": {
+      "Average": 13.68494,
+      "P50": 12.766,
+      "P95": 19.1798,
+      "P99": 37.398598,
+      "Max": 141.6706,
+      "Over33Ms": 14,
+      "Over50Ms": 2
+    },
+    "BotMs": {
+      "Average": 0.45192155,
+      "Max": 7.7035,
+      "Thinking": 0.29976322222222224
+    },
+    "SourceChanges": [],
+    "CompilerActivity": [],
+    "valid": true,
+    "ProcessActivity": [
+      {
+        "name": "System Idle Process",
+        "pid": "0",
+        "one_core_percent": 952.6
+      },
+      {
+        "name": "sbox-dev.exe",
+        "pid": "3696",
+        "one_core_percent": 314.6
+      },
+      {
+        "name": "VBCSCompiler.exe",
+        "pid": "22548",
+        "one_core_percent": 69.3
+      },
+      {
+        "name": "dwm.exe",
+        "pid": "1844",
+        "one_core_percent": 30.9
+      },
+      {
+        "name": "Discord.exe",
+        "pid": "19076",
+        "one_core_percent": 25.0
+      },
+      {
+        "name": "brave.exe",
+        "pid": "21068",
+        "one_core_percent": 23.9
+      },
+      {
+        "name": "System",
+        "pid": "4",
+        "one_core_percent": 21.1
+      },
+      {
+        "name": "AVCore.exe",
+        "pid": "8076",
+        "one_core_percent": 11.8
+      },
+      {
+        "name": "Discord.exe",
+        "pid": "18676",
+        "one_core_percent": 11.5
+      },
+      {
+        "name": "CorsairCpuIdService.exe",
+        "pid": "7948",
+        "one_core_percent": 11.0
+      },
+      {
+        "name": "MsMpEng.exe",
+        "pid": "4876",
+        "one_core_percent": 10.1
+      },
+      {
+        "name": "audiodg.exe",
+        "pid": "3908",
+        "one_core_percent": 9.2
+      },
+      {
+        "name": "Corsair.Service.exe",
+        "pid": "4852",
+        "one_core_percent": 8.3
+      },
+      {
+        "name": "iCUE.exe",
+        "pid": "16576",
+        "one_core_percent": 8.1
+      },
+      {
+        "name": "brave.exe",
+        "pid": "16748",
+        "one_core_percent": 6.6
+      }
+    ],
+    "BytesPerFrame": 153989.73333333334,
+    "state": {
+      "Enabled": false,
+      "SuppressedCount": 0,
+      "PhysicsBodies": 89,
+      "ActiveMapRenderers": 187,
+      "ActiveErrors": 16
+    },
+    "start": {
+      "Utc": "2026-10-27T15:00:24.8470244Z",
+      "Scene": "scenes/maps/depot/depot.scene",
+      "Screen": "1920,1080",
+      "CameraPosition": "140.9877,1059.529,948.1",
+      "CameraAngles": "Pitch = 0.00, Yaw = -3.00, Roll = 0.00",
+      "FieldOfView": 60,
+      "PlayerPosition": "132,1060,888.1",
+      "Bots": 9,
+      "NoDamage": true
+    },
+    "end": {
+      "Utc": "2026-10-27T15:00:51.5168339Z",
+      "Screen": "1920,1080",
+      "CameraPosition": "140.9877,1059.529,948.1",
+      "CameraAngles": "Pitch = 0.00, Yaw = -3.00, Roll = 0.00",
+      "PlayerPosition": "132,1060,888.1"
+    }
+  },
+  {
+    "name": "upper",
+    "variant": "after",
+    "FrameMs": {
+      "Average": 18.60182,
+      "P50": 14.0337,
+      "P95": 44.5559,
+      "P99": 61.0717,
+      "Max": 495.3131,
+      "Over33Ms": 63,
+      "Over50Ms": 18
+    },
+    "BotMs": {
+      "Average": 0.47965622,
+      "Max": 2.5166,
+      "Thinking": 0.3411650000000004
+    },
+    "SourceChanges": [],
+    "CompilerActivity": [],
+    "valid": true,
+    "ProcessActivity": [
+      {
+        "name": "System Idle Process",
+        "pid": "0",
+        "one_core_percent": 1101.9
+      },
+      {
+        "name": "sbox-dev.exe",
+        "pid": "3696",
+        "one_core_percent": 308.5
+      },
+      {
+        "name": "System",
+        "pid": "4",
+        "one_core_percent": 28.0
+      },
+      {
+        "name": "Discord.exe",
+        "pid": "19076",
+        "one_core_percent": 23.2
+      },
+      {
+        "name": "dwm.exe",
+        "pid": "1844",
+        "one_core_percent": 15.3
+      },
+      {
+        "name": "audiodg.exe",
+        "pid": "3908",
+        "one_core_percent": 13.4
+      },
+      {
+        "name": "CorsairCpuIdService.exe",
+        "pid": "7948",
+        "one_core_percent": 10.7
+      },
+      {
+        "name": "Discord.exe",
+        "pid": "18676",
+        "one_core_percent": 10.3
+      },
+      {
+        "name": "MsMpEng.exe",
+        "pid": "4876",
+        "one_core_percent": 9.2
+      },
+      {
+        "name": "iCUE.exe",
+        "pid": "16576",
+        "one_core_percent": 7.8
+      },
+      {
+        "name": "Corsair.Service.exe",
+        "pid": "4852",
+        "one_core_percent": 7.7
+      },
+      {
+        "name": "discord_clips.exe",
+        "pid": "19784",
+        "one_core_percent": 5.0
+      },
+      {
+        "name": "ChatGPT.exe",
+        "pid": "12804",
+        "one_core_percent": 4.8
+      },
+      {
+        "name": "claude.exe",
+        "pid": "23848",
+        "one_core_percent": 4.4
+      },
+      {
+        "name": "python.exe",
+        "pid": "2016",
+        "one_core_percent": 3.5
+      }
+    ],
+    "BytesPerFrame": 243526.67555555556,
+    "state": {
+      "Enabled": true,
+      "SuppressedCount": 69,
+      "PhysicsBodies": 20,
+      "ActiveMapRenderers": 6,
+      "ActiveErrors": 0
+    },
+    "start": {
+      "Utc": "2026-10-27T15:01:05.8874645Z",
+      "Scene": "scenes/maps/depot/depot.scene",
+      "Screen": "1920,1080",
+      "CameraPosition": "-16,-755,1092.041",
+      "CameraAngles": "Pitch = 12.00, Yaw = 90.00, Roll = 0.00",
+      "FieldOfView": 60,
+      "PlayerPosition": "-16,-764,1032.041",
+      "Bots": 9,
+      "NoDamage": true
+    },
+    "end": {
+      "Utc": "2026-10-27T15:01:32.5296051Z",
+      "Screen": "1920,1080",
+      "CameraPosition": "-16,-755,1092.041",
+      "CameraAngles": "Pitch = 12.00, Yaw = 90.00, Roll = 0.00",
+      "PlayerPosition": "-16,-764,1032.041"
+    }
+  },
+  {
+    "name": "upper",
+    "variant": "before",
+    "FrameMs": {
+      "Average": 12.950689,
+      "P50": 12.7567,
+      "P95": 16.6981,
+      "P99": 20.857399,
+      "Max": 33.242302,
+      "Over33Ms": 0,
+      "Over50Ms": 0
+    },
+    "BotMs": {
+      "Average": 0.41629612,
+      "Max": 1.7447,
+      "Thinking": 0.28681177777777805
+    },
+    "SourceChanges": [],
+    "CompilerActivity": [],
+    "valid": true,
+    "ProcessActivity": [
+      {
+        "name": "System Idle Process",
+        "pid": "0",
+        "one_core_percent": 1065.0
+      },
+      {
+        "name": "sbox-dev.exe",
+        "pid": "3696",
+        "one_core_percent": 355.2
+      },
+      {
+        "name": "Discord.exe",
+        "pid": "19076",
+        "one_core_percent": 37.1
+      },
+      {
+        "name": "dwm.exe",
+        "pid": "1844",
+        "one_core_percent": 18.8
+      },
+      {
+        "name": "System",
+        "pid": "4",
+        "one_core_percent": 14.8
+      },
+      {
+        "name": "audiodg.exe",
+        "pid": "3908",
+        "one_core_percent": 12.0
+      },
+      {
+        "name": "Discord.exe",
+        "pid": "18676",
+        "one_core_percent": 11.5
+      },
+      {
+        "name": "Corsair.Service.exe",
+        "pid": "4852",
+        "one_core_percent": 11.2
+      },
+      {
+        "name": "CorsairCpuIdService.exe",
+        "pid": "7948",
+        "one_core_percent": 8.4
+      },
+      {
+        "name": "MsMpEng.exe",
+        "pid": "4876",
+        "one_core_percent": 7.1
+      },
+      {
+        "name": "discord_clips.exe",
+        "pid": "19784",
+        "one_core_percent": 7.0
+      },
+      {
+        "name": "iCUE.exe",
+        "pid": "16576",
+        "one_core_percent": 6.9
+      },
+      {
+        "name": "AVCore.exe",
+        "pid": "8076",
+        "one_core_percent": 4.1
+      },
+      {
+        "name": "python.exe",
+        "pid": "2016",
+        "one_core_percent": 3.9
+      },
+      {
+        "name": "claude.exe",
+        "pid": "5156",
+        "one_core_percent": 3.1
+      }
+    ],
+    "BytesPerFrame": 194116.6577777778,
+    "state": {
+      "Enabled": false,
+      "SuppressedCount": 0,
+      "PhysicsBodies": 89,
+      "ActiveMapRenderers": 187,
+      "ActiveErrors": 16
+    },
+    "start": {
+      "Utc": "2026-10-27T15:01:46.8039473Z",
+      "Scene": "scenes/maps/depot/depot.scene",
+      "Screen": "1920,1080",
+      "CameraPosition": "-16,-755,1092.041",
+      "CameraAngles": "Pitch = 12.00, Yaw = 90.00, Roll = 0.00",
+      "FieldOfView": 60,
+      "PlayerPosition": "-16,-764,1032.041",
+      "Bots": 9,
+      "NoDamage": true
+    },
+    "end": {
+      "Utc": "2026-10-27T15:02:13.4508089Z",
+      "Screen": "1920,1080",
+      "CameraPosition": "-16,-755,1092.041",
+      "CameraAngles": "Pitch = 12.00, Yaw = 90.00, Roll = 0.00",
+      "PlayerPosition": "-16,-764,1032.041"
+    }
+  }
+]

@@ -1,0 +1,27 @@
+{
+  "revision": "veridant-pool-v2",
+  "stage": "stage-water-v4",
+  "files": {
+    "Assets/shaders/hc1_veridant_pool_v2.shader": {
+      "before": "0b7b2c531b91e60c8585da99325ecfed1a4f37fb3e6cf14a8523adadfd5b91fc",
+      "after": "af7c9a85d9c0000b90cb3c7e6e9fbb33f2928c4996155ae860150e661546bbd0",
+      "source": "output/veridant/pool-v2/stage-water-v4/Assets/shaders/hc1_veridant_pool_v2.shader",
+      "backup": "output/veridant/pool-v2/stage-water-v4/before/Assets/shaders/hc1_veridant_pool_v2.shader"
+    }
+  },
+  "source_sha256": {
+    "Tools/veridant_stage_pool_surface.py": "6e976559264718565f17763f4079cba49811749bd1415ad5b822fd67490b8b99",
+    "Sources/Veridant/pool-v2/water.shader": "af7c9a85d9c0000b90cb3c7e6e9fbb33f2928c4996155ae860150e661546bbd0",
+    "Tools/veridant_pool_detail.py": "d1eb7c3aba8e14f280037f0256d2907b323b2bb4d8d0cf782c83752f405503be"
+  },
+  "required_source_snippets": {},
+  "protected_sha256": {
+    "Assets/models/maps/veridant/pool-v2/pool.obj": "d0c358177a1804bc7caa472d45f8f8ea08193e04a7e731f01ea6fe667097135b",
+    "Assets/materials/veridant/vr_pool.vmat": "221eb2437322a0341fb8865f2eacbe6ad4c8de2856dceaa18683befb6437e100",
+    "Assets/models/maps/veridant/veridant_dress_hulls_default.obj": "731a685d0bf5beb747e07cfc75ae93239e2d7bfba2749c1ed1db0425c1aac05f",
+    "Assets/models/maps/veridant/veridant_dress_hulls_metal.obj": "59a5740615b24a1211d5799cdecc9ce8826711127eef6d91569b68c3452750bc"
+  },
+  "base_import": "Assets/models/maps/veridant/chair-v2/dress-base.obj",
+  "geometry_unchanged": true,
+  "collision_exact": true
+}

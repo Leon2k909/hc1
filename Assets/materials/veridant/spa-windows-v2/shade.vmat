@@ -1,0 +1,19 @@
+// Tools/veridant_spa_windows.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    g_flMetalness "0"
+    g_flRoughnessScaleFactor "1"
+    TextureColor "materials/veridant/spa-windows-v2/linen_color.png"
+    TextureNormal "materials/veridant/spa-windows-v2/linen_normal.png"
+    TextureRoughness "[0.78 0.78 0.78 0]"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[1 1 1 1]"
+    g_flModelTintAmount "1"
+    F_SELF_ILLUM "1"
+    TextureSelfIllumMask "[1 1 1 0]"
+    g_flSelfIllumBrightness "0.65"
+    g_flSelfIllumAlbedoFactor "1"
+    g_vSelfIllumTint "[1 0.76 0.46 0]"
+}

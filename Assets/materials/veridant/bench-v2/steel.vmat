@@ -1,0 +1,14 @@
+// Tools/veridant_bench.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    g_flMetalness "0.94"
+    g_flRoughnessScaleFactor "1"
+    TextureColor "materials/default/default_color.tga"
+    TextureNormal "materials/veridant/bench-v2/flat_normal.png"
+    TextureRoughness "materials/veridant/bench-v2/steel_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[0.22 0.24 0.235 1]"
+    g_flModelTintAmount "1.0"
+}

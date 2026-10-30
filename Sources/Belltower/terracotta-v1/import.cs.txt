@@ -1,0 +1,39 @@
+// Material-only update; preserve the shared editor's current unsaved work.
+var root=Sandbox.Project.Current.GetRootPath();
+if(!string.Equals(System.IO.Path.GetFullPath(root).TrimEnd('\\','/'),@"C:\sbox-projects\hc1\forked-shooter-main",StringComparison.OrdinalIgnoreCase))throw new InvalidOperationException("Wrong checkout.");
+var folder=System.IO.Path.Combine(root,"output/belltower/terracotta-v1");
+var requestPath=System.IO.Path.Combine(folder,"import-request.json");
+var stage=System.IO.File.Exists(requestPath)?System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(requestPath))["stage"].GetValue<string>():"stage-v1";
+if(!System.Text.RegularExpressions.Regex.IsMatch(stage,"^stage-[a-z0-9-]+$"))throw new InvalidOperationException("Invalid stage.");
+var m=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,stage,"manifest.json")));
+if(m["revision"].GetValue<string>()!="belltower-terracotta-v1"||m["geometry_changed"].GetValue<bool>())throw new InvalidOperationException("Unexpected revision.");
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+var session=Editor.SceneEditorSession.Active;var dirty=session.HasUnsavedChanges;var playing=Game.IsPlaying;var game=Game.ActiveScene?.Id;
+var scene=System.IO.Path.Combine(root,"Assets/scenes/maps/Belltower/belltower.scene");var sceneHash=Hash(scene);
+foreach(var group in new[]{"source_sha256","protected_sha256"})
+ foreach(var pair in m[group].AsObject())
+  if(Hash(System.IO.Path.Combine(root,pair.Key))!=pair.Value.GetValue<string>())throw new InvalidOperationException("Source changed: "+pair.Key);
+var files=m["files"].AsObject();
+foreach(var pair in files)
+{
+ if(pair.Key.Contains("..")||(!pair.Key.StartsWith("Assets/materials/belltower/terracotta-v1/",StringComparison.Ordinal)&&pair.Key!="Assets/shaders/belltower_terracotta.shader"&&pair.Key!="Assets/materials/buildings/clay_pot.vmat"))throw new InvalidOperationException("Unexpected target.");
+ var item=pair.Value;var target=System.IO.Path.Combine(root,pair.Key);var current=System.IO.File.Exists(target)?Hash(target):null;
+ if(Hash(System.IO.Path.Combine(root,item["source"].GetValue<string>()))!=item["after"].GetValue<string>())throw new InvalidOperationException("Stage changed.");
+ if(item["backup"] is not null&&Hash(System.IO.Path.Combine(root,item["backup"].GetValue<string>()))!=item["before"].GetValue<string>())throw new InvalidOperationException("Backup changed.");
+ if(current!=item["before"]?.GetValue<string>()&&current!=item["after"].GetValue<string>())throw new InvalidOperationException("Target changed: "+pair.Key);
+}
+var changed=new System.Collections.Generic.List<string>();
+foreach(var pair in files.OrderBy(p=>p.Key.EndsWith(".vmat",StringComparison.Ordinal)?2:p.Key.EndsWith(".shader",StringComparison.Ordinal)?1:0))
+{
+ var target=System.IO.Path.Combine(root,pair.Key);var item=pair.Value;
+ if(System.IO.File.Exists(target)&&Hash(target)==item["after"].GetValue<string>())continue;
+ System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target));var incoming=target+".clay-incoming";
+ try{System.IO.File.Copy(System.IO.Path.Combine(root,item["source"].GetValue<string>()),incoming,true);if(Hash(incoming)!=item["after"].GetValue<string>())throw new InvalidOperationException("Incoming differs.");System.IO.File.Move(incoming,target,true);changed.Add(pair.Key);}
+ finally{if(System.IO.File.Exists(incoming))System.IO.File.Delete(incoming);}
+ Editor.AssetSystem.RegisterFile(target);
+}
+var preserved=ReferenceEquals(session,Editor.SceneEditorSession.Active)&&dirty==session.HasUnsavedChanges&&playing==Game.IsPlaying&&game==Game.ActiveScene?.Id&&Hash(scene)==sceneHash;
+var result=new{ImportedFiles=changed,EditorStatePreserved=preserved,OriginalUnsavedState=dirty,SceneSourceUnchanged=Hash(scene)==sceneHash,GeometryAndCollisionUnchanged=true};
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"native-import.json"),System.Text.Json.JsonSerializer.Serialize(result));
+if(!preserved)throw new InvalidOperationException("Shared state changed during the material import; inspect completed changes.");
+return result;

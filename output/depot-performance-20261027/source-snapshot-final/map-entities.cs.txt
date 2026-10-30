@@ -1,0 +1,8 @@
+var scene=Game.ActiveScene;
+var map=scene.GetAllComponents<MapInstance>().Single();
+return map.GameObject.Children.Select(o=>new {
+    o.Id,o.Name,o.Enabled,
+    Position=o.WorldPosition.ToString(),
+    Components=o.Components.GetAll<Component>(FindMode.EverythingInSelf).Select(c=>new {Type=c.GetType().Name,Data=c.GetType().Name=="MapObjectComponent"?c.Serialize():null}).ToArray(),
+    Models=o.GetComponentsInChildren<ModelRenderer>(true).Select(r=>new {r.GameObject.Name,Path=r.Model?.ResourcePath,Bones=(r.Model?.BoneCount),r.Enabled,Error=r.Model?.IsError}).ToArray()
+}).Where(o=>o.Models.Length>0).ToArray();

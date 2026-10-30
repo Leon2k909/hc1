@@ -1,0 +1,41 @@
+{
+  "__guid": "2e32f51c-4d4f-4d37-aaba-3129664be376",
+  "__version": 2,
+  "Flags": 0,
+  "Name": "Ares bounced lighting",
+  "Position": "0,0,0",
+  "Rotation": "0,0,0,1",
+  "Scale": "1,1,1",
+  "Tags": "",
+  "Enabled": true,
+  "NetworkMode": 2,
+  "NetworkFlags": 0,
+  "NetworkOrphaned": 0,
+  "NetworkTransmit": true,
+  "OwnerTransfer": 1,
+  "Components": [
+    {
+      "__type": "Sandbox.IndirectLightVolume",
+      "__guid": "0d7a301c-3305-4ec9-aebe-775c3b8ead16",
+      "__enabled": true,
+      "Flags": 0,
+      "__version": 2,
+      "BakeVersion": 1,
+      "BlendDistance": 96,
+      "Bounds": { "Mins": "-1160,-2250,24", "Maxs": "760,2250,696" },
+      "DistanceTexture": "lighting/ares/photographic-v1/distance.vtex",
+      "InsideGeometry": "Relocate",
+      "IrradianceTexture": "lighting/ares/photographic-v1/irradiance.vtex",
+      "NormalBias": 8,
+      "ProbeDensity": 5,
+      "RelocationTexture": "lighting/ares/photographic-v1/relocation.vtex",
+      "RenderExcludeTags": "",
+      "RuntimeContrast": 1,
+      "RuntimeIntensity": 0.65,
+      "RuntimeSaturation": 1,
+      "RuntimeTint": "1,1,1,1",
+      "ViewBias": 4
+    }
+  ],
+  "Children": []
+}

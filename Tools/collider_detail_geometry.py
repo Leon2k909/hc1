@@ -23,7 +23,7 @@ def bolt(m,at,axis,r=.65,length=.45,paint="co_silver"):
     B.lathe(m,at,axis,[(r,0),(r,length)],paint,sides=6,cap=paint)
 
 
-def rail(m,a,b,z,lamps=False,collide=True):
+def _legacy_rail(m,a,b,z,lamps=False,collide=True):
     # Preserve the established shoot-through top/kick collision envelopes.
     if collide:
         clip=K.Model();A.railing(clip,a,b,z,lamps=False,collide=True)
@@ -47,7 +47,7 @@ def rail(m,a,b,z,lamps=False,collide=True):
             bevel_box(m,p+side*1.5+UP*31,(along,side,UP),(1.4,.8,3),"co_white",.1)
 
 
-def slope_rail(m,a,b):
+def _legacy_slope_rail(m,a,b):
     a,b=np.asarray(a,float),np.asarray(b,float)
     beam(m,a+UP*38,b+UP*38,(3.2,3),"co_case",bevel=.4)
     beam(m,a+UP*20,b+UP*20,(1.6,1.6),"co_trim",bevel=.2)
@@ -59,6 +59,16 @@ def slope_rail(m,a,b):
         bevel_box(m,p+UP*3,(direction,side,UP),(6,1.5,10),"co_silver",.2)
         for dz in (0,6):bolt(m,p+UP*dz+side*.8,side,r=.7,length=.5)
     m.beam(a+UP*40,b+UP*40,(3,10),None,"metal")
+
+
+def rail(m,a,b,z,lamps=False,collide=True):
+    import collider_craft
+    collider_craft.rail(m,a,b,z,lamps=lamps,collide=collide)
+
+
+def slope_rail(m,a,b):
+    import collider_craft
+    collider_craft.slope_rail(m,a,b)
 
 
 def stair(m,axis,c0,c1,s0,s1,z0,z1):

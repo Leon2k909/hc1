@@ -1,0 +1,42 @@
+// Read-only inspection of the installed engine's highlight implementation.
+var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic|System.Reflection.BindingFlags.DeclaredOnly;
+var codes=typeof(System.Reflection.Emit.OpCodes).GetFields().Where(f=>f.FieldType==typeof(System.Reflection.Emit.OpCode)).Select(f=>(System.Reflection.Emit.OpCode)f.GetValue(null)).ToDictionary(c=>c.Value);
+var result=new System.Collections.Generic.List<object>();
+foreach(var type in new[]{typeof(Highlight),typeof(HighlightOutline)})
+foreach(var m in type.GetMethods(flags).Cast<System.Reflection.MethodBase>().Concat(type.TypeInitializer is {} c?new System.Reflection.MethodBase[]{c}:Array.Empty<System.Reflection.MethodBase>()))
+{
+    var bytes=m.GetMethodBody()?.GetILAsByteArray();if(bytes is null)continue;
+    var calls=new System.Collections.Generic.List<string>();
+    for(int i=0;i<bytes.Length;)
+    {
+        short value=bytes[i++];if(value==0xfe)value=(short)(0xfe00|bytes[i++]);
+        var op=codes[value];var count=0;var token=0;
+        switch(op.OperandType)
+        {
+            case System.Reflection.Emit.OperandType.InlineSwitch:count=4+4*BitConverter.ToInt32(bytes,i);break;
+            case System.Reflection.Emit.OperandType.InlineI8:
+            case System.Reflection.Emit.OperandType.InlineR:count=8;break;
+            case System.Reflection.Emit.OperandType.InlineVar:count=2;break;
+            case System.Reflection.Emit.OperandType.ShortInlineBrTarget:
+            case System.Reflection.Emit.OperandType.ShortInlineI:
+            case System.Reflection.Emit.OperandType.ShortInlineVar:count=1;break;
+            case System.Reflection.Emit.OperandType.InlineNone:break;
+            default:count=4;break;
+        }
+        if(count==4)
+        {
+            token=BitConverter.ToInt32(bytes,i);
+            try
+            {
+                if(op.OperandType==System.Reflection.Emit.OperandType.InlineString)calls.Add("text: "+m.Module.ResolveString(token));
+                else if(op.OperandType is System.Reflection.Emit.OperandType.InlineMethod or System.Reflection.Emit.OperandType.InlineField or System.Reflection.Emit.OperandType.InlineType or System.Reflection.Emit.OperandType.InlineTok)
+                {
+                    var member=m.Module.ResolveMember(token);calls.Add(member.DeclaringType?.Name+"."+member.Name);
+                }
+            }catch{}
+        }
+        i+=count;
+    }
+    if(calls.Count>0)result.Add(new{Type=type.Name,Method=m.Name,Calls=calls});
+}
+return result;

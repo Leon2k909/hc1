@@ -1,0 +1,39 @@
+// Publish only the scoped reactor render OBJ. No scene, ModelDoc or material writes.
+var root=Sandbox.Project.Current.GetRootPath();
+if(!System.IO.Path.GetFullPath(root).TrimEnd('\\','/').Equals(@"C:\sbox-projects\hc1\forked-shooter-main",StringComparison.OrdinalIgnoreCase))throw new InvalidOperationException("Wrong project.");
+var folder=System.IO.Path.Combine(root,"output/ares/core-lamp-mounts-v1");
+var request=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"import-request.json")));
+var stage=request["stage"].GetValue<string>();
+if(!System.Text.RegularExpressions.Regex.IsMatch(stage,"^stage-[a-z0-9-]+$"))throw new InvalidOperationException("Invalid stage.");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,stage,"manifest.json")));
+if(manifest["revision"].GetValue<string>()!="ares-core-lamp-mounts-v1")throw new InvalidOperationException("Wrong revision.");
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+var session=Editor.SceneEditorSession.Active;var game=Game.ActiveScene?.Id;var playing=Game.IsPlaying;var dirty=session.HasUnsavedChanges;
+if(playing)throw new InvalidOperationException("Play started; inspect before publishing.");
+foreach(var group in new[]{"protected_sha256","source_sha256"})
+ foreach(var pair in manifest[group].AsObject())if(Hash(System.IO.Path.Combine(root,pair.Key))!=pair.Value.GetValue<string>())throw new InvalidOperationException("Input changed: "+pair.Key);
+foreach(var pair in manifest["required_source_snippets"].AsObject())
+{
+ var text=System.IO.File.ReadAllText(System.IO.Path.Combine(root,pair.Key)).Replace("\r\n","\n");
+ foreach(var part in pair.Value.AsArray())if(!text.Contains(part.GetValue<string>().Replace("\r\n","\n"),StringComparison.Ordinal))throw new InvalidOperationException("Source hook changed.");
+}
+var file="Assets/models/maps/ares/ares_reactor.obj";var files=manifest["files"].AsObject();
+if(files.Count!=1||!files.ContainsKey(file))throw new InvalidOperationException("Unexpected target.");
+var item=files[file];var target=System.IO.Path.Combine(root,file);var source=System.IO.Path.Combine(root,item["source"].GetValue<string>());
+var before=item["before"].GetValue<string>();var after=item["after"].GetValue<string>();
+if(Hash(source)!=after||Hash(System.IO.Path.Combine(root,item["backup"].GetValue<string>()))!=before)throw new InvalidOperationException("Stage or backup changed.");
+if(Hash(target)!=before&&Hash(target)!=after)throw new InvalidOperationException("Reactor was changed by other work.");
+var imported=false;
+if(Hash(target)!=after)
+{
+ var incoming=target+".core-lamps-incoming";
+ try{System.IO.File.Copy(source,incoming,true);if(Hash(incoming)!=after)throw new InvalidOperationException("Incoming hash differs.");System.IO.File.Move(incoming,target,true);imported=true;}
+ finally{if(System.IO.File.Exists(incoming))System.IO.File.Delete(incoming);}
+}
+Editor.AssetSystem.RegisterFile(target);
+foreach(var pair in manifest["protected_sha256"].AsObject())if(Hash(System.IO.Path.Combine(root,pair.Key))!=pair.Value.GetValue<string>())throw new InvalidOperationException("Protected file changed.");
+var preserved=ReferenceEquals(session,Editor.SceneEditorSession.Active)&&game==Game.ActiveScene?.Id&&playing==Game.IsPlaying&&dirty==session.HasUnsavedChanges;
+var result=new{Stage=stage,Imported=imported,Fixtures=24,EditorStatePreserved=preserved,ModelDocAndPhysicsUnchanged=true,MaterialsUnchanged=true};
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"native-import.json"),System.Text.Json.JsonSerializer.Serialize(result));
+if(!preserved)throw new InvalidOperationException("Editor state changed; inspect completed import.");
+return result;

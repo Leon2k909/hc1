@@ -1,0 +1,47 @@
+if (Game.IsPlaying) throw new Exception("Run preservation checks with play stopped.");
+var scene=Editor.SceneEditorSession.Active.Scene;
+if(scene.Source?.ResourcePath!="scenes/maps/depot/depot.scene") throw new Exception("Expected saved Depot.");
+var map=scene.GetAllComponents<MapInstance>().Single();
+var cleanup=map.GameObject.Components.Get<Facepunch.DepotMapCleanup>(FindMode.EverythingInSelf);
+if(!cleanup.IsValid()||!cleanup.Enabled||cleanup.SuppressedCount!=69) throw new Exception("Cleanup is not active on 69 legacy objects.");
+var guard=new GameObject(map.GameObject,true,"item_hc1_cleanup_guard");
+guard.Flags|=GameObjectFlags.NotSaved|GameObjectFlags.NotNetworked;
+guard.Components.Create<SpawnPoint>();
+var testWasEnabled=cleanup.Enabled;
+string Protected()=>Json.Serialize(new {
+    Objects=map.GameObject.Children.Where(o=>!o.Name.StartsWith("ammo_")&&!o.Name.StartsWith("item_")&&!o.Name.StartsWith("charger_")).Select(o=>new {o.Id,o.Enabled}).ToArray(),
+    Components=scene.GetAllObjects(true).SelectMany(o=>o.Components.GetAll<Component>(FindMode.EverythingInSelf)).Where(c=>c is EnvmapProbe or DirectionalLight or PointLight or SpotLight or SkyBox2D or VolumetricFogVolume or ModelCollider or Facepunch.PlayArea or SpawnPoint).Select(c=>c.Serialize()).ToArray(),
+    map.EnableCollision
+});
+var origins=new[]{new Vector3(-1192,112,948),new Vector3(132,1060,948),new Vector3(-16,-764,1092)};
+object[] Rays() {
+    var traces=origins.Select(p=>scene.Trace.Ray(p,p-Vector3.Up*500).Run()).ToArray();
+    if(traces.Any(t=>!t.Hit)) throw new Exception("A representative floor trace missed.");
+    return traces.Select(t=>(object)new {t.Hit,Position=t.HitPosition.ToString(),Normal=t.Normal.ToString()}).ToArray();
+}
+try {
+    var protectedBefore=Protected();
+    var raysBefore=Json.Serialize(Rays());
+    var afterBodies=scene.PhysicsWorld.Bodies.Count();
+    cleanup.Enabled=false;
+    var beforeBodies=scene.PhysicsWorld.Bodies.Count();
+    var activeLegacy=map.GameObject.Children.Count(o=>o.Enabled&&(o.Name.StartsWith("ammo_")||o.Name.StartsWith("item_")||o.Name.StartsWith("charger_"))&&o!=guard);
+    if(activeLegacy!=69) throw new Exception("Disabling cleanup did not restore the legacy objects.");
+    cleanup.Enabled=true;
+    if(!guard.Enabled||cleanup.SuppressedCount!=69) throw new Exception("Functional pickup guard failed.");
+    if(Protected()!=protectedBefore) throw new Exception("Architecture, gameplay, spawn or lighting data changed.");
+    if(Json.Serialize(Rays())!=raysBefore) throw new Exception("Floor traces changed.");
+    var errors=map.GetComponentsInChildren<ModelRenderer>(true).Count(r=>r.Active&&r.Model?.IsError==true);
+    if(errors!=0) throw new Exception("Depot still renders an error model.");
+    return new {
+        CleanupCount=cleanup.SuppressedCount,LegacyObjectsRestoredWhenDisabled=activeLegacy,
+        FunctionalPickupPreserved=guard.Enabled,ArchitectureSpawnsAndLightingPreserved=true,FloorTracesPreserved=true,
+        FloorTraces=Rays(),ActiveMapErrorModels=errors,BeforeBodies=beforeBodies,AfterBodies=afterBodies,
+        Probes=scene.GetAllComponents<EnvmapProbe>().Count(),Points=scene.GetAllComponents<PointLight>().Count(),Spots=scene.GetAllComponents<SpotLight>().Count(),
+        SceneHasUnsavedChanges=Editor.SceneEditorSession.Active.HasUnsavedChanges
+    };
+}
+finally {
+    guard.Destroy();
+    cleanup.Enabled=testWasEnabled;
+}

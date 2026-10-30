@@ -1,0 +1,331 @@
+{
+  "revision": "veridant-chair-soft-v4",
+  "files": {
+    "Assets/models/maps/veridant/chair-v4/chairs-0.obj": {
+      "before": null,
+      "after": "cfa2969ee45f5be73b04debd9004539e70a9ad4997f99eac323036baaa3d0ad2",
+      "source": "output/veridant/chair-v4/stage-v2/Assets/models/maps/veridant/chair-v4/chairs-0.obj"
+    },
+    "Assets/models/maps/veridant/chair-v4/chairs-0.mtl": {
+      "before": null,
+      "after": "d54443b01ba7f248c8785a3fe9ab81f72030550e6e58d37a4524209d709d5dac",
+      "source": "output/veridant/chair-v4/stage-v2/Assets/models/maps/veridant/chair-v4/chairs-0.mtl"
+    },
+    "Assets/models/maps/veridant/chair-v4/chairs-1.obj": {
+      "before": null,
+      "after": "5d9a20b4db082610b318caef9784655d2d64484dff7be49c340e904ff870d4f4",
+      "source": "output/veridant/chair-v4/stage-v2/Assets/models/maps/veridant/chair-v4/chairs-1.obj"
+    },
+    "Assets/models/maps/veridant/chair-v4/chairs-1.mtl": {
+      "before": null,
+      "after": "d54443b01ba7f248c8785a3fe9ab81f72030550e6e58d37a4524209d709d5dac",
+      "source": "output/veridant/chair-v4/stage-v2/Assets/models/maps/veridant/chair-v4/chairs-1.mtl"
+    },
+    "Assets/materials/veridant/chair-v4/cloth.vmat": {
+      "before": null,
+      "after": "1d59b203c6287f6cbf331538c2a2e90d2b18a32dd9d2d51490770695155ee1fe",
+      "source": "output/veridant/chair-v4/stage-v2/Assets/materials/veridant/chair-v4/cloth.vmat"
+    },
+    "Assets/materials/veridant/chair-v4/piping.vmat": {
+      "before": null,
+      "after": "d795373bc7174a440cdf039628a62eeaa2ac456aa86671430da7dc1909a24a8c",
+      "source": "output/veridant/chair-v4/stage-v2/Assets/materials/veridant/chair-v4/piping.vmat"
+    },
+    "Assets/materials/veridant/chair-v4/walnut.vmat": {
+      "before": null,
+      "after": "f03c28269e5a13ad65d93e54b8cf7b7f95ebb2260c5b3af6572614b4b263457a",
+      "source": "output/veridant/chair-v4/stage-v2/Assets/materials/veridant/chair-v4/walnut.vmat"
+    },
+    "Assets/models/maps/veridant/veridant_dress.vmdl": {
+      "before": "c61d15918cc36137ce6f8c7b7ef2523c79a459669193300ab57f926e9134dea4",
+      "after": "829e855571c6df5d1042496f567fdf4e5eedd8de59a842151c7730ee76a84b54",
+      "source": "output/veridant/chair-v4/stage-v2/Assets/models/maps/veridant/veridant_dress.vmdl"
+    }
+  },
+  "protected": {
+    "Assets/models/maps/veridant/chair-v2/dress-base.obj": "ff1a395ab721b9207f1f76889088ec1669a0d292661f0d01677d378d1d179745",
+    "Assets/models/maps/veridant/lounger-v2/veridant_dress-replacements.obj": "2a4119c9d9fc43fc03cdac2f0e46fd5b12b64afbc5fcbdd14bcd6df4914cf0fd",
+    "Assets/models/maps/veridant/chair-v3/chairs-0.obj": "f1265b77dbd67b42b1ccf35f89ca41da313151b80dd779af39cc53ba52b9e3a9",
+    "Assets/models/maps/veridant/chair-v3/chairs-1.obj": "86fc700221b2e7b5f7e6a0d7bd34ffbb6daa527ff0caf9ca729ac8f8da21636a",
+    "Assets/models/maps/veridant/cases-v3/veridant_dress-0.obj": "fb102df1c38334938714ea5d308e93af7b6bc1fc6ace48af38379021627cfd93",
+    "Assets/models/maps/veridant/cases-v3/veridant_dress-1.obj": "0f39d3b7aea185377569dfddcae2e3db8371fcf3d1738bc129c17a2e968089ac",
+    "Assets/models/maps/veridant/cases-v3/veridant_dress-2.obj": "bd28aebb5251f0934096809e7604da4c7f9e42c4ec225836ac5c0b26bef065a8",
+    "Assets/models/maps/veridant/cases-v3/veridant_dress-3.obj": "ca0822e41e7699dea72cbec747ab770aed08b90cdf1d37cebc89c9c0ea3c6e8f",
+    "Assets/models/maps/veridant/veridant_dress.obj": "52f7fb3e690736e5be58d3058f88afe46eef3d27e4923356bddd8b6f5142f8f0",
+    "Assets/scenes/maps/Veridant/veridant.scene": "d63b301e5b4c9ea2873bddd80a8a3f4d5da32f6fbd1caad6818725db2329e836",
+    "Tools/veridant_chair_soft.py": "f17f2f3eaca52ec1561c68d1a1d24f15fd28f974b7419966094b7615a77c0e70",
+    "Tools/veridant_chair.py": "19f2d86b43e66076a391e60cfc8aa78298696fe1f63f51995978cc8e83829407"
+  },
+  "instances": 12,
+  "triangles_per_chair": [
+    8206,
+    8202,
+    8196,
+    8184,
+    8206,
+    8202,
+    8186,
+    8200,
+    8206,
+    8204,
+    8198,
+    8194
+  ],
+  "geometry": [
+    {
+      "index": 0,
+      "triangles": 8206,
+      "bounds": [
+        [
+          -504.6934507662097,
+          794.8017537579407,
+          128.0
+        ],
+        [
+          -485.8073567481135,
+          812.4455831329203,
+          161.14515421005171
+        ]
+      ]
+    },
+    {
+      "index": 1,
+      "triangles": 8202,
+      "bounds": [
+        [
+          -546.1268248819317,
+          809.1734353533808,
+          128.0
+        ],
+        [
+          -524.180326550207,
+          831.2980071066569,
+          161.14515421005171
+        ]
+      ]
+    },
+    {
+      "index": 2,
+      "triangles": 8196,
+      "bounds": [
+        [
+          -536.1499902293323,
+          765.7394649771838,
+          128.0
+        ],
+        [
+          -517.0659145995428,
+          785.7291475288702,
+          161.14515421005171
+        ]
+      ]
+    },
+    {
+      "index": 3,
+      "triangles": 8184,
+      "bounds": [
+        [
+          -315.8752637572382,
+          817.328585726716,
+          128.0
+        ],
+        [
+          -295.76393895515235,
+          836.5682265614179,
+          161.14515421005171
+        ]
+      ]
+    },
+    {
+      "index": 4,
+      "triangles": 8206,
+      "bounds": [
+        [
+          -364.2436947413423,
+          806.8425933442772,
+          128.0
+        ],
+        [
+          -345.13168453180845,
+          824.7824721300972,
+          161.14515421005171
+        ]
+      ]
+    },
+    {
+      "index": 5,
+      "triangles": 8202,
+      "bounds": [
+        [
+          235.54908365898686,
+          -1071.1732455367999,
+          0.0
+        ],
+        [
+          254.05738310844941,
+          -1054.0987688673165,
+          33.14515421005171
+        ]
+      ]
+    },
+    {
+      "index": 6,
+      "triangles": 8186,
+      "bounds": [
+        [
+          197.19483047018502,
+          -1048.6856900365792,
+          0.0
+        ],
+        [
+          218.4043301087369,
+          -1027.0736886126758,
+          33.14515421005171
+        ]
+      ]
+    },
+    {
+      "index": 7,
+      "triangles": 8200,
+      "bounds": [
+        [
+          203.72613481669507,
+          -1094.2540088908604,
+          0.0
+        ],
+        [
+          222.85655482151523,
+          -1074.0779277063764,
+          33.14515421005171
+        ]
+      ]
+    },
+    {
+      "index": 8,
+      "triangles": 8206,
+      "bounds": [
+        [
+          -444.0423737888532,
+          -1249.1551242845671,
+          0.0
+        ],
+        [
+          -426.26563614107766,
+          -1232.9679119399439,
+          33.14515421005171
+        ]
+      ]
+    },
+    {
+      "index": 9,
+      "triangles": 8204,
+      "bounds": [
+        [
+          -469.3888275876881,
+          -1223.842729384484,
+          0.0
+        ],
+        [
+          -452.9599301862438,
+          -1206.2216336120123,
+          33.14515421005171
+        ]
+      ]
+    },
+    {
+      "index": 10,
+      "triangles": 8198,
+      "bounds": [
+        [
+          -494.2777774969618,
+          -1255.742438795607,
+          0.0
+        ],
+        [
+          -474.4506053253438,
+          -1236.8052502142893,
+          33.14515421005171
+        ]
+      ]
+    },
+    {
+      "index": 11,
+      "triangles": 8194,
+      "bounds": [
+        [
+          -472.73995583468894,
+          -1274.2160866712022,
+          0.0
+        ],
+        [
+          -455.01137562400277,
+          -1255.2875779050407,
+          33.14515421005171
+        ]
+      ]
+    }
+  ],
+  "compaction": [
+    {
+      "source": "C:/sbox-projects/hc1/forked-shooter-main/output/veridant/chair-v4/stage-v2/raw/Assets/models/maps/veridant/chair-v4/chairs-0.obj",
+      "staged": "C:/sbox-projects/hc1/forked-shooter-main/output/veridant/chair-v4/stage-v2/Assets/models/maps/veridant/chair-v4/chairs-0.obj",
+      "before_sha256": "2b202ce77cb2649a9acb4bb77c28b8c9cf27d12564323a1e782a053a2477a33f",
+      "after_sha256": "cfa2969ee45f5be73b04debd9004539e70a9ad4997f99eac323036baaa3d0ad2",
+      "before_entries": {
+        "v": 104460,
+        "vt": 104460,
+        "vn": 93540
+      },
+      "after_entries": {
+        "v": 32083,
+        "vt": 48587,
+        "vn": 17055
+      },
+      "removed_unused_entries": {
+        "v": 0,
+        "vt": 0,
+        "vn": 0
+      },
+      "merged_identical_used_entries": {
+        "v": 72377,
+        "vt": 55873,
+        "vn": 76485
+      },
+      "faces": 49196,
+      "face_semantics_sha256": "4577be870a15ba9a2ee85694a43f4b64c33b4cc8d0c1f7c6ab943176629d039a",
+      "all_face_material_position_uv_normal_bytes_identical": true
+    },
+    {
+      "source": "C:/sbox-projects/hc1/forked-shooter-main/output/veridant/chair-v4/stage-v2/raw/Assets/models/maps/veridant/chair-v4/chairs-1.obj",
+      "staged": "C:/sbox-projects/hc1/forked-shooter-main/output/veridant/chair-v4/stage-v2/Assets/models/maps/veridant/chair-v4/chairs-1.obj",
+      "before_sha256": "e7cbfebc703e5cc84184a7a4b69665a7a3d667db1ae1ef9526b16cd7201eb466",
+      "after_sha256": "5d9a20b4db082610b318caef9784655d2d64484dff7be49c340e904ff870d4f4",
+      "before_entries": {
+        "v": 104436,
+        "vt": 104436,
+        "vn": 93516
+      },
+      "after_entries": {
+        "v": 32081,
+        "vt": 48585,
+        "vn": 17164
+      },
+      "removed_unused_entries": {
+        "v": 0,
+        "vt": 0,
+        "vn": 0
+      },
+      "merged_identical_used_entries": {
+        "v": 72355,
+        "vt": 55851,
+        "vn": 76352
+      },
+      "faces": 49188,
+      "face_semantics_sha256": "5effe6bfde8a412570e5a354b5f1eb7ca00e6ce5e1ba1b0a289665eab1fe8129",
+      "all_face_material_position_uv_normal_bytes_identical": true
+    }
+  ],
+  "physics_suffix_exact": true,
+  "unrelated_imports_exact": true,
+  "canonical_obj_unchanged": true
+}

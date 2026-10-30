@@ -13,6 +13,13 @@
 						_class = "DefaultMaterialGroup"
 						remaps =
 						[
+{ from = "bw2_paint.vmat" to = "materials/belltower/wheelbarrow-v2/paint.vmat" },
+{ from = "bw2_inner.vmat" to = "materials/belltower/wheelbarrow-v2/inner.vmat" },
+{ from = "bw2_frame.vmat" to = "materials/belltower/wheelbarrow-v2/frame.vmat" },
+{ from = "bw2_rubber.vmat" to = "materials/belltower/wheelbarrow-v2/rubber.vmat" },
+{ from = "bw2_steel.vmat" to = "materials/belltower/wheelbarrow-v2/steel.vmat" },
+{ from = "bw2_wood.vmat" to = "materials/belltower/furniture_wood.vmat" },
+
 							{ from = "barrel_endgrain.vmat" to = "materials/belltower/barrels-v3/barrel_endgrain.vmat" },
 							{ from = "barrel_head.vmat" to = "materials/belltower/barrels-v3/barrel_head.vmat" },
 							{ from = "barrel_hoop_rust.vmat" to = "materials/belltower/barrels-v3/barrel_hoop_rust.vmat" },
@@ -1870,6 +1877,19 @@
     _class = "RenderMeshFile"
     name = "stone_wear_west"
     filename = "models/maps/belltower/edge-realism-v1/west.obj"
+    import_translation = [ 0.0, 0.0, 0.0 ]
+    import_rotation = [ 0.0, 0.0, 0.0 ]
+    import_scale = 1.0
+    align_origin_x_type = "None"
+    align_origin_y_type = "None"
+    align_origin_z_type = "None"
+    parent_bone = ""
+    import_filter = { exclude_by_default = false exception_list = [ ] }
+},
+{
+    _class = "RenderMeshFile"
+    name = "wheelbarrow_v2_west"
+    filename = "models/maps/belltower/wheelbarrow-v2/west.obj"
     import_translation = [ 0.0, 0.0, 0.0 ]
     import_rotation = [ 0.0, 0.0, 0.0 ]
     import_scale = 1.0

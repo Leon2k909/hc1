@@ -1,0 +1,28 @@
+// Preserve the unused first-pass files outside Assets. No shared asset is moved.
+var root=Sandbox.Project.Current.GetRootPath();
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/veridant/foliage-hero-v2/stage-v3/manifest.json")));
+string Hash(string path)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+var document=System.IO.File.ReadAllText(System.IO.Path.Combine(root,"Assets/models/maps/veridant/veridant_foliage.vmdl"));
+var paths=new[]{"Assets/models/maps/veridant/courtyard-olive-v2/tree.obj",
+    "Assets/models/maps/veridant/courtyard-olive-v2/tree.mtl",
+    "Assets/materials/veridant/courtyard-olive-v2/bark.vmat",
+    "Assets/materials/veridant/courtyard-olive-v2/leaf.vmat",
+    "Assets/materials/veridant/courtyard-olive-v2/leaf_light.vmat",
+    "Assets/materials/veridant/courtyard-olive-v2/leaf_back.vmat"};
+foreach(var path in paths)
+{
+    if(document.Contains(path.Substring(7),StringComparison.Ordinal))throw new InvalidOperationException("Still referenced: "+path);
+    var file=System.IO.Path.Combine(root,path);
+    if(System.IO.File.Exists(file)&&Hash(file)!=manifest["files"][path]["after"].GetValue<string>())
+        throw new InvalidOperationException("Discarded file changed: "+path);
+}
+var moved=new System.Collections.Generic.List<string>();
+foreach(var path in paths)
+{
+    var file=System.IO.Path.Combine(root,path);if(!System.IO.File.Exists(file))continue;
+    var destination=System.IO.Path.Combine(root,"output/veridant/foliage-hero-v2/discarded-assets",path);
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(destination));
+    if(System.IO.File.Exists(destination))throw new InvalidOperationException("Discard archive already exists.");
+    System.IO.File.Move(file,destination);moved.Add(path);
+}
+return new{Archived=moved};

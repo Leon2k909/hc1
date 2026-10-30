@@ -1,0 +1,427 @@
+{
+  "revision": "ares-pipework-v1",
+  "stage": "stage-v3",
+  "files": {
+    "Assets/models/maps/ares/pressure-doors-v2/hall_base.obj": {
+      "before": "d7fced4a9e5bc40abf3269986f863bc807bf89fd7595d625aeb4c265e776bb4c",
+      "after": "c308155478539926377d62123f92f9a78a1ac514184d9b820236cf8b773216c5",
+      "source": "output/ares/pipework-v1/stage-v3/Assets/models/maps/ares/pressure-doors-v2/hall_base.obj",
+      "backup": "output/ares/pipework-v1/stage-v3/before/Assets/models/maps/ares/pressure-doors-v2/hall_base.obj"
+    },
+    "Assets/models/maps/ares/pipework-v1/hall_preview.obj": {
+      "before": null,
+      "after": "c308155478539926377d62123f92f9a78a1ac514184d9b820236cf8b773216c5",
+      "source": "output/ares/pipework-v1/stage-v3/Assets/models/maps/ares/pipework-v1/hall_preview.obj",
+      "backup": null
+    },
+    "Assets/models/maps/ares/pipework-v1/ares_hall.mtl": {
+      "before": null,
+      "after": "3b76310cc30908afd4ce3269d0bbf4ec266f262c74ba22d4001a5e12e2d0644b",
+      "source": "output/ares/pipework-v1/stage-v3/Assets/models/maps/ares/pipework-v1/ares_hall.mtl",
+      "backup": null
+    },
+    "Assets/models/maps/ares/pipework-v1/trial_hall.vmdl": {
+      "before": null,
+      "after": "b65c2c5d08b8572c942a46d9cb0536bc70987f67e256f91ed58daaa09e30062e",
+      "source": "output/ares/pipework-v1/stage-v3/Assets/models/maps/ares/pipework-v1/trial_hall.vmdl",
+      "backup": null
+    }
+  },
+  "source_sha256": {
+    "Tools/ares_pipework.py": "ff21826f770f56645fcf75f2bf91b74a5dbc159102c978b85430d20264cde2bc",
+    "Tools/ares_stage_pipework.py": "c842e3626fe548897ada7c7200ca16ba03d707beee8591cd8642f5df7b441f9d",
+    "Tools/map_kit.py": "cc60204c747d064cb1fecdb666b24c847ae89dc863c2533d3811a0445f22020d",
+    "Tools/riverdale_parts.py": "a90f4f134053eb3397b2073f1ca4bb3bdc0bfb80a9521dce64ca1017e747f732",
+    "Tools/boxyard_map.py": "0c601e60dc7dfd1827dbd434fba49af21f379e3a11ed9a6abb534dce2c45631d",
+    "Sources/Ares/pipework-v1/legacy.py": "9678938c3b79cde4a4d4155fcdc9636bf14aa2af59996aeb4e2d0f2746b3e1a0"
+  },
+  "required_source_snippets": {
+    "Tools/ares_map.py": [
+      "def pipe_run( m, a, b, r, paint, bracket=120.0 ):\n    \"\"\" Drawn-only wall pipe with smooth tubes, bolted flanges and anchored hangers. \"\"\"\n    from ares_pipework import pipe_run as detailed_pipe_run\n    return detailed_pipe_run( m, a, b, r, paint, bracket )\n"
+    ]
+  },
+  "protected_sha256": {
+    "Assets/models/maps/ares/ares_hall.obj": "b2540404d6c9849512f5c9bc21c3ecd812b8f0d996d030fcb7b6774ac6b5e915",
+    "Assets/models/maps/ares/ares_hall.mtl": "3b76310cc30908afd4ce3269d0bbf4ec266f262c74ba22d4001a5e12e2d0644b",
+    "Assets/scenes/maps/Ares/ares.scene": "d4b026c3a729d7e65f580b1923bd5fce64dddd887b829efc14697232b6ab7929",
+    "Assets/models/maps/ares/pressure-doors-v2/ares_hall.mtl": "3b76310cc30908afd4ce3269d0bbf4ec266f262c74ba22d4001a5e12e2d0644b",
+    "Assets/models/maps/ares/ares_hall_hulls_default.obj": "621ee1ff4d7ff6ae5fc773c6b321baefff14554871c307f9663acaef1e532a6a",
+    "Assets/models/maps/ares/ares_hall_hulls_metal.obj": "ddca4bd830ae1152fa8def602d699950e5b4cd394a24f4192fb7b297a6fc8645",
+    "Assets/models/maps/ares/pressure-doors-v2/wing_west.obj": "d7788c3c6640c33323a1f411d82a7dc05ea6ae48bc01c4e9565068253b5fdfdf",
+    "Assets/models/maps/ares/pressure-doors-v2/wing_east.obj": "edf0bb1651e76ae2b115ddbafb13e9a3a7113dba305e05decc3f955797068b8e",
+    "Assets/models/maps/ares/pressure-doors-v2/cargo.obj": "41b4f00e9c904085cf0e4922937d22eacac3d45ecc73dbc2a6bf6207db87d79a"
+  },
+  "active_base": "Assets/models/maps/ares/pressure-doors-v2/hall_base.obj",
+  "trial_document": "Assets/models/maps/ares/pipework-v1/trial_hall.vmdl",
+  "preview_base": "Assets/models/maps/ares/pipework-v1/hall_preview.obj",
+  "document": "Assets/models/maps/ares/ares_hall.vmdl",
+  "document_sha256": "4cfe4886f379251711bfe049db1dc7de49c5eeb2926bfc41958a245f5eaf96d7",
+  "materials": {
+    "ar_pipe": "materials/ares/ar_pipe.vmat",
+    "ar_copper": "materials/ares/ar_copper.vmat",
+    "ar_gunmetal": "materials/ares/ar_gunmetal.vmat",
+    "ar_ext_metal": "materials/ares/ar_ext_metal.vmat",
+    "ar_dark": "materials/ares/ar_dark.vmat"
+  },
+  "runs": [
+    {
+      "name": "wing_-1_0",
+      "a": [
+        -1132.0,
+        -706.0,
+        300.0
+      ],
+      "b": [
+        -2000.0,
+        -706.0,
+        300.0
+      ],
+      "r": 7.0,
+      "paint": "ar_pipe",
+      "wall_n": -720.0,
+      "triangles": 12880,
+      "sides": 48,
+      "joints": 7,
+      "supports": 3,
+      "radius": 7.0,
+      "length": 868.0
+    },
+    {
+      "name": "wing_-1_1",
+      "a": [
+        -1132.0,
+        -684.0,
+        322.0
+      ],
+      "b": [
+        -2000.0,
+        -684.0,
+        322.0
+      ],
+      "r": 5.0,
+      "paint": "ar_copper",
+      "wall_n": -720.0,
+      "triangles": 12848,
+      "sides": 32,
+      "joints": 7,
+      "supports": 3,
+      "radius": 5.0,
+      "length": 868.0
+    },
+    {
+      "name": "wing_-1_2",
+      "a": [
+        -1132.0,
+        -662.0,
+        342.0
+      ],
+      "b": [
+        -2000.0,
+        -662.0,
+        342.0
+      ],
+      "r": 9.0,
+      "paint": "ar_pipe",
+      "wall_n": -720.0,
+      "triangles": 12880,
+      "sides": 48,
+      "joints": 7,
+      "supports": 3,
+      "radius": 9.0,
+      "length": 868.0
+    },
+    {
+      "name": "wing_1_0",
+      "a": [
+        1132.0,
+        -706.0,
+        300.0
+      ],
+      "b": [
+        2000.0,
+        -706.0,
+        300.0
+      ],
+      "r": 7.0,
+      "paint": "ar_pipe",
+      "wall_n": -720.0,
+      "triangles": 12880,
+      "sides": 48,
+      "joints": 7,
+      "supports": 3,
+      "radius": 7.0,
+      "length": 868.0
+    },
+    {
+      "name": "wing_1_1",
+      "a": [
+        1132.0,
+        -684.0,
+        322.0
+      ],
+      "b": [
+        2000.0,
+        -684.0,
+        322.0
+      ],
+      "r": 5.0,
+      "paint": "ar_copper",
+      "wall_n": -720.0,
+      "triangles": 12848,
+      "sides": 32,
+      "joints": 7,
+      "supports": 3,
+      "radius": 5.0,
+      "length": 868.0
+    },
+    {
+      "name": "wing_1_2",
+      "a": [
+        1132.0,
+        -662.0,
+        342.0
+      ],
+      "b": [
+        2000.0,
+        -662.0,
+        342.0
+      ],
+      "r": 9.0,
+      "paint": "ar_pipe",
+      "wall_n": -720.0,
+      "triangles": 12880,
+      "sides": 48,
+      "joints": 7,
+      "supports": 3,
+      "radius": 9.0,
+      "length": 868.0
+    },
+    {
+      "name": "cargo_south_-1_0",
+      "a": [
+        -2000.0,
+        -1384.0,
+        228.0
+      ],
+      "b": [
+        -190.0,
+        -1384.0,
+        228.0
+      ],
+      "r": 8.0,
+      "paint": "ar_pipe",
+      "wall_n": -1400.0,
+      "triangles": 27920,
+      "sides": 48,
+      "joints": 15,
+      "supports": 7,
+      "radius": 8.0,
+      "length": 1810.0
+    },
+    {
+      "name": "cargo_south_1_0",
+      "a": [
+        190.0,
+        -1384.0,
+        228.0
+      ],
+      "b": [
+        2000.0,
+        -1384.0,
+        228.0
+      ],
+      "r": 8.0,
+      "paint": "ar_pipe",
+      "wall_n": -1400.0,
+      "triangles": 27920,
+      "sides": 48,
+      "joints": 15,
+      "supports": 7,
+      "radius": 8.0,
+      "length": 1810.0
+    },
+    {
+      "name": "cargo_south_-1_1",
+      "a": [
+        -2000.0,
+        -1360.0,
+        252.0
+      ],
+      "b": [
+        -190.0,
+        -1360.0,
+        252.0
+      ],
+      "r": 6.0,
+      "paint": "ar_copper",
+      "wall_n": -1400.0,
+      "triangles": 27888,
+      "sides": 32,
+      "joints": 15,
+      "supports": 7,
+      "radius": 6.0,
+      "length": 1810.0
+    },
+    {
+      "name": "cargo_south_1_1",
+      "a": [
+        190.0,
+        -1360.0,
+        252.0
+      ],
+      "b": [
+        2000.0,
+        -1360.0,
+        252.0
+      ],
+      "r": 6.0,
+      "paint": "ar_copper",
+      "wall_n": -1400.0,
+      "triangles": 27888,
+      "sides": 32,
+      "joints": 15,
+      "supports": 7,
+      "radius": 6.0,
+      "length": 1810.0
+    },
+    {
+      "name": "cargo_south_-1_2",
+      "a": [
+        -2000.0,
+        -1336.0,
+        274.0
+      ],
+      "b": [
+        -190.0,
+        -1336.0,
+        274.0
+      ],
+      "r": 10.0,
+      "paint": "ar_pipe",
+      "wall_n": -1400.0,
+      "triangles": 27920,
+      "sides": 48,
+      "joints": 15,
+      "supports": 7,
+      "radius": 10.0,
+      "length": 1810.0
+    },
+    {
+      "name": "cargo_south_1_2",
+      "a": [
+        190.0,
+        -1336.0,
+        274.0
+      ],
+      "b": [
+        2000.0,
+        -1336.0,
+        274.0
+      ],
+      "r": 10.0,
+      "paint": "ar_pipe",
+      "wall_n": -1400.0,
+      "triangles": 27920,
+      "sides": 48,
+      "joints": 15,
+      "supports": 7,
+      "radius": 10.0,
+      "length": 1810.0
+    },
+    {
+      "name": "cargo_north_-1_0",
+      "a": [
+        -2000.0,
+        -766.0,
+        270.0
+      ],
+      "b": [
+        -1150.0,
+        -766.0,
+        270.0
+      ],
+      "r": 7.0,
+      "paint": "ar_pipe",
+      "wall_n": -752.0,
+      "triangles": 12880,
+      "sides": 48,
+      "joints": 7,
+      "supports": 3,
+      "radius": 7.0,
+      "length": 850.0
+    },
+    {
+      "name": "cargo_north_1_0",
+      "a": [
+        2000.0,
+        -766.0,
+        270.0
+      ],
+      "b": [
+        1150.0,
+        -766.0,
+        270.0
+      ],
+      "r": 7.0,
+      "paint": "ar_pipe",
+      "wall_n": -752.0,
+      "triangles": 12880,
+      "sides": 48,
+      "joints": 7,
+      "supports": 3,
+      "radius": 7.0,
+      "length": 850.0
+    },
+    {
+      "name": "cargo_north_-1_1",
+      "a": [
+        -2000.0,
+        -786.0,
+        292.0
+      ],
+      "b": [
+        -1150.0,
+        -786.0,
+        292.0
+      ],
+      "r": 5.0,
+      "paint": "ar_copper",
+      "wall_n": -752.0,
+      "triangles": 12848,
+      "sides": 32,
+      "joints": 7,
+      "supports": 3,
+      "radius": 5.0,
+      "length": 850.0
+    },
+    {
+      "name": "cargo_north_1_1",
+      "a": [
+        2000.0,
+        -786.0,
+        292.0
+      ],
+      "b": [
+        1150.0,
+        -786.0,
+        292.0
+      ],
+      "r": 5.0,
+      "paint": "ar_copper",
+      "wall_n": -752.0,
+      "triangles": 12848,
+      "sides": 32,
+      "joints": 7,
+      "supports": 3,
+      "radius": 5.0,
+      "length": 850.0
+    }
+  ],
+  "new_triangles": 296128,
+  "old_triangles": 2240,
+  "physics_bytes_exact": true,
+  "existing_routes_radii_retained": true,
+  "removed_triangles": 2240,
+  "unrelated_obj_bytes_exact": true,
+  "retained_bytes_sha256": "5fd5854cc7f330deb09da05f8d6278cf7037a34ef7231741f2a872a67466222d"
+}

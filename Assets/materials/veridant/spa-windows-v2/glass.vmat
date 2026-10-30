@@ -1,0 +1,19 @@
+// Tools/veridant_spa_windows.py
+"Layer0"
+{
+    shader "shaders/glass.shader"
+    F_GLASS_QUALITY "2"
+    g_bFogEnabled "1"
+    g_flBlurAmount "0.015"
+    g_flRefractionStrength "1.003"
+    AlbedoAbsorption "0.15"
+    g_flTintColor "[1 1 1 0]"
+    TextureColor "[0.85 0.89 0.87 0]"
+    TextureNormal "materials/veridant/spa-windows-v2/flat_normal.png"
+    TextureRoughness "materials/veridant/spa-windows-v2/glass_rough.png"
+    TextureMetalness "[0 0 0 0]"
+    TextureAmbientOcclusion "[1 1 1 0]"
+    TextureBlendMask "materials/default/default_blend.tga"
+    TextureTintMask "materials/default/default.tga"
+    TextureTranslucency "materials/default/default_trans.tga"
+}

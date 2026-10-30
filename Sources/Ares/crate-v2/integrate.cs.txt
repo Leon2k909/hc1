@@ -1,0 +1,86 @@
+// Integrate the verified instances into the existing Ares document. Only the
+// dedicated case group is added; the original dressing collision stays intact.
+var root=Sandbox.Project.Current.GetRootPath();var folder=System.IO.Path.Combine(root,"output/ares/crate-v2");
+var request=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"import-request.json")));
+var stage=request["stage"].GetValue<string>();
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,stage,"manifest.json")));
+var checkedProps=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"prop-validation.json")));
+if(manifest["revision"].GetValue<string>()!="ares-cargo-case-v2"||checkedProps["Instances"].GetValue<int>()!=132)throw new InvalidOperationException("Missing case validation.");
+var session=Editor.SceneEditorSession.Active;var scene=session.Scene;var playing=Game.IsPlaying;var game=Game.ActiveScene?.Id;
+if(playing||session.HasUnsavedChanges||!string.Equals(scene.Source?.ResourcePath,"scenes/maps/ares/ares.scene",StringComparison.OrdinalIgnoreCase))throw new InvalidOperationException("Inspect changed scene/play state before integration.");
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+foreach(var item in manifest["source_sha256"].AsObject())if(Hash(System.IO.Path.Combine(root,item.Key))!=item.Value.GetValue<string>())throw new InvalidOperationException("Case source changed: "+item.Key);
+foreach(var item in manifest["required_source_snippets"].AsObject())
+{
+    var source=System.IO.File.ReadAllText(System.IO.Path.Combine(root,item.Key)).Replace("\r\n","\n");
+    foreach(var snippet in item.Value.AsArray())if(!source.Contains(snippet.GetValue<string>().Replace("\r\n","\n"),StringComparison.Ordinal))throw new InvalidOperationException("Case regeneration hook changed.");
+}
+// Independent hall work may continue. Lock the actual case inputs to staging,
+// and preserve the current state of unrelated resources over this operation.
+foreach(var path in new[]{"Assets/scenes/maps/Ares/ares.scene","Assets/models/maps/ares/ares_dressing.obj"})
+    if(Hash(System.IO.Path.Combine(root,path))!=manifest["protected_sha256"][path].GetValue<string>())throw new InvalidOperationException("Case input changed: "+path);
+var preservedInputs=manifest["protected_sha256"].AsObject().ToDictionary(p=>p.Key,p=>Hash(System.IO.Path.Combine(root,p.Key)));
+foreach(var item in manifest["files"].AsObject().Where(p=>p.Value["phase"].GetValue<string>()=="assets"))
+    if(Hash(System.IO.Path.Combine(root,item.Key))!=item.Value["after"].GetValue<string>())throw new InvalidOperationException("Case asset changed: "+item.Key);
+var document="Assets/models/maps/ares/ares_dressing.vmdl";
+var docItem=manifest["files"][document];var docTarget=System.IO.Path.Combine(root,document);var docSource=System.IO.Path.Combine(root,docItem["source"].GetValue<string>());
+if(Hash(docTarget)!=docItem["before"].GetValue<string>()||Hash(docSource)!=docItem["after"].GetValue<string>())throw new InvalidOperationException("Dressing model changed since staging.");
+var oldDoc=System.IO.File.ReadAllText(docTarget);var newDoc=System.IO.File.ReadAllText(docSource);var marker="_class = \"PhysicsShapeList\"";
+if(oldDoc.Substring(oldDoc.IndexOf(marker,StringComparison.Ordinal))!=newDoc.Substring(newDoc.IndexOf(marker,StringComparison.Ordinal)))throw new InvalidOperationException("Collision definition differs.");
+var groupFile=System.IO.Path.Combine(root,manifest["scene_group"].GetValue<string>());
+if(Hash(groupFile)!=manifest["scene_group_sha256"].GetValue<string>())throw new InvalidOperationException("Instance plan changed.");
+var groupJson=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(groupFile)).AsObject();
+var all=scene.GetAllObjects(true).ToArray();var oldIds=all.Select(o=>o.Id).ToHashSet();
+var expectedNew=groupJson["Children"].AsArray().Select(n=>Guid.Parse(n["__guid"].GetValue<string>())).Append(Guid.Parse(groupJson["__guid"].GetValue<string>())).ToHashSet();
+if(expectedNew.Count!=133||expectedNew.Overlaps(oldIds))throw new InvalidOperationException("Duplicate case group or id conflict.");
+var parent=all.Single(o=>o.Id==Guid.Parse(manifest["scene_parent_guid"].GetValue<string>()));
+if(parent.WorldPosition.Length>.001f||Vector3.DistanceBetween(parent.WorldScale,Vector3.One)>.001f)throw new InvalidOperationException("The Ares root transform changed.");
+string Shallow(GameObject go){var json=go.Serialize();if(json is null)return null;json.Remove("Children");json.Remove("GameObjects");return json.ToJsonString();}
+var snapshots=all.ToDictionary(o=>o.Id,o=>Shallow(o));
+var colliderCount=scene.GetAllComponents<Collider>().Count();
+var scenePath=System.IO.Path.Combine(root,"Assets/scenes/maps/Ares/ares.scene");
+var backup=System.IO.Path.Combine(folder,stage,"before/Assets/scenes/maps/Ares/ares.scene");
+System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(backup));
+if(System.IO.File.Exists(backup)&&Hash(backup)!=manifest["original_scene_sha256"].GetValue<string>())throw new InvalidOperationException("Scene backup differs.");
+if(!System.IO.File.Exists(backup))System.IO.File.Copy(scenePath,backup,false);
+GameObject group=null;var documentApplied=false;
+try
+{
+    using(scene.Push())
+    {
+        group=new GameObject(false,"ARES transport cases");group.Deserialize(groupJson);group.Parent=parent;
+        if(group.Id!=Guid.Parse(groupJson["__guid"].GetValue<string>())||group.Children.Count!=132)throw new InvalidOperationException("Instance creation differs from the verified plan.");
+        var now=scene.GetAllObjects(true).ToArray();
+        if(!now.Select(o=>o.Id).Except(oldIds).ToHashSet().SetEquals(expectedNew))throw new InvalidOperationException("Unexpected scene objects were created.");
+        var changed=all.Where(o=>!o.IsValid()||Shallow(o)!=snapshots[o.Id]).Select(o=>new{Name=o.Name,Id=o.Id,Before=snapshots[o.Id],After=o.IsValid()?Shallow(o):null}).ToArray();
+        if(changed.Length>0)
+        {
+            System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"existing-object-diagnostic.json"),System.Text.Json.JsonSerializer.Serialize(changed));
+            throw new InvalidOperationException("An existing object changed: "+string.Join(", ",changed.Select(o=>o.Name)));
+        }
+        if(scene.GetAllComponents<Collider>().Count()!=colliderCount)throw new InvalidOperationException("A collider was added or removed.");
+        var incoming=docTarget+".crate-incoming";
+        try{System.IO.File.Copy(docSource,incoming,true);System.IO.File.Move(incoming,docTarget,true);documentApplied=true;}
+        finally{if(System.IO.File.Exists(incoming))System.IO.File.Delete(incoming);}
+        Editor.AssetSystem.RegisterFile(docTarget);
+    }
+    session.HasUnsavedChanges=true;
+    var preserved=ReferenceEquals(session,Editor.SceneEditorSession.Active)&&playing==Game.IsPlaying&&game==Game.ActiveScene?.Id;
+    foreach(var item in preservedInputs)if(Hash(System.IO.Path.Combine(root,item.Key))!=item.Value)throw new InvalidOperationException("An unrelated resource changed during integration: "+item.Key);
+    var result=new{Stage=stage,CasesReplaced=132,GroupId=group.Id,SharedModels=4,ExistingObjectsPreserved=true,ColliderCount=colliderCount,CollisionBytesExact=true,OriginalSceneBackup=System.IO.Path.GetRelativePath(root,backup),ProtectedInputsAtIntegration=preservedInputs,EditorStatePreserved=preserved,SceneNeedsSaving=session.HasUnsavedChanges};
+    System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"integration.json"),System.Text.Json.JsonSerializer.Serialize(result));
+    if(!preserved)throw new InvalidOperationException("Shared editor state changed during integration.");
+    return result;
+}
+catch
+{
+    using(scene.Push())if(group is not null&&group.IsValid())group.DestroyImmediate();
+    if(documentApplied&&Hash(docTarget)==docItem["after"].GetValue<string>())
+    {
+        var incoming=docTarget+".crate-restore";
+        try{System.IO.File.Copy(System.IO.Path.Combine(root,docItem["backup"].GetValue<string>()),incoming,true);System.IO.File.Move(incoming,docTarget,true);}
+        finally{if(System.IO.File.Exists(incoming))System.IO.File.Delete(incoming);}
+        Editor.AssetSystem.RegisterFile(docTarget);
+    }
+    throw;
+}

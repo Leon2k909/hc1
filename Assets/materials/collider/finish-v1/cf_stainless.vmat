@@ -1,0 +1,15 @@
+// Tools/collider_finish.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    TextureColor "[0.24 0.27 0.28 1]"
+    TextureNormal "materials/default/default_normal.tga"
+    TextureRoughness "[0.62 0.62 0.62 0]"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_flMetalness "0.8"
+    g_flRoughnessScaleFactor "1"
+    g_vTexCoordScale "[1.00000000 1.00000000]"
+    g_vColorTint "[1 1 1 1]"
+    g_flModelTintAmount "1"
+}

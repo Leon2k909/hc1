@@ -1,0 +1,27 @@
+{
+  "files": {
+    "Assets/materials/ares/ar_signs_color.png": {
+      "before": null,
+      "after": "3de1343b6e2af491bed62fb042b78a3bff1302a1ed35e09054a2cf7c82127bea"
+    },
+    "Assets/materials/ares/ar_signs.vmat": {
+      "before": "28af60230bd5a900403f422577e4fedd5c447db70674ff2d90a63a67cb386da7",
+      "after": "a9ea9e9da254e288f5f4a0720afa33568e8ac81a8985639039071e86d1f85b89"
+    }
+  },
+  "original_atlas_sha256": "484ff600076ce9ee4bc6d422e0b4efa8de428598840b4157210429b2598d3ee2",
+  "warning_rect": [
+    1280,
+    3712,
+    2816,
+    384
+  ],
+  "unchanged_pixels_outside_warning": 15695872,
+  "text_padding_pixels": {
+    "left": 273,
+    "right": 266,
+    "top": 94,
+    "bottom": 99
+  },
+  "source_snippet": "def warning_stripe( shape, rng=None ):\n    \"\"\"Warning lettering sits in a clear yellow panel, inset from the stripes.\"\"\"\n    h, w = shape\n    rng = rng if rng is not None else np.random.default_rng( 312 )\n    yy, xx = np.mgrid[0:h, 0:w].astype( np.float32 )\n    stripe = ( ( ( xx + yy ) / ( h * 0.25 ) ) % 2.0 ) < 1.0\n    c = np.where( stripe[..., None], lin( ( 214, 160, 28 ) ), lin( ( 24, 24, 24 ) ) ).astype( np.float32 )\n    box = ( np.abs( xx - w / 2 ) < w * 0.40 ) & ( np.abs( yy - h / 2 ) < h * 0.40 )\n    c = np.where( box[..., None], lin( ( 214, 160, 28 ) ), c )\n    words = text_layer( ( h, w ), [ ( \"CAUTION  HIGH ENERGY\", FONT_BOLD, h * 0.3, w * 0.5, h * 0.35, \"m\", 0.06, w * 0.62 ) ] )\n    c = mix( c, lin( ( 20, 20, 20 ) ), words )\n    worn = wear( rng, ( h, w ), 0.5, 6.0, 3.0 )\n    return mix( c, lin( ( 90, 90, 88 ) ), worn * 0.5 )\n"
+}

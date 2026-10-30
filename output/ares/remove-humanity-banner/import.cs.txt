@@ -1,0 +1,25 @@
+// Delete the two banner render assemblies only, retaining all other OBJ bytes.
+var root=Sandbox.Project.Current.GetRootPath();
+if(!System.IO.Path.GetFullPath(root).TrimEnd('\\','/').Equals(@"C:\sbox-projects\hc1\forked-shooter-main",StringComparison.OrdinalIgnoreCase))throw new InvalidOperationException("Wrong project.");
+var folder=System.IO.Path.Combine(root,"output/ares/remove-humanity-banner");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"manifest.json")));
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+var relative=manifest["target"].GetValue<string>();
+if(relative!="Assets/models/maps/ares/ares_dressing.obj")throw new InvalidOperationException("Unexpected target.");
+var target=System.IO.Path.Combine(root,relative);var source=System.IO.Path.Combine(root,manifest["source"].GetValue<string>());
+var before=manifest["before"].GetValue<string>();var after=manifest["after"].GetValue<string>();
+if(Hash(source)!=after||Hash(System.IO.Path.Combine(root,manifest["backup"].GetValue<string>()))!=before)throw new InvalidOperationException("Staging changed.");
+var current=Hash(target);if(current!=before&&current!=after)throw new InvalidOperationException("Shared dressing changed; restage.");
+var session=Editor.SceneEditorSession.Active;var playing=Game.IsPlaying;var game=Game.ActiveScene?.Id;var dirty=session.HasUnsavedChanges;
+var incoming=target+".banner-removal-incoming";
+if(current!=after)
+{
+ try{System.IO.File.Copy(source,incoming,true);if(Hash(incoming)!=after)throw new InvalidOperationException("Incoming hash differs.");System.IO.File.Move(incoming,target,true);}
+ finally{if(System.IO.File.Exists(incoming))System.IO.File.Delete(incoming);}
+}
+Editor.AssetSystem.RegisterFile(target);
+var preserved=ReferenceEquals(session,Editor.SceneEditorSession.Active)&&playing==Game.IsPlaying&&game==Game.ActiveScene?.Id&&dirty==session.HasUnsavedChanges;
+var result=new{BannersRemoved=2,TrianglesRemoved=56,HabitatBannerPreserved=true,OtherObjBytesAndIndicesPreserved=true,EditorStatePreserved=preserved,Hash=Hash(target)};
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"native-import.json"),System.Text.Json.JsonSerializer.Serialize(result));
+if(!preserved)throw new InvalidOperationException("Editor state changed; inspect before continuing.");
+return result;

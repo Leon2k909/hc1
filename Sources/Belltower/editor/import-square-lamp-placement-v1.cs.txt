@@ -1,0 +1,53 @@
+// Move only the two northern plaza lamps and their four collision hulls.
+var root=Sandbox.Project.Current.GetRootPath();
+if(!string.Equals(System.IO.Path.GetFullPath(root).TrimEnd('\\','/'),@"C:\sbox-projects\hc1\forked-shooter-main",StringComparison.OrdinalIgnoreCase))throw new InvalidOperationException("Wrong checkout.");
+var directory=System.IO.Path.Combine(root,"output/belltower/lamp-placement");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(directory,"stage-v1/manifest.json")));
+if(manifest["revision"].GetValue<string>()!="belltower-square-lamp-placement-v1"||manifest["lamps"].GetValue<int>()!=2)throw new InvalidOperationException("Unexpected repair.");
+var session=Editor.SceneEditorSession.Active;
+if(Game.IsPlaying||session is null||session.HasUnsavedChanges||session.Scene.Source?.ResourcePath?.Equals("scenes/maps/belltower/belltower.scene",StringComparison.OrdinalIgnoreCase)!=true)throw new InvalidOperationException("Requires the saved, stopped Belltower document.");
+var game=Game.ActiveScene?.Id;var ids=session.Scene.GetAllObjects(true).Select(o=>o.Id).ToHashSet();
+string Hash(string path)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+foreach(var group in new[]{"source_sha256","protected_sha256"})
+ foreach(var pair in manifest[group].AsObject())
+  if(Hash(System.IO.Path.Combine(root,pair.Key))!=pair.Value.GetValue<string>())throw new InvalidOperationException("Shared input changed: "+pair.Key);
+var pattern=@"^Assets/models/maps/belltower/(belltower_(west|east)(_hulls_metal)?\.obj|compiler-safe/(west|east)/[a-z0-9_]+_(iron_black|lamp_bulb|lamp_reflector|lantern_glass)\.obj)$";
+var plan=new System.Collections.Generic.List<(string Source,string Target,string Backup,string After)>();
+foreach(var pair in manifest["files"].AsObject())
+{
+ if(!System.Text.RegularExpressions.Regex.IsMatch(pair.Key,pattern))throw new InvalidOperationException("Unexpected target: "+pair.Key);
+ var item=pair.Value;var target=System.IO.Path.Combine(root,pair.Key);var source=System.IO.Path.Combine(root,item["source"].GetValue<string>());var backup=System.IO.Path.Combine(root,item["backup"].GetValue<string>());
+ var before=item["before"].GetValue<string>();var after=item["after"].GetValue<string>();
+ if(Hash(source)!=after||Hash(backup)!=before)throw new InvalidOperationException("Stage or backup changed.");
+ var current=Hash(target);if(current==after)continue;
+ if(current!=before)throw new InvalidOperationException("Shared target changed: "+pair.Key);
+ plan.Add((source,target,backup,after));
+}
+var changed=new System.Collections.Generic.List<(string Target,string Backup)>();
+try
+{
+ foreach(var item in plan)
+ {
+  var incoming=item.Target+".lamp-placement-incoming";
+  try
+  {
+   System.IO.File.Copy(item.Source,incoming,true);if(Hash(incoming)!=item.After)throw new InvalidOperationException("Incoming hash differs.");
+   changed.Add((item.Target,item.Backup));System.IO.File.Move(incoming,item.Target,true);
+  }
+  finally{if(System.IO.File.Exists(incoming))System.IO.File.Delete(incoming);}
+ }
+}
+catch
+{
+ foreach(var item in changed.AsEnumerable().Reverse())System.IO.File.Copy(item.Backup,item.Target,true);
+ throw;
+}
+foreach(var item in plan)Editor.AssetSystem.RegisterFile(item.Target);
+foreach(var side in new[]{"west","east"})Editor.AssetSystem.RegisterFile(System.IO.Path.Combine(root,"Assets/models/maps/belltower/belltower_"+side+".vmdl"));
+foreach(var pair in manifest["protected_sha256"].AsObject())
+ if(Hash(System.IO.Path.Combine(root,pair.Key))!=pair.Value.GetValue<string>())throw new InvalidOperationException("Protected source changed: "+pair.Key);
+var preserved=ReferenceEquals(session,Editor.SceneEditorSession.Active)&&game==Game.ActiveScene?.Id&&!session.HasUnsavedChanges&&!Game.IsPlaying&&session.Scene.GetAllObjects(true).Select(o=>o.Id).ToHashSet().SetEquals(ids);
+var result=new{ImportedFiles=plan.Count,LampsMoved=2,CollisionHullsMoved=4,ShiftWorld=new[]{190,0,0},OtherGeometryAndPhysicsPreserved=true,SceneUnchanged=true,EditorStatePreserved=preserved};
+System.IO.File.WriteAllText(System.IO.Path.Combine(directory,"native-import.json"),System.Text.Json.JsonSerializer.Serialize(result));
+if(!preserved)throw new InvalidOperationException("Editor state changed; inspect the completed import.");
+return result;

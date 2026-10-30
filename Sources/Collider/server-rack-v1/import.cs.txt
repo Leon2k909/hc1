@@ -1,0 +1,69 @@
+// Bounded east rack repair. Does not replace or save any editor document.
+var root=Sandbox.Project.Current.GetRootPath();
+if(root.TrimEnd('\\','/').Replace('\\','/').ToLowerInvariant()!="c:/sbox-projects/hc1/forked-shooter-main")throw new InvalidOperationException("Wrong project");
+var output=System.IO.Path.Combine(root,"output/collider-server-rack-20261027");
+var stage=System.IO.Path.Combine(output,"stage-v1");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(stage,"manifest.json")));
+if(manifest["revision"].GetValue<string>()!="collider-east-server-rack-v1")throw new InvalidOperationException("Wrong revision");
+var selected=Editor.SceneEditorSession.Active;
+var selectedDirty=selected?.HasUnsavedChanges;
+var session=Editor.SceneEditorSession.All.Single(s=>s.Scene.Source?.ResourcePath?.Equals("scenes/maps/collider/collider.scene",StringComparison.OrdinalIgnoreCase)==true);
+if(Game.IsPlaying)throw new InvalidOperationException("Rack asset repair requires stopped play");
+var sceneId=session.Scene.Id;var gameId=Game.ActiveScene?.Id;var dirty=session.HasUnsavedChanges;
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+void CheckGuards()
+{
+    foreach(var pair in manifest["protected"].AsObject())
+        if(Hash(System.IO.Path.Combine(root,"Assets",pair.Key))!=pair.Value.GetValue<string>())throw new InvalidOperationException("Protected content changed: "+pair.Key);
+    foreach(var pair in manifest["source"].AsObject())
+        if(Hash(System.IO.Path.Combine(root,pair.Key))!=pair.Value.GetValue<string>())throw new InvalidOperationException("Rack authoring changed");
+}
+CheckGuards();
+var entries=manifest["files"].AsArray();
+if(entries.Count!=2)throw new InvalidOperationException("Unexpected file count");
+foreach(var entry in entries)
+{
+    var rel=entry["relative"].GetValue<string>();
+    if(!new[]{"models/maps/collider/collider_detail.obj","models/maps/collider/collider_detail.vmdl"}.Contains(rel))throw new InvalidOperationException("Unexpected target");
+    if(Hash(System.IO.Path.Combine(root,"Assets",rel))!=entry["before"].GetValue<string>() ||
+       Hash(System.IO.Path.Combine(stage,"before",rel))!=entry["before"].GetValue<string>() ||
+       Hash(System.IO.Path.Combine(stage,"assets",rel))!=entry["after"].GetValue<string>())throw new InvalidOperationException("Rack target or stage changed");
+}
+var relDoc="models/maps/collider/collider_detail.vmdl";
+var oldDoc=System.IO.File.ReadAllText(System.IO.Path.Combine(root,"Assets",relDoc));
+var newDoc=System.IO.File.ReadAllText(System.IO.Path.Combine(stage,"assets",relDoc));
+var oldBox=manifest["oldPhysicsBox"].GetValue<string>();var newBox=manifest["newPhysicsBox"].GetValue<string>();
+if(oldDoc.Replace(oldBox,newBox,StringComparison.Ordinal)!=newDoc || oldDoc.IndexOf(oldBox,StringComparison.Ordinal)!=oldDoc.LastIndexOf(oldBox,StringComparison.Ordinal))
+    throw new InvalidOperationException("Physics scope must be exactly the one rack");
+var completed=new System.Collections.Generic.List<string>();
+try
+{
+    foreach(var entry in entries)
+    {
+        var rel=entry["relative"].GetValue<string>();var target=System.IO.Path.Combine(root,"Assets",rel);var incoming=target+".rack-incoming";
+        try
+        {
+            System.IO.File.Copy(System.IO.Path.Combine(stage,"assets",rel),incoming,false);
+            if(Hash(incoming)!=entry["after"].GetValue<string>())throw new InvalidOperationException("Incoming rack hash differs");
+            System.IO.File.Move(incoming,target,true);completed.Add(rel);
+        }
+        finally {if(System.IO.File.Exists(incoming))System.IO.File.Delete(incoming);}
+    }
+    foreach(var rel in completed)Editor.AssetSystem.RegisterFile(System.IO.Path.Combine(root,"Assets",rel));
+    CheckGuards();
+}
+catch
+{
+    foreach(var rel in completed)
+    {
+        System.IO.File.Copy(System.IO.Path.Combine(stage,"before",rel),System.IO.Path.Combine(root,"Assets",rel),true);
+        Editor.AssetSystem.RegisterFile(System.IO.Path.Combine(root,"Assets",rel));
+    }
+    throw;
+}
+var preserved=ReferenceEquals(selected,Editor.SceneEditorSession.Active) && selected?.HasUnsavedChanges==selectedDirty &&
+    session.Scene.Id==sceneId && session.HasUnsavedChanges==dirty && Game.ActiveScene?.Id==gameId && !Game.IsPlaying;
+var result=new{Imported=completed,OtherPhysicsPreserved=true,SceneSourcePreserved=true,EditorStatePreserved=preserved,CheckedAt=DateTime.UtcNow};
+System.IO.File.WriteAllText(System.IO.Path.Combine(output,"native-import.json"),Json.Serialize(result));
+if(!preserved)throw new InvalidOperationException("Editor state changed; inspect the completed import");
+return result;

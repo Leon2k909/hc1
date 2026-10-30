@@ -1,0 +1,62 @@
+// Publish only the staged case meshes, case materials and two guarded model docs.
+var root=Sandbox.Project.Current.GetRootPath();
+if(!string.Equals(System.IO.Path.GetFullPath(root).TrimEnd('\\','/'),@"C:\sbox-projects\hc1\forked-shooter-main",StringComparison.OrdinalIgnoreCase))throw new InvalidOperationException("Wrong project.");
+var folder=System.IO.Path.Combine(root,"output/veridant/cases-v4");
+var request=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"import-request.json")));
+var stage=request["stage"].GetValue<string>();
+if(!System.Text.RegularExpressions.Regex.IsMatch(stage,"^stage-[a-z0-9-]+$"))throw new InvalidOperationException("Invalid stage.");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,stage,"manifest.json")));
+if(manifest["revision"].GetValue<string>()!="veridant-transport-cases-v4")throw new InvalidOperationException("Wrong revision.");
+var session=Editor.SceneEditorSession.Active;var playing=Game.IsPlaying;var game=Game.ActiveScene?.Id;var dirty=session.HasUnsavedChanges;
+if(playing||dirty||session.Scene.Source?.ResourcePath?.Equals("scenes/maps/veridant/veridant.scene",StringComparison.OrdinalIgnoreCase)!=true)
+    throw new InvalidOperationException("Requires the saved, stopped Veridant document; no editor state was changed.");
+string Hash(string path)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+foreach(var group in new[]{"source_sha256","protected_sha256"})
+    foreach(var pair in manifest[group].AsObject())
+        if(Hash(System.IO.Path.Combine(root,pair.Key))!=pair.Value.GetValue<string>())throw new InvalidOperationException("Shared input changed: "+pair.Key);
+var documents=new System.Collections.Generic.HashSet<string>{"Assets/models/maps/veridant/veridant_buildings.vmdl","Assets/models/maps/veridant/veridant_dress.vmdl"};
+var files=manifest["files"].AsObject();
+foreach(var pair in files)
+{
+    var path=pair.Key;
+    var allowed=path.StartsWith("Assets/materials/veridant/cases-v4/",StringComparison.Ordinal)
+        ||path.StartsWith("Assets/models/maps/veridant/cases-v4/",StringComparison.Ordinal)||documents.Contains(path);
+    if(!allowed||path.Contains(".."))throw new InvalidOperationException("Unexpected file: "+path);
+    var item=pair.Value;var target=System.IO.Path.Combine(root,path);
+    var source=System.IO.Path.Combine(root,item["source"].GetValue<string>());
+    var after=item["after"].GetValue<string>();var before=item["before"]?.GetValue<string>();
+    if(Hash(source)!=after)throw new InvalidOperationException("Stage changed: "+path);
+    if(before is not null&&Hash(System.IO.Path.Combine(root,item["backup"].GetValue<string>()))!=before)throw new InvalidOperationException("Backup changed.");
+    var current=System.IO.File.Exists(target)?Hash(target):null;
+    if(current!=before&&current!=after)throw new InvalidOperationException("Shared target changed: "+path);
+    if(documents.Contains(path))
+    {
+        var oldText=System.IO.File.ReadAllText(System.IO.Path.Combine(root,item["backup"].GetValue<string>()));
+        var newText=System.IO.File.ReadAllText(source);var marker="_class = \"PhysicsShapeList\"";
+        var a=oldText.IndexOf(marker,StringComparison.Ordinal);var b=newText.IndexOf(marker,StringComparison.Ordinal);
+        if(a<0||b<0||oldText.Substring(a)!=newText.Substring(b))throw new InvalidOperationException("Model physics changed: "+path);
+    }
+}
+var imported=new System.Collections.Generic.List<string>();
+foreach(var pair in files)
+{
+    var item=pair.Value;var target=System.IO.Path.Combine(root,pair.Key);var after=item["after"].GetValue<string>();
+    if(System.IO.File.Exists(target)&&Hash(target)==after)continue;
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target));
+    var incoming=target+".case-detail-incoming";
+    try
+    {
+        System.IO.File.Copy(System.IO.Path.Combine(root,item["source"].GetValue<string>()),incoming,true);
+        if(Hash(incoming)!=after)throw new InvalidOperationException("Incoming hash differs.");
+        System.IO.File.Move(incoming,target,true);imported.Add(pair.Key);
+    }
+    finally{if(System.IO.File.Exists(incoming))System.IO.File.Delete(incoming);}
+    Editor.AssetSystem.RegisterFile(target);
+}
+foreach(var pair in manifest["protected_sha256"].AsObject())
+    if(Hash(System.IO.Path.Combine(root,pair.Key))!=pair.Value.GetValue<string>())throw new InvalidOperationException("Protected file changed: "+pair.Key);
+var preserved=ReferenceEquals(session,Editor.SceneEditorSession.Active)&&playing==Game.IsPlaying&&game==Game.ActiveScene?.Id&&dirty==session.HasUnsavedChanges;
+var result=new{Stage=stage,ImportedFiles=imported,CasesUpdated=82,PhysicsBytesPreserved=true,SceneChanged=false,EditorStatePreserved=preserved};
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"native-import.json"),System.Text.Json.JsonSerializer.Serialize(result));
+if(!preserved)throw new InvalidOperationException("Editor state changed; inspect the completed import.");
+return result;

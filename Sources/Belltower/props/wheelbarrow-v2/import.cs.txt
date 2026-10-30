@@ -1,0 +1,62 @@
+// Scoped wheelbarrow publication. Preview publishes only new, private resources.
+var root=Sandbox.Project.Current.GetRootPath();
+if(!string.Equals(System.IO.Path.GetFullPath(root).TrimEnd('\\','/'),@"C:\sbox-projects\hc1\forked-shooter-main",StringComparison.OrdinalIgnoreCase))throw new InvalidOperationException("Wrong checkout.");
+var folder=System.IO.Path.Combine(root,"output/belltower/wheelbarrow-v2");
+var request=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"import-request.json")));
+var stage=request["stage"].GetValue<string>();var preview=request["preview"]?.GetValue<bool>()??true;
+if(!System.Text.RegularExpressions.Regex.IsMatch(stage,"^stage-[a-z0-9-]+$"))throw new InvalidOperationException("Unexpected stage.");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,stage,"manifest.json")));
+if(manifest["revision"].GetValue<string>()!="belltower-wheelbarrow-v2")throw new InvalidOperationException("Unexpected revision.");
+var session=Editor.SceneEditorSession.Active;var playing=Game.IsPlaying;var gameId=Game.ActiveScene?.Id;var dirty=session.HasUnsavedChanges;
+if(!preview&&playing)throw new InvalidOperationException("Preserve the current play test; install when it has stopped.");
+string Hash(string path)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+foreach(var group in new[]{"source_sha256","protected_sha256"})
+ foreach(var pair in manifest[group].AsObject())
+  if(Hash(System.IO.Path.Combine(root,pair.Key))!=pair.Value.GetValue<string>())throw new InvalidOperationException("Shared input changed: "+pair.Key);
+foreach(var pair in manifest["required_source_snippets"].AsObject())
+ foreach(var snippet in pair.Value.AsArray())
+  if(!System.IO.File.ReadAllText(System.IO.Path.Combine(root,pair.Key)).Replace("\r\n","\n").Contains(snippet.GetValue<string>(),StringComparison.Ordinal))throw new InvalidOperationException("Placement hook changed.");
+var files=manifest["files"].AsObject();
+bool Private(string path)=>path.StartsWith("Assets/materials/belltower/wheelbarrow-v2/",StringComparison.Ordinal)||path.StartsWith("Assets/models/maps/belltower/wheelbarrow-v2/",StringComparison.Ordinal);
+foreach(var pair in files)
+{
+ var path=pair.Key;var item=pair.Value;
+ if(path.Contains("..")||(!Private(path)&&!path.StartsWith("Assets/models/maps/belltower/compiler-safe/",StringComparison.Ordinal)
+    &&path!="Assets/models/maps/belltower/belltower_west.obj"&&path!="Assets/models/maps/belltower/belltower_east.obj"
+    &&path!="Assets/models/maps/belltower/belltower_west.vmdl"&&path!="Assets/models/maps/belltower/belltower_east.vmdl"))throw new InvalidOperationException("Unexpected target: "+path);
+ var target=System.IO.Path.Combine(root,path);var source=System.IO.Path.Combine(root,item["source"].GetValue<string>());
+ var before=item["before"]?.GetValue<string>();var after=item["after"].GetValue<string>();
+ if(Hash(source)!=after)throw new InvalidOperationException("Stage changed: "+path);
+ if(before is not null&&Hash(System.IO.Path.Combine(root,item["backup"].GetValue<string>()))!=before)throw new InvalidOperationException("Backup changed.");
+ var current=System.IO.File.Exists(target)?Hash(target):null;
+ if(current!=before&&current!=after)throw new InvalidOperationException("Shared target changed: "+path);
+ if(!Private(path)&&path.EndsWith(".vmdl",StringComparison.Ordinal))
+ {
+  var old=System.IO.File.ReadAllText(System.IO.Path.Combine(root,item["backup"].GetValue<string>()));var updated=System.IO.File.ReadAllText(source);var marker="_class = \"PhysicsShapeList\"";
+  if(old.Substring(old.IndexOf(marker,StringComparison.Ordinal))!=updated.Substring(updated.IndexOf(marker,StringComparison.Ordinal)))throw new InvalidOperationException("Physics changed.");
+ }
+}
+if(!preview)
+ foreach(var pair in manifest["models"].AsObject())
+ {
+  var trial=Model.Load(pair.Value["trial"].GetValue<string>().Substring(7));
+  if(trial is null||trial.IsError)throw new InvalidOperationException("Compile the wheelbarrow trials before installation.");
+ }
+int Priority(string path)=>path.EndsWith(".png",StringComparison.Ordinal)?0:path.EndsWith(".mtl",StringComparison.Ordinal)?1:path.EndsWith(".obj",StringComparison.Ordinal)?2:path.EndsWith(".vmat",StringComparison.Ordinal)?3:4;
+var imported=new System.Collections.Generic.List<string>();
+foreach(var pair in files.OrderBy(p=>Priority(p.Key)))
+{
+ if(preview&&!Private(pair.Key))continue;
+ var target=System.IO.Path.Combine(root,pair.Key);var item=pair.Value;
+ if(System.IO.File.Exists(target)&&Hash(target)==item["after"].GetValue<string>())continue;
+ System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target));var incoming=target+".wheelbarrow-incoming";
+ try{System.IO.File.Copy(System.IO.Path.Combine(root,item["source"].GetValue<string>()),incoming,true);if(Hash(incoming)!=item["after"].GetValue<string>())throw new InvalidOperationException("Incoming hash differs.");System.IO.File.Move(incoming,target,true);imported.Add(pair.Key);}
+ finally{if(System.IO.File.Exists(incoming))System.IO.File.Delete(incoming);}
+}
+foreach(var pair in files.OrderBy(p=>Priority(p.Key)))if(!preview||Private(pair.Key))Editor.AssetSystem.RegisterFile(System.IO.Path.Combine(root,pair.Key));
+var preserved=ReferenceEquals(session,Editor.SceneEditorSession.Active)&&playing==Game.IsPlaying&&gameId==Game.ActiveScene?.Id&&dirty==session.HasUnsavedChanges;
+foreach(var pair in manifest["protected_sha256"].AsObject())if(Hash(System.IO.Path.Combine(root,pair.Key))!=pair.Value.GetValue<string>())throw new InvalidOperationException("Protected source changed: "+pair.Key);
+var result=new{Stage=stage,Preview=preview,Imported=imported.Count,ImportedFiles=imported,Wheelbarrows=preview?0:2,PhysicsPreserved=true,SourceScenePreserved=true,EditorStatePreserved=preserved};
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,preview?"native-preview.json":"native-install.json"),System.Text.Json.JsonSerializer.Serialize(result));
+if(!preserved)throw new InvalidOperationException("Editor state changed during import; inspect its completed result.");
+return result;

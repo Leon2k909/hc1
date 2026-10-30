@@ -3846,7 +3846,10 @@
               "Projection": "Box",
               "RenderExcludeTags": "",
               "Resolution": "Small",
-              "Texture": "lighting/collider/reflection_hall_v3.vtex",
+              "Texture": {
+                "Id": "83285c99-02d7-4dd5-b90f-81a0592fb9a5",
+                "Path": "lighting/collider/reflection_hall_v4.vtex"
+              },
               "TintColor": "1,1,1,1",
               "UpdateStrategy": "OnEnabled",
               "ZFar": 6000,
@@ -3898,7 +3901,10 @@
               "Projection": "Box",
               "RenderExcludeTags": "",
               "Resolution": "Small",
-              "Texture": "lighting/collider/reflection_beam_v3.vtex",
+              "Texture": {
+                "Id": "ecce7dbd-ab66-4c3e-9c42-54977f8a34ee",
+                "Path": "lighting/collider/reflection_beam_v4.vtex"
+              },
               "TintColor": "1,1,1,1",
               "UpdateStrategy": "OnEnabled",
               "ZFar": 6000,
@@ -3950,7 +3956,10 @@
               "Projection": "Box",
               "RenderExcludeTags": "",
               "Resolution": "Small",
-              "Texture": "lighting/collider/reflection_west_v3.vtex",
+              "Texture": {
+                "Id": "9f4e7031-988b-418e-b83d-b27ab8dfc227",
+                "Path": "lighting/collider/reflection_west_v4.vtex"
+              },
               "TintColor": "1,1,1,1",
               "UpdateStrategy": "OnEnabled",
               "ZFar": 6000,
@@ -4002,7 +4011,10 @@
               "Projection": "Box",
               "RenderExcludeTags": "",
               "Resolution": "Small",
-              "Texture": "lighting/collider/reflection_east_v3.vtex",
+              "Texture": {
+                "Id": "a98e33c5-4729-45f4-be11-d01c95b221e1",
+                "Path": "lighting/collider/reflection_east_v4.vtex"
+              },
               "TintColor": "1,1,1,1",
               "UpdateStrategy": "OnEnabled",
               "ZFar": 6000,
@@ -7752,7 +7764,7 @@
         "45d2f9c1-e34d-4756-807d-b5197dfc0e92": "5bf893b0-2f19-5744-b245-3cde97854e64",
         "35f22135-8476-417b-b33c-fea8b2524a75": "e4de0e0b-ea8e-5b72-a8f1-ca444e5c874f",
         "ec32f16b-5053-4522-8948-4eaef65a809a": "cd7a844d-bda8-50cf-84ba-a7721a3e74bb",
-        "0279e932-a8c0-4902-9a64-7e68712d3215": "a0fc03da-e18f-8165-a967-613ac10e4c13"
+        "23b3cb66-73db-4f3a-aac4-325f48863245": "fce26ab9-0b00-8982-9871-ebfafe02e316"
       }
     },
     {
@@ -7919,7 +7931,7 @@
         "c3b437df-9396-434e-90be-11b99ef6f0c5": "c26a8cd3-c894-560b-8f10-b4e4f27244f9",
         "01e48aeb-9352-4716-ad31-3833d2f5ccef": "fb5ed748-0b04-5d3c-b658-f672c4ba76ef",
         "a3a74cfa-fb01-442b-830c-1b445a6b5109": "dce71652-2318-596b-b685-93950b79c692",
-        "b4e060c9-2179-4fd8-8231-35a51637cf2e": "68edb0cc-0641-8acd-ba19-0449e0669824"
+        "8d60b3e8-b36d-4a33-bb87-b60e40825542": "d48a7e3d-5291-8ca3-acc9-4ab67a4fd35f"
       }
     },
     {
@@ -7965,7 +7977,9 @@
         "277c324d-4d24-4dcf-9d9c-5f7dc9051932": "68b52469-7b65-58f6-bfec-0aa999ab8670",
         "a0ca5a0f-4af9-416f-8308-bb7fa5dfb8f7": "672c0fde-aeb1-5dbe-819f-c0209cbd8e6d",
         "62e7124f-7d96-4d4a-b3ba-4c0ef58f6b4a": "d4e59b03-d558-54d6-a032-c69467e14661",
+        "37b4fba5-67ef-81bb-866f-c8cfc5b5a492": "91d92c80-224b-8adc-a1f5-c039576fc3ae",
         "932f5e2c-242a-8101-95e4-a2a78a7da717": "b0fa8ec3-4be2-82ab-91dc-3d8aef91439b",
+        "0501fc7f-ec2f-8532-90d2-5f88bb898cdb": "93752e03-f155-8ecd-9882-41427c8c9534",
         "91d5d71c-7576-48cb-8996-eb3c468aaf59": "a9362098-314c-5fb4-822e-109d5b4f7af0",
         "b4ca6d36-f647-49b3-9151-8ef4c63aeddd": "57d13c03-4d1d-5057-971a-733cac5efa4c",
         "4dc414cd-ed6d-4fcd-bd26-0c4c340b5301": "6f6fefdf-54a3-5862-a23f-f5aa38034307"
@@ -7999,15 +8013,9 @@
             "Mins": "-930,-1950,-30",
             "Maxs": "1930,1950,1060"
           },
-          "DistanceTexture": {
-            "Id": "f5fd6e09-dc12-4f17-a44e-12743a03c6f5",
-            "Path": "lighting/collider/lighting-v4/distance.vtex"
-          },
+          "DistanceTexture": "lighting/collider/lighting-v6/distance.vtex",
           "InsideGeometry": "Relocate",
-          "IrradianceTexture": {
-            "Id": "88e6e14b-eaf2-423b-86c4-543bab7309d3",
-            "Path": "lighting/collider/lighting-v4/irradiance.vtex"
-          },
+          "IrradianceTexture": "lighting/collider/lighting-v6/irradiance.vtex",
           "NormalBias": 16,
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
@@ -8016,10 +8024,7 @@
           "OnComponentStart": null,
           "OnComponentUpdate": null,
           "ProbeDensity": 5,
-          "RelocationTexture": {
-            "Id": "bd59ba05-eadd-4b9b-ac09-1b4747a9a614",
-            "Path": "lighting/collider/lighting-v4/relocation.vtex"
-          },
+          "RelocationTexture": "lighting/collider/lighting-v6/relocation.vtex",
           "RenderExcludeTags": "",
           "RuntimeContrast": 1,
           "RuntimeIntensity": 1.6,
@@ -8029,6 +8034,209 @@
         }
       ],
       "Children": []
+    },
+    {
+      "__guid": "b69fcfd3-22f0-4ee6-9ecc-3cdc702c59a8",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Automatic west lab door",
+      "Position": "0,1412,0",
+      "Rotation": "0,0,0.707106769,0.707106769",
+      "Scale": "1,1,1",
+      "Tags": "door",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Facepunch.AutomaticSlidingDoor",
+          "__guid": "f9db721b-9719-4bac-b890-85b1d798bce4",
+          "__enabled": true,
+          "Flags": 0,
+          "ApproachDistance": 144,
+          "CloseDelay": 1.5,
+          "CloseTime": 1,
+          "Height": 192,
+          "LeftClosedPosition": "0,44,96",
+          "LeftLeaf": {
+            "_type": "gameobject",
+            "go": "0a6f178b-5fdf-4213-ae28-93784bc94b3a"
+          },
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "OpenTime": 0.65,
+          "RightClosedPosition": "0,-44,96",
+          "RightLeaf": {
+            "_type": "gameobject",
+            "go": "00a4ef0e-fb47-4603-b392-8026b7c32f2e"
+          },
+          "Travel": 91,
+          "Width": 176
+        }
+      ],
+      "Children": [
+        {
+          "__guid": "0a6f178b-5fdf-4213-ae28-93784bc94b3a",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Left sliding leaf",
+          "Position": "0,44.0000076,96.0000153",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.ModelRenderer",
+              "__guid": "30e2d893-0dba-4094-881a-18b171203fef",
+              "__enabled": true,
+              "Flags": 0,
+              "BodyGroups": 18446744073709551615,
+              "CreateAttachments": false,
+              "LodOverride": null,
+              "MaterialGroup": null,
+              "MaterialOverride": null,
+              "Materials": null,
+              "Model": {
+                "Id": "9e79b5c5-3a2c-457f-93ac-7c8e5a7bc954",
+                "Path": "models/maps/collider/automatic-door-v1/lab_door_leaf.vmdl"
+              },
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null,
+              "RenderOptions": {
+                "GameLayer": true,
+                "OverlayLayer": false,
+                "BloomLayer": false,
+                "AfterUILayer": false
+              },
+              "RenderType": "On",
+              "Tint": "1,1,1,1"
+            },
+            {
+              "__type": "Sandbox.ModelCollider",
+              "__guid": "6aedf275-2fb3-4124-a52c-6f7baefe1c8a",
+              "__enabled": true,
+              "Flags": 0,
+              "ColliderFlags": 0,
+              "Elasticity": null,
+              "Friction": null,
+              "IsTrigger": false,
+              "Model": {
+                "Id": "9e79b5c5-3a2c-457f-93ac-7c8e5a7bc954",
+                "Path": "models/maps/collider/automatic-door-v1/lab_door_leaf.vmdl"
+              },
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null,
+              "OnObjectTriggerEnter": null,
+              "OnObjectTriggerExit": null,
+              "OnTriggerEnter": null,
+              "OnTriggerExit": null,
+              "RollingResistance": null,
+              "Static": false,
+              "Surface": null,
+              "SurfaceVelocity": "0,0,0"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "00a4ef0e-fb47-4603-b392-8026b7c32f2e",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Right sliding leaf",
+          "Position": "0,-44.0000076,96.0000153",
+          "Rotation": "0,0,1,0",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.ModelRenderer",
+              "__guid": "d98e538a-ca9d-44c3-a6a0-4bce500b6104",
+              "__enabled": true,
+              "Flags": 0,
+              "BodyGroups": 18446744073709551615,
+              "CreateAttachments": false,
+              "LodOverride": null,
+              "MaterialGroup": null,
+              "MaterialOverride": null,
+              "Materials": null,
+              "Model": {
+                "Id": "9e79b5c5-3a2c-457f-93ac-7c8e5a7bc954",
+                "Path": "models/maps/collider/automatic-door-v1/lab_door_leaf.vmdl"
+              },
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null,
+              "RenderOptions": {
+                "GameLayer": true,
+                "OverlayLayer": false,
+                "BloomLayer": false,
+                "AfterUILayer": false
+              },
+              "RenderType": "On",
+              "Tint": "1,1,1,1"
+            },
+            {
+              "__type": "Sandbox.ModelCollider",
+              "__guid": "99a44ffe-c70b-4f25-ba22-e5acb42d50a6",
+              "__enabled": true,
+              "Flags": 0,
+              "ColliderFlags": 0,
+              "Elasticity": null,
+              "Friction": null,
+              "IsTrigger": false,
+              "Model": {
+                "Id": "9e79b5c5-3a2c-457f-93ac-7c8e5a7bc954",
+                "Path": "models/maps/collider/automatic-door-v1/lab_door_leaf.vmdl"
+              },
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null,
+              "OnObjectTriggerEnter": null,
+              "OnObjectTriggerExit": null,
+              "OnTriggerEnter": null,
+              "OnTriggerExit": null,
+              "RollingResistance": null,
+              "Static": false,
+              "Surface": null,
+              "SurfaceVelocity": "0,0,0"
+            }
+          ],
+          "Children": []
+        }
+      ]
     }
   ],
   "SceneProperties": {
@@ -8053,7 +8261,7 @@
       "AgentRadius": 16,
       "AgentStepSize": 18,
       "AgentMaxSlope": 40,
-      "ExcludedBodies": "zone",
+      "ExcludedBodies": "zone,door",
       "IncludedBodies": "",
       "DeferGeneration": false,
       "CustomBounds": true,

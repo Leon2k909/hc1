@@ -1,0 +1,30 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var output=System.IO.Path.Combine(root,"output/collider-server-rack-20261027");
+var session=Editor.SceneEditorSession.All.Single(s=>s.Scene.Source?.ResourcePath?.Equals("scenes/maps/collider/collider.scene",StringComparison.OrdinalIgnoreCase)==true);
+var scene=session.Scene;
+Vector3 W(float e,float n,float z)=>new(n,-e,z);
+var checks=new System.Collections.Generic.List<object>();var failed=0;
+// Probe the previously blocked part of the first tread, then both interior lanes.
+foreach(var e in new[]{410f,430f,450f,480f,550f,700f,900f,980f})
+foreach(var n in new[]{64f,96f,128f,160f,176f})
+{
+    var floor=scene.Trace.Ray(W(e,n,400),W(e,n,-10)).WithoutTags("zone").Run();
+    var p=floor.EndPosition+Vector3.Up*.5f;
+    // The body's bottom clears the uphill ramp edge by less than the normal step height.
+    var box=scene.Trace.Box(new BBox(new Vector3(-16,-16,9),new Vector3(16,16,64)),p,p).WithoutTags("zone").Run();
+    var expected=256f/35f*.5f+(e-400f)*(256f-256f/35f*.5f)/600f;
+    var onStair=MathF.Abs(floor.EndPosition.z-expected)<1;
+    var clear=floor.Hit&&onStair&&!box.Hit&&!box.StartedSolid;
+    if(!clear)failed++;
+    checks.Add(new{East=e,North=n,FloorZ=floor.EndPosition.z,OnStair=onStair,Clear=clear,Blocker=box.GameObject?.Name});
+}
+var oldRackRay=scene.Trace.Ray(W(430,35,70),W(430,125,70)).WithoutTags("zone").Run();
+var newRackRay=scene.Trace.Ray(W(430,-100,42),W(430,-20,42)).WithoutTags("zone").Run();
+var support=scene.Trace.Ray(W(430,-60,.4f),W(430,-60,-12)).WithoutTags("zone").Run();
+var model=scene.GetAllComponents<ModelRenderer>().Single(r=>r.Model?.ResourcePath?.Equals("models/maps/collider/collider_detail.vmdl",StringComparison.OrdinalIgnoreCase)==true);
+var result=new{CheckedAt=DateTime.UtcNow,Checked=checks.Count,Failed=failed,Checks=checks,
+    OldRackVolumeClear=!oldRackRay.Hit,NewRackCollisionPresent=newRackRay.Hit,NewRackOnFloor=support.Hit,
+    ModelValid=!model.Model.IsError,SceneDirty=session.HasUnsavedChanges,Game.IsPlaying};
+var suffix=System.IO.File.Exists(System.IO.Path.Combine(output,"native-import.json"))?"after":"before";
+System.IO.File.WriteAllText(System.IO.Path.Combine(output,"clearance-"+suffix+".json"),Json.Serialize(result));
+return result;

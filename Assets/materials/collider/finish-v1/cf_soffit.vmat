@@ -1,0 +1,15 @@
+// Tools/collider_finish.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    TextureColor "materials/spillway/scans/concrete_wall_009_diff_2k.jpg"
+    TextureNormal "materials/collider/finish-v1/concrete_wall_009_nor_gl_2k.jpg"
+    TextureRoughness "[0.93 0.93 0.93 0]"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_flMetalness "0.0"
+    g_flRoughnessScaleFactor "1"
+    g_vTexCoordScale "[2.70182825 2.70182825]"
+    g_vColorTint "[0.77 0.8 0.82 1]"
+    g_flModelTintAmount "1"
+}

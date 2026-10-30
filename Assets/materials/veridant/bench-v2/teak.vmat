@@ -1,0 +1,14 @@
+// Tools/veridant_bench.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    g_flMetalness "0"
+    g_flRoughnessScaleFactor "1"
+    TextureColor "materials/veridant/bench-v2/teak_color.png"
+    TextureNormal "materials/veridant/bench-v2/teak_normal.png"
+    TextureRoughness "materials/veridant/bench-v2/teak_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[0.84 0.84 0.84 1]"
+    g_flModelTintAmount "1.0"
+}

@@ -1,0 +1,32 @@
+var c=Editor.SceneEditorSession.Active.Scene.GetAllComponents<CameraComponent>().Single(x=>x.GameObject.Name=="editor_camera");
+var codes=typeof(System.Reflection.Emit.OpCodes).GetFields().Where(f=>f.FieldType==typeof(System.Reflection.Emit.OpCode)).Select(f=>(System.Reflection.Emit.OpCode)f.GetValue(null)).ToDictionary(x=>unchecked((ushort)x.Value));
+var methods=typeof(CameraComponent).GetMethods().Where(x=>x.Name=="RenderToBitmap" || x.Name=="RenderToTexture")
+    .Concat(typeof(SceneCamera).GetMethods(System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic).Where(x=>x.Name=="RenderToBitmap")).ToArray();
+var records=new System.Collections.Generic.List<object>();
+foreach(var method in methods)
+{
+    var body=method.GetMethodBody()?.GetILAsByteArray();
+    var lines=new System.Collections.Generic.List<string>();
+    if(body is not null)for(var at=0;at<body.Length;)
+    {
+        var offset=at;ushort op=body[at++];if(op==254)op=(ushort)(65024+body[at++]);
+        var code=codes[op];var size=code.OperandType switch {
+            System.Reflection.Emit.OperandType.InlineNone=>0,
+            System.Reflection.Emit.OperandType.ShortInlineBrTarget or System.Reflection.Emit.OperandType.ShortInlineI or System.Reflection.Emit.OperandType.ShortInlineVar=>1,
+            System.Reflection.Emit.OperandType.InlineVar=>2,
+            System.Reflection.Emit.OperandType.InlineI8 or System.Reflection.Emit.OperandType.InlineR=>8,
+            System.Reflection.Emit.OperandType.InlineSwitch=>4+4*BitConverter.ToInt32(body,at),_=>4};
+        string operand="";
+        if(size==4)
+        {
+            var token=BitConverter.ToInt32(body,at);
+            try{operand=method.Module.ResolveMember(token)?.ToString();}catch{operand=token.ToString();}
+        }
+        else if(size>0)operand=Convert.ToHexString(body.AsSpan(at,size));
+        lines.Add($"{offset:X4} {code.Name} {operand}");at+=size;
+    }
+    records.Add(new {Method=method.ToString(),IL=lines});
+}
+var nativeCamera=(SceneCamera)typeof(CameraComponent).GetProperty("SceneCamera",System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic).GetValue(c);
+return new {ViewportAntiAliasing=nativeCamera.AntiAliasing,Methods=records,
+    ViewSetupFields=typeof(Sandbox.Rendering.ViewSetup).GetFields().Select(f=>new {f.Name,Type=f.FieldType.FullName}).ToArray()};

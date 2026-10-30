@@ -1,0 +1,33 @@
+// Read current engine defaults in an inactive disposable scene. No document edit.
+var root=Sandbox.Project.Current.GetRootPath();var folder=System.IO.Path.Combine(root,"output/ares/crate-v2");
+var session=Editor.SceneEditorSession.Active;var game=Game.ActiveScene?.Id;var playing=Game.IsPlaying;var dirty=session.HasUnsavedChanges;
+var scene=new Scene();object result=null;object audit=null;
+try
+{
+    using(scene.Push())
+    {
+        var go=new GameObject(false,"default serialization audit");
+        var components=new Component[]{
+            go.Components.Create<Sandbox.DirectionalLight>(),go.Components.Create<Sandbox.PointLight>(),
+            go.Components.Create<Sandbox.ColorGrading>(),go.Components.Create<Sandbox.ModelRenderer>(),
+            go.Components.Create<Sandbox.ModelCollider>(),go.Components.Create<Sandbox.EnvmapProbe>(),
+            go.Components.Create<Sandbox.WorldPanel>()};
+        result=components.Select(c=>c.Serialize()).ToArray();
+        var blank=scene.Serialize();
+        var old=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"stage-v5/before/Assets/scenes/maps/Ares/ares.scene")));
+        var probes=old["GameObjects"][8]["Children"].AsArray().Select(node=>{
+            var copy=new GameObject(false,"probe serialization audit");copy.Deserialize(node.AsObject());
+            return copy.Components.Get<Sandbox.EnvmapProbe>().Serialize();
+        }).ToArray();
+        var prefabs=new[]{19,20,21}.Select(index=>{
+            var copy=new GameObject(false,"prefab serialization audit");copy.Deserialize(old["GameObjects"][index].AsObject());
+            return copy.Serialize();
+        }).ToArray();
+        audit=new{BlankSceneSystems=blank["SceneProperties"]?["GameObjectSystems"],MigratedProbes=probes,MigratedPrefabs=prefabs};
+    }
+}
+finally{scene.Destroy();}
+if(!ReferenceEquals(session,Editor.SceneEditorSession.Active)||game!=Game.ActiveScene?.Id||playing!=Game.IsPlaying||dirty!=session.HasUnsavedChanges)throw new InvalidOperationException("Shared editor state changed.");
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"engine-component-defaults.json"),System.Text.Json.JsonSerializer.Serialize(result));
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"engine-serialization-audit.json"),System.Text.Json.JsonSerializer.Serialize(audit));
+return new{DefaultComponents=7,MigratedProbes=4,MigratedPrefabs=3,EditorStatePreserved=true};

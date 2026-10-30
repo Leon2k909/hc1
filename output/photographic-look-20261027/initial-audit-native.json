@@ -1,0 +1,322 @@
+{
+  "Scene": "scenes/maps/ares/ares.scene",
+  "IsPlaying": false,
+  "Cameras": [
+    {
+      "Name": "editor_camera",
+      "Id": "293b0ebd-00bf-4241-811f-5df71cfba0a8",
+      "IsMainCamera": false,
+      "Priority": 1,
+      "Orthographic": false
+    },
+    {
+      "Name": "GameObject",
+      "Id": "3c8ae1e2-0b3b-4ef9-931c-670b01005832",
+      "IsMainCamera": false,
+      "Priority": 1,
+      "Orthographic": true
+    }
+  ],
+  "Look": [
+    {
+      "__guid": "a8777728-11fb-567d-9740-011b946e1c7c",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Look",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.PostProcessVolume",
+          "__guid": "d48125b7-4588-579d-8731-4283e7a7b03e",
+          "__enabled": true,
+          "Flags": 0,
+          "BlendDistance": 50,
+          "BlendWeight": 1,
+          "EditorPreview": true,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Priority": 0,
+          "SceneVolume": {
+            "Type": "Infinite",
+            "Sphere": {
+              "Center": "0,0,0",
+              "Radius": 10
+            },
+            "Box": {
+              "Mins": "-50,-50,-50",
+              "Maxs": "50,50,50"
+            },
+            "Capsule": {
+              "CenterA": "0,0,10",
+              "CenterB": "0,0,90",
+              "Radius": 10
+            }
+          }
+        },
+        {
+          "__type": "Sandbox.AmbientOcclusion",
+          "__guid": "2d51fdc9-7295-504d-8c90-07b8be49fee8",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "FalloffRange": 1,
+          "Intensity": 0.68,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Radius": 72,
+          "ThinCompensation": 5
+        },
+        {
+          "__type": "Sandbox.ColorGrading",
+          "__guid": "699d416a-70a6-53f8-83a5-cd3e4d8236a4",
+          "__enabled": true,
+          "Flags": 0,
+          "BlendFactor": 0.33,
+          "BlueCurve": [
+            {
+              "x": 0,
+              "y": 0.5,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            }
+          ],
+          "ColorSpace": "None",
+          "ColorTempK": 5800,
+          "GradingMethod": "TemperatureControl",
+          "GreenCurve": [
+            {
+              "x": 0,
+              "y": 0.5,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            }
+          ],
+          "HueCurve": [
+            {
+              "x": 0,
+              "y": 0.5,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            }
+          ],
+          "LookupTexture": null,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "RedCurve": [
+            {
+              "x": 0,
+              "y": 0.5,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            }
+          ],
+          "SaturationCurve": [
+            {
+              "x": 0,
+              "y": 0.5,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            }
+          ],
+          "ValueCurve": [
+            {
+              "x": 0,
+              "y": 0.5,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 1,
+              "y": 1,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            }
+          ]
+        },
+        {
+          "__type": "Sandbox.Bloom",
+          "__guid": "bb2c8686-3ae9-5923-96a1-0b6a6f78056f",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 1,
+          "Mode": "Additive",
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Strength": 0.135,
+          "Threshold": 2.5,
+          "Tint": "1,1,1,1"
+        },
+        {
+          "__type": "Sandbox.Vignette",
+          "__guid": "5d56b6ca-454b-5d86-8bbb-6cea7538a119",
+          "__enabled": true,
+          "Flags": 0,
+          "Center": "0.5,0.5",
+          "Color": "0,0,0,1",
+          "Intensity": 0.19,
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Roundness": 1,
+          "Smoothness": 1
+        },
+        {
+          "__type": "Sandbox.Tonemapping",
+          "__guid": "33bd5be5-afdb-5834-bb0a-8f58dd9b61da",
+          "__enabled": true,
+          "Flags": 0,
+          "__version": 3,
+          "AutoExposureEnabled": true,
+          "ExposureCompensation": 0,
+          "ExposureMethod": "RGB",
+          "MaximumExposure": 3.35,
+          "MinimumExposure": 1.7,
+          "Mode": "ACES",
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "Rate": 1
+        }
+      ],
+      "Children": []
+    }
+  ],
+  "Lighting": [],
+  "BasePostProcess": {
+    "Name": "Sandbox.BasePostProcess",
+    "Methods": [
+      "Sandbox.PostProcessContext get_context()",
+      "Sandbox.CameraComponent get_Camera()",
+      "Void Build(Sandbox.PostProcessContext)",
+      "Void Render()",
+      "Void Blit(BlitMode, System.String)",
+      "Void BlitSimple(Sandbox.Material, Sandbox.Rendering.Stage, Int32, System.String)",
+      "Void InsertCommandList(Sandbox.Rendering.CommandList, Sandbox.Rendering.Stage, Int32, System.String)",
+      "Boolean get_AsyncCompute()",
+      "Boolean get_NeedsDepthNormals()"
+    ],
+    "Properties": [
+      {
+        "Name": "context",
+        "Type": "Sandbox.PostProcessContext"
+      },
+      {
+        "Name": "Camera",
+        "Type": "Sandbox.CameraComponent"
+      },
+      {
+        "Name": "AsyncCompute",
+        "Type": "System.Boolean"
+      },
+      {
+        "Name": "NeedsDepthNormals",
+        "Type": "System.Boolean"
+      }
+    ]
+  },
+  "GenericPostProcess": {
+    "Name": "Sandbox.BasePostProcess`1",
+    "Methods": [
+      "U GetWeighted[U](System.Func`2[T,U], U, Boolean)"
+    ],
+    "Properties": []
+  },
+  "Stages": [
+    "AfterDepthPrepass",
+    "AfterOpaque",
+    "AfterSkybox",
+    "AfterTransparent",
+    "AfterViewmodel",
+    "EarlyUI",
+    "BeforePostProcess",
+    "Tonemapping",
+    "AfterPostProcess",
+    "UI",
+    "AfterUI"
+  ],
+  "Sessions": [
+    {
+      "Name": "menu",
+      "Path": "scenes/menu.scene",
+      "HasUnsavedChanges": false
+    },
+    {
+      "Name": "ares",
+      "Path": "scenes/maps/ares/ares.scene",
+      "HasUnsavedChanges": false
+    }
+  ]
+}

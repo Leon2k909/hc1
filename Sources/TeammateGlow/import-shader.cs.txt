@@ -1,0 +1,24 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var source=System.IO.Path.Combine(root,"Sources/TeammateGlow/hc1_teammate_occlusion.shader");
+var target=System.IO.Path.Combine(root,"Assets/shaders/hc1_teammate_occlusion.shader");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"Sources/TeammateGlow/shader-import.json")));
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+if(Hash(source)!=manifest["shader_sha256"].GetValue<string>())throw new InvalidOperationException("Shader source changed.");
+var current=System.IO.File.Exists(target)?Hash(target):null;
+if(current!=manifest["before_sha256"]?.GetValue<string>()&&current!=manifest["shader_sha256"].GetValue<string>())throw new InvalidOperationException("Shader target changed.");
+if(current!=manifest["shader_sha256"].GetValue<string>())
+{
+    var incoming=target+".teammate-incoming";
+    try{System.IO.File.Copy(source,incoming,true);System.IO.File.Move(incoming,target,true);}
+    finally{if(System.IO.File.Exists(incoming))System.IO.File.Delete(incoming);}
+}
+Editor.AssetSystem.RegisterFile(target);
+var compiled=await Editor.EditorUtility.CompileShader("shaders/hc1_teammate_occlusion.shader",new(){ForceRecompile=true},cancellationToken);
+if(!compiled.Success)throw new InvalidOperationException(string.Join("\n",compiled.Programs.SelectMany(p=>p.Output??new System.Collections.Generic.List<string>())));
+if(compiled.CompiledShader is {Length:>0})
+{
+    var incoming=target+"_c.teammate-incoming";
+    try{System.IO.File.WriteAllBytes(incoming,compiled.CompiledShader);System.IO.File.Move(incoming,target+"_c",true);}
+    finally{if(System.IO.File.Exists(incoming))System.IO.File.Delete(incoming);}
+}
+return new {Imported="shaders/hc1_teammate_occlusion.shader",ShaderCompiled=compiled.Success,SceneUntouched=true};

@@ -1,0 +1,55 @@
+// Install the reviewed one-file mesh correction through the native editor.
+var root=Sandbox.Project.Current.GetRootPath();
+if(root.TrimEnd('\\','/').Replace('\\','/').ToLowerInvariant()!="c:/sbox-projects/hc1/forked-shooter-main")
+    throw new InvalidOperationException("Wrong project");
+var output=System.IO.Path.Combine(root,"output/collider-wall-overlap-20261027");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(output,"stage/manifest.json")));
+var selected=Editor.SceneEditorSession.Active;
+var selectedDirty=selected?.HasUnsavedChanges;
+var session=Editor.SceneEditorSession.All.Single(s=>s.Scene.IsEditor &&
+    s.Scene.Source?.ResourcePath?.Equals("scenes/maps/collider/collider.scene",StringComparison.OrdinalIgnoreCase)==true);
+if(Game.IsPlaying) throw new InvalidOperationException("Collider import requires the existing stopped editor");
+var gameId=Game.ActiveScene?.Id;var sceneId=session.Scene.Id;var dirty=session.HasUnsavedChanges;
+string Hash(string path)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+void CheckGuards()
+{
+    foreach(var pair in manifest["protected"].AsObject())
+        if(Hash(System.IO.Path.Combine(root,"Assets",pair.Key))!=pair.Value.GetValue<string>())
+            throw new InvalidOperationException("Protected asset changed: "+pair.Key);
+    foreach(var pair in manifest["sources"].AsObject())
+        if(Hash(System.IO.Path.Combine(root,pair.Key))!=pair.Value.GetValue<string>())
+            throw new InvalidOperationException("Source changed: "+pair.Key);
+}
+CheckGuards();
+var relative=manifest["relative"].GetValue<string>();
+if(relative!="models/maps/collider/collider_machine.obj") throw new InvalidOperationException("Unexpected import target");
+var target=System.IO.Path.Combine(root,"Assets",relative);
+var candidate=System.IO.Path.Combine(output,"stage/assets",relative);
+if(Hash(target)!=manifest["before"].GetValue<string>() || Hash(candidate)!=manifest["after"].GetValue<string>())
+    throw new InvalidOperationException("Target or candidate changed");
+var audit=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(output,"candidate-audit.json")));
+if(audit["overlaps"].AsArray().Count!=0) throw new InvalidOperationException("Concrete overlap audit failed");
+var backup=System.IO.Path.Combine(output,"native-before",relative);
+System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(backup));
+System.IO.File.Copy(target,backup,false);
+try
+{
+    System.IO.File.WriteAllBytes(target+".seams-incoming",System.IO.File.ReadAllBytes(candidate));
+    System.IO.File.Move(target+".seams-incoming",target,true);
+    Editor.AssetSystem.RegisterFile(target);
+    CheckGuards();
+    if(Hash(target)!=manifest["after"].GetValue<string>()) throw new InvalidOperationException("Import verification failed");
+}
+catch
+{
+    System.IO.File.Copy(backup,target,true);
+    Editor.AssetSystem.RegisterFile(target);
+    throw;
+}
+if(!ReferenceEquals(selected,Editor.SceneEditorSession.Active) || selected?.HasUnsavedChanges!=selectedDirty ||
+    Game.ActiveScene?.Id!=gameId || Game.IsPlaying || session.Scene.Id!=sceneId || session.HasUnsavedChanges!=dirty)
+    throw new InvalidOperationException("Editor state changed during import");
+var result=new{Revision="collider-wall-seams-v1",Imported=relative,Before=manifest["before"].GetValue<string>(),
+    After=Hash(target),ModelPhysicsAndScenePreserved=true,EditorStatePreserved=true,CheckedAt=DateTime.UtcNow};
+System.IO.File.WriteAllText(System.IO.Path.Combine(output,"native-import.json"),Json.Serialize(result));
+return result;

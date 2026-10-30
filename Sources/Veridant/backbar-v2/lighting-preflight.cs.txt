@@ -1,0 +1,5 @@
+var session=Editor.SceneEditorSession.Active;var scene=session.Scene;
+var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic;
+var rows=scene.GetAllComponents<EnvmapProbe>().Where(p=>p.GameObject.Name is "Probe Cafe" or "Probe Lounge Down").Select(p=>new{
+ p.GameObject.Name,Config=p.Serialize(),Fields=typeof(EnvmapProbe).GetFields(flags).Where(f=>!f.Name.Contains("BackingField")).Select(f=>new{f.Name,Type=f.FieldType.FullName,Value=f.GetValue(p)?.ToString()})}).ToArray();
+return new{TemporaryObjects=scene.GetAllObjects(true).Where(o=>o.Name.StartsWith("Backbar temporary",StringComparison.Ordinal)).Select(o=>new{o.Name,o.Id,o.IsValid}).ToArray(),Probes=rows,SaveMethods=session.GetType().GetMethods(flags).Where(m=>m.Name.Contains("Save")).Select(m=>m.ToString()).ToArray(),session.HasUnsavedChanges,Playing=Game.IsPlaying};

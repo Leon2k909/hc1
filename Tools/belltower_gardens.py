@@ -246,44 +246,5 @@ def woodpile(model,e0,e1,n0,n1,z,height=40):
 
 
 def wheelbarrow(model,p):
-    """A pressed basin with an open interior, rolled edge, legs and rounded tyre."""
-    def rim(half_x,half_y,height,corner):
-        points=[]
-        for cx,cy,start in ((half_x-corner,half_y-corner,0),
-                            (-half_x+corner,half_y-corner,90),
-                            (-half_x+corner,-half_y+corner,180),
-                            (half_x-corner,-half_y+corner,270)):
-            for step in range(4):
-                angle=math.radians(start+step*30)
-                points.append((cx+corner*math.cos(angle),cy+corner*math.sin(angle),height))
-        return points
-    bottom=rim(16,9,12.6,2.0)
-    top=rim(20,13.7,25.7,3.0)
-    inside_bottom=rim(15.2,8.2,13.4,1.8)
-    inside_top=rim(19.2,12.9,25.7,2.7)
-    for i in range(len(top)):
-        j=(i+1)%len(top)
-        normal=p.x*(top[i][0]+top[j][0])+p.y*(top[i][1]+top[j][1])-p.z*8
-        F.face(model,'iron_green',[p.at(q) for q in (bottom[i],bottom[j],top[j],top[i])],normal)
-        F.face(model,'iron_green',[p.at(q) for q in (inside_bottom[i],inside_bottom[j],inside_top[j],inside_top[i])],-normal)
-        F.face(model,'iron_green',[p.at(q) for q in (top[i],top[j],inside_top[j],inside_top[i])],p.z)
-        F.beam(model,p.at(top[i]),p.at(top[j]),(.7,.7),'iron_green',.28,up=p.z)
-    F.face(model,'iron_green',[p.at(q) for q in bottom],-p.z)
-    F.face(model,'iron_green',[p.at(q) for q in inside_bottom],p.z)
-    # The chassis stays below the pressed basin and rises behind its rear wall.
-    # Four short saddles connect the rails to the underside without entering it.
-    for side in (-1,1):
-        F.beam(model,p.at((28,side*7,8)),p.at((-18,side*8,9)),(1.6,1.6),'iron_green',.22)
-        F.beam(model,p.at((-18,side*8,9)),p.at((-32,side*10.8,27.0)),(1.6,1.6),'iron_green',.22)
-        F.beam(model,p.at((-32,side*10.8,27.0)),p.at((-48,side*12,30)),(2.3,2.3),F.WOOD,.35)
-        F.beam(model,p.at((-9,side*7.8,9.5)),p.at((-15,side*10,1)),(1.4,1.4),'iron_green',.22)
-        F.beam(model,p.at((-15,side*10,1)),p.at((3,side*7.5,9)),(1.1,1.1),'iron_green',.17)
-        for mount_x,mount_y in ((-10,7.8),(10,7.4)):
-            F.box(model,p,(mount_x-2,side*mount_y-.7,9.0),(mount_x+2,side*mount_y+.7,12.65),'iron_green',.15)
-        F.box(model,p,(-18,side*10-1.2,0),(-12,side*10+1.2,1),'iron_green',.2)
-        F.bolt(model,p.at((-10,side*12.4,22)),p.y*side-p.z*(4.7/13.1),.28)
-    centre=p.at((26,0,8))
-    F.turned(model,centre,p.y,p.x,[(6.2,-2),(7.35,-1.8),(8,-1.1),(8,1.1),(7.35,1.8),(6.2,2)],F.IRON,32,False)
-    F.turned(model,centre,p.y,p.x,[(4.3,-1.9),(5.5,-1.6),(5.5,1.6),(4.3,1.9)],'iron_green',24,True)
-    F.turned(model,centre,p.y,p.x,[(1.4,-4),(1.8,-3),(1.8,3),(1.4,4)],F.IRON,16,True)
-    F.beam(model,p.at((26,-8,8)),p.at((26,8,8)),(1.1,1.1),F.IRON,.15)
+    from belltower_wheelbarrow import build
+    return build(model,p)

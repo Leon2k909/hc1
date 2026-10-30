@@ -1,0 +1,8 @@
+return new {
+    Runtime=Game.ActiveScene.GetAllComponents<MapInstance>().Select(m=>new {
+        m.MapName,m.IsLoaded,
+        Components=m.GameObject.Components.GetAll<Component>(FindMode.EverythingInSelf).Select(c=>new {Type=c.GetType().FullName,Assembly=c.GetType().Assembly.FullName,c.Enabled,Data=c.Serialize()}).ToArray()
+    }).ToArray(),
+    Edited=Editor.SceneEditorSession.All.Select(s=>new {s.Scene.Name,Path=s.Scene.Source?.ResourcePath,Maps=s.Scene.GetAllComponents<MapInstance>().Select(m=>new {m.MapName,Components=m.GameObject.Components.GetAll<Component>(FindMode.EverythingInSelf).Select(c=>new {Type=c.GetType().FullName,c.Enabled,Data=c.Serialize()}).ToArray()}).ToArray()}).ToArray(),
+    Reference=typeof(Facepunch.DepotMapCleanup).Assembly.FullName
+};

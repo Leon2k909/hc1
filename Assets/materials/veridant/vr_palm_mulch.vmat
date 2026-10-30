@@ -1,14 +1,14 @@
-// Tools/veridant_materials.py
+// Tools/veridant_palm_mulch.py
 "Layer0"
 {
     shader "shaders/complex.shader"
     F_SPECULAR "1"
     g_flRoughnessScaleFactor "1"
-    g_flMetalness "0.00"
-    TextureColor "materials/veridant/vr_gravel_color.jpg"
-    TextureNormal "materials/veridant/vr_gravel_normal.jpg"
-    TextureRoughness "materials/veridant/vr_gravel_rough.png"
+    g_flMetalness "0"
+    TextureColor "materials/veridant/palm-mulch-v1/soil-bark-color.png"
+    TextureNormal "materials/veridant/palm-mulch-v1/soil-bark-normal.png"
+    TextureRoughness "materials/veridant/palm-mulch-v1/soil-bark-rough.png"
     TextureAmbientOcclusion "materials/default/default_ao.tga"
-    g_vColorTint "[0.480000 0.310000 0.180000 1.000000]"
+    g_vColorTint "[1 1 1 1]"
     g_flModelTintAmount "1.0"
 }

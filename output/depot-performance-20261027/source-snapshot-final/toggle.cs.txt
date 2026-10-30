@@ -1,0 +1,7 @@
+if (!Game.IsPlaying || Game.ActiveScene?.Source?.ResourcePath != "scenes/maps/depot/depot.scene") throw new Exception("Expected running Depot.");
+var scene=Game.ActiveScene;
+var map=scene.GetAllComponents<MapInstance>().Single();
+var cleanup=map.GameObject.Components.Get<Facepunch.DepotMapCleanup>(FindMode.EverythingInSelf);
+var config=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(Project.Current.GetRootPath(),"Sources/Depot/performance-v1/toggle.json")));
+cleanup.Enabled=config["enabled"].GetValue<bool>();
+return new {cleanup.Enabled,cleanup.SuppressedCount,PhysicsBodies=scene.PhysicsWorld.Bodies.Count(),ActiveMapRenderers=map.GetComponentsInChildren<ModelRenderer>(true).Count(r=>r.Active),ActiveErrors=map.GetComponentsInChildren<ModelRenderer>(true).Count(r=>r.Active&&r.Model?.IsError==true)};

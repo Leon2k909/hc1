@@ -1,0 +1,35 @@
+// Validate compiled variants and the deterministic group in a disposable scene,
+// without touching the user's document or editor camera.
+var root=Sandbox.Project.Current.GetRootPath();var folder=System.IO.Path.Combine(root,"output/ares/crate-v2");
+var request=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"import-request.json")));
+var stage=request["stage"].GetValue<string>();
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,stage,"manifest.json")));
+var source=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,manifest["scene_group"].GetValue<string>()))).AsObject();
+var session=Editor.SceneEditorSession.Active;var game=Game.ActiveScene?.Id;var playing=Game.IsPlaying;var dirty=session.HasUnsavedChanges;
+var variants=manifest["models"].AsObject().Select(pair=>"models/props/ares/crate-v2/"+pair.Key+".vmdl").ToArray();
+var models=variants.Select(p=>Model.Load(p)).ToArray();
+if(models.Any(m=>m is null||m.IsError||m.Materials.Any(x=>x is null||x.IsError)))throw new InvalidOperationException("A case variant or material did not compile.");
+var scene=new Scene();object result=null;
+try
+{
+    using(scene.Push())
+    {
+        var group=new GameObject(false,"case validation");group.Deserialize(source);
+        if(group.Id.ToString()!=source["__guid"].GetValue<string>())throw new InvalidOperationException("Deserialize changed the deterministic root id.");
+        var children=group.Children.ToArray();
+        if(children.Length!=132)throw new InvalidOperationException("Incorrect case count.");
+        var expected=source["Children"].AsArray().ToDictionary(n=>n["__guid"].GetValue<string>(),n=>n);
+        foreach(var child in children)
+        {
+            var node=expected[child.Id.ToString()];var renderer=child.Components.Get<ModelRenderer>();
+            if(renderer?.Model is null||renderer.Model.IsError||child.Components.GetAll<Component>().Count()!=1)throw new InvalidOperationException("Case must have one valid renderer and no collider/gameplay component.");
+            if(Vector3.DistanceBetween(child.WorldPosition,Vector3.Parse(node["Position"].GetValue<string>()))>.001f)throw new InvalidOperationException("Instance position changed.");
+            if(renderer.Id.ToString()!=node["Components"][0]["__guid"].GetValue<string>())throw new InvalidOperationException("Renderer id changed.");
+        }
+        result=new{Variants=models.Select(m=>new{Path=m.ResourcePath,Bounds=m.Bounds.ToString(),Materials=m.Materials.Select(x=>x.ResourcePath).ToArray()}).ToArray(),Instances=children.Length,DeterministicIds=true,RendererOnly=true};
+    }
+}
+finally{scene.Destroy();}
+if(!ReferenceEquals(session,Editor.SceneEditorSession.Active)||game!=Game.ActiveScene?.Id||playing!=Game.IsPlaying||dirty!=session.HasUnsavedChanges)throw new InvalidOperationException("Shared editor state changed.");
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"prop-validation.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

@@ -1,0 +1,839 @@
+{
+  "revision": "veridant-lamp-placement-v1",
+  "files": {
+    "Assets/models/maps/veridant/lounger-v2/veridant_buildings-base.obj": {
+      "before": "551d94ddb2dd2e46a965454b758f19ce8f63cc709f6a1b85d150797751f486a6",
+      "after": "1b671b48936905e369f60749c1203c64313873ce2714cc269a237b730876fef0",
+      "source": "output/veridant/lamp-placement-v1/stage-v2/Assets/models/maps/veridant/lounger-v2/veridant_buildings-base.obj",
+      "backup": "output/veridant/lamp-placement-v1/stage-v2/before/Assets/models/maps/veridant/lounger-v2/veridant_buildings-base.obj"
+    },
+    "Assets/models/maps/veridant/veridant_buildings_hulls_metal.obj": {
+      "before": "eab46b35ecf6a05b599d033370f2f45fb2b51ed5af12eb88327a8f6e2ef9891c",
+      "after": "2deb29af4b8a7fc7faab3a27eb27902bc13bf9cbc6c1f989e6d53b63a7b04349",
+      "source": "output/veridant/lamp-placement-v1/stage-v2/Assets/models/maps/veridant/veridant_buildings_hulls_metal.obj",
+      "backup": "output/veridant/lamp-placement-v1/stage-v2/before/Assets/models/maps/veridant/veridant_buildings_hulls_metal.obj"
+    },
+    "Assets/models/maps/veridant/chair-v2/dress-base.obj": {
+      "before": "c0d5198fe335cd256ac57e821708f97fe966fda22c60501f478e023b1e450cf8",
+      "after": "8d13f5dd2c8c3da80822bebded2fe09e7faf9203acad9ab20470ea7fcdd06844",
+      "source": "output/veridant/lamp-placement-v1/stage-v2/Assets/models/maps/veridant/chair-v2/dress-base.obj",
+      "backup": "output/veridant/lamp-placement-v1/stage-v2/before/Assets/models/maps/veridant/chair-v2/dress-base.obj"
+    },
+    "Assets/models/maps/veridant/veridant_dress_hulls_metal.obj": {
+      "before": "59a5740615b24a1211d5799cdecc9ce8826711127eef6d91569b68c3452750bc",
+      "after": "02a76cc091af2aeb3aecd81f39e0346a3952e66f7afedd0433b78e61e73cb68f",
+      "source": "output/veridant/lamp-placement-v1/stage-v2/Assets/models/maps/veridant/veridant_dress_hulls_metal.obj",
+      "backup": "output/veridant/lamp-placement-v1/stage-v2/before/Assets/models/maps/veridant/veridant_dress_hulls_metal.obj"
+    },
+    "Assets/scenes/maps/Veridant/veridant.scene": {
+      "before": "0d7492dc7a0f61e8d36639b1bdb5f104c41424d70b1c52aee98de81f1b6dbc06",
+      "after": "e953ef1ffba64f98da0f0cb8ddae41a36fd3f2def13c8cb7c3c5b0195ef0ab50",
+      "source": "output/veridant/lamp-placement-v1/stage-v2/Assets/scenes/maps/Veridant/veridant.scene",
+      "backup": "output/veridant/lamp-placement-v1/stage-v2/before/Assets/scenes/maps/Veridant/veridant.scene"
+    }
+  },
+  "protected_sha256": {
+    "Assets/models/maps/veridant/veridant_buildings.vmdl": "26084cc6295acc9fd3a895f9a1b0b250c28d0791fcc492902eff2f9df4a382c4",
+    "Assets/models/maps/veridant/lounger-v2/veridant_buildings-replacements.obj": "8d751cee2c4965380f4187884f2d7ec2a726567092dd6915c91f520d89e57e84",
+    "Assets/models/maps/veridant/backbar-v1/shelves-0.obj": "66ff136b10e4844ad4364aecbb2bb50b921e37392664545be64e05f86fdc64ce",
+    "Assets/models/maps/veridant/backbar-v1/shelves-1.obj": "7158394e3b1d7fd4525b34788500268ced301b17dc600a1db6aa36a474dae75a",
+    "Assets/models/maps/veridant/backbar-v1/shelves-2.obj": "283bb37100f3aec67b93bb4d28be908db3146aa2f56d369494205b7d90c9fb3e",
+    "Assets/models/maps/veridant/cases-v4/veridant_buildings-0.obj": "6e2ccec88a6b8dca2c6611d5508ed6678c9f45ff7aece8c48ee973a747d08805",
+    "Assets/models/maps/veridant/cases-v4/veridant_buildings-1.obj": "1be3e96c9f8a053c83104dd792dd103b286f8238b042036dbeaa7bd2fdfbb3f5",
+    "Assets/models/maps/veridant/cases-v4/veridant_buildings-2.obj": "274c590e05c03c3cff714c64be0a8995621ea96bbd50368f15ff6c4530bc2e5b",
+    "Assets/models/maps/veridant/spa-windows-v2/spa-facades.obj": "59941263528fe641ffd7a17efa12c90c2a4cf248285f7efb3733d47d71165113",
+    "Assets/models/maps/veridant/veridant_dress.vmdl": "24ee21fb3d3ff22007e88817b3dd6779b346e4c61f58860e1b8c551005647943",
+    "Assets/models/maps/veridant/lounger-v2/veridant_dress-replacements.obj": "2a4119c9d9fc43fc03cdac2f0e46fd5b12b64afbc5fcbdd14bcd6df4914cf0fd",
+    "Assets/models/maps/veridant/chair-v4/chairs-0.obj": "89ad8e11575df41756f322d8ae9090d87785696b4245d1b79d9a314da83bf1e2",
+    "Assets/models/maps/veridant/chair-v4/chairs-1.obj": "63afc6ab51af3a1a07b6297dd1696f4f4d23e03fe4b025fec40a0ef04e2ea80b",
+    "Assets/models/maps/veridant/bench-v2/benches.obj": "45254020a6bb8762891a0dccf9cbb704c2387defa3ca4ac080e5e7d3afa6a639",
+    "Assets/models/maps/veridant/pool-v2/pool.obj": "d0c358177a1804bc7caa472d45f8f8ea08193e04a7e731f01ea6fe667097135b",
+    "Assets/models/maps/veridant/gates-v1/gates.obj": "70eab689d1197dcc824cda5c71250c4cf6669e95ab8367d7a1d1fa5083efb6b7",
+    "Assets/models/maps/veridant/cases-v4/veridant_dress-0.obj": "617ba6240676cafb396665379ba38065d45ad809713a61a89fc6b09988de330f",
+    "Assets/models/maps/veridant/cases-v4/veridant_dress-1.obj": "fe1eb3c5fd58cd061f444e083fe3cf8eb2eea9268683a63a49e02ed2a78f633d",
+    "Assets/models/maps/veridant/cases-v4/veridant_dress-2.obj": "f1dc2509441437cb4a6beea5414286d7b73d4d4bea65f543ed66e086d9354909",
+    "Assets/models/maps/veridant/cases-v4/veridant_dress-3.obj": "87d87546ef74a363ec0ccfc43c48e5d10db3d5073a917a7dfcd7b49276e563bf",
+    "Assets/models/maps/veridant/cases-v4/veridant_dress-4.obj": "8c043e450c1e5331d59f9f89c621b74586b5b0a558443a51fb726add39613089",
+    "Assets/models/maps/veridant/cases-v4/veridant_dress-5.obj": "bbcea8b10515036deb03621a214ac6ba602ff98a4e4a66054ccd69216eaaf28c",
+    "Assets/models/maps/veridant/cases-v4/veridant_dress-6.obj": "6d5eed77c545fc43b677503f7883e14e283a0847553908c84ded54dcfbd2c98e",
+    "Assets/models/maps/veridant/cases-v4/veridant_dress-7.obj": "038bdf12fe8f65ae0a482752c4f8df97143832cf2a3d0e50c3b0df4fadf4ef1d",
+    "Assets/models/maps/veridant/cases-v4/veridant_dress-8.obj": "d2ebdd33b97b3727c419175f2010560f08f49cd6f28534835ca40fded5f69b2e",
+    "Assets/models/maps/veridant/veridant_buildings.obj": "6044c2ea5dd10cca33ce5c32a6b8e5418b17d997be7d442af67923c784f96139",
+    "Assets/models/maps/veridant/veridant_dress.obj": "52f7fb3e690736e5be58d3058f88afe46eef3d27e4923356bddd8b6f5142f8f0",
+    "Assets/materials/veridant/vr_steel.vmat": "7e588c53636a7ddc409fb7c0c2f43302be98eeb1551236d5335e3780046f70a9",
+    "Assets/materials/veridant/vr_lamp.vmat": "04682c71431126d3e2f268fb5cefb13b1ca5b78ae41c7351164d28bb79bde81f"
+  },
+  "audit": [
+    {
+      "name": "North terrace lantern 0",
+      "base": [
+        -20,
+        300,
+        128.0
+      ],
+      "h": 96,
+      "model": "veridant_buildings",
+      "moved": true,
+      "new_base": [
+        -164.0,
+        240.0,
+        128.0
+      ],
+      "reason": "Move to the south-west balustrade corner, clear of the reception stairwell and central terrace."
+    },
+    {
+      "name": "North terrace lantern 1",
+      "base": [
+        130,
+        650,
+        128.0
+      ],
+      "h": 96,
+      "model": "veridant_buildings",
+      "moved": true,
+      "new_base": [
+        -92.0,
+        724.0,
+        128.0
+      ],
+      "reason": "Free the bar approach and group the post beside the pine planter instead."
+    },
+    {
+      "name": "North terrace lantern 2",
+      "base": [
+        300,
+        520,
+        128.0
+      ],
+      "h": 96,
+      "model": "veridant_buildings",
+      "moved": true,
+      "new_base": [
+        240.0,
+        580.0,
+        128.0
+      ],
+      "reason": "Clear the grand-stair centreline and keep the post to the side of its upper landing."
+    },
+    {
+      "name": "East terrace lantern 0",
+      "base": [
+        1140,
+        -200,
+        192.0
+      ],
+      "h": 96,
+      "model": "veridant_buildings",
+      "moved": false,
+      "new_base": [
+        1140,
+        -200,
+        192.0
+      ],
+      "reason": "Retained: already at a boundary, planting margin or gate pier."
+    },
+    {
+      "name": "East terrace lantern 1",
+      "base": [
+        1140,
+        300,
+        192.0
+      ],
+      "h": 96,
+      "model": "veridant_buildings",
+      "moved": false,
+      "new_base": [
+        1140,
+        300,
+        192.0
+      ],
+      "reason": "Retained: already at a boundary, planting margin or gate pier."
+    },
+    {
+      "name": "East terrace lantern 2",
+      "base": [
+        820,
+        500,
+        192.0
+      ],
+      "h": 96,
+      "model": "veridant_buildings",
+      "moved": true,
+      "new_base": [
+        410.0,
+        566.0,
+        192.0
+      ],
+      "reason": "Move from the open terrace to the western glass-rail edge, below the stair approach."
+    },
+    {
+      "name": "East terrace lantern 3",
+      "base": [
+        1000,
+        700,
+        192.0
+      ],
+      "h": 96,
+      "model": "veridant_buildings",
+      "moved": false,
+      "new_base": [
+        1000,
+        700,
+        192.0
+      ],
+      "reason": "Retained: already at a boundary, planting margin or gate pier."
+    },
+    {
+      "name": "East terrace lantern near",
+      "base": [
+        930.0,
+        -150.0,
+        192.0
+      ],
+      "h": 96,
+      "model": "veridant_buildings",
+      "moved": true,
+      "new_base": [
+        798.0,
+        -150.0,
+        192.0
+      ],
+      "reason": "Move the isolated post beside the western terrace railing, clearing the open floor."
+    },
+    {
+      "name": "Garden lantern 0",
+      "base": [
+        -600,
+        260,
+        128.0
+      ],
+      "h": 96,
+      "model": "veridant_dress",
+      "moved": true,
+      "new_base": [
+        -686.0,
+        260.0,
+        128.0
+      ],
+      "reason": "Move the post from the open south terrace route to the sea-side balustrade."
+    },
+    {
+      "name": "Garden lantern 1",
+      "base": [
+        -320,
+        600,
+        128.0
+      ],
+      "h": 96,
+      "model": "veridant_dress",
+      "moved": true,
+      "new_base": [
+        -686.0,
+        680.0,
+        128.0
+      ],
+      "reason": "Move out of the cross-terrace route, beyond the promenade-stair opening and beside the balustrade."
+    },
+    {
+      "name": "Garden lantern 2",
+      "base": [
+        -600,
+        960,
+        128.0
+      ],
+      "h": 96,
+      "model": "veridant_dress",
+      "moved": false,
+      "new_base": [
+        -600,
+        960,
+        128.0
+      ],
+      "reason": "Retained: already at a boundary, planting margin or gate pier."
+    },
+    {
+      "name": "Promenade lamp 0",
+      "base": [
+        -1690.0,
+        -1080.0,
+        0
+      ],
+      "h": 140,
+      "model": "veridant_dress",
+      "moved": false,
+      "new_base": [
+        -1690.0,
+        -1080.0,
+        0
+      ],
+      "reason": "Retained: already at a boundary, planting margin or gate pier."
+    },
+    {
+      "name": "Promenade lamp 1",
+      "base": [
+        -1690.0,
+        -780.0,
+        0
+      ],
+      "h": 140,
+      "model": "veridant_dress",
+      "moved": false,
+      "new_base": [
+        -1690.0,
+        -780.0,
+        0
+      ],
+      "reason": "Retained: already at a boundary, planting margin or gate pier."
+    },
+    {
+      "name": "Promenade lamp 2",
+      "base": [
+        -1690.0,
+        -480.0,
+        0
+      ],
+      "h": 140,
+      "model": "veridant_dress",
+      "moved": false,
+      "new_base": [
+        -1690.0,
+        -480.0,
+        0
+      ],
+      "reason": "Retained: already at a boundary, planting margin or gate pier."
+    },
+    {
+      "name": "Promenade lamp 3",
+      "base": [
+        -1690.0,
+        -180.0,
+        0
+      ],
+      "h": 140,
+      "model": "veridant_dress",
+      "moved": false,
+      "new_base": [
+        -1690.0,
+        -180.0,
+        0
+      ],
+      "reason": "Retained: already at a boundary, planting margin or gate pier."
+    },
+    {
+      "name": "Promenade lamp 4",
+      "base": [
+        -1690.0,
+        120.0,
+        0
+      ],
+      "h": 140,
+      "model": "veridant_dress",
+      "moved": false,
+      "new_base": [
+        -1690.0,
+        120.0,
+        0
+      ],
+      "reason": "Retained: already at a boundary, planting margin or gate pier."
+    },
+    {
+      "name": "Promenade lamp 5",
+      "base": [
+        -1690.0,
+        420.0,
+        0
+      ],
+      "h": 140,
+      "model": "veridant_dress",
+      "moved": false,
+      "new_base": [
+        -1690.0,
+        420.0,
+        0
+      ],
+      "reason": "Retained: already at a boundary, planting margin or gate pier."
+    },
+    {
+      "name": "Promenade lamp 6",
+      "base": [
+        -1690.0,
+        720.0,
+        0
+      ],
+      "h": 140,
+      "model": "veridant_dress",
+      "moved": false,
+      "new_base": [
+        -1690.0,
+        720.0,
+        0
+      ],
+      "reason": "Retained: already at a boundary, planting margin or gate pier."
+    },
+    {
+      "name": "Promenade lamp 7",
+      "base": [
+        -1690.0,
+        1020.0,
+        0
+      ],
+      "h": 140,
+      "model": "veridant_dress",
+      "moved": true,
+      "new_base": [
+        -1690.0,
+        950.0,
+        0.0
+      ],
+      "reason": "The old base was inside the north boundary wall at N=1000..1024; move it back onto paving."
+    },
+    {
+      "name": "Garden lamp 0",
+      "base": [
+        -300,
+        -760,
+        0
+      ],
+      "h": 120,
+      "model": "veridant_dress",
+      "moved": false,
+      "new_base": [
+        -300,
+        -760,
+        0
+      ],
+      "reason": "Retained: already at a boundary, planting margin or gate pier."
+    },
+    {
+      "name": "Garden lamp 1",
+      "base": [
+        300,
+        -760,
+        0
+      ],
+      "h": 120,
+      "model": "veridant_dress",
+      "moved": false,
+      "new_base": [
+        300,
+        -760,
+        0
+      ],
+      "reason": "Retained: already at a boundary, planting margin or gate pier."
+    },
+    {
+      "name": "Garden lamp 2",
+      "base": [
+        900,
+        -760,
+        0
+      ],
+      "h": 120,
+      "model": "veridant_dress",
+      "moved": false,
+      "new_base": [
+        900,
+        -760,
+        0
+      ],
+      "reason": "Retained: already at a boundary, planting margin or gate pier."
+    },
+    {
+      "name": "Garden lamp 3",
+      "base": [
+        1500,
+        -800,
+        0
+      ],
+      "h": 120,
+      "model": "veridant_dress",
+      "moved": false,
+      "new_base": [
+        1500,
+        -800,
+        0
+      ],
+      "reason": "Retained: already at a boundary, planting margin or gate pier."
+    },
+    {
+      "name": "Garden lamp 4",
+      "base": [
+        -600,
+        -1300,
+        0
+      ],
+      "h": 120,
+      "model": "veridant_dress",
+      "moved": false,
+      "new_base": [
+        -600,
+        -1300,
+        0
+      ],
+      "reason": "Retained: already at a boundary, planting margin or gate pier."
+    },
+    {
+      "name": "Garden lamp 5",
+      "base": [
+        1100,
+        -1300,
+        0
+      ],
+      "h": 120,
+      "model": "veridant_dress",
+      "moved": false,
+      "new_base": [
+        1100,
+        -1300,
+        0
+      ],
+      "reason": "Retained: already at a boundary, planting margin or gate pier."
+    },
+    {
+      "name": "Gate lamp -300.0 -1",
+      "base": [
+        1894.0,
+        -400.0,
+        150
+      ],
+      "h": 30,
+      "model": "veridant_dress",
+      "moved": false,
+      "new_base": [
+        1894.0,
+        -400.0,
+        150
+      ],
+      "reason": "Retained: already at a boundary, planting margin or gate pier."
+    },
+    {
+      "name": "Gate lamp -300.0 1",
+      "base": [
+        1894.0,
+        -200.0,
+        150
+      ],
+      "h": 30,
+      "model": "veridant_dress",
+      "moved": false,
+      "new_base": [
+        1894.0,
+        -200.0,
+        150
+      ],
+      "reason": "Retained: already at a boundary, planting margin or gate pier."
+    },
+    {
+      "name": "Gate lamp 500.0 -1",
+      "base": [
+        1894.0,
+        400.0,
+        150
+      ],
+      "h": 30,
+      "model": "veridant_dress",
+      "moved": false,
+      "new_base": [
+        1894.0,
+        400.0,
+        150
+      ],
+      "reason": "Retained: already at a boundary, planting margin or gate pier."
+    },
+    {
+      "name": "Gate lamp 500.0 1",
+      "base": [
+        1894.0,
+        600.0,
+        150
+      ],
+      "h": 30,
+      "model": "veridant_dress",
+      "moved": false,
+      "new_base": [
+        1894.0,
+        600.0,
+        150
+      ],
+      "reason": "Retained: already at a boundary, planting margin or gate pier."
+    },
+    {
+      "name": "Forecourt lamp 0",
+      "base": [
+        1500,
+        -640,
+        0
+      ],
+      "h": 140,
+      "model": "veridant_dress",
+      "moved": false,
+      "new_base": [
+        1500,
+        -640,
+        0
+      ],
+      "reason": "Retained: already at a boundary, planting margin or gate pier."
+    },
+    {
+      "name": "Forecourt lamp 1",
+      "base": [
+        1500,
+        950,
+        0
+      ],
+      "h": 140,
+      "model": "veridant_dress",
+      "moved": false,
+      "new_base": [
+        1500,
+        950,
+        0
+      ],
+      "reason": "Retained: already at a boundary, planting margin or gate pier."
+    },
+    {
+      "name": "Forecourt lamp 2",
+      "base": [
+        1820,
+        150,
+        0
+      ],
+      "h": 140,
+      "model": "veridant_dress",
+      "moved": false,
+      "new_base": [
+        1820,
+        150,
+        0
+      ],
+      "reason": "Retained: already at a boundary, planting margin or gate pier."
+    }
+  ],
+  "geometry": {
+    "veridant_buildings": {
+      "removed_triangles": 770,
+      "unrelated_obj_bytes_exact": true,
+      "retained_bytes_sha256": "52461fa7c6d45d866a63dd4e0befbf5f3b215b73616627efbdf12a6271a5d20d",
+      "hulls_moved": 10,
+      "vertices_moved": 180,
+      "other_collision_bytes_exact": true,
+      "components": [
+        {
+          "name": "North terrace lantern 0",
+          "vertices": 20,
+          "delta_obj": [
+            144.0,
+            0.0,
+            -60.0
+          ]
+        },
+        {
+          "name": "North terrace lantern 0",
+          "vertices": 16,
+          "delta_obj": [
+            144.0,
+            0.0,
+            -60.0
+          ]
+        },
+        {
+          "name": "North terrace lantern 1",
+          "vertices": 20,
+          "delta_obj": [
+            222.0,
+            0.0,
+            74.0
+          ]
+        },
+        {
+          "name": "North terrace lantern 1",
+          "vertices": 16,
+          "delta_obj": [
+            222.0,
+            0.0,
+            74.0
+          ]
+        },
+        {
+          "name": "North terrace lantern 2",
+          "vertices": 20,
+          "delta_obj": [
+            60.0,
+            0.0,
+            60.0
+          ]
+        },
+        {
+          "name": "North terrace lantern 2",
+          "vertices": 16,
+          "delta_obj": [
+            60.0,
+            0.0,
+            60.0
+          ]
+        },
+        {
+          "name": "East terrace lantern 2",
+          "vertices": 20,
+          "delta_obj": [
+            410.0,
+            0.0,
+            66.0
+          ]
+        },
+        {
+          "name": "East terrace lantern 2",
+          "vertices": 16,
+          "delta_obj": [
+            410.0,
+            0.0,
+            66.0
+          ]
+        },
+        {
+          "name": "East terrace lantern near",
+          "vertices": 20,
+          "delta_obj": [
+            132.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "name": "East terrace lantern near",
+          "vertices": 16,
+          "delta_obj": [
+            132.0,
+            0.0,
+            0.0
+          ]
+        }
+      ],
+      "lamps": 5,
+      "added_triangles": 770,
+      "base_import": "Assets/models/maps/veridant/lounger-v2/veridant_buildings-base.obj"
+    },
+    "veridant_dress": {
+      "removed_triangles": 462,
+      "unrelated_obj_bytes_exact": true,
+      "retained_bytes_sha256": "127598d9c20db2e84bb3bbf3a03a9bd90258c092b4cfd040a6a63258d6c54f7d",
+      "hulls_moved": 6,
+      "vertices_moved": 108,
+      "other_collision_bytes_exact": true,
+      "components": [
+        {
+          "name": "Garden lantern 0",
+          "vertices": 20,
+          "delta_obj": [
+            86.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "name": "Garden lantern 0",
+          "vertices": 16,
+          "delta_obj": [
+            86.0,
+            0.0,
+            0.0
+          ]
+        },
+        {
+          "name": "Garden lantern 1",
+          "vertices": 20,
+          "delta_obj": [
+            366.0,
+            0.0,
+            80.0
+          ]
+        },
+        {
+          "name": "Garden lantern 1",
+          "vertices": 16,
+          "delta_obj": [
+            366.0,
+            0.0,
+            80.0
+          ]
+        },
+        {
+          "name": "Promenade lamp 7",
+          "vertices": 20,
+          "delta_obj": [
+            -0.0,
+            0.0,
+            -70.0
+          ]
+        },
+        {
+          "name": "Promenade lamp 7",
+          "vertices": 16,
+          "delta_obj": [
+            -0.0,
+            0.0,
+            -70.0
+          ]
+        }
+      ],
+      "lamps": 3,
+      "added_triangles": 462,
+      "base_import": "Assets/models/maps/veridant/chair-v2/dress-base.obj"
+    }
+  },
+  "scene_moves": [
+    {
+      "name": "Garden lantern 0",
+      "id": "f1cd900b-336f-5cb1-9391-a7a8b7118097",
+      "before": "260,600,216",
+      "after": "260,686,216"
+    },
+    {
+      "name": "Garden lantern 1",
+      "id": "bfc1ab15-6a57-5ec7-8731-6c174fbfabe1",
+      "before": "600,320,216",
+      "after": "680,686,216"
+    },
+    {
+      "name": "North terrace lantern 0",
+      "id": "d4118187-736c-5561-85e2-8a003e226e4c",
+      "before": "300,20,216",
+      "after": "240,164,216"
+    },
+    {
+      "name": "North terrace lantern 1",
+      "id": "927040bf-22c1-5ec5-918e-e0cd8c02001b",
+      "before": "650,-130,216",
+      "after": "724,92,216"
+    },
+    {
+      "name": "North terrace lantern 2",
+      "id": "721eb5e9-4978-58eb-b0c4-983061d343e6",
+      "before": "520,-300,216",
+      "after": "580,-240,216"
+    },
+    {
+      "name": "East terrace lantern 2",
+      "id": "1cf5d686-e00f-5477-b448-5e2fd304ea5c",
+      "before": "500,-820,280",
+      "after": "566,-410,280"
+    },
+    {
+      "name": "East terrace lantern near",
+      "id": "547f76ff-219a-5256-a6e0-3e038e60e213",
+      "before": "-150,-930,280",
+      "after": "-150,-798,280"
+    },
+    {
+      "name": "Promenade lamp 7",
+      "id": "e1b18445-175c-5872-a701-f7905030940c",
+      "before": "1020,1690,132",
+      "after": "950,1690,132"
+    }
+  ],
+  "original_design_retained": true,
+  "unchanged_lanterns": 24,
+  "lamps_moved": 8,
+  "new_fixture_unused": true,
+  "source_hook_pending": true
+}

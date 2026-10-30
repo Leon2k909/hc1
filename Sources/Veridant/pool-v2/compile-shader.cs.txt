@@ -1,0 +1,15 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var session=Editor.SceneEditorSession.Active;var game=Game.ActiveScene?.Id;var playing=Game.IsPlaying;var dirty=session.HasUnsavedChanges;
+var path="shaders/hc1_veridant_pool_v2.shader";
+string Hash(string file)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(file))).ToLowerInvariant();
+if(Hash(System.IO.Path.Combine(root,"Assets",path))!=Hash(System.IO.Path.Combine(root,"Sources/Veridant/pool-v2/water.shader")))throw new InvalidOperationException("Published shader differs from its source.");
+var compiled=await Editor.EditorUtility.CompileShader(path,new(){ForceRecompile=true},cancellationToken);
+var output=compiled.Programs.SelectMany(p=>p.Output??new System.Collections.Generic.List<string>()).Take(30).ToArray();
+if(compiled.Success&&compiled.CompiledShader is {Length:>0})
+    System.IO.File.WriteAllBytes(System.IO.Path.Combine(root,"Assets",path+"_c"),compiled.CompiledShader);
+var preserved=ReferenceEquals(session,Editor.SceneEditorSession.Active)&&game==Game.ActiveScene?.Id&&playing==Game.IsPlaying&&dirty==session.HasUnsavedChanges;
+var result=new{Shader=path,compiled.Success,Bytes=compiled.CompiledShader?.Length,Output=output,EditorStatePreserved=preserved};
+System.IO.File.WriteAllText(System.IO.Path.Combine(root,"output/veridant/pool-v2/native-shader-compile.json"),System.Text.Json.JsonSerializer.Serialize(result));
+if(!compiled.Success)throw new InvalidOperationException("Pool shader compile failed: "+string.Join("\n",output));
+if(!preserved)throw new InvalidOperationException("Editor state changed during shader compile.");
+return result;
