@@ -1,0 +1,2467 @@
+[
+  {
+    "Id": "e7a8a21e-f5dc-466c-b35e-422f6e5052d7",
+    "Name": "charger_health",
+    "Enabled": true,
+    "Position": "-16,-96,1088",
+    "Components": [
+      {
+        "Type": "MissingComponent",
+        "Data": null
+      },
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      },
+      {
+        "Type": "MissingComponent",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "Cube",
+        "Path": "models/dev/box.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "Cube",
+        "Path": "models/props/wall_charger/wall_charger.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": true
+      }
+    ]
+  },
+  {
+    "Id": "3ee6fd3a-bf1b-41a8-9815-474525d2b35c",
+    "Name": "item_python",
+    "Enabled": true,
+    "Position": "-56,-240,1071",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "w_usp",
+        "Path": "weapons/rust_python/w_python.vmdl",
+        "Bones": 2,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "56391bf6-c336-4083-8bf8-56eafc2250fb",
+    "Name": "item_mp5",
+    "Enabled": true,
+    "Position": "-200,-800,1032",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "model",
+        "Path": "models/weapons/sbox_smg_mp5/w_mp5.vmdl",
+        "Bones": 1,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "bc9c9a5e-2382-4b53-92bc-60d20bb70486",
+    "Name": "item_mp5 (1)",
+    "Enabled": true,
+    "Position": "-1184,-128,888",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "model",
+        "Path": "models/weapons/sbox_smg_mp5/w_mp5.vmdl",
+        "Bones": 1,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "d0ca736b-d67c-47be-a172-6dfc4ae78056",
+    "Name": "item_tripmine",
+    "Enabled": true,
+    "Position": "76,-188,1072",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "Object",
+        "Path": null,
+        "Bones": null,
+        "Enabled": true,
+        "Error": null
+      },
+      {
+        "Name": "Object",
+        "Path": null,
+        "Bones": null,
+        "Enabled": true,
+        "Error": null
+      }
+    ]
+  },
+  {
+    "Id": "14ae04f7-f95b-4159-ac24-46130769825b",
+    "Name": "item_tripmine (1)",
+    "Enabled": true,
+    "Position": "24,40,1032",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "Object",
+        "Path": null,
+        "Bones": null,
+        "Enabled": true,
+        "Error": null
+      },
+      {
+        "Name": "Object",
+        "Path": null,
+        "Bones": null,
+        "Enabled": true,
+        "Error": null
+      }
+    ]
+  },
+  {
+    "Id": "be8b4ca5-4569-4e3a-9614-2f1351368e69",
+    "Name": "item_tripmine (2)",
+    "Enabled": true,
+    "Position": "-48,40,1032",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "Object",
+        "Path": null,
+        "Bones": null,
+        "Enabled": true,
+        "Error": null
+      },
+      {
+        "Name": "Object",
+        "Path": null,
+        "Bones": null,
+        "Enabled": true,
+        "Error": null
+      }
+    ]
+  },
+  {
+    "Id": "8ff0df43-175d-49b4-a6c3-48fe48b8107b",
+    "Name": "item_tripmine (3)",
+    "Enabled": true,
+    "Position": "-776,280,888",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "Object",
+        "Path": null,
+        "Bones": null,
+        "Enabled": true,
+        "Error": null
+      },
+      {
+        "Name": "Object",
+        "Path": null,
+        "Bones": null,
+        "Enabled": true,
+        "Error": null
+      }
+    ]
+  },
+  {
+    "Id": "d38bc8cf-ef23-4b97-a89b-74b785d297cb",
+    "Name": "item_healthkit",
+    "Enabled": true,
+    "Position": "-1488,-456,784",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "health_pickup",
+        "Path": "models/props/health_pickup/health_pickup.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "bd829a0b-d75d-4544-a0e8-f1d39f41a114",
+    "Name": "item_healthkit (1)",
+    "Enabled": true,
+    "Position": "-240,320,1064",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "health_pickup",
+        "Path": "models/props/health_pickup/health_pickup.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "67f9271a-f6e7-4e81-81ba-b5f00142141d",
+    "Name": "item_healthkit (2)",
+    "Enabled": true,
+    "Position": "720,-216,888",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "health_pickup",
+        "Path": "models/props/health_pickup/health_pickup.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "7f8270b8-c75b-4bf2-8d7d-fcad5b49a594",
+    "Name": "item_healthkit (3)",
+    "Enabled": true,
+    "Position": "-936,848,944",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "health_pickup",
+        "Path": "models/props/health_pickup/health_pickup.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "a890a139-6927-4996-ae27-66d884773134",
+    "Name": "item_battery",
+    "Enabled": true,
+    "Position": "-16,-872,1032",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "Cube",
+        "Path": "models/dev/box.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "cbfa267d-6a0a-4c3c-af25-024b5e987015",
+    "Name": "charger_health (1)",
+    "Enabled": true,
+    "Position": "-1024,-736,832",
+    "Components": [
+      {
+        "Type": "MissingComponent",
+        "Data": null
+      },
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      },
+      {
+        "Type": "MissingComponent",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "Cube",
+        "Path": "models/dev/box.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "Cube",
+        "Path": "models/props/wall_charger/wall_charger.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": true
+      }
+    ]
+  },
+  {
+    "Id": "8eb27758-f9e4-4a16-a040-028d99b3d3b6",
+    "Name": "charger_armour",
+    "Enabled": true,
+    "Position": "1192,-208,1056",
+    "Components": [
+      {
+        "Type": "MissingComponent",
+        "Data": null
+      },
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      },
+      {
+        "Type": "MissingComponent",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "Cube",
+        "Path": "models/dev/box.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "Cube",
+        "Path": "models/dev/box.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "Cube",
+        "Path": "models/dev/box.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "f8d06087-0c56-4eef-876e-3ba4ae1e7124",
+    "Name": "charger_armour (1)",
+    "Enabled": true,
+    "Position": "-96,832,944",
+    "Components": [
+      {
+        "Type": "MissingComponent",
+        "Data": null
+      },
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      },
+      {
+        "Type": "MissingComponent",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "Cube",
+        "Path": "models/dev/box.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "Cube",
+        "Path": "models/dev/box.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "Cube",
+        "Path": "models/dev/box.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "6a083e3e-a683-4817-bd19-5f2992f38827",
+    "Name": "item_battery (1)",
+    "Enabled": true,
+    "Position": "-16,560,1068",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "Cube",
+        "Path": "models/dev/box.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "5528a3e2-664f-4d7d-9859-9b49972e69cc",
+    "Name": "item_battery (2)",
+    "Enabled": true,
+    "Position": "16,560,1068",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "Cube",
+        "Path": "models/dev/box.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "ee449466-39a9-46cd-b5ff-83c454211dd3",
+    "Name": "item_battery (3)",
+    "Enabled": true,
+    "Position": "-976,564,888",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "Cube",
+        "Path": "models/dev/box.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "e282a5ba-8a88-43fd-835e-de11f4ddeb07",
+    "Name": "item_battery (4)",
+    "Enabled": true,
+    "Position": "-948,564,888",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "Cube",
+        "Path": "models/dev/box.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "d013b527-63d4-454b-af40-b5c88f246412",
+    "Name": "item_battery (5)",
+    "Enabled": true,
+    "Position": "1172,280,1008",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "Cube",
+        "Path": "models/dev/box.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "a5118565-13a4-4af7-bfd1-92241e4dde42",
+    "Name": "item_grenade",
+    "Enabled": true,
+    "Position": "308,804,888",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "Grenade",
+        "Path": "models/weapons/sbox_grenade_explosive/w_he_grenade.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "65682b3b-b34d-4342-928c-8221ee792b37",
+    "Name": "item_grenade (1)",
+    "Enabled": true,
+    "Position": "340,764,888",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "Grenade",
+        "Path": "models/weapons/sbox_grenade_explosive/w_he_grenade.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "a88af5fa-7b23-408b-b3ef-bc611759886b",
+    "Name": "item_grenade (2)",
+    "Enabled": true,
+    "Position": "-948,-516,888",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "Grenade",
+        "Path": "models/weapons/sbox_grenade_explosive/w_he_grenade.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "a7269276-277b-40b9-9cd5-6c83bf728b66",
+    "Name": "item_grenade (3)",
+    "Enabled": true,
+    "Position": "-988,-508,892",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "Grenade",
+        "Path": "models/weapons/sbox_grenade_explosive/w_he_grenade.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "4c99ef14-d2cb-491c-858a-4b8ce0104f72",
+    "Name": "item_gauss",
+    "Enabled": true,
+    "Position": "-192,-992,724",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "model",
+        "Path": "weapons/gaussgun/gauss_gun.vmdl",
+        "Bones": 2,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "a99632fa-93f2-40d1-ad55-bf693ee59122",
+    "Name": "item_grenade (4)",
+    "Enabled": true,
+    "Position": "-308,-1008,800",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "Grenade",
+        "Path": "models/weapons/sbox_grenade_explosive/w_he_grenade.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "777584fa-c5e0-49a6-a6ce-4aa4791c8881",
+    "Name": "GameObject",
+    "Enabled": true,
+    "Position": "-64,-930,762",
+    "Components": [
+      {
+        "Type": "HammerMesh",
+        "Data": null
+      },
+      {
+        "Type": "ModelRenderer",
+        "Data": null
+      },
+      {
+        "Type": "ModelCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "GameObject",
+        "Path": "maps/depot/gameobjects/777584fa-c5e0-49a6-a6ce-4aa4791c8881.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "c108ceae-7ad6-421f-81e6-178dc1c7bfe9",
+    "Name": "GameObject (1)",
+    "Enabled": true,
+    "Position": "-320,-930,762",
+    "Components": [
+      {
+        "Type": "HammerMesh",
+        "Data": null
+      },
+      {
+        "Type": "ModelRenderer",
+        "Data": null
+      },
+      {
+        "Type": "ModelCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "GameObject (1)",
+        "Path": "maps/depot/gameobjects/c108ceae-7ad6-421f-81e6-178dc1c7bfe9.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "dbfd8d7a-e576-401a-8233-94abdeec846e",
+    "Name": "item_rpg",
+    "Enabled": true,
+    "Position": "1206.625,-163.2324,1013.602",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "model",
+        "Path": "models/weapons/sbox_rpg_recoillessrifle/w_recoillessrifle.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": true
+      }
+    ]
+  },
+  {
+    "Id": "f911b211-808a-4fa7-95de-db9da4f91aa5",
+    "Name": "item_grenade (5)",
+    "Enabled": true,
+    "Position": "-970,-48,920",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "Grenade",
+        "Path": "models/weapons/sbox_grenade_explosive/w_he_grenade.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "96f9c683-602d-4278-9d25-78d39f47d549",
+    "Name": "item_rat_gun",
+    "Enabled": true,
+    "Position": "380,354,987.3232",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "street_rat_2k",
+        "Path": "street_rat_2k.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "7f1770f3-9146-4a63-9263-9473a5f8f09d",
+    "Name": "GameObject (2)",
+    "Enabled": true,
+    "Position": "1224,197,953.9893",
+    "Components": [
+      {
+        "Type": "HammerMesh",
+        "Data": null
+      },
+      {
+        "Type": "ModelRenderer",
+        "Data": null
+      },
+      {
+        "Type": "ModelCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "GameObject (2)",
+        "Path": "maps/depot/gameobjects/7f1770f3-9146-4a63-9263-9473a5f8f09d.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "62185b70-113d-4651-a9eb-b1586af62f66",
+    "Name": "GameObject (3)",
+    "Enabled": true,
+    "Position": "-16,130,935.9954",
+    "Components": [
+      {
+        "Type": "HammerMesh",
+        "Data": null
+      },
+      {
+        "Type": "ModelRenderer",
+        "Data": null
+      },
+      {
+        "Type": "ModelCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "GameObject (3)",
+        "Path": "maps/depot/gameobjects/62185b70-113d-4651-a9eb-b1586af62f66.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "e8ea6b27-d44c-4a76-bd29-aeddfb6b174b",
+    "Name": "GameObject (4)",
+    "Enabled": true,
+    "Position": "191.9999,896.0001,979.9784",
+    "Components": [
+      {
+        "Type": "HammerMesh",
+        "Data": null
+      },
+      {
+        "Type": "ModelRenderer",
+        "Data": null
+      },
+      {
+        "Type": "ModelCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "GameObject (4)",
+        "Path": "maps/depot/gameobjects/e8ea6b27-d44c-4a76-bd29-aeddfb6b174b.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "9b6db756-c3a9-4b4c-bea5-249056eaf430",
+    "Name": "ammo_rpgclip",
+    "Enabled": true,
+    "Position": "-520,-1016,720",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "84mm_missile (1)",
+        "Path": "models/weapons/sbox_ammo/84mm_ammobox/missile_carrier.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": true
+      }
+    ]
+  },
+  {
+    "Id": "3cc55281-a499-46de-94ca-d81d677d4cf4",
+    "Name": "ammo_rpgclip (1)",
+    "Enabled": true,
+    "Position": "-534.1769,-986.2863,720",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "84mm_missile (1)",
+        "Path": "models/weapons/sbox_ammo/84mm_ammobox/missile_carrier.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": true
+      }
+    ]
+  },
+  {
+    "Id": "ff01392e-cf61-4baa-b5cc-4b570c04502f",
+    "Name": "ammo_9mm",
+    "Enabled": true,
+    "Position": "-487.3623,-233.8107,851.3224",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "ammobox_9mm",
+        "Path": "models/weapons/sbox_ammo/9mm_ammobox/ammobox_9mm.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "ammobox_9mm",
+        "Path": "models/weapons/sbox_ammo/9mm_ammobox/ammobox_9mm.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "9mm_bullet",
+        "Path": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "9mm_bullet (3)",
+        "Path": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "9mm_bullet (1)",
+        "Path": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "9mm_bullet (2)",
+        "Path": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "1fd53c30-88eb-4c2b-9bad-2c90c0cf46df",
+    "Name": "ammo_rpgclip (2)",
+    "Enabled": true,
+    "Position": "-1417.933,-344.1113,888",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "84mm_missile (1)",
+        "Path": "models/weapons/sbox_ammo/84mm_ammobox/missile_carrier.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": true
+      }
+    ]
+  },
+  {
+    "Id": "132afefa-1b0d-4df4-9666-63e389d759f9",
+    "Name": "ammo_40mm",
+    "Enabled": true,
+    "Position": "-1619.411,-670.2051,780",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "40mm_grenade",
+        "Path": "models/weapons/sbox_ammo/40mm_grenade/40mm_grenade.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": true
+      },
+      {
+        "Name": "40mm_grenade (1)",
+        "Path": "models/weapons/sbox_ammo/40mm_grenade/40mm_grenade.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": true
+      }
+    ]
+  },
+  {
+    "Id": "a6952d49-7223-4c0f-ae25-d8ba890a97e4",
+    "Name": "item_shotgun",
+    "Enabled": true,
+    "Position": "-1184,-440,784",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "shotgun",
+        "Path": "models/weapons/sbox_shotgun_spaghellim4/w_spaghellim4.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "daf711af-aa8f-408f-ab61-6fbfa32134b6",
+    "Name": "ammo_9mm (1)",
+    "Enabled": true,
+    "Position": "-1466.048,-363.214,783.3224",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "ammobox_9mm",
+        "Path": "models/weapons/sbox_ammo/9mm_ammobox/ammobox_9mm.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "ammobox_9mm",
+        "Path": "models/weapons/sbox_ammo/9mm_ammobox/ammobox_9mm.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "9mm_bullet",
+        "Path": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "9mm_bullet (3)",
+        "Path": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "9mm_bullet (1)",
+        "Path": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "9mm_bullet (2)",
+        "Path": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "18aa6c40-0029-4ef7-b358-ea7a43452378",
+    "Name": "ammo_buckshot",
+    "Enabled": true,
+    "Position": "-1379.983,-357.8232,783.3224",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "12g_shell (4)",
+        "Path": "models/weapons/sbox_ammo/12g_shell/12g_shell.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "e",
+        "Path": "models/weapons/sbox_ammo/12g_shell/12g_shell.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "ammobox_12g",
+        "Path": "models/weapons/sbox_ammo/12g_ammobox/ammobox_12g.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "ammobox_12g (1)",
+        "Path": "models/weapons/sbox_ammo/12g_ammobox/ammobox_12g.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "0e285ef5-617f-4c46-a5fa-0c8c06a856c0",
+    "Name": "ammo_9mm (2)",
+    "Enabled": true,
+    "Position": "-1143.142,-158.0565,891.3224",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "ammobox_9mm",
+        "Path": "models/weapons/sbox_ammo/9mm_ammobox/ammobox_9mm.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "ammobox_9mm",
+        "Path": "models/weapons/sbox_ammo/9mm_ammobox/ammobox_9mm.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "9mm_bullet",
+        "Path": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "9mm_bullet (3)",
+        "Path": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "9mm_bullet (1)",
+        "Path": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "9mm_bullet (2)",
+        "Path": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "40d0e481-25a3-45ab-8395-64a6d02412ed",
+    "Name": "ammo_40mm (1)",
+    "Enabled": true,
+    "Position": "-957.8484,111.9926,920",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "40mm_grenade",
+        "Path": "models/weapons/sbox_ammo/40mm_grenade/40mm_grenade.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": true
+      },
+      {
+        "Name": "40mm_grenade (1)",
+        "Path": "models/weapons/sbox_ammo/40mm_grenade/40mm_grenade.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": true
+      }
+    ]
+  },
+  {
+    "Id": "6e938a21-169a-4e45-ab3c-59d2af28400e",
+    "Name": "ammo_buckshot (1)",
+    "Enabled": true,
+    "Position": "-607.3497,560.494,891.3224",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "12g_shell (4)",
+        "Path": "models/weapons/sbox_ammo/12g_shell/12g_shell.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "e",
+        "Path": "models/weapons/sbox_ammo/12g_shell/12g_shell.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "ammobox_12g",
+        "Path": "models/weapons/sbox_ammo/12g_ammobox/ammobox_12g.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "ammobox_12g (1)",
+        "Path": "models/weapons/sbox_ammo/12g_ammobox/ammobox_12g.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "3c0f9ccb-262f-4c01-a7c1-5e3d132ea91e",
+    "Name": "ammo_9mm (3)",
+    "Enabled": true,
+    "Position": "-696,240,1016",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "ammobox_9mm",
+        "Path": "models/weapons/sbox_ammo/9mm_ammobox/ammobox_9mm.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "ammobox_9mm",
+        "Path": "models/weapons/sbox_ammo/9mm_ammobox/ammobox_9mm.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "9mm_bullet",
+        "Path": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "9mm_bullet (3)",
+        "Path": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "9mm_bullet (1)",
+        "Path": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "9mm_bullet (2)",
+        "Path": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "36d808e7-fe35-4843-8056-dd80735757e8",
+    "Name": "ammo_9mm (4)",
+    "Enabled": true,
+    "Position": "-696,296,1016",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "ammobox_9mm",
+        "Path": "models/weapons/sbox_ammo/9mm_ammobox/ammobox_9mm.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "ammobox_9mm",
+        "Path": "models/weapons/sbox_ammo/9mm_ammobox/ammobox_9mm.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "9mm_bullet",
+        "Path": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "9mm_bullet (3)",
+        "Path": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "9mm_bullet (1)",
+        "Path": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "9mm_bullet (2)",
+        "Path": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "4f08b68a-62b2-4db6-9535-a0f403db56db",
+    "Name": "ammo_buckshot (2)",
+    "Enabled": true,
+    "Position": "-688,-224,1016",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "12g_shell (4)",
+        "Path": "models/weapons/sbox_ammo/12g_shell/12g_shell.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "e",
+        "Path": "models/weapons/sbox_ammo/12g_shell/12g_shell.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "ammobox_12g",
+        "Path": "models/weapons/sbox_ammo/12g_ammobox/ammobox_12g.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "ammobox_12g (1)",
+        "Path": "models/weapons/sbox_ammo/12g_ammobox/ammobox_12g.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "4729d6c4-04ce-47b1-a51c-cb23e1f5d2ca",
+    "Name": "ammo_gauss",
+    "Enabled": true,
+    "Position": "-576,704,888",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "Cube",
+        "Path": "models/dev/box.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "Cube (1)",
+        "Path": "models/dev/box.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "Cube (2)",
+        "Path": "models/dev/box.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "Cube (3)",
+        "Path": "models/dev/box.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "7594c969-c4c6-4a03-9306-08f39875c8bb",
+    "Name": "ammo_40mm (2)",
+    "Enabled": true,
+    "Position": "-576,848,944",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "40mm_grenade",
+        "Path": "models/weapons/sbox_ammo/40mm_grenade/40mm_grenade.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": true
+      },
+      {
+        "Name": "40mm_grenade (1)",
+        "Path": "models/weapons/sbox_ammo/40mm_grenade/40mm_grenade.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": true
+      }
+    ]
+  },
+  {
+    "Id": "931c3253-bda1-41b2-aca7-548c71988d22",
+    "Name": "ammo_9mm (5)",
+    "Enabled": true,
+    "Position": "-1024,944,888",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "ammobox_9mm",
+        "Path": "models/weapons/sbox_ammo/9mm_ammobox/ammobox_9mm.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "ammobox_9mm",
+        "Path": "models/weapons/sbox_ammo/9mm_ammobox/ammobox_9mm.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "9mm_bullet",
+        "Path": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "9mm_bullet (3)",
+        "Path": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "9mm_bullet (1)",
+        "Path": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "9mm_bullet (2)",
+        "Path": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "6dfc44fc-26ff-4ad3-925a-4e9a25e4bbb1",
+    "Name": "ammo_9mm (6)",
+    "Enabled": true,
+    "Position": "-960,944,888",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "ammobox_9mm",
+        "Path": "models/weapons/sbox_ammo/9mm_ammobox/ammobox_9mm.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "ammobox_9mm",
+        "Path": "models/weapons/sbox_ammo/9mm_ammobox/ammobox_9mm.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "9mm_bullet",
+        "Path": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "9mm_bullet (3)",
+        "Path": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "9mm_bullet (1)",
+        "Path": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "9mm_bullet (2)",
+        "Path": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "b1df6aa9-55d6-4898-8eca-7a1e17703aaa",
+    "Name": "ammo_gauss (1)",
+    "Enabled": true,
+    "Position": "-576,1032,888",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "Cube",
+        "Path": "models/dev/box.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "Cube (1)",
+        "Path": "models/dev/box.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "Cube (2)",
+        "Path": "models/dev/box.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "Cube (3)",
+        "Path": "models/dev/box.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "d2be0a56-3c9a-4b96-8aaf-8d92b9b5c14c",
+    "Name": "ammo_buckshot (3)",
+    "Enabled": true,
+    "Position": "-392,808,888",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "12g_shell (4)",
+        "Path": "models/weapons/sbox_ammo/12g_shell/12g_shell.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "e",
+        "Path": "models/weapons/sbox_ammo/12g_shell/12g_shell.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "ammobox_12g",
+        "Path": "models/weapons/sbox_ammo/12g_ammobox/ammobox_12g.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "ammobox_12g (1)",
+        "Path": "models/weapons/sbox_ammo/12g_ammobox/ammobox_12g.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "e587bf35-0ad0-4c04-9dcf-edd641da21d5",
+    "Name": "ammo_buckshot (4)",
+    "Enabled": true,
+    "Position": "-128,424,824",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "12g_shell (4)",
+        "Path": "models/weapons/sbox_ammo/12g_shell/12g_shell.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "e",
+        "Path": "models/weapons/sbox_ammo/12g_shell/12g_shell.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "ammobox_12g",
+        "Path": "models/weapons/sbox_ammo/12g_ammobox/ammobox_12g.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "ammobox_12g (1)",
+        "Path": "models/weapons/sbox_ammo/12g_ammobox/ammobox_12g.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "9d0c4557-d9e0-4742-b0a9-5ca1f59929db",
+    "Name": "ammo_357",
+    "Enabled": true,
+    "Position": "0,280,824",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "ammobox_357",
+        "Path": "models/weapons/sbox_ammo/357_ammobox/ammobox_357.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "ammobox_357",
+        "Path": "models/weapons/sbox_ammo/357_ammobox/ammobox_357.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "357_bullet (1)",
+        "Path": "models/weapons/sbox_ammo/357_bullet/357_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "357_bullet (2)",
+        "Path": "models/weapons/sbox_ammo/357_bullet/357_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "357_bullet (3)",
+        "Path": "models/weapons/sbox_ammo/357_bullet/357_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "357_bullet (4)",
+        "Path": "models/weapons/sbox_ammo/357_bullet/357_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "5ac1e1ab-d11b-4bb6-b058-217b10161634",
+    "Name": "ammo_rpgclip (3)",
+    "Enabled": true,
+    "Position": "-8,600,832",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "84mm_missile (1)",
+        "Path": "models/weapons/sbox_ammo/84mm_ammobox/missile_carrier.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": true
+      }
+    ]
+  },
+  {
+    "Id": "fca9409a-141c-451c-8087-255ecfe43f6f",
+    "Name": "ammo_rpgclip (4)",
+    "Enabled": true,
+    "Position": "-64,600,832",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "84mm_missile (1)",
+        "Path": "models/weapons/sbox_ammo/84mm_ammobox/missile_carrier.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": true
+      }
+    ]
+  },
+  {
+    "Id": "914d58ec-05e4-4812-a522-de7f1e9337da",
+    "Name": "item_longjumpmodule",
+    "Enabled": true,
+    "Position": "0,488,1072",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      },
+      {
+        "Type": "MissingComponent",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "Cube",
+        "Path": "models/dev/box.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "Cube (1)",
+        "Path": "models/dev/box.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "58a6ea96-1f59-4e6e-bf2d-616deb667285",
+    "Name": "ammo_9mm (7)",
+    "Enabled": true,
+    "Position": "592,928,1016",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "ammobox_9mm",
+        "Path": "models/weapons/sbox_ammo/9mm_ammobox/ammobox_9mm.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "ammobox_9mm",
+        "Path": "models/weapons/sbox_ammo/9mm_ammobox/ammobox_9mm.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "9mm_bullet",
+        "Path": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "9mm_bullet (3)",
+        "Path": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "9mm_bullet (1)",
+        "Path": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "9mm_bullet (2)",
+        "Path": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "102df964-6f6d-489d-9d8b-d3070c194dc2",
+    "Name": "ammo_9mm (8)",
+    "Enabled": true,
+    "Position": "592,1008,1016",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "ammobox_9mm",
+        "Path": "models/weapons/sbox_ammo/9mm_ammobox/ammobox_9mm.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "ammobox_9mm",
+        "Path": "models/weapons/sbox_ammo/9mm_ammobox/ammobox_9mm.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "9mm_bullet",
+        "Path": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "9mm_bullet (3)",
+        "Path": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "9mm_bullet (1)",
+        "Path": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "9mm_bullet (2)",
+        "Path": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "02c40cf3-57bd-45d4-85e9-17079815d263",
+    "Name": "item_shotgun (1)",
+    "Enabled": true,
+    "Position": "672,312,1016",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "shotgun",
+        "Path": "models/weapons/sbox_shotgun_spaghellim4/w_spaghellim4.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "ca58b141-d9b8-435e-94ea-d1891f7eb58e",
+    "Name": "ammo_9mm (9)",
+    "Enabled": true,
+    "Position": "672,-48,1016",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "ammobox_9mm",
+        "Path": "models/weapons/sbox_ammo/9mm_ammobox/ammobox_9mm.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "ammobox_9mm",
+        "Path": "models/weapons/sbox_ammo/9mm_ammobox/ammobox_9mm.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "9mm_bullet",
+        "Path": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "9mm_bullet (3)",
+        "Path": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "9mm_bullet (1)",
+        "Path": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "9mm_bullet (2)",
+        "Path": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "5936e532-3a96-4bce-ae5a-eeedd0158a1d",
+    "Name": "ammo_bolts",
+    "Enabled": true,
+    "Position": "672,0,1016",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "Cube",
+        "Path": "models/dev/box.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "Cube (1)",
+        "Path": "models/dev/box.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "Cube (2)",
+        "Path": "models/dev/box.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "Cube (3)",
+        "Path": "models/dev/box.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "a44a7a93-895b-469b-8ee3-1280672bdbe1",
+    "Name": "ammo_rpgclip (5)",
+    "Enabled": true,
+    "Position": "672,464,888",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "84mm_missile (1)",
+        "Path": "models/weapons/sbox_ammo/84mm_ammobox/missile_carrier.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": true
+      }
+    ]
+  },
+  {
+    "Id": "738d2c2b-b517-4cc6-8805-88b1cc35e1c5",
+    "Name": "item_crossbow",
+    "Enabled": true,
+    "Position": "697.3784,506.7655,888",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "w_usp",
+        "Path": "models/weapons/sbox_sniper_m700/w_m700.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "893f272e-09cf-406f-b607-09c891884105",
+    "Name": "ammo_gauss (2)",
+    "Enabled": true,
+    "Position": "1240,280,1008",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "Cube",
+        "Path": "models/dev/box.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "Cube (1)",
+        "Path": "models/dev/box.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "Cube (2)",
+        "Path": "models/dev/box.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "Cube (3)",
+        "Path": "models/dev/box.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "856545f1-f883-48a9-bc55-83cc66f8eeed",
+    "Name": "ammo_9mm (10)",
+    "Enabled": true,
+    "Position": "1086,-452,888",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "ammobox_9mm",
+        "Path": "models/weapons/sbox_ammo/9mm_ammobox/ammobox_9mm.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "ammobox_9mm",
+        "Path": "models/weapons/sbox_ammo/9mm_ammobox/ammobox_9mm.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "9mm_bullet",
+        "Path": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "9mm_bullet (3)",
+        "Path": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "9mm_bullet (1)",
+        "Path": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "9mm_bullet (2)",
+        "Path": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "38d0b35b-d6cc-496f-b869-2a5abbf9473f",
+    "Name": "ammo_9mm (11)",
+    "Enabled": true,
+    "Position": "1048,-454,888",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "ammobox_9mm",
+        "Path": "models/weapons/sbox_ammo/9mm_ammobox/ammobox_9mm.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "ammobox_9mm",
+        "Path": "models/weapons/sbox_ammo/9mm_ammobox/ammobox_9mm.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "9mm_bullet",
+        "Path": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "9mm_bullet (3)",
+        "Path": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "9mm_bullet (1)",
+        "Path": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "9mm_bullet (2)",
+        "Path": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "2527662f-f556-4ddd-bf48-f39b41a40dd3",
+    "Name": "ammo_buckshot (5)",
+    "Enabled": true,
+    "Position": "416,-504,888",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "12g_shell (4)",
+        "Path": "models/weapons/sbox_ammo/12g_shell/12g_shell.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "e",
+        "Path": "models/weapons/sbox_ammo/12g_shell/12g_shell.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "ammobox_12g",
+        "Path": "models/weapons/sbox_ammo/12g_ammobox/ammobox_12g.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "ammobox_12g (1)",
+        "Path": "models/weapons/sbox_ammo/12g_ammobox/ammobox_12g.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "de517c41-4be3-433a-b8fd-dcd66d4ebc30",
+    "Name": "ammo_9mm (12)",
+    "Enabled": true,
+    "Position": "-144,-800,1032",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "ammobox_9mm",
+        "Path": "models/weapons/sbox_ammo/9mm_ammobox/ammobox_9mm.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "ammobox_9mm",
+        "Path": "models/weapons/sbox_ammo/9mm_ammobox/ammobox_9mm.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "9mm_bullet",
+        "Path": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "9mm_bullet (3)",
+        "Path": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "9mm_bullet (1)",
+        "Path": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      },
+      {
+        "Name": "9mm_bullet (2)",
+        "Path": "models/weapons/sbox_ammo/9mm_bullet/9mm_bullet.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "4e2bf96d-a28e-4d02-8b46-17c33a4d1e20",
+    "Name": "item_hornetgun",
+    "Enabled": true,
+    "Position": "0,-352,848",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "model",
+        "Path": "models/fishes/salmon/salmon.vmdl",
+        "Bones": 6,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  },
+  {
+    "Id": "25973386-4cf0-46b0-8fcf-9931c41d8aae",
+    "Name": "item_gluon_gun",
+    "Enabled": true,
+    "Position": "288,416,824",
+    "Components": [
+      {
+        "Type": "BoxCollider",
+        "Data": null
+      },
+      {
+        "Type": "MissingComponent",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "gluon_gun",
+        "Path": "models/weapons/sbox_physgun/w_physgun.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": true
+      }
+    ]
+  },
+  {
+    "Id": "1b4a9c05-f3c8-4248-b874-ba09b8f39487",
+    "Name": "Kill Volume",
+    "Enabled": true,
+    "Position": "608,-672,808",
+    "Components": [
+      {
+        "Type": "HammerMesh",
+        "Data": null
+      },
+      {
+        "Type": "TriggerHurt",
+        "Data": null
+      },
+      {
+        "Type": "ModelRenderer",
+        "Data": null
+      },
+      {
+        "Type": "ModelCollider",
+        "Data": null
+      }
+    ],
+    "Models": [
+      {
+        "Name": "Kill Volume",
+        "Path": "maps/depot/gameobjects/1b4a9c05-f3c8-4248-b874-ba09b8f39487.vmdl",
+        "Bones": 0,
+        "Enabled": true,
+        "Error": false
+      }
+    ]
+  }
+]

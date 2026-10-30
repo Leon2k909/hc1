@@ -1,0 +1,993 @@
+{
+  "results": [
+    {
+      "Window": {
+        "Frames": 150,
+        "Seconds": 2.02
+      },
+      "Fps": 74.4,
+      "TargetFps": 240,
+      "TargetSource": "vsync",
+      "LimitedBy": "CPU",
+      "MeetingTarget": false,
+      "Rating": "Bad",
+      "Frame": {
+        "AvgMs": 13.44,
+        "P50Ms": 13.21,
+        "P99Ms": 26.94,
+        "MaxMs": 27.97
+      },
+      "CpuWork": {
+        "AvgMs": 13.44,
+        "P50Ms": 13.21,
+        "P99Ms": 26.94,
+        "MaxMs": 27.97
+      },
+      "Gpu": {
+        "AvgMs": 5.37,
+        "P50Ms": 5.24,
+        "P99Ms": 6.23,
+        "MaxMs": 6.23
+      },
+      "CapWait": {
+        "AvgMs": 0,
+        "P50Ms": 0,
+        "P99Ms": 0,
+        "MaxMs": 0
+      },
+      "PerfHubWindow": null,
+      "Hitches": {
+        "Count": 2,
+        "OverMs": 26.4,
+        "WorstMs": 28
+      },
+      "Issues": [
+        {
+          "Severity": "Bad",
+          "Title": "GC pauses",
+          "Detail": "8.7 ms in the last second",
+          "MoreIn": "perf_memory"
+        },
+        {
+          "Severity": "Warning",
+          "Title": "2 hitches",
+          "Detail": "over 26 ms in 2.0 s, worst 28 ms",
+          "MoreIn": "perf_cpu"
+        }
+      ],
+      "MainThread": [
+        {
+          "Name": "Render",
+          "AvgMs": 5.78,
+          "MaxMs": 7.09
+        },
+        {
+          "Name": "Physics",
+          "AvgMs": 1.31,
+          "MaxMs": 4.07
+        },
+        {
+          "Name": "UI",
+          "AvgMs": 1.26,
+          "MaxMs": 1.99
+        },
+        {
+          "Name": "Animation",
+          "AvgMs": 1.06,
+          "MaxMs": 1.6
+        },
+        {
+          "Name": "Update",
+          "AvgMs": 1.05,
+          "MaxMs": 2.76
+        },
+        {
+          "Name": "Editor",
+          "AvgMs": 0.57,
+          "MaxMs": 2.8
+        },
+        {
+          "Name": "Audio",
+          "AvgMs": 0.38,
+          "MaxMs": 0.91
+        },
+        {
+          "Name": "Particles",
+          "AvgMs": 0.27,
+          "MaxMs": 0.44
+        }
+      ],
+      "GpuPasses": [
+        {
+          "Name": "Static Opaque Forward",
+          "AvgMs": 0.71,
+          "MaxMs": 0.93,
+          "Path": "RenderToSwapChain / Static Opaque Forward"
+        },
+        {
+          "Name": "GameOverlay",
+          "AvgMs": 0.68,
+          "MaxMs": 0.84,
+          "Path": "RenderToSwapChain / GameOverlay"
+        },
+        {
+          "Name": "Dynamic Opaque Forward",
+          "AvgMs": 0.49,
+          "MaxMs": 0.5,
+          "Path": "RenderToSwapChain / Dynamic Opaque Forward"
+        },
+        {
+          "Name": "VolumetricFog",
+          "AvgMs": 0.45,
+          "MaxMs": 0.59,
+          "Path": "RenderToSwapChain / VolumetricFog"
+        },
+        {
+          "Name": "CommandList",
+          "AvgMs": 0.33,
+          "MaxMs": 0.48,
+          "Path": "Managed: AfterTransparent / CommandList"
+        },
+        {
+          "Name": "Marker Mask",
+          "AvgMs": 0.21,
+          "MaxMs": 0.44,
+          "Path": "Managed: AfterTransparent / Marker Mask"
+        },
+        {
+          "Name": "GameOverlay Translucent",
+          "AvgMs": 0.18,
+          "MaxMs": 0.39,
+          "Path": "RenderToSwapChain / GameOverlay Translucent"
+        },
+        {
+          "Name": "Depth Normal Prepass (Large)",
+          "AvgMs": 0.17,
+          "MaxMs": 0.18,
+          "Path": "RenderToSwapChain / Depth Normal Prepass (Large)"
+        }
+      ],
+      "Memory": {
+        "ProcessMiB": 11791.4,
+        "VideoMemory": {
+          "UsedMiB": 7369.5,
+          "BudgetMiB": 10146.5
+        },
+        "AllocatedMiBPerSecond": 14.6,
+        "GcPauseMsLastSecond": 8.72,
+        "GcLastSecond": {
+          "Gen0": 2,
+          "Gen1": 0,
+          "Gen2": 0
+        }
+      },
+      "DrawCalls": 1499,
+      "Triangles": 3009442
+    },
+    {
+      "Window": {
+        "Frames": 150,
+        "Seconds": 2.02
+      },
+      "CpuWork": {
+        "AvgMs": 13.44,
+        "P50Ms": 13.21,
+        "P99Ms": 26.94,
+        "MaxMs": 27.97
+      },
+      "CapWait": {
+        "AvgMs": 0,
+        "P50Ms": 0,
+        "P99Ms": 0,
+        "MaxMs": 0
+      },
+      "Frame": {
+        "AvgMs": 13.44,
+        "P50Ms": 13.21,
+        "P99Ms": 26.94,
+        "MaxMs": 27.97
+      },
+      "FrameStdDevMs": 2.6,
+      "Hitches": {
+        "Count": 2,
+        "OverMs": 26.4,
+        "WorstMs": 28
+      },
+      "NotPresentedPercent": 0,
+      "Cap": {
+        "CappedBy": "vsync",
+        "CapFps": 240,
+        "Display": "borderless",
+        "VSync": true,
+        "RefreshRate": 239.96,
+        "FpsMax": 0,
+        "FpsMaxMenu": 0,
+        "FpsMaxInactive": 0
+      },
+      "Categories": [
+        {
+          "Name": "Render",
+          "AvgMs": 5.78,
+          "MaxMs": 7.09
+        },
+        {
+          "Name": "Physics",
+          "AvgMs": 1.31,
+          "MaxMs": 4.07
+        },
+        {
+          "Name": "UI",
+          "AvgMs": 1.26,
+          "MaxMs": 1.99
+        },
+        {
+          "Name": "Animation",
+          "AvgMs": 1.06,
+          "MaxMs": 1.6
+        },
+        {
+          "Name": "Update",
+          "AvgMs": 1.05,
+          "MaxMs": 2.76
+        },
+        {
+          "Name": "Editor",
+          "AvgMs": 0.57,
+          "MaxMs": 2.8
+        },
+        {
+          "Name": "Audio",
+          "AvgMs": 0.38,
+          "MaxMs": 0.91
+        },
+        {
+          "Name": "Particles",
+          "AvgMs": 0.27,
+          "MaxMs": 0.44
+        },
+        {
+          "Name": "NavMesh",
+          "AvgMs": 0.1,
+          "MaxMs": 0.38
+        },
+        {
+          "Name": "GcPause",
+          "AvgMs": 0.1,
+          "MaxMs": 4.05
+        },
+        {
+          "Name": "Async",
+          "AvgMs": 0.03,
+          "MaxMs": 0.53
+        },
+        {
+          "Name": "Input",
+          "AvgMs": 0.02,
+          "MaxMs": 0.1
+        }
+      ],
+      "TotalScopes": 22,
+      "Scopes": [
+        {
+          "Name": "GameFrame",
+          "AvgMs": 5.85,
+          "MaxMs": 11.1
+        },
+        {
+          "Name": "Render",
+          "AvgMs": 5.78,
+          "MaxMs": 7.09
+        },
+        {
+          "Name": "Physics",
+          "AvgMs": 1.31,
+          "MaxMs": 4.07
+        },
+        {
+          "Name": "UI",
+          "AvgMs": 1.26,
+          "MaxMs": 1.99
+        },
+        {
+          "Name": "Animation",
+          "AvgMs": 1.06,
+          "MaxMs": 1.6
+        },
+        {
+          "Name": "Update",
+          "AvgMs": 1.05,
+          "MaxMs": 2.76
+        },
+        {
+          "Name": "Editor",
+          "AvgMs": 0.57,
+          "MaxMs": 2.8
+        },
+        {
+          "Name": "Tick Panels",
+          "AvgMs": 0.45,
+          "MaxMs": 0.74
+        },
+        {
+          "Name": "Audio",
+          "AvgMs": 0.38,
+          "MaxMs": 0.91
+        },
+        {
+          "Name": "Build Command Lists",
+          "AvgMs": 0.33,
+          "MaxMs": 0.85
+        },
+        {
+          "Name": "Pre Layout",
+          "AvgMs": 0.31,
+          "MaxMs": 0.51
+        },
+        {
+          "Name": "Particles",
+          "AvgMs": 0.27,
+          "MaxMs": 0.44
+        },
+        {
+          "Name": "NavMesh",
+          "AvgMs": 0.1,
+          "MaxMs": 0.38
+        },
+        {
+          "Name": "GcPause",
+          "AvgMs": 0.1,
+          "MaxMs": 4.05
+        },
+        {
+          "Name": "Layout",
+          "AvgMs": 0.05,
+          "MaxMs": 0.15
+        },
+        {
+          "Name": "CalculateLayout",
+          "AvgMs": 0.05,
+          "MaxMs": 0.15
+        },
+        {
+          "Name": "Tick Input",
+          "AvgMs": 0.04,
+          "MaxMs": 0.15
+        },
+        {
+          "Name": "Post Layout",
+          "AvgMs": 0.03,
+          "MaxMs": 0.09
+        },
+        {
+          "Name": "Async",
+          "AvgMs": 0.03,
+          "MaxMs": 0.53
+        },
+        {
+          "Name": "Execute Command Lists",
+          "AvgMs": 0.02,
+          "MaxMs": 0.04
+        },
+        {
+          "Name": "Tool Binds",
+          "AvgMs": 0.02,
+          "MaxMs": 0.04
+        },
+        {
+          "Name": "Input",
+          "AvgMs": 0.02,
+          "MaxMs": 0.1
+        }
+      ]
+    },
+    {
+      "Gpu": {
+        "AvgMs": 5.37,
+        "P50Ms": 5.24,
+        "P99Ms": 6.23,
+        "MaxMs": 6.23
+      },
+      "OfFramePercent": 40,
+      "VideoMemory": {
+        "UsedMiB": 7369.5,
+        "BudgetMiB": 10146.5
+      },
+      "Renderer": "native",
+      "LeafPasses": [
+        {
+          "Name": "Static Opaque Forward",
+          "AvgMs": 0.71,
+          "MaxMs": 0.93,
+          "Path": "RenderToSwapChain / Static Opaque Forward"
+        },
+        {
+          "Name": "GameOverlay",
+          "AvgMs": 0.68,
+          "MaxMs": 0.84,
+          "Path": "RenderToSwapChain / GameOverlay"
+        },
+        {
+          "Name": "Dynamic Opaque Forward",
+          "AvgMs": 0.49,
+          "MaxMs": 0.5,
+          "Path": "RenderToSwapChain / Dynamic Opaque Forward"
+        },
+        {
+          "Name": "VolumetricFog",
+          "AvgMs": 0.45,
+          "MaxMs": 0.59,
+          "Path": "RenderToSwapChain / VolumetricFog"
+        },
+        {
+          "Name": "CommandList",
+          "AvgMs": 0.33,
+          "MaxMs": 0.48,
+          "Path": "Managed: AfterTransparent / CommandList"
+        },
+        {
+          "Name": "Marker Mask",
+          "AvgMs": 0.21,
+          "MaxMs": 0.44,
+          "Path": "Managed: AfterTransparent / Marker Mask"
+        },
+        {
+          "Name": "GameOverlay Translucent",
+          "AvgMs": 0.18,
+          "MaxMs": 0.39,
+          "Path": "RenderToSwapChain / GameOverlay Translucent"
+        },
+        {
+          "Name": "Depth Normal Prepass (Large)",
+          "AvgMs": 0.17,
+          "MaxMs": 0.18,
+          "Path": "RenderToSwapChain / Depth Normal Prepass (Large)"
+        },
+        {
+          "Name": "UI Root: GameRootPanel",
+          "AvgMs": 0.16,
+          "MaxMs": 0.16,
+          "Path": "Managed: UI / UI Root: GameRootPanel"
+        },
+        {
+          "Name": "Bloom",
+          "AvgMs": 0.12,
+          "MaxMs": 0.13,
+          "Path": "Managed: BeforePostProcessing / Bloom"
+        },
+        {
+          "Name": "AO Main Pass",
+          "AvgMs": 0.09,
+          "MaxMs": 0.1,
+          "Path": "Ambient Occlusion / AO Main Pass"
+        },
+        {
+          "Name": "AO Denoise",
+          "AvgMs": 0.09,
+          "MaxMs": 0.1,
+          "Path": "Ambient Occlusion / AO Denoise"
+        },
+        {
+          "Name": "SceneLine",
+          "AvgMs": 0.08,
+          "MaxMs": 0.09,
+          "Path": "Translucent Forward / SceneLine"
+        },
+        {
+          "Name": "TextRenderer",
+          "AvgMs": 0.08,
+          "MaxMs": 0.09,
+          "Path": "Translucent Forward / TextRenderer"
+        },
+        {
+          "Name": "Depth Normal Prepass (Overlay)",
+          "AvgMs": 0.06,
+          "MaxMs": 0.07,
+          "Path": "RenderToSwapChain / Depth Normal Prepass (Overlay)"
+        },
+        {
+          "Name": "Photographic Response",
+          "AvgMs": 0.06,
+          "MaxMs": 0.06,
+          "Path": "Managed: AfterPostProcessing / Photographic Response"
+        },
+        {
+          "Name": "AO Upsample",
+          "AvgMs": 0.05,
+          "MaxMs": 0.05,
+          "Path": "Ambient Occlusion / AO Upsample"
+        },
+        {
+          "Name": "DrawDepthOpaque",
+          "AvgMs": 0.05,
+          "MaxMs": 0.05,
+          "Path": "CSM Cascade 2 / DrawDepthOpaque"
+        },
+        {
+          "Name": "Sharpen",
+          "AvgMs": 0.05,
+          "MaxMs": 0.05,
+          "Path": "Managed: AfterPostProcessing / Sharpen"
+        },
+        {
+          "Name": "DrawDepthOpaque",
+          "AvgMs": 0.05,
+          "MaxMs": 0.05,
+          "Path": "CSM Cascade 1 / DrawDepthOpaque"
+        },
+        {
+          "Name": "Tonemapping",
+          "AvgMs": 0.05,
+          "MaxMs": 0.05,
+          "Path": "Managed: Tonemapping / Tonemapping"
+        },
+        {
+          "Name": "Hi-Z Depth Downsample",
+          "AvgMs": 0.04,
+          "MaxMs": 0.05,
+          "Path": "RenderToSwapChain / Hi-Z Depth Downsample"
+        },
+        {
+          "Name": "Clustered Light Culling",
+          "AvgMs": 0.04,
+          "MaxMs": 0.04,
+          "Path": "RenderToSwapChain / Clustered Light Culling"
+        },
+        {
+          "Name": "SpriteBatch",
+          "AvgMs": 0.04,
+          "MaxMs": 0.2,
+          "Path": "Translucent Forward / SpriteBatch"
+        },
+        {
+          "Name": "SpriteBatch",
+          "AvgMs": 0.04,
+          "MaxMs": 0.05,
+          "Path": "DrawDepthTranslucent / SpriteBatch"
+        },
+        {
+          "Name": "SpriteBatch",
+          "AvgMs": 0.03,
+          "MaxMs": 0.05,
+          "Path": "DrawDepthTranslucent / SpriteBatch"
+        },
+        {
+          "Name": "Depth Normal Prepass (Small)",
+          "AvgMs": 0.03,
+          "MaxMs": 0.03,
+          "Path": "RenderToSwapChain / Depth Normal Prepass (Small)"
+        },
+        {
+          "Name": "Clear Color Depth Stencil",
+          "AvgMs": 0.02,
+          "MaxMs": 0.03,
+          "Path": "RenderToSwapChain / Clear Color Depth Stencil"
+        },
+        {
+          "Name": "Vignette",
+          "AvgMs": 0.02,
+          "MaxMs": 0.02,
+          "Path": "Managed: BeforePostProcessing / Vignette"
+        },
+        {
+          "Name": "DrawDepthOpaque",
+          "AvgMs": 0.02,
+          "MaxMs": 0.03,
+          "Path": "CSM Cascade 0 / DrawDepthOpaque"
+        }
+      ],
+      "TotalTreeRows": 48,
+      "Tree": [
+        {
+          "Name": "Graphics",
+          "Depth": 0,
+          "AvgMs": null,
+          "MaxMs": null
+        },
+        {
+          "Name": "CSM Cascade 0",
+          "Depth": 1,
+          "AvgMs": null,
+          "MaxMs": null
+        },
+        {
+          "Name": "DrawDepthOpaque",
+          "Depth": 2,
+          "AvgMs": 0.02,
+          "MaxMs": 0.03
+        },
+        {
+          "Name": "CSM Cascade 1",
+          "Depth": 1,
+          "AvgMs": null,
+          "MaxMs": null
+        },
+        {
+          "Name": "DrawDepthOpaque",
+          "Depth": 2,
+          "AvgMs": 0.05,
+          "MaxMs": 0.05
+        },
+        {
+          "Name": "DrawDepthTranslucent",
+          "Depth": 2,
+          "AvgMs": 0.05,
+          "MaxMs": 0.07
+        },
+        {
+          "Name": "CSM Cascade 2",
+          "Depth": 1,
+          "AvgMs": null,
+          "MaxMs": null
+        },
+        {
+          "Name": "DrawDepthOpaque",
+          "Depth": 2,
+          "AvgMs": 0.05,
+          "MaxMs": 0.05
+        },
+        {
+          "Name": "DrawDepthTranslucent",
+          "Depth": 2,
+          "AvgMs": 0.05,
+          "MaxMs": 0.07
+        },
+        {
+          "Name": "RenderToSwapChain",
+          "Depth": 1,
+          "AvgMs": null,
+          "MaxMs": null
+        },
+        {
+          "Name": "LightBinner",
+          "Depth": 2,
+          "AvgMs": 0.02,
+          "MaxMs": 0.02
+        },
+        {
+          "Name": "Clear Color Depth Stencil",
+          "Depth": 2,
+          "AvgMs": 0.02,
+          "MaxMs": 0.03
+        },
+        {
+          "Name": "Clustered Light Culling",
+          "Depth": 2,
+          "AvgMs": 0.04,
+          "MaxMs": 0.04
+        },
+        {
+          "Name": "Depth Normal Prepass (Overlay)",
+          "Depth": 2,
+          "AvgMs": 0.06,
+          "MaxMs": 0.07
+        },
+        {
+          "Name": "Depth Normal Prepass (Large)",
+          "Depth": 2,
+          "AvgMs": 0.17,
+          "MaxMs": 0.18
+        },
+        {
+          "Name": "Depth Normal Prepass (Small)",
+          "Depth": 2,
+          "AvgMs": 0.03,
+          "MaxMs": 0.03
+        },
+        {
+          "Name": "Hi-Z Depth Downsample",
+          "Depth": 2,
+          "AvgMs": 0.04,
+          "MaxMs": 0.05
+        },
+        {
+          "Name": "VolumetricFog",
+          "Depth": 2,
+          "AvgMs": 0.45,
+          "MaxMs": 0.59
+        },
+        {
+          "Name": "Managed: AfterDepthPrepass",
+          "Depth": 2,
+          "AvgMs": 0.36,
+          "MaxMs": 0.39
+        },
+        {
+          "Name": "Static Opaque Forward",
+          "Depth": 2,
+          "AvgMs": 0.71,
+          "MaxMs": 0.93
+        },
+        {
+          "Name": "Dynamic Opaque Forward",
+          "Depth": 2,
+          "AvgMs": 0.49,
+          "MaxMs": 0.5
+        },
+        {
+          "Name": "Translucent Forward",
+          "Depth": 2,
+          "AvgMs": 0.44,
+          "MaxMs": 0.59
+        },
+        {
+          "Name": "GameOverlay",
+          "Depth": 2,
+          "AvgMs": 0.68,
+          "MaxMs": 0.84
+        },
+        {
+          "Name": "Managed: AfterTransparent",
+          "Depth": 2,
+          "AvgMs": 0.54,
+          "MaxMs": 0.75
+        },
+        {
+          "Name": "GameOverlay Translucent",
+          "Depth": 2,
+          "AvgMs": 0.18,
+          "MaxMs": 0.39
+        },
+        {
+          "Name": "Managed: BeforePostProcessing",
+          "Depth": 2,
+          "AvgMs": 0.15,
+          "MaxMs": 0.15
+        },
+        {
+          "Name": "AutoExposure",
+          "Depth": 2,
+          "AvgMs": 0.02,
+          "MaxMs": 0.02
+        },
+        {
+          "Name": "Managed: Tonemapping",
+          "Depth": 2,
+          "AvgMs": 0.07,
+          "MaxMs": 0.07
+        },
+        {
+          "Name": "ResolveHDRToFinalSDR",
+          "Depth": 2,
+          "AvgMs": 0.02,
+          "MaxMs": 0.02
+        },
+        {
+          "Name": "Managed: AfterPostProcessing",
+          "Depth": 2,
+          "AvgMs": 0.11,
+          "MaxMs": 0.12
+        },
+        {
+          "Name": "Managed: UI",
+          "Depth": 2,
+          "AvgMs": 0.16,
+          "MaxMs": 0.17
+        },
+        {
+          "Name": "SpriteBatch",
+          "Depth": 3,
+          "AvgMs": 0.04,
+          "MaxMs": 0.05
+        },
+        {
+          "Name": "Tonemapping",
+          "Depth": 3,
+          "AvgMs": 0.05,
+          "MaxMs": 0.05
+        },
+        {
+          "Name": "Ambient Occlusion",
+          "Depth": 3,
+          "AvgMs": 0.25,
+          "MaxMs": 0.26
+        },
+        {
+          "Name": "Sharpen",
+          "Depth": 3,
+          "AvgMs": 0.05,
+          "MaxMs": 0.05
+        },
+        {
+          "Name": "Photographic Response",
+          "Depth": 3,
+          "AvgMs": 0.06,
+          "MaxMs": 0.06
+        },
+        {
+          "Name": "Bloom",
+          "Depth": 3,
+          "AvgMs": 0.12,
+          "MaxMs": 0.13
+        },
+        {
+          "Name": "Vignette",
+          "Depth": 3,
+          "AvgMs": 0.02,
+          "MaxMs": 0.02
+        },
+        {
+          "Name": "SpriteBatch",
+          "Depth": 3,
+          "AvgMs": 0.03,
+          "MaxMs": 0.05
+        },
+        {
+          "Name": "UI Root: GameRootPanel",
+          "Depth": 3,
+          "AvgMs": 0.16,
+          "MaxMs": 0.16
+        },
+        {
+          "Name": "CommandList",
+          "Depth": 3,
+          "AvgMs": 0.33,
+          "MaxMs": 0.48
+        },
+        {
+          "Name": "TextRenderer",
+          "Depth": 3,
+          "AvgMs": 0.08,
+          "MaxMs": 0.09
+        },
+        {
+          "Name": "SceneLine",
+          "Depth": 3,
+          "AvgMs": 0.08,
+          "MaxMs": 0.09
+        },
+        {
+          "Name": "Marker Mask",
+          "Depth": 3,
+          "AvgMs": 0.21,
+          "MaxMs": 0.44
+        },
+        {
+          "Name": "SpriteBatch",
+          "Depth": 3,
+          "AvgMs": 0.04,
+          "MaxMs": 0.2
+        },
+        {
+          "Name": "AO Main Pass",
+          "Depth": 4,
+          "AvgMs": 0.09,
+          "MaxMs": 0.1
+        },
+        {
+          "Name": "AO Denoise",
+          "Depth": 4,
+          "AvgMs": 0.09,
+          "MaxMs": 0.1
+        },
+        {
+          "Name": "AO Upsample",
+          "Depth": 4,
+          "AvgMs": 0.05,
+          "MaxMs": 0.05
+        }
+      ]
+    },
+    {
+      "Renderer": "native",
+      "Resolution": "1920x1080",
+      "AntiAliasing": "Multisample4x",
+      "Upscaling": "Off",
+      "Issues": [
+        {
+          "Severity": "Info",
+          "Title": "Material changes",
+          "Detail": "0.69 per draw, over 0.5. Share materials so draws batch",
+          "MoreIn": null
+        }
+      ],
+      "Counters": {
+        "ObjectsRendered": 779,
+        "ObjectsPreCull": 3555,
+        "ObjectsTested": 11119,
+        "BaseObjectDraws": 1170,
+        "AnimatableObjectDraws": 439,
+        "AggregateObjectDraws": 0,
+        "AggregateObjectsFullyCulled": 0,
+        "AggregateObjectDrawCalls": 0,
+        "AggregateIndirectSubmits": 0,
+        "AggregateIndirectFragments": 0,
+        "RenderBatchDraws": 783,
+        "TrianglesRendered": 3009442,
+        "DrawCalls": 1499,
+        "MaterialChanges": 786,
+        "ShadowMaterialChanges": 253,
+        "ShadowMaterialChangesAlphaTested": 0,
+        "InitialMaterialChanges": 722,
+        "InitialShadowMaterialChanges": 236,
+        "CopyMaterialChanges": 18,
+        "MaterialComputes": 1305,
+        "FullMaterialSets": 1323,
+        "SimilarMaterialSets": 155,
+        "TextureOnlyMaterialSets": 0,
+        "VfxEvals": 0,
+        "VfxRuleChecks": 844,
+        "ConstantBufferUpdates": 1979,
+        "ConstantBufferBytes": 373376,
+        "UnbatchableMaterialDraws": 0,
+        "UniqueMaterials": 0,
+        "DisplayLists": 116,
+        "SceneViewsRendered": 4,
+        "RenderTargetResolves": 3,
+        "PrimaryContexts": 148,
+        "SecondaryContexts": 0,
+        "ObjectsCulledByVis": 875,
+        "ObjectsCulledByScreenSize": 41,
+        "ObjectsCulledByFade": 9,
+        "ObjectsFading": 0,
+        "ShadowedLightsInView": 0,
+        "UnshadowedLightsInView": 69,
+        "ShadowMaps": 0,
+        "GpuStatsSummary": "Checked pending presents 164,263 times; waited 19 times; abandoned 5 times\nTexture memory: 5,917 / 10,150 MB; in 6,654 textures (632 MB non-evictable)\nTextures created overall: 11,140; textures evicted: 0\nCommand stream pools: 712,704 bytes in base, 0 bytes in medium, 0 bytes in large (0 extra data fallbacks)\nVulkan Total Mem: 8,305.27 MB; Fragmentation: 322.39 MB; PMB mem: 130.72 MB; command buffers: 8,655\nVulkan pipelines: 946; pipeline layouts: 429\n",
+        "PendingStreamingRequests": 0,
+        "TexturePoolUsedBytes": 6204967636,
+        "TexturePoolLimitBytes": 10643046400,
+        "TexturePoolNonEvictableBytes": 663404496
+      },
+      "ManagedRenderer": null,
+      "PostProcessing": [
+        {
+          "Name": "Ambient Occlusion",
+          "Stage": "AfterDepthPrepass",
+          "Order": 0,
+          "Async": false,
+          "AsyncCompute": true,
+          "NeedsDepthNormals": true
+        },
+        {
+          "Name": "Highlight",
+          "Stage": "AfterTransparent",
+          "Order": 1000,
+          "Async": false,
+          "AsyncCompute": false,
+          "NeedsDepthNormals": false
+        },
+        {
+          "Name": "Bloom",
+          "Stage": "BeforePostProcess",
+          "Order": 100,
+          "Async": false,
+          "AsyncCompute": false,
+          "NeedsDepthNormals": false
+        },
+        {
+          "Name": "Vignette",
+          "Stage": "BeforePostProcess",
+          "Order": 5000,
+          "Async": false,
+          "AsyncCompute": false,
+          "NeedsDepthNormals": false
+        },
+        {
+          "Name": "Tonemapping",
+          "Stage": "Tonemapping",
+          "Order": 0,
+          "Async": false,
+          "AsyncCompute": false,
+          "NeedsDepthNormals": false
+        },
+        {
+          "Name": "Sharpen",
+          "Stage": "AfterPostProcess",
+          "Order": 1,
+          "Async": false,
+          "AsyncCompute": false,
+          "NeedsDepthNormals": false
+        },
+        {
+          "Name": "Photographic Response",
+          "Stage": "AfterPostProcess",
+          "Order": 1000,
+          "Async": false,
+          "AsyncCompute": false,
+          "NeedsDepthNormals": false
+        }
+      ]
+    }
+  ],
+  "text": ""
+}

@@ -1,0 +1,174 @@
+{
+  "results": [
+    {
+      "EngineVersion": "26.10.13c",
+      "Project": "razedtest",
+      "ProjectTitle": "RazedTest",
+      "ActiveScene": "menu",
+      "ActiveScenePath": "scenes/menu.scene",
+      "SceneHasUnsavedChanges": false,
+      "IsPlaying": false,
+      "IsPaused": false,
+      "ToolCount": 401,
+      "IsCompiling": false,
+      "LastCompileSucceeded": true,
+      "LastCompileErrors": 0,
+      "Paths": {
+        "Engine": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\sbox",
+        "Logs": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\sbox\\logs",
+        "ProjectRoot": "C:\\sbox-projects\\hc1\\forked-shooter-main",
+        "ProjectSettings": "C:\\sbox-projects\\hc1\\forked-shooter-main\\ProjectSettings"
+      }
+    },
+    {
+      "Scenes": [
+        {
+          "Name": "menu",
+          "ResourcePath": "scenes/menu.scene",
+          "Type": "Scene",
+          "IsActive": true,
+          "HasUnsavedChanges": false,
+          "RootObjectCount": 10
+        },
+        {
+          "Name": "depot",
+          "ResourcePath": "scenes/maps/depot/depot.scene",
+          "Type": "Scene",
+          "IsActive": false,
+          "HasUnsavedChanges": false,
+          "RootObjectCount": 8
+        },
+        {
+          "Name": "ares",
+          "ResourcePath": "scenes/maps/ares/ares.scene",
+          "Type": "Scene",
+          "IsActive": false,
+          "HasUnsavedChanges": false,
+          "RootObjectCount": 24
+        }
+      ]
+    },
+    {
+      "Window": {
+        "Frames": 169,
+        "Seconds": 2.01
+      },
+      "CpuWork": {
+        "AvgMs": 7.5,
+        "P50Ms": 6.35,
+        "P99Ms": 11.88,
+        "MaxMs": 141.39
+      },
+      "CapWait": {
+        "AvgMs": 4.38,
+        "P50Ms": 4.71,
+        "P99Ms": 5.9,
+        "MaxMs": 5.91
+      },
+      "Frame": {
+        "AvgMs": 11.88,
+        "P50Ms": 11.11,
+        "P99Ms": 11.88,
+        "MaxMs": 141.39
+      },
+      "FrameStdDevMs": 9.99,
+      "Hitches": {
+        "Count": 1,
+        "OverMs": 22.2,
+        "WorstMs": 141.4
+      },
+      "NotPresentedPercent": 0,
+      "Cap": {
+        "CappedBy": "fps_max_inactive",
+        "CapFps": 90,
+        "Display": "borderless",
+        "VSync": true,
+        "RefreshRate": 239.96,
+        "FpsMax": 0,
+        "FpsMaxMenu": 0,
+        "FpsMaxInactive": 90
+      },
+      "Categories": [
+        {
+          "Name": "Render",
+          "AvgMs": 3.96,
+          "MaxMs": 6.89
+        },
+        {
+          "Name": "Editor",
+          "AvgMs": 2.49,
+          "MaxMs": 6.19
+        },
+        {
+          "Name": "Input",
+          "AvgMs": 1.15,
+          "MaxMs": 127.91
+        },
+        {
+          "Name": "UI",
+          "AvgMs": 0.17,
+          "MaxMs": 0.33
+        },
+        {
+          "Name": "GcPause",
+          "AvgMs": 0.15,
+          "MaxMs": 4.54
+        },
+        {
+          "Name": "Particles",
+          "AvgMs": 0.08,
+          "MaxMs": 0.22
+        },
+        {
+          "Name": "Animation",
+          "AvgMs": 0.08,
+          "MaxMs": 0.38
+        },
+        {
+          "Name": "Async",
+          "AvgMs": 0.03,
+          "MaxMs": 0.14
+        },
+        {
+          "Name": "Update",
+          "AvgMs": 0.02,
+          "MaxMs": 0.05
+        },
+        {
+          "Name": "Audio",
+          "AvgMs": 0.01,
+          "MaxMs": 0.12
+        }
+      ],
+      "TotalScopes": 13,
+      "Scopes": [
+        {
+          "Name": "Render",
+          "AvgMs": 3.96,
+          "MaxMs": 6.89
+        },
+        {
+          "Name": "Editor",
+          "AvgMs": 2.49,
+          "MaxMs": 6.19
+        },
+        {
+          "Name": "Input",
+          "AvgMs": 1.15,
+          "MaxMs": 127.91
+        },
+        {
+          "Name": "UI",
+          "AvgMs": 0.17,
+          "MaxMs": 0.33
+        },
+        {
+          "Name": "GcPause",
+          "AvgMs": 0.15,
+          "MaxMs": 4.54
+        }
+      ]
+    }
+  ],
+  "text": ""
+}

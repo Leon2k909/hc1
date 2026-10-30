@@ -1,0 +1,1213 @@
+{
+  "results": [
+    {
+      "ClassName": "ModelRenderer",
+      "Namespace": "Sandbox",
+      "Title": "Model Renderer",
+      "Description": "Renders a model in the world",
+      "Group": "Rendering",
+      "Icon": "free_breakfast",
+      "BaseType": "Renderer",
+      "Properties": [
+        {
+          "Name": "RenderOptions",
+          "Title": "Render Options",
+          "Description": null,
+          "Type": "RenderOptions",
+          "Group": "Advanced Rendering",
+          "ReadOnly": true
+        },
+        {
+          "Name": "MaterialOverride",
+          "Title": "Material Override",
+          "Description": null,
+          "Type": "Material",
+          "Group": null,
+          "ReadOnly": false
+        },
+        {
+          "Name": "Model",
+          "Title": "Model",
+          "Description": null,
+          "Type": "Model",
+          "Group": null,
+          "ReadOnly": false
+        },
+        {
+          "Name": "Tint",
+          "Title": "Tint",
+          "Description": null,
+          "Type": "Color",
+          "Group": null,
+          "ReadOnly": false
+        },
+        {
+          "Name": "CreateAttachments",
+          "Title": "Create Attachments",
+          "Description": null,
+          "Type": "Boolean",
+          "Group": null,
+          "ReadOnly": false
+        },
+        {
+          "Name": "BodyGroups",
+          "Title": "Body Groups",
+          "Description": null,
+          "Type": "UInt64",
+          "Group": null,
+          "ReadOnly": false
+        },
+        {
+          "Name": "Materials",
+          "Title": "Materials",
+          "Description": "Access to the materials",
+          "Type": "MaterialAccessor",
+          "Group": "Materials",
+          "ReadOnly": true
+        },
+        {
+          "Name": "MaterialGroup",
+          "Title": "Material Group",
+          "Description": null,
+          "Type": "String",
+          "Group": null,
+          "ReadOnly": false
+        },
+        {
+          "Name": "RenderType",
+          "Title": "Cast Shadows",
+          "Description": null,
+          "Type": "ShadowRenderType",
+          "Group": "Lighting",
+          "ReadOnly": false
+        },
+        {
+          "Name": "LodOverride",
+          "Title": "LOD Override",
+          "Description": "Force a level of detail. Unset uses automatic LOD.",
+          "Type": "Int32?",
+          "Group": null,
+          "ReadOnly": false
+        },
+        {
+          "Name": "OnComponentEnabled",
+          "Title": "On Component Enabled",
+          "Description": null,
+          "Type": "Action",
+          "Group": "Component",
+          "ReadOnly": false
+        },
+        {
+          "Name": "OnComponentStart",
+          "Title": "On Component Start",
+          "Description": null,
+          "Type": "Action",
+          "Group": "Component",
+          "ReadOnly": false
+        },
+        {
+          "Name": "OnComponentUpdate",
+          "Title": "On Component Update",
+          "Description": null,
+          "Type": "Action",
+          "Group": "Component",
+          "ReadOnly": false
+        },
+        {
+          "Name": "OnComponentFixedUpdate",
+          "Title": "On Component Fixed Update",
+          "Description": null,
+          "Type": "Action",
+          "Group": "Component",
+          "ReadOnly": false
+        },
+        {
+          "Name": "OnComponentDisabled",
+          "Title": "On Component Disabled",
+          "Description": null,
+          "Type": "Action",
+          "Group": "Component",
+          "ReadOnly": false
+        },
+        {
+          "Name": "OnComponentDestroy",
+          "Title": "On Component Destroy",
+          "Description": null,
+          "Type": "Action",
+          "Group": "Component",
+          "ReadOnly": false
+        }
+      ]
+    },
+    {
+      "ClassName": "SkinnedModelRenderer",
+      "Namespace": "Sandbox",
+      "Title": "Model Renderer (skinned)",
+      "Description": "Renders a skinned model in the world. A skinned model is any model with bones/animations.",
+      "Group": "Rendering",
+      "Icon": "sports_martial_arts",
+      "BaseType": "ModelRenderer",
+      "Properties": [
+        {
+          "Name": "Morphs",
+          "Title": "Morphs",
+          "Description": "Access to the morphs for this model",
+          "Type": "MorphAccessor",
+          "Group": "Morphs",
+          "ReadOnly": true
+        },
+        {
+          "Name": "RenderOptions",
+          "Title": "Render Options",
+          "Description": null,
+          "Type": "RenderOptions",
+          "Group": "Advanced Rendering",
+          "ReadOnly": true
+        },
+        {
+          "Name": "MaterialOverride",
+          "Title": "Material Override",
+          "Description": null,
+          "Type": "Material",
+          "Group": null,
+          "ReadOnly": false
+        },
+        {
+          "Name": "CreateBoneObjects",
+          "Title": "Create Bone Objects",
+          "Description": null,
+          "Type": "Boolean",
+          "Group": "Bones",
+          "ReadOnly": false
+        },
+        {
+          "Name": "Model",
+          "Title": "Model",
+          "Description": null,
+          "Type": "Model",
+          "Group": null,
+          "ReadOnly": false
+        },
+        {
+          "Name": "BoneMergeTarget",
+          "Title": "Bone Merge Target",
+          "Description": null,
+          "Type": "SkinnedModelRenderer",
+          "Group": "Bones",
+          "ReadOnly": false
+        },
+        {
+          "Name": "Tint",
+          "Title": "Tint",
+          "Description": null,
+          "Type": "Color",
+          "Group": null,
+          "ReadOnly": false
+        },
+        {
+          "Name": "UseAnimGraph",
+          "Title": "Use Animation Graph",
+          "Description": "Usually used for turning off animation on ragdolls.",
+          "Type": "Boolean",
+          "Group": "Animation",
+          "ReadOnly": false
+        },
+        {
+          "Name": "CreateAttachments",
+          "Title": "Create Attachments",
+          "Description": null,
+          "Type": "Boolean",
+          "Group": null,
+          "ReadOnly": false
+        },
+        {
+          "Name": "BodyGroups",
+          "Title": "Body Groups",
+          "Description": null,
+          "Type": "UInt64",
+          "Group": null,
+          "ReadOnly": false
+        },
+        {
+          "Name": "AnimationGraph",
+          "Title": "Animation Graph",
+          "Description": "Override animgraph, otherwise uses animgraph of the model.",
+          "Type": "AnimationGraph",
+          "Group": "Animation",
+          "ReadOnly": false
+        },
+        {
+          "Name": "Materials",
+          "Title": "Materials",
+          "Description": "Access to the materials",
+          "Type": "MaterialAccessor",
+          "Group": "Materials",
+          "ReadOnly": true
+        },
+        {
+          "Name": "MaterialGroup",
+          "Title": "Material Group",
+          "Description": null,
+          "Type": "String",
+          "Group": null,
+          "ReadOnly": false
+        },
+        {
+          "Name": "Sequence",
+          "Title": "Sequence",
+          "Description": "Allows playback of sequences directly, rather than using an animation graph. Requires <span style=\"color: #4EC9B0;\">SkinnedModelRenderer</span>.<span style=\"color: #DCDCDC;\">UseAnimGraph</span> disabled if the scene model has one.",
+          "Type": "SequenceAccessor",
+          "Group": "Animation",
+          "ReadOnly": true
+        },
+        {
+          "Name": "RenderType",
+          "Title": "Cast Shadows",
+          "Description": null,
+          "Type": "ShadowRenderType",
+          "Group": "Lighting",
+          "ReadOnly": false
+        },
+        {
+          "Name": "PlaybackRate",
+          "Title": "Playback Rate",
+          "Description": "Control playback rate of animgraph or current sequence.",
+          "Type": "Single",
+          "Group": "Animation",
+          "ReadOnly": false
+        },
+        {
+          "Name": "LodOverride",
+          "Title": "LOD Override",
+          "Description": "Force a level of detail. Unset uses automatic LOD.",
+          "Type": "Int32?",
+          "Group": null,
+          "ReadOnly": false
+        },
+        {
+          "Name": "DeformationMode",
+          "Title": "Deformation Mode",
+          "Description": "How this model responds to model deformers. Normal reshapes it, None ignores them, and Rigid moves it without reshaping it, for hard items like earrings or a sword.",
+          "Type": "DeformationModeType",
+          "Group": null,
+          "ReadOnly": false
+        },
+        {
+          "Name": "Parameters",
+          "Title": "Parameters",
+          "Description": "Access to the animgraph parameters for this model",
+          "Type": "ParameterAccessor",
+          "Group": "Parameters",
+          "ReadOnly": true
+        },
+        {
+          "Name": "OnComponentEnabled",
+          "Title": "On Component Enabled",
+          "Description": null,
+          "Type": "Action",
+          "Group": "Component",
+          "ReadOnly": false
+        },
+        {
+          "Name": "OnComponentStart",
+          "Title": "On Component Start",
+          "Description": null,
+          "Type": "Action",
+          "Group": "Component",
+          "ReadOnly": false
+        },
+        {
+          "Name": "OnComponentUpdate",
+          "Title": "On Component Update",
+          "Description": null,
+          "Type": "Action",
+          "Group": "Component",
+          "ReadOnly": false
+        },
+        {
+          "Name": "OnComponentFixedUpdate",
+          "Title": "On Component Fixed Update",
+          "Description": null,
+          "Type": "Action",
+          "Group": "Component",
+          "ReadOnly": false
+        },
+        {
+          "Name": "OnComponentDisabled",
+          "Title": "On Component Disabled",
+          "Description": null,
+          "Type": "Action",
+          "Group": "Component",
+          "ReadOnly": false
+        },
+        {
+          "Name": "OnComponentDestroy",
+          "Title": "On Component Destroy",
+          "Description": null,
+          "Type": "Action",
+          "Group": "Component",
+          "ReadOnly": false
+        }
+      ]
+    },
+    {
+      "ClassName": "MapInstance",
+      "Namespace": "Sandbox",
+      "Title": "Map Instance",
+      "Description": "Allows you to load a map into the Scene. This can be either a vpk or a scene map.",
+      "Group": "World",
+      "Icon": "public",
+      "BaseType": "Component",
+      "Properties": [
+        {
+          "Name": "MapName",
+          "Title": "Map",
+          "Description": null,
+          "Type": "String",
+          "Group": null,
+          "ReadOnly": false
+        },
+        {
+          "Name": "UseMapFromLaunch",
+          "Title": "Use Map From Launch",
+          "Description": null,
+          "Type": "Boolean",
+          "Group": null,
+          "ReadOnly": false
+        },
+        {
+          "Name": "EnableCollision",
+          "Title": "Enable Collision",
+          "Description": null,
+          "Type": "Boolean",
+          "Group": null,
+          "ReadOnly": false
+        },
+        {
+          "Name": "OnMapLoaded",
+          "Title": "On Map Loaded",
+          "Description": "Called when the map has successfully loaded",
+          "Type": "Action",
+          "Group": null,
+          "ReadOnly": false
+        },
+        {
+          "Name": "OnMapUnloaded",
+          "Title": "On Map Unloaded",
+          "Description": "Called when the map has been unloaded",
+          "Type": "Action",
+          "Group": null,
+          "ReadOnly": false
+        },
+        {
+          "Name": "OnComponentEnabled",
+          "Title": "On Component Enabled",
+          "Description": null,
+          "Type": "Action",
+          "Group": "Component",
+          "ReadOnly": false
+        },
+        {
+          "Name": "OnComponentStart",
+          "Title": "On Component Start",
+          "Description": null,
+          "Type": "Action",
+          "Group": "Component",
+          "ReadOnly": false
+        },
+        {
+          "Name": "OnComponentUpdate",
+          "Title": "On Component Update",
+          "Description": null,
+          "Type": "Action",
+          "Group": "Component",
+          "ReadOnly": false
+        },
+        {
+          "Name": "OnComponentFixedUpdate",
+          "Title": "On Component Fixed Update",
+          "Description": null,
+          "Type": "Action",
+          "Group": "Component",
+          "ReadOnly": false
+        },
+        {
+          "Name": "OnComponentDisabled",
+          "Title": "On Component Disabled",
+          "Description": null,
+          "Type": "Action",
+          "Group": "Component",
+          "ReadOnly": false
+        },
+        {
+          "Name": "OnComponentDestroy",
+          "Title": "On Component Destroy",
+          "Description": null,
+          "Type": "Action",
+          "Group": "Component",
+          "ReadOnly": false
+        },
+        {
+          "Name": "NoOrigin",
+          "Title": "No Origin",
+          "Description": null,
+          "Type": "Boolean",
+          "Group": null,
+          "ReadOnly": false
+        }
+      ]
+    },
+    {
+      "tools": [
+        {
+          "name": "asset_compile",
+          "title": "Asset Compile",
+          "toolset": "asset",
+          "description": "Recompile an asset from its source file. Compile errors and warnings land in the console - check read_console after a failure.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "Asset path, as returned by asset_search."
+              },
+              "full": {
+                "type": "boolean",
+                "description": "Force a full recompile instead of an incremental one.",
+                "default": false
+              }
+            },
+            "required": [
+              "path"
+            ]
+          },
+          "outputSchema": {
+            "type": "object",
+            "properties": {
+              "Success": {
+                "type": "boolean"
+              },
+              "Path": {
+                "type": "string"
+              },
+              "CompiledFile": {
+                "type": "string"
+              },
+              "Hint": {
+                "type": "string"
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "asset_dependencies",
+          "title": "Asset Dependencies",
+          "toolset": "asset",
+          "description": "Walk an asset's relationships - the assets it references (uses), the assets that depend on it, or the assets it was generated from. Deep recurses the whole chain, e.g. a model's materials and their textures.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "Asset path, as returned by asset_search."
+              },
+              "relation": {
+                "type": "string",
+                "enum": [
+                  "References",
+                  "Dependants",
+                  "Parents"
+                ],
+                "description": "Which direction to walk.",
+                "default": "References"
+              },
+              "deep": {
+                "type": "boolean",
+                "description": "Recurse instead of returning only direct relationships.",
+                "default": false
+              },
+              "type": {
+                "type": "string",
+                "description": "Filter results to one asset type - a file extension or friendly name. See asset_types."
+              },
+              "limit": {
+                "type": "integer",
+                "description": "How many results to return.",
+                "minimum": 1,
+                "maximum": 500,
+                "default": 100
+              }
+            },
+            "required": [
+              "path"
+            ]
+          },
+          "annotations": {
+            "readOnlyHint": true
+          },
+          "outputSchema": {
+            "type": "object",
+            "properties": {
+              "Path": {
+                "type": "string"
+              },
+              "Relation": {
+                "type": "string"
+              },
+              "Total": {
+                "type": "integer",
+                "description": "How many related assets exist, beyond what's shown."
+              },
+              "Assets": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "Path": {
+                      "type": "string"
+                    },
+                    "Type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "asset_files",
+          "title": "Asset Files",
+          "toolset": "asset",
+          "description": "The loose disk files behind an asset - the input files it's built from (.fbx, .tga, .png...), extra content and game files it ships with, and reference paths that couldn't be resolved to assets.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "Asset path, as returned by asset_search."
+              }
+            },
+            "required": [
+              "path"
+            ]
+          },
+          "annotations": {
+            "readOnlyHint": true
+          },
+          "outputSchema": {
+            "type": "object",
+            "properties": {
+              "Path": {
+                "type": "string"
+              },
+              "SourceFile": {
+                "type": "string"
+              },
+              "CompiledFile": {
+                "type": "string"
+              },
+              "InputFiles": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "AdditionalContentFiles": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "AdditionalGameFiles": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "UnresolvedReferences": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "asset_info",
+          "title": "Asset Info",
+          "toolset": "asset",
+          "description": "Everything about one asset - name, type, source and compiled file paths, compile state, tags, cloud package, and how many assets it references and is used by. Explore those relationships with asset_dependencies.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "Asset path, as returned by asset_search. Absolute paths work too."
+              }
+            },
+            "required": [
+              "path"
+            ]
+          },
+          "annotations": {
+            "readOnlyHint": true
+          },
+          "outputSchema": {
+            "type": "object",
+            "properties": {
+              "Name": {
+                "type": "string"
+              },
+              "Path": {
+                "type": "string"
+              },
+              "Type": {
+                "type": "string"
+              },
+              "Extension": {
+                "type": "string"
+              },
+              "IsGameResource": {
+                "type": "boolean"
+              },
+              "SourceFile": {
+                "type": "string"
+              },
+              "CompiledFile": {
+                "type": "string"
+              },
+              "IsCompiled": {
+                "type": "boolean"
+              },
+              "IsCompiledAndUpToDate": {
+                "type": "boolean"
+              },
+              "IsCompileFailed": {
+                "type": "boolean"
+              },
+              "CanRecompile": {
+                "type": "boolean"
+              },
+              "IsCloud": {
+                "type": "boolean"
+              },
+              "IsTransient": {
+                "type": "boolean"
+              },
+              "IsProcedural": {
+                "type": "boolean"
+              },
+              "IsTrivialChild": {
+                "type": "boolean"
+              },
+              "Package": {
+                "type": "string"
+              },
+              "Tags": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "ReferenceCount": {
+                "type": "integer"
+              },
+              "DependantCount": {
+                "type": "integer"
+              },
+              "LastOpened": {
+                "type": "string"
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "asset_read",
+          "title": "Asset Read",
+          "toolset": "asset",
+          "description": "Read a game resource asset's raw json - the actual data of a prefab, sound event, clothing definition or any other GameResource type. Doesn't work on binary assets like models and textures.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "Asset path, as returned by asset_search."
+              }
+            },
+            "required": [
+              "path"
+            ]
+          },
+          "annotations": {
+            "readOnlyHint": true
+          }
+        },
+        {
+          "name": "asset_search",
+          "title": "Asset Search",
+          "toolset": "asset",
+          "description": "Search the asset system by keywords and type. An empty query lists every asset, so use limit and offset to page through. Returns relative asset paths - pass one to asset_info, asset_compile, asset_read or asset_dependencies.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "query": {
+                "type": "string",
+                "description": "Space separated keywords. Every keyword must match the asset's path or one of its tags. Empty matches everything."
+              },
+              "type": {
+                "type": "string",
+                "description": "Filter to one asset type - a file extension (vmdl, vmat, prefab) or friendly name (Model, Material). See asset_types."
+              },
+              "projectOnly": {
+                "type": "boolean",
+                "description": "Only assets belonging to the currently open project, excluding engine content and cloud downloads.",
+                "default": false
+              },
+              "unreferencedOnly": {
+                "type": "boolean",
+                "description": "Only assets nothing else references - useful for finding unused assets. Note map files and code can use an asset without the asset system knowing.",
+                "default": false
+              },
+              "compileFailedOnly": {
+                "type": "boolean",
+                "description": "Only assets whose last compile failed.",
+                "default": false
+              },
+              "uncompiledOnly": {
+                "type": "boolean",
+                "description": "Only assets with no compiled version at all.",
+                "default": false
+              },
+              "limit": {
+                "type": "integer",
+                "description": "How many results to return.",
+                "minimum": 1,
+                "maximum": 500,
+                "default": 50
+              },
+              "offset": {
+                "type": "integer",
+                "description": "How many results to skip, for paging.",
+                "default": 0
+              }
+            },
+            "required": []
+          },
+          "annotations": {
+            "readOnlyHint": true
+          },
+          "outputSchema": {
+            "type": "object",
+            "properties": {
+              "Total": {
+                "type": "integer",
+                "description": "How many assets matched in total, beyond this page."
+              },
+              "Showing": {
+                "type": "integer"
+              },
+              "Offset": {
+                "type": "integer"
+              },
+              "Assets": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "Path": {
+                      "type": "string"
+                    },
+                    "Type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "asset_thumbnail",
+          "title": "Asset Thumbnail",
+          "toolset": "asset",
+          "description": "Render an asset's preview thumbnail and return it as an image - see what a model, material or texture actually looks like.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "Asset path, as returned by asset_search."
+              }
+            },
+            "required": [
+              "path"
+            ]
+          },
+          "annotations": {
+            "readOnlyHint": true
+          }
+        },
+        {
+          "name": "asset_types",
+          "title": "Asset Types",
+          "toolset": "asset",
+          "description": "Every asset type the editor knows, with the file extensions and category of each. Use a type's extension or name to filter asset_search.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {},
+            "required": []
+          },
+          "annotations": {
+            "readOnlyHint": true
+          },
+          "outputSchema": {
+            "type": "object",
+            "properties": {
+              "Types": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "Name": {
+                      "type": "string"
+                    },
+                    "Extension": {
+                      "type": "string",
+                      "description": "The extension asset_search's type filter takes."
+                    },
+                    "AllExtensions": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "Category": {
+                      "type": "string"
+                    },
+                    "IsGameResource": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "asset_write",
+          "title": "Asset Write",
+          "toolset": "asset",
+          "description": "Overwrite a game resource asset's json and recompile it. Read the current json with asset_read first, modify it, and pass the whole document back - this replaces the entire file. Doesn't work on binary assets like models and textures.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "Asset path, as returned by asset_search."
+              },
+              "json": {
+                "type": "string",
+                "description": "The complete json document to write."
+              }
+            },
+            "required": [
+              "path",
+              "json"
+            ]
+          },
+          "outputSchema": {
+            "type": "object",
+            "properties": {
+              "Success": {
+                "type": "boolean"
+              },
+              "Path": {
+                "type": "string"
+              },
+              "Hint": {
+                "type": "string"
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "bridge_scatter_props",
+          "title": "Native Scatter Props",
+          "toolset": "bridge_helpers",
+          "description": "Scatter model props with a repeatable seed, optional ground snapping, rotation, scaling and grouping. Requires stopped play mode. Uses the existing Bridge helper's scene and undo behaviour.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "model": {
+                "type": "string",
+                "description": "Project-relative model path, as returned by asset_search."
+              },
+              "center": {
+                "type": "string",
+                "description": "World-space centre as x,y,z, in Source units."
+              },
+              "radius": {
+                "type": "number",
+                "description": "Finite, nonnegative scatter radius in Source units.",
+                "default": 256
+              },
+              "count": {
+                "type": "integer",
+                "description": "Number of props, from 1 to 300.",
+                "default": 10
+              },
+              "seed": {
+                "type": "integer",
+                "description": "Nonnegative seed for repeatable placement.",
+                "default": 1
+              },
+              "snapToGround": {
+                "type": "boolean",
+                "description": "Trace downward to place each prop on the ground.",
+                "default": true
+              },
+              "randomYaw": {
+                "type": "boolean",
+                "description": "Randomise each prop's yaw.",
+                "default": true
+              },
+              "scaleMin": {
+                "type": "number",
+                "description": "Positive minimum scale.",
+                "default": 1
+              },
+              "scaleMax": {
+                "type": "number",
+                "description": "Maximum scale, at least scaleMin.",
+                "default": 1
+              },
+              "group": {
+                "type": "boolean",
+                "description": "Parent the props under a new group object.",
+                "default": true
+              },
+              "name": {
+                "type": "string",
+                "description": "Name prefix for the created objects.",
+                "default": "Prop"
+              }
+            },
+            "required": [
+              "model",
+              "center"
+            ]
+          }
+        },
+        {
+          "name": "create_game_object",
+          "title": "Create Game Object",
+          "toolset": "scene",
+          "description": "Create a game object in the active scene - empty or from a prefab, optionally with components. For putting a model in the scene, spawn_model is quicker. The user can undo this. Returns the new object's id for the other scene tools.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Name for the new object. Empty picks a sensible default."
+              },
+              "parent": {
+                "type": "string",
+                "description": "Parent game object id. Empty parents to the scene root."
+              },
+              "prefab": {
+                "type": "string",
+                "description": "Prefab asset path to instantiate, from asset_search."
+              },
+              "position": {
+                "type": "string",
+                "description": "World position as 'x,y,z'. Default origin."
+              },
+              "angles": {
+                "type": "string",
+                "description": "Rotation as 'pitch,yaw,roll'."
+              },
+              "scale": {
+                "type": "string",
+                "description": "Scale as 'x,y,z', or a single number for uniform."
+              },
+              "components": {
+                "type": "string",
+                "description": "Comma separated component type names to add, e.g. 'ModelRenderer,BoxCollider'."
+              }
+            },
+            "required": []
+          },
+          "outputSchema": {
+            "type": "object",
+            "properties": {
+              "Id": {
+                "type": "string"
+              },
+              "Name": {
+                "type": "string"
+              },
+              "Position": {
+                "type": "string"
+              },
+              "Components": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "Id": {
+                      "type": "string"
+                    },
+                    "Type": {
+                      "type": "string"
+                    },
+                    "GameObject": {
+                      "type": "string"
+                    }
+                  },
+                  "required": []
+                }
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "hammer_create_game_object",
+          "title": "Create Game Object",
+          "toolset": "hammer",
+          "description": "Put a game object in the open map - empty, from a prefab, and/or with components and their properties set in the same call. This is how s&box gameplay goes in a map. The user can undo the creation. Returns the new node, whose GameObject field is the object's guid.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Name for the object. Empty uses the prefab's name, or 'GameObject'."
+              },
+              "position": {
+                "type": "string",
+                "description": "World position as 'x,y,z'."
+              },
+              "angles": {
+                "type": "string",
+                "description": "Rotation as 'pitch,yaw,roll'."
+              },
+              "prefab": {
+                "type": "string",
+                "description": "Prefab asset path to instantiate, from asset_search type:prefab."
+              },
+              "components": {
+                "type": "object",
+                "description": "Components to add, as a json object of type name to properties - e.g. {\"ModelRenderer\": {\"Model\": \"models/dev/box.vmdl\"}, \"BoxCollider\": {}}. get_component_type documents types and properties. A type the prefab already has gets its properties set instead."
+              }
+            },
+            "required": []
+          },
+          "outputSchema": {
+            "type": "object",
+            "properties": {
+              "Id": {
+                "type": "integer"
+              },
+              "Kind": {
+                "type": "string"
+              },
+              "Name": {
+                "type": "string"
+              },
+              "ClassName": {
+                "type": "string"
+              },
+              "Description": {
+                "type": "string"
+              },
+              "Position": {
+                "type": "string"
+              },
+              "Parent": {
+                "type": "integer"
+              },
+              "GameObject": {
+                "type": "string"
+              },
+              "Selected": {
+                "type": "boolean"
+              },
+              "Visible": {
+                "type": "boolean"
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "hammer_open_map",
+          "title": "Open Map",
+          "toolset": "hammer",
+          "description": "Open a map (.vmap) in Hammer, opening Hammer itself if it isn't already. Loading happens in the background - poll hammer_status until MapOpen is true and Map matches.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "Map asset path, e.g. 'maps/test.vmap' - asset_search type:vmap finds maps."
+              }
+            },
+            "required": [
+              "path"
+            ]
+          }
+        },
+        {
+          "name": "open_scene",
+          "title": "Open Scene",
+          "toolset": "scenefile",
+          "description": "Open a scene from the asset system and make it the active tab. Already open scenes are just brought to the front. Play mode has to be stopped first - play_start then runs this scene.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "Scene asset path, like \"scenes/menu-main.scene\". asset_search finds them."
+              }
+            },
+            "required": [
+              "path"
+            ]
+          },
+          "outputSchema": {
+            "type": "object",
+            "properties": {
+              "Active": {
+                "type": "string"
+              },
+              "ActivePath": {
+                "type": "string"
+              },
+              "Open": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": []
+          }
+        }
+      ],
+      "total": 401
+    }
+  ],
+  "text": ""
+}

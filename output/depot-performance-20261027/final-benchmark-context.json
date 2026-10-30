@@ -1,0 +1,88 @@
+{
+  "Utc": "2026-10-27T15:08:38.3095368Z",
+  "IsPlaying": true,
+  "Scene": "depot",
+  "Source": "scenes/maps/depot/depot.scene",
+  "Screen": "1920,1080",
+  "EditorLobby": false,
+  "NoDamage": true,
+  "IsActive": false,
+  "IsHost": true,
+  "Sessions": [
+    {
+      "Name": "menu",
+      "Path": "scenes/menu.scene",
+      "HasUnsavedChanges": false,
+      "ViewType": "Editor.SceneViewportWidget",
+      "Views": [
+        {
+          "Type": "Editor.SceneRenderingWidget",
+          "Name": "",
+          "Visible": false,
+          "Size": "1101,459",
+          "FixedSize": "0,0",
+          "Scene": "menu"
+        }
+      ]
+    },
+    {
+      "Name": "depot",
+      "Path": "scenes/maps/depot/depot.scene",
+      "HasUnsavedChanges": false,
+      "ViewType": "Editor.SceneViewportWidget",
+      "Views": [
+        {
+          "Type": "Editor.SceneRenderingWidget",
+          "Name": "",
+          "Visible": true,
+          "Size": "1920,1080",
+          "FixedSize": "1920,1080",
+          "Scene": "depot"
+        }
+      ]
+    },
+    {
+      "Name": "depot",
+      "Path": "scenes/maps/depot/depot.scene",
+      "HasUnsavedChanges": false,
+      "ViewType": null,
+      "Views": null
+    }
+  ],
+  "Cameras": [
+    {
+      "Id": "478f532e-11c6-4944-8c6d-d4a90a44f7e9",
+      "Name": "editor_camera",
+      "Enabled": true,
+      "IsMainCamera": false,
+      "Priority": 1,
+      "Position": "0,0,0",
+      "Rotation": "Pitch = -0.00, Yaw = 0.00, Roll = 0.00",
+      "FieldOfView": 60
+    },
+    {
+      "Id": "6307d3ae-0c8f-4668-902e-065112e12451",
+      "Name": "Camera",
+      "Enabled": true,
+      "IsMainCamera": true,
+      "Priority": 8,
+      "Position": "140.9877,1059.529,948.1175",
+      "Rotation": "Pitch = -0.00, Yaw = -3.00, Roll = 0.00",
+      "FieldOfView": 60
+    }
+  ],
+  "Players": [
+    {
+      "Id": "ef146f6a-379c-4ef8-a54e-4e2b471210af",
+      "Position": "132,1060,888.1175"
+    }
+  ],
+  "Bots": 9,
+  "Map": [
+    {
+      "MapName": "facepunch.depot",
+      "IsLoaded": true,
+      "EnableCollision": true
+    }
+  ]
+}

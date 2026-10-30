@@ -1,0 +1,8 @@
+var factories=Game.ActiveScene.GetAllComponents<Facepunch.Gunsmith.GunsmithMw22Factory>().Where(c=>c.Enabled).ToArray();
+var watch=System.Diagnostics.Stopwatch.StartNew();
+for (var i=0;i<300;i++) {
+    cancellationToken.ThrowIfCancellationRequested();
+    foreach(var factory in factories) factory.Refresh();
+}
+watch.Stop();
+return new {Factories=factories.Length,Iterations=300,TotalMs=watch.Elapsed.TotalMilliseconds,MsPerAllFactories=watch.Elapsed.TotalMilliseconds/300};

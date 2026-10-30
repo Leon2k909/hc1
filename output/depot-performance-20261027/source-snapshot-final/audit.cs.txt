@@ -1,0 +1,22 @@
+if (!Game.IsPlaying || Game.ActiveScene?.Source?.ResourcePath != "scenes/maps/depot/depot.scene") throw new Exception("Expected running Depot.");
+var scene=Game.ActiveScene;
+var bodies=scene.PhysicsWorld.Bodies.ToArray();
+var components=scene.GetAllObjects(true).SelectMany(o=>o.Components.GetAll<Component>(FindMode.EverythingInSelf)).ToArray();
+var renderers=scene.GetAllComponents<ModelRenderer>().ToArray();
+var flags=System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic|System.Reflection.BindingFlags.Instance;
+return new {
+    Types=components.GroupBy(c=>c.GetType().FullName).OrderByDescending(g=>g.Count()).Select(g=>new { Type=g.Key,Count=g.Count() }).ToArray(),
+    Physics=new { Bodies=bodies.Length,scene.PhysicsWorld.SleepingEnabled,scene.PhysicsWorld.SubSteps,
+        Types=bodies.GroupBy(b=>b.BodyType.ToString()).ToDictionary(g=>g.Key,g=>g.Count()),
+        Awake=bodies.Count(b=>b.MotionEnabled&&!b.Sleeping),
+        Dynamic=bodies.Where(b=>b.MotionEnabled).Select(b=>new { Name=b.GameObject?.Name,Type=b.BodyType.ToString(),b.Sleeping,Velocity=b.Velocity.ToString(),b.Mass }).ToArray()
+    },
+    Renderers=renderers.GroupBy(r=>r.GameObject.Root.Name).Select(g=>new {Root=g.Key,Count=g.Count()}).OrderByDescending(g=>g.Count).ToArray(),
+    RigidBodies=scene.GetAllComponents<Rigidbody>().Select(r=>new {r.GameObject.Name,r.Sleeping,r.Enabled,Position=r.WorldPosition.ToString(),Root=r.GameObject.Root.Name}).ToArray(),
+    Probes=scene.GetAllComponents<EnvmapProbe>().GroupBy(p=>new {p.Mode,p.UpdateStrategy,p.Resolution}).Select(g=>new {g.Key,Count=g.Count()}).ToArray(),
+    Spots=scene.GetAllComponents<SpotLight>().GroupBy(p=>p.Shadows).Select(g=>new {Shadows=g.Key,Count=g.Count()}).ToArray(),
+    Points=scene.GetAllComponents<PointLight>().GroupBy(p=>p.Shadows).Select(g=>new {Shadows=g.Key,Count=g.Count()}).ToArray(),
+    Spawns=components.Where(c=>c.GetType().Name.Contains("Spawn")).Select(c=>new {Type=c.GetType().Name,c.GameObject.Name,Position=c.WorldPosition.ToString()}).ToArray(),
+    RenderErrors=renderers.Count(r=>r.Model is null||r.Model.IsError),
+    BodyProperties=typeof(PhysicsBody).GetProperties().Select(p=>new {p.Name,Type=p.PropertyType.FullName}).ToArray()
+};

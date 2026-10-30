@@ -1,0 +1,164 @@
+{
+  "Window": {
+    "Frames": 87,
+    "Seconds": 2.02
+  },
+  "Fps": 43.2,
+  "TargetFps": 240,
+  "TargetSource": "vsync",
+  "LimitedBy": "CPU",
+  "MeetingTarget": false,
+  "Rating": "Bad",
+  "Frame": {
+    "AvgMs": 23.17,
+    "P50Ms": 19.49,
+    "P99Ms": 71.93,
+    "MaxMs": 71.93
+  },
+  "CpuWork": {
+    "AvgMs": 23.17,
+    "P50Ms": 19.49,
+    "P99Ms": 71.93,
+    "MaxMs": 71.93
+  },
+  "Gpu": {
+    "AvgMs": 5.39,
+    "P50Ms": 5.47,
+    "P99Ms": 5.95,
+    "MaxMs": 5.95
+  },
+  "CapWait": {
+    "AvgMs": 0,
+    "P50Ms": 0,
+    "P99Ms": 0,
+    "MaxMs": 0
+  },
+  "PerfHubWindow": null,
+  "Hitches": {
+    "Count": 7,
+    "OverMs": 39,
+    "WorstMs": 71.9
+  },
+  "Issues": [
+    {
+      "Severity": "Bad",
+      "Title": "7 hitches",
+      "Detail": "over 39 ms in 2.0 s, worst 72 ms",
+      "MoreIn": "perf_cpu"
+    },
+    {
+      "Severity": "Bad",
+      "Title": "GC pauses",
+      "Detail": "10.3 ms in the last second",
+      "MoreIn": "perf_memory"
+    }
+  ],
+  "MainThread": [
+    {
+      "Name": "Render",
+      "AvgMs": 7.92,
+      "MaxMs": 19.07
+    },
+    {
+      "Name": "Physics",
+      "AvgMs": 3.09,
+      "MaxMs": 12.39
+    },
+    {
+      "Name": "UI",
+      "AvgMs": 1.96,
+      "MaxMs": 15.49
+    },
+    {
+      "Name": "Animation",
+      "AvgMs": 1.92,
+      "MaxMs": 13.15
+    },
+    {
+      "Name": "Update",
+      "AvgMs": 1.68,
+      "MaxMs": 5.06
+    },
+    {
+      "Name": "Editor",
+      "AvgMs": 1.18,
+      "MaxMs": 8.21
+    },
+    {
+      "Name": "Audio",
+      "AvgMs": 0.99,
+      "MaxMs": 10.92
+    },
+    {
+      "Name": "NavMesh",
+      "AvgMs": 0.35,
+      "MaxMs": 14.31
+    }
+  ],
+  "GpuPasses": [
+    {
+      "Name": "GameOverlay",
+      "AvgMs": 0.78,
+      "MaxMs": 0.91,
+      "Path": "RenderToSwapChain / GameOverlay"
+    },
+    {
+      "Name": "Static Opaque Forward",
+      "AvgMs": 0.69,
+      "MaxMs": 0.86,
+      "Path": "RenderToSwapChain / Static Opaque Forward"
+    },
+    {
+      "Name": "Dynamic Opaque Forward",
+      "AvgMs": 0.6,
+      "MaxMs": 0.68,
+      "Path": "RenderToSwapChain / Dynamic Opaque Forward"
+    },
+    {
+      "Name": "VolumetricFog",
+      "AvgMs": 0.43,
+      "MaxMs": 0.52,
+      "Path": "RenderToSwapChain / VolumetricFog"
+    },
+    {
+      "Name": "CommandList",
+      "AvgMs": 0.28,
+      "MaxMs": 0.29,
+      "Path": "Managed: AfterTransparent / CommandList"
+    },
+    {
+      "Name": "Marker Mask",
+      "AvgMs": 0.2,
+      "MaxMs": 0.34,
+      "Path": "Managed: AfterTransparent / Marker Mask"
+    },
+    {
+      "Name": "Bloom",
+      "AvgMs": 0.2,
+      "MaxMs": 0.26,
+      "Path": "Managed: BeforePostProcessing / Bloom"
+    },
+    {
+      "Name": "GameOverlay Translucent",
+      "AvgMs": 0.19,
+      "MaxMs": 0.33,
+      "Path": "RenderToSwapChain / GameOverlay Translucent"
+    }
+  ],
+  "Memory": {
+    "ProcessMiB": 16219.8,
+    "VideoMemory": {
+      "UsedMiB": 7330.5,
+      "BudgetMiB": 9800
+    },
+    "AllocatedMiBPerSecond": 8.4,
+    "GcPauseMsLastSecond": 10.27,
+    "GcLastSecond": {
+      "Gen0": 1,
+      "Gen1": 0,
+      "Gen2": 0
+    }
+  },
+  "DrawCalls": 1247,
+  "Triangles": 2330290
+}

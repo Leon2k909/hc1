@@ -1,0 +1,2691 @@
+{
+  "results": [
+    {
+      "name": "perf",
+      "description": "Performance numbers from the performance hub (perf_hub): frame times, what limits the frame rate, CPU scopes, GPU passes, memory and GC, rendering counters, network and UI costs",
+      "tools": [
+        {
+          "name": "perf_cpu",
+          "title": "Cpu",
+          "toolset": "perf",
+          "description": "Main thread detail: frame pacing, what caps the frame rate (fps_max, vsync, display mode), time by category, and every named timing scope. Scopes nest, so they overlap - a category includes the scopes inside it.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "limit": {
+                "type": "integer",
+                "description": "How many scopes to return, biggest first. Default 30, max 200.",
+                "default": 30
+              }
+            },
+            "required": []
+          },
+          "annotations": {
+            "readOnlyHint": true
+          }
+        },
+        {
+          "name": "perf_frames",
+          "title": "Frames",
+          "toolset": "perf",
+          "description": "Per-frame timings, newest first: the whole frame, the engine's work on it (frame minus cap wait and the performance hub's own cost), the GPU frame time, and the cap wait. Use it to find hitches and pacing problems the averages in perf_overview hide. GPU times arrive a few frames late.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "count": {
+                "type": "integer",
+                "description": "How many frames, newest first. Default 120, max 512.",
+                "default": 120
+              }
+            },
+            "required": []
+          },
+          "annotations": {
+            "readOnlyHint": true
+          }
+        },
+        {
+          "name": "perf_gpu",
+          "title": "Gpu",
+          "toolset": "perf",
+          "description": "GPU detail: GPU frame time, video memory, the leaf passes by their own time, and the full pass tree in submission order (Depth is nesting under the parent; grouping scopes that aren't timed themselves have null times). Scopes overlap, so a parent's time isn't the sum of its children's. Takes about a second the first time, while GPU timings warm up.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "limit": {
+                "type": "integer",
+                "description": "How many tree rows to return, in submission order. Passes under 0.01 ms are left out. Default 80, max 500.",
+                "default": 80
+              }
+            },
+            "required": []
+          },
+          "annotations": {
+            "readOnlyHint": true
+          }
+        },
+        {
+          "name": "perf_memory",
+          "title": "Memory",
+          "toolset": "perf",
+          "description": "Memory detail: process and managed heap, allocation rate, GC pauses and collections, video memory, the texture pool and streaming, and what the resource caches hold by type. Pass allocationSeconds to also track which types allocate the most over that many seconds - the call waits that long.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "allocationSeconds": {
+                "type": "number",
+                "description": "Seconds to track managed allocations by type before returning, 2 to 60. 0 (the default) skips it.",
+                "default": 0
+              },
+              "limit": {
+                "type": "integer",
+                "description": "How many rows each list returns, biggest first. Default 20, max 100.",
+                "default": 20
+              }
+            },
+            "required": []
+          },
+          "annotations": {
+            "readOnlyHint": true
+          }
+        },
+        {
+          "name": "perf_network",
+          "title": "Network",
+          "toolset": "perf",
+          "description": "Network detail: whether this is a host or client, connections with ping, quality and bandwidth, and what the host reports. Pass seconds to also measure which RPCs, sync vars and message types use the bandwidth over that many seconds - the call waits that long.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "seconds": {
+                "type": "number",
+                "description": "Seconds to record network messages before returning, 1 to 60. 0 (the default) skips it.",
+                "default": 0
+              },
+              "limit": {
+                "type": "integer",
+                "description": "How many rows each message list returns, biggest first. Default 20, max 100.",
+                "default": 20
+              }
+            },
+            "required": []
+          },
+          "annotations": {
+            "readOnlyHint": true
+          }
+        },
+        {
+          "name": "perf_overview",
+          "title": "Overview",
+          "toolset": "perf",
+          "description": "Start here. Frame rate and frame time stats over the last ~2 seconds (avg/p50/p99/max for the frame, CPU work, GPU and cap wait), what's limiting the frame rate, hitches, the issues the performance hub flags, the top main thread and GPU costs, and memory/GC headlines. Each issue names the perf_* tool with the detail. Takes about a second the first time, while GPU timings warm up.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {},
+            "required": []
+          },
+          "annotations": {
+            "readOnlyHint": true
+          }
+        },
+        {
+          "name": "perf_rendering",
+          "title": "Rendering",
+          "toolset": "perf",
+          "description": "Rendering detail for the last frame: which renderer drew it, resolution and AA, the rendering issues the performance hub flags (draw calls, batching, texture pool), every scene system counter (draws, triangles, batches, material changes, culling, lights and shadows, texture pool, device report), the managed renderer's phases and draws when it rendered, and the active camera's post-processing layers.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {},
+            "required": []
+          },
+          "annotations": {
+            "readOnlyHint": true
+          }
+        },
+        {
+          "name": "perf_ui",
+          "title": "Ui",
+          "toolset": "perf",
+          "description": "UI cost for the last frame: every root panel that rendered (game and menu, not the performance hub's own) with its panel count, layout, command build and submit time, and draw calls, plus the totals.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {},
+            "required": []
+          },
+          "annotations": {
+            "readOnlyHint": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "scenefile",
+      "description": "Opening, switching and closing scene tabs",
+      "tools": [
+        {
+          "name": "close_scene",
+          "title": "Close Scene",
+          "toolset": "scenefile",
+          "description": "Close a scene tab. Refuses to throw away unsaved work unless you say so.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "scene": {
+                "type": "string",
+                "description": "Scene name or resource path. Empty for the active one."
+              },
+              "discardChanges": {
+                "type": "boolean",
+                "description": "Close even if the scene has unsaved changes.",
+                "default": false
+              }
+            },
+            "required": []
+          },
+          "outputSchema": {
+            "type": "object",
+            "properties": {
+              "Active": {
+                "type": "string"
+              },
+              "ActivePath": {
+                "type": "string"
+              },
+              "Open": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "open_scene",
+          "title": "Open Scene",
+          "toolset": "scenefile",
+          "description": "Open a scene from the asset system and make it the active tab. Already open scenes are just brought to the front. Play mode has to be stopped first - play_start then runs this scene.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "Scene asset path, like \"scenes/menu-main.scene\". asset_search finds them."
+              }
+            },
+            "required": [
+              "path"
+            ]
+          },
+          "outputSchema": {
+            "type": "object",
+            "properties": {
+              "Active": {
+                "type": "string"
+              },
+              "ActivePath": {
+                "type": "string"
+              },
+              "Open": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "switch_scene",
+          "title": "Switch Scene",
+          "toolset": "scenefile",
+          "description": "Switch to an already open scene tab, by name or resource path. list_scenes says what's open.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "scene": {
+                "type": "string",
+                "description": "Scene name or resource path, as list_scenes reports it."
+              }
+            },
+            "required": [
+              "scene"
+            ]
+          },
+          "outputSchema": {
+            "type": "object",
+            "properties": {
+              "Active": {
+                "type": "string"
+              },
+              "ActivePath": {
+                "type": "string"
+              },
+              "Open": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "play",
+      "description": "Play mode - start, stop and pause the game",
+      "tools": [
+        {
+          "name": "play_pause",
+          "title": "Play Pause",
+          "toolset": "play",
+          "description": "Pause or resume the running game.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "paused": {
+                "type": "boolean",
+                "description": "True to pause, false to resume.",
+                "default": true
+              }
+            },
+            "required": []
+          },
+          "outputSchema": {
+            "type": "object",
+            "properties": {
+              "IsPlaying": {
+                "type": "boolean"
+              },
+              "IsPaused": {
+                "type": "boolean"
+              },
+              "Scene": {
+                "type": "string",
+                "description": "The scene being played. Null when not playing."
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "play_start",
+          "title": "Play Start",
+          "toolset": "play",
+          "description": "Start playing the current scene, like pressing the editor's play button. Startup errors land in the console - check read_console if things look wrong.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {},
+            "required": []
+          },
+          "outputSchema": {
+            "type": "object",
+            "properties": {
+              "IsPlaying": {
+                "type": "boolean"
+              },
+              "IsPaused": {
+                "type": "boolean"
+              },
+              "Scene": {
+                "type": "string",
+                "description": "The scene being played. Null when not playing."
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "play_stop",
+          "title": "Play Stop",
+          "toolset": "play",
+          "description": "Stop playing and return to editing.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {},
+            "required": []
+          },
+          "outputSchema": {
+            "type": "object",
+            "properties": {
+              "IsPlaying": {
+                "type": "boolean"
+              },
+              "IsPaused": {
+                "type": "boolean"
+              },
+              "Scene": {
+                "type": "string",
+                "description": "The scene being played. Null when not playing."
+              }
+            },
+            "required": []
+          }
+        }
+      ]
+    },
+    {
+      "tools": [
+        {
+          "name": "run_csharp",
+          "title": "Run",
+          "toolset": "instance",
+          "description": "Run a trusted C# method body on the engine main thread in game scope. Supply code OR an absolute path to a UTF-8 script file. Supports await and return (object); System, System.Linq, System.Threading, System.Threading.Tasks and Sandbox are imported. Parameters exchangeDirectory and cancellationToken are available. Example: return Game.ActiveScene?.Name; Engine/editor APIs are available, with editor types fully qualified. This has full local process privileges, may mutate live state, and does not create undo steps. Cancellation is cooperative: check cancellationToken in loops. Discover this tool through search_tools.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "description": "C# method body to execute. Mutually exclusive with path."
+              },
+              "path": {
+                "type": "string",
+                "description": "Absolute path to a UTF-8 C# method body, usually in the session exchange directory."
+              }
+            },
+            "required": []
+          }
+        }
+      ],
+      "total": 401
+    },
+    {
+      "tools": [
+        {
+          "name": "add_component_to_new_object",
+          "title": "Add Component To New Object",
+          "toolset": "bridge_component",
+          "description": "Create a new GameObject, add a component, set its properties, and optionally parent/position/tag it \u2014 all in one atomic call. Collapses the create_gameobject \u2192 add_component_with_properties \u2192 set_parent sequence. NOTE: a freshly GENERATED component type only resolves after a trigger_hotload; generate the script, hotload, THEN call this.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "component": {
+                "type": "string",
+                "description": "Component type name to add (e.g. 'CameraComponent', 'ObjectiveManager'). Use list_available_components to find valid types."
+              },
+              "name": {
+                "type": "string",
+                "description": "Display name for the new GameObject. Defaults to the component type name."
+              },
+              "properties": {
+                "description": "Key-value map of property names to values, auto-converted to the right type (same convention as add_component_with_properties). JSON value."
+              },
+              "position": {
+                "type": "string",
+                "description": "World position. As \"x,y,z\" (or JSON {x,y,z})."
+              },
+              "rotation": {
+                "type": "string",
+                "description": "World rotation. As \"pitch,yaw,roll\" degrees."
+              },
+              "scale": {
+                "type": "string",
+                "description": "World scale (per-axis). As \"x,y,z\" (or JSON {x,y,z})."
+              },
+              "parentId": {
+                "type": "string",
+                "description": "GUID of a parent GameObject. Omit for scene root."
+              },
+              "tags": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Tags to add to the new GameObject (e.g. ['player'])."
+              }
+            },
+            "required": [
+              "component"
+            ]
+          }
+        },
+        {
+          "name": "add_interaction_prompt",
+          "title": "Add Interaction Prompt",
+          "toolset": "bridge_scaffold_gameplay",
+          "description": "Generate an eye-traced interaction-prompt HUD \u2014 a PanelComponent (.razor + .razor.scss pair, like create_leaderboard_panel) that every frame traces a ray from the scene camera (Scene.Trace.Ray, out to [Property] float Range) and, when the crosshair is on a component implementing Component.IPressable, shows a centered \"Press E\"-style pill. The prompt text comes from the target's IPressable.GetTooltip() when it overrides it (most don't), else a [Property] DefaultPrompt built from the action. This is the visible half of the interaction loop: it PAIRS with create_interactable / add_interaction_station (which implement IPressable) \u2014 this tool tells the player they CAN press, those tools handle the press. Host it under a ScreenPanel (add_screen_panel), then add the component to that panel object. The generated Razor is razor_lint-safe by construction: PanelComponent + BuildHash override folding the visible state, no switch-expressions and no non-ASCII in @code, and a class root selector in the SCSS. LOCAL/visual-only (no [Sync]).",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Class/file name for the generated .razor. Defaults to 'InteractionPrompt'."
+              },
+              "directory": {
+                "type": "string",
+                "description": "Subdirectory for the generated .razor + .razor.scss. Defaults to 'Code/UI'."
+              },
+              "action": {
+                "type": "string",
+                "description": "Verb woven into the default prompt text ('Press E to &lt;action&gt;'). Defaults to 'use'."
+              },
+              "range": {
+                "type": "number",
+                "description": "Eye-trace reach in world units \u2014 how close the crosshair must be to a pressable to show the prompt. Defaults to 120."
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "add_post_process",
+          "title": "Add Post Process",
+          "toolset": "bridge_visuals",
+          "description": "Add (or update) a post-processing effect on the scene's main camera (auto-enables post-processing). Generic: pass the effect component name + any of its properties. Examples \u2014 Bloom {Strength, Threshold, Tint}, Tonemapping, ColorAdjustments {Saturation, Brightness, Contrast}, Vignette {Intensity, Color}, FilmGrain, DepthOfField, ChromaticAberration, MotionBlur, Sharpen, AmbientOcclusion. Call describe_type &lt;Effect&gt; to discover a given effect's properties.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "effect": {
+                "type": "string",
+                "description": "Post-process component type name, e.g. 'Bloom', 'Vignette', 'ColorAdjustments'."
+              },
+              "properties": {
+                "description": "Property name -&gt; value. Floats/ints/bools as numbers/bools, colours as {r,g,b,a}, enums as their string name. JSON value."
+              },
+              "cameraId": {
+                "type": "string",
+                "description": "GUID of a specific camera GameObject (default: the scene's main camera)."
+              }
+            },
+            "required": [
+              "effect"
+            ]
+          }
+        },
+        {
+          "name": "add_render_target_camera",
+          "title": "Add Render Target Camera",
+          "toolset": "bridge_visuals",
+          "description": "CCTV / security monitor / mirror / simple portal: creates a secondary camera (IsMainCamera=false, Priority param) positioned/rotated or aimed at a target object, a display surface (scaled box with a ModelRenderer), and GENERATES a sealed wiring component that at runtime creates the render-target Texture (Texture.CreateRenderTarget builder), assigns camera.RenderTarget and sets the texture onto an anonymous complex-shader material on the display (attribute 'Color' = albedo; the screen is scene-lit, not emissive/unlit). Returns {created, camera{id,...}, display{id,...}|null, className, path, generatedCode, attachedAndWired, resolution, nextSteps[]}. FIRST call generates the .cs \u2192 follow nextSteps: trigger_hotload, then add_component_with_properties on the display with properties {SourceCamera: &lt;camera GUID&gt;}; a REPEAT call reusing the same `name` after the hotload attaches AND wires everything automatically (attachedAndWired=true). The feed only renders in play mode \u2014 verify with start_play + capture_view. If `name`'s .cs file exists but isn't compiled yet, the call errors \u2014 hotload first. Scene/file-mutating \u2014 refused during play mode.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Class name for the generated wiring component. Defaults to 'RenderTargetDisplay'. Reuse the same name for extra cameras \u2014 after a hotload the class is reused and wired in one shot."
+              },
+              "directory": {
+                "type": "string",
+                "description": "Subdirectory for the generated .cs file. Defaults to 'Code'."
+              },
+              "cameraName": {
+                "type": "string",
+                "description": "GameObject name for the camera. Defaults to 'RT Camera'."
+              },
+              "position": {
+                "type": "string",
+                "description": "World position of the camera. As \"x,y,z\" (or JSON {x,y,z})."
+              },
+              "rotation": {
+                "type": "string",
+                "description": "World rotation of the camera. As \"pitch,yaw,roll\" degrees."
+              },
+              "lookAtId": {
+                "type": "string",
+                "description": "GUID of a GameObject to aim the camera at (overrides rotation; from get_scene_hierarchy / find_objects)."
+              },
+              "priority": {
+                "type": "number",
+                "description": "CameraComponent.Priority (integer). Defaults to 1."
+              },
+              "fieldOfView": {
+                "type": "number",
+                "description": "Camera field of view in degrees (clamped 5-170). Engine default when omitted."
+              },
+              "resolution": {
+                "type": "string",
+                "description": "Render-target size as 'width,height' pixels (min 16). Defaults to '512,512'."
+              },
+              "backgroundColor": {
+                "type": "string",
+                "description": "Camera background colour. Engine default when omitted. As \"r,g,b[,a]\" (0-1 floats)."
+              },
+              "createDisplay": {
+                "type": "boolean",
+                "description": "Create the display surface GameObject. Defaults to true. Pass false to wire your own surface later."
+              },
+              "displayPosition": {
+                "type": "string",
+                "description": "World position of the display surface. As \"x,y,z\" (or JSON {x,y,z})."
+              },
+              "displayRotation": {
+                "type": "string",
+                "description": "World rotation of the display surface. As \"pitch,yaw,roll\" degrees."
+              },
+              "displaySize": {
+                "type": "string",
+                "description": "Display box extents as 'x,y,z' world units (thin x = a wall screen facing \u00b1x). Defaults to '4,128,72'."
+              },
+              "attribute": {
+                "type": "string",
+                "description": "Material attribute that receives the texture. Defaults to 'Color' (albedo on the complex shader). Sanitized to [A-Za-z0-9_]."
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "add_world_panel",
+          "title": "Add World Panel",
+          "toolset": "bridge_ui",
+          "description": "Create a new GameObject with a WorldPanel component for in-world 3D UI (health bars, signs, nameplates). Returns { created, gameObject:{ id, name, components, ... } }. As with add_screen_panel, panelComponent is SILENTLY skipped if the type isn't in the TypeLibrary (trigger_hotload first, then verify via gameObject.components). For CLICKABLE world UI the scene also needs a Sandbox.WorldInput (see create_worldpanel_ui).",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Name for the UI GameObject. Defaults to 'World Panel'."
+              },
+              "position": {
+                "type": "string",
+                "description": "World position for the panel \u2014 object {x,y,z} or comma string \"x,y,z\". As \"x,y,z\" (or JSON {x,y,z})."
+              },
+              "rotation": {
+                "type": "string",
+                "description": "Rotation as euler angles. As \"pitch,yaw,roll\" degrees."
+              },
+              "worldScale": {
+                "type": "number",
+                "description": "Scale of the world panel. Smaller = smaller in world."
+              },
+              "lookAtCamera": {
+                "type": "boolean",
+                "description": "Whether the panel always faces the camera (billboard)."
+              },
+              "panelComponent": {
+                "type": "string",
+                "description": "Name of a Razor PanelComponent to add (e.g. 'NpcNameplate')."
+              },
+              "parent": {
+                "type": "string",
+                "description": "GUID of parent GameObject."
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "apply_atmosphere",
+          "title": "Apply Atmosphere",
+          "toolset": "bridge_visuals",
+          "description": "One-call scene mood: composes ambient + directional light, gradient fog, and a camera post-fx stack (tonemap + colour grade + vignette) tuned for the chosen mood. Idempotent \u2014 re-runs update the same 'Atmosphere *' objects. Returns { applied, mood, components, postFxCamera } \u2014 the post-fx stack is only applied when a camera exists (postFxCamera is null otherwise; add a camera and re-run). Screenshot to verify.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "mood": {
+                "type": "string",
+                "description": "Atmosphere preset. One of: horror-night | foggy-dawn | overcast | warm-interior."
+              }
+            },
+            "required": [
+              "mood"
+            ]
+          }
+        },
+        {
+          "name": "apply_post_fx_look",
+          "title": "Apply Post Fx Look",
+          "toolset": "bridge_visuals",
+          "description": "Apply just a camera post-processing look (no lights/fog): cinematic (tonemap + bloom + soft vignette), filmic-horror (desaturated, high-contrast, heavy vignette, film grain), or clean (tonemap only). Errors if the scene has no CameraComponent. Returns { applied, look, components, camera } listing the effect components added to the main camera \u2014 tune them individually afterwards with add_post_process.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "look": {
+                "type": "string",
+                "description": "Post-fx look preset. One of: cinematic | filmic-horror | clean."
+              }
+            },
+            "required": [
+              "look"
+            ]
+          }
+        },
+        {
+          "name": "author_movie_clip",
+          "title": "Author Movie Clip",
+          "toolset": "bridge_moviemaker",
+          "description": "Author a MovieMaker .movie cutscene clip from a declarative shot list \u2014 EDIT MODE ONLY, no Movie Maker dock, no play mode, no real-time waiting (a 30s clip bakes in one call, typically &lt;1s). Builds a hold+blend keyframe timeline from the shots (smoothstep ease by default), steps a camera through it, and hand-pumps MovieRecorder Advance/Capture per synthetic frame, then saves Assets/&lt;folder&gt;/&lt;clipName&gt;.movie (registered + compiled; errors if the file exists \u2014 the scene itself is NOT saved). Returns { authored, path, name, durationSeconds, frames, sampleRate, shots, tracks, bakeMs, compiled, loadable, camera, nextSteps }. Camera: omit cameraId for a temp camera (destroyed after the bake \u2014 play back with add_movie_player createTargets:true so the missing target is recreated), or pass cameraId of an existing camera GameObject (transform + FOV restored EXACTLY afterwards; the clip then animates THAT object on playback). fovDegrees is baked for real (the clip carries a FieldOfView track). Authored clips animate ONLY the camera the bake moves \u2014 other scene objects don't move in edit mode (that's what record_gameplay_clip is for). Total timeline capped at 120s, max 32 shots. Errors during play mode (stop_play first). Verify with list_movies; play via add_movie_player + play_movie in play mode.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "shots": {
+                "description": "The shot list in order (1-32 shots). Timeline = hold\u2080, then blend\u1d62 + hold\u1d62 per following shot. JSON array."
+              },
+              "clipName": {
+                "type": "string",
+                "description": "Asset name without extension (default authored_&lt;UTC timestamp&gt;; sanitized to [A-Za-z0-9_-])."
+              },
+              "folder": {
+                "type": "string",
+                "description": "Assets subfolder to save into (default \"movies\")."
+              },
+              "sampleRate": {
+                "type": "integer",
+                "description": "Clip samples per second (default 30, clamped 1-120)."
+              },
+              "cameraId": {
+                "type": "string",
+                "description": "GUID of an existing camera GameObject (must have a CameraComponent) to bake through \u2014 restored EXACTLY afterwards, and playback then animates that object. Omit for a temp camera that is destroyed after the bake."
+              }
+            },
+            "required": [
+              "shots"
+            ]
+          }
+        },
+        {
+          "name": "camera_screenshot",
+          "title": "Camera Screenshot",
+          "toolset": "scene",
+          "description": "Render a camera in the scene and return it as an image. Give any CameraComponent's id or its game object's id, or nothing for the scene's main camera. Works in edit and play mode - editor_camera_screenshot shows the editor viewport instead.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "camera": {
+                "type": "string",
+                "description": "A CameraComponent id or its game object's id. Empty uses the scene's main camera."
+              },
+              "width": {
+                "type": "integer",
+                "description": "Image width in pixels.",
+                "minimum": 16,
+                "maximum": 4096,
+                "default": 1280
+              },
+              "height": {
+                "type": "integer",
+                "description": "Image height in pixels.",
+                "minimum": 16,
+                "maximum": 4096,
+                "default": 720
+              },
+              "includeUi": {
+                "type": "boolean",
+                "description": "Include any UI the camera renders.",
+                "default": true
+              }
+            },
+            "required": []
+          },
+          "annotations": {
+            "readOnlyHint": true
+          }
+        },
+        {
+          "name": "capture_camera_set",
+          "title": "Capture Camera Set",
+          "toolset": "bridge_screenshot",
+          "description": "Capture 1-8 saved camera bookmarks in the exact requested order and return a labeled JSON manifest followed by one inline PNG per bookmark. Captures are capped at 1600x1200 and eight million aggregate pixels. Every run becomes the session baseline for the same bookmark and settings; comparePrevious uses SkiaSharp RGBA metrics against that prior capture. renderUI defaults false for stable comparisons. Occlusion checks use physics traces and are diagnostic: they never move the saved camera.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "names": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Saved bookmark names in desired output order (1-8, no duplicates)."
+              },
+              "comparePrevious": {
+                "type": "boolean",
+                "description": "Compare each image with the previous session capture using the same name, dimensions, and renderUI setting.",
+                "default": false
+              },
+              "diffThreshold": {
+                "type": "integer",
+                "description": "Per-channel threshold (0-255) used for changedPixelPercent. Default 8.",
+                "default": 8
+              },
+              "width": {
+                "type": "integer",
+                "description": "Image width in pixels (16-1600). Default 960.",
+                "default": 960
+              },
+              "height": {
+                "type": "integer",
+                "description": "Image height in pixels (16-1200). Default 540.",
+                "default": 540
+              },
+              "renderUI": {
+                "type": "boolean",
+                "description": "Include screen-space UI. Defaults false for deterministic visual comparisons.",
+                "default": false
+              },
+              "checkOcclusion": {
+                "type": "boolean",
+                "description": "Trace from camera to lookAt and report blocking physics geometry. Default true.",
+                "default": true
+              }
+            },
+            "required": [
+              "names"
+            ]
+          }
+        },
+        {
+          "name": "capture_topdown",
+          "title": "Capture Topdown",
+          "toolset": "bridge_screenshot",
+          "description": "Capture a deterministic orthographic top-down PNG over a GameObject or explicit world center. Returns a JSON manifest followed by the inline image. The manifest records the fixed camera pose, ground-plane bounds, screen axes, and world-units-per-pixel so agents can place or measure objects from the image. renderUI defaults false; dimensions are capped at 1600x1200.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "targetId": {
+                "type": "string",
+                "description": "GameObject GUID whose bounds determine center, ground Z, and default worldHeight."
+              },
+              "center": {
+                "type": "string",
+                "description": "Explicit top-down center as \"x,y,z\"; use instead of targetId."
+              },
+              "worldHeight": {
+                "type": "number",
+                "description": "Vertical ground-plane span in world units (screen-up/world +X). Defaults to aspect-aware target bounds + 25%, or 1024 for explicit center."
+              },
+              "cameraHeight": {
+                "type": "number",
+                "description": "Camera height above center. Does not change orthographic scale. Defaults to worldHeight*2 with additional clearance above tall targets."
+              },
+              "width": {
+                "type": "integer",
+                "description": "Image width in pixels (16-1600). Default 1024.",
+                "default": 1024
+              },
+              "height": {
+                "type": "integer",
+                "description": "Image height in pixels (16-1200). Default 1024.",
+                "default": 1024
+              },
+              "renderUI": {
+                "type": "boolean",
+                "description": "Include screen-space UI. Default false.",
+                "default": false
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "capture_view",
+          "title": "Capture View",
+          "toolset": "bridge_screenshot",
+          "description": "Screenshot the scene from a chosen viewpoint and return it as an inline PNG image. Pass id to auto-frame a GameObject (3/4 elevated view sized to its bounds), or position (+ lookAt or rotation) for a free camera. With neither, captures the main camera view. Uses a temporary camera that is removed afterwards \u2014 the scene is left unchanged. KNOWN CAPTURE LIMITS (engine, not bridge): text in ScreenPanel/Razor labels may rasterise as solid boxes (the font atlas is not resolved for the capture pass \u2014 images and layout are correct, so a blank HUD here is NOT a HUD bug; verify text another way), and Terrain renders as a truncated ribbon from any temporary camera because its clipmap centres on the editor/main camera \u2014 verify terrain scenes with take_screenshot or in play mode.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "GUID of a GameObject to auto-frame (from get_scene_hierarchy or find_objects)."
+              },
+              "position": {
+                "type": "string",
+                "description": "Camera position as \"x,y,z\"."
+              },
+              "lookAt": {
+                "type": "string",
+                "description": "Point to aim the camera at, as \"x,y,z\"."
+              },
+              "rotation": {
+                "type": "string",
+                "description": "Camera rotation as \"pitch,yaw,roll\" degrees (alternative to lookAt)."
+              },
+              "fov": {
+                "type": "number",
+                "description": "Field of view in degrees. Default is the camera's default."
+              },
+              "width": {
+                "type": "integer",
+                "description": "Image width in pixels (16-3840). Default 1280.",
+                "default": 1280
+              },
+              "height": {
+                "type": "integer",
+                "description": "Image height in pixels (16-2160). Default 720.",
+                "default": 720
+              },
+              "renderUI": {
+                "type": "boolean",
+                "description": "Include screen-space UI in the capture. Default true.",
+                "default": true
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "create_camera_effects",
+          "title": "Create Camera Effects",
+          "toolset": "bridge_scaffold_polish",
+          "description": "Generate static conveniences over the SDK's BUILT-IN camera effects \u2014 CameraComponent.AddShake(amplitude, frequency, duration), AddPunch(Vector3 direction, amplitude, frequency, duration, fovAmplitude), AddPunch(Angles, ...) and AddTilt(Angles, duration, easeTime), all fire-and-forget, self-expiring, whitelist-verified in sandboxed game code 2026-07-13: a sealed Component exposing {name}.Shake/ShakeAt/Punch/PunchAngles/Tilt statics that resolve the main camera (Scene.Camera, else IsMainCamera search, else first camera; warn + return null when the scene has none) and return the live Sandbox.CameraEffectSystem.BaseEffect (Stop()/IsDone; ShakeAt sets Epicenter+Radius for distance falloff), plus one-word preset triggers \u2014 HitPunch() / ExplosionShake() / ExplosionShakeAt(position, radius) / LandingTilt() \u2014 driven by [Property] tunables. Statics work with NO instance placed; place the component only to tune presets in the inspector. RELATIONSHIP: create_camera_shake is the CONTINUOUS trauma model (AddTrauma accumulates and decays); these built-ins are ONE-SHOT engine effects \u2014 they compose safely, but don't fire both for the same event or hits feel doubled. Returns {created, path, className, staticApi[], presetTriggers[], propertyNames[], note}. Next: trigger_hotload + get_compile_errors, call the statics from game code (e.g. {name}.Shake(4, 25, 0.8) on explosion) or attach via targetId and trigger presets. Limits & honesty: compile + camera resolution verified; the editor cannot judge FEEL \u2014 tune amplitudes in a human playtest; effects are LOCAL visuals (wrap in [Rpc.Broadcast] for everyone). Refused during play mode; refuses to overwrite an existing file.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Class/file name. Defaults to 'CameraFx'. Sanitized to a valid C# identifier."
+              },
+              "directory": {
+                "type": "string",
+                "description": "Subdirectory under the project root for the .cs file. Defaults to 'Code'."
+              },
+              "hitPunchDirection": {
+                "type": "string",
+                "description": "HitPunch preset: punch direction. Defaults to Vector3.Backward (camera kicks back). As \"x,y,z\" (or JSON {x,y,z})."
+              },
+              "hitPunchAmplitude": {
+                "type": "number",
+                "description": "HitPunch preset: positional kick strength. Defaults to 8."
+              },
+              "hitPunchFrequency": {
+                "type": "number",
+                "description": "HitPunch preset: oscillation frequency. Defaults to 20."
+              },
+              "hitPunchDuration": {
+                "type": "number",
+                "description": "HitPunch preset: seconds. Defaults to 0.25."
+              },
+              "hitPunchFovAmplitude": {
+                "type": "number",
+                "description": "HitPunch preset: FOV kick amount (0 = none). Defaults to 3."
+              },
+              "explosionShakeAmplitude": {
+                "type": "number",
+                "description": "ExplosionShake preset: shake strength. Defaults to 5."
+              },
+              "explosionShakeFrequency": {
+                "type": "number",
+                "description": "ExplosionShake preset: oscillation frequency. Defaults to 25."
+              },
+              "explosionShakeDuration": {
+                "type": "number",
+                "description": "ExplosionShake preset: seconds. Defaults to 0.8."
+              },
+              "landingTiltAngles": {
+                "type": "string",
+                "description": "LandingTilt preset as {x: pitch, y: yaw, z: roll} degrees (or 'p,y,r'). Defaults to 5 pitch / 0 yaw / 2 roll. As \"x,y,z\" (or JSON {x,y,z})."
+              },
+              "landingTiltDuration": {
+                "type": "number",
+                "description": "LandingTilt preset: seconds the tilt lasts. Defaults to 0.35."
+              },
+              "landingTiltEase": {
+                "type": "number",
+                "description": "LandingTilt preset: ease-in/out time within the duration. Defaults to 0.15."
+              },
+              "targetId": {
+                "type": "string",
+                "description": "GUID of a GameObject to attach the component to \u2014 only needed to tune presets in the inspector; the statics work with no instance (only attaches if the type is already in the TypeLibrary \u2014 hotload first)."
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "create_camera_shake",
+          "title": "Create Camera Shake",
+          "toolset": "bridge_scaffold_polish",
+          "description": "Generate a trauma-based camera shake component (the standard game-feel model: events add Trauma 0..1, shake magnitude = Trauma\u00b2, smooth Perlin offsets \u2014 not white-noise jitter \u2014 and Trauma decays every frame, so explosions slam and footsteps barely register). Attach the generated component to the CAMERA GameObject; fire from any game code via the static &lt;Name&gt;.Shake(0.4f). Applies in OnPreRender AFTER controllers position the camera, with an un-apply guard so it neither fights a controller-driven camera nor accumulates on a static one, and restores the camera when trauma hits zero. LOCAL-only (no [Sync]) \u2014 call Shake inside an [Rpc.Broadcast] handler if every client should feel it. Optionally attached to an existing GameObject by GUID (after a hotload).",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Class name for the generated component. Defaults to 'CameraShake'."
+              },
+              "directory": {
+                "type": "string",
+                "description": "Subdirectory for the generated .cs file. Defaults to 'Code'."
+              },
+              "maxOffset": {
+                "type": "number",
+                "description": "Positional shake at full trauma, in world units. Defaults to 6."
+              },
+              "maxAngle": {
+                "type": "number",
+                "description": "Rotational shake at full trauma, in degrees (applied to pitch/yaw/roll). Defaults to 4."
+              },
+              "frequency": {
+                "type": "number",
+                "description": "Noise speed \u2014 higher = violent rattle, lower = drunken sway. Defaults to 10."
+              },
+              "decayPerSecond": {
+                "type": "number",
+                "description": "How much trauma drains per second. Defaults to 1.5."
+              },
+              "targetId": {
+                "type": "string",
+                "description": "GUID of the camera GameObject to attach to (only attaches if the type is already loaded \u2014 hotload first)."
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "create_carry_system",
+          "title": "Create Carry System",
+          "toolset": "bridge_scaffold_gameplay",
+          "description": "Generate a first-person pickup / carry / throw component (sealed Component) for physics props. Attach it to the PLAYER (the object that owns the camera). It eye-traces from Scene.Camera for a Rigidbody-bearing GameObject tagged [Property] CarryTag (default 'carryable') within [Property] Range; grabbing routes a host-authoritative [Rpc.Host] request that re-validates the target and caller, hands the object's network ownership to the carrier (GameObject.Network.AssignOwnership), and disables the rigidbody's MotionEnabled while held. The held object follows a hold point ([Property] Vector3 HoldOffset in front of the camera) each FixedUpdate; dropping restores physics, throwing applies an impulse ([Property] float ThrowForce). The held-object id is [Sync(SyncFlags.FromHost)] so proxies see the carrying state, and static OnPickedUp / OnDropped events fire uniformly for SFX/VFX. PAIRS with physics props \u2014 give each carryable a Rigidbody + Collider and the CarryTag (set_tags); network-spawn them for multiplayer so ownership + transform replicate. Single-player safe (IsProxy is false and RPCs run locally with no session). Inputs: GrabAction (default 'use') grabs/drops, ThrowAction (default 'attack1') throws. Optionally attach to an existing player GameObject by GUID after a hotload.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Class name for the generated component. Defaults to 'CarrySystem'."
+              },
+              "directory": {
+                "type": "string",
+                "description": "Subdirectory for the generated .cs file. Defaults to 'Code'."
+              },
+              "range": {
+                "type": "number",
+                "description": "Eye-trace reach for grabbing a carryable, in world units. Defaults to 130."
+              },
+              "throwForce": {
+                "type": "number",
+                "description": "Impulse magnitude applied on throw (scales with the prop's mass \u2014 tune per game). Defaults to 20000."
+              },
+              "carryTag": {
+                "type": "string",
+                "description": "Only objects with this tag (and a Rigidbody) can be picked up; lower-cased/underscored to match s&box tag convention. Defaults to 'carryable'."
+              },
+              "targetId": {
+                "type": "string",
+                "description": "GUID of the PLAYER GameObject (the one with the camera) to attach to (only attaches if the type is already loaded \u2014 hotload first)."
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "create_cutscene_director",
+          "title": "Create Cutscene Director",
+          "toolset": "bridge_scaffold_polish",
+          "description": "Generate a hand-authored cutscene player component that needs NO .movie asset \u2014 the zero-asset alternative to the MovieMaker family (add_movie_player/play_movie, which play keyframed .movie clips authored in the editor's Movie Maker dock). You author the shots directly in the inspector as parallel lists: ShotPositions (Vector3), ShotAngles (pitch/yaw/roll \u2014 Angles, not raw quaternions), ShotHoldSeconds, ShotBlendSeconds, and an optional per-shot ShotLookAt GameObject (aim at a target instead of using ShotAngles). At runtime it takes over the main camera (Scene.Camera) in OnPreRender ONLY while playing \u2014 smoothstep-eased Vector3.Lerp + Rotation.Slerp between shots \u2014 captures the camera's prior transform and restores it exactly when finished (same un-apply discipline as create_camera_shake). Play from any game code via the static &lt;Name&gt;.Play() (first director) or &lt;Name&gt;.Play(\"name\") (matches CutsceneName); subscribe the static &lt;Name&gt;.OnCutsceneFinished, or gate game logic on the static &lt;Name&gt;.IsCutscenePlaying. LockInput freezes player input each frame via Input.ClearActions() while still reading the SkipAction press first so the cutscene stays skippable. Optional letterbox generates a razor_lint-safe black-bars overlay panel (host under a ScreenPanel) shown while IsCutscenePlaying. LOCAL-only (each client renders its own view) \u2014 trigger inside an [Rpc.Broadcast] for all clients. Attach to ANY GameObject; it drives the camera itself and does not need to sit on the camera. Returns { created, path, className, skipAction, lockInput, letterbox, nextSteps } \u2014 path is the generated .cs (letterbox lists the overlay files when enabled). Follow with trigger_hotload, then get_compile_errors, then attach via add_component_with_properties (component=className).",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Class name for the generated component. Defaults to 'CutsceneDirector'."
+              },
+              "directory": {
+                "type": "string",
+                "description": "Subdirectory for the generated files. Defaults to 'Code'."
+              },
+              "skipAction": {
+                "type": "string",
+                "description": "Input action that ends the cutscene early (read before input is cleared, so a locked cutscene is still skippable). Sanitized to a safe token. Empty = not skippable. Defaults to 'jump'."
+              },
+              "lockInput": {
+                "type": "boolean",
+                "description": "Freeze player input during playback via Input.ClearActions() each frame. Defaults to true."
+              },
+              "letterbox": {
+                "type": "boolean",
+                "description": "Also generate a razor_lint-safe letterbox overlay (two black bars, shown while IsCutscenePlaying \u2014 host it under a ScreenPanel). Defaults to false."
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "create_floating_combat_text",
+          "title": "Create Floating Combat Text",
+          "toolset": "bridge_scaffold_polish",
+          "description": "Generate a floating combat text component \u2014 rising, fading, camera-billboarded world-space popups for damage numbers, '+10 gold', pickup names. TextRenderer-based: no Razor, no WorldPanel, zero UI setup. Nothing to place in the scene \u2014 the generated class carries a static factory: &lt;Name&gt;.Spawn(position, \"-25\", Color.Red[, sizeMultiplier]) spawns a popup that rises at RiseSpeed, fades over Lifetime, and destroys itself. Pairs with create_health_system (spawn from the damage path so every hit prints its number). LOCAL-only \u2014 spawn inside an [Rpc.Broadcast] handler if every client should see it.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Class name for the generated component. Defaults to 'FloatingCombatText'."
+              },
+              "directory": {
+                "type": "string",
+                "description": "Subdirectory for the generated .cs file. Defaults to 'Code'."
+              },
+              "riseSpeed": {
+                "type": "number",
+                "description": "World units the popup rises per second. Defaults to 48."
+              },
+              "lifetime": {
+                "type": "number",
+                "description": "Seconds until the popup is fully faded and destroyed. Defaults to 1.1."
+              },
+              "fontSize": {
+                "type": "number",
+                "description": "Base font size baked into Spawn() (the optional Spawn size argument multiplies it). Defaults to 24."
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "create_killcam",
+          "title": "Create Killcam",
+          "toolset": "bridge_moviemaker",
+          "description": "Generate a sealed killcam Component: a rolling-buffer MovieRecorder keeps ONLY the last MaxBufferSeconds of a target's gameplay (BufferDuration verified live: the compiled clip's Duration equals the buffer, re-based to 0), and TriggerReplay() plays that history back through a MoviePlayer while the main camera chase-follows the target (Scene.Camera takeover in OnPreRender, restored exactly afterwards; static OnReplayFinished event + IsReplaying flag). Sandbox-safe: live-verified that GAME code can construct and drive MovieRecorder/MoviePlayer at runtime, and killcams/replays are the official recording-api use case \u2014 this is the real MovieMaker path, not a transform-history approximation. The replay REWINDS THE LIVE TARGET through its recorded past (classic killcam \u2014 the target is dead/inactive when it runs; disable a still-alive controller for the duration). wholeScene:true makes the generated component default to MovieRecorderOptions.Default (all renderers/cameras/sound points/particles \u2014 the replay rewinds everything, killer included; heavy in dense scenes), and it stays toggleable per-instance via the RecordWholeScene property. Returns { created, path, className, bufferSeconds, sampleRate, cameraDistance, cameraHeight, nextSteps }. Then: trigger_hotload \u2192 attach to a MANAGER object \u2192 set_component_reference Target to the player \u2192 arm via WatchOnStart or StartWatching() from spawn code \u2192 call TriggerReplay() from death code (pairs with create_health_system). LOCAL/visual-only \u2014 wrap in an [Rpc.Broadcast] for all clients. Refuses if the file already exists.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Component class/file name (default \"Killcam\")."
+              },
+              "directory": {
+                "type": "string",
+                "description": "Project folder for the .cs file (default \"Code\")."
+              },
+              "bufferSeconds": {
+                "type": "number",
+                "description": "Rolling-buffer length in seconds \u2014 the replay shows at most this much history (default 10, clamped 2-120)."
+              },
+              "sampleRate": {
+                "type": "integer",
+                "description": "Recorder samples per second (default 30, clamped 1-120)."
+              },
+              "cameraDistance": {
+                "type": "number",
+                "description": "Replay chase-camera distance behind the target (default 150, clamped 10-2000)."
+              },
+              "cameraHeight": {
+                "type": "number",
+                "description": "Replay chase-camera height above the target (default 60, clamped 0-2000)."
+              },
+              "wholeScene": {
+                "type": "boolean",
+                "description": "Generated default for RecordWholeScene: true = buffer the WHOLE scene via MovieRecorderOptions.Default (replay rewinds everything; heavy in dense scenes), false = only the Target hierarchy (default)."
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "create_placement_mode",
+          "title": "Create Placement Mode",
+          "toolset": "bridge_scaffold_gameplay",
+          "description": "Generate a ghost-preview + commit placement component (single class). StartPlacing() clones GhostPrefab as a NetworkMode.Never preview with colliders disabled and ModelRenderers tinted semi-transparent. Each frame while placing: ray from Scene.Camera.GetMouseRay(), IgnoreGameObjectHierarchy(ghost), snap hit position to GridSize (0 = freeform), move ghost. On Input.Pressed('attack1') TryPlace() re-validates distance and commits a real clone. StopPlacing() destroys the ghost. Static OnPlaced(GameObject, Vector3) event. Includes a multiplayer RPC note. API grounded in building-placement cookbook (enifun.shop_manager pattern).",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Class name. Defaults to 'PlacementMode'."
+              },
+              "directory": {
+                "type": "string",
+                "description": "Subdirectory for the .cs file. Defaults to 'Code'."
+              },
+              "gridSize": {
+                "type": "number",
+                "description": "Snap grid size in world units (0 = freeform placement). Defaults to 0."
+              },
+              "targetId": {
+                "type": "string",
+                "description": "GUID of an existing GameObject to attach to (hotload first)."
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "create_player_controller",
+          "title": "Create Player Controller",
+          "toolset": "bridge_scaffold_gameplay",
+          "description": "Generate a player controller script with WASD movement, mouse look, jumping, and sprint. Supports first-person, third-person, and top-down movement modes. Optionally places a player rig (GameObject + CharacterController + Camera) in the scene \u2014 note the generated component is attached AFTER a trigger_hotload (it isn't in the TypeLibrary until a recompile).",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Class name. Defaults to 'PlayerController'."
+              },
+              "directory": {
+                "type": "string",
+                "description": "Subdirectory under code/ for the file."
+              },
+              "type": {
+                "type": "string",
+                "description": "Movement mode: 'first_person' (mouse-look body+camera, WASD relative to facing), 'third_person' (mouse yaw, WASD relative to facing, boom camera), or 'top_down' (screen-relative WASD, fixed overhead camera, no jump). Defaults to 'first_person'. One of: first_person | third_person | top_down."
+              },
+              "moveSpeed": {
+                "type": "number",
+                "description": "Movement speed in units/sec. Defaults to 300."
+              },
+              "jumpForce": {
+                "type": "number",
+                "description": "Jump force (ignored for top_down). Defaults to 350."
+              },
+              "sprintMultiplier": {
+                "type": "number",
+                "description": "Sprint speed multiplier (held 'run' action). Defaults to 1.5."
+              },
+              "placeInScene": {
+                "type": "boolean",
+                "description": "If true, build a player rig in the scene: a GameObject (tagged 'player') with a CharacterController and (unless createCamera=false) a Camera. The generated controller component is NOT attached in this call \u2014 trigger_hotload then add_component_with_properties on the returned GameObject. Defaults to false (file-only)."
+              },
+              "createCamera": {
+                "type": "boolean",
+                "description": "When placeInScene is true, also create a Camera (FP/TP: child at eye/boom offset; top_down: fixed overhead). Defaults to true."
+              },
+              "spawnPosition": {
+                "type": "string",
+                "description": "When placeInScene is true, the world position to spawn the player rig at \u2014 object {x,y,z} or comma string \"x,y,z\". Defaults to the origin. As \"x,y,z\" (or JSON {x,y,z})."
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "create_proxy_nametag",
+          "title": "Create Proxy Nametag",
+          "toolset": "bridge_scaffold_polish",
+          "description": "Generate a sealed Component that floats the OWNER'S display name above a networked player. TextRenderer-based (not WorldPanel): a nametag is one short string with a distance fade, so a TextRenderer on a managed child object is far simpler than a WorldPanel + Razor + WorldInput stack \u2014 no UI assets, no panel host, per-frame alpha is a one-liner (mirrors create_floating_combat_text). Reads GameObject.Network.Owner.DisplayName (Owner and OwnerConnection are the same Connection on this SDK; falls back to the object name offline). Visibility is the INVERSE of the usual proxy guard: it renders only when GameObject.Network.IsProxy is true \u2014 i.e. on OTHER clients' copies of the player \u2014 so you never see a tag over your own head (offline / no networking =&gt; IsProxy false everywhere =&gt; no tags, expected). Spawns a CHILD GameObject for the text so billboarding never rotates the player model; cleaned up on disable. [Property] MaxDistance fades the tag out with distance, HeightOffset floats it above the head, FontSize sizes it. Attach to the ROOT of your networked player object. Pairs with create_networked_player (add it to the generated player prefab so every remote player is labeled). Returns { created, path, className, maxDistance, heightOffset, note, nextSteps }. Follow with trigger_hotload, then get_compile_errors, then attach via add_component_with_properties (component=className).",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Class name for the generated component. Defaults to 'ProxyNametag'."
+              },
+              "directory": {
+                "type": "string",
+                "description": "Subdirectory for the generated .cs file. Defaults to 'Code'."
+              },
+              "maxDistance": {
+                "type": "number",
+                "description": "Full alpha up close; fades to zero as the camera approaches this distance and is hidden past it, in world units. Defaults to 2000."
+              },
+              "heightOffset": {
+                "type": "number",
+                "description": "Height above the object's origin to float the tag, in world units (~72 clears a Citizen's head). Defaults to 72."
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "create_scene",
+          "title": "Create Scene",
+          "toolset": "bridge_scene",
+          "description": "Create a new EMPTY .scene file under the project's Assets folder and register it with the AssetSystem so load_scene works immediately. Errors if the scene already exists. NOTE: includeDefaults is not yet honored \u2014 the scene is always created empty, so after load_scene add a camera/light/ground yourself (create_gameobject, add_light). Returns a confirmation with the path \u2014 pass it to load_scene next.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "Relative path for the new scene (e.g. 'scenes/level_01.scene')."
+              },
+              "name": {
+                "type": "string",
+                "description": "Display name for the scene."
+              },
+              "includeDefaults": {
+                "type": "boolean",
+                "description": "If true, includes a Camera, Directional Light, and ground plane. Defaults to true."
+              }
+            },
+            "required": [
+              "path"
+            ]
+          }
+        },
+        {
+          "name": "create_seat_system",
+          "title": "Create Seat System",
+          "toolset": "bridge_vehicle",
+          "description": "Generate a standalone networked one-occupant seat component: press E (use) to sit \u2014 claims route through the host so seats can't be shared \u2014 E to stand; the occupant parents to the seat with their controller input disabled and restored on exit, which tries each ExitOffsets entry and takes the first spot with clearance. Static OnOccupantChanged event for camera/UI. For chairs, benches, turret mounts; vehicles get a seat built into create_vehicle_controller. Returns { created, path, className, nextSteps } \u2014 trigger_hotload + compile_status, then attach to any prop.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Class/file name (default 'Seat' -&gt; Code/Seat.cs). Errors if the file exists."
+              },
+              "directory": {
+                "type": "string",
+                "description": "Directory for the .cs file. Default 'Code'."
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "create_vehicle_controller",
+          "title": "Create Vehicle Controller",
+          "toolset": "bridge_vehicle",
+          "description": "Generate a drivable raycast-car component: 4-corner spring/damper suspension, mass-scaled engine force, speed-scaled yaw steering, lateral grip (lower = drift), and a BUILT-IN driver seat (press E to enter \u2014 the driver is hidden while driving so their controller can't fight the vehicle transform, the host assigns them ownership, and a chase camera follows the car \u2014 E to exit). Attach it plus a Rigidbody and collider to any prop and it drives. Returns { created, path, className, nextSteps } \u2014 follow with trigger_hotload + compile_status, then batch_add_component the parts. Apply handling presets with tune_vehicle. HONEST LIMIT: compiles + runs is verified; driving FEEL needs a human playtest \u2014 tune from the inspector while playing.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Class/file name (default 'VehicleController' -&gt; Code/VehicleController.cs). Errors if the file exists."
+              },
+              "directory": {
+                "type": "string",
+                "description": "Directory for the .cs file. Default 'Code'."
+              },
+              "engineForce": {
+                "type": "number",
+                "description": "Engine force (mass-scaled). Default 900."
+              },
+              "steerStrength": {
+                "type": "number",
+                "description": "Yaw rate in rad/s at full speed factor. Default 2.0."
+              },
+              "grip": {
+                "type": "number",
+                "description": "Lateral grip 0-1 \u2014 fraction of sideways velocity killed per tick; lower = drift. Default 0.85."
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "create_worldpanel_ui",
+          "title": "Create Worldpanel Ui",
+          "toolset": "bridge_scaffold_polish",
+          "description": "Generate a diegetic, clickable world-space UI: a Razor PanelComponent (+ .razor.scss) meant to sit on a GameObject that ALSO carries a Sandbox.WorldPanel \u2014 the WorldPanel is the world-space render surface (PanelSize / RenderScale / InteractionRange), this component is the actual UI it renders (PanelComponent has no world-panel mode of its own). Ships two example buttons wired to @onclick that raise a static event OnButtonPressed(string id), so game code reacts WITHOUT editing the panel (subscribe: &lt;Name&gt;.OnButtonPressed += id =&gt; ...). razor_lint-safe by construction (BuildHash override, no switch-expressions / non-ASCII in @code, class-selector SCSS root). SCENE PREREQUISITE FOR CLICKS: a WorldPanel's buttons only fire when a Sandbox.WorldInput exists in the scene (typically on the camera or the player) with its LeftMouseAction set to your click input action (e.g. \"attack1\"); on this SDK WorldInput drives itself from the camera + that action \u2014 there is no manual ray to feed, and WorldInput.Hovered (read-only) reflects the panel under the cursor. Without a WorldInput present, @onclick never fires. Setup: add_world_panel to a GameObject, add this component to the same object, add a WorldInput to the scene.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Class name for the generated panel. Defaults to 'WorldPanelUi'."
+              },
+              "directory": {
+                "type": "string",
+                "description": "Subdirectory for the generated .razor + .razor.scss. Defaults to 'Code/UI'."
+              },
+              "title": {
+                "type": "string",
+                "description": "Heading text baked into the panel (editable per-instance via the Title [Property]). Defaults to 'Interact'."
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "delete_camera_bookmark",
+          "title": "Delete Camera Bookmark",
+          "toolset": "bridge_screenshot",
+          "description": "Delete one session-scoped camera bookmark and its comparison baselines. Returns deleted=false when the name was already absent. Use list_camera_bookmarks to inspect what remains.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Bookmark name to delete (case-insensitive)."
+              }
+            },
+            "required": [
+              "name"
+            ]
+          }
+        },
+        {
+          "name": "describe_scene",
+          "title": "Describe Scene",
+          "toolset": "bridge_scene",
+          "description": "One-call orientation for the OPEN scene (works in edit and play mode): total/root object counts, component histogram (top 20 types), every camera with position, light count, tag histogram (top 12), and the aggregate world bounds of renderable content. Returns a structured summary \u2014 orient here, then find_objects by component/tag, get_scene_hierarchy for structure, find_broken_references for health, screenshot_orbit to look at something. Complements describe_project (project-level). Read-only.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {},
+            "required": []
+          },
+          "annotations": {
+            "readOnlyHint": true
+          }
+        },
+        {
+          "name": "drive_player",
+          "title": "Drive Player",
+          "toolset": "bridge_playtest",
+          "description": "EXPERIMENTAL \u2014 Drive the active PlayerController DURING PLAY MODE across multiple frames: synthesize sustained look (EyeAngles), analog movement (wish velocity), and/or hold a named action down long enough that Input.Pressed fires its rising edge. This is the reliable alternative to simulate_input, which only sets an action for ONE frame and so MISSES edge-triggered controls (Input.Pressed) and cannot inject analog move/look at all. Requires start_play first. Runs ASYNC across editor frames and returns immediately \u2014 the job keeps applying for `frames` (or `durationMs`) frames. After it runs, confirm with drive_player_status, then verify the actual effect with capture_view / get_runtime_property. Provide at least one of look / lookDelta / move / action.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "GUID of the GameObject holding the controller. Omit to auto-resolve the first PlayerController (or *Controller with EyeAngles/WishVelocity) in the play scene."
+              },
+              "component": {
+                "type": "string",
+                "description": "Controller component type name to target (e.g. 'PlayerController'). Omit to auto-detect."
+              },
+              "frames": {
+                "type": "integer",
+                "description": "How many editor frames to drive for (1\u20131800, ~60/sec). Default 30 (~0.5s). Takes precedence over durationMs."
+              },
+              "durationMs": {
+                "type": "integer",
+                "description": "Duration in ms, converted at ~60fps (ignored if `frames` is given). Default ~500ms."
+              },
+              "look": {
+                "type": "string",
+                "description": "Absolute EyeAngles target {pitch,yaw,roll} held for the whole duration (aim the camera/body). Object, [pitch,yaw,roll], or 'pitch,yaw,roll'. pitch is clamped to \u00b189. As \"pitch,yaw,roll\" degrees."
+              },
+              "lookDelta": {
+                "type": "string",
+                "description": "Per-frame EyeAngles delta added each frame (turn/pan over time, e.g. {yaw:2} to sweep right). Combine with `frames` to control total rotation. As \"pitch,yaw,roll\" degrees."
+              },
+              "move": {
+                "description": "Analog movement in the controller's facing frame: x = forward(+)/back(-), y = left(+)/right(-). Magnitude clamped to 1. e.g. {x:1} walks forward for the whole duration. JSON value."
+              },
+              "moveSpeed": {
+                "type": "number",
+                "description": "Units/sec used when synthesizing WishVelocity from `move` (default 160). Ignored if the controller exposes its own AnalogMove field."
+              },
+              "action": {
+                "type": "string",
+                "description": "A named input action ('jump','use','attack1',\u2026) HELD DOWN every frame for the whole duration, so Input.Pressed catches the edge single-frame simulate_input misses. Auto-released on the final frame."
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "editor_camera_screenshot",
+          "title": "Editor Camera Screenshot",
+          "toolset": "scene",
+          "description": "Render what the editor scene camera sees and return it as an image - see the scene the way the viewport does. Move the view first with set_editor_camera.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "width": {
+                "type": "integer",
+                "description": "Image width in pixels.",
+                "minimum": 16,
+                "maximum": 4096,
+                "default": 1280
+              },
+              "height": {
+                "type": "integer",
+                "description": "Image height in pixels.",
+                "minimum": 16,
+                "maximum": 4096,
+                "default": 720
+              }
+            },
+            "required": []
+          },
+          "annotations": {
+            "readOnlyHint": true
+          }
+        },
+        {
+          "name": "focus_object",
+          "title": "Focus Object",
+          "toolset": "bridge_gameobject",
+          "description": "Highlight a GameObject by selecting it in the editor. NOTE: s&box exposes no dedicated focus API, so this only sets the selection \u2014 it does NOT move any camera (returns { focused, id, note } saying so). To actually point the viewport at an object use frame_camera; to aim a screenshot use screenshot_from.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "GUID of the GameObject to focus."
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "frame_camera",
+          "title": "Frame Camera",
+          "toolset": "bridge_debug",
+          "description": "Aim the s&box EDITOR viewport camera at a GameObject (by id) or a world point (position + optional radius), then call take_screenshot to capture that view. This is how Claude points its own screenshots at what it's working on \u2014 frame a spawned object, then screenshot to verify it actually looks right.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "GUID of a GameObject to frame on."
+              },
+              "position": {
+                "type": "string",
+                "description": "World point to frame on (use instead of id) \u2014 object {x,y,z} or comma string \"x,y,z\". As \"x,y,z\" (or JSON {x,y,z})."
+              },
+              "radius": {
+                "type": "number",
+                "description": "Frame radius around the position, in units (default 128)."
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "get_editor_camera",
+          "title": "Get Editor Camera",
+          "toolset": "scene",
+          "description": "The editor scene camera's transform - where the scene viewport is looking from. Position, angles (pitch yaw roll) and field of view.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {},
+            "required": []
+          },
+          "annotations": {
+            "readOnlyHint": true
+          },
+          "outputSchema": {
+            "type": "object",
+            "properties": {
+              "Position": {
+                "type": "string"
+              },
+              "Angles": {
+                "type": "string"
+              },
+              "FieldOfView": {
+                "type": "number"
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "hammer_screenshot",
+          "title": "Screenshot",
+          "toolset": "hammer",
+          "description": "Render the map as Hammer's 3D view draws it and return the image - see what you've built. Renders from the main 3D view's camera unless you give a camera, which doesn't move the user's view. Aim it with hammer_focus_nodes or hammer_set_camera first, or pass position and lookAt.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "width": {
+                "type": "integer",
+                "description": "Image width in pixels.",
+                "minimum": 16,
+                "maximum": 4096,
+                "default": 1280
+              },
+              "height": {
+                "type": "integer",
+                "description": "Image height in pixels.",
+                "minimum": 16,
+                "maximum": 4096,
+                "default": 720
+              },
+              "position": {
+                "type": "string",
+                "description": "Camera position as 'x,y,z'. Empty uses the 3D view's camera."
+              },
+              "angles": {
+                "type": "string",
+                "description": "Camera angles as 'pitch,yaw,roll'."
+              },
+              "lookAt": {
+                "type": "string",
+                "description": "A point to look at as 'x,y,z' - overrides angles."
+              },
+              "fieldOfView": {
+                "type": "number",
+                "description": "Field of view in degrees. 0 uses the 3D view's.",
+                "minimum": 0,
+                "maximum": 170,
+                "default": 0
+              }
+            },
+            "required": []
+          },
+          "annotations": {
+            "readOnlyHint": true
+          }
+        },
+        {
+          "name": "hammer_set_camera",
+          "title": "Set Camera",
+          "toolset": "hammer",
+          "description": "Move a Hammer view's camera - give a position, and angles or a point to look at. Defaults to the 3D view the user used last. Returns the view's new state. To frame specific nodes instead, use hammer_focus_nodes.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "position": {
+                "type": "string",
+                "description": "Camera position as 'x,y,z'. Empty keeps the current one."
+              },
+              "angles": {
+                "type": "string",
+                "description": "View angles as 'pitch,yaw,roll'."
+              },
+              "lookAt": {
+                "type": "string",
+                "description": "A point to look at, as 'x,y,z' - overrides angles."
+              },
+              "view": {
+                "type": "integer",
+                "description": "Which view, by index from hammer_views. -1 for the main 3D view.",
+                "default": -1
+              }
+            },
+            "required": []
+          },
+          "outputSchema": {
+            "type": "object",
+            "properties": {
+              "Index": {
+                "type": "integer"
+              },
+              "Is3D": {
+                "type": "boolean"
+              },
+              "Active": {
+                "type": "boolean"
+              },
+              "Position": {
+                "type": "string"
+              },
+              "Angles": {
+                "type": "string"
+              },
+              "FieldOfView": {
+                "type": "number"
+              },
+              "Size": {
+                "type": "string"
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "hammer_trace",
+          "title": "Trace Ray",
+          "toolset": "hammer",
+          "description": "Trace a ray through the open map and report the first node it hits, where, and the surface normal - find the floor under a point, check what's in front of the camera, or probe where to place something. Traces Hammer's own geometry, so it works before the map is compiled.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "from": {
+                "type": "string",
+                "description": "Ray start as 'x,y,z'."
+              },
+              "to": {
+                "type": "string",
+                "description": "Ray end as 'x,y,z'."
+              },
+              "meshesOnly": {
+                "type": "boolean",
+                "description": "Only hit mesh geometry, ignoring entities and game objects.",
+                "default": false
+              },
+              "skipToolsMaterials": {
+                "type": "boolean",
+                "description": "Don't hit tools materials like clip or trigger.",
+                "default": false
+              },
+              "hitBackfaces": {
+                "type": "boolean",
+                "description": "Hit faces from behind too. A back face hit (the normal points along the ray) means the ray started inside something.",
+                "default": false
+              }
+            },
+            "required": [
+              "from",
+              "to"
+            ]
+          },
+          "annotations": {
+            "readOnlyHint": true
+          },
+          "outputSchema": {
+            "type": "object",
+            "properties": {
+              "Hit": {
+                "type": "boolean"
+              },
+              "Position": {
+                "type": "string"
+              },
+              "Normal": {
+                "type": "string"
+              },
+              "Node": {
+                "type": "object",
+                "properties": {
+                  "Id": {
+                    "type": "integer"
+                  },
+                  "Kind": {
+                    "type": "string"
+                  },
+                  "Name": {
+                    "type": "string"
+                  },
+                  "ClassName": {
+                    "type": "string"
+                  },
+                  "Description": {
+                    "type": "string"
+                  },
+                  "Position": {
+                    "type": "string"
+                  },
+                  "Parent": {
+                    "type": "integer"
+                  },
+                  "GameObject": {
+                    "type": "string"
+                  },
+                  "Selected": {
+                    "type": "boolean"
+                  },
+                  "Visible": {
+                    "type": "boolean"
+                  }
+                },
+                "required": []
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "hammer_views",
+          "title": "Views",
+          "toolset": "hammer",
+          "description": "Hammer's views of the open map - each one's index, whether it's 3D or a 2D (orthographic) view, its camera position, angles and field of view, its size, and which one the user used last.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {},
+            "required": []
+          },
+          "annotations": {
+            "readOnlyHint": true
+          }
+        },
+        {
+          "name": "list_camera_bookmarks",
+          "title": "List Camera Bookmarks",
+          "toolset": "bridge_screenshot",
+          "description": "List all session-scoped camera bookmarks in stable name order. Returns each resolved position, rotation, optional lookAt/target, FOV, and save time. Read-only; bookmarks reset on addon hotload or editor restart. Feed names into capture_camera_set.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {},
+            "required": []
+          },
+          "annotations": {
+            "readOnlyHint": true
+          }
+        },
+        {
+          "name": "perf_rendering",
+          "title": "Rendering",
+          "toolset": "perf",
+          "description": "Rendering detail for the last frame: which renderer drew it, resolution and AA, the rendering issues the performance hub flags (draw calls, batching, texture pool), every scene system counter (draws, triangles, batches, material changes, culling, lights and shadows, texture pool, device report), the managed renderer's phases and draws when it rendered, and the active camera's post-processing layers.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {},
+            "required": []
+          },
+          "annotations": {
+            "readOnlyHint": true
+          }
+        },
+        {
+          "name": "playtest",
+          "title": "Playtest",
+          "toolset": "bridge_playtest",
+          "description": "Run a scripted gameplay-verification sequence in PLAY MODE and get a pass/fail transcript (start_play first; poll playtest_status until finished). Each step is an object with ONE verb: \u2022 { \"move\": {\"x\":1,\"y\":0}, \"frames\":60 } \u2014 analog move in the controller frame (x=fwd/back, y=left/right); auto-sets UseInputControls=false and zeroes WishVelocity after. Movement is controller-specific/best-effort. \u2022 { \"look\": {\"pitch\":0,\"yaw\":90,\"roll\":0} } / { \"lookDelta\": {\"yaw\":2}, \"frames\":30 } \u2014 set/sweep EyeAngles. \u2022 { \"action\": \"use\", \"frames\":20 } \u2014 hold a named input action down (rising-edge safe; for use/dig/attack handled by gameplay components). \u2022 { \"jump\": \"0,0,400\" } \u2014 invoke the controller's Jump(velocity). \u2022 { \"set\": {\"component\":\"PlayerController\",\"property\":\"WorldPosition\",\"to\":\"100,0,0\"} } \u2014 set a runtime property (toggles, or teleport via WorldPosition \u2014 the robust positioning fallback). \u2022 { \"wait\": 10 } \u2014 advance N frames. \u2022 { \"capture\": \"after-jump\" } \u2014 screenshot the live player-POV camera at this frame; the PNG path is recorded in the transcript (diagnostic, never pass/fail). Pass true for no label. \u2022 { \"assert\": {\"read\":\"Displacement\",\"op\":\"&gt;\",\"value\":50,\"desc\":\"moved &gt;50u\"} } \u2014 read a value and compare IN-FRAME. read = \"Displacement\" (scalar distance moved from job start \u2014 the clean facing-independent movement proof), \"WorldPosition[.x|.y|.z]\", or \"&lt;Component&gt;.&lt;Property&gt;[.x|.y|.z|.Count]\". op = &gt; &lt; &gt;= &lt;= == != changed. Records pass/fail. Tip: prove movement with read:'Displacement' op:'&gt;' (facing-independent, unambiguous), and catch transient state (IsAirborne) right after the action.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "steps": {
+                "description": "Ordered step objects (see verbs above). Runs top-to-bottom in the frame loop. JSON array."
+              },
+              "id": {
+                "type": "string",
+                "description": "GUID of the player/controller GameObject. Omit to auto-resolve the first PlayerController."
+              },
+              "component": {
+                "type": "string",
+                "description": "Controller component type to target (e.g. 'PlayerController'). Omit to auto-detect."
+              }
+            },
+            "required": [
+              "steps"
+            ]
+          }
+        },
+        {
+          "name": "save_camera_bookmark",
+          "title": "Save Camera Bookmark",
+          "toolset": "bridge_screenshot",
+          "description": "Save or replace a named camera bookmark in editor-session memory. Pass targetId to save the bridge's deterministic framed view of a GameObject, position plus lookAt/rotation for an explicit pose, or omit both to snapshot the current main camera. Returns the resolved pose. Bookmarks reset on addon hotload or editor restart; list them with list_camera_bookmarks and capture an ordered group with capture_camera_set.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "Bookmark name (case-insensitive, 1-64 characters)."
+              },
+              "targetId": {
+                "type": "string",
+                "description": "GameObject GUID to resolve into a deterministic framed pose."
+              },
+              "position": {
+                "type": "string",
+                "description": "Explicit camera position as \"x,y,z\"."
+              },
+              "lookAt": {
+                "type": "string",
+                "description": "World point to aim at as \"x,y,z\"; pair with position."
+              },
+              "rotation": {
+                "type": "string",
+                "description": "Explicit camera rotation as \"pitch,yaw,roll\"; alternative to lookAt."
+              },
+              "fov": {
+                "type": "number",
+                "description": "Field of view in degrees (clamped 1-179). Defaults to 80, or the main camera FOV when snapshotting it."
+              }
+            },
+            "required": [
+              "name"
+            ]
+          }
+        },
+        {
+          "name": "scene_validate",
+          "title": "Scene Validate",
+          "toolset": "bridge_validation",
+          "description": "Validate the active scene for the silent setup footguns that break controllers/physics/cameras: no CameraComponent, no player controller, multiple root Rigidbodies, a Rigidbody with MotionEnabled=false fighting a kinematic root, IsTrigger colliders that Scene.Trace will ignore, child Rigidbodies breaking collider binding, and missing required child anchors. Returns each issue with the GameObject and the exact fix.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {},
+            "required": []
+          },
+          "annotations": {
+            "readOnlyHint": true
+          }
+        },
+        {
+          "name": "screenshot_from",
+          "title": "Screenshot From",
+          "toolset": "bridge_screenshot",
+          "description": "Frame a GameObject or a free camera position and return the shot as an inline PNG image. Same as capture_view (kept under its historical name \u2014 existing workflows use it), with the same capture limits: UI text may rasterise as boxes, and Terrain renders truncated from a temporary camera (clipmap centres on the main camera) \u2014 verify terrain via take_screenshot.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "GUID of a GameObject to auto-frame."
+              },
+              "position": {
+                "type": "string",
+                "description": "Camera position as \"x,y,z\"."
+              },
+              "lookAt": {
+                "type": "string",
+                "description": "Point to aim the camera at, as \"x,y,z\"."
+              },
+              "rotation": {
+                "type": "string",
+                "description": "Camera rotation as \"pitch,yaw,roll\" degrees."
+              },
+              "width": {
+                "type": "integer",
+                "description": "Image width in pixels. Default 1280.",
+                "default": 1280
+              },
+              "height": {
+                "type": "integer",
+                "description": "Image height in pixels. Default 720.",
+                "default": 720
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "screenshot_orbit",
+          "title": "Screenshot Orbit",
+          "toolset": "bridge_screenshot",
+          "description": "Capture a GameObject from several angles in ONE call \u2014 orbits around the object and returns every angle as an inline PNG image, so 3D work can be verified from multiple sides instead of guessed from one. Temporary-camera limits apply: Terrain renders as a truncated ribbon (clipmap centres on the main camera) and UI text may rasterise as boxes.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "GUID of the GameObject to orbit."
+              },
+              "shots": {
+                "type": "integer",
+                "description": "Number of angles around the object (2-8). Default 4.",
+                "default": 4
+              },
+              "elevation": {
+                "type": "number",
+                "description": "Camera height factor: 0 = level with the object, 1 = high above. Default 0.4.",
+                "default": 0.4
+              },
+              "distance": {
+                "type": "number",
+                "description": "Camera distance in units. Default: auto from the object's bounds."
+              },
+              "width": {
+                "type": "integer",
+                "description": "Image width in pixels. Default 1280.",
+                "default": 1280
+              },
+              "height": {
+                "type": "integer",
+                "description": "Image height in pixels. Default 720.",
+                "default": 720
+              }
+            },
+            "required": [
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "set_component_reference",
+          "title": "Set Component Reference",
+          "toolset": "bridge_component",
+          "description": "Wire a component's GameObject/Component-typed property to ANOTHER live object in the scene by GUID (e.g. ObjectiveManager.Player = the player, a camera's follow target, a door's hinge). Preferred for object/component refs (can pick a specific component type off the target via targetComponent, and validates). set_property also accepts a GUID for ref props; set_prefab_ref is for prefab assets. Set clear:true to null the reference.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "GUID of the GameObject that HOLDS the component you're writing into."
+              },
+              "component": {
+                "type": "string",
+                "description": "Component type name on that object (e.g. 'ObjectiveManager', 'CameraComponent')."
+              },
+              "property": {
+                "type": "string",
+                "description": "The property to set (must be a GameObject- or Component-typed property)."
+              },
+              "targetId": {
+                "type": "string",
+                "description": "GUID of the GameObject to reference. Required unless clear:true."
+              },
+              "targetComponent": {
+                "type": "string",
+                "description": "If the property is a Component subtype, the specific component type to pull off the target object. Omit to auto-match by the property's type."
+              },
+              "clear": {
+                "type": "boolean",
+                "description": "If true, set the reference to null instead of assigning a target."
+              }
+            },
+            "required": [
+              "id",
+              "component",
+              "property"
+            ]
+          }
+        },
+        {
+          "name": "set_editor_camera",
+          "title": "Set Editor Camera",
+          "toolset": "scene",
+          "description": "Move the editor scene camera. Give a position and/or angles - anything left empty keeps its current value. Returns the resulting transform.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "position": {
+                "type": "string",
+                "description": "World position as 'x,y,z'."
+              },
+              "angles": {
+                "type": "string",
+                "description": "View angles as 'pitch,yaw,roll'."
+              }
+            },
+            "required": []
+          }
+        },
+        {
+          "name": "take_screenshot",
+          "title": "Take Screenshot",
+          "toolset": "bridge_screenshot",
+          "description": "Screenshot the scene's main camera view (the player's view in play mode) and return it as an inline PNG image. To frame a specific object or position instead, use capture_view or screenshot_orbit. KNOWN CAPTURE LIMIT (engine, not bridge): text in ScreenPanel/Razor labels may rasterise as solid boxes while images and layout are correct \u2014 a blank HUD in a capture is NOT a HUD bug; verify text another way (e.g. a Log.Info of the bound value).",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "width": {
+                "type": "integer",
+                "description": "Image width in pixels (16-3840). Default 1280.",
+                "default": 1280
+              },
+              "height": {
+                "type": "integer",
+                "description": "Image height in pixels (16-2160). Default 720.",
+                "default": 720
+              },
+              "renderUI": {
+                "type": "boolean",
+                "description": "Include screen-space UI (HUD) in the capture. Default true.",
+                "default": true
+              }
+            },
+            "required": []
+          },
+          "annotations": {
+            "readOnlyHint": true
+          }
+        },
+        {
+          "name": "ui_screenshot",
+          "title": "Screenshot",
+          "toolset": "ui",
+          "description": "A screenshot of one panel, cropped to its screen rect, so you can look at what a panel actually draws without hunting for it in a full frame. Renders through the running scene's camera.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "panel": {
+                "type": "string",
+                "description": "Panel path from ui_panel_dump, or a selector. Empty uses the first root."
+              },
+              "padding": {
+                "type": "integer",
+                "description": "Extra pixels around the panel, for seeing shadows and outlines.",
+                "minimum": 0,
+                "maximum": 512,
+                "default": 0
+              }
+            },
+            "required": []
+          },
+          "annotations": {
+            "readOnlyHint": true
+          }
+        }
+      ],
+      "total": 401
+    },
+    {
+      "tools": [
+        {
+          "name": "console_command",
+          "title": "Console Command",
+          "toolset": "editor",
+          "description": "Run a console command - anything the editor console accepts, including setting convars. Output, if any, lands in the console - read_console shows it.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "command": {
+                "type": "string",
+                "description": "The command line to run, e.g. 'stat fps' or 'sv_cheats 1'."
+              }
+            },
+            "required": [
+              "command"
+            ]
+          }
+        },
+        {
+          "name": "instance_console_command",
+          "title": "Console Command",
+          "toolset": "instance",
+          "description": "Run a local engine console command. Read the result with read_console. This can change engine state or quit the instance.",
+          "inputSchema": {
+            "type": "object",
+            "properties": {
+              "command": {
+                "type": "string",
+                "description": "One console command, including its arguments."
+              }
+            },
+            "required": [
+              "command"
+            ]
+          }
+        }
+      ],
+      "total": 401
+    },
+    {
+      "Scenes": [
+        {
+          "Name": "menu",
+          "ResourcePath": "scenes/menu.scene",
+          "Type": "Scene",
+          "IsActive": true,
+          "HasUnsavedChanges": false,
+          "RootObjectCount": 10
+        },
+        {
+          "Name": "ares",
+          "ResourcePath": "scenes/maps/ares/ares.scene",
+          "Type": "Scene",
+          "IsActive": false,
+          "HasUnsavedChanges": false,
+          "RootObjectCount": 24
+        }
+      ]
+    },
+    {
+      "IsBuilding": false,
+      "Compilers": [
+        {
+          "Name": "local.menu",
+          "IsBuilding": false,
+          "NeedsBuild": false,
+          "Success": true,
+          "Errors": 0,
+          "Warnings": 0,
+          "Diagnostics": []
+        },
+        {
+          "Name": "toolbase",
+          "IsBuilding": false,
+          "NeedsBuild": false,
+          "Success": true,
+          "Errors": 0,
+          "Warnings": 0,
+          "Diagnostics": []
+        },
+        {
+          "Name": "local.shadergraph",
+          "IsBuilding": false,
+          "NeedsBuild": false,
+          "Success": true,
+          "Errors": 0,
+          "Warnings": 0,
+          "Diagnostics": []
+        },
+        {
+          "Name": "local.actiongraph",
+          "IsBuilding": false,
+          "NeedsBuild": false,
+          "Success": true,
+          "Errors": 0,
+          "Warnings": 0,
+          "Diagnostics": []
+        },
+        {
+          "Name": "local.moviemaker",
+          "IsBuilding": false,
+          "NeedsBuild": false,
+          "Success": true,
+          "Errors": 0,
+          "Warnings": 0,
+          "Diagnostics": []
+        },
+        {
+          "Name": "local.hammer",
+          "IsBuilding": false,
+          "NeedsBuild": false,
+          "Success": true,
+          "Errors": 0,
+          "Warnings": 0,
+          "Diagnostics": []
+        },
+        {
+          "Name": "local.dooeditor",
+          "IsBuilding": false,
+          "NeedsBuild": false,
+          "Success": true,
+          "Errors": 0,
+          "Warnings": 0,
+          "Diagnostics": []
+        },
+        {
+          "Name": "facepunch.bettersounds",
+          "IsBuilding": false,
+          "NeedsBuild": false,
+          "Success": true,
+          "Errors": 0,
+          "Warnings": 0,
+          "Diagnostics": []
+        },
+        {
+          "Name": "facepunch.jigglebones",
+          "IsBuilding": false,
+          "NeedsBuild": false,
+          "Success": true,
+          "Errors": 0,
+          "Warnings": 0,
+          "Diagnostics": []
+        },
+        {
+          "Name": "facepunch.libevents",
+          "IsBuilding": false,
+          "NeedsBuild": false,
+          "Success": true,
+          "Errors": 0,
+          "Warnings": 0,
+          "Diagnostics": []
+        },
+        {
+          "Name": "facepunch.singletons",
+          "IsBuilding": false,
+          "NeedsBuild": false,
+          "Success": true,
+          "Errors": 0,
+          "Warnings": 0,
+          "Diagnostics": []
+        },
+        {
+          "Name": "sboxshare.sboxshare.editor",
+          "IsBuilding": false,
+          "NeedsBuild": false,
+          "Success": true,
+          "Errors": 0,
+          "Warnings": 1,
+          "Diagnostics": [
+            {
+              "Severity": "Warning",
+              "Id": "CS4014",
+              "Message": "Because this call is not awaited, execution of the current method continues before the call is completed. Consider applying the 'await' operator to the result of the call.",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Libraries\\sboxshare.sboxshare\\Editor\\ShareDropObject.cs",
+              "Line": 401
+            }
+          ]
+        },
+        {
+          "Name": "sboxskinsgg.claudebridge",
+          "IsBuilding": false,
+          "NeedsBuild": false,
+          "Success": true,
+          "Errors": 0,
+          "Warnings": 0,
+          "Diagnostics": []
+        },
+        {
+          "Name": "sboxskinsgg.claudebridge.editor",
+          "IsBuilding": false,
+          "NeedsBuild": false,
+          "Success": true,
+          "Errors": 0,
+          "Warnings": 12,
+          "Diagnostics": [
+            {
+              "Severity": "Warning",
+              "Id": "CS0618",
+              "Message": "'LobbyConfig.AutoSwitchToBestHost' is obsolete: 'The host only changes when the current host leaves'",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Libraries\\sboxskinsgg.claudebridge\\Editor\\MultiplayerTestHandlers.cs",
+              "Line": 466
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0618",
+              "Message": "'BeamEffect.Texture' is obsolete: 'Use Material instead'",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Libraries\\sboxskinsgg.claudebridge\\Editor\\MyEditorMenu.cs",
+              "Line": 8114
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0612",
+              "Message": "'ParticleSpriteRenderer.Texture.set' is obsolete",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Libraries\\sboxskinsgg.claudebridge\\Editor\\MyEditorMenu.cs",
+              "Line": 7992
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0612",
+              "Message": "'ParticleSpriteRenderer.Texture.set' is obsolete",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Libraries\\sboxskinsgg.claudebridge\\Editor\\MyEditorMenu.cs",
+              "Line": 8229
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0618",
+              "Message": "'ClothingContainer.Apply(SkinnedModelRenderer)' is obsolete: 'Use Dresser.UpdateAppearance and Dresser.Apply instead.'",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Libraries\\sboxskinsgg.claudebridge\\Editor\\MyEditorMenu.cs",
+              "Line": 8479
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0618",
+              "Message": "'NavMesh.GetSimplePath(Vector3, Vector3)' is obsolete: 'Use CalculatePath instead'",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Libraries\\sboxskinsgg.claudebridge\\Editor\\MyEditorMenu.cs",
+              "Line": 9860
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0612",
+              "Message": "'ParticleSystem' is obsolete",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Libraries\\sboxskinsgg.claudebridge\\Editor\\MyEditorMenu.cs",
+              "Line": 10052
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0612",
+              "Message": "'ParticleSystem' is obsolete",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Libraries\\sboxskinsgg.claudebridge\\Editor\\MyEditorMenu.cs",
+              "Line": 10055
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0612",
+              "Message": "'ParticleSystem.Load(string)' is obsolete",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Libraries\\sboxskinsgg.claudebridge\\Editor\\MyEditorMenu.cs",
+              "Line": 10055
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0612",
+              "Message": "'LegacyParticleSystem' is obsolete",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Libraries\\sboxskinsgg.claudebridge\\Editor\\MyEditorMenu.cs",
+              "Line": 10073
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0649",
+              "Message": "Field 'PlaytestRunner.Job.Done' is never assigned to, and will always have its default value false",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Libraries\\sboxskinsgg.claudebridge\\Editor\\PlaytestHandler.cs",
+              "Line": 113
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0649",
+              "Message": "Field 'PlaytestRunner.Job.EndReason' is never assigned to, and will always have its default value null",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Libraries\\sboxskinsgg.claudebridge\\Editor\\PlaytestHandler.cs",
+              "Line": 115
+            }
+          ]
+        },
+        {
+          "Name": "verarp.razedtest",
+          "IsBuilding": false,
+          "NeedsBuild": false,
+          "Success": true,
+          "Errors": 0,
+          "Warnings": 75,
+          "Diagnostics": [
+            {
+              "Severity": "Warning",
+              "Id": "CS0618",
+              "Message": "'GameResourceAttribute' is obsolete: 'Use AssetType instead'",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Code\\Gunsmith\\Parts\\GunsmithPart.cs",
+              "Line": 32
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0618",
+              "Message": "'GameResourceAttribute' is obsolete: 'Use AssetType instead'",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Code\\Weapons\\EquipmentResource.cs",
+              "Line": 68
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS8632",
+              "Message": "The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Code\\Weapons\\swb_shared\\IPlayerBase.cs",
+              "Line": 45
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS8632",
+              "Message": "The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Code\\Weapons\\swb_shared\\IPlayerBase.cs",
+              "Line": 35
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0618",
+              "Message": "'GameResourceAttribute' is obsolete: 'Use AssetType instead'",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Code\\GameLoop\\Audio\\RadioSounds.cs",
+              "Line": 86
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0618",
+              "Message": "'HudPainter' is obsolete: 'Use Painter.Begin( commandList ) or CameraComponent.BeginHud()/BeginOverlay() instead. Dispose the painter to submit its drawing.'",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Code\\UI\\HUD\\Crosshair\\HitmarkerPainter.cs",
+              "Line": 84
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0618",
+              "Message": "'HudPainter' is obsolete: 'Use Painter.Begin( commandList ) or CameraComponent.BeginHud()/BeginOverlay() instead. Dispose the painter to submit its drawing.'",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Code\\UI\\HUD\\Crosshair\\HitmarkerPainter.cs",
+              "Line": 164
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0618",
+              "Message": "'HudPainter' is obsolete: 'Use Painter.Begin( commandList ) or CameraComponent.BeginHud()/BeginOverlay() instead. Dispose the painter to submit its drawing.'",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Code\\UI\\HUD\\Crosshair\\HitmarkerPainter.cs",
+              "Line": 176
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS8632",
+              "Message": "The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Code\\Weapons\\swb_shared\\DamageInfo.cs",
+              "Line": 33
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS8632",
+              "Message": "The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Code\\Weapons\\swb_shared\\DamageInfo.cs",
+              "Line": 34
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS8632",
+              "Message": "The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Code\\Weapons\\swb_shared\\DamageInfo.cs",
+              "Line": 36
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0618",
+              "Message": "'GameResourceAttribute' is obsolete: 'Use AssetType instead'",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Code\\PawnSystem\\Player\\Perks\\PerkResource.cs",
+              "Line": 21
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0109",
+              "Message": "The member 'Weapon.IsRunning' does not hide an accessible member. The new keyword is not required.",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Code\\Weapons\\swb_base\\Weapon.Var.cs",
+              "Line": 314
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0109",
+              "Message": "The member 'PlayerBase.IsRunning' does not hide an accessible member. The new keyword is not required.",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Code\\Weapons\\swb_player\\PlayerBase.Movement.cs",
+              "Line": 171
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0618",
+              "Message": "'RangeAttribute.RangeAttribute(float, float, float, bool, bool)' is obsolete: 'Use [Step] attribute for setting step value.'",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Code\\Settings\\GameSettingsSystem.cs",
+              "Line": 137
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0618",
+              "Message": "'RangeAttribute.RangeAttribute(float, float, float, bool, bool)' is obsolete: 'Use [Step] attribute for setting step value.'",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Code\\Settings\\GameSettingsSystem.cs",
+              "Line": 151
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0618",
+              "Message": "'RangeAttribute.RangeAttribute(float, float, float, bool, bool)' is obsolete: 'Use [Step] attribute for setting step value.'",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Code\\Settings\\GameSettingsSystem.cs",
+              "Line": 162
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0618",
+              "Message": "'RangeAttribute.RangeAttribute(float, float, float, bool, bool)' is obsolete: 'Use [Step] attribute for setting step value.'",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Code\\Settings\\GameSettingsSystem.cs",
+              "Line": 168
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0618",
+              "Message": "'RangeAttribute.RangeAttribute(float, float, float, bool, bool)' is obsolete: 'Use [Step] attribute for setting step value.'",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Code\\Settings\\GameSettingsSystem.cs",
+              "Line": 174
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0618",
+              "Message": "'RangeAttribute.RangeAttribute(float, float, float, bool, bool)' is obsolete: 'Use [Step] attribute for setting step value.'",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Code\\Settings\\GameSettingsSystem.cs",
+              "Line": 186
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0618",
+              "Message": "'RangeAttribute.RangeAttribute(float, float, float, bool, bool)' is obsolete: 'Use [Step] attribute for setting step value.'",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Code\\Settings\\GameSettingsSystem.cs",
+              "Line": 192
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0618",
+              "Message": "'RangeAttribute.RangeAttribute(float, float, float, bool, bool)' is obsolete: 'Use [Step] attribute for setting step value.'",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Code\\Settings\\GameSettingsSystem.cs",
+              "Line": 198
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0618",
+              "Message": "'RangeAttribute.RangeAttribute(float, float, float, bool, bool)' is obsolete: 'Use [Step] attribute for setting step value.'",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Code\\Settings\\GameSettingsSystem.cs",
+              "Line": 204
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0618",
+              "Message": "'RangeAttribute.RangeAttribute(float, float, float, bool, bool)' is obsolete: 'Use [Step] attribute for setting step value.'",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Code\\Settings\\GameSettingsSystem.cs",
+              "Line": 210
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0618",
+              "Message": "'RangeAttribute.RangeAttribute(float, float, float, bool, bool)' is obsolete: 'Use [Step] attribute for setting step value.'",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Code\\Settings\\GameSettingsSystem.cs",
+              "Line": 216
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0618",
+              "Message": "'RangeAttribute.RangeAttribute(float, float, float, bool, bool)' is obsolete: 'Use [Step] attribute for setting step value.'",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Code\\Settings\\GameSettingsSystem.cs",
+              "Line": 258
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0618",
+              "Message": "'RangeAttribute.RangeAttribute(float, float, float, bool, bool)' is obsolete: 'Use [Step] attribute for setting step value.'",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Code\\Settings\\GameSettingsSystem.cs",
+              "Line": 316
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0618",
+              "Message": "'RangeAttribute.RangeAttribute(float, float, float, bool, bool)' is obsolete: 'Use [Step] attribute for setting step value.'",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Code\\Settings\\GameSettingsSystem.cs",
+              "Line": 324
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0618",
+              "Message": "'RangeAttribute.RangeAttribute(float, float, float, bool, bool)' is obsolete: 'Use [Step] attribute for setting step value.'",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Code\\Settings\\GameSettingsSystem.cs",
+              "Line": 332
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0618",
+              "Message": "'RangeAttribute.RangeAttribute(float, float, float, bool, bool)' is obsolete: 'Use [Step] attribute for setting step value.'",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Code\\Settings\\GameSettingsSystem.cs",
+              "Line": 340
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0618",
+              "Message": "'RangeAttribute.RangeAttribute(float, float, float, bool, bool)' is obsolete: 'Use [Step] attribute for setting step value.'",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Code\\Settings\\GameSettingsSystem.cs",
+              "Line": 348
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0618",
+              "Message": "'RangeAttribute.RangeAttribute(float, float, float, bool, bool)' is obsolete: 'Use [Step] attribute for setting step value.'",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Code\\Settings\\GameSettingsSystem.cs",
+              "Line": 379
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0618",
+              "Message": "'RangeAttribute.RangeAttribute(float, float, float, bool, bool)' is obsolete: 'Use [Step] attribute for setting step value.'",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Code\\Settings\\GameSettingsSystem.cs",
+              "Line": 385
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0108",
+              "Message": "'EndOfMatchScreen.IsVisible' hides inherited member 'Panel.IsVisible'. Use the new keyword if hiding was intended.",
+              "File": "_gen_EndOfMatchScreen.razor_f857cb8c.cs",
+              "Line": 563
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0618",
+              "Message": "'RangeAttribute.RangeAttribute(float, float, float, bool, bool)' is obsolete: 'Use [Step] attribute for setting step value.'",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Code\\Settings\\GameSettingsSystem.cs",
+              "Line": 391
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0108",
+              "Message": "'GunEmblemOverlay.IsVisible' hides inherited member 'Panel.IsVisible'. Use the new keyword if hiding was intended.",
+              "File": "_gen_GunEmblemOverlay.razor_e7419e77.cs",
+              "Line": 56
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0108",
+              "Message": "'SkirmishArena.Active' hides inherited member 'Component.Active'. Use the new keyword if hiding was intended.",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Code\\GameLoop\\Rules\\SkirmishArena.cs",
+              "Line": 95
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0108",
+              "Message": "'WeaponPanel.Class' hides inherited member 'Panel.Class'. Use the new keyword if hiding was intended.",
+              "File": "_gen_WeaponPanel.razor_e37bb507.cs",
+              "Line": 98
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0618",
+              "Message": "'BroadcastAttribute' is obsolete: 'Please use Rpc.Broadcast'",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Code\\PawnSystem\\Player\\PlayerPingSystem.cs",
+              "Line": 51
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0618",
+              "Message": "'Package.PackageType' is obsolete: 'Use TypeName to determine the type'",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Code\\TestMapFetcher.cs",
+              "Line": 58
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0618",
+              "Message": "'CameraComponent.Hud' is obsolete: 'Use BeginHud() instead. Dispose the painter to submit its drawing.'",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Code\\Weapons\\swb_base\\Weapon.AimAssist.cs",
+              "Line": 273
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0618",
+              "Message": "'CameraComponent.Hud' is obsolete: 'Use BeginHud() instead. Dispose the painter to submit its drawing.'",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Code\\Weapons\\swb_base\\Weapon.AimAssist.cs",
+              "Line": 273
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0618",
+              "Message": "'GlobalGameNamespace.Cookie' is obsolete: 'Use Game.Cookies'",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Code\\UI\\MenuSystem\\MainMenu\\QuickPlayFilter.cs",
+              "Line": 59
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0618",
+              "Message": "'GlobalGameNamespace.Cookie' is obsolete: 'Use Game.Cookies'",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Code\\UI\\MenuSystem\\MainMenu\\QuickPlayFilter.cs",
+              "Line": 64
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0612",
+              "Message": "'Mouse.Visible' is obsolete",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Code\\GameLoop\\GameUtils.cs",
+              "Line": 283
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0612",
+              "Message": "'Mouse.Visible' is obsolete",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Code\\GameLoop\\GameUtils.cs",
+              "Line": 301
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0612",
+              "Message": "'Mouse.Visible' is obsolete",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Code\\GameLoop\\GameUtils.cs",
+              "Line": 490
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0618",
+              "Message": "'RangeAttribute.Step' is obsolete: 'Use [Step] attribute instead'",
+              "File": "_gen_SettingEntry.razor_ff785057.cs",
+              "Line": 323
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0618",
+              "Message": "'RangeAttribute.Step' is obsolete: 'Use [Step] attribute instead'",
+              "File": "_gen_SettingEntry.razor_ff785057.cs",
+              "Line": 528
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0618",
+              "Message": "'RangeAttribute.Step' is obsolete: 'Use [Step] attribute instead'",
+              "File": "_gen_SettingEntry.razor_ff785057.cs",
+              "Line": 630
+            }
+          ]
+        },
+        {
+          "Name": "verarp.razedtest.editor",
+          "IsBuilding": false,
+          "NeedsBuild": false,
+          "Success": true,
+          "Errors": 0,
+          "Warnings": 4,
+          "Diagnostics": [
+            {
+              "Severity": "Warning",
+              "Id": "CS0612",
+              "Message": "'SkinnedModelRenderer.PostAnimationUpdate()' is obsolete",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Editor\\Hc1FamasAttachmentsQa.cs",
+              "Line": 138
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0618",
+              "Message": "'EnvmapProbe.RenderDynamically' is obsolete: 'Use Mode to select the update mode'",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Editor\\Hc1LowtideFinishQa.cs",
+              "Line": 493
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0169",
+              "Message": "The field 'BotContextControlWidget._behaviorLabel' is never used",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Editor\\ControlWidgets\\BotContextControlWidget.cs",
+              "Line": 16
+            },
+            {
+              "Severity": "Warning",
+              "Id": "CS0169",
+              "Message": "The field 'BotContextControlWidget._nodeLabel' is never used",
+              "File": "C:\\sbox-projects\\hc1\\forked-shooter-main\\Editor\\ControlWidgets\\BotContextControlWidget.cs",
+              "Line": 18
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "text": "60 entries, oldest first (532 buffered):\n14:23:30 [Generic] Warn: GameObject:ammo_buckshot (1): Guid 6e938a21-169a-4e45-ab3c-59d2af28400e is already taken by GameObject:[Missing Prefab] weapons/shotgun/ammo_buckshot.prefab - changing\n14:23:30 [Generic] Warn: GameObject:GameObject: Guid 3c0f9ccb-262f-4c01-a7c1-5e3d132ea91e is already taken by GameObject:[Missing Prefab] weapons/glock/ammo_9mm.prefab - changing\n14:23:30 [Generic] Warn: GameObject:ammo_9mm (3): Guid 3c0f9ccb-262f-4c01-a7c1-5e3d132ea91e is already taken by GameObject:[Missing Prefab] weapons/glock/ammo_9mm.prefab - changing\n14:23:30 [Generic] Warn: GameObject:GameObject: Guid 36d808e7-fe35-4843-8056-dd80735757e8 is already taken by GameObject:[Missing Prefab] weapons/glock/ammo_9mm.prefab - changing\n14:23:30 [Generic] Warn: GameObject:ammo_9mm (4): Guid 36d808e7-fe35-4843-8056-dd80735757e8 is already taken by GameObject:[Missing Prefab] weapons/glock/ammo_9mm.prefab - changing\n14:23:30 [Generic] Warn: GameObject:GameObject: Guid 4f08b68a-62b2-4db6-9535-a0f403db56db is already taken by GameObject:[Missing Prefab] weapons/shotgun/ammo_buckshot.prefab - changing\n14:23:30 [Generic] Warn: GameObject:ammo_buckshot (2): Guid 4f08b68a-62b2-4db6-9535-a0f403db56db is already taken by GameObject:[Missing Prefab] weapons/shotgun/ammo_buckshot.prefab - changing\n14:23:30 [Generic] Warn: GameObject:GameObject: Guid 4729d6c4-04ce-47b1-a51c-cb23e1f5d2ca is already taken by GameObject:[Missing Prefab] weapons/gaussgun/ammo_gauss.prefab - changing\n14:23:30 [Generic] Warn: GameObject:ammo_gauss: Guid 4729d6c4-04ce-47b1-a51c-cb23e1f5d2ca is already taken by GameObject:[Missing Prefab] weapons/gaussgun/ammo_gauss.prefab - changing\n14:23:30 [Generic] Warn: GameObject:GameObject: Guid 7594c969-c4c6-4a03-9306-08f39875c8bb is already taken by GameObject:[Missing Prefab] weapons/mp5/ammo_40mm.prefab - changing\n14:23:30 [Generic] Warn: GameObject:ammo_40mm (2): Guid 7594c969-c4c6-4a03-9306-08f39875c8bb is already taken by GameObject:[Missing Prefab] weapons/mp5/ammo_40mm.prefab - changing\n14:23:30 [Generic] Warn: GameObject:GameObject: Guid 931c3253-bda1-41b2-aca7-548c71988d22 is already taken by GameObject:[Missing Prefab] weapons/glock/ammo_9mm.prefab - changing\n14:23:30 [Generic] Warn: GameObject:ammo_9mm (5): Guid 931c3253-bda1-41b2-aca7-548c71988d22 is already taken by GameObject:[Missing Prefab] weapons/glock/ammo_9mm.prefab - changing\n14:23:30 [Generic] Warn: GameObject:GameObject: Guid 6dfc44fc-26ff-4ad3-925a-4e9a25e4bbb1 is already taken by GameObject:[Missing Prefab] weapons/glock/ammo_9mm.prefab - changing\n14:23:30 [Generic] Warn: GameObject:ammo_9mm (6): Guid 6dfc44fc-26ff-4ad3-925a-4e9a25e4bbb1 is already taken by GameObject:[Missing Prefab] weapons/glock/ammo_9mm.prefab - changing\n14:23:30 [Generic] Warn: GameObject:GameObject: Guid b1df6aa9-55d6-4898-8eca-7a1e17703aaa is already taken by GameObject:[Missing Prefab] weapons/gaussgun/ammo_gauss.prefab - changing\n14:23:30 [Generic] Warn: GameObject:ammo_gauss (1): Guid b1df6aa9-55d6-4898-8eca-7a1e17703aaa is already taken by GameObject:[Missing Prefab] weapons/gaussgun/ammo_gauss.prefab - changing\n14:23:30 [Generic] Warn: GameObject:GameObject: Guid d2be0a56-3c9a-4b96-8aaf-8d92b9b5c14c is already taken by GameObject:[Missing Prefab] weapons/shotgun/ammo_buckshot.prefab - changing\n14:23:30 [Generic] Warn: GameObject:ammo_buckshot (3): Guid d2be0a56-3c9a-4b96-8aaf-8d92b9b5c14c is already taken by GameObject:[Missing Prefab] weapons/shotgun/ammo_buckshot.prefab - changing\n14:23:30 [Generic] Warn: GameObject:GameObject: Guid e587bf35-0ad0-4c04-9dcf-edd641da21d5 is already taken by GameObject:[Missing Prefab] weapons/shotgun/ammo_buckshot.prefab - changing\n14:23:30 [Generic] Warn: GameObject:ammo_buckshot (4): Guid e587bf35-0ad0-4c04-9dcf-edd641da21d5 is already taken by GameObject:[Missing Prefab] weapons/shotgun/ammo_buckshot.prefab - changing\n14:23:30 [Generic] Warn: GameObject:GameObject: Guid 9d0c4557-d9e0-4742-b0a9-5ca1f59929db is already taken by GameObject:[Missing Prefab] weapons/python/ammo_357.prefab - changing\n14:23:30 [Generic] Warn: GameObject:ammo_357: Guid 9d0c4557-d9e0-4742-b0a9-5ca1f59929db is already taken by GameObject:[Missing Prefab] weapons/python/ammo_357.prefab - changing\n14:23:30 [Generic] Warn: GameObject:GameObject: Guid 5ac1e1ab-d11b-4bb6-b058-217b10161634 is already taken by GameObject:[Missing Prefab] weapons/rpg/ammo_rpgclip.prefab - changing\n14:23:30 [Generic] Warn: GameObject:ammo_rpgclip (3): Guid 5ac1e1ab-d11b-4bb6-b058-217b10161634 is already taken by GameObject:[Missing Prefab] weapons/rpg/ammo_rpgclip.prefab - changing\n14:23:30 [Generic] Warn: GameObject:GameObject: Guid fca9409a-141c-451c-8087-255ecfe43f6f is already taken by GameObject:[Missing Prefab] weapons/rpg/ammo_rpgclip.prefab - changing\n14:23:30 [Generic] Warn: GameObject:ammo_rpgclip (4): Guid fca9409a-141c-451c-8087-255ecfe43f6f is already taken by GameObject:[Missing Prefab] weapons/rpg/ammo_rpgclip.prefab - changing\n14:23:30 [Generic] Warn: GameObject:GameObject: Guid 914d58ec-05e4-4812-a522-de7f1e9337da is already taken by GameObject:[Missing Prefab] prefabs/player/item_longjumpmodule.prefab - changing\n14:23:30 [Generic] Warn: GameObject:item_longjumpmodule: Guid 914d58ec-05e4-4812-a522-de7f1e9337da is already taken by GameObject:[Missing Prefab] prefabs/player/item_longjumpmodule.prefab - changing\n14:23:30 [Generic] Warn: Missing Component: couldn't find Component type InventoryPickup on GameObject:item_longjumpmodule\n14:23:30 [Generic] Warn: GameObject:GameObject: Guid 58a6ea96-1f59-4e6e-bf2d-616deb667285 is already taken by GameObject:[Missing Prefab] weapons/glock/ammo_9mm.prefab - changing\n14:23:30 [Generic] Warn: GameObject:ammo_9mm (7): Guid 58a6ea96-1f59-4e6e-bf2d-616deb667285 is already taken by GameObject:[Missing Prefab] weapons/glock/ammo_9mm.prefab - changing\n14:23:30 [Generic] Warn: GameObject:GameObject: Guid 102df964-6f6d-489d-9d8b-d3070c194dc2 is already taken by GameObject:[Missing Prefab] weapons/glock/ammo_9mm.prefab - changing\n14:23:30 [Generic] Warn: GameObject:ammo_9mm (8): Guid 102df964-6f6d-489d-9d8b-d3070c194dc2 is already taken by GameObject:[Missing Prefab] weapons/glock/ammo_9mm.prefab - changing\n14:23:30 [Generic] Warn: GameObject:GameObject: Guid 02c40cf3-57bd-45d4-85e9-17079815d263 is already taken by GameObject:[Missing Prefab] weapons/shotgun/item_shotgun.prefab - changing\n14:23:30 [Generic] Warn: GameObject:item_shotgun (1): Guid 02c40cf3-57bd-45d4-85e9-17079815d263 is already taken by GameObject:[Missing Prefab] weapons/shotgun/item_shotgun.prefab - changing\n14:23:30 [Generic] Warn: GameObject:GameObject: Guid ca58b141-d9b8-435e-94ea-d1891f7eb58e is already taken by GameObject:[Missing Prefab] weapons/glock/ammo_9mm.prefab - changing\n14:23:30 [Generic] Warn: GameObject:ammo_9mm (9): Guid ca58b141-d9b8-435e-94ea-d1891f7eb58e is already taken by GameObject:[Missing Prefab] weapons/glock/ammo_9mm.prefab - changing\n14:23:30 [Generic] Warn: GameObject:GameObject: Guid 5936e532-3a96-4bce-ae5a-eeedd0158a1d is already taken by GameObject:[Missing Prefab] weapons/crossbow/ammo_bolts.prefab - changing\n14:23:30 [Generic] Warn: GameObject:ammo_bolts: Guid 5936e532-3a96-4bce-ae5a-eeedd0158a1d is already taken by GameObject:[Missing Prefab] weapons/crossbow/ammo_bolts.prefab - changing\n14:23:30 [Generic] Warn: GameObject:GameObject: Guid a44a7a93-895b-469b-8ee3-1280672bdbe1 is already taken by GameObject:[Missing Prefab] weapons/rpg/ammo_rpgclip.prefab - changing\n14:23:30 [Generic] Warn: GameObject:ammo_rpgclip (5): Guid a44a7a93-895b-469b-8ee3-1280672bdbe1 is already taken by GameObject:[Missing Prefab] weapons/rpg/ammo_rpgclip.prefab - changing\n14:23:30 [Generic] Warn: GameObject:GameObject: Guid 738d2c2b-b517-4cc6-8805-88b1cc35e1c5 is already taken by GameObject:[Missing Prefab] weapons/crossbow/item_crossbow.prefab - changing\n14:23:30 [Generic] Warn: GameObject:item_crossbow: Guid 738d2c2b-b517-4cc6-8805-88b1cc35e1c5 is already taken by GameObject:[Missing Prefab] weapons/crossbow/item_crossbow.prefab - changing\n14:23:30 [Generic] Warn: GameObject:GameObject: Guid 893f272e-09cf-406f-b607-09c891884105 is already taken by GameObject:[Missing Prefab] weapons/gaussgun/ammo_gauss.prefab - changing\n14:23:30 [Generic] Warn: GameObject:ammo_gauss (2): Guid 893f272e-09cf-406f-b607-09c891884105 is already taken by GameObject:[Missing Prefab] weapons/gaussgun/ammo_gauss.prefab - changing\n14:23:30 [Generic] Warn: GameObject:GameObject: Guid 856545f1-f883-48a9-bc55-83cc66f8eeed is already taken by GameObject:[Missing Prefab] weapons/glock/ammo_9mm.prefab - changing\n14:23:30 [Generic] Warn: GameObject:ammo_9mm (10): Guid 856545f1-f883-48a9-bc55-83cc66f8eeed is already taken by GameObject:[Missing Prefab] weapons/glock/ammo_9mm.prefab - changing\n14:23:30 [Generic] Warn: GameObject:GameObject: Guid 38d0b35b-d6cc-496f-b869-2a5abbf9473f is already taken by GameObject:[Missing Prefab] weapons/glock/ammo_9mm.prefab - changing\n14:23:30 [Generic] Warn: GameObject:ammo_9mm (11): Guid 38d0b35b-d6cc-496f-b869-2a5abbf9473f is already taken by GameObject:[Missing Prefab] weapons/glock/ammo_9mm.prefab - changing\n14:23:30 [Generic] Warn: GameObject:GameObject: Guid 2527662f-f556-4ddd-bf48-f39b41a40dd3 is already taken by GameObject:[Missing Prefab] weapons/shotgun/ammo_buckshot.prefab - changing\n14:23:30 [Generic] Warn: GameObject:ammo_buckshot (5): Guid 2527662f-f556-4ddd-bf48-f39b41a40dd3 is already taken by GameObject:[Missing Prefab] weapons/shotgun/ammo_buckshot.prefab - changing\n14:23:30 [Generic] Warn: GameObject:GameObject: Guid de517c41-4be3-433a-b8fd-dcd66d4ebc30 is already taken by GameObject:[Missing Prefab] weapons/glock/ammo_9mm.prefab - changing\n14:23:30 [Generic] Warn: GameObject:ammo_9mm (12): Guid de517c41-4be3-433a-b8fd-dcd66d4ebc30 is already taken by GameObject:[Missing Prefab] weapons/glock/ammo_9mm.prefab - changing\n14:23:30 [Generic] Warn: GameObject:GameObject: Guid 4e2bf96d-a28e-4d02-8b46-17c33a4d1e20 is already taken by GameObject:[Missing Prefab] weapons/hornetgun/item_hornetgun.prefab - changing\n14:23:30 [Generic] Warn: GameObject:item_hornetgun: Guid 4e2bf96d-a28e-4d02-8b46-17c33a4d1e20 is already taken by GameObject:[Missing Prefab] weapons/hornetgun/item_hornetgun.prefab - changing\n14:23:30 [Generic] Warn: GameObject:GameObject: Guid 25973386-4cf0-46b0-8fcf-9931c41d8aae is already taken by GameObject:[Missing Prefab] weapons/gluongun/item_gluon_gun.prefab - changing\n14:23:30 [Generic] Warn: GameObject:item_gluon_gun: Guid 25973386-4cf0-46b0-8fcf-9931c41d8aae is already taken by GameObject:[Missing Prefab] weapons/gluongun/item_gluon_gun.prefab - changing\n14:23:30 [Generic] Warn: Missing Component: couldn't find Component type InventoryPickup on GameObject:item_gluon_gun\n14:23:30 [engine/ResourceSystem] Warn: Error loading resource file \"materials/particles/water_drop.vtex_c\" (Error: ERROR_FILEOPEN: File not found)\nCursor: 532"
+}

@@ -1,0 +1,109 @@
+{
+  "status": "ready-for-user-review",
+  "installedInMap": false,
+  "editorUsed": false,
+  "engineValidation": "pending",
+  "renderSessionExited": true,
+  "renderEvidence": {
+    "renderer": "Blender Cycles",
+    "nativeEngineScreenshot": false,
+    "sameCameraLightingScaleAndExposure": true,
+    "samples": 32,
+    "viewTransform": "AgX",
+    "exposure": 0.0,
+    "images": [
+      {
+        "variant": "before",
+        "view": "main",
+        "file": "before-main.png",
+        "eyeMetres": [
+          1.35,
+          -1.85,
+          1.15
+        ],
+        "targetMetres": [
+          0.0,
+          -0.22,
+          0.33
+        ],
+        "lens": 54.0,
+        "width": 1400,
+        "height": 1050,
+        "sha256": "da4bef36b83faee078874f3f3ce1f08d8752f6da9927d36ae14fc09374f6444b"
+      },
+      {
+        "variant": "after",
+        "view": "main",
+        "file": "after-main.png",
+        "eyeMetres": [
+          1.35,
+          -1.85,
+          1.15
+        ],
+        "targetMetres": [
+          0.0,
+          -0.22,
+          0.33
+        ],
+        "lens": 54.0,
+        "width": 1400,
+        "height": 1050,
+        "sha256": "590dce39046056540b55653dc3c5e5bccefa50e59df5ccb6fd3dac60a3824525"
+      }
+    ]
+  },
+  "geometryVerification": {
+    "candidateInstalledInMap": false,
+    "allAcceptedUpgradesAndMapSourcesPreserved": true,
+    "variants": {
+      "before": {
+        "triangles": 678,
+        "windingErrors": 0,
+        "degenerateTriangles": 0,
+        "finiteUVsAndNormals": true,
+        "minimumTriangleArea": 0.20994342094954951,
+        "validMaterialSources": 4,
+        "authoredCollisionShapes": 0,
+        "meshSHA256": "ef4a2eafac75558a991f471a211c281153d120286fe092dc02d95ccbf0db0d2b"
+      },
+      "after": {
+        "triangles": 20164,
+        "windingErrors": 0,
+        "degenerateTriangles": 0,
+        "finiteUVsAndNormals": true,
+        "minimumTriangleArea": 0.0018699999999999886,
+        "validMaterialSources": 7,
+        "authoredCollisionShapes": 0,
+        "meshSHA256": "2f33b6041d18149aad91adc9b93317abdd05f4067d1dd89c9b1e36f8ebae2660",
+        "wheelUVUnwrapArea": 1.0,
+        "wheelUVTriangles": 2048,
+        "inwardBoreTriangles": 96
+      }
+    },
+    "editorUsed": false,
+    "engineCompilation": "pending"
+  },
+  "modelSourceSHA256": {
+    "before": "ef4a2eafac75558a991f471a211c281153d120286fe092dc02d95ccbf0db0d2b",
+    "after": "2f33b6041d18149aad91adc9b93317abdd05f4067d1dd89c9b1e36f8ebae2660"
+  },
+  "materialSourceSHA256": {
+    "Assets/materials/collider/valve-trial-v1/label.png": "2f77af254c0132653420cd933439db46741ee433684b248c69d9476b1ec01707",
+    "Assets/materials/collider/valve-trial-v1/vv_body.vmat": "cf97716aee135449630ab0c64630f53662441cc0f070b7d23b1203f1cd5e0891",
+    "Assets/materials/collider/valve-trial-v1/vv_body_color.png": "d9b55151e293dd6f07e58d96a29fab479643adc7eb481e269f77953df8ccea45",
+    "Assets/materials/collider/valve-trial-v1/vv_body_normal.png": "04ed9b0ce6a7b5e7e425b67ded890698e1a678e48e56ace86d1178a6b5cce5b5",
+    "Assets/materials/collider/valve-trial-v1/vv_body_rough.png": "ddc36836d749c355c30f1817ba2adee4b93dee012ebbfc9deec48e730f18b913",
+    "Assets/materials/collider/valve-trial-v1/vv_bolt.vmat": "583ad3166d43747ab21ad079e3d4a6a81d1b27796c07c65b3f674b3fe4285e3c",
+    "Assets/materials/collider/valve-trial-v1/vv_label.vmat": "68788bd94a207d8b827e6f8eb1152b72f8d583e63631b09331cc0aae81d4f790",
+    "Assets/materials/collider/valve-trial-v1/vv_metal.vmat": "c5f0598b0bedf73d9e2d64b8cf838104141ac5f2bd6d20bd86161871f802b90c",
+    "Assets/materials/collider/valve-trial-v1/vv_red.vmat": "a7dc4800a90102644b0ec1b7d97797e36ac5630a105a375bd57b8d6ee0268081",
+    "Assets/materials/collider/valve-trial-v1/vv_red_color.png": "86424e554906bd8b553d74c6ea4140833273a7b19fe2408d9028647860315dc1",
+    "Assets/materials/collider/valve-trial-v1/vv_red_normal.png": "04ed9b0ce6a7b5e7e425b67ded890698e1a678e48e56ace86d1178a6b5cce5b5",
+    "Assets/materials/collider/valve-trial-v1/vv_red_rough.png": "ddc36836d749c355c30f1817ba2adee4b93dee012ebbfc9deec48e730f18b913",
+    "Assets/materials/collider/valve-trial-v1/vv_rubber.vmat": "df85ff2df9e35c86e65cd8dab71aa080334f34d582ea85e8420dc8021cc074a5",
+    "Assets/materials/collider/valve-trial-v1/vv_wheel.vmat": "06f4458875e6ed59612e3f4d49e2c282517343be2157587f2e64b35b63abf513",
+    "Assets/materials/collider/valve-trial-v1/vv_wheel_color.png": "3448e73211283ef732def8de3ed7e6edd6eda6b9b8d51d6d6343886c00d44a26",
+    "Assets/materials/collider/valve-trial-v1/vv_wheel_normal.png": "a66eabb888a21972dfa04df375cc79046e243713ccd823a13a0306136534d151",
+    "Assets/materials/collider/valve-trial-v1/vv_wheel_rough.png": "b060129ff10b314ce696795e5ce08c4913d6591ab2ea823ce1a64c5a54a94395"
+  }
+}

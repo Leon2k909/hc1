@@ -1,0 +1,11 @@
+if (!Game.IsPlaying) throw new Exception("Expected play mode.");
+var scene=Game.ActiveScene;
+return new {
+    BadRenderers=scene.GetAllComponents<ModelRenderer>().Where(r=>r.Model is null||r.Model.IsError).Select(r=>new {
+        r.Id,r.GameObject.Name,Root=r.GameObject.Root.Name,Parent=r.GameObject.Parent?.Name,
+        Position=r.WorldPosition.ToString(),Model=r.Model?.ResourcePath,IsError=r.Model?.IsError, r.Enabled,
+        Components=r.GameObject.Components.GetAll<Component>(FindMode.EverythingInSelf).Select(c=>c.GetType().FullName).ToArray()
+    }).ToArray(),
+    SceneErrors=scene.SceneWorld.SceneObjects.Where(o=>o.Model?.IsError==true).Select(o=>new {o.GetType().FullName,Model=o.Model.ResourcePath,o.RenderingEnabled,Position=o.Transform.Position.ToString()}).ToArray(),
+    Missing=scene.GetAllComponents<MissingComponent>().Select(c=>new {c.GameObject.Name,Root=c.GameObject.Root.Name,Position=c.WorldPosition.ToString(),Data=c.Serialize()}).ToArray()
+};

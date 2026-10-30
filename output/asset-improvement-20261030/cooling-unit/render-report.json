@@ -1,0 +1,56 @@
+{
+  "renderer": "Blender Cycles",
+  "nativeEngineScreenshot": false,
+  "sameCameraLightingScaleAndExposure": true,
+  "samples": 32,
+  "viewTransform": "AgX",
+  "exposure": 0.0,
+  "renderDevice": "CPU",
+  "threads": 2,
+  "idlePriority": true,
+  "groundPlanZ": 0.0,
+  "images": [
+    {
+      "variant": "before",
+      "view": "main",
+      "file": "before-main.png",
+      "eyeMetres": [
+        7.0,
+        -10.0,
+        6.9
+      ],
+      "targetMetres": [
+        0.0,
+        1.0,
+        2.6
+      ],
+      "lens": 82.0,
+      "width": 1050,
+      "height": 1400,
+      "sha256": "6991b574507e90e5103a2755095e5f13b8bc138fbeffddc08be532ee6c4017f3"
+    },
+    {
+      "variant": "after",
+      "view": "main",
+      "file": "after-main.png",
+      "eyeMetres": [
+        7.0,
+        -10.0,
+        6.9
+      ],
+      "targetMetres": [
+        0.0,
+        1.0,
+        2.6
+      ],
+      "lens": 82.0,
+      "width": 1050,
+      "height": 1400,
+      "sha256": "e6af2f0835a133b0a67b521f4d150037ff3b1ff7449c2853d45732dfd1fb04d7"
+    }
+  ],
+  "modelSourceSHA256": {
+    "before": "8ad5230695f9a560b67be824ea906d4bd6ef30b1a1b191a088728e9175c2dba9",
+    "after": "58810b5ef523d2f5c3f4f238e3ce28562c9550b06ba8f47b0400d07d3ce7f76f"
+  }
+}

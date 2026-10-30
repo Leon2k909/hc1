@@ -1,0 +1,1114 @@
+{
+  "results": [
+    {
+      "Window": {
+        "Frames": 119,
+        "Seconds": 2
+      },
+      "Fps": 59.4,
+      "TargetFps": 240,
+      "TargetSource": "vsync",
+      "LimitedBy": "CPU",
+      "MeetingTarget": false,
+      "Rating": "Bad",
+      "Frame": {
+        "AvgMs": 16.85,
+        "P50Ms": 16.17,
+        "P99Ms": 32.52,
+        "MaxMs": 40
+      },
+      "CpuWork": {
+        "AvgMs": 16.85,
+        "P50Ms": 16.17,
+        "P99Ms": 32.52,
+        "MaxMs": 40
+      },
+      "Gpu": {
+        "AvgMs": 8.67,
+        "P50Ms": 8.61,
+        "P99Ms": 9.52,
+        "MaxMs": 9.67
+      },
+      "CapWait": {
+        "AvgMs": 0,
+        "P50Ms": 0,
+        "P99Ms": 0,
+        "MaxMs": 0
+      },
+      "PerfHubWindow": null,
+      "Hitches": {
+        "Count": 2,
+        "OverMs": 32.3,
+        "WorstMs": 40
+      },
+      "Issues": [
+        {
+          "Severity": "Warning",
+          "Title": "2 hitches",
+          "Detail": "over 32 ms in 2.0 s, worst 40 ms",
+          "MoreIn": "perf_cpu"
+        },
+        {
+          "Severity": "Warning",
+          "Title": "GC pauses",
+          "Detail": "4.5 ms in the last second",
+          "MoreIn": "perf_memory"
+        }
+      ],
+      "MainThread": [
+        {
+          "Name": "Render",
+          "AvgMs": 10.03,
+          "MaxMs": 13.11
+        },
+        {
+          "Name": "UI",
+          "AvgMs": 1.3,
+          "MaxMs": 2.88
+        },
+        {
+          "Name": "Animation",
+          "AvgMs": 1.28,
+          "MaxMs": 2.99
+        },
+        {
+          "Name": "Update",
+          "AvgMs": 1.04,
+          "MaxMs": 2.49
+        },
+        {
+          "Name": "Editor",
+          "AvgMs": 0.72,
+          "MaxMs": 3.18
+        },
+        {
+          "Name": "GcPause",
+          "AvgMs": 0.39,
+          "MaxMs": 20.87
+        },
+        {
+          "Name": "Physics",
+          "AvgMs": 0.32,
+          "MaxMs": 1.7
+        },
+        {
+          "Name": "Particles",
+          "AvgMs": 0.25,
+          "MaxMs": 0.7
+        }
+      ],
+      "GpuPasses": [
+        {
+          "Name": "Dynamic Opaque Forward",
+          "AvgMs": 1.51,
+          "MaxMs": 2.18,
+          "Path": "RenderToSwapChain / Dynamic Opaque Forward"
+        },
+        {
+          "Name": "DrawDepthOpaque",
+          "AvgMs": 1.08,
+          "MaxMs": 1.23,
+          "Path": "Sandbox.ScenePointLight_Shadow / DrawDepthOpaque"
+        },
+        {
+          "Name": "UI Root: GameRootPanel",
+          "AvgMs": 0.88,
+          "MaxMs": 1.08,
+          "Path": "Managed: UI / UI Root: GameRootPanel"
+        },
+        {
+          "Name": "GameOverlay",
+          "AvgMs": 0.6,
+          "MaxMs": 1.12,
+          "Path": "RenderToSwapChain / GameOverlay"
+        },
+        {
+          "Name": "CommandList",
+          "AvgMs": 0.57,
+          "MaxMs": 0.76,
+          "Path": "Managed: AfterTransparent / CommandList"
+        },
+        {
+          "Name": "DrawDepthOpaque",
+          "AvgMs": 0.43,
+          "MaxMs": 0.83,
+          "Path": "CSM Cascade 2 / DrawDepthOpaque"
+        },
+        {
+          "Name": "Depth Normal Prepass (Large)",
+          "AvgMs": 0.24,
+          "MaxMs": 0.31,
+          "Path": "RenderToSwapChain / Depth Normal Prepass (Large)"
+        },
+        {
+          "Name": "DrawDepthFade",
+          "AvgMs": 0.22,
+          "MaxMs": 0.33,
+          "Path": "Sandbox.ScenePointLight_Shadow / DrawDepthFade"
+        }
+      ],
+      "Memory": {
+        "ProcessMiB": 16333.8,
+        "VideoMemory": {
+          "UsedMiB": 7218.5,
+          "BudgetMiB": 10242.8
+        },
+        "AllocatedMiBPerSecond": 8.4,
+        "GcPauseMsLastSecond": 4.45,
+        "GcLastSecond": {
+          "Gen0": 1,
+          "Gen1": 0,
+          "Gen2": 0
+        }
+      },
+      "DrawCalls": 5488,
+      "Triangles": 18409159
+    },
+    {
+      "Window": {
+        "Frames": 119,
+        "Seconds": 2
+      },
+      "CpuWork": {
+        "AvgMs": 16.85,
+        "P50Ms": 16.17,
+        "P99Ms": 32.52,
+        "MaxMs": 40
+      },
+      "CapWait": {
+        "AvgMs": 0,
+        "P50Ms": 0,
+        "P99Ms": 0,
+        "MaxMs": 0
+      },
+      "Frame": {
+        "AvgMs": 16.85,
+        "P50Ms": 16.17,
+        "P99Ms": 32.52,
+        "MaxMs": 40
+      },
+      "FrameStdDevMs": 3.36,
+      "Hitches": {
+        "Count": 2,
+        "OverMs": 32.3,
+        "WorstMs": 40
+      },
+      "NotPresentedPercent": 0,
+      "Cap": {
+        "CappedBy": "vsync",
+        "CapFps": 240,
+        "Display": "borderless",
+        "VSync": true,
+        "RefreshRate": 239.96,
+        "FpsMax": 0,
+        "FpsMaxMenu": 0,
+        "FpsMaxInactive": 0
+      },
+      "Categories": [
+        {
+          "Name": "Render",
+          "AvgMs": 10.03,
+          "MaxMs": 13.11
+        },
+        {
+          "Name": "UI",
+          "AvgMs": 1.3,
+          "MaxMs": 2.88
+        },
+        {
+          "Name": "Animation",
+          "AvgMs": 1.28,
+          "MaxMs": 2.99
+        },
+        {
+          "Name": "Update",
+          "AvgMs": 1.04,
+          "MaxMs": 2.49
+        },
+        {
+          "Name": "Editor",
+          "AvgMs": 0.72,
+          "MaxMs": 3.18
+        },
+        {
+          "Name": "GcPause",
+          "AvgMs": 0.39,
+          "MaxMs": 20.87
+        },
+        {
+          "Name": "Physics",
+          "AvgMs": 0.32,
+          "MaxMs": 1.7
+        },
+        {
+          "Name": "Particles",
+          "AvgMs": 0.25,
+          "MaxMs": 0.7
+        },
+        {
+          "Name": "Audio",
+          "AvgMs": 0.18,
+          "MaxMs": 0.75
+        },
+        {
+          "Name": "NavMesh",
+          "AvgMs": 0.16,
+          "MaxMs": 0.76
+        },
+        {
+          "Name": "Async",
+          "AvgMs": 0.06,
+          "MaxMs": 5.31
+        },
+        {
+          "Name": "Input",
+          "AvgMs": 0.02,
+          "MaxMs": 0.29
+        }
+      ],
+      "TotalScopes": 23,
+      "Scopes": [
+        {
+          "Name": "Render",
+          "AvgMs": 10.03,
+          "MaxMs": 13.11
+        },
+        {
+          "Name": "GameFrame",
+          "AvgMs": 4.66,
+          "MaxMs": 9.97
+        },
+        {
+          "Name": "UI",
+          "AvgMs": 1.3,
+          "MaxMs": 2.88
+        },
+        {
+          "Name": "Animation",
+          "AvgMs": 1.28,
+          "MaxMs": 2.99
+        },
+        {
+          "Name": "Update",
+          "AvgMs": 1.04,
+          "MaxMs": 2.49
+        },
+        {
+          "Name": "Editor",
+          "AvgMs": 0.72,
+          "MaxMs": 3.18
+        },
+        {
+          "Name": "Build Command Lists",
+          "AvgMs": 0.53,
+          "MaxMs": 1.21
+        },
+        {
+          "Name": "Tick Panels",
+          "AvgMs": 0.5,
+          "MaxMs": 1.06
+        },
+        {
+          "Name": "GcPause",
+          "AvgMs": 0.39,
+          "MaxMs": 20.87
+        },
+        {
+          "Name": "Physics",
+          "AvgMs": 0.32,
+          "MaxMs": 1.7
+        },
+        {
+          "Name": "Particles",
+          "AvgMs": 0.25,
+          "MaxMs": 0.7
+        },
+        {
+          "Name": "Audio",
+          "AvgMs": 0.18,
+          "MaxMs": 0.75
+        },
+        {
+          "Name": "NavMesh",
+          "AvgMs": 0.16,
+          "MaxMs": 0.76
+        },
+        {
+          "Name": "Pre Layout",
+          "AvgMs": 0.11,
+          "MaxMs": 0.48
+        },
+        {
+          "Name": "GenerateMips",
+          "AvgMs": 0.08,
+          "MaxMs": 0.51
+        },
+        {
+          "Name": "Async",
+          "AvgMs": 0.06,
+          "MaxMs": 5.31
+        },
+        {
+          "Name": "Layout",
+          "AvgMs": 0.05,
+          "MaxMs": 0.17
+        },
+        {
+          "Name": "CalculateLayout",
+          "AvgMs": 0.05,
+          "MaxMs": 0.17
+        },
+        {
+          "Name": "Tick Input",
+          "AvgMs": 0.04,
+          "MaxMs": 0.14
+        },
+        {
+          "Name": "Post Layout",
+          "AvgMs": 0.04,
+          "MaxMs": 0.25
+        },
+        {
+          "Name": "Tool Binds",
+          "AvgMs": 0.02,
+          "MaxMs": 0.05
+        },
+        {
+          "Name": "Execute Command Lists",
+          "AvgMs": 0.02,
+          "MaxMs": 0.06
+        },
+        {
+          "Name": "Input",
+          "AvgMs": 0.02,
+          "MaxMs": 0.29
+        }
+      ]
+    },
+    {
+      "Gpu": {
+        "AvgMs": 8.67,
+        "P50Ms": 8.61,
+        "P99Ms": 9.52,
+        "MaxMs": 9.67
+      },
+      "OfFramePercent": 51.4,
+      "VideoMemory": {
+        "UsedMiB": 7218.5,
+        "BudgetMiB": 10242.8
+      },
+      "Renderer": "native",
+      "LeafPasses": [
+        {
+          "Name": "Dynamic Opaque Forward",
+          "AvgMs": 1.51,
+          "MaxMs": 2.18,
+          "Path": "RenderToSwapChain / Dynamic Opaque Forward"
+        },
+        {
+          "Name": "DrawDepthOpaque",
+          "AvgMs": 1.08,
+          "MaxMs": 1.23,
+          "Path": "Sandbox.ScenePointLight_Shadow / DrawDepthOpaque"
+        },
+        {
+          "Name": "UI Root: GameRootPanel",
+          "AvgMs": 0.88,
+          "MaxMs": 1.08,
+          "Path": "Managed: UI / UI Root: GameRootPanel"
+        },
+        {
+          "Name": "GameOverlay",
+          "AvgMs": 0.6,
+          "MaxMs": 1.12,
+          "Path": "RenderToSwapChain / GameOverlay"
+        },
+        {
+          "Name": "CommandList",
+          "AvgMs": 0.57,
+          "MaxMs": 0.76,
+          "Path": "Managed: AfterTransparent / CommandList"
+        },
+        {
+          "Name": "DrawDepthOpaque",
+          "AvgMs": 0.43,
+          "MaxMs": 0.83,
+          "Path": "CSM Cascade 2 / DrawDepthOpaque"
+        },
+        {
+          "Name": "Depth Normal Prepass (Large)",
+          "AvgMs": 0.24,
+          "MaxMs": 0.31,
+          "Path": "RenderToSwapChain / Depth Normal Prepass (Large)"
+        },
+        {
+          "Name": "DrawDepthFade",
+          "AvgMs": 0.22,
+          "MaxMs": 0.33,
+          "Path": "Sandbox.ScenePointLight_Shadow / DrawDepthFade"
+        },
+        {
+          "Name": "Depth Normal Prepass (Small)",
+          "AvgMs": 0.21,
+          "MaxMs": 0.42,
+          "Path": "RenderToSwapChain / Depth Normal Prepass (Small)"
+        },
+        {
+          "Name": "Static Opaque Forward",
+          "AvgMs": 0.2,
+          "MaxMs": 0.41,
+          "Path": "RenderToSwapChain / Static Opaque Forward"
+        },
+        {
+          "Name": "DrawDepthOpaque",
+          "AvgMs": 0.18,
+          "MaxMs": 0.26,
+          "Path": "CSM Cascade 1 / DrawDepthOpaque"
+        },
+        {
+          "Name": "Bloom",
+          "AvgMs": 0.17,
+          "MaxMs": 0.23,
+          "Path": "Managed: BeforePostProcessing / Bloom"
+        },
+        {
+          "Name": "GameOverlay Translucent",
+          "AvgMs": 0.16,
+          "MaxMs": 0.26,
+          "Path": "RenderToSwapChain / GameOverlay Translucent"
+        },
+        {
+          "Name": "Marker Mask",
+          "AvgMs": 0.13,
+          "MaxMs": 0.16,
+          "Path": "Managed: AfterTransparent / Marker Mask"
+        },
+        {
+          "Name": "AO Main Pass",
+          "AvgMs": 0.09,
+          "MaxMs": 0.1,
+          "Path": "Ambient Occlusion / AO Main Pass"
+        },
+        {
+          "Name": "AO Denoise",
+          "AvgMs": 0.09,
+          "MaxMs": 0.09,
+          "Path": "Ambient Occlusion / AO Denoise"
+        },
+        {
+          "Name": "Clustered Light Culling",
+          "AvgMs": 0.09,
+          "MaxMs": 0.12,
+          "Path": "RenderToSwapChain / Clustered Light Culling"
+        },
+        {
+          "Name": "SceneLine",
+          "AvgMs": 0.06,
+          "MaxMs": 0.16,
+          "Path": "Translucent Forward / SceneLine"
+        },
+        {
+          "Name": "Depth Normal Prepass (Overlay)",
+          "AvgMs": 0.06,
+          "MaxMs": 0.07,
+          "Path": "RenderToSwapChain / Depth Normal Prepass (Overlay)"
+        },
+        {
+          "Name": "Photographic Response",
+          "AvgMs": 0.06,
+          "MaxMs": 0.06,
+          "Path": "Managed: AfterPostProcessing / Photographic Response"
+        },
+        {
+          "Name": "DrawDepthTranslucent",
+          "AvgMs": 0.06,
+          "MaxMs": 0.16,
+          "Path": "Sandbox.ScenePointLight_Shadow / DrawDepthTranslucent"
+        },
+        {
+          "Name": "AO Upsample",
+          "AvgMs": 0.05,
+          "MaxMs": 0.06,
+          "Path": "Ambient Occlusion / AO Upsample"
+        },
+        {
+          "Name": "Sharpen",
+          "AvgMs": 0.05,
+          "MaxMs": 0.05,
+          "Path": "Managed: AfterPostProcessing / Sharpen"
+        },
+        {
+          "Name": "Tonemapping",
+          "AvgMs": 0.05,
+          "MaxMs": 0.05,
+          "Path": "Managed: Tonemapping / Tonemapping"
+        },
+        {
+          "Name": "Hi-Z Depth Downsample",
+          "AvgMs": 0.04,
+          "MaxMs": 0.05,
+          "Path": "RenderToSwapChain / Hi-Z Depth Downsample"
+        },
+        {
+          "Name": "DrawDepthOpaque",
+          "AvgMs": 0.04,
+          "MaxMs": 0.04,
+          "Path": "CSM Cascade 0 / DrawDepthOpaque"
+        },
+        {
+          "Name": "ColorGrading",
+          "AvgMs": 0.03,
+          "MaxMs": 0.03,
+          "Path": "Managed: AfterPostProcessing / ColorGrading"
+        },
+        {
+          "Name": "SpriteBatch",
+          "AvgMs": 0.03,
+          "MaxMs": 0.04,
+          "Path": "Translucent Forward / SpriteBatch"
+        },
+        {
+          "Name": "Vignette",
+          "AvgMs": 0.03,
+          "MaxMs": 0.03,
+          "Path": "Managed: BeforePostProcessing / Vignette"
+        },
+        {
+          "Name": "Clear Color Depth Stencil",
+          "AvgMs": 0.02,
+          "MaxMs": 0.03,
+          "Path": "RenderToSwapChain / Clear Color Depth Stencil"
+        }
+      ],
+      "TotalTreeRows": 50,
+      "Tree": [
+        {
+          "Name": "Graphics",
+          "Depth": 0,
+          "AvgMs": null,
+          "MaxMs": null
+        },
+        {
+          "Name": "CSM Cascade 0",
+          "Depth": 1,
+          "AvgMs": null,
+          "MaxMs": null
+        },
+        {
+          "Name": "DrawDepthOpaque",
+          "Depth": 2,
+          "AvgMs": 0.04,
+          "MaxMs": 0.04
+        },
+        {
+          "Name": "CSM Cascade 1",
+          "Depth": 1,
+          "AvgMs": null,
+          "MaxMs": null
+        },
+        {
+          "Name": "DrawDepthOpaque",
+          "Depth": 2,
+          "AvgMs": 0.18,
+          "MaxMs": 0.26
+        },
+        {
+          "Name": "CSM Cascade 2",
+          "Depth": 1,
+          "AvgMs": null,
+          "MaxMs": null
+        },
+        {
+          "Name": "DrawDepthOpaque",
+          "Depth": 2,
+          "AvgMs": 0.43,
+          "MaxMs": 0.83
+        },
+        {
+          "Name": "Sandbox.ScenePointLight_Shadow",
+          "Depth": 1,
+          "AvgMs": null,
+          "MaxMs": null
+        },
+        {
+          "Name": "DrawDepthOpaque",
+          "Depth": 2,
+          "AvgMs": 1.08,
+          "MaxMs": 1.23
+        },
+        {
+          "Name": "DrawDepthFade",
+          "Depth": 2,
+          "AvgMs": 0.22,
+          "MaxMs": 0.33
+        },
+        {
+          "Name": "DrawDepthTranslucent",
+          "Depth": 2,
+          "AvgMs": 0.06,
+          "MaxMs": 0.16
+        },
+        {
+          "Name": "RenderToSwapChain",
+          "Depth": 1,
+          "AvgMs": null,
+          "MaxMs": null
+        },
+        {
+          "Name": "LightBinner",
+          "Depth": 2,
+          "AvgMs": 0.02,
+          "MaxMs": 0.02
+        },
+        {
+          "Name": "Clear Color Depth Stencil",
+          "Depth": 2,
+          "AvgMs": 0.02,
+          "MaxMs": 0.03
+        },
+        {
+          "Name": "Clustered Light Culling",
+          "Depth": 2,
+          "AvgMs": 0.09,
+          "MaxMs": 0.12
+        },
+        {
+          "Name": "Depth Normal Prepass (Overlay)",
+          "Depth": 2,
+          "AvgMs": 0.06,
+          "MaxMs": 0.07
+        },
+        {
+          "Name": "Depth Normal Prepass (Large)",
+          "Depth": 2,
+          "AvgMs": 0.24,
+          "MaxMs": 0.31
+        },
+        {
+          "Name": "Depth Normal Prepass (Small)",
+          "Depth": 2,
+          "AvgMs": 0.21,
+          "MaxMs": 0.42
+        },
+        {
+          "Name": "Hi-Z Depth Downsample",
+          "Depth": 2,
+          "AvgMs": 0.04,
+          "MaxMs": 0.05
+        },
+        {
+          "Name": "Refraction Stencil Layer",
+          "Depth": 2,
+          "AvgMs": 0.01,
+          "MaxMs": 0.02
+        },
+        {
+          "Name": "Managed: AfterDepthPrepass",
+          "Depth": 2,
+          "AvgMs": 0.36,
+          "MaxMs": 0.39
+        },
+        {
+          "Name": "Static Opaque Forward",
+          "Depth": 2,
+          "AvgMs": 0.2,
+          "MaxMs": 0.41
+        },
+        {
+          "Name": "Dynamic Opaque Forward",
+          "Depth": 2,
+          "AvgMs": 1.51,
+          "MaxMs": 2.18
+        },
+        {
+          "Name": "Translucent Forward",
+          "Depth": 2,
+          "AvgMs": 0.39,
+          "MaxMs": 0.53
+        },
+        {
+          "Name": "GameOverlay",
+          "Depth": 2,
+          "AvgMs": 0.6,
+          "MaxMs": 1.12
+        },
+        {
+          "Name": "Managed: AfterTransparent",
+          "Depth": 2,
+          "AvgMs": 0.7,
+          "MaxMs": 0.87
+        },
+        {
+          "Name": "GameOverlay Translucent",
+          "Depth": 2,
+          "AvgMs": 0.16,
+          "MaxMs": 0.26
+        },
+        {
+          "Name": "Managed: BeforePostProcessing",
+          "Depth": 2,
+          "AvgMs": 0.2,
+          "MaxMs": 0.25
+        },
+        {
+          "Name": "AutoExposure",
+          "Depth": 2,
+          "AvgMs": 0.02,
+          "MaxMs": 0.02
+        },
+        {
+          "Name": "Managed: Tonemapping",
+          "Depth": 2,
+          "AvgMs": 0.07,
+          "MaxMs": 0.07
+        },
+        {
+          "Name": "ResolveHDRToFinalSDR",
+          "Depth": 2,
+          "AvgMs": 0.02,
+          "MaxMs": 0.02
+        },
+        {
+          "Name": "Managed: AfterPostProcessing",
+          "Depth": 2,
+          "AvgMs": 0.13,
+          "MaxMs": 0.14
+        },
+        {
+          "Name": "Managed: UI",
+          "Depth": 2,
+          "AvgMs": 0.89,
+          "MaxMs": 1.08
+        },
+        {
+          "Name": "PlatformOverlay",
+          "Depth": 1,
+          "AvgMs": null,
+          "MaxMs": null
+        },
+        {
+          "Name": "Managed: PlatformOverlay",
+          "Depth": 2,
+          "AvgMs": 0.02,
+          "MaxMs": 0.18
+        },
+        {
+          "Name": "Sharpen",
+          "Depth": 3,
+          "AvgMs": 0.05,
+          "MaxMs": 0.05
+        },
+        {
+          "Name": "Photographic Response",
+          "Depth": 3,
+          "AvgMs": 0.06,
+          "MaxMs": 0.06
+        },
+        {
+          "Name": "ColorGrading",
+          "Depth": 3,
+          "AvgMs": 0.03,
+          "MaxMs": 0.03
+        },
+        {
+          "Name": "Ambient Occlusion",
+          "Depth": 3,
+          "AvgMs": 0.25,
+          "MaxMs": 0.28
+        },
+        {
+          "Name": "Bloom",
+          "Depth": 3,
+          "AvgMs": 0.17,
+          "MaxMs": 0.23
+        },
+        {
+          "Name": "Tonemapping",
+          "Depth": 3,
+          "AvgMs": 0.05,
+          "MaxMs": 0.05
+        },
+        {
+          "Name": "Vignette",
+          "Depth": 3,
+          "AvgMs": 0.03,
+          "MaxMs": 0.03
+        },
+        {
+          "Name": "UI Root: GameRootPanel",
+          "Depth": 3,
+          "AvgMs": 0.88,
+          "MaxMs": 1.08
+        },
+        {
+          "Name": "CommandList",
+          "Depth": 3,
+          "AvgMs": 0.57,
+          "MaxMs": 0.76
+        },
+        {
+          "Name": "Marker Mask",
+          "Depth": 3,
+          "AvgMs": 0.13,
+          "MaxMs": 0.16
+        },
+        {
+          "Name": "SceneLine",
+          "Depth": 3,
+          "AvgMs": 0.06,
+          "MaxMs": 0.16
+        },
+        {
+          "Name": "SpriteBatch",
+          "Depth": 3,
+          "AvgMs": 0.03,
+          "MaxMs": 0.04
+        },
+        {
+          "Name": "AO Main Pass",
+          "Depth": 4,
+          "AvgMs": 0.09,
+          "MaxMs": 0.1
+        },
+        {
+          "Name": "AO Denoise",
+          "Depth": 4,
+          "AvgMs": 0.09,
+          "MaxMs": 0.09
+        },
+        {
+          "Name": "AO Upsample",
+          "Depth": 4,
+          "AvgMs": 0.05,
+          "MaxMs": 0.06
+        }
+      ]
+    },
+    {
+      "Renderer": "native",
+      "Resolution": "1920x1080",
+      "AntiAliasing": "Multisample4x",
+      "Upscaling": "Off",
+      "Issues": [
+        {
+          "Severity": "Bad",
+          "Title": "Draw calls",
+          "Detail": "5,488, over 3,000. Merge meshes, instance repeats, use LODs",
+          "MoreIn": null
+        }
+      ],
+      "Counters": {
+        "ObjectsRendered": 2021,
+        "ObjectsPreCull": 28063,
+        "ObjectsTested": 51040,
+        "BaseObjectDraws": 6510,
+        "AnimatableObjectDraws": 659,
+        "AggregateObjectDraws": 0,
+        "AggregateObjectsFullyCulled": 0,
+        "AggregateObjectDrawCalls": 0,
+        "AggregateIndirectSubmits": 0,
+        "AggregateIndirectFragments": 0,
+        "RenderBatchDraws": 1611,
+        "TrianglesRendered": 18409159,
+        "DrawCalls": 5488,
+        "MaterialChanges": 603,
+        "ShadowMaterialChanges": 1231,
+        "ShadowMaterialChangesAlphaTested": 0,
+        "InitialMaterialChanges": 1509,
+        "InitialShadowMaterialChanges": 1088,
+        "CopyMaterialChanges": 15,
+        "MaterialComputes": 1867,
+        "FullMaterialSets": 1882,
+        "SimilarMaterialSets": 309,
+        "TextureOnlyMaterialSets": 0,
+        "VfxEvals": 0,
+        "VfxRuleChecks": 1750,
+        "ConstantBufferUpdates": 2069,
+        "ConstantBufferBytes": 393792,
+        "UnbatchableMaterialDraws": 0,
+        "UniqueMaterials": 0,
+        "DisplayLists": 334,
+        "SceneViewsRendered": 40,
+        "RenderTargetResolves": 3,
+        "PrimaryContexts": 413,
+        "SecondaryContexts": 0,
+        "ObjectsCulledByVis": 0,
+        "ObjectsCulledByScreenSize": 17,
+        "ObjectsCulledByFade": 0,
+        "ObjectsFading": 0,
+        "ShadowedLightsInView": 0,
+        "UnshadowedLightsInView": 114,
+        "ShadowMaps": 0,
+        "GpuStatsSummary": "Checked pending presents 85,044 times; waited 8 times; abandoned 4 times\nTexture memory: 5,765 / 10,150 MB; in 6,611 textures (658 MB non-evictable)\nTextures created overall: 8,896; textures evicted: 0\nCommand stream pools: 712,704 bytes in base, 0 bytes in medium, 0 bytes in large (0 extra data fallbacks)\nVulkan Total Mem: 8,148.72 MB; Fragmentation: 317.07 MB; PMB mem: 130.72 MB; command buffers: 7,412\nVulkan pipelines: 854; pipeline layouts: 429\n",
+        "PendingStreamingRequests": 0,
+        "TexturePoolUsedBytes": 6045554044,
+        "TexturePoolLimitBytes": 10643046400,
+        "TexturePoolNonEvictableBytes": 690113144
+      },
+      "ManagedRenderer": null,
+      "PostProcessing": [
+        {
+          "Name": "Ambient Occlusion",
+          "Stage": "AfterDepthPrepass",
+          "Order": 0,
+          "Async": false,
+          "AsyncCompute": true,
+          "NeedsDepthNormals": true
+        },
+        {
+          "Name": "Highlight",
+          "Stage": "AfterTransparent",
+          "Order": 1000,
+          "Async": false,
+          "AsyncCompute": false,
+          "NeedsDepthNormals": false
+        },
+        {
+          "Name": "Bloom",
+          "Stage": "BeforePostProcess",
+          "Order": 100,
+          "Async": false,
+          "AsyncCompute": false,
+          "NeedsDepthNormals": false
+        },
+        {
+          "Name": "Vignette",
+          "Stage": "BeforePostProcess",
+          "Order": 5000,
+          "Async": false,
+          "AsyncCompute": false,
+          "NeedsDepthNormals": false
+        },
+        {
+          "Name": "Tonemapping",
+          "Stage": "Tonemapping",
+          "Order": 0,
+          "Async": false,
+          "AsyncCompute": false,
+          "NeedsDepthNormals": false
+        },
+        {
+          "Name": "Sharpen",
+          "Stage": "AfterPostProcess",
+          "Order": 1,
+          "Async": false,
+          "AsyncCompute": false,
+          "NeedsDepthNormals": false
+        },
+        {
+          "Name": "Photographic Response",
+          "Stage": "AfterPostProcess",
+          "Order": 1000,
+          "Async": false,
+          "AsyncCompute": false,
+          "NeedsDepthNormals": false
+        },
+        {
+          "Name": "ColorGrading",
+          "Stage": "AfterPostProcess",
+          "Order": 4000,
+          "Async": false,
+          "AsyncCompute": false,
+          "NeedsDepthNormals": false
+        }
+      ]
+    },
+    {
+      "Total": {
+        "Name": "all roots",
+        "PanelsRendered": 172,
+        "SubtreesCulled": 22,
+        "CpuMs": 1.04,
+        "LayoutMs": 0.13,
+        "BuildMs": 0.4,
+        "SubmitMs": 0.51,
+        "DrawCalls": 20,
+        "Instances": 539,
+        "Layers": 5,
+        "FrameGrabs": 1
+      },
+      "GpuBuffers": 27,
+      "Roots": [
+        {
+          "Name": "GameRootPanel",
+          "PanelsRendered": 158,
+          "SubtreesCulled": 13,
+          "CpuMs": 1.02,
+          "LayoutMs": 0.12,
+          "BuildMs": 0.39,
+          "SubmitMs": 0.5,
+          "DrawCalls": 20,
+          "Instances": 539,
+          "Layers": 5,
+          "FrameGrabs": 1
+        },
+        {
+          "Name": "GameRootPanel",
+          "PanelsRendered": 1,
+          "SubtreesCulled": 1,
+          "CpuMs": 0,
+          "LayoutMs": 0,
+          "BuildMs": 0,
+          "SubmitMs": 0,
+          "DrawCalls": 0,
+          "Instances": 0,
+          "Layers": 0,
+          "FrameGrabs": 0
+        },
+        {
+          "Name": "LoadingRoot (menu)",
+          "PanelsRendered": 1,
+          "SubtreesCulled": 1,
+          "CpuMs": 0.01,
+          "LayoutMs": 0,
+          "BuildMs": 0,
+          "SubmitMs": 0,
+          "DrawCalls": 0,
+          "Instances": 0,
+          "Layers": 0,
+          "FrameGrabs": 0
+        },
+        {
+          "Name": "MenuOverlay (menu)",
+          "PanelsRendered": 8,
+          "SubtreesCulled": 4,
+          "CpuMs": 0,
+          "LayoutMs": 0,
+          "BuildMs": 0,
+          "SubmitMs": 0,
+          "DrawCalls": 0,
+          "Instances": 0,
+          "Layers": 0,
+          "FrameGrabs": 0
+        },
+        {
+          "Name": "DevLayer (menu)",
+          "PanelsRendered": 3,
+          "SubtreesCulled": 2,
+          "CpuMs": 0,
+          "LayoutMs": 0,
+          "BuildMs": 0,
+          "SubmitMs": 0,
+          "DrawCalls": 0,
+          "Instances": 0,
+          "Layers": 0,
+          "FrameGrabs": 0
+        },
+        {
+          "Name": "RootPanel (menu)",
+          "PanelsRendered": 1,
+          "SubtreesCulled": 1,
+          "CpuMs": 0,
+          "LayoutMs": 0,
+          "BuildMs": 0,
+          "SubmitMs": 0,
+          "DrawCalls": 0,
+          "Instances": 0,
+          "Layers": 0,
+          "FrameGrabs": 0
+        }
+      ]
+    }
+  ],
+  "text": "31 entries, oldest first (602 buffered):\n14:25:39 [Generic] Warn: Missing Component: couldn't find Component type ChargeStation on GameObject:charger_health\n14:25:39 [Generic] Warn: Missing Component: couldn't find Component type GrabAction on GameObject:charger_health\n14:25:39 [Generic] Warn: Missing Component: couldn't find Component type ChargeStation on GameObject:charger_health (1)\n14:25:39 [Generic] Warn: Missing Component: couldn't find Component type GrabAction on GameObject:charger_health (1)\n14:25:39 [Generic] Warn: Missing Component: couldn't find Component type ChargeStation on GameObject:charger_armour\n14:25:39 [Generic] Warn: Missing Component: couldn't find Component type GrabAction on GameObject:charger_armour\n14:25:39 [Generic] Warn: Missing Component: couldn't find Component type ChargeStation on GameObject:charger_armour (1)\n14:25:39 [Generic] Warn: Missing Component: couldn't find Component type GrabAction on GameObject:charger_armour (1)\n14:25:39 [Generic] Warn: Missing Component: couldn't find Component type InventoryPickup on GameObject:item_longjumpmodule\n14:25:39 [Generic] Warn: Missing Component: couldn't find Component type InventoryPickup on GameObject:item_gluon_gun\n14:26:52 [Generic] Warn: Missing Component: couldn't find Component type ChargeStation on GameObject:charger_health\n14:26:52 [Generic] Warn: Missing Component: couldn't find Component type GrabAction on GameObject:charger_health\n14:26:52 [Generic] Warn: Missing Component: couldn't find Component type ChargeStation on GameObject:charger_health (1)\n14:26:52 [Generic] Warn: Missing Component: couldn't find Component type GrabAction on GameObject:charger_health (1)\n14:26:52 [Generic] Warn: Missing Component: couldn't find Component type ChargeStation on GameObject:charger_armour\n14:26:52 [Generic] Warn: Missing Component: couldn't find Component type GrabAction on GameObject:charger_armour\n14:26:52 [Generic] Warn: Missing Component: couldn't find Component type ChargeStation on GameObject:charger_armour (1)\n14:26:52 [Generic] Warn: Missing Component: couldn't find Component type GrabAction on GameObject:charger_armour (1)\n14:26:52 [Generic] Warn: Missing Component: couldn't find Component type InventoryPickup on GameObject:item_longjumpmodule\n14:26:52 [Generic] Warn: Missing Component: couldn't find Component type InventoryPickup on GameObject:item_gluon_gun\n14:27:07 [engine/ToolsStallMonitor] Warn: Stall detected.\n14:27:08 [engine/RenderSystem] Warn: Grew the global bindless descriptor set ring to 9\n14:35:56 [engine/Engine] Warn: CSwapChainBase::QueuePresentAndWait() looped for 21 iterations without a present event.\n14:35:56 [engine/RenderSystem] Warn: FrameSync: GPU fence wait exceeded 250ms, idling the queue\n14:39:47 [engine/Engine] Warn: CSwapChainBase::QueuePresentAndWait() looped for 21 iterations without a present event.\n14:39:47 [engine/RenderSystem] Warn: FrameSync: GPU fence wait exceeded 250ms, idling the queue\n14:39:48 [engine/Engine] Warn: CSwapChainBase::QueuePresentAndWait() looped for 21 iterations without a present event.\n14:39:48 [engine/RenderSystem] Warn: FrameSync: GPU fence wait exceeded 250ms, idling the queue\n14:39:48 [engine/Engine] Warn: CSwapChainBase::QueuePresentAndWait() looped for 22 iterations without a present event.\n14:42:16 [Generic] Warn: Error when building render tree on Facepunch.UI.EndOfMatchScreen - Can't set child index - it's not our child!\n14:42:20 [Generic] Warn: A task has been running without yielding for more than 1000ms: Facepunch.MatchRecorder+<>c__DisplayClass87_0::<Save>b__0\nCursor: 602"
+}
