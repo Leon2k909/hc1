@@ -1,0 +1,38 @@
+// Texture format preparation only: copy original decoded texels into a POT
+// canvas without resampling. Original artwork and alpha remain in source.
+var root=Sandbox.Project.Current.GetRootPath();
+if(!string.Equals(System.IO.Path.GetFullPath(root).TrimEnd('\\','/'),@"C:\sbox-projects\hc1\forked-shooter-main",StringComparison.OrdinalIgnoreCase))
+    throw new InvalidOperationException("Wrong project");
+var folder=System.IO.Path.Combine(root,"Sources/Veridant/ivy-v2");
+var input=System.IO.Path.Combine(folder,"leaf-source.png");
+var output=System.IO.Path.Combine(folder,"leaf-packed.png");
+var metadata=System.IO.Path.Combine(folder,"texture-packing.json");
+if(System.IO.File.Exists(output)||System.IO.File.Exists(metadata))throw new InvalidOperationException("Packing output already exists; inspect it before replacing it.");
+var bytes=System.IO.File.ReadAllBytes(input);
+var originalHash=Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(bytes)).ToLowerInvariant();
+using var original=Bitmap.CreateFromBytes(bytes);
+var colors=original.GetPixels32();
+var pixels=System.Runtime.InteropServices.MemoryMarshal.AsBytes(colors.AsSpan()).ToArray();
+if(pixels.Length!=original.Width*original.Height*4)throw new InvalidOperationException("Expected RGBA8 decoded pixels");
+const int size=2048;
+if(original.Width>size||original.Height>size)throw new InvalidOperationException("Unexpected source dimensions");
+var x=(size-original.Width)/2;var y=(size-original.Height)/2;
+var canvas=new byte[size*size*4];
+for(var row=0;row<original.Height;row++)
+    Array.Copy(pixels,row*original.Width*4,canvas,((row+y)*size+x)*4,original.Width*4);
+using var packed=new Bitmap(size,size);
+var setter=typeof(Bitmap).GetMethod("SetPixelData",System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic)
+    .CreateDelegate<Action<ReadOnlySpan<byte>,bool>>(packed);
+setter(canvas,false);
+var resultPixels=System.Runtime.InteropServices.MemoryMarshal.AsBytes(packed.GetPixels32().AsSpan()).ToArray();
+if(!canvas.AsSpan().SequenceEqual(resultPixels))throw new InvalidOperationException("Pixel layout changed during packing");
+var png=packed.ToPng();
+using var decoded=Bitmap.CreateFromBytes(png);
+var decodedPixels=System.Runtime.InteropServices.MemoryMarshal.AsBytes(decoded.GetPixels32().AsSpan()).ToArray();
+if(!canvas.AsSpan().SequenceEqual(decodedPixels))throw new InvalidOperationException("PNG round trip changed packed texels");
+System.IO.File.WriteAllBytes(output,png);
+var result=new {SourceWidth=original.Width,SourceHeight=original.Height,Width=size,Height=size,OffsetX=x,OffsetY=y,
+    SourceSha256=originalHash,PackedSha256=Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(png)).ToLowerInvariant(),
+    DecodedTexelsPreserved=true,Resampled=false};
+System.IO.File.WriteAllText(metadata,System.Text.Json.JsonSerializer.Serialize(result));
+return result;

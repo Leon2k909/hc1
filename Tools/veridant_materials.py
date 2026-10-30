@@ -1054,7 +1054,7 @@ DERIVED = { "vr_soil": ( "vr_gravel", ( .60, .55, .48 ) ),
             "vr_palm_mulch": ( "palm-mulch-v1/soil-bark", ( 1.0, 1.0, 1.0 ) ),  # dedicated PNG material in build()
             "vr_cliff_far": ( "vr_cliff", ( 0.60, 0.62, 0.68 ) ), "vr_cliff_grey": ( "vr_cliff", ( 0.78, 0.83, 0.94 ) ),
             "vr_rock_dark": ( "vr_rock", ( 0.55, 0.54, 0.54 ) ) }
-NAMES = list( SURFACES ) + [ "foliage", "prints", "letters", "water", "glass", "painted", "derived", "impostors" ]
+NAMES = list( SURFACES ) + [ "foliage", "ivy", "prints", "letters", "water", "glass", "painted", "derived", "impostors" ]
 
 
 def all_paints():
@@ -1073,6 +1073,9 @@ def build( name, out ):
     elif name in SURFACES:
         c, r, h, ppi = SURFACES[name]()
         done[name] = write_surface( out, name, c, r, h, ppi, METALNESS.get( name, 0.0 ), normal_size=NORMAL_SIZE.get( name ) )
+    elif name == "ivy":
+        from veridant_ivy import write_materials
+        write_materials(out / "ivy-v2")
     elif name == "foliage":
         colour, alpha = foliage_atlas()
         save_rgb( out / "vr_foliage_color.png", colour )

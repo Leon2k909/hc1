@@ -1,0 +1,18 @@
+// Tools/veridant_ivy.py
+"Layer0"
+{
+    shader "shaders/foliage.shader"
+    F_ALPHA_TEST "0"
+    F_RENDER_BACKFACES "0"
+    F_FOLIAGE_ANIMATION "0"
+    F_TRANSMISSIVE "1"
+    TextureColor "materials/veridant/ivy-v2/leaf-pot.png"
+    TextureNormal "materials/default/default_normal.tga"
+    TextureRoughness "[0.73 0.73 0.73 0]"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    TextureTransmissiveColor "[0.20 0.30 0.08 0]"
+    g_flRoughnessScaleFactor "1"
+    g_flMetalness "0"
+    g_vColorTint "[0.7800 0.8800 0.7400 1]"
+    g_flModelTintAmount "1"
+}

@@ -141,6 +141,8 @@ UNKNOWN = set()
 
 def configure( model ):
     for paint in list( model.polygons ):
+        if paint.startswith( "vr_ivy_" ) and paint in model.material_overrides:
+            continue
         if paint.startswith( "vr_spa_" ) and paint in model.material_overrides:
             continue
         if paint.startswith( "vr_gate_" ) and paint in model.material_overrides:

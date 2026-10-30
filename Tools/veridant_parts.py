@@ -649,18 +649,9 @@ def palm( m, base, h=380.0, seed=0, lean=( 0.0, 0.0 ), fronds=20, frond=150.0 ):
 
 
 def ivy( m, at, right, w, h, seed=0, off=1.2 ):
-    """ Ivy hanging down a wall face from its top edge at at (the top middle), w wide and h down, in strands. """
-    rng = np.random.default_rng( abs( int( seed ) ) )
-    right = unit( right )
-    out = np.cross( right, UP )
-    top = v( *at )
-    count = max( 1, int( w / 26 ) )
-    for i in range( count ):
-        f = ( i + 0.5 ) / count - 0.5
-        hh = h * rng.uniform( 0.45, 1.0 )
-        ww = hh * 0.5
-        c = top + right * ( f * w + rng.normal( 0, 4 ) ) - UP * ( hh / 2 ) + out * ( off + rng.uniform( 0, 2.5 ) )
-        sheet( m, "vr_foliage", VM.FOLIAGE, VM.FOLIAGE_ATLAS, "ivy" if i % 2 else "ivy_2", c, right, UP, hh, ww, 0.0, True )
+    """Hanging ivy with individual curved leaves and connected branching shoots."""
+    from veridant_ivy import build_into
+    return build_into(m, at, right, w, h, seed, off)
 
 
 def bougainvillea( m, at, right, w, h, seed=0, off=2.0 ):

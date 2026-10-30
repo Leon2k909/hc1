@@ -1,0 +1,4 @@
+using var b=Bitmap.CreateFromBytes(System.IO.File.ReadAllBytes(System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(),"Sources/Veridant/ivy-v2/leaf-source.png")));
+return new {b.Width,b.Height,b.BytesPerPixel,
+    Getters=typeof(Bitmap).GetMethods().Where(m=>m.Name.StartsWith("GetPixels")).Select(m=>m.ToString()).ToArray(),
+    Properties=typeof(Bitmap).GetProperties().Where(p=>p.Name.Contains("Format")||p.Name.Contains("Alpha")).Select(p=>new {p.Name,Value=p.GetValue(b)?.ToString()}).ToArray()};

@@ -1,0 +1,46 @@
+// Read only: check the installed ivy material slots in the open Veridant document.
+var project = Sandbox.Project.Current.GetRootPath();
+if (!string.Equals(System.IO.Path.GetFullPath(project).TrimEnd('\\', '/'), @"C:\sbox-projects\hc1\forked-shooter-main", StringComparison.OrdinalIgnoreCase))
+    throw new InvalidOperationException("Unexpected project.");
+var active = Editor.SceneEditorSession.Active;
+var game = Game.ActiveScene?.Id;
+var playing = Game.IsPlaying;
+var session = Editor.SceneEditorSession.All.Single(s => s.Scene.IsEditor && s.Scene.Source?.ResourcePath?.Equals("scenes/maps/veridant/veridant.scene", StringComparison.OrdinalIgnoreCase) == true);
+var dirty = session.HasUnsavedChanges;
+var rows = new System.Collections.Generic.List<object>();
+var found = new System.Collections.Generic.HashSet<string>(StringComparer.OrdinalIgnoreCase);
+var expected = new[] { "leaf", "fresh", "back", "stem" };
+string PathOf(Material material)
+{
+    foreach (var key in new[] { "ResourcePath", "Name" })
+    {
+        var value = material.GetType().GetProperty(key)?.GetValue(material)?.ToString();
+        if (!string.IsNullOrEmpty(value)) return value.Replace('\\', '/');
+    }
+    return material.ToString();
+}
+using (session.Scene.Push())
+{
+    var renderers = session.Scene.GetAllComponents<ModelRenderer>().Where(r => r.Model?.ResourcePath?.Equals("models/maps/veridant/veridant_foliage.vmdl", StringComparison.OrdinalIgnoreCase) == true).ToArray();
+    if (renderers.Length == 0) throw new InvalidOperationException("No Veridant foliage renderer is loaded.");
+    foreach (var renderer in renderers)
+        for (int slot = 0; slot < renderer.Materials.Count; slot++)
+        {
+            var material = renderer.Materials.GetOverride(slot) ?? renderer.Materials.GetOriginal(slot);
+            var path = material is null ? "null" : PathOf(material);
+            if (!path.Contains("materials/veridant/ivy-v2/", StringComparison.OrdinalIgnoreCase)) continue;
+            if (material.IsError) throw new InvalidOperationException("Ivy error material: " + path);
+            var name = System.IO.Path.GetFileNameWithoutExtension(path);
+            if (!expected.Contains(name)) throw new InvalidOperationException("Unexpected ivy material: " + path);
+            var texture = material.GetTexture("g_tColor");
+            var leaf = name != "stem";
+            if (leaf && (texture is null || texture.IsError || texture.Width != 2048 || texture.Height != 2048))
+                throw new InvalidOperationException("Ivy color texture is not the compiled 2048 square image: " + path);
+            found.Add(name);
+            rows.Add(new { Slot = slot, Path = path, Error = material.IsError, TextureWidth = texture?.Width, TextureHeight = texture?.Height, TextureError = texture?.IsError });
+        }
+}
+if (!found.SetEquals(expected)) throw new InvalidOperationException("Some ivy material slots are missing: " + string.Join(", ", found));
+if (!ReferenceEquals(active, Editor.SceneEditorSession.Active) || game != Game.ActiveScene?.Id || playing != Game.IsPlaying || dirty != session.HasUnsavedChanges)
+    throw new InvalidOperationException("Editor state changed during the read-only material check.");
+return new { Success = true, Materials = rows, EditorStatePreserved = true };
