@@ -1,3 +1,6 @@
+@import "/UI/Styles/Theme.scss";
+
+// A player's builds and crosshair, over the scoreboard: the scoreboard's charcoal and orange (Scoreboard.razor.scss).
 ScoreboardPlayerDetails {
     position: absolute;
     inset: 0;
@@ -17,9 +20,11 @@ ScoreboardPlayerDetails {
         padding: 24px;
         flex-direction: column;
         gap: 12px;
-        background-color: #121519;
-        border: 1px solid rgba(white, 0.2);
-        border-radius: 6px;
+        background-color: #101114;
+        border: 1px solid rgba(white, 0.1);
+        border-top: 2px solid $hud-accent;
+        border-radius: 2px;
+        box-shadow: 0 24px 80px rgba(black, 0.6);
         color: white;
     }
 
@@ -29,7 +34,7 @@ ScoreboardPlayerDetails {
         margin-bottom: 6px;
 
         PlayerAvatar { width: 32px; height: 32px; }
-        .details-name { flex-grow: 1; font-size: 22px; }
+        .details-name { flex-grow: 1; font-size: 22px; font-weight: 700; }
     }
 
     .details-close, .details-code {
@@ -38,23 +43,24 @@ ScoreboardPlayerDetails {
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
-        border-radius: 4px;
-        background-color: rgba(white, 0.06);
+        border: 1px solid rgba(white, 0.12);
+        border-radius: 2px;
+        background-color: #1a1b1e;
         cursor: pointer;
 
         i { font-size: 20px; }
-        &:hover { background-color: rgba(white, 0.18); }
+        &:hover { background-color: #242426; border-color: $hud-accent; }
     }
 
-    .details-help { font-size: 13px; color: #a4adb8; }
+    .details-help { font-size: 13px; color: rgba(white, 0.58); }
 
     .details-item {
         padding: 14px;
         gap: 10px;
         align-items: center;
-        border: 1px solid rgba(white, 0.1);
-        border-radius: 4px;
-        background-color: rgba(white, 0.03);
+        border: 1px solid rgba(white, 0.07);
+        border-radius: 2px;
+        background-color: rgba(black, 0.24);
     }
 
     .details-item-name {
@@ -64,7 +70,7 @@ ScoreboardPlayerDetails {
         font-size: 17px;
     }
 
-    .details-category { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #a4adb8; }
+    .details-category { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: $hud-accent; }
 
     .details-action {
         padding: 9px 12px;
@@ -72,14 +78,15 @@ ScoreboardPlayerDetails {
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
-        border: 1px solid rgba(white, 0.2);
-        border-radius: 4px;
-        background-color: rgba(white, 0.1);
+        border: 1px solid rgba(white, 0.16);
+        border-radius: 2px;
+        background-color: #1a1b1e;
         cursor: pointer;
         font-size: 13px;
+        font-weight: 700;
 
         i { font-size: 17px; }
-        &:hover { background-color: rgba(white, 0.22); }
+        &:hover { background-color: #242426; border-color: $hud-accent; }
     }
 
     .disabled { opacity: 0.3; pointer-events: none; }

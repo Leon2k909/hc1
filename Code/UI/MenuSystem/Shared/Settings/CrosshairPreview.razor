@@ -1,0 +1,305 @@
+@using Sandbox;
+@using Sandbox.UI;
+@using Facepunch;
+@using System.Globalization;
+@inherits Panel
+@namespace Facepunch.UI
+@attribute [StyleSheet]
+
+@* Settings → Crosshair's live preview. It draws the crosshair and the hit marker from the settings as they stand,
+   at the size they have in a match at 1x (the HUD and the menu share the ScreenPanel's 1080p scale), on a backdrop
+   the player picks, and plays the hit marker's animation (HitmarkerPainter's) in the box. *@
+
+<root class="crosshair-preview">
+    <div class="pv-stage bg-@Backdrop">
+        <div class="pv-layer">
+            <div class="pv-anchor">
+                @if ( Cfg.Enabled )
+                {
+                    @if ( Cfg.Style == "hc1" )
+                    {
+                        var s = GameSettingsSystem.Current;
+                        var w = s.CrosshairWidth;
+                        var len = s.CrosshairLength;
+                        var gap = s.CrosshairDistance;
+                        var col = Rgba( s.CrosshairColor );
+                        <div class="pv-el" style="@(Css( At( -(gap + len), -w / 2f, len, w ), Fill( col ) ))"></div>
+                        <div class="pv-el" style="@(Css( At( gap, -w / 2f, len, w ), Fill( col ) ))"></div>
+                        <div class="pv-el" style="@(Css( At( -w / 2f, -(gap + len), w, len ), Fill( col ) ))"></div>
+                        <div class="pv-el" style="@(Css( At( -w / 2f, gap, w, len ), Fill( col ) ))"></div>
+                        @if ( s.ShowCrosshairDot )
+                        {
+                            <div class="pv-el" style="@(Css( At( -w / 2f, -w / 2f, w, w ), Fill( col ), Round( w ) ))"></div>
+                        }
+                    }
+                    else if ( Cfg.Style == "classic" )
+                    {
+                        <div class="pv-el classic v" style="@(At( -1, -13, 2, 8 ))"></div>
+                        <div class="pv-el classic v" style="@(At( -1, 5, 2, 8 ))"></div>
+                        <div class="pv-el classic h" style="@(At( -13, -1, 8, 2 ))"></div>
+                        <div class="pv-el classic h" style="@(At( 5, -1, 8, 2 ))"></div>
+                    }
+                    else if ( Cfg.Style == "modern" )
+                    {
+                        <div class="pv-el modern-ring" style="@(Css( At( -8, -8, 16, 16 ), Border( 2 ), Round( 8 ) ))"></div>
+                        <div class="pv-el modern-dot" style="@(Css( At( -1.5f, -1.5f, 3, 3 ), Round( 1.5f ) ))"></div>
+                    }
+                    else if ( Cfg.Style == "custom" )
+                    {
+                        var th = Cfg.Thickness;
+                        var len = Cfg.Size;
+                        var gap = Cfg.Gap;
+                        var paint = $"background-color:{Rgba( Cfg.Color, Cfg.Alpha )};box-shadow:{CustomOutline()};";
+                        @if ( !Cfg.TStyle )
+                        {
+                            <div class="pv-el" style="@(Css( At( -th / 2f, -(gap + len), th, len ), paint ))"></div>
+                        }
+                        <div class="pv-el" style="@(Css( At( -th / 2f, gap, th, len ), paint ))"></div>
+                        <div class="pv-el" style="@(Css( At( -(gap + len), -th / 2f, len, th ), paint ))"></div>
+                        <div class="pv-el" style="@(Css( At( gap, -th / 2f, len, th ), paint ))"></div>
+                        @if ( Cfg.Dot )
+                        {
+                            <div class="pv-el" style="@(Css( At( -2, -2, 4, 4 ), paint, Round( 1 ) ))"></div>
+                        }
+                    }
+                }
+            </div>
+        </div>
+
+        <div class="pv-layer" @ref="HitLayer">
+            <div class="pv-anchor">
+                @{
+                    var size = (float)Cfg.HitSize;
+                    var t = (float)Cfg.HitThickness;
+                    var edge = Cfg.HitOutline ? Cfg.HitOutlineThickness : 0f;
+                    var hit = Rgba( Cfg.HitColor, Cfg.HitAlpha );
+                    var dark = $"rgba(0,0,0,{F( Cfg.HitOutlineAlpha )})";
+                }
+                @if ( Cfg.HitStyle == "x" )
+                {
+                        @if ( edge > 0f )
+                        {
+                            <div class="pv-el" style="@(Css( Bar( size + edge * 2f, t + edge * 2f, 45 ), Fill( dark ) ))"></div>
+                            <div class="pv-el" style="@(Css( Bar( size + edge * 2f, t + edge * 2f, -45 ), Fill( dark ) ))"></div>
+                        }
+                        <div class="pv-el" style="@(Css( Bar( size, t, 45 ), Fill( hit ) ))"></div>
+                        <div class="pv-el" style="@(Css( Bar( size, t, -45 ), Fill( hit ) ))"></div>
+                }
+                else if ( Cfg.HitStyle == "diamond" )
+                {
+                        var side = size * 0.5f;
+                        @if ( edge > 0f )
+                        {
+                            <div class="pv-el" style="@(Css( Bar( side + edge * 2f, side + edge * 2f, 45 ), Fill( dark ) ))"></div>
+                        }
+                        <div class="pv-el" style="@(Css( Bar( side, side, 45 ), Fill( hit ) ))"></div>
+                }
+                else if ( Cfg.HitStyle == "ring" )
+                {
+                        @if ( edge > 0f )
+                        {
+                            <div class="pv-el" style="@(Ring( size + edge * 2f, t + edge * 2f, dark ))"></div>
+                        }
+                        <div class="pv-el" style="@(Ring( size, t, hit ))"></div>
+                }
+                else if ( Cfg.HitStyle == "dot" )
+                {
+                        var dot = size / 3f;
+                        @if ( edge > 0f )
+                        {
+                            <div class="pv-el" style="@(Css( At( -(dot / 2f + edge), -(dot / 2f + edge), dot + edge * 2f, dot + edge * 2f ), Fill( dark ), Round( dot / 2f + edge ) ))"></div>
+                        }
+                        <div class="pv-el" style="@(Css( At( -dot / 2f, -dot / 2f, dot, dot ), Fill( hit ), Round( dot / 2f ) ))"></div>
+                }
+            </div>
+        </div>
+
+        @if ( Mode == "crosshair" && (!Cfg.Enabled || Cfg.Style == "none") )
+        {
+            <label class="pv-note">@Tr( "Crosshair Off" )</label>
+        }
+        else if ( Mode == "hit" && Cfg.HitStyle == "none" )
+        {
+            <label class="pv-note">@Tr( "None" )</label>
+        }
+        <label class="pv-tag">@(Zoom)x</label>
+    </div>
+
+    <div class="pv-row">
+        @foreach ( var (key, title) in Backdrops )
+        {
+            var k = key;
+            <button class="pv-chip @(Backdrop == k ? "selected" : "")" @onmousedown=@(() => SetBackdrop( k ))>@Tr( title )</button>
+        }
+    </div>
+
+    <div class="pv-row">
+        <label class="pv-label">@Tr( "Zoom" )</label>
+        @foreach ( var z in ZoomSteps )
+        {
+            var v = z;
+            <button class="pv-chip @(Zoom == v ? "selected" : "")" @onmousedown=@(() => SetZoom( v ))>@(v)x</button>
+        }
+    </div>
+
+    <div class="pv-row">
+        <button class="pv-chip accent" @onmousedown=@PlayHit>@Tr( "Preview Hit" )</button>
+        <button class="pv-chip @(Loop ? "selected" : "")" @onmousedown=@ToggleLoop>@Tr( "Loop" )</button>
+    </div>
+</root>
+
+@code
+{
+    /// <summary> The tab it sits beside: "crosshair" shows the hit marker only while it plays, "hit" holds it up. </summary>
+    [Parameter] public string Mode { get; set; } = "crosshair";
+
+    // Kept for the session, so the backdrop and zoom stay as picked when the page is left and opened again.
+    static string Backdrop = "outdoor";
+    static int Zoom = 2;
+    static bool Loop;
+
+    static readonly (string key, string title)[] Backdrops =
+    {
+        ("dark", "Dark"), ("grey", "Grey"), ("light", "Light"), ("outdoor", "Outdoor")
+    };
+
+    static readonly int[] ZoomSteps = { 1, 2, 4 };
+
+    // A loop rests this long between hits.
+    const float LoopRest = 0.45f;
+
+    Panel HitLayer { get; set; }
+    RealTimeSince _sinceHit;
+    bool _playing;
+    float _shownOpacity = -1f;
+    float _shownGrow = -1f;
+
+    CrosshairConfig Cfg => CrosshairManager.Config;
+
+    void SetBackdrop( string key ) { Backdrop = key; StateHasChanged(); }
+    void SetZoom( int zoom ) { Zoom = zoom; StateHasChanged(); }
+
+    void ToggleLoop()
+    {
+        Loop = !Loop;
+        if ( Loop ) PlayHit();
+        StateHasChanged();
+    }
+
+    public void PlayHit()
+    {
+        _playing = true;
+        _sinceHit = 0;
+    }
+
+    public override void Tick()
+    {
+        base.Tick();
+        if ( !HitLayer.IsValid() ) return;
+
+        // HitmarkerPainter.Draw's animation: in from 0.6x and clear over the first 30%, then out to 1.2x (ease-out).
+        float opacity = Mode == "hit" ? 1f : 0f;
+        float grow = 1f;
+        if ( _playing )
+        {
+            var duration = Math.Max( 1, Cfg.HitDuration ) / 1000f;
+            var progress = _sinceHit / duration;
+            if ( progress >= 1f )
+            {
+                opacity = 0f;
+                if ( !Loop ) _playing = false;
+                else if ( _sinceHit >= duration + LoopRest ) _sinceHit = 0;
+            }
+            else if ( progress < 0.3f )
+            {
+                var e = EaseOut( progress / 0.3f );
+                opacity = e;
+                grow = 0.6f + 0.4f * e;
+            }
+            else
+            {
+                var e = EaseOut( (progress - 0.3f) / 0.7f );
+                opacity = 1f - e;
+                grow = 1f + 0.2f * e;
+            }
+        }
+
+        // Only the layer's style changes per frame, never the markup.
+        if ( opacity == _shownOpacity && grow == _shownGrow ) return;
+        _shownOpacity = opacity;
+        _shownGrow = grow;
+        HitLayer.Style.Opacity = opacity;
+        var transform = new PanelTransform();
+        transform.AddScale( grow );
+        HitLayer.Style.Transform = transform;
+    }
+
+    static float EaseOut( float t ) => 1f - (1f - t) * (1f - t);
+
+    static string F( float v ) => v.ToString( "0.###", CultureInfo.InvariantCulture );
+
+    static string Css( params string[] parts ) => string.Concat( parts );
+    static string Fill( string color ) => $"background-color:{color};";
+    string Round( float radius ) => $"border-radius:{Px( radius )};";
+    string Border( float width ) => $"border-width:{Px( width )};";
+
+    string Px( float v ) => $"{F( v * Zoom )}px";
+
+    /// <summary> A rect in setting pixels round the stage's centre, scaled by the zoom. </summary>
+    string At( float x, float y, float w, float h ) => $"left:{Px( x )};top:{Px( y )};width:{Px( w )};height:{Px( h )};";
+
+    /// <summary> A bar centred on the stage, turned <paramref name="degrees"/>. </summary>
+    string Bar( float length, float width, float degrees ) =>
+        At( -length / 2f, -width / 2f, length, width ) + $"transform:rotate({F( degrees )}deg);";
+
+    /// <summary> A ring <paramref name="diameter"/> across with its border inside, as HitmarkerPainter's rect draws it. </summary>
+    string Ring( float diameter, float border, string color ) =>
+        At( -diameter / 2f, -diameter / 2f, diameter, diameter ) + $"border:{Px( border )} solid {color};border-radius:{Px( diameter )};";
+
+    string CustomOutline() => Cfg.Outline
+        ? $"0 0 0 {Px( Cfg.OutlineThickness )} rgba(0,0,0,{F( Cfg.OutlineAlpha )})"
+        : "none";
+
+    static string Rgba( Color c ) =>
+        $"rgba({(int)MathF.Round( c.r * 255 )},{(int)MathF.Round( c.g * 255 )},{(int)MathF.Round( c.b * 255 )},{F( c.a )})";
+
+    static string Rgba( string hex, float alpha ) =>
+        Rgba( (Color.TryParse( hex ?? "#ffffff", out var c ) ? c : Color.White).WithAlpha( alpha ) );
+
+    protected override int BuildHash()
+    {
+        var c = Cfg;
+        var s = GameSettingsSystem.Current;
+        var h = new HashCode();
+        h.Add( Mode );
+        h.Add( Backdrop );
+        h.Add( Zoom );
+        h.Add( Loop );
+        h.Add( c.Style );
+        h.Add( c.Enabled );
+        h.Add( c.Color );
+        h.Add( c.Alpha );
+        h.Add( c.Thickness );
+        h.Add( c.Size );
+        h.Add( c.Gap );
+        h.Add( c.Dot );
+        h.Add( c.TStyle );
+        h.Add( c.Outline );
+        h.Add( c.OutlineThickness );
+        h.Add( c.OutlineAlpha );
+        h.Add( c.HitStyle );
+        h.Add( c.HitColor );
+        h.Add( c.HitAlpha );
+        h.Add( c.HitThickness );
+        h.Add( c.HitSize );
+        h.Add( c.HitOutline );
+        h.Add( c.HitOutlineThickness );
+        h.Add( c.HitOutlineAlpha );
+        h.Add( s.ShowCrosshairDot );
+        h.Add( s.CrosshairLength );
+        h.Add( s.CrosshairWidth );
+        h.Add( s.CrosshairDistance );
+        h.Add( s.CrosshairColor );
+        return h.ToHashCode();
+    }
+}

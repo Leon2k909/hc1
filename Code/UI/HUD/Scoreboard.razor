@@ -23,7 +23,7 @@
         <div class="match-heading">
             <div class="match-identity">
                 <label class="eyebrow">@Tr( "SCOREBOARD" )</label>
-                <label class="match-title">@Tr( Name )</label>
+                <label class="match-title">@Tr( Name?.ToUpperInvariant() )</label>
             </div>
             <div class="match-state">
                 @if ( !string.IsNullOrWhiteSpace( Status ) )
@@ -32,7 +32,7 @@
                 }
                 @if ( RoundNumber is { } roundNumber && RoundLimit is { } roundLimit )
                 {
-                    <label class="match-round">@Tr( "Round {0} of {1}", roundNumber, roundLimit )</label>
+                    <label class="match-round">@Tr( "ROUND {0} OF {1}", roundNumber, roundLimit )</label>
                 }
             </div>
             @if ( Time is { } matchTime )
@@ -54,7 +54,7 @@
                             <i class="coop-icon">groups</i>
                             <div class="team-identity">
                                 <label class="team-name">@Tr( "SQUAD" )</label>
-                                <label class="team-count">@players.Count @Tr( "Players" )</label>
+                                <label class="team-count">@players.Count @Tr( "PLAYERS" )</label>
                             </div>
                         </div>
                         <ScoreboardColumns Columns=@columns />
@@ -70,18 +70,18 @@
                     @foreach ( var group in groups.Where( x => x.Team != Team.Unassigned ) )
                     {
                         var team = group.Team;
-                        <div class="team-roster" style="border-top-color: @team.GetColor().Hex">
-                            <div class="team-heading" style="background-color: @team.GetColor().WithAlpha( 0.08f ).Hex">
+                        <div class="team-roster">
+                            <div class="team-heading" style="@TeamBand( team )">
                                 <Icon class="team-logo" file="@team.GetIconPath()" size="54" />
                                 <div class="team-identity">
-                                    <label class="team-name">@Tr( team.GetName() )</label>
-                                    <label class="team-count">@group.Entries.Count @Tr( "Players" )</label>
+                                    <label class="team-name">@Tr( team.GetName().ToUpperInvariant() )</label>
+                                    <label class="team-count">@group.Entries.Count @Tr( "PLAYERS" )</label>
                                 </div>
                                 @if ( LightweightBotManager.CanManageBots )
                                 {
                                     <button class="add-bot" onclick=@(() => AddBot( team )) tooltip=@(Tr( "Add Bot" ))>
                                         <i>person_add</i>
-                                        <label>@Tr( "Add Bot" )</label>
+                                        <label>@Tr( "ADD BOT" )</label>
                                     </button>
                                 }
                                 @if ( teamScoring is not null )
@@ -103,7 +103,7 @@
                             {
                                 <div class="empty-team">
                                     <i>groups</i>
-                                    <label>0 @Tr( "Players" )</label>
+                                    <label>0 @Tr( "PLAYERS" )</label>
                                 </div>
                             }
                         </div>
@@ -124,7 +124,7 @@
                 {
                     <div class="spectator-list">
                         <Icon file="/ui/teams/spectator.png" size="18" />
-                        <label class="spectator-heading">@Tr( "Spectators" )</label>
+                        <label class="spectator-heading">@Tr( "SPECTATORS" )</label>
                         @foreach ( var entry in group.Entries )
                         {
                             var spectator = entry.Client;
@@ -136,23 +136,23 @@
         </div>
 
         <div class="communications">
-            <div class="voice-label"><i>headset_mic</i><label>@Tr( "Voice Channel:" )</label></div>
+            <div class="voice-label"><i>headset_mic</i><label>@Tr( "VOICE CHANNEL:" )</label></div>
             <div class="voice-options">
-                <button class="voice-option @(GameSettingsSystem.Current.VoiceChatMode == VoiceChatMode.Auto ? "selected" : "")" onclick=@(() => SetVoiceMode( VoiceChatMode.Auto ))>@Tr( "Auto" )</button>
-                <button class="voice-option @(GameSettingsSystem.Current.VoiceChatMode == VoiceChatMode.Global ? "selected" : "")" onclick=@(() => SetVoiceMode( VoiceChatMode.Global ))>@Tr( "Lobby" )</button>
-                <button class="voice-option @(GameSettingsSystem.Current.VoiceChatMode == VoiceChatMode.TeamOnly ? "selected" : "")" onclick=@(() => SetVoiceMode( VoiceChatMode.TeamOnly ))>@Tr( "Team" )</button>
-                <button class="voice-option @(GameSettingsSystem.Current.VoiceChatMode == VoiceChatMode.PartyOnly ? "selected" : "")" onclick=@(() => SetVoiceMode( VoiceChatMode.PartyOnly ))>@Tr( "Party" )</button>
+                <button class="voice-option @(GameSettingsSystem.Current.VoiceChatMode == VoiceChatMode.Auto ? "selected" : "")" onclick=@(() => SetVoiceMode( VoiceChatMode.Auto ))>@Tr( "AUTO" )</button>
+                <button class="voice-option @(GameSettingsSystem.Current.VoiceChatMode == VoiceChatMode.Global ? "selected" : "")" onclick=@(() => SetVoiceMode( VoiceChatMode.Global ))>@Tr( "LOBBY" )</button>
+                <button class="voice-option @(GameSettingsSystem.Current.VoiceChatMode == VoiceChatMode.TeamOnly ? "selected" : "")" onclick=@(() => SetVoiceMode( VoiceChatMode.TeamOnly ))>@Tr( "TEAM" )</button>
+                <button class="voice-option @(GameSettingsSystem.Current.VoiceChatMode == VoiceChatMode.PartyOnly ? "selected" : "")" onclick=@(() => SetVoiceMode( VoiceChatMode.PartyOnly ))>@Tr( "PARTY" )</button>
             </div>
             <button class="proximity-option @(GameSettingsSystem.Current.VoiceProximity ? "selected" : "")" onclick=@ToggleProximity>
                 <i>@(GameSettingsSystem.Current.VoiceProximity ? "spatial_audio_off" : "spatial_audio")</i>
-                <label>@Tr( "Prox Chat" )</label>
+                <label>@Tr( "PROX CHAT" )</label>
             </button>
         </div>
         <div class="scoreboard-footer">
             <label class="sharing-hint">@Tr( "Click a player to copy their gun builds or crosshair." )</label>
             <div class="scoreboard-key">
                 <InputHint Action="Score" Size=@InputGlyphSize.Small />
-                <label>@Tr( "Scoreboard" )</label>
+                <label>@Tr( "SCOREBOARD" )</label>
             </div>
         </div>
     </div>
@@ -167,6 +167,13 @@
     public string Status => GameMode.Instance?.DisplayedStatus;
     public string Name => GameMode.Instance?.DisplayTitle;
     public TimeSpan? Time => GameMode.Instance?.DisplayedTime;
+
+    /// <summary> A team's heading: a band of its colour from its left edge, fading off to the right. </summary>
+    private static string TeamBand( Team team )
+    {
+        var color = team.GetColor();
+        return $"border-left-color: {color.Hex}; background-image: linear-gradient( to right, {color.WithAlpha( 0.3f ).Hex}, {color.WithAlpha( 0.03f ).Hex} );";
+    }
 
     public int? RoundNumber => GameMode.Instance.IsValid() ? GameMode.Instance.Get<RoundCounter>()?.Round : null;
     public int? RoundLimit => GameMode.Instance.IsValid() ? GameMode.Instance.Get<RoundLimit>()?.MaxRounds : null;

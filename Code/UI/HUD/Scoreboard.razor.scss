@@ -1,5 +1,15 @@
 @import "/UI/Styles/Theme.scss";
 
+// The scoreboard, while Score is held, in the menus' look (MenuPage.scss): a charcoal sheet with an orange line along
+// its top, Chakra Petch for words and the HUD's DIN numerals for numbers. Each team's roster opens on a band of its
+// colour, and your own row is marked in orange, as the HUD marks what's yours.
+$sb-accent: $hud-accent;
+$sb-sheet: rgba( 14, 15, 18, 0.97 );
+$sb-line: rgba( white, 0.07 );
+$sb-text: #F4F4F0;
+$sb-muted: rgba( white, 0.58 );
+$sb-faint: rgba( white, 0.36 );
+
 Scoreboard {
     // Keep medals and hit markers below this panel; the round strip and critical AO warnings stay above it.
     // Razor's early return leaves the panel itself alive, so hide it until Score is held.
@@ -12,13 +22,13 @@ Scoreboard {
     padding-top: 36px;
     pointer-events: none;
     font-family: Chakra Petch;
-    color: #eef1f3;
+    color: $sb-text;
 }
 
 Scoreboard.visible {
     display: flex;
-    background-color: rgba(3, 6, 10, 0.72);
-    backdrop-filter: blur(5px);
+    background-color: rgba(4, 5, 7, 0.62);
+    backdrop-filter: blur(6px);
     pointer-events: all;
     cursor: default;
 }
@@ -30,42 +40,47 @@ Scoreboard button {
 }
 
 Scoreboard .scoreboard-panel {
-    width: 1520px;
+    width: 1400px;
     max-width: 94%;
-    max-height: 82%;
+    max-height: 84%;
     flex-direction: column;
-    background-color: rgba(15, 20, 27, 0.97);
-    border: 1px solid rgba(197, 211, 224, 0.16);
-    border-radius: 3px;
-    box-shadow: 0 18px 70px rgba(0, 0, 0, 0.5);
+    background-color: $sb-sheet;
+    border: 1px solid $sb-line;
+    border-top: 2px solid $sb-accent;
+    border-radius: 2px;
+    box-shadow: 0 24px 80px rgba(black, 0.6);
 }
 
+// The match: what's being played, its state and its clock.
+
 Scoreboard .match-heading {
-    min-height: 104px;
-    padding: 22px 28px;
+    min-height: 88px;
+    padding: 16px 28px;
     align-items: center;
     gap: 24px;
     flex-shrink: 0;
-    border-bottom: 1px solid rgba(197, 211, 224, 0.12);
+    border-bottom: 1px solid $sb-line;
+    background-image: linear-gradient(to bottom, rgba(white, 0.035), rgba(white, 0));
 }
 
 Scoreboard .match-identity {
     flex-direction: column;
     flex-grow: 1;
     min-width: 0;
-    gap: 3px;
+    gap: 2px;
 }
 
 Scoreboard .eyebrow {
-    font-size: 11px;
-    letter-spacing: 2.5px;
-    color: #98a5b5;
-    font-weight: 600;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: $sb-accent;
 }
 
 Scoreboard .match-title {
     font-size: 30px;
     font-weight: 700;
+    letter-spacing: 1px;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
@@ -74,24 +89,32 @@ Scoreboard .match-title {
 Scoreboard .match-state {
     flex-direction: column;
     align-items: flex-end;
-    gap: 5px;
+    gap: 4px;
     max-width: 34%;
     flex-shrink: 0;
 }
 
-Scoreboard .match-status { font-size: 15px; color: #c5cdd7; }
-Scoreboard .match-round { font-size: 13px; color: #8996a6; }
+Scoreboard .match-status { font-size: 14px; font-weight: 600; color: rgba(white, 0.82); }
+Scoreboard .match-round { font-size: 12px; font-weight: 700; letter-spacing: 1.5px; color: $sb-muted; }
 
 Scoreboard .match-clock {
     padding-left: 24px;
     align-items: center;
     gap: 10px;
     flex-shrink: 0;
-    border-left: 1px solid rgba(197, 211, 224, 0.18);
+    border-left: 1px solid $sb-line;
 }
 
-Scoreboard .match-clock i { font-size: 21px; color: #8996a6; }
-Scoreboard .match-clock label { font-size: 34px; font-weight: 600; min-width: 86px; }
+Scoreboard .match-clock i { font-size: 20px; color: $sb-accent; }
+
+Scoreboard .match-clock label {
+    min-width: 86px;
+    font-family: $hud-font;
+    font-size: 36px;
+    font-weight: bold;
+}
+
+// The rosters.
 
 Scoreboard .scoreboard-body {
     padding: 20px 24px;
@@ -107,7 +130,7 @@ Scoreboard .scoreboard-body > * { flex-shrink: 0; }
 Scoreboard .rosters {
     width: 100%;
     align-items: stretch;
-    gap: 18px;
+    gap: 16px;
 }
 
 Scoreboard .team-roster {
@@ -115,11 +138,10 @@ Scoreboard .team-roster {
     flex-basis: 0;
     flex-grow: 1;
     min-width: 0;
-    min-height: 170px;
+    min-height: 160px;
     flex-direction: column;
-    border: 1px solid rgba(197, 211, 224, 0.1);
-    border-top: 2px solid #75879a;
-    background-color: rgba(6, 10, 15, 0.64);
+    background-color: rgba(black, 0.24);
+    border: 1px solid $sb-line;
     overflow: hidden;
 }
 
@@ -135,103 +157,112 @@ Scoreboard.compact .team-roster {
     flex-shrink: 0;
 }
 
+// A band of the team's colour, fading off to the right (its colour is set on the element).
 Scoreboard .team-heading {
-    min-height: 96px;
-    padding: 16px 20px;
+    min-height: 78px;
+    padding: 12px 18px 12px 14px;
     align-items: center;
     gap: 14px;
     flex-shrink: 0;
-    border-bottom: 1px solid rgba(197, 211, 224, 0.08);
+    border-left: 4px solid #75879a;
+    border-bottom: 1px solid $sb-line;
 }
 
 Scoreboard .team-logo { flex-shrink: 0; }
 
 Scoreboard .team-identity {
     flex-direction: column;
-    gap: 4px;
+    gap: 3px;
     min-width: 0;
     flex-grow: 1;
 }
 
 Scoreboard .team-name {
-    font-size: 23px;
+    font-size: 22px;
     font-weight: 700;
+    letter-spacing: 1.5px;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
 }
 
-Scoreboard .team-count { font-size: 13px; color: #97a5b6; font-weight: 500; }
+Scoreboard .team-count { font-size: 11px; font-weight: 700; letter-spacing: 2px; color: $sb-muted; }
 
 Scoreboard .team-score {
-    font-size: 52px;
-    font-weight: 700;
+    min-width: 70px;
     flex-shrink: 0;
-    min-width: 65px;
-    text-align: right;
     justify-content: flex-end;
-    color: #f4f6f8;
+    text-align: right;
+    font-family: $hud-font;
+    font-size: 54px;
+    font-weight: bold;
+    color: white;
+    text-shadow: 0 2px 6px rgba(black, 0.5);
 }
 
-Scoreboard .coop-icon { font-size: 42px; color: #b8c8d5; }
-Scoreboard .coop-roster .team-heading { background-color: rgba(152, 177, 196, 0.06); }
+Scoreboard .coop-icon { font-size: 40px; color: $sb-accent; }
+Scoreboard .coop-roster .team-heading {
+    border-left-color: $sb-accent;
+    background-image: linear-gradient(to right, rgba($sb-accent, 0.18), rgba($sb-accent, 0.02));
+}
 
 Scoreboard .add-bot {
-    padding: 7px 9px;
-    gap: 5px;
+    height: 30px;
+    padding: 0 10px;
+    gap: 6px;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    color: #a6b4c4;
-    border: 1px solid rgba(197, 211, 224, 0.16);
+    color: rgba(white, 0.75);
+    border: 1px solid rgba(white, 0.14);
     border-radius: 2px;
-    background-color: rgba(7, 11, 16, 0.35);
+    background-color: rgba(26, 27, 30, 0.85);
     cursor: pointer;
 }
 
-Scoreboard .add-bot label { font-size: 12px; white-space: nowrap; }
+Scoreboard .add-bot label { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; white-space: nowrap; }
 Scoreboard .add-bot i { font-size: 16px; }
-Scoreboard .add-bot:hover { color: white; background-color: rgba(197, 211, 224, 0.12); }
+Scoreboard .add-bot:hover { color: white; border-color: $sb-accent; background-color: #242426; }
 
 Scoreboard .scoreboard-columns,
 Scoreboard .scoreboard-row {
     width: 100%;
-    padding: 6px 12px 6px 8px;
+    padding: 4px 14px 4px 8px;
     align-items: center;
     flex-shrink: 0;
-    border-left: 2px solid transparent;
+    border-left: 3px solid transparent;
 }
 
 Scoreboard .scoreboard-columns {
-    min-height: 34px;
-    background-color: rgba(185, 202, 220, 0.035);
-    border-bottom: 1px solid rgba(197, 211, 224, 0.06);
+    min-height: 30px;
+    background-color: rgba(black, 0.3);
+    border-bottom: 1px solid $sb-line;
 }
 
 Scoreboard .scoreboard-columns label {
-    font-size: 12px;
-    color: #98a5b5;
-    font-weight: 500;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: $sb-faint;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
 }
 
 Scoreboard .scoreboard-row {
-    min-height: 60px;
-    border-bottom: 1px solid rgba(197, 211, 224, 0.055);
-    background-color: rgba(255, 255, 255, 0.012);
+    min-height: 50px;
+    border-bottom: 1px solid rgba(white, 0.04);
 }
 
-Scoreboard .scoreboard-row:hover { background-color: rgba(190, 206, 222, 0.065); }
+Scoreboard .scoreboard-row:hover { background-color: rgba(white, 0.045); }
 
 Scoreboard .scoreboard-row.local {
-    border-left-color: #e7edf3;
-    background-color: rgba(189, 207, 226, 0.12);
+    border-left-color: $sb-accent;
+    background-image: linear-gradient(to right, rgba($sb-accent, 0.2), rgba($sb-accent, 0.04));
 }
 
-Scoreboard .scoreboard-row.local .placement,
-Scoreboard .scoreboard-row.local .player-label { color: #ffffff; }
+Scoreboard .scoreboard-row.local .placement { color: $sb-accent; }
+Scoreboard .scoreboard-row.local .player-label { color: white; }
 
 Scoreboard .col {
     flex-shrink: 0;
@@ -239,14 +270,17 @@ Scoreboard .col {
 }
 
 Scoreboard .placement {
-    width: 30px;
-    flex-basis: 30px;
+    width: 32px;
+    flex-basis: 32px;
     justify-content: center;
     text-align: center;
-    font-size: 12px;
-    font-weight: 500;
-    color: #758498;
+    font-family: $hud-font;
+    font-size: 16px;
+    font-weight: bold;
+    color: $sb-faint;
 }
+
+Scoreboard .scoreboard-columns .placement { font-family: Chakra Petch; font-size: 11px; }
 
 Scoreboard .playername {
     min-width: 0;
@@ -261,25 +295,25 @@ Scoreboard .playername {
 Scoreboard .portrait,
 Scoreboard .portrait PlayerAvatar,
 Scoreboard .bot-avatar {
-    width: 36px;
-    height: 36px;
+    width: 34px;
+    height: 34px;
     flex-shrink: 0;
 }
 
 Scoreboard .portrait { align-items: center; justify-content: center; }
 Scoreboard .bot-avatar { border: 1px solid transparent; border-radius: 2px; }
-Scoreboard .dead .portrait { filter: saturate(0.25) brightness(55%); }
+Scoreboard .dead .portrait { filter: saturate(0.2) brightness(50%); }
 
 Scoreboard .player-identity {
     flex-direction: column;
     min-width: 0;
     width: 0;
     flex-grow: 1;
-    gap: 2px;
+    gap: 1px;
 }
 
 Scoreboard .name-line {
-    height: 24px;
+    height: 22px;
     align-items: center;
     gap: 4px;
     min-width: 0;
@@ -287,41 +321,45 @@ Scoreboard .name-line {
 
 Scoreboard .name-line.inspectable { cursor: pointer; }
 Scoreboard .name-line.inspectable:hover .player-label { color: white; }
-Scoreboard .name-line.inspectable:hover .sharing-arrow { opacity: 1; }
+Scoreboard .name-line.inspectable:hover .sharing-arrow { opacity: 1; color: $sb-accent; }
 
 Scoreboard .player-label {
     min-width: 0;
     flex-shrink: 1;
-    font-size: 17px;
+    font-size: 16px;
     font-weight: 600;
-    color: #dce3eb;
+    color: #E6E8EA;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
 }
 
+Scoreboard .dead .player-label { color: rgba(white, 0.42); }
+
 Scoreboard .prestige {
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
     margin: -4px 0;
     flex-shrink: 0;
 }
 
-Scoreboard .sharing-arrow { font-size: 16px; opacity: 0.35; flex-shrink: 0; }
+Scoreboard .leader-crown { flex-shrink: 0; margin-left: 2px; background-image-tint: $hud-warn; }
+
+Scoreboard .sharing-arrow { font-size: 16px; opacity: 0.3; flex-shrink: 0; }
 
 Scoreboard .player-meta {
-    height: 22px;
+    height: 18px;
     align-items: center;
     gap: 5px;
     min-width: 0;
-    color: #8190a2;
+    color: $sb-faint;
 }
 
-Scoreboard .latency { font-size: 12px; font-weight: 500; white-space: nowrap; }
-Scoreboard .connection-icon { font-size: 12px; color: #6c8297; }
+Scoreboard .latency { font-size: 11px; font-weight: 600; white-space: nowrap; }
+Scoreboard .connection-icon { font-size: 12px; color: $sb-faint; }
 Scoreboard .connection-lost { background-image-tint: #e38484; }
-Scoreboard .local-marker { font-size: 14px; color: #e7edf3; }
-Scoreboard .bot-prefix { font-size: 11px; font-weight: 700; letter-spacing: 0.8px; }
+Scoreboard .local-marker { font-size: 14px; color: $sb-accent; }
+Scoreboard .bot-prefix { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; }
 
 Scoreboard .row-actions {
     margin-left: auto;
@@ -333,13 +371,13 @@ Scoreboard .row-actions {
 
 Scoreboard .mute-toggle {
     width: 26px;
-    height: 22px;
+    height: 20px;
     align-items: center;
     justify-content: center;
-    border: 1px solid rgba(176, 196, 216, 0.12);
+    border: 1px solid rgba(white, 0.1);
     border-radius: 2px;
-    background-color: rgba(176, 196, 216, 0.04);
-    color: #8fa0b4;
+    background-color: rgba(white, 0.03);
+    color: $sb-muted;
     cursor: pointer;
     flex-shrink: 0;
 }
@@ -347,56 +385,61 @@ Scoreboard .mute-toggle {
 Scoreboard .mute-toggle i { font-size: 14px; }
 
 Scoreboard .mute-toggle:hover {
-    background-color: rgba(176, 196, 216, 0.18);
-    border-color: rgba(176, 196, 216, 0.3);
+    background-color: #242426;
+    border-color: $sb-accent;
     color: white;
 }
 
 Scoreboard .mute-toggle.muted,
 Scoreboard .kick-bot:hover {
     background-color: rgba(211, 78, 82, 0.16);
-    border-color: rgba(233, 113, 117, 0.35);
+    border-color: rgba(233, 113, 117, 0.4);
     color: #ee999b;
 }
 
 Scoreboard .stat {
-    width: 66px;
-    flex-basis: 66px;
+    width: 70px;
+    flex-basis: 70px;
     padding: 0 3px;
     justify-content: center;
     text-align: center;
-    font-size: 18px;
-    font-weight: 500;
+    font-family: $hud-font;
+    font-size: 20px;
+    font-weight: bold;
+    color: rgba(white, 0.8);
     white-space: nowrap;
 }
 
 Scoreboard .score-value {
     width: 84px;
     flex-basis: 84px;
-    color: #f5f7fa;
-    font-weight: 700;
+    color: white;
 }
-
-Scoreboard .scoreboard-columns .score-value { color: #c6d2df; font-weight: 600; }
 
 Scoreboard .balance-value {
     width: 92px;
     flex-basis: 92px;
-    font-size: 16px;
+    font-size: 18px;
 }
 
+Scoreboard .dead .stat { color: rgba(white, 0.45); }
+
+// The column headings are words: Chakra Petch, small and spaced, over the numbers.
+Scoreboard .scoreboard-columns .stat { font-family: Chakra Petch; font-size: 11px; color: $sb-faint; }
+Scoreboard .scoreboard-columns .score-value { color: $sb-muted; }
+
 Scoreboard .empty-team {
-    min-height: 144px;
+    min-height: 140px;
     flex-grow: 1;
     align-items: center;
     justify-content: center;
     flex-direction: column;
     gap: 8px;
-    color: #738296;
+    color: $sb-faint;
 }
 
 Scoreboard .empty-team i { font-size: 30px; }
-Scoreboard .empty-team label { font-size: 13px; font-weight: 500; }
+Scoreboard .empty-team label { font-size: 11px; font-weight: 700; letter-spacing: 2px; }
 
 Scoreboard .round-history {
     justify-content: center;
@@ -410,93 +453,100 @@ Scoreboard .spectator-list {
     align-items: center;
     gap: 9px;
     padding: 9px 12px;
-    background-color: rgba(174, 191, 208, 0.035);
+    background-color: rgba(black, 0.24);
+    border: 1px solid $sb-line;
 }
 
-Scoreboard .spectator-heading { font-size: 12px; color: #8493a6; margin-right: 6px; }
+Scoreboard .spectator-heading { font-size: 11px; font-weight: 700; letter-spacing: 2px; color: $sb-muted; margin-right: 6px; }
 
 Scoreboard .spectator-name {
     font-size: 13px;
-    color: #b7c3d1;
+    color: rgba(white, 0.75);
     padding: 3px 6px;
     cursor: pointer;
 }
 
-Scoreboard .spectator-name:hover { background-color: rgba(174, 191, 208, 0.1); color: white; }
+Scoreboard .spectator-name:hover { background-color: rgba(white, 0.08); color: white; }
+
+// Voice: the channel as the menus' segmented choice, the picked one in orange.
 
 Scoreboard .communications {
     flex-wrap: wrap;
     align-items: center;
-    padding: 13px 24px;
+    padding: 12px 24px;
     gap: 14px;
     flex-shrink: 0;
-    border-top: 1px solid rgba(197, 211, 224, 0.12);
-    background-color: rgba(5, 9, 14, 0.24);
+    border-top: 1px solid $sb-line;
+    background-color: rgba(black, 0.28);
 }
 
-Scoreboard .voice-label { align-items: center; gap: 8px; color: #8999ac; flex-shrink: 0; }
-Scoreboard .voice-label i { font-size: 18px; }
-Scoreboard .voice-label label { font-size: 13px; font-weight: 500; }
+Scoreboard .voice-label { align-items: center; gap: 8px; color: $sb-muted; flex-shrink: 0; }
+Scoreboard .voice-label i { font-size: 18px; color: $sb-accent; }
+Scoreboard .voice-label label { font-size: 11px; font-weight: 700; letter-spacing: 2px; }
 
 Scoreboard .voice-options {
-    padding: 3px;
-    gap: 3px;
-    border: 1px solid rgba(174, 191, 208, 0.1);
-    border-radius: 3px;
-    background-color: rgba(4, 7, 11, 0.65);
+    padding: 2px;
+    gap: 2px;
+    border: 1px solid rgba(white, 0.1);
+    border-radius: 2px;
+    background-color: rgba(black, 0.4);
     flex-shrink: 0;
 }
 
 Scoreboard .voice-option {
-    height: 28px;
-    padding: 4px 16px;
+    height: 30px;
+    padding: 0 16px;
     align-items: center;
     justify-content: center;
-    font-size: 14px;
-    font-weight: 600;
-    color: #8696a9;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: rgba(white, 0.6);
     border-radius: 2px;
     cursor: pointer;
 }
 
-Scoreboard .voice-option:hover { color: white; background-color: rgba(174, 191, 208, 0.08); }
-Scoreboard .voice-option.selected { color: #f3f6f9; background-color: #354354; }
+Scoreboard .voice-option:hover { color: white; background-color: rgba(white, 0.07); }
+Scoreboard .voice-option.selected { color: #08090B; background-color: $sb-accent; }
 
 Scoreboard .proximity-option {
+    height: 34px;
     margin-left: auto;
-    padding: 7px 11px;
+    padding: 0 12px;
     gap: 7px;
     align-items: center;
-    border: 1px solid rgba(174, 191, 208, 0.15);
+    border: 1px solid rgba(white, 0.14);
     border-radius: 2px;
-    color: #8b9aab;
+    background-color: rgba(26, 27, 30, 0.85);
+    color: rgba(white, 0.6);
     cursor: pointer;
 }
 
 Scoreboard .proximity-option i { font-size: 17px; }
-Scoreboard .proximity-option label { font-size: 13px; font-weight: 500; }
-Scoreboard .proximity-option:hover { color: white; border-color: rgba(174, 191, 208, 0.4); }
-Scoreboard .proximity-option.selected { color: #d5e9e0; border-color: rgba(136, 187, 163, 0.5); background-color: rgba(103, 160, 133, 0.1); }
+Scoreboard .proximity-option label { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; }
+Scoreboard .proximity-option:hover { color: white; border-color: $sb-accent; background-color: #242426; }
+Scoreboard .proximity-option.selected { color: white; border-color: rgba($sb-accent, 0.75); background-color: rgba($sb-accent, 0.12); }
+Scoreboard .proximity-option.selected i { color: $sb-accent; }
 
 Scoreboard .scoreboard-footer {
     align-items: center;
     gap: 18px;
-    padding: 10px 24px;
+    padding: 9px 24px 11px;
     flex-shrink: 0;
 }
 
 Scoreboard .sharing-hint {
     flex-grow: 1;
     min-width: 0;
-    font-size: 13px;
-    color: #7f8ea1;
+    font-size: 12px;
+    color: $sb-faint;
     font-weight: 500;
 }
 
 Scoreboard .scoreboard-key { align-items: center; gap: 7px; flex-shrink: 0; }
-Scoreboard .scoreboard-key label { font-size: 11px; color: #8b9aac; font-weight: 500; }
+Scoreboard .scoreboard-key label { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; color: $sb-muted; }
 
-Scoreboard.compact .match-heading { gap: 16px; padding: 18px 24px; }
+Scoreboard.compact .match-heading { gap: 16px; padding: 14px 24px; }
 Scoreboard.compact .match-title { font-size: 26px; }
 Scoreboard.compact .match-clock { padding-left: 16px; }
 Scoreboard.compact .scoreboard-body { padding: 16px 20px; }

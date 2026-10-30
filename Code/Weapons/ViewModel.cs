@@ -154,9 +154,13 @@ public partial class ViewModel : WeaponModel, ICameraSetup, IGameEventHandler<Pl
 		ModelRenderer?.SetBool( "b_deploy_skip", true );
 	}
 
+	// Keeps teammates' glow off this gun while it's the viewer's (TeammateOcclusionGlow).
+	private HighlightOutline _teammateGlowShield;
+
 	protected override void OnUpdate()
 	{
 		UpdateInspect();
+		TeammateOcclusionGlow.UpdateShield( this, ref _teammateGlowShield );
 
 		if ( ModelRenderer.IsValid() )
 		{

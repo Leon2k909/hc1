@@ -144,23 +144,36 @@ PS
     CreateInputTexture2D( Pattern, Linear, 8, "", "",  "Pattern,11/2", Default( 1.0 ) );
     Texture2D g_tPattern < Channel( R, Box( Pattern ), Linear ); OutputFormat( BC7 ); SrgbRead( false ); >;
 	
+
+	// The scene's distance at a pixel. The private highlight target uses projection
+	// Z already; only the sampled scene depth needs the scene's layer range.
+	float CoverDistance( float2 pixel )
+	{
+		pixel = clamp( pixel, 0.0f, 1.0f / g_vInvViewportSize - 1.0f );
+		float depth = Depth::Get( pixel );
+		float layer = ( depth - g_flViewportMinZ ) / ( g_flViewportMaxZ - g_flViewportMinZ );
+		return Depth::Linearize( saturate( layer ), pixel );
+	}
 	//
 	// Main
 	//
 	float4 MainPs( PixelInput i ): SV_Target
 	{
-        // The private highlight target uses projection Z already. Normalize
-        // only the sampled scene depth, which includes the scene's layer range.
+        // A pixel is hidden only where cover stands in front of the character across
+        // its whole 3x3 neighbourhood. A single depth tap reads the nearer surface
+        // at the character's own depth edges (a vest's hem over the shirt, belts,
+        // pockets) and on sloped triangles, which lit visible teammates.
         float2 pixelPosition = i.vPositionSs.xy - g_vViewportOffset;
         float2 screenUv = CalculateViewportUv( i.vPositionSs.xy );
-        float objectDepth = i.vPositionSs.z;
-        float worldDepth = Depth::GetNormalized( pixelPosition );
-        float objectDistance = Depth::Linearize( objectDepth, pixelPosition );
-        float worldDistance = Depth::Linearize( worldDepth, pixelPosition );
-        // A tiny world-space tolerance prevents the character's own surface
-        // being mistaken for cover, including flat arm/armour triangles.
-        float tolerance = max( 0.12f, fwidth( objectDistance ) * 0.25f );
-        bool hidden = objectDistance > worldDistance + tolerance;
+        float objectDistance = Depth::Linearize( i.vPositionSs.z, pixelPosition );
+        float coverDistance = 0.0f;
+        [unroll] for ( int y = -1; y <= 1; y++ )
+            [unroll] for ( int x = -1; x <= 1; x++ )
+                coverDistance = max( coverDistance, CoverDistance( pixelPosition + float2( x, y ) ) );
+        // About a pixel and a half of world size at that distance, for LOD and
+        // depth precision, and never under a quarter inch.
+        float pixelSize = objectDistance * 2.0f * g_vInvViewportSize.y / g_matViewToProjection[1][1];
+        bool hidden = objectDistance > coverDistance + max( 0.25f, pixelSize * 1.5f );
         float4 vColor = hidden ? _ColorOccluded : _ColorMain;
 
 		// Add pattern to alpha

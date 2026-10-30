@@ -1,0 +1,153 @@
+// Teammate glow regression: one dressed character per isolated scene, visible, partly behind cover, hidden, and
+// behind a first-person-gun stand-in drawn in the overlay layer (with and without a transparent shield outline on it,
+// as TeammateOcclusionGlow.UpdateShield puts on the viewer's gun). Writes PNGs and native-result.json only; it doesn't
+// change the edited scene or play state. Compare each "-installed" image with its "-off" one: a visible teammate and the
+// shielded gun should match, the hidden one glow. Run with run_csharp and this file's absolute path.
+var root = Sandbox.Project.Current.GetRootPath();
+var folder = System.IO.Path.Combine( root, "output/teammate-glow/fix-20261027/installed" );
+System.IO.Directory.CreateDirectory( folder );
+var session = Editor.SceneEditorSession.Active;
+var source = session?.Scene;
+var sourceId = source?.Id;
+var playing = Game.IsPlaying;
+var dirty = session?.HasUnsavedChanges;
+var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
+var beforeRender = typeof( Scene ).GetMethod( "PreRender", flags, null, Type.EmptyTypes, null );
+var beforeCamera = typeof( Scene ).GetMethod( "PreCameraRender", flags, null, Type.EmptyTypes, null );
+var updateCamera = typeof( PostProcessSystem ).GetMethod( "UpdateCamera", flags );
+var style = typeof( Facepunch.PlayerPawn ).Assembly.GetType( "Facepunch.TeammateOcclusionGlow" )
+	.GetMethod( "Apply", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic );
+
+var trials = new System.Collections.Generic.Dictionary<string, string> { ["installed"] = "shaders/hc1_teammate_occlusion.shader" };
+var shieldMethod = typeof( Facepunch.PlayerPawn ).Assembly.GetType( "Facepunch.TeammateOcclusionGlow" )
+	.GetMethod( "UpdateShield", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic );
+var materials = trials.ToDictionary( t => t.Key, t => Material.FromShader( t.Value ) );
+
+var cases = new[]
+{
+	( Name: "front200", Distance: 200f, Yaw: 180f, Female: false, Style: Facepunch.MilitaryUniformStyle.Standard, Duck: 0f, Move: 0f ),
+	( Name: "side350", Distance: 350f, Yaw: 75f, Female: false, Style: Facepunch.MilitaryUniformStyle.Field, Duck: 0f, Move: 0f ),
+	( Name: "run550", Distance: 550f, Yaw: 160f, Female: false, Style: Facepunch.MilitaryUniformStyle.Tactical, Duck: 0f, Move: 200f ),
+	( Name: "back850", Distance: 850f, Yaw: 0f, Female: false, Style: Facepunch.MilitaryUniformStyle.Tactical, Duck: 0f, Move: 0f ),
+	( Name: "crouch240", Distance: 240f, Yaw: 150f, Female: true, Style: Facepunch.MilitaryUniformStyle.Standard, Duck: 1f, Move: 0f ),
+};
+var results = new System.Collections.Generic.List<object>();
+foreach ( var entry in cases )
+{
+	cancellationToken.ThrowIfCancellationRequested();
+	var scene = new Scene();
+	try
+	{
+		CameraComponent camera; ModelRenderer wall; ModelRenderer gun; GameObject actor; HighlightOutline outline; SkinnedModelRenderer renderer;
+		using ( scene.Push() )
+		{
+			camera = new GameObject( true, "Glow test camera" ).AddComponent<CameraComponent>();
+			camera.WorldPosition = new Vector3( 0, 0, 60 );
+			camera.WorldRotation = Rotation.LookAt( new Vector3( entry.Distance, 0, 36 ) - camera.WorldPosition );
+			camera.FieldOfView = 60; camera.FovAxis = CameraComponent.Axis.Vertical;
+			camera.CustomSize = new Vector2( 1280, 720 );
+			camera.ZNear = 1; camera.ZFar = 100000;
+			camera.BackgroundColor = new Color( .12f, .12f, .12f );
+			camera.IsMainCamera = true; camera.EnablePostProcessing = true;
+			camera.Components.Create<Highlight>();
+			var sun = new GameObject( true, "Glow test light" ).AddComponent<DirectionalLight>();
+			sun.WorldRotation = Rotation.From( new Angles( 35, -125, 0 ) );
+			sun.LightColor = Color.White; sun.SkyColor = Color.White * .5f;
+			var floor = new GameObject( true, "Glow test floor" ).AddComponent<ModelRenderer>();
+			floor.Model = Model.Cube; floor.Tint = new Color( .45f, .43f, .4f );
+			floor.WorldPosition = new Vector3( entry.Distance, 0, -2 );
+			floor.WorldScale = new Vector3( 4000, 4000, 4 ) / floor.Model.Bounds.Size;
+			wall = new GameObject( true, "Glow test cover" ).AddComponent<ModelRenderer>();
+			wall.Model = Model.Cube; wall.Tint = new Color( .32f, .32f, .32f ); wall.Enabled = false;
+			// A first-person-gun stand-in: drawn in the overlay layer, close to the eye, over the teammate's left half.
+			gun = new GameObject( true, "Glow test overlay" ).AddComponent<ModelRenderer>();
+			gun.Model = Model.Cube; gun.Tint = new Color( .25f, .1f, .35f );
+			gun.RenderOptions.Game = false; gun.RenderOptions.Overlay = true;
+			gun.Enabled = false;
+			actor = new GameObject( true, "Glow test teammate" );
+			actor.WorldPosition = new Vector3( entry.Distance, 0, 0 );
+			actor.WorldRotation = Rotation.FromYaw( entry.Yaw );
+			renderer = actor.AddComponent<SkinnedModelRenderer>();
+			Facepunch.MilitaryUniform.SetModel( renderer, Model.Load( entry.Female
+				? Facepunch.MilitaryUniform.FemaleHumanModelPath : Facepunch.MilitaryUniform.HumanModelPath ), entry.Style );
+			renderer.Set( "holdtype", 1 ); renderer.Set( "duck", entry.Duck );
+			renderer.Set( "move_x", entry.Move ); renderer.Set( "move_speed", entry.Move ); renderer.Set( "wish_x", entry.Move );
+			outline = actor.AddComponent<HighlightOutline>();
+			style.Invoke( null, new object[] { outline, new Color( .02f, .57f, .92f ) } );
+			outline.Enabled = false;
+		}
+
+		async Task Frame( float delta, string path = null )
+		{
+			using ( scene.Push() )
+			{
+				scene.EditorTick( delta, delta );
+				typeof( Scene ).GetProperty( "Camera", flags ).SetValue( scene, camera );
+				beforeRender.Invoke( scene, null );
+				beforeCamera.Invoke( scene, null );
+				updateCamera.Invoke( scene.GetSystem<PostProcessSystem>(), new object[] { camera } );
+				using var bitmap = new Bitmap( 1280, 720 );
+				camera.RenderToBitmap( bitmap, false );
+				if ( path is not null ) System.IO.File.WriteAllBytes( path, bitmap.ToPng() );
+			}
+			await Task.Delay( 12, cancellationToken );
+		}
+
+		for ( var frame = 0; frame < 20; ++frame ) await Frame( .016f );
+		// The frame without the actor gives its silhouette.
+		actor.Enabled = false;
+		for ( var frame = 0; frame < 3; ++frame ) await Frame( 0, frame == 2 ? System.IO.Path.Combine( folder, entry.Name + "-empty.png" ) : null );
+		actor.Enabled = true;
+		var targets = outline.GetOutlineTargets().Count();
+		foreach ( var cover in new[] { "visible", "partial", "hidden", "overlay" } )
+		{
+			wall.Enabled = cover is "partial" or "hidden";
+			gun.Enabled = cover == "overlay";
+			if ( gun.Enabled )
+			{
+				var toward = ( new Vector3( entry.Distance, 0, 36 ) - camera.WorldPosition ).Normal;
+				gun.WorldPosition = camera.WorldPosition + toward * 30 + camera.WorldRotation.Left * 0.9f;
+				gun.WorldRotation = camera.WorldRotation;
+				gun.WorldScale = new Vector3( 2, 1.8f, 12 ) / gun.Model.Bounds.Size;
+			}
+			wall.WorldPosition = new Vector3( entry.Distance * .65f, cover == "partial" ? entry.Distance * .04f : 0, cover == "partial" ? 25 : 40 );
+			wall.WorldScale = new Vector3( 8, cover == "partial" ? entry.Distance * .08f : 400, cover == "partial" ? 50 : 90 ) / wall.Model.Bounds.Size;
+			outline.Enabled = false;
+			for ( var frame = 0; frame < 3; ++frame )
+				await Frame( 0, frame == 2 ? System.IO.Path.Combine( folder, $"{entry.Name}-{cover}-off.png" ) : null );
+			outline.Enabled = true;
+			foreach ( var trial in materials )
+			{
+				outline.Material = trial.Value;
+				for ( var frame = 0; frame < 3; ++frame )
+					await Frame( 0, frame == 2 ? System.IO.Path.Combine( folder, $"{entry.Name}-{cover}-{trial.Key}.png" ) : null );
+			}
+			if ( cover != "overlay" ) continue;
+			// The same with a transparent outline on the gun, which puts it in the glow's own depth buffer.
+			HighlightOutline shield;
+			using ( scene.Push() )
+			{
+				shield = gun.GameObject.AddComponent<HighlightOutline>();
+				shield.Width = 0; shield.Color = Color.Transparent; shield.ObscuredColor = Color.Transparent;
+				shield.InsideColor = Color.Transparent; shield.InsideObscuredColor = Color.Transparent;
+			}
+			foreach ( var trial in materials )
+			{
+				outline.Material = trial.Value;
+				shield.Material = trial.Value;
+				for ( var frame = 0; frame < 3; ++frame )
+					await Frame( 0, frame == 2 ? System.IO.Path.Combine( folder, $"{entry.Name}-shield-{trial.Key}.png" ) : null );
+			}
+			outline.Enabled = false;
+			for ( var frame = 0; frame < 3; ++frame )
+				await Frame( 0, frame == 2 ? System.IO.Path.Combine( folder, $"{entry.Name}-shield-off.png" ) : null );
+		}
+		results.Add( new { entry.Name, entry.Distance, Targets = targets } );
+	}
+	finally { scene.Destroy(); }
+}
+var preserved = ReferenceEquals( session, Editor.SceneEditorSession.Active ) && source?.Id == sourceId
+	&& Game.IsPlaying == playing && session?.HasUnsavedChanges == dirty;
+var result = new { EditorStatePreserved = preserved, ShieldCodeLoaded = shieldMethod is not null, Trials = trials, Cases = results };
+System.IO.File.WriteAllText( System.IO.Path.Combine( folder, "native-result.json" ), System.Text.Json.JsonSerializer.Serialize( result ) );
+return result;

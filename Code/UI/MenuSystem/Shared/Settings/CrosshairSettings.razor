@@ -11,6 +11,7 @@
         <button class="ch-tab @(_tab == "hit" ? "selected" : "")" @onmousedown=@(() => SetTab( "hit" ))>@Tr( "Hit Marker" )</button>
     </div>
 
+    <div class="ch-body">
     <div class="ch-scroll">
     @if ( _tab == "crosshair" )
     {
@@ -34,6 +35,17 @@
             <button class="ch-chip @(Cfg.HideOnAds ? "selected" : "")" @onmousedown=@(() => { Cfg.HideOnAds = true; Save(); })>@Tr( "On" )</button>
             <button class="ch-chip @(!Cfg.HideOnAds ? "selected" : "")" @onmousedown=@(() => { Cfg.HideOnAds = false; Save(); })>@Tr( "Off" )</button>
         </div>
+
+        @if ( Cfg.Style == "hc1" )
+        {
+            @* HC1's own crosshair (Crosshair.cs) reads these game settings; they had shown only in a search. *@
+            <div class="ch-native">
+                @foreach ( var property in NativeSettings )
+                {
+                    <SettingEntry Target=@GameSettingsSystem.Current Description=@property />
+                }
+            </div>
+        }
 
         @if ( Cfg.Style == "custom" )
         {
@@ -164,7 +176,7 @@
             @foreach ( var v in DurationSteps )
             {
                 var val = v;
-                <button class="ch-chip @(Cfg.HitDuration == val ? "selected" : "")" @onmousedown=@(() => { Cfg.HitDuration = val; Save(); })>@val</button>
+                <button class="ch-chip @(Cfg.HitDuration == val ? "selected" : "")" @onmousedown=@(() => { Cfg.HitDuration = val; Save(); Preview?.PlayHit(); })>@val</button>
             }
         </div>
 
@@ -193,13 +205,14 @@
                 }
             </div>
         }
-
-        <button class="ch-btn" @onmousedown=TestHit>@Tr( "Preview Hit" )</button>
     }
 
     <div class="ch-footer">
         <button class="ch-btn subtle" @onmousedown=ResetDefaults>@Tr( "Reset Defaults" )</button>
     </div>
+    </div>
+
+    <CrosshairPreview @ref="Preview" Mode=@_tab />
     </div>
 </root>
 
@@ -223,6 +236,11 @@
 
     CrosshairConfig Cfg => CrosshairManager.Config;
 
+    CrosshairPreview Preview { get; set; }
+
+    static IEnumerable<PropertyDescription> NativeSettings =>
+        TypeLibrary.GetPropertyDescriptions( GameSettingsSystem.Current ).Where( x => x.Group == "Crosshair" );
+
     void SetTab( string tab )
     {
         _tab = tab;
@@ -239,17 +257,13 @@
     {
         Cfg.HitStyle = style;
         Save();
+        Preview?.PlayHit();
     }
 
     void Save()
     {
         CrosshairManager.SaveConfig();
         StateHasChanged();
-    }
-
-    void TestHit()
-    {
-        CrosshairManager.TriggerHit();
     }
 
     void ResetDefaults()
