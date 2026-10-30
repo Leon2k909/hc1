@@ -52,12 +52,14 @@ def main():
                 'forestbase_current' if name=='waterfall_current' else 'forestbase_foam')
         footprint=' EllipticalFootprint "1"\n' if name=='waterfall_foam' else ''
         basin=' ConstrainPlungeBasin "1"\n' if name in ('waterfall_spray','waterfall_foam') else ''
+        mist_strength=' MistStrength "1.8"\n' if name=='waterfall_spray' else ''
         K.write_text(OUT/f'{name}.vmat', f'''"Layer0"
 {{
  shader "shaders/{shader}.shader"
  SplashMask "{RESOURCE}/{name}_mask.png"
 {footprint}
 {basin}
+{mist_strength}
 }}
 ''')
     K.write_text(OUT/'waterfall.vmat', f'''"Layer0"
@@ -79,7 +81,7 @@ def main():
 {{
  shader "shaders/forestbase_mist.shader"
  SplashMask "{RESOURCE}/waterfall_spray_mask.png"
- MistStrength "2.0"
+ MistStrength "3.2"
  ConstrainPlungeBasin "1"
 }}
 ''')
