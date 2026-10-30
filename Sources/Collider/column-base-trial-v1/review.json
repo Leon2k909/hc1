@@ -1,7 +1,7 @@
 {
-  "status": "preview-ready-awaiting-user-approval",
-  "userApproved": false,
-  "installedInMap": false,
+  "status": "accepted-installed-in-map-sources",
+  "userApproved": true,
+  "installedInMap": true,
   "oldAssetRetained": true,
   "editorUsed": false,
   "engineCompilation": "pending",
@@ -466,5 +466,14 @@
     },
     "actualColumnContextExtendsAboveCloseup": true
   },
-  "additionalComponentOnlyComparison": "output/asset-improvement-20261030/column-base/base-only-review/verification.json"
+  "additionalComponentOnlyComparison": "output/asset-improvement-20261030/column-base/base-only-review/verification.json",
+  "acceptance": {
+    "userMessage": "alright if u think its better than do it",
+    "recordedUTC": "2026-10-30T15:53:17.686007+00:00",
+    "installationReceipt": "Sources/Collider/column-base-trial-v1/installed.json",
+    "verification": "output/collider-column-base-accepted-20261030/verification.json",
+    "editorUsed": false,
+    "engineCompilation": "pending",
+    "fullColumnComparisonRender": "stopped on approval to free resources; before frame only"
+  }
 }

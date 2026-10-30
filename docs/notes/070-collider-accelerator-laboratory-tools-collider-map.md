@@ -1,13 +1,18 @@
 ## Collider (accelerator laboratory, `Tools/collider_map.py`)
-- Column-base proposal (2026-10-30): private review of the plain base at plan `(-960,-500,0)`.
-  `Sources/Collider/column-base-trial-v1/` copies all 12 saved base triangles/UVs/normals from `collider_structure.obj`.
-  The 35,002-triangle candidate adds chipped grout, bevelled steel, eight threaded anchors/open washers/hex nuts,
-  six welded stiffeners, physical weld beads, localized coating loss/metalness and fastener dirt/oxidation.
-  The actual 36-triangle H-column is unchanged, render-only context outside Assets. Comparison framing is a base
-  close-up; both views retain the same column/camera/scale/lights. Original/map sources and prior accepted props stay
-  unchanged until user approval. New hardware fits the existing base/column clip envelope. Evidence:
-  `output/asset-improvement-20261030/column-base/`. One idle-priority two-thread CPU render, no editor/GPU;
-  native import/appearance/LOD/performance pending.
+- Column base accepted (2026-10-30): the base beside B1 LABS, left of the stairs up to CONTROL, at plan
+  `(-960,-500,0)`. The user approved applying it after the room-context view. Exactly 12 original base triangles
+  were replaced with the reviewed 35,002-triangle mesh: chipped grout, bevelled steel, eight threaded anchors,
+  open washers/hex nuts, six welded stiffeners, physical weld beads and localized coating loss/fastener oxidation.
+  Eight private material bindings and exact approved positions/UVs/normals are retained. Structure is now 284,871
+  triangles. The complete original column, unrelated original face lines/attributes, saved scene, all physics,
+  other three bases and prior accepted props are preserved. `Tools/collider_column_base.py` and selected
+  `collider_map.column_base` branch preserve the new mesh and original collision during regeneration.
+  Old standalone before resources removed; rollback is outside Assets. Matching primary staged structure files
+  were synchronized. `Sources/Collider/column-base-trial-v1/installed.json` and
+  `output/collider-column-base-accepted-20261030/` record integration. These structure hashes supersede historical
+  acceptance guards. Existing offline evidence: `output/asset-improvement-20261030/column-base/`; the unfinished
+  full-column comparison render was stopped on approval to free resources. No editor/GPU used; native
+  import/appearance/LOD/performance pending.
 - Cooling unit accepted (2026-10-30): refined proposal at plan origin `(-1470,1702,20)` replaces exactly 170 old
   render triangles with 45,890 approved triangles. Machine mesh is now 182,141 triangles. Fourteen private material
   bindings and exact approved positions/UVs/normals are retained. All unrelated original face lines/attribute

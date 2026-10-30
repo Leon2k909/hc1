@@ -31,6 +31,7 @@ import collider_chair as CH
 import collider_valve as CV
 import collider_console as CCN
 import collider_cooling_unit as CU
+import collider_column_base as CB
 import collider_server_rack as SR
 import collider_wall_seams as W
 import collider_ceiling as CE
@@ -70,7 +71,10 @@ ART_VIEW = {"name":"art","eye":[850,-620,G+74],"target":[-650,500,220],"fov":82}
 
 def configure(m):
     for paint in m.polygons:
-        if paint.startswith('cu_'):
+        if paint.startswith('cb_'):
+            m.material_overrides[paint] = f'{CB.MATERIAL_DIR}/{paint}.vmat'
+            m.tile_overrides[paint] = 12.
+        elif paint.startswith('cu_'):
             m.material_overrides[paint] = f'{CU.MATERIAL_DIR}/{paint}.vmat'
             m.tile_overrides[paint] = 12.
         elif paint.startswith('cp_'):
@@ -114,6 +118,13 @@ def configure(m):
 
 def box(m,e0,e1,n0,n1,z0,z1,paint="co_wall",solid=True):
     m.box((e0,n0,z0),(e1,n1,z1),paint,"metal" if solid else None)
+
+def column_base(m,e,n):
+    if (e,n)==tuple(CB.ORIGIN[:2]):
+        box(m,e-44,e+44,n-44,n+44,0,8,None)
+        CB.append(m)
+    else:
+        box(m,e-44,e+44,n-44,n+44,0,8,'co_trim')
 
 def wall(m,axis,run,across,z,openings=()):
     return A.wall(m,axis,run,across,z,openings,outside="co_wall",inside="co_wall",reveal="co_steel")
@@ -325,7 +336,7 @@ def shell(m,glass):
                 box(m,e-38,e+38,nn-4,nn+4,8,440,"co_steel",False)
             box(m,e-38,e+38,n-38,n+38,440,900,None)
             D.plate(m,(e-38,n-38,440),(e+38,n+38,900),"co_concrete",5)
-            box(m,e-44,e+44,n-44,n+44,0,8,"co_trim")
+            column_base(m,e,n)
             for z in (G-25,G+3,430):
                 box(m,e-40,e+40,n-40,n+40,z,z+5,"co_trim",False)
     for e in range(-1200,1201,300):
