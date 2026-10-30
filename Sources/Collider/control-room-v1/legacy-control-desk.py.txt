@@ -1,0 +1,28 @@
+def control_desk(m,side,n,z,collide=True):
+    """Sloped operator station and chair, against the outer control-room wall."""
+    def part(e0,e1,n0,n1,z0,z1,paint,solid=False):
+        lo,hi=sorted((side*e0,side*e1)); box(m,lo,hi,n+n0,n+n1,z+z0,z+z1,paint,solid)
+    part(1780,1870,-56,56,6,38,"co_steel",collide)
+    part(1776,1874,-59,59,36,40,"co_trim")
+    # The keyboard deck rises toward its screen; it is not a floating flat sign.
+    points=[(side*1755,n-56,z+40),(side*1816,n-56,z+58),
+            (side*1816,n+56,z+58),(side*1755,n+56,z+40)]
+    B.card(m,"co_steel",points,(-side*.3,0,1))
+    for nn in (-56,56):
+        m.beam((side*1755,n+nn,z+40),(side*1816,n+nn,z+58),(3,3),"co_trim")
+    for row in range(4):
+        for col in range(12):
+            e=1765+row*5
+            part(e,e+3,-36+col*5.6,-32+col*5.6,43+(e-1765)*.295,44+(e-1765)*.295,"co_trim")
+    for nn in (42,49):
+        part(1783,1787,nn,nn+3,49,50,"co_beam" if nn==42 else "co_amber")
+    part(1820,1825,-4,4,38,76,"co_trim")
+    monitor(m,(side*1818,n,z+83),(-side,0),100,48,index=int((n+200)//100)%4)
+    # Chair frame and padded seat, with one simple player clip.
+    part(1700,1746,-22,22,0,52,None,collide)
+    part(1706,1740,-20,20,22,27,"co_case")
+    part(1702,1708,-20,20,27,53,"co_case")
+    pipe(m,(side*1723,n,z+4),(side*1723,n,z+22),2.4,"co_trim",10)
+    for nn in (-17,17):
+        m.beam((side*1705,n+nn,z+3),(side*1740,n-nn,z+3),(2.5,3),"co_trim")
+        part(1710,1730,nn-1,nn+1,34,37,"co_trim")

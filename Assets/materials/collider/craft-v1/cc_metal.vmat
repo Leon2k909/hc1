@@ -1,0 +1,15 @@
+// Tools/collider_finish.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    TextureColor "[0.31 0.34 0.35 1]"
+    TextureNormal "materials/railhead/rw_galvanised_normal.png"
+    TextureRoughness "materials/railhead/rw_galvanised_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_flMetalness "0.82"
+    g_flRoughnessScaleFactor "1"
+    g_vTexCoordScale "[1.00000000 1.00000000]"
+    g_vColorTint "[1 1 1 1]"
+    g_flModelTintAmount "1"
+}

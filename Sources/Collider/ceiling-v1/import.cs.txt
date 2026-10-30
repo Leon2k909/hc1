@@ -1,0 +1,84 @@
+// Install only this local ceiling revision through the existing native editor.
+var root=Sandbox.Project.Current.GetRootPath();
+if(root.TrimEnd('\\','/').Replace('\\','/').ToLowerInvariant()!="c:/sbox-projects/hc1/forked-shooter-main")
+    throw new InvalidOperationException("Wrong project");
+var output=System.IO.Path.Combine(root,"output/collider-ceiling-v1-20261027");
+var request=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(output,"import-request.json")));
+var relativeStage=request["stage"].GetValue<string>();
+if(!System.Text.RegularExpressions.Regex.IsMatch(relativeStage,"^output/collider-ceiling-v1-20261027/stage-v[0-9]+$"))
+    throw new InvalidOperationException("Unexpected private stage");
+var stage=System.IO.Path.Combine(root,relativeStage);
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(stage,"manifest.json")));
+var selected=Editor.SceneEditorSession.Active;
+var selectedDirty=selected?.HasUnsavedChanges;
+var session=Editor.SceneEditorSession.All.SingleOrDefault(s=>
+    s.Scene.Source?.ResourcePath?.Equals("scenes/maps/collider/collider.scene",StringComparison.OrdinalIgnoreCase)==true);
+if(Game.IsPlaying || session is null)throw new InvalidOperationException("Requires an open, stopped Collider document");
+var sourceScene=session.Scene.Id;var game=Game.ActiveScene?.Id;var dirty=session.HasUnsavedChanges;
+string Hash(string p)=>System.IO.File.Exists(p)?Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant():null;
+var scenePath=System.IO.Path.Combine(root,"Assets/scenes/maps/Collider/collider.scene");
+var sceneHash=Hash(scenePath);
+var entries=manifest["files"].AsArray();
+foreach(var entry in entries)
+{
+    var relative=entry["relative"].GetValue<string>();
+    if(!new[]{"models/maps/collider/collider_structure.obj","models/maps/collider/collider_structure.mtl",
+        "models/maps/collider/collider_structure.vmdl"}.Contains(relative) &&
+       !(relative.StartsWith("materials/collider/ceiling-v1/") && !relative.Contains("..")))
+        throw new InvalidOperationException("Outside ceiling scope: "+relative);
+    if(Hash(System.IO.Path.Combine(root,"Assets",relative))!=entry["before"]?.GetValue<string>())
+        throw new InvalidOperationException("Target changed; restage against current asset: "+relative);
+    if(Hash(System.IO.Path.Combine(stage,"assets",relative))!=entry["after"].GetValue<string>())
+        throw new InvalidOperationException("Stage changed: "+relative);
+}
+var modelRelative="models/maps/collider/collider_structure.vmdl";
+var marker="\t\t\t{\n\t\t\t\t_class = \"PhysicsShapeList\"";
+var beforeDoc=System.IO.File.ReadAllText(System.IO.Path.Combine(root,"Assets",modelRelative));
+var afterDoc=System.IO.File.ReadAllText(System.IO.Path.Combine(stage,"assets",modelRelative));
+if(beforeDoc[beforeDoc.IndexOf(marker,StringComparison.Ordinal)..]!=afterDoc[afterDoc.IndexOf(marker,StringComparison.Ordinal)..])
+    throw new InvalidOperationException("Collision must remain identical");
+var done=new System.Collections.Generic.List<string>();
+try
+{
+    foreach(var entry in entries)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        var relative=entry["relative"].GetValue<string>();
+        var target=System.IO.Path.Combine(root,"Assets",relative);
+        var backup=System.IO.Path.Combine(stage,"native-before",relative);
+        System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target));
+        if(System.IO.File.Exists(target))
+        {
+            System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(backup));
+            System.IO.File.Copy(target,backup,false);
+        }
+        System.IO.File.WriteAllBytes(target+".ceiling-incoming",System.IO.File.ReadAllBytes(System.IO.Path.Combine(stage,"assets",relative)));
+        System.IO.File.Move(target+".ceiling-incoming",target,true);
+        done.Add(relative);
+    }
+    foreach(var relative in done.OrderBy(p=>p.EndsWith(".vmdl")?3:p.EndsWith(".vmat")?2:0))
+        Editor.AssetSystem.RegisterFile(System.IO.Path.Combine(root,"Assets",relative));
+    foreach(var entry in entries)
+        if(Hash(System.IO.Path.Combine(root,"Assets",entry["relative"].GetValue<string>()))!=entry["after"].GetValue<string>())
+            throw new InvalidOperationException("Asset verification failed");
+}
+catch
+{
+    foreach(var relative in done)
+    {
+        var target=System.IO.Path.Combine(root,"Assets",relative);
+        var backup=System.IO.Path.Combine(stage,"native-before",relative);
+        if(System.IO.File.Exists(backup))System.IO.File.Copy(backup,target,true);
+        else System.IO.File.Delete(target);
+        Editor.AssetSystem.RegisterFile(target);
+    }
+    throw;
+}
+if(Game.IsPlaying || Game.ActiveScene?.Id!=game || selected?.HasUnsavedChanges!=selectedDirty ||
+    !ReferenceEquals(selected,Editor.SceneEditorSession.Active) || session.Scene.Id!=sourceScene ||
+    session.HasUnsavedChanges!=dirty || Hash(scenePath)!=sceneHash)
+    throw new InvalidOperationException("Editor or source scene state changed");
+var result=new{Revision="collider-ceiling-v1",Stage=relativeStage,Imported=done,PhysicsPreserved=true,
+    SourceSceneSha256=sceneHash,EditorStatePreserved=true,CheckedAt=DateTime.UtcNow};
+System.IO.File.WriteAllText(System.IO.Path.Combine(stage,"native-import.json"),Json.Serialize(result));
+return result;

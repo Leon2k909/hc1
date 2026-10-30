@@ -1,0 +1,15 @@
+// Tools/collider_finish.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    TextureColor "materials/collider/ceiling-v1/soffit_color.png"
+    TextureNormal "materials/collider/ceiling-v1/soffit_normal.png"
+    TextureRoughness "materials/collider/ceiling-v1/soffit_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_flMetalness "0.0"
+    g_flRoughnessScaleFactor "1"
+    g_vTexCoordScale "[1.00000000 1.00000000]"
+    g_vColorTint "[1 1 1 1]"
+    g_flModelTintAmount "1"
+}

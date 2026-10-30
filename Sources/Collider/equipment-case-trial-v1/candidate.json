@@ -1,0 +1,75 @@
+{
+  "status": "candidate-only-not-used-by-map",
+  "editorAvailable": false,
+  "engineCompilation": "pending",
+  "baseline": {
+    "source": "Assets/models/maps/collider/collider_detail.obj",
+    "sha256": "41519fab689c6a142a4fc9d72f1f2ef4d94b8b0151dc7c06a44eb3586eaf070a",
+    "sourceOriginPlan": [
+      -1150.0,
+      -350.0,
+      0.0
+    ],
+    "exactHardwareTriangleMatches": 2332,
+    "originalBodyTrianglesCopied": 88,
+    "copiedInstalledGeometryUVsAndNormals": true,
+    "installedBodyDiffersFromCurrentGenerator": true
+  },
+  "models": {
+    "before": {
+      "triangles": 2420,
+      "boundsPlan": [
+        [
+          -52.40000000000009,
+          -30.5,
+          0.0
+        ],
+        [
+          52.40000000000009,
+          30.5,
+          66.5
+        ]
+      ],
+      "materials": {
+        "co_amber": "materials/collider/co_amber.vmat",
+        "co_case": "materials/collider/co_case.vmat",
+        "co_rubber": "materials/collider/co_rubber.vmat",
+        "co_signs": "materials/collider/co_signs.vmat",
+        "co_silver": "materials/collider/co_silver.vmat",
+        "co_trim": "materials/collider/co_trim.vmat"
+      }
+    },
+    "after": {
+      "triangles": 15568,
+      "boundsPlan": [
+        [
+          -50.31,
+          -28.71,
+          0.0
+        ],
+        [
+          50.31,
+          28.84,
+          65.85
+        ]
+      ],
+      "materials": {
+        "tc_panel": "materials/collider/equipment-case-trial-v1/tc_panel.vmat",
+        "tc_dark": "materials/collider/equipment-case-trial-v1/tc_dark.vmat",
+        "tc_steel": "materials/collider/equipment-case-trial-v1/tc_steel.vmat",
+        "tc_rubber": "materials/collider/equipment-case-trial-v1/tc_rubber.vmat",
+        "tc_edge": "materials/collider/equipment-case-trial-v1/tc_edge.vmat",
+        "tc_label": "materials/collider/equipment-case-trial-v1/tc_label.vmat"
+      }
+    }
+  },
+  "originalAssetsSHA256": {
+    "Assets/models/maps/collider/collider_detail.obj": "41519fab689c6a142a4fc9d72f1f2ef4d94b8b0151dc7c06a44eb3586eaf070a",
+    "Assets/models/maps/collider/collider_detail.mtl": "9ff783ca7a0238cbccd2d738379c5256d25cc8d888d317aa45dfe2aaa05ba82d",
+    "Assets/models/maps/collider/collider_detail.vmdl": "c599d2489678f1257ce2c8342be65212dc2d3460af08f48bd4df9d09d2aa488a",
+    "Assets/scenes/maps/Collider/collider.scene": "bf6a9feabd22b988276ec8cdb80f383e734e2ac733f38a4f923d404a14729802"
+  },
+  "sameAuthoredCollision": true,
+  "nativePreview": false,
+  "previewRenderer": "Blender Cycles; matched lighting, camera, scale and exposure"
+}

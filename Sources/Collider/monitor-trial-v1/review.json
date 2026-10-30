@@ -1,0 +1,130 @@
+{
+  "status": "accepted-installed-in-map-sources",
+  "installedInMap": true,
+  "editorUsed": false,
+  "engineValidation": "pending",
+  "renderSessionExited": true,
+  "renderEvidence": {
+    "renderer": "Blender Cycles",
+    "nativeEngineScreenshot": false,
+    "sameCameraLightingScaleAndExposure": true,
+    "samples": 32,
+    "viewTransform": "AgX",
+    "exposure": 0.0,
+    "images": [
+      {
+        "variant": "before",
+        "view": "main",
+        "file": "before-main.png",
+        "eyeMetres": [
+          3.3,
+          -4.8,
+          2.9
+        ],
+        "targetMetres": [
+          0,
+          0.1,
+          0.86
+        ],
+        "lens": 50.0,
+        "width": 1400,
+        "height": 1050,
+        "sha256": "245ebee0f977c9a422dbceff428430eb1068ce64bb7e6d316b923dc070940367"
+      },
+      {
+        "variant": "after",
+        "view": "main",
+        "file": "after-main.png",
+        "eyeMetres": [
+          3.3,
+          -4.8,
+          2.9
+        ],
+        "targetMetres": [
+          0,
+          0.1,
+          0.86
+        ],
+        "lens": 50.0,
+        "width": 1400,
+        "height": 1050,
+        "sha256": "ed9456af45a98105f92f59372ea535dcf766959b32bea66d90dc6db90a4a57ca"
+      },
+      {
+        "variant": "before",
+        "view": "rear",
+        "file": "before-rear.png",
+        "eyeMetres": [
+          3.3,
+          4.8,
+          2.9
+        ],
+        "targetMetres": [
+          0,
+          0.1,
+          0.86
+        ],
+        "lens": 50.0,
+        "width": 1400,
+        "height": 1050,
+        "sha256": "1ba014625dffa668c5a15982909f0f574403f82149c00abbadd79d9d2740f804"
+      },
+      {
+        "variant": "after",
+        "view": "rear",
+        "file": "after-rear.png",
+        "eyeMetres": [
+          3.3,
+          4.8,
+          2.9
+        ],
+        "targetMetres": [
+          0,
+          0.1,
+          0.86
+        ],
+        "lens": 50.0,
+        "width": 1400,
+        "height": 1050,
+        "sha256": "250cd16b94aef192b358033070c8eddbf9b56416331339f4c08adbdb3bd2ebd5"
+      }
+    ]
+  },
+  "geometryVerification": {
+    "acceptedCaseCabinetAndMapSourcesUnchanged": true,
+    "exactSavedBaselineTriangles": 26,
+    "candidateInstalledInMap": true,
+    "editorUsed": false,
+    "engineCompilation": "pending",
+    "variants": {
+      "before": {
+        "triangles": 26,
+        "windingErrors": 0,
+        "degenerateTriangles": 0,
+        "minimumTriangleArea": 0.16249999999999998,
+        "finiteUVsAndNormals": true,
+        "sourceMaterialsResolved": 3,
+        "existingAtlasAndActiveImageScalePreserved": true,
+        "authoredCollisionShapes": 0,
+        "meshSHA256": "c4e81d6e1553668e65e5b4f7f9b1850d07ebf0e16ca6129009a8e8e8dbaebbb7"
+      },
+      "after": {
+        "triangles": 6088,
+        "windingErrors": 0,
+        "degenerateTriangles": 0,
+        "minimumTriangleArea": 0.0011223689233046531,
+        "finiteUVsAndNormals": true,
+        "sourceMaterialsResolved": 8,
+        "existingAtlasAndActiveImageScalePreserved": true,
+        "authoredCollisionShapes": 0,
+        "meshSHA256": "ee5afc1ca3c72eeee22ad8b0d43b19c7a1e6c03922ab196cd2fbee4007a4fa02"
+      }
+    }
+  },
+  "modelSourceSHA256": {
+    "before": "c4e81d6e1553668e65e5b4f7f9b1850d07ebf0e16ca6129009a8e8e8dbaebbb7",
+    "after": "ee5afc1ca3c72eeee22ad8b0d43b19c7a1e6c03922ab196cd2fbee4007a4fa02"
+  },
+  "userApproved": true,
+  "installationReceipt": "Sources/Collider/monitor-trial-v1/installed.json"
+}

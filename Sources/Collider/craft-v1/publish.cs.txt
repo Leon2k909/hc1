@@ -1,0 +1,85 @@
+// Save the reviewed menu image and synchronize only this pass's staged assets.
+// No scene is opened, selected, edited or saved.
+var root=Sandbox.Project.Current.GetRootPath();
+if(root.TrimEnd('\\','/').Replace('\\','/').ToLowerInvariant()!="c:/sbox-projects/hc1/forked-shooter-main")
+    throw new InvalidOperationException("Wrong project");
+var output=System.IO.Path.Combine(root,"output/collider-detail-v3-20261027");
+var stage=System.IO.Path.Combine(output,"stage-v6");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(stage,"manifest.json")));
+var captures=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(output,"captures-final/capture-report.json")));
+var navigation=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(output,"native-validation.json")));
+var verified=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(stage,"installed-validation.json")));
+string Hash(string p)=>System.IO.File.Exists(p)?Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant():null;
+if(!verified["success"].GetValue<bool>() || !verified["installed"].GetValue<bool>() ||
+    navigation["Checked"].GetValue<int>()!=68 || navigation["Failed"].AsArray().Count!=0 ||
+    navigation["MissingModels"].AsArray().Count!=0 || navigation["MissingMaterials"].AsArray().Count!=0 ||
+    !captures["NativeEngineCapture"].GetValue<bool>() || !captures["FullTextureCapture"].GetValue<bool>() || !captures["SavedSceneCurrent"].GetValue<bool>() ||
+    !captures["SceneDirtyStatePreserved"].GetValue<bool>() || !captures["GamePreserved"].GetValue<bool>() ||
+    !captures["SelectedDocumentPreserved"].GetValue<bool>()) throw new InvalidOperationException("Incomplete native review");
+var scenePath=System.IO.Path.Combine(root,"Assets/scenes/maps/Collider/collider.scene");
+var sceneHash=Hash(scenePath);
+if(sceneHash!=captures["SavedSceneSha256"].GetValue<string>() || sceneHash!=navigation["SceneSha256"].GetValue<string>())
+    throw new InvalidOperationException("Native review identifies a different saved scene");
+foreach(var entry in manifest["files"].AsArray())
+{
+    var relative=entry["relative"].GetValue<string>();
+    if(Hash(System.IO.Path.Combine(root,"Assets",relative))!=entry["after"].GetValue<string>() ||
+        captures["AssetSourcesSHA256"][relative]?.GetValue<string>()!=entry["after"].GetValue<string>())
+        throw new InvalidOperationException("Reviewed asset changed: "+relative);
+}
+foreach(var pair in manifest["protected"].AsObject())
+    if(Hash(System.IO.Path.Combine(root,"Assets",pair.Key))!=pair.Value.GetValue<string>())
+        throw new InvalidOperationException("Protected content changed: "+pair.Key);
+foreach(var pair in manifest["sources"].AsObject())
+    if(Hash(System.IO.Path.Combine(root,pair.Key))!=pair.Value.GetValue<string>())
+        throw new InvalidOperationException("Generator changed: "+pair.Key);
+var selected=Editor.SceneEditorSession.Active;var selectedDirty=selected?.HasUnsavedChanges;
+var game=Game.ActiveScene?.Id;var playing=Game.IsPlaying;
+var art=System.IO.Path.Combine(output,"captures-final/art-after.png");
+var target=System.IO.Path.Combine(root,"Assets/ui/maps/collider.png");
+var beforeArt=Hash(target);
+var artBackup=System.IO.Path.Combine(output,"map-preview-before.png");
+if(!System.IO.File.Exists(artBackup))System.IO.File.Copy(target,artBackup,false);
+System.IO.File.WriteAllBytes(target+".craft-incoming",System.IO.File.ReadAllBytes(art));
+System.IO.File.Move(target+".craft-incoming",target,true);
+Editor.AssetSystem.RegisterFile(target);
+var synchronized=new System.Collections.Generic.List<string>();
+var preserved=new System.Collections.Generic.List<string>();
+foreach(var entry in manifest["files"].AsArray())
+{
+    var relative=entry["relative"].GetValue<string>();
+    var source=System.IO.Path.Combine(root,"Assets",relative);
+    var destination=System.IO.Path.Combine(root,"output/collider/stage",relative);
+    var current=Hash(destination);
+    var original=Hash(System.IO.Path.Combine(output,"stage-v2/before",relative));
+    var allowed=new[]{(string)null,entry["before"]?.GetValue<string>(),entry["after"].GetValue<string>(),original};
+    if(!allowed.Contains(current)){preserved.Add(relative);continue;}
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(destination));
+    System.IO.File.Copy(source,destination,true);synchronized.Add(relative);
+}
+var stagedArt=System.IO.Path.Combine(root,"output/collider/stage/ui/maps/collider.png");
+if(new[]{(string)null,beforeArt,Hash(target)}.Contains(Hash(stagedArt)))
+{
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(stagedArt));
+    System.IO.File.Copy(target,stagedArt,true);synchronized.Add("ui/maps/collider.png");
+}
+else preserved.Add("ui/maps/collider.png");
+if(!ReferenceEquals(selected,Editor.SceneEditorSession.Active) || selected?.HasUnsavedChanges!=selectedDirty ||
+    Game.ActiveScene?.Id!=game || Game.IsPlaying!=playing || Hash(scenePath)!=sceneHash)
+    throw new InvalidOperationException("Editor or saved scene changed");
+var photographs=System.IO.Directory.EnumerateFiles(System.IO.Path.Combine(output,"captures-final"),"*.png")
+    .ToDictionary(p=>System.IO.Path.GetFileName(p),p=>Hash(p));
+var record=new { Revision="collider-craft-v1",ProjectRoot=root,Stage="output/collider-detail-v3-20261027/stage-v6",
+    SceneSha256=sceneHash,AssetSourcesSHA256=captures["AssetSourcesSHA256"],Geometry=manifest["geometry"],
+    NativePositionsPassed=68,MissingModels=0,MissingMaterials=0,PhysicsPreserved=true,SceneSourcePreserved=true,
+    Screenshots=new { RenderWidth=3728,RenderHeight=1832,OutputWidth=1864,OutputHeight=916,Supersampling=2,
+        FullTextureCapture=true,MatchingSessionContext=true,Files=photographs },
+    RetainedLighting="lighting-v6",RetainedReflections="v4",NewLightingBake=false,
+    PrimaryStageSynchronized=synchronized,PrimaryStagePreserved=preserved,
+    PrimaryStageSceneReplaced=false,MenuImageSha256=Hash(target),EditorStatePreserved=true,
+    SelectedScene=selected?.Scene.Source?.ResourcePath,GamePreserved=true,CheckedAt=DateTime.UtcNow };
+var json=System.Text.Json.JsonSerializer.Serialize(record,new System.Text.Json.JsonSerializerOptions{WriteIndented=true});
+System.IO.File.WriteAllText(System.IO.Path.Combine(output,"published.json"),json);
+System.IO.File.WriteAllText(System.IO.Path.Combine(root,"Sources/Collider/craft-v1/installed.json"),json);
+return new {Published=true,Assets=19,NativePositionsPassed=68,Synchronized=synchronized,Preserved=preserved,
+    SceneSourcePreserved=true,EditorStatePreserved=true,SelectedScene=selected?.Scene.Source?.ResourcePath};

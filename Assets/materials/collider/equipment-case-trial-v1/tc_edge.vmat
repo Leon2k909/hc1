@@ -1,0 +1,13 @@
+// Equipment case trial; new private material
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    TextureColor "[0.39 0.43 0.46 1]"
+    TextureNormal "materials/default/default_normal.tga"
+    TextureRoughness "[0.31 0.31 0.31 0]"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_flMetalness "0.84"
+    g_flRoughnessScaleFactor "1"
+    g_flModelTintAmount "1"
+}

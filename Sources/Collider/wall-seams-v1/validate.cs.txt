@@ -1,0 +1,39 @@
+var session=Editor.SceneEditorSession.All.Single(s=>s.Scene.IsEditor && s.Scene.Source?.ResourcePath?.Equals("scenes/maps/collider/collider.scene",StringComparison.OrdinalIgnoreCase)==true);
+var scene=session.Scene;
+var root=Sandbox.Project.Current.GetRootPath();
+if(scene.NavMesh.IsGenerating) return new { WaitingForNavMesh=true };
+var requested=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/collider/check-points.json"))).AsArray();
+Vector3 V(System.Text.Json.Nodes.JsonNode a)=>new(a[0].GetValue<float>(),a[1].GetValue<float>(),a[2].GetValue<float>());
+var anchor=scene.NavMesh.GetClosestPoint(V(requested[0]["position"]),48);
+var checks=requested.Select(node=>{
+    var p=V(node["position"]);
+    var floor=scene.Trace.Ray(p+Vector3.Up*8,p+Vector3.Down*32).WithoutTags("zone").Run();
+    var head=scene.Trace.Box(new BBox(new Vector3(-16,-16,2),new Vector3(16,16,64)),p,p).WithoutTags("zone").Run();
+    var snap=scene.NavMesh.GetClosestPoint(p,48);
+    var status="MissingNavMesh"; var count=0; var endError=float.MaxValue;
+    if(anchor is not null && snap is not null)
+    {
+        var path=scene.NavMesh.CalculatePath(new Sandbox.Navigation.CalculatePathRequest{Start=anchor.Value,Target=snap.Value});
+        status=path.Status.ToString(); count=path.Points?.Count()??0;
+        if(count>0) endError=(path.Points.Last().Position-snap.Value).Length;
+    }
+    return new { Name=node["name"].GetValue<string>(), Position=p.ToString(), Floor=floor.Hit,
+        Clear=!head.Hit&&!head.StartedSolid, BlockingObject=head.GameObject?.Name,
+        Snapped=snap?.ToString(), SnapDistance=snap is null ? float.MaxValue : (snap.Value-p).Length,
+        PathStatus=status, Waypoints=count, EndError=endError };
+}).ToArray();
+var models=scene.GetAllComponents<ModelRenderer>().Where(r=>r.Model?.ResourcePath?.StartsWith("models/maps/collider/",StringComparison.OrdinalIgnoreCase)==true).ToArray();
+var materials=models.SelectMany(r=>Enumerable.Range(0,r.Materials.Count).Select(i=>r.Materials.GetOverride(i)??r.Materials.GetOriginal(i))).Distinct().ToArray();
+var missingModels=models.Where(r=>r.Model is null||r.Model.IsError).Select(r=>r.GameObject.Name).ToArray();
+var missingMaterials=materials.Where(m=>m is null||m.IsError).Select(m=>m?.ResourcePath??"null").ToArray();
+var result=new { Scene=scene.Source.ResourcePath, Checked=checks.Length, CheckedAt=DateTime.UtcNow,
+    ModelCount=models.Length,
+    SceneSha256=Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(
+        System.IO.Path.Combine(root,"Assets/scenes/maps/Collider/collider.scene")))).ToLowerInvariant(),
+    MissingModels=missingModels, MissingMaterials=missingMaterials,
+    Failed=checks.Where(c=>!c.Floor||!c.Clear||c.PathStatus!="Complete"||c.EndError>4).ToArray(),
+    Checks=checks, NavEnabled=scene.NavMesh.IsEnabled, scene.NavMesh.IsGenerating,
+    scene.NavMesh.AgentRadius, scene.NavMesh.AgentHeight, scene.NavMesh.AgentStepSize,
+    Modes=Facepunch.GameMode.GetAll((SceneFile)scene.Source).Select(m=>m.Ident).ToArray() };
+System.IO.File.WriteAllText(System.IO.Path.Combine(root,"output/collider-wall-overlap-20261027/native-validation.json"),System.Text.Json.JsonSerializer.Serialize(result,new System.Text.Json.JsonSerializerOptions{WriteIndented=true}));
+return new { result.Scene, result.Checked, result.MissingModels, result.MissingMaterials, result.Failed, result.NavEnabled, result.IsGenerating, result.Modes };

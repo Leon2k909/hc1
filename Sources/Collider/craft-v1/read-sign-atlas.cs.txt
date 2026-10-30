@@ -1,0 +1,11 @@
+using(Editor.EditorUtility.DisableTextureStreaming())
+{
+    var texture=Material.Load("materials/collider/co_signs.vmat").GetTexture("g_tColor");
+    texture.MarkUsed();
+    using(var bitmap=texture.GetBitmap(0))
+    {
+        var path=System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(),"output/collider-detail-v3-20261027/sign-atlas-native.png");
+        System.IO.File.WriteAllBytes(path,bitmap.ToPng());
+        return new {Path=path,bitmap.Width,bitmap.Height};
+    }
+}

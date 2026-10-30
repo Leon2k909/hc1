@@ -4,6 +4,7 @@ import numpy as np
 import map_kit as K
 import boxyard_map as B
 import collider_detail_geometry as D
+import collider_valve as CV
 
 UP=np.array((0.,0.,1.))
 SERVICE_WINDOWS=((-380.,640.,30.,207.),(380.,640.,30.,207.))
@@ -58,6 +59,9 @@ def flange(m,center,axis,radius):
 
 
 def valve(m,at,facing):
+    CV.append(m,at,facing)
+
+def _legacy_valve(m,at,facing):
     at=np.asarray(at,float);facing=K.normalise(facing)
     B.lathe(m,at,(0,1,0),[(7,-12),(10,-5),(10,5),(7,12)],"co_steel",sides=12,cap="co_trim")
     for offset in (-14,14):flange(m,at+(0,offset,0),(0,1,0),7)

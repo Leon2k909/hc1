@@ -63,7 +63,20 @@ def validate(stage,installed=False,geometry_baseline=None):
         assert sha(stage/'assets'/entry['relative'])==entry['after']
         if installed:assert sha(ROOT/'Assets'/entry['relative'])==entry['after']
     if installed:
-        for p,value in manifest['protected'].items():assert sha(ROOT/'Assets'/p)==value,p
+        publication=stage.parent/'published.json'
+        for p,value in manifest['protected'].items():
+            if p=='scenes/maps/Collider/collider.scene' and publication.is_file():
+                # The asset import precedes the owned native GI/reflection save.
+                # Accept that scene only when both native checks and captures
+                # identify the exact saved file recorded by finalization.
+                receipt=json.loads(publication.read_text())
+                native=json.loads((stage.parent/'native-validation.json').read_text())
+                capture=json.loads((stage.parent/'captures/capture-report.json').read_text())
+                value=receipt['scene_sha256']
+                assert native['SceneSha256']==capture['SavedSceneSha256']==value
+                assert native['Checked']==68 and not native['Failed']
+            assert sha(ROOT/'Assets'/p)==value,p
+        for p,value in manifest['sources'].items():assert sha(ROOT/p)==value,p
     result={'revision':manifest['revision'],'stage':manifest['stage'],'files_verified':len(manifest['files']),
         'geometry_baseline':str(baseline.relative_to(ROOT)),
         'original_vertex_uv_normal_tables_preserved':True,'retained_faces_exact':True,
@@ -79,7 +92,8 @@ def validate(stage,installed=False,geometry_baseline=None):
 
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--stage',type=Path,default=ROOT/'output/depot-finish-20261027/stage-v3')
-    parser.add_argument('--baseline',type=Path,help='Original geometry directory retained by the first published stage')
+    parser.add_argument('--stage',type=Path,default=ROOT/'output/depot-finish-20261027/stage-v8')
+    parser.add_argument('--baseline',type=Path,default=ROOT/'output/depot-finish-20261027/stage-v4/before',
+                        help='Original geometry directory retained by the first published stage')
     parser.add_argument('--installed',action='store_true');args=parser.parse_args()
     validate(args.stage.resolve(),args.installed,args.baseline.resolve() if args.baseline else None)

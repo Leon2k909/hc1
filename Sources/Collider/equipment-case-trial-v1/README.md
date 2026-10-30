@@ -1,0 +1,19 @@
+# Collider equipment case: accepted source replacement
+
+Created 2026-10-29 on `codex/collider-equipment-case-preview`, then explicitly accepted by the user. The shown case at plan `(-1150,-350,0)` is now replaced in the map sources: exactly 2,420 old triangles removed and the reviewed 15,568 new triangles inserted. Other case placements retain their own designs. The saved scene and all original physics bytes are unchanged. `Tools/collider_equipment_case.py` and the placement branch in `collider_map.hardcase` reproduce the approved geometry exactly. No editor was opened or used, and engine compilation remains pending. Nothing was committed.
+
+The baseline is the equipment case at Collider plan `(-1150,-350,0)`, with the existing 100 x 56 x 65 inch body and its authored collision. Its 2,332 hardware/label triangles match the installed map source exactly. The saved body differs from the current generator, so the 88 body triangles were copied directly from this isolated case's bounds. Original saved positions, material bindings, UVs and normals are retained in the standalone before resource. This avoids presenting a regenerated approximation as the current game asset.
+
+The candidate has cut handle pockets with recessed backing and metal returns, folding rubber-gripped handles, butterfly draw latches, separate hinge knuckles, extruded edge rails, restrained formed corner guards, a continuous lid gasket, stacking pads and a printed serial/inspection plate. It uses six private materials with authored powder-coat colour/normal/roughness, metal roughness and label images. No third-party texture or model was downloaded.
+
+Review resources:
+
+- `Assets/models/props/collider/equipment-case-trial-v1/after.vmdl` with its OBJ/MTL sources is the accepted standalone resource. The old `before` game resource was deleted; rollback copies are outside Assets in `output/collider-case-accepted-20261029/retired-before-resources/`.
+- `Assets/materials/collider/equipment-case-trial-v1/` contains only new private materials/textures.
+- `output/asset-improvement-20261029/equipment-case/` holds the manifest, mesh verification and matched renders.
+
+Both ModelDocs have the exact same physics suffix and one plastic collision box. Before: 2,420 triangles; candidate: 15,568 triangles. The after resource has no reversed or degenerate exported triangles and finite UVs/normals. All source material/texture references resolve locally. The original packed detail mesh/MTL/ModelDoc and saved scene retain their original SHA256 hashes. This is a close-review asset candidate; it has no accepted in-game performance budget or LOD integration yet.
+
+The editor was closed. Images are Blender Cycles renders of the actual exported meshes, **not s&box screenshots or AI concept images**. They use identical camera, lens, scale, floor, lighting, exposure and sample count for each view. Existing constant material colours/roughness are interpreted explicitly alongside image-based materials. The accepted sources have not been compiled or visually checked in s&box, following the user's instruction to work without the editor.
+
+`build.py` refuses to overwrite an existing candidate. `render.py` uses the installed Blender in background mode with four CPU threads; it renders the main and close views for both versions, using the retired rollback resource when recreating the original before image. `verify.py` checks exported geometry, local material dependencies and matching collision. `verify_accepted.py` independently confirms zero old triangles remaining, all approved triangles present, exact original physics bytes, generator parity and guarded primary-stage synchronization. Never replace the whole packed map mesh with the standalone review resource. Native compilation/inspection remains pending under the requested source-only workflow.

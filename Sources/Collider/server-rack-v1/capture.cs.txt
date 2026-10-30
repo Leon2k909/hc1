@@ -1,0 +1,136 @@
+// Capture an already-open Collider editor document with its persistent editor camera.
+// Does not open a scene, start play, render reflection cubemaps or install frame callbacks.
+// Copy to the current native MCP exchange directory before run_csharp.
+var root = Sandbox.Project.Current.GetRootPath();
+var config = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(
+    System.IO.Path.Combine(root,"output/collider-server-rack-20261027/capture-config.json"))).AsObject();
+var scale=config["supersample"]?.GetValue<int>() ?? 2;
+if(scale<1 || scale>2) throw new InvalidOperationException("Capture supersampling must be 1 or 2");
+var outputWidth=config["width"].GetValue<int>();var outputHeight=config["height"].GetValue<int>();
+var renderWidth=outputWidth*scale;var renderHeight=outputHeight*scale;
+var folder=config["folder"]?.GetValue<string>() ?? "captures";
+if(!System.Text.RegularExpressions.Regex.IsMatch(folder,"^[a-z0-9-]+$")) throw new InvalidOperationException("Invalid capture folder");
+var destination = System.IO.Path.Combine(root,"output/collider-server-rack-20261027",folder);
+System.IO.Directory.CreateDirectory(destination);
+var previous = Editor.SceneEditorSession.Active;
+var gameId = Game.ActiveScene?.Id;
+var playing = Game.IsPlaying;
+var session = Editor.SceneEditorSession.All.Single(s => s.Scene.IsEditor &&
+    s.Scene.Source?.ResourcePath?.Equals("scenes/maps/collider/collider.scene",StringComparison.OrdinalIgnoreCase)==true);
+var scene = session.Scene;
+var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
+var camera = scene.GetAllComponents<CameraComponent>().Single(c =>
+    c.GameObject.Name=="editor_camera" && c.GameObject.Flags.HasFlag(GameObjectFlags.EditorOnly));
+var oldPosition = camera.WorldPosition;
+var oldRotation = camera.WorldRotation;
+var oldFov = camera.FieldOfView;
+var oldSize=camera.CustomSize;var oldAxis=camera.FovAxis;var oldOrtho=camera.Orthographic;
+var unsaved = session.HasUnsavedChanges;
+string AssetHash(string path)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+var inputFiles=new[]{"collider_structure","collider_machine","collider_detail"}.SelectMany(name=>new[]{".obj",".mtl",".vmdl"}.Select(ext=>"models/maps/collider/"+name+ext))
+    .Concat(System.IO.Directory.EnumerateFiles(System.IO.Path.Combine(root,"Assets/materials/collider/craft-v1"))
+        .Where(p=>p.EndsWith(".png")||p.EndsWith(".vmat"))
+        .Select(p=>System.IO.Path.GetRelativePath(System.IO.Path.Combine(root,"Assets"),p).Replace('\\','/'))).OrderBy(p=>p).ToArray();
+var inputHashes=inputFiles.ToDictionary(p=>p,p=>AssetHash(System.IO.Path.Combine(root,"Assets",p)));
+var models = scene.GetAllComponents<ModelRenderer>().Where(r =>
+    r.Model?.ResourcePath?.StartsWith("models/maps/collider/",StringComparison.OrdinalIgnoreCase)==true).ToArray();
+var required=new[]{"collider_structure","collider_detail","collider_machine","collider_glass"};
+if(required.Any(name=>!models.Any(r=>r.Model.ResourcePath=="models/maps/collider/"+name+".vmdl")) || models.Any(r=>r.Model.IsError))
+    throw new InvalidOperationException("The four base Collider models must be compiled; additional authored props are preserved.");
+// Request useful texture mip levels before changing the camera. Never await with a scene scope open.
+using(scene.Push())
+using(Editor.EditorUtility.DisableTextureStreaming())
+{
+    foreach(var renderer in models)
+    for(var slot=0;slot<renderer.Materials.Count;slot++)
+    {
+        var material=renderer.Materials.GetOverride(slot) ?? renderer.Materials.GetOriginal(slot);
+        if(material is null || material.IsError) throw new InvalidOperationException("Collider has a missing material");
+        foreach(var key in new[]{"g_tColor","g_tNormal","g_tRma"})
+        {
+            var texture=material.GetTexture(key);
+            if(texture is not null)texture.MarkUsed(Math.Max(texture.Width,texture.Height));
+        }
+    }
+    foreach(var volume in scene.GetAllComponents<IndirectLightVolume>())
+    foreach(var texture in new[]{volume.IrradianceTexture,volume.DistanceTexture,volume.RelocationTexture})
+        if(texture is not null && !texture.IsError) texture.MarkUsed(Math.Max(texture.Width,texture.Height));
+}
+await Task.Delay(1000,cancellationToken);
+if(!ReferenceEquals(previous,Editor.SceneEditorSession.Active) || Game.ActiveScene?.Id!=gameId ||
+    Game.IsPlaying!=playing || session.HasUnsavedChanges!=unsaved)
+    throw new InvalidOperationException("Editor state changed while warming capture textures");
+Vector3 World(System.Text.Json.Nodes.JsonNode p) => new(p[1].GetValue<float>(),-p[0].GetValue<float>(),p[2].GetValue<float>());
+var captures = new System.Collections.Generic.List<object>();
+try
+{
+    // The engine's material/streaming context follows the active editor session.
+    // Do not bring its tab forward; restore the user's session synchronously.
+    session.MakeActive(false);
+    using(scene.Push())
+    using(Editor.EditorUtility.DisableTextureStreaming())
+    using(var bitmap = new Bitmap(renderWidth,renderHeight))
+    {
+        foreach(var view in config["views"].AsArray())
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            var name=view["name"].GetValue<string>();
+            if(!System.Text.RegularExpressions.Regex.IsMatch(name,"^[a-z0-9-]+$"))
+                throw new InvalidOperationException("Invalid capture name");
+            camera.WorldPosition=view["current"]?.GetValue<bool>()==true?oldPosition:World(view["eye"]);
+            camera.WorldRotation=view["current"]?.GetValue<bool>()==true?oldRotation:Rotation.LookAt(World(view["target"])-World(view["eye"]));
+            camera.FieldOfView=view["current"]?.GetValue<bool>()==true?oldFov:view["fov"].GetValue<float>();
+            typeof(Scene).GetMethod("PreRender",flags,null,Type.EmptyTypes,null).Invoke(scene,null);
+            typeof(Scene).GetMethod("PreCameraRender",flags,null,Type.EmptyTypes,null).Invoke(scene,null);
+            var post=scene.GetSystem<PostProcessSystem>();
+            typeof(PostProcessSystem).GetMethod("UpdateCamera",flags).Invoke(post,new object[]{camera});
+            // Hidden documents can miss the native DDGI buffer refresh after a bake/hotload.
+            var ddgiType=typeof(Scene).Assembly.GetType("Sandbox.DDGIVolumeSystem");
+            var getter=typeof(Scene).GetMethods().Single(m=>m.Name=="GetSystem" && m.IsGenericMethodDefinition && m.GetParameters().Length==0);
+            var ddgi=getter.MakeGenericMethod(ddgiType).Invoke(scene,null);
+            ddgiType.GetMethod("MarkDirty",flags).Invoke(ddgi,null);
+            ddgiType.GetMethod("UpdateVolumes",flags).Invoke(ddgi,null);
+            if(!camera.AutoExposure.Enabled || MathF.Abs(camera.AutoExposure.MinimumExposure-1f)>.001f ||
+                MathF.Abs(camera.AutoExposure.MaximumExposure-2.3f)>.001f)
+                throw new InvalidOperationException("Collider's tone mapping did not reach the editor camera");
+            for(var frame=0;frame<3;frame++)
+            {
+                camera.WorldPosition=view["current"]?.GetValue<bool>()==true?oldPosition:World(view["eye"]);
+                camera.WorldRotation=view["current"]?.GetValue<bool>()==true?oldRotation:Rotation.LookAt(World(view["target"])-World(view["eye"]));
+                camera.FieldOfView=view["current"]?.GetValue<bool>()==true?oldFov:view["fov"].GetValue<float>();
+                camera.CustomSize=new Vector2(renderWidth,renderHeight);
+                camera.FovAxis=view["current"]?.GetValue<bool>()==true?oldAxis:CameraComponent.Axis.Horizontal;camera.Orthographic=false;
+                camera.RenderToBitmap(bitmap,false);
+            }
+            System.IO.File.WriteAllBytes(System.IO.Path.Combine(destination,name+"-native.png"),bitmap.ToPng());
+            using(var resolved=bitmap.Resize(outputWidth,outputHeight,true))
+                System.IO.File.WriteAllBytes(System.IO.Path.Combine(destination,name+".png"),resolved.ToPng());
+            captures.Add(new { Name=name, Position=camera.WorldPosition.ToString(),
+                Angles=camera.WorldRotation.Angles().ToString(), camera.FieldOfView,
+                camera.EnablePostProcessing, camera.AutoExposure.Enabled,
+                camera.AutoExposure.MinimumExposure, camera.AutoExposure.MaximumExposure });
+        }
+    }
+}
+finally
+{
+    if(camera.IsValid())
+    {
+        camera.WorldPosition=oldPosition;
+        camera.WorldRotation=oldRotation;
+        camera.FieldOfView=oldFov;
+        camera.CustomSize=oldSize;camera.FovAxis=oldAxis;camera.Orthographic=oldOrtho;
+    }
+    if(previous is not null && !ReferenceEquals(previous,Editor.SceneEditorSession.Active))previous.MakeActive(false);
+}
+if(inputFiles.Any(p=>AssetHash(System.IO.Path.Combine(root,"Assets",p))!=inputHashes[p]))
+    throw new InvalidOperationException("Collider asset inputs changed during capture");
+var result = new { Captures=captures, SourceScene=scene.Source?.ResourcePath, AssetSourcesSHA256=inputHashes,
+    CheckedAt=DateTime.UtcNow, SavedSceneCurrent=!unsaved,
+    SavedSceneSha256=Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(
+        System.IO.Path.Combine(root,"Assets/scenes/maps/Collider/collider.scene")))).ToLowerInvariant(),
+    NativeEngineCapture=true, FullTextureCapture=true, RenderWidth=renderWidth, RenderHeight=renderHeight, OutputWidth=outputWidth, OutputHeight=outputHeight, Supersampling=scale, SceneDirtyStatePreserved=session.HasUnsavedChanges==unsaved,
+    GamePreserved=Game.ActiveScene?.Id==gameId && Game.IsPlaying==playing,
+    SelectedDocumentPreserved=ReferenceEquals(previous,Editor.SceneEditorSession.Active) };
+System.IO.File.WriteAllText(System.IO.Path.Combine(destination,"capture-report.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

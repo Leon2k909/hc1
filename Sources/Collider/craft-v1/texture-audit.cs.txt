@@ -1,0 +1,5 @@
+var material=Material.Load("materials/collider/co_signs.vmat");
+var texture=material.GetTexture("g_tColor");
+var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic;
+return new {MarkUsed=typeof(Texture).GetMethods(flags).Where(m=>m.Name=="MarkUsed").Select(m=>new {Method=m.ToString(),Parameters=m.GetParameters().Select(p=>new{p.Name,Type=p.ParameterType.FullName,Default=p.HasDefaultValue?p.DefaultValue?.ToString():null}).ToArray()}).ToArray(),
+    TextureProperties=texture.GetType().GetProperties(flags).Where(p=>p.GetIndexParameters().Length==0 && p.CanRead && System.Text.RegularExpressions.Regex.IsMatch(p.Name,"Mip|Resident|Stream|Width|Height|Name|Size",System.Text.RegularExpressions.RegexOptions.IgnoreCase)).Select(p=>new{p.Name,Type=p.PropertyType.FullName,Value=p.GetValue(p.GetMethod.IsStatic?null:texture)?.ToString()}).ToArray()};

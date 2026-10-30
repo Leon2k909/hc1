@@ -197,6 +197,12 @@ def build(out=OUT):
     floor_markings(out)
     import collider_finish
     collider_finish.materials(out / "finish-v1")
+    import collider_craft
+    collider_craft.materials(out / "craft-v1")
+    import collider_ceiling
+    collider_ceiling.materials(out / "ceiling-v1")
+    import collider_gallery_trench
+    collider_gallery_trench.materials(out)
     print(f"Staged {len(list(out.glob('*.vmat')))} Collider materials in {out}")
 
 if __name__ == "__main__":

@@ -1,0 +1,74 @@
+var root=Sandbox.Project.Current.GetRootPath();
+if(root.TrimEnd('\\','/').Replace('\\','/').ToLowerInvariant()!="c:/sbox-projects/hc1/forked-shooter-main")
+    throw new InvalidOperationException("Wrong project");
+var output=System.IO.Path.Combine(root,"output/collider-gallery-drain-20261027");
+var stage=System.IO.Path.Combine(output,"stage-v1");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(stage,"manifest.json")));
+var capture=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(output,"after/capture-report.json")));
+var geometry=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(stage,"geometry-validation.json")));
+var imported=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(stage,"native-import.json")));
+if(!geometry["Success"].GetValue<bool>() || !geometry["InstalledMatchesStage"].GetValue<bool>() ||
+   !capture["FullTextureCapture"].GetValue<bool>() || !capture["NativeEngineCapture"].GetValue<bool>() ||
+   !capture["SceneDirtyStatePreserved"].GetValue<bool>() || !capture["SelectedDocumentPreserved"].GetValue<bool>() ||
+   !capture["GamePreserved"].GetValue<bool>())throw new InvalidOperationException("Validation incomplete");
+string Hash(string p)=>System.IO.File.Exists(p)?Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant():null;
+foreach(var entry in manifest["files"].AsArray())
+{
+    var path=entry["relative"].GetValue<string>();
+    if(Hash(System.IO.Path.Combine(root,"Assets",path))!=entry["after"].GetValue<string>() ||
+       capture["AssetSourcesSHA256"][path]?.GetValue<string>()!=entry["after"].GetValue<string>())
+        throw new InvalidOperationException("Reviewed input changed: "+path);
+}
+var selected=Editor.SceneEditorSession.Active;
+var selectedDirty=selected?.HasUnsavedChanges;
+var session=Editor.SceneEditorSession.All.Single(s=>s.Scene.Source?.ResourcePath?.Equals("scenes/maps/collider/collider.scene",StringComparison.OrdinalIgnoreCase)==true);
+if(Game.IsPlaying)throw new InvalidOperationException("Expected stopped editor");
+var dirty=session.HasUnsavedChanges;
+var game=Game.ActiveScene?.Id;
+var sceneHash=Hash(System.IO.Path.Combine(root,"Assets/scenes/maps/Collider/collider.scene"));
+if(sceneHash!=imported["SourceSceneSHA256"].GetValue<string>())throw new InvalidOperationException("Saved scene changed since import");
+var renderer=session.Scene.GetAllComponents<ModelRenderer>().Single(r=>r.Model?.ResourcePath=="models/maps/collider/collider_detail.vmdl");
+if(renderer.Model.IsError)throw new InvalidOperationException("Detail model is missing");
+var materials=new System.Collections.Generic.List<string>();
+for(var i=0;i<renderer.Materials.Count;i++)
+{
+    var material=renderer.Materials.GetOverride(i) ?? renderer.Materials.GetOriginal(i);
+    if(material is null || material.IsError)throw new InvalidOperationException("Missing material at slot "+i);
+    materials.Add(material.ToString());
+}
+if(Material.Load("materials/collider/co_drain_frame.vmat").IsError)throw new InvalidOperationException("Steel material is missing");
+var synced=new System.Collections.Generic.List<string>();
+var preserved=new System.Collections.Generic.List<string>();
+foreach(var entry in manifest["files"].AsArray())
+{
+    var path=entry["relative"].GetValue<string>();
+    var target=System.IO.Path.Combine(root,"output/collider/stage/assets",path);
+    var current=Hash(target);
+    if(current is not null && current!=entry["before"]?.GetValue<string>() && current!=entry["after"].GetValue<string>())
+    {
+        preserved.Add(path);
+        continue;
+    }
+    var backup=System.IO.Path.Combine(output,"primary-stage-before",path);
+    if(System.IO.File.Exists(target) && !System.IO.File.Exists(backup))
+    {
+        System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(backup));
+        System.IO.File.Copy(target,backup);
+    }
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target));
+    System.IO.File.Copy(System.IO.Path.Combine(root,"Assets",path),target,true);
+    if(Hash(target)!=entry["after"].GetValue<string>())throw new InvalidOperationException("Primary stage copy failed");
+    synced.Add(path);
+}
+if(!ReferenceEquals(selected,Editor.SceneEditorSession.Active) || selected?.HasUnsavedChanges!=selectedDirty ||
+   session.HasUnsavedChanges!=dirty || Game.ActiveScene?.Id!=game || Game.IsPlaying)
+    throw new InvalidOperationException("Editor state changed");
+var result=new{Revision="gallery-drain-v1",Installed=true,SourceSceneSHA256=sceneHash,
+    Files=manifest["files"].DeepClone(),Geometry=manifest["geometry"].DeepClone(),
+    ValidMaterialSlots=materials,PrimaryStageSynced=synced,PrimaryStageNewerFilesPreserved=preserved,
+    NativeCaptures="output/collider-gallery-drain-20261027/after",PhysicsSourcePreserved=true,
+    SceneSourcePreserved=true,SceneDirtyStatePreserved=true,SelectedDocumentPreserved=true,GamePreserved=true,CheckedAt=DateTime.UtcNow};
+var json=Json.Serialize(result);
+System.IO.File.WriteAllText(System.IO.Path.Combine(root,"Sources/Collider/gallery-drain-v1/installed.json"),json);
+System.IO.File.WriteAllText(System.IO.Path.Combine(output,"installed.json"),json);
+return result;

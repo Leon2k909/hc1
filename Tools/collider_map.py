@@ -23,6 +23,17 @@ import collider_detail_geometry as D
 import collider_services as S
 import collider_machinery as H
 import collider_finish as F
+import collider_craft as C
+import collider_equipment_case as EC
+import collider_west_cabinet as WC
+import collider_monitor as CM
+import collider_chair as CH
+import collider_valve as CV
+import collider_console as CCN
+import collider_cooling_unit as CU
+import collider_server_rack as SR
+import collider_wall_seams as W
+import collider_ceiling as CE
 
 ROOT = Path(__file__).resolve().parents[1]
 STAGE = ROOT / "output/collider/stage"
@@ -59,7 +70,31 @@ ART_VIEW = {"name":"art","eye":[850,-620,G+74],"target":[-650,500,220],"fov":82}
 
 def configure(m):
     for paint in m.polygons:
-        if paint.startswith("cf_"):
+        if paint.startswith('cu_'):
+            m.material_overrides[paint] = f'{CU.MATERIAL_DIR}/{paint}.vmat'
+            m.tile_overrides[paint] = 12.
+        elif paint.startswith('cp_'):
+            m.material_overrides[paint] = f'{CCN.MATERIAL_DIR}/{paint}.vmat'
+            m.tile_overrides[paint] = 12.
+        elif paint.startswith('vv_'):
+            m.material_overrides[paint] = f'{CV.MATERIAL_DIR}/{paint}.vmat'
+            m.tile_overrides[paint] = 8.
+        elif paint in CH.PAINTS:
+            m.material_overrides[paint] = f"{CH.MATERIAL_DIR}/{paint}.vmat"
+            m.tile_overrides[paint] = CH.TILES[paint]
+        elif paint.startswith("mm_"):
+            m.material_overrides[paint] = f"{CM.MATERIAL_DIR}/{paint}.vmat"
+            m.tile_overrides[paint] = 32.
+        elif paint.startswith("ch_"):
+            m.material_overrides[paint] = f"{CE.MATERIAL_DIR}/{paint}.vmat"
+            m.tile_overrides[paint] = CE.TILES[paint]
+        elif paint.startswith("tc_"):
+            m.material_overrides[paint] = f"{EC.MATERIAL_DIR}/{paint}.vmat"
+            m.tile_overrides[paint] = 48. if paint=="tc_panel" else 16.
+        elif paint.startswith("cc_"):
+            m.material_overrides[paint] = f"{C.MATERIAL_DIR}/{paint}.vmat"
+            m.tile_overrides[paint] = C.TILES[paint]
+        elif paint.startswith("cf_"):
             m.material_overrides[paint] = f"{F.MATERIAL_DIR}/{paint}.vmat"
             m.tile_overrides[paint] = F.TILES[paint]
         elif paint.startswith("co_"):
@@ -104,6 +139,12 @@ def sign(m,label,center,facing,width,height):
     B.card(m,"co_signs",points,f,uv=[M.uv(label,s,t) for s,t in ((0,0),(1,0),(1,1),(0,1))])
 
 def monitor(m,center,facing,width,height,index=0):
+    if tuple(center)==(1880.,-190.,381.) and tuple(facing)==(-1,0) and (width,height,index)==(112,66,0):
+        CM.append(m)
+        return
+    _legacy_monitor(m,center,facing,width,height,index)
+
+def _legacy_monitor(m,center,facing,width,height,index=0):
     c=np.asarray(center,float); f=K.normalise((*facing,0)); right=np.cross(UP,f)
     m.oriented_box(c-f*2,(-right,f,UP),(width+5,4,height+5),"co_case")
     c=c+f*.08  # Separate the display from the bezel's front face to prevent z-fighting.
@@ -122,6 +163,16 @@ def floor_stencil(m,label,e,n,z,width=140,height=100,angle=0):
     B.card(m,"co_markings",points,UP,uv=[(u,v),(u+.5,v),(u+.5,v+.5),(u,v+.5)])
 
 def control_desk(m,side,n,z,collide=True):
+    selected=(side,n,z)==(1,-55.,256.)
+    if selected:
+        # Retain both original clips exactly; the legacy visual is offline reference only.
+        legacy=K.Model();_legacy_control_desk(legacy,side,n,z,collide,render_chair=False)
+        m.boxes.extend(legacy.boxes);m.hulls.extend(legacy.hulls)
+        CCN.append(m);CH.append(m)
+    else:
+        _legacy_control_desk(m,side,n,z,collide)
+
+def _legacy_control_desk(m,side,n,z,collide=True,render_chair=True):
     """Sloped operator station and chair, against the outer control-room wall."""
     def part(e0,e1,n0,n1,z0,z1,paint,solid=False):
         lo,hi=sorted((side*e0,side*e1)); box(m,lo,hi,n+n0,n+n1,z+z0,z+z1,paint,solid)
@@ -143,6 +194,7 @@ def control_desk(m,side,n,z,collide=True):
     monitor(m,(side*1818,n,z+83),(-side,0),100,48,index=int((n+200)//100)%4)
     # Chair frame and padded seat, with one simple player clip.
     part(1700,1746,-22,22,0,52,None,collide)
+    if not render_chair:return
     part(1706,1740,-20,20,22,27,"co_case")
     part(1702,1708,-20,20,27,53,"co_case")
     pipe(m,(side*1723,n,z+4),(side*1723,n,z+22),2.4,"co_trim",10)
@@ -200,6 +252,8 @@ def portal(m,name,axis,center,cross,z=0,width=160,height=192):
 def hardcase(m,e,n,z=0,w=78,d=46,h=55,heading=0):
     if (e,n) in ((-850,-350),(850,-420),(1270,-300),(1130,230),(-1260,-50),(160,-605)):
         H.instrument_cart(m,e,n,z,w,d,h,heading)
+    elif (e,n,z)==(-1150,-350,0):
+        EC.append(m,e,n,z,w,d,h,heading)
     else:
         D.hardcase(m,e,n,z,w,d,h,heading,label=sign)
 
@@ -347,17 +401,15 @@ def detail(m):
         (-1150,820,0,90,50,65,0),(1150,820,0,90,50,65,0)):
         hardcase(m,e,n,z,w,d,h,head)
     # A few taller server cabinets make solid mid-lane cover.
-    for e,n in ((-430,80),(430,80)):
-        box(m,e-24,e+24,n-30,n+30,0,138,None)
-        H.server_face(m,e,n)
+    for e,n in ((-430,80),SR.POSITION):
+        if e > 0:
+            SR.build(m,e,n)
+        else:
+            WC.append(m,e,n)
     S.overhead_services(m)
-    # Floor trench strips, expansion seams and yellow route markings on the upper gallery.
-    for e in (-1320,1320):
-        box(m,e-12,e+12,-870,610,G+.12,G+.3,"ar_grating",False)
-        for n in range(-850,601,150):
-            box(m,e-15,e+15,n-2,n+2,G+.3,G+.6,"co_silver",False)
-    for n in (-840,590):
-        box(m,-1300,1300,n-9,n+9,G+.12,G+.3,"ar_grating",False)
+    # Continuous fitted trench covers and yellow route markings on the upper gallery.
+    import collider_gallery_trench
+    collider_gallery_trench.append(m)
     for e in (-1012,1012):
         for n in range(-500,250,120):
             if (e<0 and -240<n<0) or (e>0 and 0<n<230): continue
@@ -385,6 +437,19 @@ def detail(m):
             D.plate(m,(e-12,n-43,17),(e+12,n-38,31),"co_trim",2)
             D.plate(m,(e-9,n-44,23),(e+9,n-42,28),"co_white",.7)
             LIGHTS.append((f"column wash {e} {n}",(e,n-55,43),"4.2,3.1,1.9,1",360,False))
+
+def cooling_unit(m,e):
+    if e==-1470:
+        CU.append(m)
+    else:
+        _legacy_cooling_unit(m,e)
+
+def _legacy_cooling_unit(m,e):
+    """Original unit retained for other placements and offline scope verification."""
+    box(m,e-53,e+53,1710,1785,20,250,"co_steel",False)
+    for zz in range(43,230,17):
+        box(m,e-44,e+44,1708,1710,zz,zz+7,"co_trim",False)
+    monitor(m,(e,1707,211),(0,-1),56,28,2)
 
 def machine(m):
     # The large tunnel is visible through the full observation wall.
@@ -437,10 +502,7 @@ def machine(m):
                 pipe(m,(e,nn,zz-3),(e,nn,zz+3),7,"co_trim",12)
             pipe(m,(e,nn,795),(e+70,nn,860),5,"co_silver",12)
             pipe(m,(e+70,nn,860),(e+230,nn,860),5,"co_silver",12)
-        box(m,e-53,e+53,1710,1785,20,250,"co_steel",False)
-        for zz in range(43,230,17):
-            box(m,e-44,e+44,1708,1710,zz,zz+7,"co_trim",False)
-        monitor(m,(e,1707,211),(0,-1),56,28,2)
+        cooling_unit(m,e)
     # Segmented service panels and ribs line the far half of the cylindrical chamber.
     for e in range(-1800,1801,300):
         for k in range(-4,5):
@@ -478,7 +540,10 @@ def build():
     F.refine_structure(structure)
     detail(details)
     machine(accel)
+    W.refine_machine(accel)
     F.add_finish(structure, F.surface_context([structure, details, accel]))
+    C.refine_floor(structure)
+    CE.refine_structure(structure)
     return dict(zip((p[0] for p in MODELS),map(configure,(structure,details,accel,glass))))
 
 def component(kind,key,**values): return K.component(IDS,kind,key,**values)
