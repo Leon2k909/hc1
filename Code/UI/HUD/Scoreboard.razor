@@ -71,8 +71,8 @@
                     {
                         var team = group.Team;
                         <div class="team-roster">
-                            <div class="team-heading" style="@TeamBand( team )">
-                                <Icon class="team-logo" file="@team.GetIconPath()" size="54" />
+                            <div class="team-heading" style="@GetTeamBannerStyle( team )">
+                                <Icon class="team-logo" file="@team.GetIconPath()" size="48" />
                                 <div class="team-identity">
                                     <label class="team-name">@Tr( team.GetName().ToUpperInvariant() )</label>
                                     <label class="team-count">@group.Entries.Count @Tr( "PLAYERS" )</label>
@@ -168,13 +168,6 @@
     public string Name => GameMode.Instance?.DisplayTitle;
     public TimeSpan? Time => GameMode.Instance?.DisplayedTime;
 
-    /// <summary> A team's heading: a band of its colour from its left edge, fading off to the right. </summary>
-    private static string TeamBand( Team team )
-    {
-        var color = team.GetColor();
-        return $"border-left-color: {color.Hex}; background-image: linear-gradient( to right, {color.WithAlpha( 0.3f ).Hex}, {color.WithAlpha( 0.03f ).Hex} );";
-    }
-
     public int? RoundNumber => GameMode.Instance.IsValid() ? GameMode.Instance.Get<RoundCounter>()?.Round : null;
     public int? RoundLimit => GameMode.Instance.IsValid() ? GameMode.Instance.Get<RoundLimit>()?.MaxRounds : null;
 
@@ -210,6 +203,13 @@
         .OrderByDescending( x => GetZombiesEconomy( x )?.Points ?? -1 )
         .ThenBy( x => x.DisplayName )
         .ToList();
+
+    /// <summary> A team's banner: its colour, strong at the logo and fading toward its score. </summary>
+    private static string GetTeamBannerStyle( Team team )
+    {
+        var color = team.GetColor();
+        return $"background-image: linear-gradient( to right, {color.WithAlpha( 0.85f ).Hex}, {color.WithAlpha( 0.22f ).Hex} );";
+    }
 
     private void AddBot( Team team )
     {

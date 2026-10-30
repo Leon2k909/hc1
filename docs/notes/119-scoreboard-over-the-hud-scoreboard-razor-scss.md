@@ -10,16 +10,15 @@
 - The Return to the AO countdown (`PlayAreaOverlay`) and the drone prompt (`DeployedPawnOverlay`), both 99999, still
   show over it.
 - Not yet seen in a match.
-- Its look (2026-10-27, the user: "scoreboard needs to look better"). It was slate blue-grey, unlike the rest of the game.
-  Now it's in the menus' look:
-  - a charcoal sheet with the menus' orange line along its top, Chakra Petch for words and the HUD's Dinish for every
-    number (the clock, team scores, positions, stats);
-  - each team's heading a band of its colour from a 4px edge, fading off to the right (`Scoreboard.TeamBand`);
-  - your row marked in orange, as the HUD marks what's yours; dead players' names and stats dimmed;
-  - each team's leader (first in its roster with a score) gets the HUD's crown (`ScoreboardRow.IsLeader`);
-  - the voice channel picker is the menus' segmented choice, the picked one in orange; the player details popup matches.
-  - Headings are capitals through the translation tables (`Tr( "PLAYERS" )`, `Tr( column.ToUpperInvariant() )`: an
-    ALL-CAPS key shows its translation in capitals, with Turkish's İ), not CSS `text-transform`.
-  - Checked in a browser mockup of the real SCSS (`output/scoreboard-redesign/20261027/mockup.py`, sass and headless
-    Chrome, before and after) and parsed in the engine with no warnings. Not yet seen in a match.
-
+- Its look (2026-10-27, the user: "scoreboard needs to look better") is the HUD's: Dinish capitals and numerals, the HUD's
+  ink and orange, no outer box.
+  - Each team's heading is a banner of its colour fading right (`GetTeamBannerStyle`), with its score at 54 px.
+  - Rows are 48 px on dark ink with hairlines; your own row has the orange bar and wash; the dead are greyed.
+  - Ping's signal bars are green, amber from 80 ms (`ping-fair`), red from 150 ms (`ping-poor`).
+  - The voice channel picker is flat with an orange underline on the chosen one.
+  - Each team's leader (first in its roster with a score) gets the HUD's crown (`ScoreboardRow.IsLeader`).
+  - Headings are capitals through the translation tables (`Tr( "PLAYERS" )`: an ALL-CAPS key shows its translation in
+    capitals, with Turkish's I), not only CSS.
+  - Two restyles were made in parallel that day. The other, in the menus' look (a charcoal sheet and Chakra Petch), was
+    never committed; the user merged this one later, so it won when the two met on 2026-10-30. Its stylesheet is in commit
+    efd629b7 if it's ever wanted. Mocked up in a browser from the real SCSS; not yet compiled or seen in a match.
