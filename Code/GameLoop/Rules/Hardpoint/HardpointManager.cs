@@ -45,7 +45,7 @@ public sealed class HardpointManager : Component
 
 		// Add Visuals (ModelRenderer)
 		var mr = go.Components.Create<ModelRenderer>();
-		mr.Model = Model.Load( "models/gameplay/flag_pole_base/flag_pole_base.vmdl" );
+		mr.Model = Model.Load( "models/gameplay/capture_flag_v2/capture_flag.vmdl" );
 		_zone.FlagModel = mr;
 
 		// Add Trigger (BoxCollider)
