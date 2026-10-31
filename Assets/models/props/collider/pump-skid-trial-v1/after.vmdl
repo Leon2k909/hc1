@@ -1,0 +1,87 @@
+<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:modeldoc29:version{3cec427c-1b0e-4d48-a90a-0436f33a6041} -->
+{
+	rootNode =
+	{
+		_class = "RootNode"
+		children =
+		[
+			{
+				_class = "MaterialGroupList"
+				children =
+				[
+					{
+						_class = "DefaultMaterialGroup"
+						remaps =
+						[
+							{ from = "ps_bore.vmat" to = "materials/collider/pump-skid-trial-v1/ps_bore.vmat" },
+							{ from = "ps_cast_face.vmat" to = "materials/collider/pump-skid-trial-v1/ps_cast_face.vmat" },
+							{ from = "ps_cast_skin.vmat" to = "materials/collider/pump-skid-trial-v1/ps_cast_skin.vmat" },
+							{ from = "ps_dark.vmat" to = "materials/collider/pump-skid-trial-v1/ps_dark.vmat" },
+							{ from = "ps_dial.vmat" to = "materials/collider/pump-skid-trial-v1/ps_dial.vmat" },
+							{ from = "ps_edge.vmat" to = "materials/collider/pump-skid-trial-v1/ps_edge.vmat" },
+							{ from = "ps_fastener.vmat" to = "materials/collider/pump-skid-trial-v1/ps_fastener.vmat" },
+							{ from = "ps_frame.vmat" to = "materials/collider/pump-skid-trial-v1/ps_frame.vmat" },
+							{ from = "ps_gasket.vmat" to = "materials/collider/pump-skid-trial-v1/ps_gasket.vmat" },
+							{ from = "ps_green.vmat" to = "materials/collider/pump-skid-trial-v1/ps_green.vmat" },
+							{ from = "ps_guard.vmat" to = "materials/collider/pump-skid-trial-v1/ps_guard.vmat" },
+							{ from = "ps_label.vmat" to = "materials/collider/pump-skid-trial-v1/ps_label.vmat" },
+							{ from = "ps_lip.vmat" to = "materials/collider/pump-skid-trial-v1/ps_lip.vmat" },
+							{ from = "ps_metal.vmat" to = "materials/collider/pump-skid-trial-v1/ps_metal.vmat" },
+							{ from = "ps_motor.vmat" to = "materials/collider/pump-skid-trial-v1/ps_motor.vmat" },
+							{ from = "ps_motor_skin.vmat" to = "materials/collider/pump-skid-trial-v1/ps_motor_skin.vmat" },
+							{ from = "ps_oil.vmat" to = "materials/collider/pump-skid-trial-v1/ps_oil.vmat" },
+							{ from = "ps_outlet_skin.vmat" to = "materials/collider/pump-skid-trial-v1/ps_outlet_skin.vmat" },
+							{ from = "ps_pump.vmat" to = "materials/collider/pump-skid-trial-v1/ps_pump.vmat" },
+							{ from = "ps_red.vmat" to = "materials/collider/pump-skid-trial-v1/ps_red.vmat" },
+							{ from = "ps_rubber.vmat" to = "materials/collider/pump-skid-trial-v1/ps_rubber.vmat" },
+							{ from = "ps_screen.vmat" to = "materials/collider/pump-skid-trial-v1/ps_screen.vmat" },
+							{ from = "ps_sheet.vmat" to = "materials/collider/pump-skid-trial-v1/ps_sheet.vmat" },
+							{ from = "ps_tray.vmat" to = "materials/collider/pump-skid-trial-v1/ps_tray.vmat" },
+							{ from = "ps_weld.vmat" to = "materials/collider/pump-skid-trial-v1/ps_weld.vmat" }
+						]
+						use_global_default = false
+						global_default_material = ""
+					},
+				]
+			},
+			{
+				_class = "RenderMeshList"
+				children =
+				[
+					{
+						_class = "RenderMeshFile"
+						name = "after"
+						filename = "models/props/collider/pump-skid-trial-v1/after.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+				]
+			},
+			{
+				_class = "PhysicsShapeList"
+				children =
+				[
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "plastic"
+						collision_tags = "solid"
+						origin = [ 0.0000, -0.0000, 38.5000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 106.0000, 58.0000, 71.0000 ]
+					},
+				]
+			},
+		]
+		model_archetype = ""
+		primary_associated_entity = ""
+		anim_graph_name = ""
+		base_model_name = ""
+	}
+}

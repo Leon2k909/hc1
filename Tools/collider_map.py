@@ -32,6 +32,7 @@ import collider_valve as CV
 import collider_console as CCN
 import collider_cooling_unit as CU
 import collider_column_base as CB
+import collider_pump_skid as PS
 import collider_server_rack as SR
 import collider_wall_seams as W
 import collider_ceiling as CE
@@ -71,7 +72,10 @@ ART_VIEW = {"name":"art","eye":[850,-620,G+74],"target":[-650,500,220],"fov":82}
 
 def configure(m):
     for paint in m.polygons:
-        if paint.startswith('cb_'):
+        if paint.startswith('ps_'):
+            m.material_overrides[paint] = f'{PS.MATERIAL_DIR}/{paint}.vmat'
+            m.tile_overrides[paint] = 12.
+        elif paint.startswith('cb_'):
             m.material_overrides[paint] = f'{CB.MATERIAL_DIR}/{paint}.vmat'
             m.tile_overrides[paint] = 12.
         elif paint.startswith('cu_'):
@@ -261,6 +265,11 @@ def portal(m,name,axis,center,cross,z=0,width=160,height=192):
                 box(m,e-.6,e+.6,n-1.1,n+1.1,z+25,z+height-24,"co_red",False)
 
 def hardcase(m,e,n,z=0,w=78,d=46,h=55,heading=0):
+    if (e,n,z,w,d,h,heading)==(-850,-350,0,106,58,74,0):
+        frame=B.Frame(e,n,heading,z)
+        frame.box(m,-w/2,w/2,-d/2,d/2,3,h,None,surface="plastic")
+        PS.append(m)
+        return
     if (e,n) in ((-850,-350),(850,-420),(1270,-300),(1130,230),(-1260,-50),(160,-605)):
         H.instrument_cart(m,e,n,z,w,d,h,heading)
     elif (e,n,z)==(-1150,-350,0):

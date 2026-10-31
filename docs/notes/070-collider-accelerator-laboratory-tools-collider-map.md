@@ -1,4 +1,44 @@
 ## Collider (accelerator laboratory, `Tools/collider_map.py`)
+- Maintenance-cabinet proposal (2026-10-30): replaces the saved 2,420-triangle case at plan `(-650,160,0)`
+  only after approval. The private 23,646-triangle candidate has a folded shell, separate returned drawer
+  fronts, hollow metal pulls, rolled stainless worktop/rubber mat, grounded swivel casters, brakes, rear
+  service panel and localized coating wear. The actual before mesh/UVs/normals and saved collider are copied
+  from detail sources. Collision uses 33 small boxes and six disconnected rounded/profiled hulls. Tests read
+  the exported ModelDoc/hull topology and pass 36 solid/empty-space probes, all four ground contacts, open
+  underside/handle gaps, original visible-footprint bounds and outside player-width clearance. Maximum
+  collision-vertex distance to a visible vertex is 0.4472 inch at a small bevel; there is no full-height case
+  blocker under the new cabinet. All 495 protected sources remain unchanged, including the accepted pump.
+  `Sources/Collider/tool-cabinet-trial-v1/` and `output/asset-improvement-20261030/tool-cabinet/` retain source,
+  collision checks and matched whole-object render evidence. Original map asset retained; not installed.
+  Work is offline, CPU only, idle priority/two threads; native collision/import/appearance checks pending.
+- Pump skid accepted (2026-10-30): the user approved revision 4 after the dark-blotch correction. Exactly
+  2,420 saved equipment-case triangles at plan `(-850,-350,0)` are replaced by the reviewed 58,005-triangle
+  pump; detail now totals 283,193 triangles. Exact approved positions, UVs, normals and 25 material bindings
+  are retained. Unrelated original face lines/attribute tables, saved scene, full ModelDoc physics and prior
+  accepted assets are preserved. `Tools/collider_pump_skid.py` and the exact selected `collider_map.hardcase`
+  branch retain the approved mesh and original clip on regeneration; other placements are unchanged.
+  Matching primary staged detail files were synchronized. Old standalone before resources and rollback map
+  sources are archived outside Assets. `Sources/Collider/pump-skid-trial-v1/installed.json` and
+  `output/collider-pump-skid-accepted-20261030/` record integration and supersede historical detail/generator
+  hashes. No editor/GPU used; native import, appearance, LOD and performance checks remain pending.
+- Historical pump-skid proposal review (2026-10-30): copied the saved 2,420-triangle case at plan
+  `(-850,-350,0)` before installation. The 58,005-triangle pump was subsequently accepted above.
+  Revision 4 adapts the accepted valve surface recipe, with separate 2048 x 4096 unwrapped casting/motor
+  maps, radial casing-cap/bolt-seat maps, and independently finished machined bores and flange lips. Albedo,
+  GL-normal, roughness and metalness channels provide foundry pits, orange peel, paint loss, dust and grease.
+  Geometry includes a curved split casing/gasket, formed perforated guard, rounded connected mounts/shims,
+  fabricated hinged controller, glands/conduit and grounded supports. Frame/controller wear follows actual
+  convex and concave edges. Continuous outlet UVs remove projection seams; exact guard-cell corners remove
+  unintended diamond gaps. Actual-OBJ checks verify 24 intended holes, 15 closed grid junctions and zero bend
+  UV seams. The pre-installation review guarded original collision and 266 existing sources.
+  Dark blotches were reduced by lowering broad paint-colour and roughness variation and removing generic flat-face
+  grease; twelve colour/roughness textures changed, with fine normal/metal maps and mesh byte identical.
+  Current material-only evidence is in `output/asset-improvement-20261030/pump-skid/clean-finish-review/`.
+  The earlier smooth pump/materials remain outside Assets in `output/asset-improvement-20261030/pump-skid/revision-01/`.
+  Generated `realism-review/finish-reference-v3.png` is a finish target only; actual OBJ/PBR renders compare
+  the full previous/revised units with the same camera/lights, plus a separate real surface close-up. Sources:
+  `Sources/Collider/pump-skid-trial-v1/`; evidence: `output/asset-improvement-20261030/pump-skid/realism-review/`.
+  One idle-priority two-thread CPU render, no editor/GPU used. Native import/appearance/LOD/performance pending.
 - Column base accepted (2026-10-30): the base beside B1 LABS, left of the stairs up to CONTROL, at plan
   `(-960,-500,0)`. The user approved applying it after the room-context view. Exactly 12 original base triangles
   were replaced with the reviewed 35,002-triangle mesh: chipped grout, bevelled steel, eight threaded anchors,

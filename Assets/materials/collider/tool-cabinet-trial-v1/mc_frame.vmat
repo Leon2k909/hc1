@@ -1,0 +1,15 @@
+// Tools/collider_operators.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    TextureColor "materials/collider/tool-cabinet-trial-v1/mc_frame_color.png"
+    TextureNormal "materials/collider/tool-cabinet-trial-v1/mc_frame_normal.png"
+    TextureRoughness "materials/collider/tool-cabinet-trial-v1/mc_frame_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    F_METALNESS_TEXTURE "1"
+    TextureMetalness "materials/collider/tool-cabinet-trial-v1/mc_frame_metal.png"
+    g_flRoughnessScaleFactor "1"
+    g_vColorTint "[1 1 1 1]"
+    g_flModelTintAmount "1"
+}

@@ -1,0 +1,15 @@
+// Tools/collider_operators.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    TextureColor "materials/collider/pump-skid-trial-v1/atlas_ps_guard_color.png"
+    TextureNormal "materials/collider/pump-skid-trial-v1/atlas_ps_guard_normal.png"
+    TextureRoughness "materials/collider/pump-skid-trial-v1/atlas_ps_guard_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    F_METALNESS_TEXTURE "1"
+    TextureMetalness "materials/collider/pump-skid-trial-v1/atlas_ps_guard_metal.png"
+    g_flRoughnessScaleFactor "1"
+    g_vColorTint "[1 1 1 1]"
+    g_flModelTintAmount "1"
+}
