@@ -43,6 +43,8 @@ from PIL import Image
 
 import map_kit as K
 import orion_parts as OP
+import orion_cable_reel as OCR
+import orion_generator as OG
 import orion_textures as OT
 import railhead_map as R
 import railhead_preview as PV
@@ -561,10 +563,11 @@ def launch_deck( m ):
     box( m, -230, -110, 1290, 1380, G, G + 110, { "default": "oa_steel", "+z": "oa_dark" }, METAL )
     # More clutter on the deck's top (the picture's strip of machinery and cases along it): a generator, cable drums,
     # crates and a run of pipes on stands.
-    box( m, 200, 330, 1300, 1370, G, G + 70, { "default": "oa_dark", "+z": "oa_steel" }, METAL )
-    for k, ( e, n ) in enumerate( ( ( 380, 1320 ), ( 470, 1300 ) ) ):
-        P.cylinder( m, ( e, n ), 26, G, G + 46, "oa_wall_dark", 14 )
-        m.collision_box( ( e - 26, n - 26, G ), ( e + 26, n + 26, G + 46 ), METAL )
+    # Approved standalone generator replaces the plain box; retain its collision.
+    OG.collision( m, G )
+    # The approved standalone reel replaces both placeholder shells. Its first
+    # collision stays here; the second placement obstructed the stair opening.
+    OCR.collision( m, G )
     OP.case_block( m, ( -20, 1340 ), ( 1, 0 ), 3, 1, ( 52, 32, 30 ), 2, "rv_olive", tarp=True, seed=420, z0=G )
     OP.case_block( m, ( 520, 1180 ), ( 0, 1 ), 2, 1, ( 48, 30, 28 ), 1, "rv_case", seed=421, z0=G )
     P.door( m, ( -170, 1290, G ), ( 1, 0, 0 ), 40, 84, "rv_door", window=True, double=False )
@@ -1316,10 +1319,25 @@ def yard_probe( name="Yard", box_=WET_FLOORS[0][1], strength=18 ):
              "NetworkMode": 2 }
 
 
+RED_CRATE_MODEL = "models/props/orion/red_crate_v2/red_crate.vmdl"
+RED_CRATE_SIZE = ( 44.0, 34.0, 40.0 )     # the model's length (its y), width (its x) and height
+
+
+def red_crate_object( at, heading, size ):
+    """ A crate's model where red_crate put its collision box, scaled to that box's size. It has no collider of its own. """
+    key = f"world/red_crate/{at[0]:g}/{at[1]:g}"
+    x, y, z = size[1] / RED_CRATE_SIZE[1], size[0] / RED_CRATE_SIZE[0], size[2] / RED_CRATE_SIZE[2]
+    return K.game_object( ids, "Red crate", key, K.to_world( at ), K.yaw_rotation( heading ), scale=f"{x:.5f},{y:.5f},{z:.5f}", components=[
+        K.component( ids, "Sandbox.ModelRenderer", f"{key}/renderer", BodyGroups=18446744073709551615,
+                     Model=RED_CRATE_MODEL, RenderType="On", Tint="1,1,1,1" ) ] )
+
+
 def write_scene( written, light_list, path ):
     world = K.game_object( ids, "Orion", "world", children=[
         model_object( title, f"world/{name}", name, collide, shadows )
-        for name, title, collide, shadows in SCENE_MODELS if name in written ] )
+        for name, title, collide, shadows in SCENE_MODELS if name in written ]
+        + ( [ OCR.scene_object(), OG.scene_object() ] if "orion_launch_deck" in written else [] )
+        + [ red_crate_object( *placed ) for placed in OP.RED_CRATES ] )
     light_objects = [
         { **K.game_object( ids, name, f"light/{name}", K.to_world( position ), tags="light_point,light", components=[
             K.component( ids, "Sandbox.PointLight", f"light/{name}/light", Attenuation=1, FogMode="Enabled",

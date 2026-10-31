@@ -1,0 +1,12 @@
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    TextureColor "materials/orion/cable_reel_v1/oxide_color.png"
+    TextureNormal "materials/orion/cable_reel_v1/oxide_normal.png"
+    TextureRoughness "materials/orion/cable_reel_v1/oxide_roughness.png"
+    TextureMetalness "materials/orion/cable_reel_v1/oxide_metallic.png"
+    TextureAmbientOcclusion "[1 1 1 0]"
+    g_flRoughnessScaleFactor "1"
+    g_flModelTintAmount "1"
+}

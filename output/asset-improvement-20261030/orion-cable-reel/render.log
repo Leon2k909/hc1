@@ -1,0 +1,24 @@
+TBBmalloc: skip allocation functions replacement in ucrtbase.dll: unknown prologue for function _aligned_free
+C:\sbox-projects\hc1\forked-shooter-main\Sources\Orion\cable-reel-trial-v1\build_render.py:15: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m=bpy.data.materials.new(name);m.use_nodes=True;n=m.node_tree.nodes;l=m.node_tree.links;p=n.get('Principled BSDF')
+Info: File exported successfully
+INFO Draco mesh compression is available, use library at C:\Program Files\Blender Foundation\Blender 5.1\5.1\scripts\addons_core\io_scene_gltf2\extern_draco.dll
+17:47:50 | INFO: Starting glTF 2.0 export
+17:47:50 | INFO: Extracting primitive: Lower cross-laminated timber board.026
+17:47:54 | WARNING: More than one shader node tex image used for a texture. The resulting glTF sampler will behave like the first shader node tex image.
+17:47:54 | WARNING: More than one shader node tex image used for a texture. The resulting glTF sampler will behave like the first shader node tex image.
+17:47:55 | WARNING: More than one shader node tex image used for a texture. The resulting glTF sampler will behave like the first shader node tex image.
+17:47:55 | INFO: Primitives created: 6
+17:47:55 | INFO: Finished glTF 2.0 export in 4.970409154891968 s
+C:\sbox-projects\hc1\forked-shooter-main\Sources\Orion\cable-reel-trial-v1\build_render.py:222: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  scene.world=scene.world or bpy.data.worlds.new('Same studio ambient');scene.world.use_nodes=True
+01:35.000  render           | Saved: 'C:\sbox-projects\hc1\forked-shooter-main\output\asset-improvement-20261030\orion-cable-reel\after.png'
+
+Info: Packed 22 file(s)
+Info: Saved as "cable_reel_review.blend"
+{"asset": "Orion launch-deck cable reel", "renderer": "Blender Cycles CPU", "nativeEngineScreenshot": false, "installed": false, "sameCameraScaleLightingExposure": true, "beforeTriangles": 28, "afterTriangles": 81443, "boundsInches": [[-25.946939085412215, -25.90619672940472, 0.0], [25.9146352452556, 25.946939085412215, 45.875179486011895]], "zeroAreaTriangles": 0, "finiteGeometry": true, "protectedOriginalsUnchanged": 527, "images": [{"variant": "before", "file": "before.png", "sha256": "50640188c80be39687c6170eb8c41b8e5bff10fdb0e99827744d9078cfab65ac", "reusedUnchangedBefore": true}, {"variant": "after", "file": "after.png", "sha256": "71ebca4e915eeab0befdbce1adb2fa1bd1bd2b44794a249409c7dd780044e854"}], "cameraMetres": [1.935, -2.655, 2.258], "targetMetres": [0, 0, 0.53], "lens": 60, "samples": 24}
+Blender 5.1.1 (hash b70da489d7f4 built 2026-04-14 01:37:22)
+Writing to C:\sbox-projects\hc1\forked-shooter-main\Sources\Orion\cable-reel-trial-v1\cable_reel_after.obj
+OBJ export of 'cable_reel_after.obj' took 227.92 ms
+
+Blender quit

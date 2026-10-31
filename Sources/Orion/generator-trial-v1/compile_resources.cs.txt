@@ -1,0 +1,15 @@
+// Compile one or two material/model resources per call, preserving the current document.
+var root=Sandbox.Project.Current.GetRootPath();
+var output=System.IO.Path.Combine(root,"output/orion-generator-installed-20261030");
+var request=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(output,"compile-request.json")));
+var results=new System.Collections.Generic.List<object>();
+foreach(var entry in request["paths"].AsArray()){
+    cancellationToken.ThrowIfCancellationRequested();
+    var rel=entry.GetValue<string>();
+    if(rel.Contains("..")||!(rel.StartsWith("materials/orion/generator_v1/")||rel.StartsWith("models/props/orion/generator_v1/")||rel=="models/maps/orion/orion_launch_deck.vmdl"||rel=="scenes/maps/Orion/orion.scene"))throw new Exception("Unexpected compile path");
+    var path=System.IO.Path.Combine(root,"Assets",rel);var asset=Editor.AssetSystem.FindByPath(path)??Editor.AssetSystem.RegisterFile(path);
+    var ok=asset.Compile(true);results.Add(new{Path=rel,Ok=ok,asset.IsCompileFailed,asset.IsCompiled});
+    if(!ok||asset.IsCompileFailed)throw new Exception("Native compile failed: "+rel);
+    await Task.Delay(1,cancellationToken);
+}
+return results;

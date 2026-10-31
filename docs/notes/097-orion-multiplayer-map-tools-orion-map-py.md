@@ -63,4 +63,17 @@
   - the gantries are an evenly lit orange lattice, not dark steel picked out by small lamps;
   - Launch Control, the deck front's arcade and B3's pipe bank are simpler builds.
   Not yet checked: a second client and the frame time.
+- 2026-10-30: user approved the reviewed cable reel at plan `(380,1320,240)` beside
+  the deck generator. `models/props/orion/cable_reel_v1/cable_reel.vmdl` is a separate
+  render-only scene child, with six private materials and four LODs (81,443 / 28,505 /
+  9,773 / 2,850 triangles). The first packed box collider stays in the launch-deck
+  model. Both old open cylinder render shells are removed; the second placement at
+  `(470,1300,240)` was inside `DECK_STAIR`, so its box collider is removed too.
+  `Tools/orion_cable_reel.py` retains the native instance schema and the first
+  collision; `orion_map.py` invokes it so rebuilding does not restore the stair
+  obstruction. All other launch-deck geometry and physics are preserved. Native
+  model/material loading, map/scene compilation, saved-scene screenshots, 95/95
+  navigation targets from both teams and a direct upper stair path passed. No live
+  match or frame-time benchmark. Sources: `Sources/Orion/cable-reel-trial-v1/`;
+  installation receipts and captures: `output/orion-cable-reel-installed-20261030/`.
 

@@ -1,0 +1,1 @@
+{"code":"var model = Model.Load(\"models/maps/orion/orion_launch_deck.vmdl\");\nreturn new { Loaded = model is not null && !model.IsError, Model = model?.ResourcePath, ActiveEditorScene = Editor.SceneEditorSession.Active?.Scene?.Name, Game.IsPlaying };"}

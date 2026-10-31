@@ -1,0 +1,14 @@
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    TextureColor "materials/orion/generator_v1/display.png"
+    TextureRoughness "[0.27 0.27 0.27 0]"
+    g_flMetalness "0"
+    F_SELF_ILLUM "1"
+    TextureSelfIllumMask "[1 1 1 0]"
+    g_flSelfIllumBrightness "0.45"
+    TextureAmbientOcclusion "[1 1 1 0]"
+    g_flRoughnessScaleFactor "1"
+    g_flModelTintAmount "1"
+}

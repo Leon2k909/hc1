@@ -44,6 +44,7 @@ RV_PAINTS = {
 
 def reset():
     P.reset()
+    RED_CRATES.clear()
 
 
 def repaint( model, mapping=RV_PAINTS ):
@@ -492,24 +493,16 @@ def drape( m, origin, along, L, W, H, sag=4.0, hang=0.62, seed=0, paint="oa_tarp
             card( m, "oa_black", [ p0 - a * 1.2, p0 + a * 1.2, p1 + a * 1.2, p1 - a * 1.2 ], UP )
 
 
+RED_CRATES = []     # the crates red_crate has placed: ( plan position, heading, size ), for orion_map's write_scene
+
+
 def red_crate( m, c, along, size=( 40, 30, 34 ), z0=0.0, surface=METAL ):
-    """ A red steel transport crate: a ribbed body in a darker frame, corner fittings, latches, a stencilled panel. """
+    """ A red steel transit crate. Only its collision box goes in the merged model. Sources/Orion/red_crate_v2's model draws it, placed by the
+    scene, with its latches on the side towards cross( UP, along ). """
     a = unit( ( along[0], along[1], 0 ) )
-    s = np.cross( UP, a )
     L, W, H = size
-    cc = v( c[0], c[1], z0 + H / 2 )
-    obox( m, cc, a, ( L, W, H ), { "default": "oa_red", "-z": None }, surface )
-    for sx in ( -1, 1 ):
-        for sy in ( -1, 1 ):
-            q = v( c[0], c[1], 0 ) + a * ( sx * ( L / 2 - 1.5 ) ) + s * ( sy * ( W / 2 - 1.5 ) )
-            obox( m, q + UP * ( z0 + H / 2 ), a, ( 3.4, 3.4, H + 0.4 ), "oa_dark" )
-    for zz in ( 0.08, 0.5, 0.92 ):
-        for sy in ( -1, 1 ):
-            q = v( c[0], c[1], 0 ) + s * ( sy * ( W / 2 + 0.2 ) ) + UP * ( z0 + H * zz )
-            obox( m, q, a, ( L, 0.6, 2.2 ), "oa_dark" )
-    for sy in ( -1, 1 ):
-        q = v( c[0], c[1], 0 ) + s * ( sy * ( W / 2 + 0.3 ) ) + UP * ( z0 + H * 0.7 )
-        letters( m, "x", q, a * sy, H * 0.28, "light", off=0.05 )
+    obox( m, v( c[0], c[1], z0 + H / 2 ), a, ( L, W, H ), { "default": None }, surface )
+    RED_CRATES.append( ( ( c[0], c[1], z0 ), math.degrees( math.atan2( a[1], a[0] ) ), size ) )
 
 
 def tarp_pile( m, centre, L, W, H, along=( 1, 0 ), seed=3, surface=PLASTIC ):

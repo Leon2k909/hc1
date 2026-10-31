@@ -1,0 +1,27 @@
+// Publish only the new approved resource files. Existing map/scene files stay untouched.
+var root=Sandbox.Project.Current.GetRootPath();
+if(root.TrimEnd('\\','/').Replace('\\','/').ToLowerInvariant()!="c:/sbox-projects/hc1/forked-shooter-main")throw new Exception("Wrong checkout");
+var active=Editor.SceneEditorSession.Active;var sceneId=active?.Scene?.Id;var gameId=Game.ActiveScene?.Id;var dirty=active?.HasUnsavedChanges;
+if(Game.IsPlaying)throw new Exception("Cannot import while playing");
+var output=System.IO.Path.Combine(root,"output/orion-cable-reel-installed-20261030");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(output,"manifest.json")));
+string Hash(string p)=>System.IO.File.Exists(p)?Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant():null;
+var entries=manifest["files"].AsArray().Where(f=>f["phase"].GetValue<string>()=="resource").ToArray();
+foreach(var f in entries){
+    var rel=f["relative"].GetValue<string>();
+    if(rel.Contains("..")||!(rel.StartsWith("materials/orion/cable_reel_v1/")||rel.StartsWith("models/props/orion/cable_reel_v1/")))throw new Exception("Unexpected resource path");
+    var target=System.IO.Path.Combine(root,"Assets",rel);var staged=System.IO.Path.Combine(output,"stage/Assets",rel);
+    if(Hash(staged)!=f["after"].GetValue<string>())throw new Exception("Stage changed: "+rel);
+    var actual=Hash(target);var before=f["before"]?.GetValue<string>();
+    if(actual!=before&&actual!=f["after"].GetValue<string>())throw new Exception("Target changed: "+rel);
+}
+foreach(var f in entries){
+    var rel=f["relative"].GetValue<string>();var target=System.IO.Path.Combine(root,"Assets",rel);
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target));
+    System.IO.File.WriteAllBytes(target+".reel-incoming",System.IO.File.ReadAllBytes(System.IO.Path.Combine(output,"stage/Assets",rel)));
+    System.IO.File.Move(target+".reel-incoming",target,true);
+}
+foreach(var f in entries.OrderBy(f=>f["relative"].GetValue<string>().EndsWith(".vmdl")?3:f["relative"].GetValue<string>().EndsWith(".vmat")?2:0))
+    Editor.AssetSystem.RegisterFile(System.IO.Path.Combine(root,"Assets",f["relative"].GetValue<string>()));
+if(Editor.SceneEditorSession.Active?.Scene?.Id!=sceneId||Game.ActiveScene?.Id!=gameId||active?.HasUnsavedChanges!=dirty||Game.IsPlaying)throw new Exception("Editor state changed");
+return new{Published=entries.Length,OriginalMapAndScenePreserved=true,EditorStatePreserved=true};

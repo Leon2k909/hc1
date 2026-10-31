@@ -1,0 +1,8 @@
+## Red crate v2 (`models/props/orion/red_crate_v2`, `Sources/Orion/red_crate_v2/`, 2026-10-31)
+- Replaced all 10 of Orion's red crates at the user's word after comparing both in s&box ("crate new better"). They stand in `orion_launch_control`, `orion_launch_deck` and `orion_props`.
+- `Tools/orion_parts.py`'s `red_crate()` writes only its old collision box and records a placement, and `orion_map.py`'s `red_crate_object()` places the model with no collider.
+- One model serves the map's five sizes: each object's scale is its box's size over the model's 44 x 34 x 40, so the scale isn't uniform. The other sizes stretch its latches and lettering a little (up to about 30% between axes, on the 40 x 30 x 46 crates).
+- Those three models no longer draw `oa_red` or `oa_letters_light`, so they've lost those material slots. The materials stay in Assets for what else uses them.
+- **Rerunning `orion_map.py` changes more than its author meant.** With no change to the script, tiny corner triangles on the containers (`rw_steel_dark`) came out different in five models from the 17 October ones, the same number but not the same corners. So `install_map.py` takes each live OBJ and removes only the crates' triangles: the script's OBJs were not copied, and those corners are as they were. A plain rerun of the script will change them. Nobody has looked at which version is right.
+- Rollback: `output/asset-improvement-20261030/red-crate/before-install/`.
+- Checked in an isolated editor scene, not in a match: see the folder's README. Shots are in `output/asset-improvement-20261030/installed-check/orion/`.

@@ -1,0 +1,63 @@
+// Editor-native publication: remove the stair obstruction and serialize the approved standalone instance.
+var root=Sandbox.Project.Current.GetRootPath();
+if(root.TrimEnd('\\','/').Replace('\\','/').ToLowerInvariant()!="c:/sbox-projects/hc1/forked-shooter-main")throw new Exception("Wrong checkout");
+var active=Editor.SceneEditorSession.Active;var beforeScene=active?.Scene?.Id;var beforeGame=Game.ActiveScene?.Id;var beforeDirty=active?.HasUnsavedChanges;
+if(Game.IsPlaying)throw new Exception("Cannot install during play");
+if(active?.Scene?.Source?.ResourcePath?.Equals("scenes/maps/orion/orion.scene",StringComparison.OrdinalIgnoreCase)==true)throw new Exception("Orion is currently open; use its document instead");
+var output=System.IO.Path.Combine(root,"output/orion-cable-reel-installed-20261030");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(output,"manifest.json")));
+string Hash(string p)=>System.IO.File.Exists(p)?Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant():null;
+var scenePath=System.IO.Path.Combine(root,"Assets",manifest["sceneRelative"].GetValue<string>());
+if(Hash(scenePath)!=manifest["sceneSHA256"].GetValue<string>())throw new Exception("Orion scene changed since staging");
+var mapFiles=manifest["files"].AsArray().Where(f=>f["phase"].GetValue<string>()=="map").ToArray();
+foreach(var f in mapFiles){var rel=f["relative"].GetValue<string>();if(Hash(System.IO.Path.Combine(root,"Assets",rel))!=f["before"].GetValue<string>()||Hash(System.IO.Path.Combine(output,"stage/Assets",rel))!=f["after"].GetValue<string>())throw new Exception("Map input changed: "+rel);}
+var model=Model.Load(manifest["resource"].GetValue<string>());
+if(model is null||model.IsError||model.Materials.Count()!=6||model.Materials.Any(m=>m is null||!m.ResourcePath.StartsWith("materials/orion/cable_reel_v1/")))throw new Exception("New model/materials did not load correctly");
+var temp=Scene.CreateEditorScene();System.Text.Json.Nodes.JsonNode instance;
+try{
+    using(temp.Push()){
+        var go=new GameObject(true,"ORION cable reel");go.WorldPosition=new Vector3(1320,-380,240);
+        var renderer=go.Components.Create<ModelRenderer>();renderer.Model=model;renderer.Tint=Color.White;
+        temp.EditorTick(.016f,.016f);
+        instance=go.Serialize().DeepClone();
+    }
+}finally{temp.Destroy();}
+var text=System.IO.File.ReadAllText(scenePath);
+var original=System.Text.Json.Nodes.JsonNode.Parse(text);
+var parent=original["GameObjects"].AsArray().Single(n=>n["Name"]?.GetValue<string>()=="Orion");
+if(parent["Children"].AsArray().Any(n=>n["Name"]?.GetValue<string>()=="ORION cable reel"))throw new Exception("Reel already installed");
+using var doc=System.Text.Json.JsonDocument.Parse(text);
+var parentText=doc.RootElement.GetProperty("GameObjects").EnumerateArray().Single(n=>n.TryGetProperty("Name",out var name)&&name.GetString()=="Orion").GetRawText();
+var parentStart=text.IndexOf(parentText,StringComparison.Ordinal);if(parentStart<0)throw new Exception("Could not locate original parent text");
+var child=System.Text.RegularExpressions.Regex.Match(parentText,"\"Children\"\\s*:\\s*\\[");if(!child.Success)throw new Exception("No Orion child array");
+var start=parentStart+child.Index+child.Length-1;var depth=0;var inString=false;var escape=false;var end=-1;
+for(var i=start;i<text.Length;i++){
+    var c=text[i];if(inString){if(escape){escape=false;continue;}if(c=='\\'){escape=true;continue;}if(c=='"')inString=false;continue;}
+    if(c=='"'){inString=true;continue;}if(c=='[')depth++;if(c==']'&&--depth==0){end=i;break;}
+}
+if(end<0)throw new Exception("Could not locate Orion child array end");
+var addition=",\n"+instance.ToJsonString(new System.Text.Json.JsonSerializerOptions{WriteIndented=true})+"\n";
+var updated=text.Insert(end,addition);
+var expected=original.DeepClone();expected["GameObjects"].AsArray().Single(n=>n["Name"]?.GetValue<string>()=="Orion")["Children"].AsArray().Add(instance.DeepClone());
+if(!System.Text.Json.Nodes.JsonNode.DeepEquals(expected,System.Text.Json.Nodes.JsonNode.Parse(updated)))throw new Exception("Scene insertion changed unrelated data");
+var completed=new System.Collections.Generic.List<string>();
+try{
+    foreach(var f in mapFiles){
+        var rel=f["relative"].GetValue<string>();var target=System.IO.Path.Combine(root,"Assets",rel);var backup=System.IO.Path.Combine(output,"before",rel);
+        System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(backup));System.IO.File.Copy(target,backup,false);
+        System.IO.File.WriteAllBytes(target+".reel-incoming",System.IO.File.ReadAllBytes(System.IO.Path.Combine(output,"stage/Assets",rel)));
+        System.IO.File.Move(target+".reel-incoming",target,true);completed.Add(rel);Editor.AssetSystem.RegisterFile(target);
+    }
+    var sceneBackup=System.IO.Path.Combine(output,"before",manifest["sceneRelative"].GetValue<string>());
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(sceneBackup));System.IO.File.Copy(scenePath,sceneBackup,false);
+    System.IO.File.WriteAllText(scenePath+".reel-incoming",updated);System.IO.File.Move(scenePath+".reel-incoming",scenePath,true);
+    completed.Add(manifest["sceneRelative"].GetValue<string>());Editor.AssetSystem.RegisterFile(scenePath);
+    System.IO.File.WriteAllText(System.IO.Path.Combine(root,"Sources/Orion/cable-reel-trial-v1/native-instance.json"),instance.ToJsonString(new System.Text.Json.JsonSerializerOptions{WriteIndented=true}));
+}catch{
+    foreach(var rel in completed){var target=System.IO.Path.Combine(root,"Assets",rel);System.IO.File.Copy(System.IO.Path.Combine(output,"before",rel),target,true);Editor.AssetSystem.RegisterFile(target);}
+    throw;
+}
+if(Editor.SceneEditorSession.Active?.Scene?.Id!=beforeScene||Game.ActiveScene?.Id!=beforeGame||active?.HasUnsavedChanges!=beforeDirty||Game.IsPlaying)throw new Exception("Active editor state changed");
+var result=new{Installed=true,Instance=instance,RemovedPlaceholderTriangles=56,RemovedStairCollider=true,OriginalReelColliderRetained=true,
+    NewModel=model.ResourcePath,SceneInsertionOnly=true,ActiveEditorStatePreserved=true,At=DateTime.UtcNow};
+System.IO.File.WriteAllText(System.IO.Path.Combine(output,"native-install.json"),Json.Serialize(result));return result;

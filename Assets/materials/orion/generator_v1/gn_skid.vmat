@@ -1,0 +1,12 @@
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    TextureColor "materials/orion/generator_v1/skid_color.png"
+    TextureNormal "materials/orion/generator_v1/skid_normal.png"
+    TextureRoughness "materials/orion/generator_v1/skid_roughness.png"
+    TextureMetalness "materials/orion/generator_v1/skid_metallic.png"
+    TextureAmbientOcclusion "[1 1 1 0]"
+    g_flRoughnessScaleFactor "1"
+    g_flModelTintAmount "1"
+}
