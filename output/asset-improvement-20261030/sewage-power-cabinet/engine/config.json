@@ -1,0 +1,143 @@
+{
+ "model": "models/maps/sewage/power_cabinet_v2/power_cabinet.vmdl",
+ "cabinets": [
+  {
+   "at": [
+    470,
+    958,
+    0
+   ],
+   "yaw": -90
+  },
+  {
+   "at": [
+    600,
+    -946,
+    0
+   ],
+   "yaw": 90
+  },
+  {
+   "at": [
+    830,
+    870,
+    352
+   ],
+   "yaw": -90
+  }
+ ],
+ "light_local": [
+  24.0,
+  -24.0,
+  104.5
+ ],
+ "exposure": 2.0,
+ "stream_frames": 70,
+ "settle_frames": 14,
+ "width": 1280,
+ "height": 800,
+ "variants": [
+  "before",
+  "after"
+ ],
+ "views": [
+  {
+   "name": "a_wide",
+   "eye": [
+    400,
+    740,
+    64
+   ],
+   "target": [
+    470,
+    958,
+    58
+   ],
+   "fov": 70
+  },
+  {
+   "name": "a_door",
+   "eye": [
+    450,
+    850,
+    66
+   ],
+   "target": [
+    462,
+    940,
+    62
+   ],
+   "fov": 75
+  },
+  {
+   "name": "a_side",
+   "eye": [
+    300,
+    760,
+    64
+   ],
+   "target": [
+    430,
+    958,
+    62
+   ],
+   "fov": 70
+  },
+  {
+   "name": "a_low",
+   "eye": [
+    395,
+    860,
+    56
+   ],
+   "target": [
+    430,
+    950,
+    40
+   ],
+   "fov": 70
+  },
+  {
+   "name": "a_top",
+   "eye": [
+    495,
+    860,
+    70
+   ],
+   "target": [
+    455,
+    940,
+    92
+   ],
+   "fov": 70
+  },
+  {
+   "name": "b_wide",
+   "eye": [
+    660,
+    -745,
+    64
+   ],
+   "target": [
+    600,
+    -946,
+    58
+   ],
+   "fov": 70
+  },
+  {
+   "name": "c_wide",
+   "eye": [
+    760,
+    700,
+    416
+   ],
+   "target": [
+    830,
+    870,
+    410
+   ],
+   "fov": 75
+  }
+ ]
+}

@@ -1,0 +1,142 @@
+{
+ "out": "output/asset-improvement-20261030/cerroblanco-boulder/final",
+ "scene": "Assets/scenes/maps/CerroBlanco/cerroblanco.scene",
+ "roots": [
+  "Sun",
+  "Sky",
+  "Fog",
+  "Look",
+  "Cerro Blanco",
+  "Trees",
+  "Lights",
+  "Reflection Probes",
+  "Cerro Blanco construction details",
+  "Museum indirect light"
+ ],
+ "exposure": 3.0,
+ "width": 1100,
+ "height": 720,
+ "stone_texels": 4096,
+ "stones": [
+  {
+   "model": "models/props/cerroblanco/boulder_v2/boulder_a.vmdl",
+   "at": [
+    -1078.6298300203048,
+    1591.153830020305,
+    0.0
+   ],
+   "yaw": 30.0,
+   "scale": 1.0
+  },
+  {
+   "model": "models/props/cerroblanco/boulder_v2/boulder_b.vmdl",
+   "at": [
+    -1121.4757170940381,
+    2034.2973329356932,
+    0.0
+   ],
+   "yaw": 200.0,
+   "scale": 1.0
+  }
+ ],
+ "views": [
+  {
+   "name": "pair_a",
+   "eye": [
+    -968.1478300203048,
+    1453.9798300203047,
+    64.0
+   ],
+   "target": [
+    -1105.6778300203048,
+    1553.9398300203047,
+    16.0
+   ],
+   "fov": 60.0
+  },
+  {
+   "name": "new_a_close",
+   "eye": [
+    -1004.2018300203048,
+    1537.057830020305,
+    44.0
+   ],
+   "target": [
+    -1078.6298300203048,
+    1591.153830020305,
+    16.0
+   ],
+   "fov": 55.0
+  },
+  {
+   "name": "old_a_close",
+   "eye": [
+    -1058.2978300203047,
+    1462.6298300203048,
+    44.0
+   ],
+   "target": [
+    -1132.7258300203048,
+    1516.7258300203048,
+    14.0
+   ],
+   "fov": 55.0
+  },
+  {
+   "name": "new_a_crouched",
+   "eye": [
+    -1054.3518300203048,
+    1546.307830020305,
+    34.0
+   ],
+   "target": [
+    -1078.6298300203048,
+    1591.153830020305,
+    22.0
+   ],
+   "fov": 60.0
+  },
+  {
+   "name": "pair_b",
+   "eye": [
+    -1006.2897170940382,
+    1903.5953329356932,
+    64.0
+   ],
+   "target": [
+    -1143.8197170940382,
+    2003.5553329356933,
+    16.0
+   ],
+   "fov": 60.0
+  },
+  {
+   "name": "new_b_close",
+   "eye": [
+    -1047.047717094038,
+    1980.2013329356932,
+    44.0
+   ],
+   "target": [
+    -1121.4757170940381,
+    2034.2973329356932,
+    16.0
+   ],
+   "fov": 55.0
+  },
+  {
+   "name": "old_b_close",
+   "eye": [
+    -1091.7357170940381,
+    1918.7173329356933,
+    44.0
+   ],
+   "target": [
+    -1166.1637170940382,
+    1972.8133329356933,
+    14.0
+   ],
+   "fov": 55.0
+  }
+ ]
+}

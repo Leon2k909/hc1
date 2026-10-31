@@ -1,0 +1,25 @@
+TBBmalloc: skip allocation functions replacement in ucrtbase.dll: unknown prologue for function _aligned_free
+C:\sbox-projects\hc1\forked-shooter-main\Sources\Ares\control-console-trial-v1\build_render.py:15: DeprecationWarning: 'Material.use_nodes' is expected to be removed in Blender 6.0
+  m=bpy.data.materials.new(name);m.use_nodes=True;n=m.node_tree.nodes;l=m.node_tree.links;p=n.get('Principled BSDF')
+Info: File exported successfully
+INFO Draco mesh compression is available, use library at C:\Program Files\Blender Foundation\Blender 5.1\5.1\scripts\addons_core\io_scene_gltf2\extern_draco.dll
+17:24:48 | INFO: Starting glTF 2.0 export
+17:24:48 | INFO: Extracting primitive: Cube.161
+17:24:49 | WARNING: More than one shader node tex image used for a texture. The resulting glTF sampler will behave like the first shader node tex image.
+17:24:49 | WARNING: More than one shader node tex image used for a texture. The resulting glTF sampler will behave like the first shader node tex image.
+17:24:49 | WARNING: More than one shader node tex image used for a texture. The resulting glTF sampler will behave like the first shader node tex image.
+17:24:49 | INFO: Primitives created: 13
+17:24:49 | INFO: Finished glTF 2.0 export in 1.1739799976348877 s
+C:\sbox-projects\hc1\forked-shooter-main\Sources\Ares\control-console-trial-v1\build_render.py:199: DeprecationWarning: 'World.use_nodes' is expected to be removed in Blender 6.0
+  scene.world=scene.world or bpy.data.worlds.new('Same studio ambient');scene.world.use_nodes=True
+01:43.360  render           | Saved: 'C:\sbox-projects\hc1\forked-shooter-main\output\asset-improvement-20261030\ares-control-console\before.png'
+02:52.829  render           | Saved: 'C:\sbox-projects\hc1\forked-shooter-main\output\asset-improvement-20261030\ares-control-console\after.png'
+
+Info: Packed 20 file(s)
+Info: Saved as "control_console_review.blend"
+{"renderer": "Blender Cycles CPU", "nativeEngineScreenshot": false, "installed": false, "sameCameraScaleLightingExposure": true, "screenArtwork": "Original approved Ares atlas and original saved UVs", "cameraMetres": [2.385, -3.735, 2.6], "targetMetres": [0, 0, 0.8], "lens": 60, "samples": 24, "beforeTriangles": 40, "afterTriangles": 41806, "images": [{"variant": "before", "file": "before.png", "sha256": "bb3bc385b00a26230df9220dc6fec0d5f1f783d1d9d21cf94effc0d563e1c7d6"}, {"variant": "after", "file": "after.png", "sha256": "215064e63797745ef9f3e786d71a7c2c83f1aee87a3bb74063024754a0c6a946"}], "boundsInches": [[-29.939999730568235, -15.760000765792967, 0.0], [29.939999730568235, 17.87841085373886, 63.68669937914751]], "protectedOriginalFilesUnchanged": 410, "finiteGeometry": true, "zeroAreaTriangles": 0}
+Blender 5.1.1 (hash b70da489d7f4 built 2026-04-14 01:37:22)
+Writing to C:\sbox-projects\hc1\forked-shooter-main\Sources\Ares\control-console-trial-v1\control_console_after.obj
+OBJ export of 'control_console_after.obj' took 104.94 ms
+
+Blender quit

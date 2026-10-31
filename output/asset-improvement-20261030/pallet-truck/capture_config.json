@@ -1,0 +1,131 @@
+{
+ "out": "output/asset-improvement-20261030/pallet-truck/pass2",
+ "scene": "Assets/scenes/maps/Railhead/railhead.scene",
+ "roots": [
+  "Sun",
+  "Sky",
+  "Fog",
+  "Look",
+  "Station",
+  "Trees",
+  "Lights",
+  "Reflection Probes",
+  "Station Indirect Light"
+ ],
+ "exposure": 1.9,
+ "width": 1100,
+ "height": 720,
+ "stone_texels": 2048,
+ "stones": [
+  {
+   "model": "models/props/railhead/pallet_truck_v2/truck.vmdl",
+   "at": [
+    -2290.0,
+    -1977.0,
+    0.0
+   ],
+   "yaw": 0.0,
+   "scale": 1.0
+  }
+ ],
+ "views": [
+  {
+   "name": "pair",
+   "eye": [
+    -2368.0,
+    -1972.0,
+    64.0
+   ],
+   "target": [
+    -2264.0,
+    -1956.0,
+    10.0
+   ],
+   "fov": 60.0
+  },
+  {
+   "name": "pair_side",
+   "eye": [
+    -2142.0,
+    -1968.0,
+    44.0
+   ],
+   "target": [
+    -2272.0,
+    -1956.0,
+    14.0
+   ],
+   "fov": 50.0
+  },
+  {
+   "name": "new_rear",
+   "eye": [
+    -2352.0,
+    -2003.0,
+    42.0
+   ],
+   "target": [
+    -2294.0,
+    -1977.0,
+    16.0
+   ],
+   "fov": 50.0
+  },
+  {
+   "name": "old_rear",
+   "eye": [
+    -2352.0,
+    -1961.0,
+    42.0
+   ],
+   "target": [
+    -2294.0,
+    -1935.0,
+    16.0
+   ],
+   "fov": 50.0
+  },
+  {
+   "name": "new_pump",
+   "eye": [
+    -2324.0,
+    -1999.0,
+    26.0
+   ],
+   "target": [
+    -2294.0,
+    -1977.0,
+    8.0
+   ],
+   "fov": 50.0
+  },
+  {
+   "name": "new_handle",
+   "eye": [
+    -2324.0,
+    -1993.0,
+    56.0
+   ],
+   "target": [
+    -2299.0,
+    -1977.0,
+    44.0
+   ],
+   "fov": 50.0
+  },
+  {
+   "name": "new_forks",
+   "eye": [
+    -2224.0,
+    -2011.0,
+    34.0
+   ],
+   "target": [
+    -2264.0,
+    -1977.0,
+    2.0
+   ],
+   "fov": 50.0
+  }
+ ]
+}

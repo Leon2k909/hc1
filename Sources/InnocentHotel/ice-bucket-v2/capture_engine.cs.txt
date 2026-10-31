@@ -1,0 +1,89 @@
+var projectRoot = Sandbox.Project.Current.GetRootPath();
+var root = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(projectRoot, "Assets/scenes/maps/InnocentHotel/innocent_hotel.scene"))).AsObject();
+var objects = new System.Text.Json.Nodes.JsonArray();
+foreach (var item in root["GameObjects"].AsArray())
+    if ((item["Name"]?.GetValue<string>() ?? "") == "Map") objects.Add(item.DeepClone());
+root["GameObjects"] = objects;
+if (root["SceneProperties"]?["NavMesh"] is System.Text.Json.Nodes.JsonObject nav) nav["Enabled"] = false;
+if (root["SceneProperties"] is System.Text.Json.Nodes.JsonObject sceneProperties) sceneProperties["WantsSystemScene"] = false;
+var scene = Scene.CreateEditorScene();
+var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
+var preRender = typeof(Scene).GetMethod("PreRender", flags, null, Type.EmptyTypes, null);
+var preCameraRender = typeof(Scene).GetMethod("PreCameraRender", flags, null, Type.EmptyTypes, null);
+MapInstance map; CameraComponent camera;
+using (scene.Push())
+{
+    scene.Deserialize(root);
+    map = scene.GetAll<MapInstance>().First();
+    var holder = new GameObject(false, "Capture camera");
+    camera = holder.Components.Create<CameraComponent>();
+    camera.ZFar = 30000;
+    // The player camera's own look (default_player_camera.prefab), held at one exposure inside its range.
+    var tone = holder.Components.Create<Tonemapping>();
+    tone.Mode = Tonemapping.TonemappingMode.ACES; tone.AutoExposureEnabled = true; tone.MinimumExposure = tone.MaximumExposure = 1.5f; tone.ExposureCompensation = 0; tone.Rate = 10;
+    var bloom = holder.Components.Create<Bloom>(); bloom.Mode = SceneCamera.BloomAccessor.BloomMode.Additive; bloom.Strength = .1f; bloom.Threshold = 1.6f; bloom.Gamma = 2.2f;
+    var ao = holder.Components.Create<AmbientOcclusion>(); ao.Radius = 48; ao.Intensity = .45f; ao.FalloffRange = .9f; ao.ThinCompensation = 1;
+    var vignette = holder.Components.Create<Vignette>(); vignette.Intensity = .08f; vignette.Roundness = 1; vignette.Smoothness = 1; vignette.Center = new Vector2(.5f, .5f); vignette.Color = Color.Black;
+    var sharpen = holder.Components.Create<Sharpen>(); sharpen.Scale = .1f;
+    holder.Enabled = true;
+}
+for (var i = 0; i < 1500 && !map.IsLoaded; i++)
+{
+    using (scene.Push()) scene.EditorTick(.016f, .016f);
+    await Task.Delay(100, cancellationToken);
+}
+if (!map.IsLoaded) throw new Exception("Map didn't load");
+try {
+    var model = Model.Load("models/maps/innocenthotel/ice_bucket_v2/ice_bucket.vmdl");
+    if (model is null || model.IsError) throw new InvalidOperationException("The new bucket hasn't compiled.");
+    var world = scene.SceneWorld.SceneObjects.OfType<SceneObject>().Where(o => o.Model is not null).ToArray();
+    var textureNames = new[] { "g_tColor", "g_tNormal", "g_tRoughness", "g_tAmbientOcclusion" };
+    foreach (var material in world.SelectMany(o => o.Model.Materials).Distinct())
+        foreach (var texture in textureNames.Select(material.GetTexture).Append(material.FirstTexture).Where(t => t is not null).Distinct())
+            texture.MarkUsed(1024);
+    foreach (var material in model.Materials)
+        foreach (var texture in textureNames.Select(material.GetTexture).Append(material.FirstTexture).Where(t => t is not null).Distinct())
+            texture.MarkUsed(2048);
+    for (var wait = 0; wait < 80; wait++)
+    {
+        using (scene.Push()) { scene.EditorTick(.016f, .016f); preRender.Invoke(scene, null); }
+        await Task.Delay(33, cancellationToken);
+    }
+    var destination = System.IO.Path.Combine(projectRoot, "output/asset-improvement-20261030/ice-bucket/engine");
+    var buckets = world.Where(o => o.Model.Name.Contains("ice_bucket")).ToArray();
+    var old = buckets[0].Model;
+    if (buckets.Length != 5) throw new Exception("Found " + buckets.Length + " buckets");
+    var shots = new System.Collections.Generic.List<(string name, int which, float yaw, float dist, float height, float fov)>();
+    shots.Add(("close_b", 3, 270f, 34f, 22f, 50f));
+    shots.Add(("stand_d", 3, 270f, 70f, 30f, 70f));
+    shots.Add(("close_top", 0, 135f, 26f, 34f, 50f));
+    shots.Add(("far_a", 0, 180f, 110f, 28f, 70f));
+    var written = new System.Collections.Generic.List<string>();
+    foreach (var variant in new[] { "warm", "before", "after" })
+    {
+        foreach (var b in buckets) b.Model = variant == "after" ? model : old;
+        foreach (var s in shots)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            var c = buckets[s.which].Position + Vector3.Up * 6.5f;
+            var dir = Rotation.FromYaw(s.yaw) * Vector3.Forward;
+            var eye = c + dir * s.dist; eye.z = buckets[s.which].Position.z + s.height;
+            using var bitmap = new Bitmap(1920, 1080);
+            for (var frame = 0; frame < 12; frame++)
+            {
+                using (scene.Push())
+                {
+                    camera.WorldPosition = eye; camera.WorldRotation = Rotation.LookAt(c - eye); camera.FieldOfView = s.fov; camera.ZNear = s.dist > 300 ? s.dist - 40 : 1;
+                    scene.EditorTick(.016f, .016f); preRender.Invoke(scene, null); preCameraRender.Invoke(scene, null);
+                    camera.RenderToBitmap(bitmap);
+                }
+                await Task.Delay(16, cancellationToken);
+            }
+            if (variant == "warm") continue;
+            System.IO.File.WriteAllBytes(System.IO.Path.Combine(destination, s.name + "-" + variant + ".png"), bitmap.ToPng());
+            written.Add(s.name + "-" + variant);
+        }
+    }
+    return new { Written = written, Materials = model.Materials.Select(m => m.Name).ToArray(), Bounds = model.Bounds.Mins + " .. " + model.Bounds.Maxs };
+}
+finally { scene.Destroy(); }

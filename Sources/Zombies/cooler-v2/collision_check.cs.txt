@@ -1,0 +1,41 @@
+// Riverside's cooler and a burn drum: is the collision still there now their faces are gone from the zone models? Rays against the map's compiled
+// models, in an isolated editor scene. Run with sbox-cli --call run_csharp. Changes nothing and needs no play session.
+var projectRoot = Sandbox.Project.Current.GetRootPath();
+var root = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(projectRoot, "Assets/scenes/maps/Riverside/riverside.scene"))).AsObject();
+var objects = new System.Text.Json.Nodes.JsonArray();
+foreach (var item in root["GameObjects"].AsArray())
+    if ((item["Name"]?.GetValue<string>() ?? "") == "Riverside") objects.Add(item.DeepClone());
+root["GameObjects"] = objects;
+if (root["SceneProperties"]?["NavMesh"] is System.Text.Json.Nodes.JsonObject nav) nav["Enabled"] = false;
+if (root["SceneProperties"] is System.Text.Json.Nodes.JsonObject sceneProperties) sceneProperties["WantsSystemScene"] = false;
+var scene = Scene.CreateEditorScene();
+try
+{
+    var results = new System.Collections.Generic.List<string>();
+    using (scene.Push())
+    {
+        scene.Deserialize(root);
+        for (var tick = 0; tick < 5; tick++) scene.EditorTick(.016f, .016f);
+        void Ray(string name, Vector3 from, Vector3 to, string expected)
+        {
+            var hit = scene.Trace.Ray(from, to).Run();
+            results.Add($"{name}: {(hit.Hit ? $"hit at {hit.EndPosition.x:0.0},{hit.EndPosition.y:0.0},{hit.EndPosition.z:0.0} surface {hit.Surface?.ResourceName}" : "miss")} (expected {expected})");
+        }
+        var foot = new Vector3(-170.871f, 23.4456f, 96f);
+        var side = new Vector3(-0.2504f, -0.9681f, 0f);
+        Ray("cooler, down onto its middle", foot + Vector3.Up * 60, foot - Vector3.Up * 2, "z about 112");
+        Ray("cooler, in at its front, 8 up", foot + side * 40 + Vector3.Up * 8, foot + Vector3.Up * 8, "8.5 in front of the foot");
+        Ray("cooler, down beside it, 25 out", foot + side * 25 + Vector3.Up * 60, foot + side * 25 - Vector3.Up * 2, "the ground, z about 96");
+        var drum = new Vector3(-18f, -48f, 96f);
+        Ray("pad drum, down onto its middle", drum + Vector3.Up * 60, drum - Vector3.Up * 2, "z about 130.5");
+        Ray("pad drum, in along +X, 15 up", drum + new Vector3(-40, 0, 15), drum + new Vector3(0, 0, 15), "x about -29");
+        var store = new Vector3(0, 0, 0);
+    }
+    return new
+    {
+        Results = results,
+        Models = scene.GetAllComponents<ModelCollider>().Select(c => c.Model?.ResourcePath).ToArray(),
+        Editor = new { Game.IsPlaying, Scene = Editor.SceneEditorSession.Active?.Scene?.Name }
+    };
+}
+finally { scene.Destroy(); }

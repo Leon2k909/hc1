@@ -1,0 +1,92 @@
+// The old and new control desks side by side, drawn by s&box: run with sbox-cli --call run_csharp through capture.py.
+// Loads Spillway's visual roots into an isolated editor scene, so the open scene and play state are never touched and nothing is saved.
+// The new desk stands in the gap between two old ones on the control room's back wall, under the same light.
+var projectRoot = Sandbox.Project.Current.GetRootPath();
+var destination = System.IO.Path.Combine(projectRoot, "%OUT%");
+System.IO.Directory.CreateDirectory(destination);
+var visual = new System.Collections.Generic.HashSet<string>(new[] { "Sun", "Sky", "Fog", "Look", "Spillway", "Lights", "Reflection Probes", "Volumetric Fog" }, StringComparer.OrdinalIgnoreCase);
+var root = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(projectRoot, "Assets/scenes/maps/spillway/spillway.scene"))).AsObject();
+var objects = new System.Text.Json.Nodes.JsonArray();
+foreach (var item in root["GameObjects"].AsArray())
+    if (visual.Contains(item["Name"]?.GetValue<string>() ?? "")) objects.Add(item.DeepClone());
+root["GameObjects"] = objects;
+if (root["SceneProperties"]?["NavMesh"] is System.Text.Json.Nodes.JsonObject nav) nav["Enabled"] = false;
+if (root["SceneProperties"] is System.Text.Json.Nodes.JsonObject sceneProperties) sceneProperties["WantsSystemScene"] = false;
+var scene = Scene.CreateEditorScene();
+var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
+var preRender = typeof(Scene).GetMethod("PreRender", flags, null, Type.EmptyTypes, null);
+var preCameraRender = typeof(Scene).GetMethod("PreCameraRender", flags, null, Type.EmptyTypes, null);
+try
+{
+    var model = Model.Load("models/props/spillway/control_desk_v2/control_desk.vmdl");
+    if (model is null || model.IsError) throw new InvalidOperationException("The desk hasn't compiled.");
+    CameraComponent camera;
+    using (scene.Push())
+    {
+        scene.Deserialize(root);
+        foreach (var tonemap in scene.GetAllComponents<Tonemapping>())
+        {
+            var hold = ( tonemap.MinimumExposure + tonemap.MaximumExposure ) / 2f;
+            tonemap.AutoExposureEnabled = true;
+            tonemap.MinimumExposure = tonemap.MaximumExposure = hold;
+            tonemap.Rate = 10;
+        }
+        foreach (var place in new[] { %PLACES% })
+        {
+            var go = new GameObject(true, "New desk");
+            go.WorldPosition = place;
+            go.WorldRotation = Rotation.FromYaw(180);
+            go.Components.Create<ModelRenderer>().Model = model;
+        }
+        var holder = new GameObject(false, "Capture camera");
+        camera = holder.Components.Create<CameraComponent>();
+        camera.ZNear = 1;
+        camera.ZFar = 30000;
+        holder.Enabled = true;
+        scene.EditorTick(.016f, .016f);
+        preRender.Invoke(scene, null);
+        preCameraRender.Invoke(scene, null);
+    }
+    // 1024 at most for the map and 4096 for this one model: the editor is shared.
+    var textureNames = new[] { "g_tColor", "g_tNormal", "g_tRoughness", "g_tAmbientOcclusion", "SkyTexture" };
+    foreach (var material in scene.GetAllComponents<ModelRenderer>().Where(r => r.Model is not null && r.Model != model).SelectMany(r => r.Model.Materials).Distinct())
+        foreach (var texture in textureNames.Select(material.GetTexture).Append(material.FirstTexture).Where(t => t is not null).Distinct())
+            texture.MarkUsed(1024);
+    var sharp = model.Materials.Distinct().SelectMany(m => textureNames.Select(m.GetTexture).Append(m.FirstTexture)).Where(t => t is not null).Distinct().ToArray();
+    foreach (var texture in sharp) texture.MarkUsed(4096);
+    for (var wait = 0; wait < 120; wait++)
+    {
+        foreach (var texture in sharp) texture.MarkUsed(4096);
+        using (scene.Push()) { scene.EditorTick(.016f, .016f); preRender.Invoke(scene, null); }
+        await Task.Delay(33, cancellationToken);
+    }
+    var shots = new (string name, Vector3 eye, Vector3 target, float fov)[] { %SHOTS% };
+    foreach (var shot in shots)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        using var bitmap = new Bitmap(1600, 900);
+        for (var frame = 0; frame < 20; frame++)
+        {
+            foreach (var texture in sharp) texture.MarkUsed(4096);
+            using (scene.Push())
+            {
+                camera.WorldPosition = shot.eye;
+                camera.WorldRotation = Rotation.LookAt(shot.target - shot.eye);
+                camera.FieldOfView = shot.fov;
+                scene.EditorTick(.016f, .016f);
+                preRender.Invoke(scene, null);
+                preCameraRender.Invoke(scene, null);
+                camera.RenderToBitmap(bitmap);
+            }
+            await Task.Delay(16, cancellationToken);
+        }
+        System.IO.File.WriteAllBytes(System.IO.Path.Combine(destination, shot.name + ".png"), bitmap.ToPng());
+    }
+    return new { Written = shots.Length, Materials = model.Materials.Select(m => m.ResourcePath + " " + (m.GetTexture("g_tColor")?.Width ?? 0) + "x" + (m.GetTexture("g_tColor")?.Height ?? 0)).ToArray(), Bounds = model.Bounds.ToString() };
+}
+catch (Exception error)
+{
+    System.IO.File.WriteAllText(System.IO.Path.Combine(destination, "capture-error.txt"), error.ToString());
+    throw;
+}
+finally { scene.Destroy(); }

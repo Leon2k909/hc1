@@ -1,0 +1,1434 @@
+{
+  "tools": [
+    {
+      "name": "add_ragdoll",
+      "title": "Add Ragdoll",
+      "toolset": "bridge_character",
+      "description": "Add ModelPhysics to a skinned model so it becomes a ragdoll (physics-driven bones). NOTE: the ragdoll only flops in PLAY mode \u00e2\u20ac\u201d it won't move in the static editor view, so this one is verified structurally, not by screenshot. Returns { ragdoll, note, gameObject } \u00e2\u20ac\u201d check gameObject.components for ModelPhysics, then verify at runtime with start_play + capture_view.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of the GameObject with a SkinnedModelRenderer."
+          },
+          "motionEnabled": {
+            "type": "boolean",
+            "description": "Whether physics bodies start with motion enabled."
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "align_objects",
+      "title": "Align Objects",
+      "toolset": "bridge_gameobject",
+      "description": "Align several GameObjects on one axis so they share a coordinate. mode = first (match the first object), min, max, or average; defaults to first. Returns { aligned, axis, mode, target } \u00e2\u20ac\u201d aligned is the object count and target the shared coordinate; verify positions with get_scene_hierarchy or a screenshot.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "GUIDs of the GameObjects to align (&gt;= 2)."
+          },
+          "axis": {
+            "type": "string",
+            "description": "Axis to align on. One of: x | y | z."
+          },
+          "mode": {
+            "type": "string",
+            "description": "Target coordinate to align to (default first). One of: first | min | max | average."
+          }
+        },
+        "required": [
+          "ids",
+          "axis"
+        ]
+      }
+    },
+    {
+      "name": "apply_atmosphere",
+      "title": "Apply Atmosphere",
+      "toolset": "bridge_visuals",
+      "description": "One-call scene mood: composes ambient + directional light, gradient fog, and a camera post-fx stack (tonemap + colour grade + vignette) tuned for the chosen mood. Idempotent \u00e2\u20ac\u201d re-runs update the same 'Atmosphere *' objects. Returns { applied, mood, components, postFxCamera } \u00e2\u20ac\u201d the post-fx stack is only applied when a camera exists (postFxCamera is null otherwise; add a camera and re-run). Screenshot to verify.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "mood": {
+            "type": "string",
+            "description": "Atmosphere preset. One of: horror-night | foggy-dawn | overcast | warm-interior."
+          }
+        },
+        "required": [
+          "mood"
+        ]
+      }
+    },
+    {
+      "name": "assign_model",
+      "title": "Assign Model",
+      "toolset": "bridge_material",
+      "description": "Set a 3D model on a GameObject's ModelRenderer. Creates the renderer component if it doesn't exist; errors if the model path can't be loaded. Returns { assigned, id, model } \u00e2\u20ac\u201d follow with assign_material / set_material_property to style it, or take a screenshot to verify.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of the GameObject."
+          },
+          "model": {
+            "type": "string",
+            "description": "Model path (e.g. 'models/citizen/citizen.vmdl', 'models/dev/box.vmdl')."
+          }
+        },
+        "required": [
+          "id",
+          "model"
+        ]
+      }
+    },
+    {
+      "name": "bake_reflections",
+      "title": "Bake Reflections",
+      "toolset": "bridge_visuals",
+      "description": "Bake all EnvmapProbe reflection probes in the scene (EnvmapProbe.BakeAll) so they actually capture their surroundings \u00e2\u20ac\u201d placing a probe with add_envmap_probe does nothing visible until it's baked. This is a real editor compute step, not a component setter. Runs async \u00e2\u20ac\u201d returns { baking, count, note, probes } immediately (each probe: id, name, mode, hasBaked), or { baked: false, count: 0 } when the scene has no probes; re-screenshot after a moment to see reflections appear.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
+    },
+    {
+      "name": "camera_screenshot",
+      "title": "Camera Screenshot",
+      "toolset": "scene",
+      "description": "Render a camera in the scene and return it as an image. Give any CameraComponent's id or its game object's id, or nothing for the scene's main camera. Works in edit and play mode - editor_camera_screenshot shows the editor viewport instead.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "camera": {
+            "type": "string",
+            "description": "A CameraComponent id or its game object's id. Empty uses the scene's main camera."
+          },
+          "width": {
+            "type": "integer",
+            "description": "Image width in pixels.",
+            "minimum": 16,
+            "maximum": 4096,
+            "default": 1280
+          },
+          "height": {
+            "type": "integer",
+            "description": "Image height in pixels.",
+            "minimum": 16,
+            "maximum": 4096,
+            "default": 720
+          },
+          "includeUi": {
+            "type": "boolean",
+            "description": "Include any UI the camera renders.",
+            "default": true
+          }
+        },
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "capture_camera_set",
+      "title": "Capture Camera Set",
+      "toolset": "bridge_screenshot",
+      "description": "Capture 1-8 saved camera bookmarks in the exact requested order and return a labeled JSON manifest followed by one inline PNG per bookmark. Captures are capped at 1600x1200 and eight million aggregate pixels. Every run becomes the session baseline for the same bookmark and settings; comparePrevious uses SkiaSharp RGBA metrics against that prior capture. renderUI defaults false for stable comparisons. Occlusion checks use physics traces and are diagnostic: they never move the saved camera.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "names": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Saved bookmark names in desired output order (1-8, no duplicates)."
+          },
+          "comparePrevious": {
+            "type": "boolean",
+            "description": "Compare each image with the previous session capture using the same name, dimensions, and renderUI setting.",
+            "default": false
+          },
+          "diffThreshold": {
+            "type": "integer",
+            "description": "Per-channel threshold (0-255) used for changedPixelPercent. Default 8.",
+            "default": 8
+          },
+          "width": {
+            "type": "integer",
+            "description": "Image width in pixels (16-1600). Default 960.",
+            "default": 960
+          },
+          "height": {
+            "type": "integer",
+            "description": "Image height in pixels (16-1200). Default 540.",
+            "default": 540
+          },
+          "renderUI": {
+            "type": "boolean",
+            "description": "Include screen-space UI. Defaults false for deterministic visual comparisons.",
+            "default": false
+          },
+          "checkOcclusion": {
+            "type": "boolean",
+            "description": "Trace from camera to lookAt and report blocking physics geometry. Default true.",
+            "default": true
+          }
+        },
+        "required": [
+          "names"
+        ]
+      }
+    },
+    {
+      "name": "capture_topdown",
+      "title": "Capture Topdown",
+      "toolset": "bridge_screenshot",
+      "description": "Capture a deterministic orthographic top-down PNG over a GameObject or explicit world center. Returns a JSON manifest followed by the inline image. The manifest records the fixed camera pose, ground-plane bounds, screen axes, and world-units-per-pixel so agents can place or measure objects from the image. renderUI defaults false; dimensions are capped at 1600x1200.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "targetId": {
+            "type": "string",
+            "description": "GameObject GUID whose bounds determine center, ground Z, and default worldHeight."
+          },
+          "center": {
+            "type": "string",
+            "description": "Explicit top-down center as \"x,y,z\"; use instead of targetId."
+          },
+          "worldHeight": {
+            "type": "number",
+            "description": "Vertical ground-plane span in world units (screen-up/world +X). Defaults to aspect-aware target bounds + 25%, or 1024 for explicit center."
+          },
+          "cameraHeight": {
+            "type": "number",
+            "description": "Camera height above center. Does not change orthographic scale. Defaults to worldHeight*2 with additional clearance above tall targets."
+          },
+          "width": {
+            "type": "integer",
+            "description": "Image width in pixels (16-1600). Default 1024.",
+            "default": 1024
+          },
+          "height": {
+            "type": "integer",
+            "description": "Image height in pixels (16-1200). Default 1024.",
+            "default": 1024
+          },
+          "renderUI": {
+            "type": "boolean",
+            "description": "Include screen-space UI. Default false.",
+            "default": false
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "capture_view",
+      "title": "Capture View",
+      "toolset": "bridge_screenshot",
+      "description": "Screenshot the scene from a chosen viewpoint and return it as an inline PNG image. Pass id to auto-frame a GameObject (3/4 elevated view sized to its bounds), or position (+ lookAt or rotation) for a free camera. With neither, captures the main camera view. Uses a temporary camera that is removed afterwards \u00e2\u20ac\u201d the scene is left unchanged. KNOWN CAPTURE LIMITS (engine, not bridge): text in ScreenPanel/Razor labels may rasterise as solid boxes (the font atlas is not resolved for the capture pass \u00e2\u20ac\u201d images and layout are correct, so a blank HUD here is NOT a HUD bug; verify text another way), and Terrain renders as a truncated ribbon from any temporary camera because its clipmap centres on the editor/main camera \u00e2\u20ac\u201d verify terrain scenes with take_screenshot or in play mode.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of a GameObject to auto-frame (from get_scene_hierarchy or find_objects)."
+          },
+          "position": {
+            "type": "string",
+            "description": "Camera position as \"x,y,z\"."
+          },
+          "lookAt": {
+            "type": "string",
+            "description": "Point to aim the camera at, as \"x,y,z\"."
+          },
+          "rotation": {
+            "type": "string",
+            "description": "Camera rotation as \"pitch,yaw,roll\" degrees (alternative to lookAt)."
+          },
+          "fov": {
+            "type": "number",
+            "description": "Field of view in degrees. Default is the camera's default."
+          },
+          "width": {
+            "type": "integer",
+            "description": "Image width in pixels (16-3840). Default 1280.",
+            "default": 1280
+          },
+          "height": {
+            "type": "integer",
+            "description": "Image height in pixels (16-2160). Default 720.",
+            "default": 720
+          },
+          "renderUI": {
+            "type": "boolean",
+            "description": "Include screen-space UI in the capture. Default true.",
+            "default": true
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "debug_draw_box",
+      "title": "Debug Draw Box",
+      "toolset": "bridge_debug",
+      "description": "Draw a wireframe debug box centered at a point. Renders in editor and play. Ideal for visualizing a trigger_zone's bounds or a physics_overlap box volume. Accumulates until debug_clear. Returns { drawn: 'box', count, mode } \u00e2\u20ac\u201d count is the total accumulated primitives, mode is 'edit' or 'play' (edit-mode gizmos are NOT in take_screenshot; use capture_view in play mode).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "center": {
+            "type": "string",
+            "description": "Box center, world-space \"x,y,z\"."
+          },
+          "size": {
+            "type": "string",
+            "description": "Full size \"x,y,z\" in units (default \"32,32,32\")."
+          },
+          "color": {
+            "type": "string",
+            "description": "Color as \"r,g,b\" or \"r,g,b,a\" floats 0\u00e2\u20ac\u201c1 (default varies per shape)."
+          },
+          "thickness": {
+            "type": "number",
+            "description": "Line thickness for edit-mode gizmos (default 2)."
+          }
+        },
+        "required": [
+          "center"
+        ]
+      }
+    },
+    {
+      "name": "debug_draw_line",
+      "title": "Debug Draw Line",
+      "toolset": "bridge_debug",
+      "description": "Draw a debug line between two world points. Renders in the editor viewport (Gizmo) AND in play mode (DebugOverlay), accumulating until debug_clear. NB: edit-mode gizmos show in the live editor but NOT in take_screenshot/screenshot_from \u00e2\u20ac\u201d use capture_view in play mode to see debug draws through the bridge.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": "string",
+            "description": "Start point, world-space \"x,y,z\"."
+          },
+          "to": {
+            "type": "string",
+            "description": "End point, world-space \"x,y,z\"."
+          },
+          "color": {
+            "type": "string",
+            "description": "Color as \"r,g,b\" or \"r,g,b,a\" floats 0\u00e2\u20ac\u201c1 (default varies per shape)."
+          },
+          "thickness": {
+            "type": "number",
+            "description": "Line thickness for edit-mode gizmos (default 2)."
+          }
+        },
+        "required": [
+          "from",
+          "to"
+        ]
+      }
+    },
+    {
+      "name": "debug_draw_ray",
+      "title": "Debug Draw Ray",
+      "toolset": "bridge_debug",
+      "description": "Draw a debug ray (drawn as an arrow) from an origin along a direction for a given length. Renders in editor and play. Ideal for visualizing a raycast result or a facing/normal direction. Accumulates until debug_clear. Returns { drawn: 'ray', count, mode } \u00e2\u20ac\u201d count is the total accumulated primitives, mode is 'edit' or 'play' (edit-mode gizmos are NOT in take_screenshot; use capture_view in play mode).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "origin": {
+            "type": "string",
+            "description": "Ray origin, world-space \"x,y,z\"."
+          },
+          "direction": {
+            "type": "string",
+            "description": "Direction vector \"x,y,z\" (normalized internally)."
+          },
+          "length": {
+            "type": "number",
+            "description": "Ray length in units (default 64)."
+          },
+          "color": {
+            "type": "string",
+            "description": "Color as \"r,g,b\" or \"r,g,b,a\" floats 0\u00e2\u20ac\u201c1 (default varies per shape)."
+          },
+          "thickness": {
+            "type": "number",
+            "description": "Line thickness for edit-mode gizmos (default 2)."
+          }
+        },
+        "required": [
+          "origin",
+          "direction"
+        ]
+      }
+    },
+    {
+      "name": "debug_draw_sphere",
+      "title": "Debug Draw Sphere",
+      "toolset": "bridge_debug",
+      "description": "Draw a wireframe debug sphere at a point. Renders in editor and play. Ideal for visualizing a physics_overlap radius or an NPC's hearing/sight range. Accumulates until debug_clear. Returns { drawn: 'sphere', count, mode } \u00e2\u20ac\u201d count is the total accumulated primitives, mode is 'edit' or 'play' (edit-mode gizmos are NOT in take_screenshot; use capture_view in play mode).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "center": {
+            "type": "string",
+            "description": "Sphere center, world-space \"x,y,z\"."
+          },
+          "radius": {
+            "type": "number",
+            "description": "Radius in units (default 32)."
+          },
+          "color": {
+            "type": "string",
+            "description": "Color as \"r,g,b\" or \"r,g,b,a\" floats 0\u00e2\u20ac\u201c1 (default varies per shape)."
+          },
+          "thickness": {
+            "type": "number",
+            "description": "Line thickness for edit-mode gizmos (default 2)."
+          }
+        },
+        "required": [
+          "center"
+        ]
+      }
+    },
+    {
+      "name": "delete_camera_bookmark",
+      "title": "Delete Camera Bookmark",
+      "toolset": "bridge_screenshot",
+      "description": "Delete one session-scoped camera bookmark and its comparison baselines. Returns deleted=false when the name was already absent. Use list_camera_bookmarks to inspect what remains.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Bookmark name to delete (case-insensitive)."
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "describe_scene",
+      "title": "Describe Scene",
+      "toolset": "bridge_scene",
+      "description": "One-call orientation for the OPEN scene (works in edit and play mode): total/root object counts, component histogram (top 20 types), every camera with position, light count, tag histogram (top 12), and the aggregate world bounds of renderable content. Returns a structured summary \u00e2\u20ac\u201d orient here, then find_objects by component/tag, get_scene_hierarchy for structure, find_broken_references for health, screenshot_orbit to look at something. Complements describe_project (project-level). Read-only.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "editor_camera_screenshot",
+      "title": "Editor Camera Screenshot",
+      "toolset": "scene",
+      "description": "Render what the editor scene camera sees and return it as an image - see the scene the way the viewport does. Move the view first with set_editor_camera.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "width": {
+            "type": "integer",
+            "description": "Image width in pixels.",
+            "minimum": 16,
+            "maximum": 4096,
+            "default": 1280
+          },
+          "height": {
+            "type": "integer",
+            "description": "Image height in pixels.",
+            "minimum": 16,
+            "maximum": 4096,
+            "default": 720
+          }
+        },
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "focus_object",
+      "title": "Focus Object",
+      "toolset": "bridge_gameobject",
+      "description": "Highlight a GameObject by selecting it in the editor. NOTE: s&box exposes no dedicated focus API, so this only sets the selection \u00e2\u20ac\u201d it does NOT move any camera (returns { focused, id, note } saying so). To actually point the viewport at an object use frame_camera; to aim a screenshot use screenshot_from.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of the GameObject to focus."
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "frame_camera",
+      "title": "Frame Camera",
+      "toolset": "bridge_debug",
+      "description": "Aim the s&box EDITOR viewport camera at a GameObject (by id) or a world point (position + optional radius), then call take_screenshot to capture that view. This is how Claude points its own screenshots at what it's working on \u00e2\u20ac\u201d frame a spawned object, then screenshot to verify it actually looks right.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of a GameObject to frame on."
+          },
+          "position": {
+            "type": "string",
+            "description": "World point to frame on (use instead of id) \u00e2\u20ac\u201d object {x,y,z} or comma string \"x,y,z\". As \"x,y,z\" (or JSON {x,y,z})."
+          },
+          "radius": {
+            "type": "number",
+            "description": "Frame radius around the position, in units (default 128)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "hammer_find_hidden_faces",
+      "title": "Find Hidden Faces",
+      "toolset": "hammer",
+      "description": "Find mesh faces nobody can see because they're buried inside or pressed flat against other geometry - the underside of a crate sitting on a floor, wall ends tucked into other walls. They still cost rendering and lightmap space. By default this only reports; set apply to paint them nodraw (or another material) in one undo step. A face counts as hidden only if every sample point on it is enclosed by opaque, non-tools mesh geometry, so partly covered faces are left alone. Meshes that aren't closed can fool it - check the result with hammer_focus_nodes and hammer_screenshot before applying on a map you care about.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "ids": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "Mesh node ids to check. Empty checks every mesh."
+          },
+          "apply": {
+            "type": "boolean",
+            "description": "Paint the hidden faces with 'material'. False only reports them.",
+            "default": false
+          },
+          "material": {
+            "type": "string",
+            "description": "The material to paint hidden faces with.",
+            "default": "materials/tools/toolsnodraw.vmat"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "How many meshes to list in the report.",
+            "minimum": 1,
+            "maximum": 1000,
+            "default": 100
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "hammer_focus_nodes",
+      "title": "Focus Nodes",
+      "toolset": "hammer",
+      "description": "Select nodes and frame every Hammer view on them, like the user pressing the frame selection key - the quickest way to show the user something, or to aim hammer_screenshot at it.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "ids": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "The node ids to frame."
+          }
+        },
+        "required": [
+          "ids"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "Mode": {
+            "type": "string"
+          },
+          "Pivot": {
+            "type": "string"
+          },
+          "Count": {
+            "type": "integer"
+          },
+          "Nodes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "Id": {
+                  "type": "integer"
+                },
+                "Kind": {
+                  "type": "string"
+                },
+                "Name": {
+                  "type": "string"
+                },
+                "ClassName": {
+                  "type": "string"
+                },
+                "Description": {
+                  "type": "string"
+                },
+                "Position": {
+                  "type": "string"
+                },
+                "Parent": {
+                  "type": "integer"
+                },
+                "GameObject": {
+                  "type": "string"
+                },
+                "Selected": {
+                  "type": "boolean"
+                },
+                "Visible": {
+                  "type": "boolean"
+                }
+              },
+              "required": []
+            }
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "hammer_screenshot",
+      "title": "Screenshot",
+      "toolset": "hammer",
+      "description": "Render the map as Hammer's 3D view draws it and return the image - see what you've built. Renders from the main 3D view's camera unless you give a camera, which doesn't move the user's view. Aim it with hammer_focus_nodes or hammer_set_camera first, or pass position and lookAt.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "width": {
+            "type": "integer",
+            "description": "Image width in pixels.",
+            "minimum": 16,
+            "maximum": 4096,
+            "default": 1280
+          },
+          "height": {
+            "type": "integer",
+            "description": "Image height in pixels.",
+            "minimum": 16,
+            "maximum": 4096,
+            "default": 720
+          },
+          "position": {
+            "type": "string",
+            "description": "Camera position as 'x,y,z'. Empty uses the 3D view's camera."
+          },
+          "angles": {
+            "type": "string",
+            "description": "Camera angles as 'pitch,yaw,roll'."
+          },
+          "lookAt": {
+            "type": "string",
+            "description": "A point to look at as 'x,y,z' - overrides angles."
+          },
+          "fieldOfView": {
+            "type": "number",
+            "description": "Field of view in degrees. 0 uses the 3D view's.",
+            "minimum": 0,
+            "maximum": 170,
+            "default": 0
+          }
+        },
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "list_camera_bookmarks",
+      "title": "List Camera Bookmarks",
+      "toolset": "bridge_screenshot",
+      "description": "List all session-scoped camera bookmarks in stable name order. Returns each resolved position, rotation, optional lookAt/target, FOV, and save time. Read-only; bookmarks reset on addon hotload or editor restart. Feed names into capture_camera_set.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "play_animation",
+      "title": "Play Animation",
+      "toolset": "bridge_character",
+      "description": "Play a named animation sequence on a GameObject's SkinnedModelRenderer (sets the Sequence). Best for models with raw sequences; for AnimationGraph characters (Citizen) prefer set_animgraph_param. The renderer needs PlayAnimationsInEditorScene = true to animate in-editor \u00e2\u20ac\u201d then screenshot to verify. Use list_animations for valid names.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of the GameObject with a SkinnedModelRenderer."
+          },
+          "animation": {
+            "type": "string",
+            "description": "Sequence name to play (see list_animations)."
+          },
+          "looping": {
+            "type": "boolean",
+            "description": "Loop the sequence (default: the model's setting)."
+          },
+          "speed": {
+            "type": "number",
+            "description": "Playback rate multiplier (default 1)."
+          }
+        },
+        "required": [
+          "id",
+          "animation"
+        ]
+      }
+    },
+    {
+      "name": "playtest",
+      "title": "Playtest",
+      "toolset": "bridge_playtest",
+      "description": "Run a scripted gameplay-verification sequence in PLAY MODE and get a pass/fail transcript (start_play first; poll playtest_status until finished). Each step is an object with ONE verb: \u00e2\u20ac\u00a2 { \"move\": {\"x\":1,\"y\":0}, \"frames\":60 } \u00e2\u20ac\u201d analog move in the controller frame (x=fwd/back, y=left/right); auto-sets UseInputControls=false and zeroes WishVelocity after. Movement is controller-specific/best-effort. \u00e2\u20ac\u00a2 { \"look\": {\"pitch\":0,\"yaw\":90,\"roll\":0} } / { \"lookDelta\": {\"yaw\":2}, \"frames\":30 } \u00e2\u20ac\u201d set/sweep EyeAngles. \u00e2\u20ac\u00a2 { \"action\": \"use\", \"frames\":20 } \u00e2\u20ac\u201d hold a named input action down (rising-edge safe; for use/dig/attack handled by gameplay components). \u00e2\u20ac\u00a2 { \"jump\": \"0,0,400\" } \u00e2\u20ac\u201d invoke the controller's Jump(velocity). \u00e2\u20ac\u00a2 { \"set\": {\"component\":\"PlayerController\",\"property\":\"WorldPosition\",\"to\":\"100,0,0\"} } \u00e2\u20ac\u201d set a runtime property (toggles, or teleport via WorldPosition \u00e2\u20ac\u201d the robust positioning fallback). \u00e2\u20ac\u00a2 { \"wait\": 10 } \u00e2\u20ac\u201d advance N frames. \u00e2\u20ac\u00a2 { \"capture\": \"after-jump\" } \u00e2\u20ac\u201d screenshot the live player-POV camera at this frame; the PNG path is recorded in the transcript (diagnostic, never pass/fail). Pass true for no label. \u00e2\u20ac\u00a2 { \"assert\": {\"read\":\"Displacement\",\"op\":\"&gt;\",\"value\":50,\"desc\":\"moved &gt;50u\"} } \u00e2\u20ac\u201d read a value and compare IN-FRAME. read = \"Displacement\" (scalar distance moved from job start \u00e2\u20ac\u201d the clean facing-independent movement proof), \"WorldPosition[.x|.y|.z]\", or \"&lt;Component&gt;.&lt;Property&gt;[.x|.y|.z|.Count]\". op = &gt; &lt; &gt;= &lt;= == != changed. Records pass/fail. Tip: prove movement with read:'Displacement' op:'&gt;' (facing-independent, unambiguous), and catch transient state (IsAirborne) right after the action.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "steps": {
+            "description": "Ordered step objects (see verbs above). Runs top-to-bottom in the frame loop. JSON array."
+          },
+          "id": {
+            "type": "string",
+            "description": "GUID of the player/controller GameObject. Omit to auto-resolve the first PlayerController."
+          },
+          "component": {
+            "type": "string",
+            "description": "Controller component type to target (e.g. 'PlayerController'). Omit to auto-detect."
+          }
+        },
+        "required": [
+          "steps"
+        ]
+      }
+    },
+    {
+      "name": "pose_citizen",
+      "title": "Pose Citizen",
+      "toolset": "bridge_character",
+      "description": "Pose a Citizen by setting CitizenAnimationHelper params (enables PlayAnimationsInEditorScene so the pose shows in-editor). Set holdType (None/Pistol/Rifle/Shotgun/HoldItem/Punch/Swing), moveStyle (Auto/Walk/Run), specialMove, sitting (bool), and/or duckLevel (0-1). Returns { posed, changed:[...], gameObject } \u00e2\u20ac\u201d changed lists which helper params were applied; take_screenshot to verify the pose.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of the Citizen GameObject (must have a CitizenAnimationHelper)."
+          },
+          "holdType": {
+            "type": "string",
+            "description": "Hold pose, e.g. None, Pistol, Rifle, Shotgun, HoldItem."
+          },
+          "moveStyle": {
+            "type": "string",
+            "description": "Movement style, e.g. Auto, Walk, Run."
+          },
+          "specialMove": {
+            "type": "string",
+            "description": "Special move style, e.g. None, LedgeGrab, Roll."
+          },
+          "sitting": {
+            "type": "boolean",
+            "description": "Sit the character (IsSitting)."
+          },
+          "duckLevel": {
+            "type": "number",
+            "description": "Crouch amount, 0-1."
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "save_camera_bookmark",
+      "title": "Save Camera Bookmark",
+      "toolset": "bridge_screenshot",
+      "description": "Save or replace a named camera bookmark in editor-session memory. Pass targetId to save the bridge's deterministic framed view of a GameObject, position plus lookAt/rotation for an explicit pose, or omit both to snapshot the current main camera. Returns the resolved pose. Bookmarks reset on addon hotload or editor restart; list them with list_camera_bookmarks and capture an ordered group with capture_camera_set.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Bookmark name (case-insensitive, 1-64 characters)."
+          },
+          "targetId": {
+            "type": "string",
+            "description": "GameObject GUID to resolve into a deterministic framed pose."
+          },
+          "position": {
+            "type": "string",
+            "description": "Explicit camera position as \"x,y,z\"."
+          },
+          "lookAt": {
+            "type": "string",
+            "description": "World point to aim at as \"x,y,z\"; pair with position."
+          },
+          "rotation": {
+            "type": "string",
+            "description": "Explicit camera rotation as \"pitch,yaw,roll\"; alternative to lookAt."
+          },
+          "fov": {
+            "type": "number",
+            "description": "Field of view in degrees (clamped 1-179). Defaults to 80, or the main camera FOV when snapshotting it."
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "screenshot_from",
+      "title": "Screenshot From",
+      "toolset": "bridge_screenshot",
+      "description": "Frame a GameObject or a free camera position and return the shot as an inline PNG image. Same as capture_view (kept under its historical name \u00e2\u20ac\u201d existing workflows use it), with the same capture limits: UI text may rasterise as boxes, and Terrain renders truncated from a temporary camera (clipmap centres on the main camera) \u00e2\u20ac\u201d verify terrain via take_screenshot.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of a GameObject to auto-frame."
+          },
+          "position": {
+            "type": "string",
+            "description": "Camera position as \"x,y,z\"."
+          },
+          "lookAt": {
+            "type": "string",
+            "description": "Point to aim the camera at, as \"x,y,z\"."
+          },
+          "rotation": {
+            "type": "string",
+            "description": "Camera rotation as \"pitch,yaw,roll\" degrees."
+          },
+          "width": {
+            "type": "integer",
+            "description": "Image width in pixels. Default 1280.",
+            "default": 1280
+          },
+          "height": {
+            "type": "integer",
+            "description": "Image height in pixels. Default 720.",
+            "default": 720
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "screenshot_orbit",
+      "title": "Screenshot Orbit",
+      "toolset": "bridge_screenshot",
+      "description": "Capture a GameObject from several angles in ONE call \u00e2\u20ac\u201d orbits around the object and returns every angle as an inline PNG image, so 3D work can be verified from multiple sides instead of guessed from one. Temporary-camera limits apply: Terrain renders as a truncated ribbon (clipmap centres on the main camera) and UI text may rasterise as boxes.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of the GameObject to orbit."
+          },
+          "shots": {
+            "type": "integer",
+            "description": "Number of angles around the object (2-8). Default 4.",
+            "default": 4
+          },
+          "elevation": {
+            "type": "number",
+            "description": "Camera height factor: 0 = level with the object, 1 = high above. Default 0.4.",
+            "default": 0.4
+          },
+          "distance": {
+            "type": "number",
+            "description": "Camera distance in units. Default: auto from the object's bounds."
+          },
+          "width": {
+            "type": "integer",
+            "description": "Image width in pixels. Default 1280.",
+            "default": 1280
+          },
+          "height": {
+            "type": "integer",
+            "description": "Image height in pixels. Default 720.",
+            "default": 720
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "set_animgraph_param",
+      "title": "Set Animgraph Param",
+      "toolset": "bridge_character",
+      "description": "Set an AnimationGraph parameter on a GameObject's SkinnedModelRenderer (calls Set). This drives Citizen/animgraph motion \u00e2\u20ac\u201d e.g. 'move_x'/'move_y' (float), 'b_grounded'/'b_ducked' (bool), or a Vector3. Pose previews in-editor when PlayAnimationsInEditorScene is on; screenshot to verify. Param names are defined by the model's animation graph \u00e2\u20ac\u201d use list_animations to check whether the model is animgraph-driven. Returns { set, param, kind, note } \u00e2\u20ac\u201d kind is the type actually applied (float/int/bool/vector).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of the GameObject with a SkinnedModelRenderer."
+          },
+          "param": {
+            "type": "string",
+            "description": "Animgraph parameter name, e.g. 'move_x', 'b_grounded'."
+          },
+          "value": {
+            "type": "string",
+            "description": "Value: number (float), boolean, or a vector as {x,y,z} OR a comma string \"x,y,z\". As \"x,y,z\" (or JSON {x,y,z})."
+          },
+          "type": {
+            "type": "string",
+            "description": "Force the parameter type (default: inferred from value). One of: float | int | bool | vector."
+          }
+        },
+        "required": [
+          "id",
+          "param",
+          "value"
+        ]
+      }
+    },
+    {
+      "name": "set_bodygroup",
+      "title": "Set Bodygroup",
+      "toolset": "bridge_character",
+      "description": "Show/hide a bodygroup on a SkinnedModelRenderer (e.g. hide hands when holding a tool, swap head variants). Provide value (int index) or choice (string name). Returns { set, bodygroup } on success (errors if the object has no SkinnedModelRenderer or neither value nor choice is given); take_screenshot to verify the visual change.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of the GameObject with a SkinnedModelRenderer."
+          },
+          "name": {
+            "type": "string",
+            "description": "Bodygroup name."
+          },
+          "value": {
+            "type": "integer",
+            "description": "Bodygroup choice index."
+          },
+          "choice": {
+            "type": "string",
+            "description": "Bodygroup choice by name (alternative to value)."
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "set_fog",
+      "title": "Set Fog",
+      "toolset": "bridge_visuals",
+      "description": "Add or update fog in the active scene. Types: 'gradient' (distance haze \u00e2\u20ac\u201d great for mood/horror), 'cubemap' (sky-tinted distance fog), 'volumetric' (a localized fog volume). Re-running with the same targetId updates it rather than duplicating; without targetId each call creates a new fog object. Returns { created, type, gameObject } \u00e2\u20ac\u201d gameObject.id addresses the fog object for later set_property/delete_gameobject; screenshot to verify the look.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Fog type (default gradient). One of: gradient | cubemap | volumetric."
+          },
+          "name": {
+            "type": "string",
+            "description": "GameObject name when creating a new fog object."
+          },
+          "targetId": {
+            "type": "string",
+            "description": "GUID of an existing GameObject to host the fog (else a new fog object is created)."
+          },
+          "color": {
+            "type": "string",
+            "description": "Fog colour (gradient/volumetric Color, cubemap Tint). As \"r,g,b[,a]\" (0-1 floats)."
+          },
+          "startDistance": {
+            "type": "number",
+            "description": "gradient/cubemap: distance (units) where fog begins."
+          },
+          "endDistance": {
+            "type": "number",
+            "description": "gradient/cubemap: distance (units) where fog reaches full density."
+          },
+          "height": {
+            "type": "number",
+            "description": "gradient: world height the fog settles around."
+          },
+          "falloff": {
+            "type": "number",
+            "description": "Distance/density falloff exponent (higher = sharper onset)."
+          },
+          "blur": {
+            "type": "number",
+            "description": "cubemap: sky blur amount."
+          },
+          "heightStart": {
+            "type": "number",
+            "description": "cubemap: world height where height-fog starts."
+          },
+          "heightWidth": {
+            "type": "number",
+            "description": "cubemap: height-fog band width."
+          },
+          "heightExponent": {
+            "type": "number",
+            "description": "cubemap: height-fog falloff exponent."
+          },
+          "strength": {
+            "type": "number",
+            "description": "volumetric: fog density/strength."
+          },
+          "size": {
+            "type": "string",
+            "description": "volumetric: bounds size (units) centred on the object \u00e2\u20ac\u201d object {x,y,z} or comma string \"x,y,z\". As \"x,y,z\" (or JSON {x,y,z})."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "set_forest_seed",
+      "title": "Set Forest Seed",
+      "toolset": "bridge_world",
+      "description": "Set ForestGenerator.Seed and (by default) regenerate \u00e2\u20ac\u201d re-rolls the forest layout while keeping POIs, trails, and density regions. Returns `set`, `seed`, and `rebuilt`; take a screenshot afterwards (screenshot_from) to judge the new layout.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "seed": {
+            "type": "integer",
+            "description": "New random seed (integer). Default 77.",
+            "default": 77
+          },
+          "rebuild": {
+            "type": "boolean",
+            "description": "Regenerate the forest after setting (default true).",
+            "default": true
+          },
+          "id": {
+            "type": "string",
+            "description": "GUID of the GameObject holding the ForestGenerator; omit to auto-find the first ForestGenerator in the scene."
+          },
+          "component": {
+            "type": "string",
+            "description": "Override the builder component type name \u00e2\u20ac\u201d set this if your project's terrain/cave/forest component is named differently than the default (MapBuilder/CaveBuilder/ForestGenerator)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "set_material_property",
+      "title": "Set Material Property",
+      "toolset": "bridge_material",
+      "description": "Change a property on the material assigned to a GameObject \u00e2\u20ac\u201d color, roughness, metallic, texture, etc. Operates on the ModelRenderer's MaterialOverride; if none is assigned it auto-creates one from the default complex shader (no separate assign_material step needed). Returns { set, id, property, autoCreatedMaterial } \u00e2\u20ac\u201d screenshot to verify the visual change.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of the GameObject."
+          },
+          "property": {
+            "type": "string",
+            "description": "Material property name (e.g. 'Color', 'Roughness', 'Metalness', 'Normal')."
+          },
+          "value": {
+            "description": "Property value \u00e2\u20ac\u201d number for floats, string for texture paths/colors, {r,g,b,a} for colors. JSON value."
+          }
+        },
+        "required": [
+          "id",
+          "property",
+          "value"
+        ]
+      }
+    },
+    {
+      "name": "set_skybox",
+      "title": "Set Skybox",
+      "toolset": "bridge_visuals",
+      "description": "Set the scene's 2D skybox tint / indirect lighting (re-uses an existing SkyBox2D or creates one). Darken the tint for night/dusk. Optionally point it at a .vmat sky material (silently kept as-is if the material fails to load). Returns { created, gameObject } \u00e2\u20ac\u201d gameObject.id is the sky object; screenshot to verify the change.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "tint": {
+            "type": "string",
+            "description": "Sky tint colour. As \"r,g,b[,a]\" (0-1 floats)."
+          },
+          "indirectLighting": {
+            "type": "boolean",
+            "description": "Whether the sky contributes indirect/ambient light."
+          },
+          "material": {
+            "type": "string",
+            "description": "Path to a .vmat sky material (optional)."
+          },
+          "name": {
+            "type": "string",
+            "description": "Name for the sky GameObject if one is created."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "simulate_npc_perception",
+      "title": "Simulate Npc Perception",
+      "toolset": "bridge_npc",
+      "description": "READ-ONLY edit-mode verifier: evaluate the NPC's perception math RIGHT NOW without entering play mode. Given an NPC (reads its NpcBrain SightRange/FovDegrees/EyeHeight/TargetTag + transform) and either a targetId or a point, it runs the SAME line-of-sight check the brain uses \u00e2\u20ac\u201d FOV cone (dot vs the baked cosine), sight-range gate, and an occlusion trace from the eye to the target \u00e2\u20ac\u201d and reports the result AND why. This is the keystone verifier: it makes the perception layer checkable in edit mode (no flaky screenshot timing) \u00e2\u20ac\u201d e.g. place the Sasquatch, place a camper behind a tree, and confirm the tree blocks LOS. Call params override the brain's values, so it also works before/without an NpcBrain (uses defaults). Safe in play mode too (read-only, like raycast).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "npcId": {
+            "type": "string",
+            "description": "GUID of the NPC GameObject (ideally with an NpcBrain; its perception [Property] values are read)."
+          },
+          "targetId": {
+            "type": "string",
+            "description": "GUID of the target GameObject to test visibility to (e.g. a player). Provide this OR point."
+          },
+          "point": {
+            "type": "string",
+            "description": "A raw world point to test visibility to. Provide this OR targetId. As \"x,y,z\" (or JSON {x,y,z})."
+          },
+          "sightRange": {
+            "type": "number",
+            "description": "Override the sight range for this check (else read from the NpcBrain / default 1500)."
+          },
+          "fovDegrees": {
+            "type": "number",
+            "description": "Override the FOV cone angle for this check (else read from the NpcBrain / default 110)."
+          },
+          "eyeHeight": {
+            "type": "number",
+            "description": "Override the eye height for this check (else read from the NpcBrain / default 64)."
+          },
+          "targetTag": {
+            "type": "string",
+            "description": "Override the target tag (canSee also requires the target to carry this tag; else read from the NpcBrain / default 'player')."
+          }
+        },
+        "required": [
+          "npcId"
+        ]
+      }
+    },
+    {
+      "name": "spawn_citizen",
+      "title": "Spawn Citizen",
+      "toolset": "bridge_character",
+      "description": "Spawn an animated Citizen character: a SkinnedModelRenderer with the Citizen model, plus (by default) a CitizenAnimationHelper so it idles. PlayAnimationsInEditorScene is enabled so the idle pose shows in the editor view (screenshot-verifiable). Returns { created, hasAnimator, gameObject:{ id, name, position, components, ... } } \u00e2\u20ac\u201d pass gameObject.id to the follow-ups: dress_citizen, pose_citizen, set_expression, equip_model.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "GameObject name (default 'Citizen')."
+          },
+          "model": {
+            "type": "string",
+            "description": "Override the skinned model (default 'models/citizen/citizen.vmdl')."
+          },
+          "position": {
+            "type": "string",
+            "description": "World position. As \"x,y,z\" (or JSON {x,y,z})."
+          },
+          "rotation": {
+            "type": "string",
+            "description": "World rotation. As \"pitch,yaw,roll\" degrees."
+          },
+          "scale": {
+            "type": "string",
+            "description": "World scale (default 1,1,1). As \"x,y,z\" (or JSON {x,y,z})."
+          },
+          "tint": {
+            "type": "string",
+            "description": "Body tint colour. As \"r,g,b[,a]\" (0-1 floats)."
+          },
+          "animator": {
+            "type": "boolean",
+            "description": "Add a CitizenAnimationHelper for idle/pose (default true)."
+          },
+          "holdType": {
+            "type": "string",
+            "description": "Initial hold pose, e.g. None, Pistol, Rifle, Shotgun, HoldItem, Punch, Swing."
+          },
+          "moveStyle": {
+            "type": "string",
+            "description": "Movement style, e.g. Auto, Walk, Run."
+          },
+          "parentId": {
+            "type": "string",
+            "description": "GUID of a parent GameObject."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "spawn_vpcf",
+      "title": "Spawn Vpcf",
+      "toolset": "bridge_visuals",
+      "description": "Spawn a REAL particle system by playing a compiled .vpcf asset through LegacyParticleSystem \u00e2\u20ac\u201d the reliable path that actually renders, unlike spawn_particle/create_particle_effect (which build a runtime ParticleEffect graph that shows nothing). Defaults to 'particles/impact.generic.vpcf' (a sparks/impact burst \u00e2\u20ac\u201d the only particle .vpcf reliably present; set looped + a warm tint for a fire-ish effect). Pass your own compiled .vpcf logical path if you have one. Screenshot-verifiable in edit mode.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "vpcf": {
+            "type": "string",
+            "description": "Logical .vpcf path (default 'particles/impact.generic.vpcf'). NOT the .vpcf_c or .sbox/cloud cache path."
+          },
+          "position": {
+            "type": "string",
+            "description": "World position (default origin). As \"x,y,z\" (or JSON {x,y,z})."
+          },
+          "name": {
+            "type": "string",
+            "description": "GameObject name."
+          },
+          "looped": {
+            "type": "boolean",
+            "description": "Loop the effect (default true)."
+          },
+          "playbackSpeed": {
+            "type": "number",
+            "description": "Playback speed multiplier."
+          },
+          "tint": {
+            "type": "string",
+            "description": "Color tint (e.g. orange for fire); applied to the live SceneObject if it's ready this frame. As \"r,g,b[,a]\" (0-1 floats)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "take_screenshot",
+      "title": "Take Screenshot",
+      "toolset": "bridge_screenshot",
+      "description": "Screenshot the scene's main camera view (the player's view in play mode) and return it as an inline PNG image. To frame a specific object or position instead, use capture_view or screenshot_orbit. KNOWN CAPTURE LIMIT (engine, not bridge): text in ScreenPanel/Razor labels may rasterise as solid boxes while images and layout are correct \u00e2\u20ac\u201d a blank HUD in a capture is NOT a HUD bug; verify text another way (e.g. a Log.Info of the bound value).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "width": {
+            "type": "integer",
+            "description": "Image width in pixels (16-3840). Default 1280.",
+            "default": 1280
+          },
+          "height": {
+            "type": "integer",
+            "description": "Image height in pixels (16-2160). Default 720.",
+            "default": 720
+          },
+          "renderUI": {
+            "type": "boolean",
+            "description": "Include screen-space UI (HUD) in the capture. Default true.",
+            "default": true
+          }
+        },
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "ui_pixels",
+      "title": "Pixels",
+      "toolset": "ui",
+      "description": "Read exact pixel values out of a panel - the numbers behind ui_screenshot, for when looking at an image isn't an answer. Points are relative to the panel's top left, which is what makes them comparable to a browser's readout of the same case. Values are 0-255, straight off the rendered frame.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "panel": {
+            "type": "string",
+            "description": "Panel path from ui_panel_dump, or a selector. Empty uses the first root."
+          },
+          "points": {
+            "type": "string",
+            "description": "Points to read, as 'x,y x,y x,y'. Empty reads the panel's centre."
+          }
+        },
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "ui_probe",
+      "title": "Probe",
+      "toolset": "ui",
+      "description": "Draw a scratch panel with the css you give it, measure it, screenshot it, then throw it away. This is how you try a declaration without editing a file and waiting for a hotload - state a case, see what it renders to, compare it against a browser. The sample is a 100x100 block, or a label when you give it text, both inset in a cell like tools/uiparity draws them.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "css": {
+            "type": "string",
+            "description": "The css to try, e.g. 'border-radius: 20px; background-color: #e8b04a'."
+          },
+          "text": {
+            "type": "string",
+            "description": "Text to draw, which makes the sample a label instead of a block."
+          },
+          "background": {
+            "type": "string",
+            "description": "Colour behind the sample, so anything with alpha reads against something known.",
+            "default": "#101010"
+          },
+          "points": {
+            "type": "string",
+            "description": "Pixels to read, as 'x,y x,y' relative to the sample. Empty reads its centre."
+          },
+          "screenshot": {
+            "type": "boolean",
+            "description": "Return an image as well as the numbers.",
+            "default": true
+          }
+        },
+        "required": [
+          "css"
+        ]
+      }
+    },
+    {
+      "name": "ui_probe_batch",
+      "title": "Probe Batch",
+      "toolset": "ui",
+      "description": "Probe a whole list of css cases at once - one cell each, laid out in a grid, measured together and captured as a single contact sheet. This is the parity sweep: state the cases, get every measurement back in one call, then diff them against the same cases in a browser.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "cases": {
+            "type": "string",
+            "description": "One css case per line. Lines starting with # are ignored, so a case file pastes straight in."
+          },
+          "text": {
+            "type": "string",
+            "description": "Text to draw, which makes every sample a label instead of a block."
+          },
+          "background": {
+            "type": "string",
+            "description": "Colour behind the samples.",
+            "default": "#101010"
+          },
+          "columns": {
+            "type": "integer",
+            "description": "Cells per row. 0 fits as many as the screen holds.",
+            "minimum": 0,
+            "maximum": 24,
+            "default": 0
+          },
+          "points": {
+            "type": "string",
+            "description": "Pixels to read from every sample, as 'x,y x,y'. Empty reads their centres."
+          },
+          "screenshot": {
+            "type": "boolean",
+            "description": "Return the contact sheet as well as the numbers.",
+            "default": true
+          }
+        },
+        "required": [
+          "cases"
+        ]
+      }
+    },
+    {
+      "name": "ui_screenshot",
+      "title": "Screenshot",
+      "toolset": "ui",
+      "description": "A screenshot of one panel, cropped to its screen rect, so you can look at what a panel actually draws without hunting for it in a full frame. Renders through the running scene's camera.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "panel": {
+            "type": "string",
+            "description": "Panel path from ui_panel_dump, or a selector. Empty uses the first root."
+          },
+          "padding": {
+            "type": "integer",
+            "description": "Extra pixels around the panel, for seeing shadows and outlines.",
+            "minimum": 0,
+            "maximum": 512,
+            "default": 0
+          }
+        },
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "ui_set_pseudo",
+      "title": "Set Pseudo",
+      "toolset": "ui",
+      "description": "Force a pseudo class on a panel - hover, active, focus - so its styles can be looked at and screenshotted without a mouse. Clears again with on false.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "panel": {
+            "type": "string",
+            "description": "Panel path from ui_panel_dump, or a selector."
+          },
+          "pseudo": {
+            "type": "string",
+            "description": "Which one, e.g. 'Hover'."
+          },
+          "on": {
+            "type": "boolean",
+            "description": "Set it, or clear it.",
+            "default": true
+          }
+        },
+        "required": [
+          "panel",
+          "pseudo"
+        ]
+      }
+    }
+  ],
+  "total": 402
+}

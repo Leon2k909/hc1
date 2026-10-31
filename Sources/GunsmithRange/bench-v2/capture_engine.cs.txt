@@ -1,0 +1,138 @@
+// Before and after of the firing range's benches, rendered by s&box: run with sbox-cli --call run_csharp '{"path":...}'.
+// Loads gunsmith_range.scene's visual roots into an isolated editor scene, so the open scene and play state are never touched and nothing is saved.
+// The capture camera carries the player camera prefab's post stack, with exposure held still. Reads engine/config.json; writes <view>-<variant>.png beside it.
+//   before: the game's range model as it is.
+//   after:  the range with its old benches cut out and the new bench on every lane.
+//   mixed:  the same, with the old bench stood beside the new one on the 10 m lane, in place of the bench on the 25 m lane.
+var projectRoot = Sandbox.Project.Current.GetRootPath();
+var destination = System.IO.Path.Combine(projectRoot, "output/asset-improvement-20261030/range-bench/engine");
+var configuration = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(destination, "config.json"))).AsObject();
+var keep = new System.Collections.Generic.HashSet<string>(StringComparer.OrdinalIgnoreCase) { "Range", "Sun", "Sky", "Firing Platform Light", "10 m Target", "25 m Target", "50 m Target", "100 m Target" };
+var root = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(projectRoot, "Assets/scenes/gunsmith_range.scene"))).AsObject();
+var objects = new System.Text.Json.Nodes.JsonArray();
+foreach (var item in root["GameObjects"].AsArray())
+    if (keep.Contains(item["Name"]?.GetValue<string>() ?? "")) objects.Add(item.DeepClone());
+// The player's own camera stack, off its prefab.
+var prefab = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(projectRoot, "Assets/prefabs/player/cameras/default_player_camera.prefab"))).AsObject();
+var wanted = new[] { "Sandbox.CameraComponent", "Sandbox.Bloom", "Sandbox.Tonemapping", "Sandbox.Sharpen", "Sandbox.AmbientOcclusion", "Sandbox.Vignette", "Facepunch.PhotographicResponse" };
+var components = new System.Text.Json.Nodes.JsonArray();
+foreach (var component in prefab["RootObject"]["Components"].AsArray())
+    if (wanted.Contains(component["__type"]?.GetValue<string>())) components.Add(component.DeepClone());
+objects.Add(new System.Text.Json.Nodes.JsonObject { ["__guid"] = System.Text.Json.Nodes.JsonNode.Parse("\"" + Guid.NewGuid() + "\""), ["Name"] = "Capture camera", ["Enabled"] = true, ["Components"] = components });
+root["GameObjects"] = objects;
+if (root["SceneProperties"] is System.Text.Json.Nodes.JsonObject sceneProperties) sceneProperties["WantsSystemScene"] = false;
+
+var folder = "models/gunsmith_range/shooting_bench_v2/";
+var newModel = Model.Load(folder + "bench.vmdl");
+var cutRange = Model.Load(folder + "compare/range_no_bench.vmdl");
+var oldBench = Model.Load(folder + "compare/old_bench.vmdl");
+foreach (var m in new[] { newModel, cutRange, oldBench })
+    if (m is null || m.IsError) throw new InvalidOperationException("A compare model hasn't compiled.");
+
+var scene = Scene.CreateEditorScene();
+var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
+var preRender = typeof(Scene).GetMethod("PreRender", flags, null, Type.EmptyTypes, null);
+var preCameraRender = typeof(Scene).GetMethod("PreCameraRender", flags, null, Type.EmptyTypes, null);
+Vector3 Vec(System.Text.Json.Nodes.JsonNode node) { var a = node.AsArray(); return new(a[0].GetValue<float>(), a[1].GetValue<float>(), a[2].GetValue<float>()); }
+try
+{
+    CameraComponent camera;
+    ModelRenderer range;
+    Model originalRange;
+    var benches = new System.Collections.Generic.Dictionary<float, GameObject>();
+    GameObject oldPiece;
+    var cameraFound = new System.Collections.Generic.List<string>();
+    using (scene.Push())
+    {
+        scene.Deserialize(root);
+        var holder = scene.GetAllObjects(false).Single(g => g.Name == "Capture camera");
+        camera = holder.Components.Get<CameraComponent>();
+        camera.ZNear = 1;
+        camera.ZFar = 30000;
+        camera.IsMainCamera = true;
+        foreach (var tonemap in holder.Components.GetAll<Tonemapping>())
+        {
+            tonemap.AutoExposureEnabled = true;
+            tonemap.MinimumExposure = tonemap.MaximumExposure = configuration["exposure"].GetValue<float>();
+            tonemap.ExposureCompensation = 0;
+            tonemap.Rate = 10;
+        }
+        cameraFound.AddRange(holder.Components.GetAll<Component>().Select(c => c.GetType().Name));
+        range = scene.GetAllObjects(false).Single(g => g.Name == "Range").Components.Get<ModelRenderer>();
+        originalRange = range.Model;
+        foreach (var lane in new[] { -450f, -150f, 150f, 450f })
+        {
+            var go = new GameObject(false, "New bench " + lane);
+            go.WorldPosition = new Vector3(-19f, lane, 0f);
+            go.Components.Create<ModelRenderer>().Model = newModel;
+            benches[lane] = go;
+        }
+        oldPiece = new GameObject(false, "Old bench");
+        oldPiece.WorldPosition = new Vector3(0f, -120f, 0f);
+        oldPiece.Components.Create<ModelRenderer>().Model = oldBench;
+        scene.EditorTick(.016f, .016f);
+        preRender.Invoke(scene, null);
+        preCameraRender.Invoke(scene, null);
+    }
+    // 1024 for the range. The bench's one material at its full size, since its atlas is wider than 2048 and the close-ups would otherwise be judged on a blur.
+    var textureNames = new[] { "g_tColor", "g_tNormal", "g_tRoughness", "g_tAmbientOcclusion", "g_tMetalness", "SkyTexture" };
+    foreach (var material in new[] { originalRange, cutRange, oldBench }.Concat(scene.GetAllComponents<ModelRenderer>().Where(r => r.Model is not null && r.Model != newModel).Select(r => r.Model)).SelectMany(m => m.Materials).Distinct())
+        foreach (var texture in textureNames.Select(material.GetTexture).Append(material.FirstTexture).Where(t => t is not null).Distinct())
+            texture.MarkUsed(1024);
+    foreach (var material in newModel.Materials)
+        foreach (var texture in textureNames.Select(material.GetTexture).Append(material.FirstTexture).Where(t => t is not null).Distinct())
+            texture.MarkUsed(4096);
+    for (var wait = 0; wait < configuration["stream_frames"].GetValue<int>(); wait++)
+    {
+        using (scene.Push()) { scene.EditorTick(.016f, .016f); preRender.Invoke(scene, null); }
+        await Task.Delay(33, cancellationToken);
+    }
+    var settle = configuration["settle_frames"].GetValue<int>();
+    var written = new System.Collections.Generic.List<string>();
+    foreach (var view in configuration["views"].AsArray())
+    {
+        var name = view["name"].GetValue<string>();
+        foreach (var variantNode in view["variants"].AsArray())
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            var variant = variantNode.GetValue<string>();
+            using (scene.Push())
+            {
+                range.Model = variant == "before" ? originalRange : cutRange;
+                foreach (var pair in benches) pair.Value.Enabled = variant == "after" || (variant == "mixed" && pair.Key != -150f);
+                oldPiece.Enabled = variant == "mixed";
+            }
+            using var bitmap = new Bitmap(view["width"]?.GetValue<int>() ?? configuration["width"].GetValue<int>(), view["height"]?.GetValue<int>() ?? configuration["height"].GetValue<int>());
+            var eye = Vec(view["eye"]);
+            var target = Vec(view["target"]);
+            for (var frame = 0; frame < settle; frame++)
+            {
+                using (scene.Push())
+                {
+                    camera.WorldPosition = eye;
+                    camera.WorldRotation = Rotation.LookAt(target - eye);
+                    camera.FieldOfView = view["fov"].GetValue<float>();
+                    scene.EditorTick(.016f, .016f);
+                    preRender.Invoke(scene, null);
+                    preCameraRender.Invoke(scene, null);
+                    camera.RenderToBitmap(bitmap);
+                }
+                await Task.Delay(16, cancellationToken);
+            }
+            System.IO.File.WriteAllBytes(System.IO.Path.Combine(destination, $"{name}-{variant}.png"), bitmap.ToPng());
+            written.Add($"{name}-{variant}");
+        }
+    }
+    return new
+    {
+        Game.IsPlaying, Written = written, Camera = cameraFound, Renderers = scene.GetAllComponents<ModelRenderer>().Count(),
+        OldBounds = oldBench.Bounds.Size.ToString(), ErrorModels = scene.GetAllComponents<ModelRenderer>().Where(r => r.Model is null || r.Model.IsError).Select(r => r.GameObject.Name).ToArray(),
+        NewMaterials = newModel.Materials.Select(m => m.ResourcePath).ToArray()
+    };
+}
+catch (Exception error)
+{
+    System.IO.File.WriteAllText(System.IO.Path.Combine(destination, "capture-error.txt"), error.ToString());
+    throw;
+}
+finally { scene.Destroy(); }

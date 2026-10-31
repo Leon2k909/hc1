@@ -1,0 +1,38 @@
+// In a running Boxyard match: stand the incendiary grenade's skins in a row on a crate. Run with sbox-cli --call run_csharp. Changes only the running match.
+var scene = Game.ActiveScene;
+if (!Game.IsPlaying || scene is null) throw new InvalidOperationException("Not playing.");
+var pawn = Facepunch.Client.Local?.PlayerPawn;
+if (!pawn.IsValid()) return new { Error = "No player yet" };
+Facepunch.LightweightBotManager.Instance?.DevClearBots();
+foreach (var go in scene.GetAllObjects(false).Where(g => g.Name == "Grenade skin (comparison)").ToArray()) go.Destroy();
+
+var top = scene.Trace.Ray(new Vector3(-207f, 76f, 120f), new Vector3(-207f, 76f, 0f)).Run();
+var z = top.Hit ? top.EndPosition.z : 48f;
+var skins = Facepunch.EquipmentSkins.All.Where(s => s.Item == "molotov_grenade").ToArray();
+var stock = "models/weapons/sbox_grenade_incendiary/w_incendiary_grenade.vmdl";
+var report = new System.Collections.Generic.List<string>();
+for (var k = 0; k < skins.Length; k++)
+{
+    var model = Model.Load(skins[k].ModelPath ?? stock);
+    report.Add($"{skins[k].Name}: {model?.ResourcePath} error={model?.IsError} picture={FileSystem.Mounted.FileExists(skins[k].Picture)}");
+    if (model is null || model.IsError) continue;
+    var go = new GameObject(true, "Grenade skin (comparison)");
+    go.NetworkMode = NetworkMode.Never;
+    go.WorldPosition = new Vector3(-218f + k * 7.4f, 76f, z);
+    var renderer = go.Components.Create<ModelRenderer>();
+    renderer.Model = model;
+    renderer.BodyGroups = 11;
+    foreach (var material in model.Materials)
+        foreach (var key in new[] { "g_tColor", "g_tNormal" })
+            material.GetTexture(key)?.MarkUsed(2048);
+}
+
+var eye = new Vector3(-211f, 28f, 64f);
+var target = new Vector3(-198f, 76f, z + 3f);
+pawn.WorldPosition = eye.WithZ(0f);
+pawn.Transform.ClearInterpolation();
+await Task.Delay(6000, cancellationToken);
+pawn.EyeAngles = Rotation.LookAt(target - eye).Angles().WithRoll(0f);
+await Task.Delay(150, cancellationToken);
+pawn.EyeAngles = Rotation.LookAt(target - eye).Angles().WithRoll(0f);
+return new { CrateTop = z, Skins = report, Pawn = pawn.WorldPosition.ToString(), Holding = pawn.CurrentEquipment?.GameObject?.Name };

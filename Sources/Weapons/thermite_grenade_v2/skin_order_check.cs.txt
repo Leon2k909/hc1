@@ -1,0 +1,37 @@
+// Which material does the first-person grenade end up drawing, with the skin applied after the attachments' camo pass (the old order) and before it (the fix)?
+// Builds the viewmodel prefab in a throwaway editor scene. Run with sbox-cli --call run_csharp. Touches nothing open and saves nothing.
+var scene = Scene.CreateEditorScene();
+var results = new System.Collections.Generic.List<string>();
+try
+{
+    using (scene.Push())
+    {
+        var resource = ResourceLibrary.Get<EquipmentResource>("weapons/throwable/molotov_cocktail/molotov_grenade.equip");
+        var prefab = GameObject.GetPrefab("weapons/throwable/molotov_cocktail/vm_molotov_grenade.prefab");
+        if (resource is null || prefab is null) throw new InvalidOperationException("Grenade resource or prefab not found.");
+        foreach (var id in new[] { "incendiary_anm14", "incendiary_anm14_grey" })
+        {
+            var skin = Facepunch.EquipmentSkins.Find(id);
+            foreach (var order in new[] { "old: camo pass, then skin", "fix: skin, then camo pass" })
+            {
+                var root = prefab.Clone(new CloneConfig { Transform = new Transform(), StartEnabled = false });
+                if (order.StartsWith("old"))
+                {
+                    Facepunch.Gunsmith.GunsmithLoadoutManager.ApplyAttachments(resource, root);
+                    Facepunch.EquipmentSkins.Apply(root, skin);
+                }
+                else
+                {
+                    Facepunch.EquipmentSkins.Apply(root, skin);
+                    Facepunch.Gunsmith.GunsmithLoadoutManager.ApplyAttachments(resource, root);
+                }
+                var renderer = root.Components.GetAll<ModelRenderer>(FindMode.EverythingInSelfAndDescendants).First(r => r.GameObject.Name == "grenade");
+                var drawn = renderer.Materials.GetOverride(0) ?? renderer.Model.Materials.FirstOrDefault();
+                results.Add($"{skin.Name} | {order} | mesh {renderer.Model.ResourcePath} | draws {drawn?.ResourcePath ?? drawn?.Name}");
+                root.Destroy();
+            }
+        }
+    }
+}
+finally { scene.Destroy(); }
+return results;

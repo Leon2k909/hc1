@@ -78,3 +78,19 @@ images are diagnostic history, not the installed result.
 `installed.json` records final hashes, model variants, saved group, validation,
 native save receipt and screenshots. The pre-edit scene snapshot is at
 `output/ares/crate-v2/stage-v5/before/Assets/scenes/maps/Ares/ares.scene`.
+
+## Distance fix (2026-10-31)
+
+The user saw the cases fall apart a short way off. Two causes, both measured in
+the engine at 1920 x 1080 with a 90 degree FOV:
+
+- LOD thresholds 10/24 switched at 190 and 456 in, so the plain far shell showed
+  from 11.6 m. They are now 30/80: LOD 1 from about 14.5 m, LOD 2 from about 38.6 m.
+- The alpha-tested stencil broke into blotches beyond about 11 m. It is now
+  `F_TRANSLUCENT`, and fades to a soft grey with distance. At 3 m it looks the same.
+
+Geometry, textures, placements and the scene are unchanged. The comparison is
+`output/ares/crate-v2/captures/distance-fix/before-after.png`. `installed.json`
+and the stage-v7 manifest predate this fix, so they still record the old hashes of
+those five files, and `Tools/ares_check_cargo_cases.py` stops at them until the
+cases are staged again.

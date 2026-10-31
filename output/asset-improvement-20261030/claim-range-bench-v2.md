@@ -1,0 +1,1 @@
+Range shooting bench v2: Assets/scenes/gunsmith_range.scene's four benches. Session local 2026-10-31T12:19:04+00:00. Folders: Sources/GunsmithRange/bench-v2, Assets/models/gunsmith_range/shooting_bench_v2, output/asset-improvement-20261030/range-bench.

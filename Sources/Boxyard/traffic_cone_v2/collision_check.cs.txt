@@ -1,0 +1,30 @@
+// In a running Boxyard match: test the installed cones' collision with rays, from the shape the model really has. Run with sbox-cli --call run_csharp. Changes nothing.
+var scene = Game.ActiveScene;
+if (!Game.IsPlaying || scene is null) throw new InvalidOperationException("Not playing.");
+var results = new System.Collections.Generic.List<string>();
+void Ray(string name, Vector3 from, Vector3 to, string expected)
+{
+    var hit = scene.Trace.Ray(from, to).Run();
+    results.Add($"{name}: {(hit.Hit ? $"hit at {hit.EndPosition.x:0.0},{hit.EndPosition.y:0.0},{hit.EndPosition.z:0.0} surface {hit.Surface?.ResourceName}" : "miss")} (expected {expected})");
+}
+var c = new Vector3(-166f, 54f, 0f);
+// Rays in along +X, towards the standing cone's axis: its wall is 5.6 in out at 1.2 up, tapering to about 1 at the tip.
+Ray("standing, 5 up", c + new Vector3(-40, 0, 5), c + new Vector3(0, 0, 5), "x about -171");
+Ray("standing, 20 up", c + new Vector3(-40, 0, 20), c + new Vector3(0, 0, 20), "x about -168.4");
+Ray("standing, 27 up", c + new Vector3(-40, 0, 27), c + new Vector3(0, 0, 27), "x about -167");
+Ray("standing, 29 up, over the tip", c + new Vector3(-40, 0, 29), c + new Vector3(40, 0, 29), "miss");
+Ray("standing, 20 up, 4 to the side", c + new Vector3(-40, 4, 20), c + new Vector3(40, 4, 20), "miss: the old cone's lathe was narrower here too");
+Ray("standing, base", c + new Vector3(0, -30, 0.6f), c + new Vector3(0, 0, 0.6f), "y about 47");
+Ray("standing, down on the base's corner area", c + new Vector3(4.5f, -4.5f, 10), c + new Vector3(4.5f, -4.5f, -1), "z about 1.2 or the collar");
+// The knocked-over cone. Its tip rests on the ground, so nothing should be left where the old one's tip hung, 13 up.
+var b = new Vector3(-189.974f, 42.181f, 6.845f);
+var axis = new Vector3(-0.33441f, 0.91878f, -0.20953f);
+var mid = b + axis * 14f;
+Ray("lying, down onto its middle", mid + Vector3.Up * 30, mid - Vector3.Up * 12, "z about 7");
+Ray("lying, where the old tip hung, 13 up", new Vector3(-199.5f, 40f, 13f), new Vector3(-199.5f, 68.5f, 13f), "miss");
+var tip = b + axis * 28f;
+Ray("lying, down onto its tip", tip + Vector3.Up * 12, tip - Vector3.Up * 4, "z about 1.5");
+var site = new Vector3(549f, -558f, 0f);
+Ray("A site cone, 10 up", site + new Vector3(-40, 0, 10), site + new Vector3(0, 0, 10), "x about 545");
+var cones = scene.GetAllObjects(false).Where(g => g.Name.StartsWith("Cone")).Select(g => $"{g.Name} at {g.WorldPosition.x:0.#},{g.WorldPosition.y:0.#},{g.WorldPosition.z:0.#}: {g.Components.Get<ModelRenderer>()?.Model?.ResourcePath} error={g.Components.Get<ModelRenderer>()?.Model?.IsError}").ToArray();
+return new { Results = results, Cones = cones };

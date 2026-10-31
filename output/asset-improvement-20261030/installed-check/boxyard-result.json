@@ -1,0 +1,283 @@
+{
+  "Before": {
+    "IsPlaying": false,
+    "Scene": "asset_compare",
+    "SceneId": "2fb17a65-6fe7-5a63-b2d9-8085d155e51b",
+    "GameSceneId": null
+  },
+  "IsPlaying": false,
+  "SourceUnchanged": true,
+  "Written": [
+    "ibc_tote_1",
+    "ibc_tote_1_close",
+    "ibc_tote_3",
+    "ibc_tote_3_close",
+    "wheelie_bin_1",
+    "wheelie_bin_1_close",
+    "wheelie_bin_3",
+    "wheelie_bin_3_close",
+    "wheelie_bin_5",
+    "wheelie_bin_5_close"
+  ],
+  "Renderers": 19,
+  "ErrorModels": [],
+  "Placed": [
+    {
+      "Name": "IBC tote",
+      "Model": "models/props/boxyard/ibc_tote_v2/ibc_tote.vmdl",
+      "Position": "319,-352,0",
+      "Scale": "1,1,1",
+      "Colliders": 0,
+      "Bounds": "39.55,47.87,45.835",
+      "Materials": [
+        "materials/boxyard/ibc_tote_v2/it_tote.vmat"
+      ]
+    },
+    {
+      "Name": "IBC tote",
+      "Model": "models/props/boxyard/ibc_tote_v2/ibc_tote.vmdl",
+      "Position": "372,-352,0",
+      "Scale": "1,1,1",
+      "Colliders": 0,
+      "Bounds": "39.55,47.87,45.835",
+      "Materials": [
+        "materials/boxyard/ibc_tote_v2/it_tote.vmat"
+      ]
+    },
+    {
+      "Name": "Bin green",
+      "Model": "models/maps/boxyard/wheelie_bin_v2/wheelie_bin_green.vmdl",
+      "Position": "150,-34,0",
+      "Scale": "1,1,1",
+      "Colliders": 0,
+      "Bounds": "24.4179,32.55,42.2001",
+      "Materials": [
+        "models/maps/boxyard/wheelie_bin_v2/wheelie_bin_green.vmat"
+      ]
+    },
+    {
+      "Name": "Bin grey",
+      "Model": "models/maps/boxyard/wheelie_bin_v2/wheelie_bin_grey.vmdl",
+      "Position": "150,-60,0",
+      "Scale": "1,1,1",
+      "Colliders": 0,
+      "Bounds": "24.4179,32.55,42.2001",
+      "Materials": [
+        "models/maps/boxyard/wheelie_bin_v2/wheelie_bin_grey.vmat"
+      ]
+    },
+    {
+      "Name": "Bin blue",
+      "Model": "models/maps/boxyard/wheelie_bin_v2/wheelie_bin_blue.vmdl",
+      "Position": "150,-86,0",
+      "Scale": "1,1,1",
+      "Colliders": 0,
+      "Bounds": "24.4179,32.55,42.2001",
+      "Materials": [
+        "models/maps/boxyard/wheelie_bin_v2/wheelie_bin_blue.vmat"
+      ]
+    }
+  ],
+  "Rays": [
+    {
+      "Label": "ibc_tote_1 +x",
+      "Hit": true,
+      "Distance": 0,
+      "Expect": 60,
+      "Object": "Containers",
+      "Surface": "metal"
+    },
+    {
+      "Label": "ibc_tote_1 -x",
+      "Hit": true,
+      "Distance": 60,
+      "Expect": 60,
+      "Object": "Props",
+      "Surface": "metal"
+    },
+    {
+      "Label": "ibc_tote_1 +y",
+      "Hit": true,
+      "Distance": 60,
+      "Expect": 60,
+      "Object": "Props",
+      "Surface": "metal"
+    },
+    {
+      "Label": "ibc_tote_1 -y",
+      "Hit": true,
+      "Distance": 7,
+      "Expect": 60,
+      "Object": "Props",
+      "Surface": "metal"
+    },
+    {
+      "Label": "ibc_tote_1 over the top",
+      "Hit": true,
+      "Distance": 0,
+      "Expect": -1,
+      "Object": "Containers",
+      "Surface": "metal"
+    },
+    {
+      "Label": "ibc_tote_3 +x",
+      "Hit": true,
+      "Distance": 0,
+      "Expect": 60,
+      "Object": "Containers",
+      "Surface": "metal"
+    },
+    {
+      "Label": "ibc_tote_3 -x",
+      "Hit": true,
+      "Distance": 60,
+      "Expect": 60,
+      "Object": "Props",
+      "Surface": "metal"
+    },
+    {
+      "Label": "ibc_tote_3 +y",
+      "Hit": true,
+      "Distance": 7,
+      "Expect": 60,
+      "Object": "Props",
+      "Surface": "metal"
+    },
+    {
+      "Label": "ibc_tote_3 -y",
+      "Hit": true,
+      "Distance": 60,
+      "Expect": 60,
+      "Object": "Props",
+      "Surface": "metal"
+    },
+    {
+      "Label": "ibc_tote_3 over the top",
+      "Hit": true,
+      "Distance": 0,
+      "Expect": -1,
+      "Object": "Containers",
+      "Surface": "metal"
+    },
+    {
+      "Label": "wheelie_bin_1 +x",
+      "Hit": true,
+      "Distance": 60,
+      "Expect": 60,
+      "Object": "Props",
+      "Surface": "plastic"
+    },
+    {
+      "Label": "wheelie_bin_1 -x",
+      "Hit": true,
+      "Distance": 7.99,
+      "Expect": 60,
+      "Object": "Props",
+      "Surface": "plastic"
+    },
+    {
+      "Label": "wheelie_bin_1 +y",
+      "Hit": true,
+      "Distance": 60,
+      "Expect": 60,
+      "Object": "Props",
+      "Surface": "plastic"
+    },
+    {
+      "Label": "wheelie_bin_1 -y",
+      "Hit": true,
+      "Distance": 60,
+      "Expect": 60,
+      "Object": "Props",
+      "Surface": "plastic"
+    },
+    {
+      "Label": "wheelie_bin_1 over the top",
+      "Hit": false,
+      "Distance": -1,
+      "Expect": -1,
+      "Object": null,
+      "Surface": "ejected_9mm"
+    },
+    {
+      "Label": "wheelie_bin_3 +x",
+      "Hit": true,
+      "Distance": 34,
+      "Expect": 60,
+      "Object": "Props",
+      "Surface": "plastic"
+    },
+    {
+      "Label": "wheelie_bin_3 -x",
+      "Hit": true,
+      "Distance": 4.11,
+      "Expect": 60,
+      "Object": "Containers",
+      "Surface": "metal"
+    },
+    {
+      "Label": "wheelie_bin_3 +y",
+      "Hit": true,
+      "Distance": 60,
+      "Expect": 60,
+      "Object": "Props",
+      "Surface": "plastic"
+    },
+    {
+      "Label": "wheelie_bin_3 -y",
+      "Hit": true,
+      "Distance": 60,
+      "Expect": 60,
+      "Object": "Props",
+      "Surface": "plastic"
+    },
+    {
+      "Label": "wheelie_bin_3 over the top",
+      "Hit": true,
+      "Distance": 138.13,
+      "Expect": -1,
+      "Object": "Containers",
+      "Surface": "metal"
+    },
+    {
+      "Label": "wheelie_bin_5 +x",
+      "Hit": true,
+      "Distance": 7.99,
+      "Expect": 60,
+      "Object": "Props",
+      "Surface": "plastic"
+    },
+    {
+      "Label": "wheelie_bin_5 -x",
+      "Hit": true,
+      "Distance": 30.44,
+      "Expect": 60,
+      "Object": "Containers",
+      "Surface": "metal"
+    },
+    {
+      "Label": "wheelie_bin_5 +y",
+      "Hit": true,
+      "Distance": 60,
+      "Expect": 60,
+      "Object": "Props",
+      "Surface": "plastic"
+    },
+    {
+      "Label": "wheelie_bin_5 -y",
+      "Hit": true,
+      "Distance": 0,
+      "Expect": 60,
+      "Object": "Props",
+      "Surface": "wood"
+    },
+    {
+      "Label": "wheelie_bin_5 over the top",
+      "Hit": true,
+      "Distance": 111.81,
+      "Expect": -1,
+      "Object": "Containers",
+      "Surface": "metal"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+// In a running Boxyard match: pick one skin the way the gear picker does, then draw the incendiary grenade, so the game dresses it as it would for a player. SKIN_ID is
+// filled in before it's run. The player's saved pick is put back before it returns: the grenade in hand keeps its look until it's next drawn. Changes only the running match.
+var scene = Game.ActiveScene;
+if (!Game.IsPlaying || scene is null) throw new InvalidOperationException("Not playing.");
+var pawn = Facepunch.Client.Local?.PlayerPawn;
+if (!pawn.IsValid()) return new { Error = "No player yet" };
+Facepunch.LightweightBotManager.Instance?.DevClearBots();
+foreach (var go in scene.GetAllObjects(false).Where(g => g.Name == "Grenade skin (comparison)").ToArray()) go.Destroy();
+
+pawn.WorldPosition = new Vector3(-72f, 8f, 0f);
+pawn.Transform.ClearInterpolation();
+pawn.EyeAngles = new Angles(30f, 140f, 0f);
+
+var cookie = "hc1.equipment_skin.molotov_grenade";
+var saved = Game.Cookies.Get<string>(cookie, "");
+var skin = Facepunch.EquipmentSkins.Find("SKIN_ID");
+string[] seen;
+try
+{
+    Facepunch.EquipmentSkins.Equip(skin);
+    pawn.Inventory.SwitchToSlot(EquipmentSlot.Primary);
+    await Task.Delay(1200, cancellationToken);
+    pawn.Inventory.SwitchToSlot(EquipmentSlot.Lethal);
+    await Task.Delay(1000, cancellationToken);
+    var renderers = scene.GetAllObjects(false).SelectMany(g => g.Components.GetAll<ModelRenderer>())
+        .Where(r => r.GameObject.Name == "grenade" || r.GameObject.Name == "Model" || r.Model?.ResourcePath?.Contains("grenade", StringComparison.OrdinalIgnoreCase) == true).ToArray();
+    foreach (var renderer in renderers)
+        foreach (var material in renderer.Model?.Materials ?? Enumerable.Empty<Material>())
+            foreach (var key in new[] { "g_tColor", "g_tNormal" })
+                material.GetTexture(key)?.MarkUsed(2048);
+    seen = renderers.Select(r => $"{r.GameObject.Name}: {r.Model?.ResourcePath} slot0 {r.Materials.GetOriginal(0)?.ResourcePath} override {r.Materials.GetOverride(0)?.ResourcePath ?? r.Materials.GetOverride(0)?.Name}").ToArray();
+}
+finally
+{
+    // Equip clears the cached picks, so the next read comes from the cookie put back here.
+    Game.Cookies.Set(cookie, saved);
+}
+await Task.Delay(3000, cancellationToken);
+pawn.EyeAngles = new Angles(30f, 140f, 0f);
+return new { Skin = skin?.Name, Saved = saved, CookieNow = Game.Cookies.Get<string>(cookie, ""), Holding = pawn.CurrentEquipment?.GameObject?.Name, Seen = seen };

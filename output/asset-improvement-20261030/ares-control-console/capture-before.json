@@ -1,0 +1,1 @@
+{"code":"var args = System.Text.Json.JsonSerializer.SerializeToElement(new { position = new { x = -530f, y = -190f, z = 80f }, lookAt = new { x = -440f, y = -230f, z = 32f }, fov = 50, width = 1400, height = 1200, renderUI = false });\nreturn await new CaptureViewHandler().Execute(args);"}

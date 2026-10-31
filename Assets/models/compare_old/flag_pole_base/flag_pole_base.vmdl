@@ -1,0 +1,147 @@
+<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:modeldoc29:version{3cec427c-1b0e-4d48-a90a-0436f33a6041} -->
+{
+	rootNode = 
+	{
+		_class = "RootNode"
+		children = 
+		[
+			{
+				_class = "MaterialGroupList"
+				children = 
+				[
+					{
+						_class = "DefaultMaterialGroup"
+						remaps = 
+						[
+							{
+								from = "flag.vmat"
+								to = "models/compare_old/flag_pole_base/materials/flag.vmat"
+							},
+							{
+								from = "Flag.vmat"
+								to = "models/compare_old/flag_pole_base/materials/flag.vmat"
+							},
+							{
+								from = "flag"
+								to = "models/compare_old/flag_pole_base/materials/flag.vmat"
+							},
+							{
+								from = "Flag"
+								to = "models/compare_old/flag_pole_base/materials/flag.vmat"
+							},
+							{
+								from = "flag_base.vmat"
+								to = "models/compare_old/flag_pole_base/materials/flag_base.vmat"
+							},
+							{
+								from = "Flag_base.vmat"
+								to = "models/compare_old/flag_pole_base/materials/flag_base.vmat"
+							},
+							{
+								from = "flag_base"
+								to = "models/compare_old/flag_pole_base/materials/flag_base.vmat"
+							},
+							{
+								from = "Flag_base"
+								to = "models/compare_old/flag_pole_base/materials/flag_base.vmat"
+							},
+							{
+								from = "flag_pole.vmat"
+								to = "models/compare_old/flag_pole_base/materials/flag_pole.vmat"
+							},
+							{
+								from = "Flag_pole.vmat"
+								to = "models/compare_old/flag_pole_base/materials/flag_pole.vmat"
+							},
+							{
+								from = "flag_pole"
+								to = "models/compare_old/flag_pole_base/materials/flag_pole.vmat"
+							},
+							{
+								from = "Flag_pole"
+								to = "models/compare_old/flag_pole_base/materials/flag_pole.vmat"
+							},
+						]
+						use_global_default = true
+						global_default_material = "models/compare_old/flag_pole_base/materials/flag_pole.vmat"
+					},
+				]
+			},
+			{
+				_class = "PhysicsShapeList"
+				children = 
+				[
+					{
+						_class = "PhysicsMeshFile"
+						name = "flag_pole_base"
+						parent_bone = ""
+						surface_prop = "default"
+						collision_tags = "solid"
+						recenter_on_parent_bone = false
+						offset_origin = [ 0.0, 0.0, 0.0 ]
+						offset_angles = [ 0.0, 0.0, 0.0 ]
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						filename = "models/compare_old/flag_pole_base/flag_pole_base.fbx"
+						import_scale = 1.0
+						maxMeshVertices = 0
+						qemError = 0.0
+						import_filter = 
+						{
+							exclude_by_default = false
+							exception_list = 
+							[
+								"flag_base",
+								"flag_pole",
+							]
+						}
+					},
+				]
+			},
+			{
+				_class = "RenderMeshList"
+				children = 
+				[
+					{
+						_class = "RenderMeshFile"
+						filename = "models/compare_old/flag_pole_base/flag_pole_base.fbx"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = 
+						{
+							exclude_by_default = true
+							exception_list = 
+							[
+								"Cube",
+								"Cube_001",
+								"Circle",
+								"Circle_001",
+								"Circle_002",
+								"Plane",
+								"Circle_003",
+								"Cube_002",
+								"Cube_003",
+								"Cube_004",
+								"flag_pole",
+								"flag_base",
+								"flag",
+								"Flag",
+								"Flag_base",
+							]
+						}
+					},
+				]
+			},
+		]
+		model_archetype = ""
+		primary_associated_entity = ""
+		anim_graph_name = ""
+		base_model_name = ""
+	}
+}

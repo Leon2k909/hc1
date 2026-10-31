@@ -1,0 +1,283 @@
+{
+ "only": "sofas",
+ "width": 1280,
+ "height": 800,
+ "stream_frames": 90,
+ "settle_frames": 24,
+ "jobs": [
+  {
+   "name": "pews",
+   "scene": "Assets/scenes/maps/Belltower/belltower.scene",
+   "roots": [
+    "Sun",
+    "Sky",
+    "Fog",
+    "Look",
+    "Town",
+    "Lights",
+    "Reflections"
+   ],
+   "drop_children": [
+    "West Half",
+    "East Half",
+    "Vista",
+    "Vista Props",
+    "Shop Display Lighting v2"
+   ],
+   "exposure": 2.0,
+   "fresh": "pew_v2",
+   "merged": "belltower_centre",
+   "gone_paints": [],
+   "views": [
+    {
+     "name": "nave",
+     "eye": [
+      -430,
+      0,
+      72
+     ],
+     "target": [
+      -640,
+      0,
+      24
+     ],
+     "fov": 70
+    },
+    {
+     "name": "row",
+     "eye": [
+      -424,
+      118,
+      60
+     ],
+     "target": [
+      -458,
+      90,
+      22
+     ],
+     "fov": 60
+    },
+    {
+     "name": "far",
+     "eye": [
+      -430,
+      -120,
+      70
+     ],
+     "target": [
+      -760,
+      -60,
+      20
+     ],
+     "fov": 60
+    }
+   ]
+  },
+  {
+   "name": "sofas",
+   "scene": "Assets/scenes/maps/Veridant/veridant.scene",
+   "roots": [
+    "Sun",
+    "Sky",
+    "Fog",
+    "Look",
+    "Veridant",
+    "Lights",
+    "Reflection Probes"
+   ],
+   "drop_children": [
+    "Foliage",
+    "Pool Water",
+    "Sea",
+    "Backdrop",
+    "Backdrop Props",
+    "Beech Hedges",
+    "Pine planter beech bushes",
+    "Palm planting surrounds",
+    "Courtyard planter tree"
+   ],
+   "exposure": 2.0,
+   "fresh": "sofa_v2",
+   "merged": "veridant_buildings",
+   "gone_paints": [
+    "vr_sofa",
+    "vr_cushion"
+   ],
+   "views": [
+    {
+     "name": "reception",
+     "eye": [
+      340,
+      -20,
+      62
+     ],
+     "target": [
+      270,
+      -60,
+      18
+     ],
+     "fov": 60
+    },
+    {
+     "name": "lounge",
+     "eye": [
+      -230,
+      440,
+      62
+     ],
+     "target": [
+      -300,
+      480,
+      18
+     ],
+     "fov": 60
+    },
+    {
+     "name": "gallery",
+     "eye": [
+      -395,
+      445,
+      190
+     ],
+     "target": [
+      -470,
+      470,
+      146
+     ],
+     "fov": 60
+    },
+    {
+     "name": "gallery96a",
+     "eye": [
+      -375,
+      355,
+      190
+     ],
+     "target": [
+      -300,
+      380,
+      146
+     ],
+     "fov": 60
+    },
+    {
+     "name": "gallery96b",
+     "eye": [
+      -375,
+      535,
+      190
+     ],
+     "target": [
+      -300,
+      560,
+      146
+     ],
+     "fov": 60
+    },
+    {
+     "name": "lounge3",
+     "eye": [
+      -430,
+      400,
+      62
+     ],
+     "target": [
+      -460,
+      330,
+      18
+     ],
+     "fov": 60
+    },
+    {
+     "name": "ops1",
+     "eye": [
+      -470,
+      -310,
+      190
+     ],
+     "target": [
+      -500,
+      -240,
+      146
+     ],
+     "fov": 60
+    },
+    {
+     "name": "ops2",
+     "eye": [
+      -470,
+      -590,
+      190
+     ],
+     "target": [
+      -500,
+      -660,
+      146
+     ],
+     "fov": 60
+    }
+   ]
+  },
+  {
+   "name": "shutters",
+   "scene": "Assets/scenes/maps/Ridgeback/ridgeback.scene",
+   "roots": [
+    "Sun",
+    "Sky",
+    "Fog",
+    "Buildings"
+   ],
+   "drop_children": [],
+   "exposure": 1.1,
+   "fresh": "shutter_v2",
+   "merged": "town_house",
+   "gone_paints": [
+    "shutter_green"
+   ],
+   "views": [
+    {
+     "name": "wall",
+     "eye": [
+      -1450.1,
+      -1746.9,
+      226.8
+     ],
+     "target": [
+      -1455.2,
+      -1865.8,
+      218.8
+     ],
+     "fov": 60
+    },
+    {
+     "name": "leaf",
+     "eye": [
+      -1401.4,
+      -1824.1,
+      228.8
+     ],
+     "target": [
+      -1416.8,
+      -1867.5,
+      218.8
+     ],
+     "fov": 60
+    },
+    {
+     "name": "corner",
+     "eye": [
+      -1353.0,
+      -1771.2,
+      276.8
+     ],
+     "target": [
+      -1508.6,
+      -1894.5,
+      246.8
+     ],
+     "fov": 60
+    }
+   ]
+  }
+ ]
+}

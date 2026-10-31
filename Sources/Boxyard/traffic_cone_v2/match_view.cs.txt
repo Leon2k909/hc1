@@ -1,0 +1,75 @@
+// In a running Boxyard match: stand the local player at a spot looking at a target, and show the old cones, the new model in their places,
+// or both side by side. Run with sbox-cli --call run_csharp, with the placeholders filled in by match_shot.py. Changes only the running match, and nothing is saved.
+var scene = Game.ActiveScene;
+if (!Game.IsPlaying || scene is null) throw new InvalidOperationException("Not playing.");
+var pawn = Facepunch.Client.Local?.PlayerPawn;
+if (!pawn.IsValid()) return new { Error = "No player yet", Scene = scene.Name };
+
+// No bots: their shots set off the game's just-been-hit effect, and they walk into frame. The fill rule would only put them back.
+foreach (var rule in scene.GetAllObjects(false).SelectMany(g => g.Components.GetAll<Facepunch.BotFillRule>()).ToArray())
+    rule.Enabled = false;
+Facepunch.LightweightBotManager.Instance?.DevClearBots();
+Facepunch.UI.ClassSelect.CloseAny();
+Facepunch.UI.PauseMenuPanel.CloseAny();
+
+var eyeHeight = 64f;
+var eye = new Vector3(EYE_X, EYE_Y, 0f);
+var target = new Vector3(TARGET_X, TARGET_Y, TARGET_Z);
+pawn.WorldPosition = eye;
+pawn.Transform.ClearInterpolation();
+pawn.EyeAngles = Rotation.LookAt(target - (eye + Vector3.Up * eyeHeight)).Angles().WithRoll(0f);
+
+var props = scene.GetAllObjects(false).FirstOrDefault(g => g.Name == "Props")?.Components.Get<ModelRenderer>();
+if (!props.IsValid()) throw new InvalidOperationException("No merged props renderer in this scene.");
+var hidden = Material.Load("attachments/m4a1/materials/hidden.vmat");
+var model = Model.Load("models/maps/boxyard/traffic_cone_v2/traffic_cone.vmdl");
+if (model is null || model.IsError || hidden is null || hidden.IsError) throw new InvalidOperationException("Cone or hidden material missing.");
+foreach (var material in model.Materials)
+    foreach (var key in new[] { "g_tColor", "g_tNormal" })
+        material.GetTexture(key)?.MarkUsed(2048);
+
+var mode = "MODE";
+var slots = new System.Collections.Generic.List<int>();
+for (var slot = 0; slot < props.Materials.Count; slot++)
+{
+    var path = props.Materials.GetOriginal(slot)?.ResourcePath ?? "";
+    if (path.Contains("bx_cone_orange") || path.Contains("bx_reflective") || path.Contains("bx_black_plastic"))
+    {
+        props.Materials.SetOverride(slot, mode == "new" ? hidden : null);
+        slots.Add(slot);
+    }
+}
+var existing = scene.GetAllObjects(false).Where(g => g.Name == "New cone (comparison)").ToArray();
+foreach (var go in existing) go.Destroy();
+var inPlace = new (Vector3 At, Rotation Turn)[] {
+    (new(-166f, 54f, 0f), Rotation.FromYaw(20f)),
+    (new(511f, -688f, 0f), Rotation.FromYaw(78f)),
+    (new(549f, -558f, 0f), Rotation.FromYaw(81f)),
+    (new(563f, -593f, 0f), Rotation.FromYaw(15f)),
+    (new(-189.986f, 42.176f, 6.8446f), Rotation.LookAt(new Vector3(-0.3304f, 0.92029f, -0.20953f)) * Rotation.FromPitch(90f)),
+};
+// Side by side: one new cone beside the old standing cone, the same distance from the player, turned the same way.
+var beside = new (Vector3 At, Rotation Turn)[] { (new(-152.5f, 80.7f, 0f), Rotation.FromYaw(20f)) };
+var places = mode == "new" ? inPlace : mode == "both" ? beside : Array.Empty<(Vector3 At, Rotation Turn)>();
+foreach (var (at, turn) in places)
+{
+    var go = new GameObject(true, "New cone (comparison)");
+    go.NetworkMode = NetworkMode.Never;
+    go.WorldPosition = at;
+    go.WorldRotation = turn;
+    go.Components.Create<ModelRenderer>().Model = model;
+}
+
+// Let auto exposure settle on this view, as it would for a player standing here, and the textures stream in: the scene's rate is 1, so a few seconds.
+await Task.Delay(6000, cancellationToken);
+pawn = Facepunch.Client.Local?.PlayerPawn;
+// The aim can wander during the wait, so before and after wouldn't line up: set it again just before the shot.
+var aim = Rotation.LookAt(target - (eye + Vector3.Up * eyeHeight)).Angles().WithRoll(0f);
+pawn.EyeAngles = aim;
+await Task.Delay(150, cancellationToken);
+pawn.EyeAngles = aim;
+return new
+{
+    Scene = scene.Name, Game.IsPlaying, Mode = mode, Pawn = pawn?.WorldPosition.ToString(), Eye = pawn?.EyeAngles.ToString(), Made = places.Length,
+    Holding = pawn?.CurrentEquipment?.GameObject?.Name, Bots = scene.GetAllObjects(false).Count(g => g.Components.Get<Facepunch.LightweightCombatBot>().IsValid())
+};

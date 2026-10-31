@@ -1,0 +1,33 @@
+// In a running Boxyard match: walk the local player into the installed cones with dev_force_move, and report where they stopped. It always turns the dev toggle back off.
+var scene = Game.ActiveScene;
+if (!Game.IsPlaying || scene is null) throw new InvalidOperationException("Not playing.");
+var results = new System.Collections.Generic.List<string>();
+var ray = scene.Trace.Ray(new Vector3(-126f, 54f, 5f), new Vector3(-166f, 54f, 5f)).Run();
+results.Add($"standing cone from the open side, 5 up: {(ray.Hit ? $"hit at x {ray.EndPosition.x:0.0}" : "miss")} (expected about -161)");
+
+async Task Walk(string name, Vector3 start, float yaw, string expected)
+{
+    var pawn = Facepunch.Client.Local.PlayerPawn;
+    pawn.WorldPosition = start;
+    pawn.Transform.ClearInterpolation();
+    pawn.EyeAngles = new Angles(10f, yaw, 0f);
+    await Task.Delay(300, cancellationToken);
+    ConsoleSystem.Run("dev_force_move 1");
+    try
+    {
+        for (var k = 0; k < 16; k++)
+        {
+            pawn.EyeAngles = new Angles(10f, yaw, 0f);
+            await Task.Delay(200, cancellationToken);
+        }
+    }
+    finally { ConsoleSystem.Run("dev_force_move 0"); }
+    await Task.Delay(300, cancellationToken);
+    var at = pawn.WorldPosition;
+    results.Add($"{name}: from {start.x:0},{start.y:0} stopped at {at.x:0.0},{at.y:0.0},{at.z:0.0} (expected {expected})");
+}
+
+await Walk("into the standing cone, along -X", new Vector3(-110f, 54f, 0f), 180f, "stopped short of x -166, about -144");
+await Walk("into the knocked-over cone's base, along +Y", new Vector3(-190f, -5f, 0f), 90f, "stopped short of y 42, about 20");
+await Walk("into an A site cone, along -Y", new Vector3(549f, -500f, 0f), -90f, "stopped short of y -558, about -536");
+return new { Results = results };
