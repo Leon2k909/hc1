@@ -145,6 +145,7 @@ public static partial class GameText
 		["Primary"] = "主要武器",
 		["Secondary"] = "次要武器",
 		["Lethal"] = "致命裝備",
+		["Skins"] = "外觀",
 		["Tactical"] = "戰術裝備",
 		["Melee"] = "近戰武器",
 		["Assault Rifle"] = "突擊步槍",

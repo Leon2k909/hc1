@@ -2538,26 +2538,12 @@ def bench( model, e, n, z0=0.0, facing="+e", length=78.7, slats="rw_wood", frame
 
 
 def bin( model, e, n, z0=0.0, facing="+e" ):
-    """ A platform litter bin: a two-compartment steel bin (600 x 300 x 1000 mm) on a plinth, a slot in each half of
-    its front under a sloping rain hood, a pictogram plate under each. One metal box. """
+    """ A platform litter bin's collision: one metal box. The bin itself is station_bin_v2, placed in the scene
+    (railhead_bins). railhead_furniture.bin still builds the old one, for comparing. """
     F = frame_for( e, n, z0, facing )
     w, d = 11.8, 5.9
-    try:
-        import railhead_furniture as FU
-        FU.bin( model, F )
-        F.collide( model, -w - 0.4, w + 0.4, -d - 0.4, d + 0.9, 0.0, 39.4, "metal" )
-        return
-    except Exception as error:
-        print( f"railhead_furniture.bin failed: {error}" )
-    F.box( model, -w + 0.8, w - 0.8, -d + 0.8, d - 0.8, 0.0, 2.0, DARK, skip=( "bottom", ) )
-    F.box( model, -w, w, -d, d, 2.0, 35.0, "rw_steel_grey", skip=( "bottom", "top" ) )
-    _side_prism( model, F, [ ( -d - 0.4, 35.0 ), ( d + 0.9, 35.0 ), ( d + 0.9, 36.4 ), ( -d - 0.4, 39.4 ) ],
-                 -w - 0.4, w + 0.4, lambda k: DARK, DARK )
-    for x in ( -5.7, 5.7 ):
-        F.quad( model, "rw_black", x, d + 0.02, 31.4, 8.6, 3.0 )
-        F.box( model, x - 4.6, x + 4.6, d, d + 0.6, 29.3, 29.9, DARK, skip=( "back", ) )
-        F.quad( model, "rw_white_paint", x, d + 0.02, 24.5, 3.2, 3.2 )
-    F.quad( model, DARK, 0.0, d + 0.02, 18.5, 0.6, 33.0 )
+    import railhead_bins
+    railhead_bins.record( ( e, n, z0 ), F.y[:2] )
     F.collide( model, -w - 0.4, w + 0.4, -d - 0.4, d + 0.9, 0.0, 39.4, "metal" )
 
 
@@ -2986,9 +2972,12 @@ def drum( model, e, n, z0=0.0, paint="rw_drum_blue" ):
 
 
 def pallet_jack( model, e, n, along="n", z0=0.0 ):
-    """ A hand pallet truck, its forks along along ("n", "e", or signed). Visual only (railhead_furniture). """
-    import railhead_furniture as FU
-    FU.pallet_jack( model, e, n, along, z0 )
+    """ A hand pallet truck's collision, its forks along along ("n", "e", or signed). The truck itself is pallet_truck_v2, placed in the scene
+    (railhead_pallet_trucks). railhead_furniture.pallet_jack still builds the old one, for comparing. """
+    import railhead_pallet_trucks
+    F = frame_for( e, n, z0, { "n": "+n", "e": "+e", "+n": "+n", "-n": "-n", "+e": "+e", "-e": "-e" }[along] )
+    railhead_pallet_trucks.record( ( e, n, z0 ), F.y[:2] )
+    F.collide( model, -10.7, 10.7, -9.0, 47.2, 0.0, 14.0, "metal" )
 
 
 def cable_reel( model, e, n, z0=0.0, d=55.1 ):

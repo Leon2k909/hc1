@@ -148,6 +148,7 @@ public static partial class GameText
 		["Primary"] = "Birincil",
 		["Secondary"] = "İkincil",
 		["Lethal"] = "Ölümcül",
+		["Skins"] = "Görünümler",
 		["Tactical"] = "Taktiksel",
 		["Melee"] = "Yakın dövüş",
 		["Assault Rifle"] = "Taarruz tüfeği",

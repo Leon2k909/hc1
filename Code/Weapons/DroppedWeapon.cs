@@ -18,6 +18,9 @@ public partial class DroppedEquipment : Component, IUse, Component.ICollisionLis
 	/// </summary>
 	[Sync( SyncFlags.FromHost )] public string Build { get; set; } = "";
 
+	/// <summary> The skin its holder had on it (<see cref="EquipmentSkins"/>), which each machine draws. </summary>
+	[Sync( SyncFlags.FromHost )] public string SkinId { get; set; }
+
 	public Rigidbody Rigidbody { get; private set; }
 
 	/// <summary>
@@ -62,6 +65,7 @@ public partial class DroppedEquipment : Component, IUse, Component.ICollisionLis
 		droppedWeapon.Resource = resource;
 		droppedWeapon.ApplySavedAttachments = heldWeapon?.ApplySavedAttachments ?? true;
 		droppedWeapon.Build = heldWeapon.IsValid() ? heldWeapon.HolderBuild : "";
+		droppedWeapon.SkinId = heldWeapon.IsValid() ? EquipmentSkins.SkinOf( resource, heldWeapon.Owner )?.Id : null;
 
 		// A gun is drawn from its world model prefab, as in someone's hands, by each machine (UpdateModel). Only things
 		// with no prefab (the cash bag, the drone) are the bare model.
@@ -172,6 +176,7 @@ public partial class DroppedEquipment : Component, IUse, Component.ICollisionLis
 			return;
 
 		_model.Flags |= GameObjectFlags.NotSaved | GameObjectFlags.NotNetworked;
+		EquipmentSkins.Apply( _model, EquipmentSkins.Find( SkinId ) );
 		if ( _model.Components.TryGet<SkinnedModelRenderer>( out var renderer, FindMode.EverythingInSelfAndDescendants ) )
 		{
 			renderer.SetBodyGroup( "sight", 0 );

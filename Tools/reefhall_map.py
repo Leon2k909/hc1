@@ -51,7 +51,8 @@ from map_kit import Model, normalise
 TITLE = "Reef Hall"
 OUT_DIR = K.ASSETS / "models" / "maps" / "reefhall"
 RESOURCE_DIR = "models/maps/reefhall"
-SCENE_FILE = K.ASSETS / "scenes" / "maps" / "ReefHall" / "reefhall.scene"
+BENCH_MODEL = "models/maps/reefhall/bench_v2/bench.vmdl"
+SCENE_FILE =K.ASSETS / "scenes" / "maps" / "ReefHall" / "reefhall.scene"
 MINIMAP_FILE = K.ASSETS / "ui" / "minimaps" / "minimap_reefhall.png"
 MINIMAP_PATH = "ui/minimaps/minimap_reefhall.png"
 MAP_ART_FILE = K.ASSETS / "ui" / "maps" / "reefhall.png"
@@ -819,10 +820,12 @@ def decal( model, paint, e0, e1, n0, n1, z ):
 
 
 def bench( model, centre, yaw, length=96.0, z=0.0 ):
+    """ Its collision only: BENCH_MODEL draws it, placed by write_scene (docs/notes, "Reef Hall bench v2"). """
     fr = Frame( centre, ( math.cos( math.radians( yaw ) ), math.sin( math.radians( yaw ) ) ) )
-    fbox( model, fr, -length / 2, length / 2, -9, 9, z + 15, z + 18, "rh_laminate", WOOD )
+    fbox( model, fr, -length / 2, length / 2, -9, 9, z + 15, z + 18, None, WOOD )
     for u in ( -length / 2 + 8, length / 2 - 8 ):
-        fbox( model, fr, u - 2, u + 2, -8, 8, z, z + 15, "rh_gunmetal", METAL )
+        fbox( model, fr, u - 2, u + 2, -8, 8, z, z + 15, None, METAL )
+    model.props.append( { "model": BENCH_MODEL, "position": tuple( fr.p( 0, 0, z ) ), "along": tuple( fr.d ) } )
 
 
 def lectern( model, centre, yaw, z=0.0, screen="rh_screen_map" ):
@@ -1128,8 +1131,10 @@ def rotunda( model, inside, lights, rng ):
 
     # The floor: the emblem, benches facing the tank, display tanks for cover, information stands.
     decal( model, "rh_emblem", -130, 130, -560, -300, 0.0 )
-    for a in ( 205.0, 335.0 ):
-        bench( model, polar( a, 420 ), a + 90 )
+    # Each slides along its own length, away from the display case it would otherwise run into.
+    for a, slide in ( ( 205.0, 42.0 ), ( 335.0, -42.0 ) ):
+        fr = Frame( polar( a, 420 ), ( math.cos( math.radians( a + 90 ) ), math.sin( math.radians( a + 90 ) ) ) )
+        bench( model, fr.p( slide, 0, 0 ), a + 90 )
     for a in ( 160.0, 200.0, 340.0, 20.0 ):
         display_case( model, polar( a, 430 ), ( 44, 44 ), tank_name="display", rng=rng, inside=inside )
     for a in ( 250.0, 290.0 ):
@@ -1176,9 +1181,12 @@ def mirror_model( model, flip_e=False, flip_n=False, paint_map=None ):
     for points, surface in model.hulls:
         out.hulls.append( ( [ tuple( np.asarray( p, float ) * flip ) for p in points ], surface ) )
     for prop in model.props:
-        assert "fauna" in prop
+        assert "fauna" in prop or "model" in prop
         mirrored = { **prop, "position": tuple( np.asarray( prop["position"], float ) * flip ),
                      "along": tuple( np.asarray( prop.get( "along", ( 1.0, 0.0 ) ), float ) * flip[:2] ) }
+        # A placed model can only turn, not mirror: a single flip turns it end for end too, so its front still mirrors.
+        if "model" in prop and turn:
+            mirrored["along"] = tuple( -np.asarray( mirrored["along"] ) )
         if prop.get( "hole" ):
             mirrored["hole"] = ( prop["hole"][0], tuple( np.asarray( prop["hole"][1], float ) * flip ) )
         out.props.append( mirrored )
@@ -1672,7 +1680,7 @@ def lobby_north( model, inside, lights, rng ):
     skip_cases( rng, stacks=2 )
     display_case( model, ( -2060, 330 ), ( 44, 44 ), tank_name="display", rng=rng, inside=inside )
     drain( model, -2400, -1900, 375, 385 )
-    bench( model, ( -2300, 972 ), 0.0, z=L1 )
+    bench( model, ( -2300, 972 ), 180.0, z=L1 )     # its front to the balcony, its back to the wall
     display_case( model, ( -2850, 760 ), ( 40, 40 ), z=L1, tank_name="display", rng=rng, inside=inside )
 
 
@@ -2956,6 +2964,13 @@ def model_object( name, key, model_name, collide=True, shadows=True ):
     return K.game_object( ids, name, key, components=components )
 
 
+def placed_model_object( name, key, prop ):
+    """ A model drawn where the room's collision already has it: no collider of its own. """
+    return K.game_object( ids, name, key, K.to_world( prop["position"] ), K.yaw_rotation( K.plan_yaw( prop["along"] ) ), components=[
+        K.component( ids, "Sandbox.ModelRenderer", f"{key}/renderer", BodyGroups=18446744073709551615, Model=prop["model"],
+                     RenderType="On", Tint="1,1,1,1" ) ] )
+
+
 def probe_object( name, centre, box ):
     """ An EnvmapProbe that renders its room once, when it's enabled (box projected onto the room). """
     e0, e1, n0, n1, z0, z1 = box
@@ -3193,10 +3208,12 @@ def fauna_objects( rooms ):
 def write_scene( rooms, lights ):
     # A room with no tanks gets no tanks model (`map_kit.write_model` writes none: an empty one hung the editor).
     building = K.game_object( ids, "Aquarium", "aquarium", children=[
-        child for name, _, inside in rooms for child in (
+        child for name, model, inside in rooms for child in (
             model_object( name.title(), f"aquarium/{name}", f"reefhall_{name}" ),
             *( [] if K.is_empty( inside ) else [ model_object( f"{name.title()} Tanks", f"aquarium/{name}/tanks",
-                                                               f"reefhall_{name}_tanks", collide=False, shadows=False ) ] ) ) ] )
+                                                               f"reefhall_{name}_tanks", collide=False, shadows=False ) ] ),
+            *( placed_model_object( f"{name.title()} Bench {k + 1}", f"aquarium/{name}/bench/{k}", prop )
+               for k, prop in enumerate( p for p in model.props if "model" in p ) ) ) ] )
     light_objects = [
         K.game_object( ids, name, f"light/{name}", K.to_world( position ), tags="light_point,light", components=[
             K.component( ids, "Sandbox.PointLight", f"light/{name}/light", Attenuation=1, FogMode="Enabled", FogStrength=1,

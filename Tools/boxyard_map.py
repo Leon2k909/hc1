@@ -591,66 +591,93 @@ def yard():
 # ---------------------------------------------------------------------------------------------------------------------
 # Props
 
+TRAFFIC_CONE_MODEL = "models/maps/boxyard/traffic_cone_v2/traffic_cone.vmdl"
+CONE_LEAN = 0.16    # how far the model's tip leans along its own x, as Sources/Boxyard/traffic_cone_v2/cone.py bends it
+CONES = []      # the cones props() has placed: ( name, plan position, rotation ), for write_scene
+
+
+def rotation_text( x, y, z ):
+    """ The x,y,z,w rotation taking a model's own axes onto these world directions. """
+    r = np.column_stack( ( x, y, z ) )
+    w = math.sqrt( max( 0.0, 1.0 + r[0, 0] + r[1, 1] + r[2, 2] ) ) / 2
+    a = math.sqrt( max( 0.0, 1.0 + r[0, 0] - r[1, 1] - r[2, 2] ) ) / 2
+    b = math.sqrt( max( 0.0, 1.0 - r[0, 0] + r[1, 1] - r[2, 2] ) ) / 2
+    c = math.sqrt( max( 0.0, 1.0 - r[0, 0] - r[1, 1] + r[2, 2] ) ) / 2
+    a, b, c = math.copysign( a, r[2, 1] - r[1, 2] ), math.copysign( b, r[0, 2] - r[2, 0] ), math.copysign( c, r[1, 0] - r[0, 1] )
+    return f"{a:.7f},{b:.7f},{c:.7f},{w:.7f}"
+
+
+def cone_collision( m, at, axes ):
+    """ The model's own shape as collision: one hull for its base and collar, one for its body with its lean. at is its origin
+    in plan, axes its own x, y and z in world directions. """
+    def plan( x, y, z ):
+        world = axes[0] * x + axes[1] * y + axes[2] * z
+        return np.asarray( at, float ) + np.array( ( -world[1], world[0], world[2] ) )
+
+    def ring( radius, z, sides=16 ):
+        lean = CONE_LEAN * ( z / 28.0 ) ** 2
+        return [ plan( radius * math.cos( 2 * math.pi * k / sides ) + lean, radius * math.sin( 2 * math.pi * k / sides ), z ) for k in range( sides ) ]
+
+    def rounded_square( half, radius, z ):
+        inner = half - radius
+        return [ plan( sx * inner + radius * math.cos( math.radians( start + 22.5 * k ) ), sy * inner + radius * math.sin( math.radians( start + 22.5 * k ) ), z )
+                 for sx, sy, start in ( ( 1, 1, 0 ), ( -1, 1, 90 ), ( -1, -1, 180 ), ( 1, -1, 270 ) ) for k in range( 5 ) ]
+
+    base = [ p for half, radius, z in ( ( 6.86, 1.0, 0.0 ), ( 7.0, 1.1, 0.12 ), ( 7.0, 1.1, 0.84 ), ( 6.66, 1.0, 1.2 ) ) for p in rounded_square( half, radius, z ) ]
+    m.hull( base + ring( 5.62, 1.88 ), PLASTIC )
+    m.hull( ring( 5.6, 1.2 ) + ring( 1.09, 27.8 ) + ring( 0.98, 28.0 ), PLASTIC )
+
+
 def cone( m, e, n, heading=0.0 ):
-    """ A 28 in traffic cone on its square base, with two reflective collars. """
-    F = Frame( e, n, heading )
-    F.box( m, -7.0, 7.0, -7.0, 7.0, 0.0, 1.2, "bx_black_plastic" )
-    profile = [ ( 5.6, 1.2 ), ( 4.09, 10.0 ), ( 3.40, 14.0 ), ( 2.89, 17.0 ), ( 2.37, 20.0 ), ( 1.0, 28.0 ) ]
-    paints = [ "bx_cone_orange", "bx_reflective", "bx_cone_orange", "bx_reflective", "bx_cone_orange" ]
-    lathe( m, F.p( 0, 0, 0 ), ( 0, 0, 1 ), profile, paints, sides=14, cap="bx_cone_orange", surface=PLASTIC )
-    F.box( m, -7.0, 7.0, -7.0, 7.0, 0.0, 1.2, surface=PLASTIC )
+    """ A 28 in traffic cone on its square base. Sources/Boxyard/traffic_cone_v2's model draws it, placed by the scene, and only its
+    collision goes in the props model. """
+    t = math.radians( heading )
+    x, y, z = np.array( ( math.cos( t ), math.sin( t ), 0.0 ) ), np.array( ( -math.sin( t ), math.cos( t ), 0.0 ) ), np.array( ( 0.0, 0.0, 1.0 ) )
+    cone_collision( m, ( e, n, 0.0 ), ( x, y, z ) )
+    CONES.append( ( "Cone", ( e, n, 0.0 ), K.yaw_rotation( heading ) ) )
 
 
 def lying_cone( m, e, n, heading ):
-    """ A cone knocked over, along heading: it rests on its base's edge and its tip. """
+    """ A cone knocked over, along heading: it rests on its base's edge and its tip. It lies 3 back from ( e, n ) along heading, which
+    keeps its tip out of the crate behind it. """
     F = Frame( e, n, heading )
     tilt = math.atan2( 7.0 - 1.0, 28.0 )
-    axis = F.v( math.cos( tilt ), 0, math.sin( tilt ) )
-    up = F.v( -math.sin( tilt ), 0, math.cos( tilt ) )
-    base = F.p( 0, 0, 7.0 * math.cos( tilt ) )
-    centre = base + axis * 0.6
-    m.oriented_box( centre, ( axis, F.y, up ), ( 1.2, 14.0, 14.0 ), "bx_black_plastic" )
-    profile = [ ( 5.6, 1.2 ), ( 4.09, 10.0 ), ( 3.40, 14.0 ), ( 2.89, 17.0 ), ( 2.37, 20.0 ), ( 1.0, 28.0 ) ]
-    paints = [ "bx_cone_orange", "bx_reflective", "bx_cone_orange", "bx_reflective", "bx_cone_orange" ]
-    rings = lathe( m, base, axis, profile, paints, sides=14, cap="bx_cone_orange" )
-    m.hull( [ p for ring in rings for p in ring ] + [ centre + F.y * sy * 7 + up * sz * 7 for sy in ( -1, 1 ) for sz in ( -1, 1 ) ],
-            PLASTIC )
+    base = F.p( -3.0, 0, 7.0 * math.cos( tilt ) )
+    z = K.to_world( F.v( math.cos( tilt ), 0, -math.sin( tilt ) ) )
+    # The base's edge lies level: the model's y stays flat, square to the way it points.
+    y = np.cross( ( 0.0, 0.0, 1.0 ), z )
+    y = y / np.linalg.norm( y )
+    x = np.cross( y, z )
+    cone_collision( m, base, ( x, y, z ) )
+    CONES.append( ( "Cone knocked over", tuple( map( float, base ) ), rotation_text( x, y, z ) ) )
 
 
-def drum( m, e, n, paint ):
-    """ A 205 l steel drum: 22.5 in across, 34.8 high, with two rolling hoops and its bungs on top. """
+OIL_DRUM_DIR = "models/maps/boxyard/oil_drum_v2"
+DRUMS = []      # the drums props() has placed: ( e, n, colour, yaw ), for write_scene
+
+
+def drum( m, e, n, colour, yaw ):
+    """ A 205 l steel drum: 22.5 in across, 34.8 high, with two rolling hoops. Only its hull goes in the props model, as it
+    always did. Sources/Boxyard/oil_drum_v2's model draws it, placed by the scene. yaw turns its lettering to the lane. """
     r = 11.25
     profile = [ ( r, 0.0 ), ( r, 11.4 ), ( r + 0.5, 11.55 ), ( r + 0.5, 11.85 ), ( r, 12.0 ), ( r, 22.8 ), ( r + 0.5, 22.95 ),
                 ( r + 0.5, 23.25 ), ( r, 23.4 ), ( r, 34.8 ), ( r - 0.6, 34.8 ), ( r - 0.6, 34.3 ) ]
-    lathe( m, ( e, n, 0.0 ), ( 0, 0, 1 ), profile, paint, sides=16, cap=paint, surface=METAL,
+    lathe( m, ( e, n, 0.0 ), ( 0, 0, 1 ), profile, None, sides=16, surface=METAL,
            turn=( keyed( "drum", e, n ) % 360 ) * math.pi / 180 )
-    turn = ( keyed( "bung", e, n ) % 360 ) * math.pi / 180
-    for radius, size in ( ( 6.5, 1.3 ), ( -6.5, 0.8 ) ):
-        c = ( e + radius * math.cos( turn ), n + radius * math.sin( turn ) )
-        m.cylinder( c, size, 34.3, 34.7, { "side": "bx_galv", "top": "bx_galv", "bottom": None }, sides=6 )
+    DRUMS.append( ( e, n, colour, yaw ) )
+
+
+IBC_TOTE_MODEL = "models/props/boxyard/ibc_tote_v2/ibc_tote.vmdl"
+IBCS = []       # the totes props() has placed: ( e, n, heading ), for write_scene
 
 
 def ibc( m, e, n, heading ):
-    """ An IBC tote: a white plastic tank in a galvanised cage on a steel pallet, 47.2 x 39.4 x 45.8 in. """
+    """ An IBC tote, 47.2 x 39.4 x 45.8 in. Only its collision box goes in the props model. Sources/Boxyard/ibc_tote_v2's model
+    draws it, placed by the scene, with its valve at the +x end. """
     F = Frame( e, n, heading )
     hl, hw = 47.2 / 2, 39.4 / 2
-    F.box( m, -hl, hl, -hw, hw, 0.0, 5.5, "bx_galv" )
-    F.box( m, -hl + 1.4, hl - 1.4, -hw + 1.4, hw - 1.4, 5.5, 44.0, { "default": "bx_hdpe", "-z": None } )
-    m.cylinder( F.p( 0, 0, 0 )[:2], 5.5, 44.0, 45.4, { "side": "bx_black_plastic", "top": "bx_black_plastic", "bottom": None }, sides=10 )
-    F.box( m, hl - 1.4, hl + 0.6, -3.0, 3.0, 6.0, 12.0, "bx_black_plastic" )
-    x, y = hl - 0.6, hw - 0.6
-    for xx in np.linspace( -x, x, 6 ):
-        for sy in ( -1, 1 ):
-            F.rod( m, ( xx, sy * y, 5.5 ), ( xx, sy * y, 45.8 ), 0.45, "bx_galv", sides=5 )
-    for yy in np.linspace( -y, y, 5 )[1:-1]:
-        for sx in ( -1, 1 ):
-            F.rod( m, ( sx * x, yy, 5.5 ), ( sx * x, yy, 45.8 ), 0.45, "bx_galv", sides=5 )
-    for z in ( 16.0, 30.0, 45.3 ):
-        for a, b in ( ( ( -x, -y ), ( x, -y ) ), ( ( x, -y ), ( x, y ) ), ( ( x, y ), ( -x, y ) ), ( ( -x, y ), ( -x, -y ) ) ):
-            F.rod( m, ( *a, z ), ( *b, z ), 0.45, "bx_galv", sides=5 )
-    for yy in np.linspace( -y, y, 4 )[1:-1]:
-        F.rod( m, ( -x, yy, 45.3 ), ( x, yy, 45.3 ), 0.45, "bx_galv", sides=5 )
     F.box( m, -hl, hl, -hw, hw, 0.0, 45.8, surface=METAL )
+    IBCS.append( ( e, n, heading ) )
 
 
 def skip( m, e, n, heading ):
@@ -697,27 +724,24 @@ def pipes( m, e, n, heading ):
     F.box( m, -84.0, 84.0, -14.0, 14.0, 0.0, 3.0 + r + 4 * r * math.sin( math.pi / 3 ) + r, surface=METAL )
 
 
-def wheelie_bin( m, e, n, heading, paint ):
-    """ A 240 l wheelie bin: 23 wide, 29 deep and 42 high, its lid hinged at the back over its two wheels. """
+WHEELIE_BIN_DIR = "models/maps/boxyard/wheelie_bin_v2"
+BINS = []       # the bins props() has placed: ( e, n, heading, colour ), for write_scene
+
+
+def wheelie_bin( m, e, n, heading, colour ):
+    """ A 240 l wheelie bin: 23 wide, 29 deep and 42 high. Only its collision box goes in the props model. Sources/Boxyard/wheelie_bin_v2's
+    model draws it, placed by the scene, with its lid hinged at -y over its two wheels. """
     F = Frame( e, n, heading )
-    bottom = [ ( -10.0, -12.0 ), ( 10.0, -12.0 ), ( 10.0, 12.5 ), ( -10.0, 12.5 ) ]
-    top = [ ( -11.5, -13.5 ), ( 11.5, -13.5 ), ( 11.5, 14.5 ), ( -11.5, 14.5 ) ]
-    zb, zt = 2.0, 40.0
-    for k in range( 4 ):
-        a, b = bottom[k], bottom[( k + 1 ) % 4]
-        c, d = top[( k + 1 ) % 4], top[k]
-        mid = np.array( ( ( a[0] + b[0] ) / 2, ( a[1] + b[1] ) / 2, 0.0 ) )
-        F.quad( m, paint, [ ( *a, zb ), ( *b, zb ), ( *c, zt ), ( *d, zt ) ], mid )
-    F.box( m, -12.0, 12.0, -14.5, 16.0, zt, zt + 2.2, paint )
-    F.box( m, -11.0, 11.0, -16.5, -13.5, zt - 3.0, zt + 1.5, "bx_black_plastic" )
-    for sx in ( -1, 1 ):
-        lathe( m, F.p( sx * 8.0, -12.5, 4.0 ) + F.x * sx * 0.0, F.x * sx, [ ( 4.0, 0.0 ), ( 4.0, 2.0 ) ], "bx_rubber", sides=10,
-               cap="bx_rubber" )
-    F.box( m, -12.0, 12.0, -16.5, 16.0, 0.0, zt + 2.2, surface=PLASTIC )
+    F.box( m, -12.0, 12.0, -16.5, 16.0, 0.0, 42.2, surface=PLASTIC )
+    BINS.append( ( e, n, heading, colour ) )
 
 
 def props():
     m = Model()
+    DRUMS.clear()
+    CONES.clear()
+    IBCS.clear()
+    BINS.clear()
     # The north-west corner: a crate on a grounded pallet, and a skip.
     deck = R.use( "pallet_stack", m, -571.2, 560.0, z0=0.0, layers=1, along="e" )
     R.use( "crate", m, -571.2, 560.0, z0=deck if deck is not None else 5.7, along="e" )
@@ -738,15 +762,15 @@ def props():
     # B site: pipes against the east wall and the south wall, drums.
     pipes( m, 782.0, -480.0, 90.0 )
     pipes( m, 640.0, -816.0, 0.0 )
-    for e, n, paint in ( ( 557.0, -498.0, "bx_drum_blue" ), ( 592.0, -515.0, "bx_drum_red" ), ( 562.0, -534.0, "bx_drum_blue" ) ):
-        drum( m, e, n, paint )
+    for e, n, colour, yaw in ( ( 557.0, -498.0, "blue", 200.0 ), ( 592.0, -515.0, "red", 160.0 ), ( 562.0, -534.0, "blue", 75.0 ) ):
+        drum( m, e, n, colour, yaw )
     # Bins in the middle.
-    for e, paint in ( ( 34.0, "bx_bin_green" ), ( 60.0, "bx_bin_grey" ), ( 86.0, "bx_bin_blue" ) ):
-        wheelie_bin( m, e, 150.0, 180.0 + ( keyed( "bin", e ) % 7 ) - 3.0, paint )
+    for e, colour in ( ( 34.0, "green" ), ( 60.0, "grey" ), ( 86.0, "blue" ) ):
+        wheelie_bin( m, e, 150.0, 180.0 + ( keyed( "bin", e ) % 7 ) - 3.0, colour )
     # The south-west corner: a stack of pallets and two drums.
     R.use( "pallet_stack", m, -632.0, -589.0, layers=3, along="e" )
-    drum( m, -600.0, -620.0, "bx_drum_red" )
-    drum( m, -575.0, -600.0, "bx_drum_blue" )
+    drum( m, -600.0, -620.0, "red", 40.0 )
+    drum( m, -575.0, -600.0, "blue", 300.0 )
     return m
 
 
@@ -1047,6 +1071,38 @@ def model_object( name, key, model_name, collide=True, shadows=True ):
     return K.game_object( ids, name, key, components=components )
 
 
+def drum_object( e, n, colour, yaw ):
+    """ A drum's model where props() put its hull. It has no collider of its own: the Props model's hull stops things. """
+    key = f"world/drum/{e}/{n}"
+    return K.game_object( ids, f"Drum {colour}", key, K.to_world( ( e, n, 0.0 ) ), K.yaw_rotation( yaw ), components=[
+        K.component( ids, "Sandbox.ModelRenderer", f"{key}/renderer", BodyGroups=18446744073709551615,
+                     Model=f"{OIL_DRUM_DIR}/oil_drum_{colour}.vmdl", RenderType="On", Tint="1,1,1,1" ) ] )
+
+
+def cone_object( name, at, rotation ):
+    """ A cone's model where props() put its collision. It has no collider of its own: the Props model's hulls stop things. """
+    key = f"world/cone/{at[0]:g}/{at[1]:g}"
+    return K.game_object( ids, name, key, K.to_world( at ), rotation, components=[
+        K.component( ids, "Sandbox.ModelRenderer", f"{key}/renderer", BodyGroups=18446744073709551615,
+                     Model=TRAFFIC_CONE_MODEL, RenderType="On", Tint="1,1,1,1" ) ] )
+
+
+def ibc_object( e, n, heading ):
+    """ A tote's model where props() put its collision box. It has no collider of its own. """
+    key = f"world/ibc/{e}/{n}"
+    return K.game_object( ids, "IBC tote", key, K.to_world( ( e, n, 0.0 ) ), K.yaw_rotation( heading ), components=[
+        K.component( ids, "Sandbox.ModelRenderer", f"{key}/renderer", BodyGroups=18446744073709551615,
+                     Model=IBC_TOTE_MODEL, RenderType="On", Tint="1,1,1,1" ) ] )
+
+
+def bin_object( e, n, heading, colour ):
+    """ A bin's model where props() put its collision box. It has no collider of its own. The model's front is +y, which is Frame's y at heading - 90. """
+    key = f"world/bin/{e}/{n}"
+    return K.game_object( ids, f"Bin {colour}", key, K.to_world( ( e, n, 0.0 ) ), K.yaw_rotation( heading - 90.0 ), components=[
+        K.component( ids, "Sandbox.ModelRenderer", f"{key}/renderer", BodyGroups=18446744073709551615,
+                     Model=f"{WHEELIE_BIN_DIR}/wheelie_bin_{colour}.vmdl", RenderType="On", Tint="1,1,1,1" ) ] )
+
+
 def probe_object( name, centre, box ):
     e0, e1, n0, n1, z0, z1 = box
     at = K.to_world( centre )
@@ -1080,8 +1136,12 @@ def look_object():
 
 def write_scene( written, light_list, probe_list, tops ):
     world = K.game_object( ids, "Boxyard", "world", children=[
-        model_object( title, f"world/{name}", name, collide, shadows )
-        for name, title, collide, shadows in SCENE_MODELS if name in written ] )
+        *( model_object( title, f"world/{name}", name, collide, shadows )
+           for name, title, collide, shadows in SCENE_MODELS if name in written ),
+        *( drum_object( *placed ) for placed in DRUMS ),
+        *( cone_object( *placed ) for placed in CONES ),
+        *( ibc_object( *placed ) for placed in IBCS ),
+        *( bin_object( *placed ) for placed in BINS ) ] )
     light_objects = [
         K.game_object( ids, name, f"light/{name}", K.to_world( position ), tags="light_point,light", components=[
             K.component( ids, "Sandbox.PointLight", f"light/{name}/light", Attenuation=1, FogMode="Enabled", FogStrength=1,

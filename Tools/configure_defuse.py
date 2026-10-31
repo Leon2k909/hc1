@@ -2,7 +2,7 @@
 from pathlib import Path
 import json, uuid
 ROOT=Path(__file__).resolve().parents[1]
-MODEL='weapons/c4/field_device/field_device.vmdl'
+MODEL='weapons/c4/field_device_v2/field_device.vmdl'
 def guid(): return str(uuid.uuid4())
 def read(path): return json.loads((ROOT/path).read_text(encoding='utf-8-sig'))
 def save(path,data): (ROOT/path).write_text(json.dumps(data,indent=2)+'\n',encoding='utf-8')

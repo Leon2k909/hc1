@@ -13,18 +13,7 @@
 						_class = "DefaultMaterialGroup"
 						remaps =
 						[
-							{ from = "bx_bin_blue.vmat" to = "materials/boxyard/bx_bin_blue.vmat" },
-							{ from = "bx_bin_green.vmat" to = "materials/boxyard/bx_bin_green.vmat" },
-							{ from = "bx_bin_grey.vmat" to = "materials/boxyard/bx_bin_grey.vmat" },
-							{ from = "bx_black_plastic.vmat" to = "materials/boxyard/bx_black_plastic.vmat" },
-							{ from = "bx_cone_orange.vmat" to = "materials/boxyard/bx_cone_orange.vmat" },
 							{ from = "bx_dark.vmat" to = "materials/boxyard/bx_dark.vmat" },
-							{ from = "bx_drum_blue.vmat" to = "materials/boxyard/bx_drum_blue.vmat" },
-							{ from = "bx_drum_red.vmat" to = "materials/boxyard/bx_drum_red.vmat" },
-							{ from = "bx_galv.vmat" to = "materials/boxyard/bx_galv.vmat" },
-							{ from = "bx_hdpe.vmat" to = "materials/boxyard/bx_hdpe.vmat" },
-							{ from = "bx_reflective.vmat" to = "materials/boxyard/bx_reflective.vmat" },
-							{ from = "bx_rubber.vmat" to = "materials/boxyard/bx_rubber.vmat" },
 							{ from = "bx_rust.vmat" to = "materials/boxyard/bx_rust.vmat" },
 							{ from = "bx_skip_green.vmat" to = "materials/boxyard/bx_skip_green.vmat" },
 							{ from = "rw_wood.vmat" to = "materials/railhead/rw_wood.vmat" }
@@ -114,33 +103,6 @@
 					{
 						_class = "PhysicsShapeBox"
 						parent_bone = ""
-						surface_prop = "plastic"
-						collision_tags = "solid"
-						origin = [ 511.0000, -688.0000, 0.6000 ]
-						angles = [ -0.0000, -12.0000, 0.0000 ]
-						dimensions = [ 14.0000, 14.0000, 1.2000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "plastic"
-						collision_tags = "solid"
-						origin = [ 549.0000, -558.0000, 0.6000 ]
-						angles = [ -0.0000, -9.0000, 0.0000 ]
-						dimensions = [ 14.0000, 14.0000, 1.2000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "plastic"
-						collision_tags = "solid"
-						origin = [ 563.0000, -593.0000, 0.6000 ]
-						angles = [ -0.0000, -75.0000, 0.0000 ]
-						dimensions = [ 14.0000, 14.0000, 1.2000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
 						surface_prop = "wood"
 						collision_tags = "solid"
 						origin = [ 207.0000, -96.0000, 24.0000 ]
@@ -173,15 +135,6 @@
 						origin = [ 372.0000, -352.0000, 22.9000 ]
 						angles = [ -0.0000, -0.0000, 0.0000 ]
 						dimensions = [ 47.2000, 39.4000, 45.8000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "plastic"
-						collision_tags = "solid"
-						origin = [ -166.0000, 54.0000, 0.6000 ]
-						angles = [ -0.0000, -70.0000, 0.0000 ]
-						dimensions = [ 14.0000, 14.0000, 1.2000 ]
 					},
 					{
 						_class = "PhysicsShapeBox"

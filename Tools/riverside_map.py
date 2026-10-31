@@ -593,8 +593,8 @@ def pad( m ):
     d = ( b - a ) / np.linalg.norm( b - a )
     out = ( d[1], -d[0] )
     gate = a + d * ( DOG_GATE[1] + DOG_GATE[2] ) / 2
-    P.cooler( m, ( gate[0] + out[0] * 10, gate[1] + out[1] * 10 ), ( -d[0], -d[1] ), gz, lid_open=True )
-    P.teddy( m, ( -24, -215 ), ( 0.45, -0.9 ), gz, scale=1.0 )
+    P.cooler( m, ( gate[0] + out[0] * 10, gate[1] + out[1] * 10 ), ( -d[0], -d[1] ), gz )
+    P.teddy( ( -24, -215 ), ( 0.45, -0.9 ), gz )
     lantern( m, ( -50, -205, gz ) )
     # The gate leaf swung open into the run.
     hinge = a + d * DOG_GATE[1]
@@ -995,6 +995,39 @@ def spot_light_object( name, key, position, target, colour, radius, angle ):
                      FogStrength=1.0, LightColor=colour, Radius=radius, Shadows=True ) ] )
 
 
+def burn_drum_objects():
+    """ The burn drums' models. P.drum keeps their hulls and fires in the zone models. """
+    out = []
+    for k, ( name, position, variant, yaw ) in enumerate( P.BURN_DRUMS ):
+        key = f"drum/{k}"
+        out.append( K.game_object( ids, f"Burn Drum {name}", key, K.to_world( position ), K.yaw_rotation( yaw ), components=[
+            K.component( ids, "Sandbox.ModelRenderer", f"{key}/renderer", BodyGroups=18446744073709551615,
+                         Model=f"models/zombies/burn_drum_v2/burn_drum_{variant}.vmdl", RenderType="On", Tint="1,1,1,1" ) ] ) )
+    return out
+
+
+def cooler_objects():
+    """ The cooler's model. P.cooler keeps its collision in the pad's model. """
+    out = []
+    for k, ( position, yaw ) in enumerate( P.COOLERS ):
+        key = f"cooler/{k}"
+        out.append( K.game_object( ids, "Cooler", key, K.to_world( position ), K.yaw_rotation( yaw ), components=[
+            K.component( ids, "Sandbox.ModelRenderer", f"{key}/renderer", BodyGroups=18446744073709551615,
+                         Model="models/zombies/cooler_v2/cooler.vmdl", RenderType="On", Tint="1,1,1,1" ) ] ) )
+    return out
+
+
+def teddy_objects():
+    """ The teddy's model. It has no collision, as it never had. """
+    out = []
+    for k, ( position, yaw ) in enumerate( P.TEDDIES ):
+        key = f"teddy/{k}"
+        out.append( K.game_object( ids, "Teddy", key, K.to_world( position ), K.yaw_rotation( yaw ), components=[
+            K.component( ids, "Sandbox.ModelRenderer", f"{key}/renderer", BodyGroups=18446744073709551615,
+                         Model="models/zombies/teddy_v2/teddy.vmdl", RenderType="On", Tint="1,1,1,1" ) ] ) )
+    return out
+
+
 def write_scene( written ):
     world = K.game_object( ids, "Riverside", "world", children=[
         model_object( title, f"world/{name}", name, collide, shadows )
@@ -1066,6 +1099,9 @@ def write_scene( written ):
         world,
         K.game_object( ids, "Lights", "lights", children=light_objects ),
         K.game_object( ids, "Fires", "fires", children=fires ),
+        K.game_object( ids, "Burn Drums", "drums", children=burn_drum_objects() ),
+        *cooler_objects(),
+        *teddy_objects(),
         K.game_object( ids, "Reflection Probes", "probes", children=[ probe_object( *p ) for p in PROBES ] ),
         K.game_object( ids, "Volumetric Fog", "haze", children=[ haze_object( *h ) for h in HAZE ] ),
         K.game_object( ids, "Player Spawns", "spawns", children=spawns ),

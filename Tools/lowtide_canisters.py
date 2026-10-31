@@ -1,7 +1,7 @@
 """Separate Lowtide's LPG bottles from the existing dressing, preserving every other face.
 
-Run once (or safely again) to write the intact/torn bottle models, leak/jet audio and
-four damageable scene objects. lowtide_map.py also emits these objects on rebuild.
+Run once (or safely again) to write the leak/jet audio and four damageable scene objects.
+The models themselves are built by Sources/Lowtide/lpg_canister_v2/. lowtide_map.py also emits these objects on rebuild.
 """
 import argparse
 import json
@@ -15,8 +15,8 @@ import numpy as np
 import map_kit as K
 import lowtide_forklift as F
 
-MODEL_RESOURCE = "models/props/lowtide"
-MODEL_OUT = K.ASSETS / MODEL_RESOURCE
+# Built by Sources/Lowtide/lpg_canister_v2/; this tool only places them.
+MODEL_RESOURCE = "models/props/lowtide/lpg_canister_v2"
 SCENE = K.ASSETS / "scenes/maps/Lowtide/lowtide.scene"
 IDS = K.SceneIds("42831158-c0ca-45b1-a99e-b3b3f5f2d624")
 
@@ -50,56 +50,6 @@ def scene_objects():
             ])
         objects.append(obj)
     return objects
-
-
-class TornBottle(F.Forklift):
-    def lathe(self, centre, axis, profile, paint=F.STEEL, segments=40, closed=False, smooth=True):
-        if paint != F.SILVER or len(profile) != 10:
-            return super().lathe(centre, axis, profile, paint, segments, closed, smooth)
-        # A longitudinal split opens the rear of the shell; the torn lips curl outwards.
-        centre = np.asarray(centre, float)
-        angles = np.linspace(-math.pi * 2 / 3, math.pi * 2 / 3, 48)
-        for a in range(len(profile) - 1):
-            x0, r0 = profile[a]
-            x1, r1 = profile[a + 1]
-            for b in range(len(angles) - 1):
-                points = []
-                for x, radius, angle in ((x0, r0, angles[b]), (x1, r1, angles[b]),
-                                         (x1, r1, angles[b + 1]), (x0, r0, angles[b + 1])):
-                    lip = max(0, (abs(angle) - 1.55) / .55)
-                    jagged = 1 + .15 * math.sin(x * 1.7 + angle * 8)
-                    r = radius * (1 + lip * jagged * 2.8 / 6.3)
-                    points.append(centre + (x, r * math.cos(angle), r * math.sin(angle)))
-                angle = (angles[b] + angles[b + 1]) / 2
-                normal = (0, math.cos(angle), math.sin(angle)) if x0 != x1 else (-1 if x0 < 0 else 1, 0, 0)
-                uv = None if x0 == x1 else [((x0 + 17) / 34, b / 47), ((x1 + 17) / 34, b / 47),
-                                            ((x1 + 17) / 34, (b + 1) / 47), ((x0 + 17) / 34, (b + 1) / 47)]
-                self.poly(paint, points, normal, uv=uv)
-                self.poly(F.BLACK, points[::-1], -np.asarray(normal), uv=None if uv is None else uv[::-1])
-
-
-def write_models():
-    for name, cls in (("lpg_canister", F.Forklift), ("lpg_canister_ruptured", TornBottle)):
-        model = K.Model()
-        # Recenter on the bottle rather than the truck's ground origin.
-        cls(model, 0, 42.2, "+n", -49.8).gas_tank()
-        if name == "lpg_canister":
-            frame = F.Forklift(model, 0, 42.2, "+n", -49.8)
-            profile = ((-17, 0), (-17, 2.3), (-16.4, 4.7), (-15.2, 5.9), (-13.5, 6.3),
-                       (13.5, 6.3), (15.2, 5.9), (16.4, 4.7), (17, 2.3), (17, 0))
-            points = {tuple(frame.p((x, -42.2 + radius * math.cos(a), 49.8 + radius * math.sin(a))))
-                      for x, radius in profile for a in np.linspace(0, 2 * math.pi, 48, endpoint=False)}
-            model.hull(sorted(points), "metal")
-        F.configure(model)
-        F.validate(model)
-        count = K.write_model(MODEL_OUT, MODEL_RESOURCE, name, model)
-        print(f"{name}: {count} triangles; bounds={model.bounds()}")
-    cap = K.Model()
-    F.Forklift(cap, 0, 0).lathe((0, 0, 0), (1, 0, 0),
-        ((-1.75, 0), (-1.75, 2.3), (-1.15, 4.7), (.05, 5.9), (1.75, 6.3), (1.75, 0)), F.SILVER, 32)
-    F.configure(cap)
-    F.validate(cap)
-    K.write_model(MODEL_OUT, MODEL_RESOURCE, "lpg_canister_cap", cap)
 
 
 def triangle_key(paint, points):
@@ -202,11 +152,10 @@ def write_audio():
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--models-only", action="store_true")
+    parser.add_argument("--audio-only", action="store_true")
     args = parser.parse_args()
-    write_models()
     write_audio()
-    if not args.models_only:
+    if not args.audio_only:
         split_dressing()
         update_scene()
 

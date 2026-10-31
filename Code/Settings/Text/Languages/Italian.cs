@@ -148,6 +148,7 @@ public static partial class GameText
 		["Primary"] = "Primaria",
 		["Secondary"] = "Secondaria",
 		["Lethal"] = "Letale",
+		["Skins"] = "Skin",
 		["Tactical"] = "Tattico",
 		["Melee"] = "Corpo a corpo",
 		["Assault Rifle"] = "Fucile d'assalto",

@@ -1,0 +1,7 @@
+## Town house shutter v2 (`models/props/ridgeback/shutter_v2`, `Sources/Ridgeback/shutter_v2/`, 2026-10-31)
+- Replaced the town house's 34 shutter leaves at the user's word after comparing both in s&box ("shutters new better"). A louvred timber leaf with strap hinges, a pull ring and a shutter dog, in the old leaf's 25 x 64 x 1.5 in. `shutter_l` and `shutter_r` are mirror images: a leaf's hinge goes on the side nearest its window.
+- The prefab's "Shutters" group holds them, renderers only: the old leaves had no collision either. `ridgeback_buildings.dress_openings` records each in `model.shutters`, and `write_prefab` writes the group. The house's model no longer has any `shutter_green` faces.
+- **The prefab's doors are edited in the prefab, not in the script.** It draws `door_v2`, but `write_prefab` still writes the old door models, so running `ridgeback_buildings.py` puts them back until that's changed too.
+- A new object in a prefab needs a fixed id in the scene's instance (`__PrefabIdToInstanceId`), which `--place` gives it. `install_shutters.py` added just the shutters' 69 ids, since `--place` also re-surveys the terrain and replaces the Buildings object. Rollback: git, or `output/asset-improvement-20261030/shutter/before-install/`.
+- LOD switches are 25, 70 and 160, about 12, 34 and 78 m. The last LOD is a plain dark green leaf.
+- See the folder's README for what's been checked.

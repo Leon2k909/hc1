@@ -1,4 +1,5 @@
 ## Riverside (Zombies map, `Tools/riverside_map.py`)
+- Rerunning `riverside_map.py` isn't safe at the moment: the shared kit has moved on and it rewrites more than you changed (note 163).
 - The user asked for a Zombies trailer park map "as close to this img as possible" (2026-10-15). The picture is a night
   view down the muddy lane of a Florida trailer park:
   - the RIVERSIDE TRAILER PARK sign with GOOD TIMES / BIGGER TOMORROW under it and STILL HERE sprayed below, and a porch

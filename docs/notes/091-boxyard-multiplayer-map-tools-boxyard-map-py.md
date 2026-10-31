@@ -36,7 +36,8 @@
   - Shipment's SWAT van is a closed grey container on B (508, -630): a van would have been the car again.
   - Every container's top and the wall's top are player-clipped up to z 1000.
 - Props: a crate on a grounded pallet, a skip, crates, cones (one knocked over), two IBC totes,
-  205 l drums, wheelie bins, two stacks of rusty pipe, and a stack of pallets.
+  205 l drums, wheelie bins, two stacks of rusty pipe, and a stack of pallets. The cones and drums are models placed by the
+  scene, with only their collision in the props model (`docs/notes/165`, `docs/notes/162`).
 - Forklifts (2026-10-14): the user retired the old Boxyard model from every map. Its geometry and collision were
   removed from Boxyard and both Railhead yards, and its shared `railhead_props` generator and Stillhouse preview
   reference were deleted. Use `Tools/lowtide_forklift.py` for future forklifts; preserve Lowtide's detailed model.

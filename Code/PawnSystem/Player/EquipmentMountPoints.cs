@@ -31,6 +31,7 @@ public class MountPoint
 			if ( inst.IsValid() )
 			{
 				equipment.FitHolderBuild( inst );
+				EquipmentSkins.Apply( inst, equipment.Resource, player );
 				inst.BreakFromPrefab();
 				Mounted.Add( equipment, inst );
 			}

@@ -87,7 +87,8 @@ import lowtide_construction as CONSTRUCTION
 TITLE = "Lowtide"
 OUT_DIR = K.ASSETS / "models/maps/lowtide"
 RESOURCE_DIR = "models/maps/lowtide"
-SCENE_FILE = K.ASSETS / "scenes/maps/Lowtide/lowtide.scene"
+BOLLARD_MODEL = "models/maps/lowtide/mooring_bollard_v2/mooring_bollard.vmdl"
+SCENE_FILE =K.ASSETS / "scenes/maps/Lowtide/lowtide.scene"
 MAT_DIR = K.ASSETS / "materials/lowtide"
 MINIMAP_PATH = "ui/minimaps/minimap_lowtide.png"
 MINIMAP_FILE = K.asset_file( "ui/minimaps" ) / "minimap_lowtide.png"     # the folder is ui/Minimaps on disk
@@ -1953,8 +1954,8 @@ def dress_side( s ):
     use( "forklift", m, s * 1100, -1180, face( s, "+e" ), 0.0, 0.0 )
     crates( m, s, 900, -1420, 0.0, [ ( 0, 0, 2 ), ( 0, 1, 2 ), ( 1, 1, 1 ) ], seed=8 )
     use( "pallet_stack", m, s * 2080, -1150, 0.0, 6, "n" )
-    for e in np.arange( 360, 2200, 330 ):
-        mooring_bollard( m, s * e, QUAY_N + 20 )
+    for e, n in quay_bollards( s ):
+        mooring_bollard( m, e, n )
     return m
 
 
@@ -1964,12 +1965,22 @@ def sacks_at( m, s, e, n, z0, rows=2, cols=3, layers=3, along="e" ):
     sacks( m, e if s > 0 else -e - width, n, z0, rows=rows, cols=cols, layers=layers, along=along )
 
 
+def quay_bollards( s ):
+    """ Where one side's mooring bollards stand. The one by the crane's leg is 4 in further out, clear of its bogie. """
+    return [ ( s * e, QUAY_N + ( 16.0 if e == 690 else 20.0 ) ) for e in range( 360, 2200, 330 ) ]
+
+
 def mooring_bollard( m, e, n ):
-    """ A cast-iron mooring bollard (a Poller) on the quay's edge: a short drum with a flared head. """
-    m.cylinder( ( e, n ), 9.0, 0.0, 4.0, { "side": "iron_black", "top": "iron_black" }, sides=12 )
-    m.cylinder( ( e, n ), 6.5, 4.0, 20.0, { "side": "iron_black" }, sides=12 )
-    m.cylinder( ( e, n ), 8.5, 20.0, 25.0, { "side": "iron_black", "top": "iron_black", "bottom": "iron_black" }, sides=12 )
+    """ A cast-iron mooring bollard (a Poller) on the quay's edge: its collision only. BOLLARD_MODEL draws it. """
     m.collision_box( ( e - 9, n - 9, 0 ), ( e + 9, n + 9, 25 ), METAL )
+
+
+def bollard_object( e, n ):
+    """ A mooring bollard's model, its rope-worn side (-x) to the harbour, give or take 25 degrees. """
+    key = f"world/bollards/{e}"
+    return K.game_object( ids, "Mooring Bollard", key, K.to_world( ( e, n, 0.0 ) ), K.yaw_rotation( keyed( "bollard", e, n ) % 51 - 25.0 ), components=[
+        K.component( ids, "Sandbox.ModelRenderer", f"{key}/renderer", BodyGroups=18446744073709551615, Model=BOLLARD_MODEL,
+                     RenderType="On", Tint="1,1,1,1" ) ] )
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -2291,8 +2302,10 @@ def write_scene( written, light_list, props ):
                                        components=[ K.component( ids, "Sandbox.ModelRenderer", f"{key}/renderer", Model=prop["path"],
                                                                  RenderType="On", Tint="1,1,1,1" ) ] ) )
     world = K.game_object( ids, "Lowtide", "world", children=[
-        model_object( title, f"world/{name}", name, collide, shadows )
-        for name, title, collide, shadows in SCENE_MODELS if name in written ] )
+        *( model_object( title, f"world/{name}", name, collide, shadows )
+           for name, title, collide, shadows in SCENE_MODELS if name in written ),
+        K.game_object( ids, "Quay Bollards", "world/bollards", children=[
+            bollard_object( e, n ) for s in ( 1, -1 ) for e, n in quay_bollards( s ) ] ) ] )
     light_objects = [
         K.game_object( ids, name, f"light/{name}", K.to_world( position ), tags="light_point,light", components=[
             K.component( ids, "Sandbox.PointLight", f"light/{name}/light", Attenuation=1, FogMode="Enabled",

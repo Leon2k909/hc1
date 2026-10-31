@@ -148,6 +148,7 @@ public static partial class GameText
 		["Primary"] = "Основное",
 		["Secondary"] = "Дополнительное",
 		["Lethal"] = "Летальное",
+		["Skins"] = "Скины",
 		["Tactical"] = "Тактическое",
 		["Melee"] = "Ближний бой",
 		["Assault Rifle"] = "Штурмовая винтовка",

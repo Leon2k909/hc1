@@ -146,6 +146,7 @@ public static partial class GameText
 		["Primary"] = "プライマリ",
 		["Secondary"] = "セカンダリ",
 		["Lethal"] = "リーサル",
+		["Skins"] = "スキン",
 		["Tactical"] = "タクティカル",
 		["Melee"] = "近接武器",
 		["Assault Rifle"] = "アサルトライフル",

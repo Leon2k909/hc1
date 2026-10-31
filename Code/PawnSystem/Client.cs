@@ -178,6 +178,18 @@ public partial class Client : Component, ITeam, IGameEventHandler<KillEvent>
 			outfitter.UpdateFromTeam( PlayerPawn.Team );
 	}
 
+	/// <summary>
+	/// The equipment skins this player picked (<see cref="EquipmentSkins.LocalPicks"/>). Every machine reads it to draw their
+	/// equipment, so it's their grenade everyone sees.
+	/// </summary>
+	[Sync( SyncFlags.FromHost )] public string EquipmentSkinPicks { get; set; }
+
+	[Rpc.Host]
+	public void UpdateEquipmentSkinPicks( string picks )
+	{
+		EquipmentSkinPicks = picks?.Truncate( 128 );
+	}
+
 	public void Kick( string reason = "No reason" )
 	{
 		if ( PlayerPawn.IsValid() )

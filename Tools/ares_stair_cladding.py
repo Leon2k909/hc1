@@ -16,14 +16,17 @@ def append_rear_closure(model,axis,c0,c1,s0,s1,z0,z1,landing_thickness=16.):
     up=np.array((0,0,1),float)
     axes=(across,along,up)
     def panel(ca,cb,za,zb,front,back,paint,bevel=.12):
+        # An end on c0 or c1 lies exactly on the stair's own wall and z-fights it, so that face is left out.
+        skip=(('-x',) if ca<=c0 else ())+(('+x',) if cb>=c1 else ())
         P.bevel_box(model,point((ca+cb)/2,(front+back)/2,(za+zb)/2),axes,
-                    (cb-ca,back-front,zb-za),paint,bevel=bevel)
+                    (cb-ca,back-front,zb-za),paint,bevel=bevel,skip=skip)
     panel(c0,c1,z0-.35,top,.70,4.2,'ar_gunmetal',.16)
     # Two columns of replaceable steel sheets with shallow, recessed joints.
     middle=(c0+c1)/2
     for ca,cb in ((c0+3,middle-.55),(middle+.55,c1-3)):
         for row in range(3):
-            za=z0+3+(top-z0-6)*row/3
+            # The bottom row starts above the floor kick, or the two overlap a quarter inch apart.
+            za=z0+4.3 if row==0 else z0+3+(top-z0-6)*row/3
             zb=z0+3+(top-z0-6)*(row+1)/3
             panel(ca,cb,za+.35,zb-.35,.25,2.8,'ar_steel',.16)
     # Flush edge angles and a floor kick close the raw ends of the stringers.

@@ -26,6 +26,9 @@ CLIPS = RP.CLIPS        # ( name, centre, yaw, ( length, thickness, height ) )
 LIGHTS = []             # ( name, position, "r,g,b,1", radius, shadows )
 FIRES = []              # ( name, position, kind ): MapFire objects
 SPOTLIGHTS = []         # ( name, position, target, "r,g,b,1", radius, angle )
+BURN_DRUMS = []         # ( name, position, variant, yaw ): burn_drum_v2 models the scene places
+COOLERS = []            # ( position, yaw ): cooler_v2 models the scene places
+TEDDIES = []            # ( position, yaw ): teddy_v2 models the scene places
 
 WARM = "1.00,0.72,0.42,1"
 PORCH = "1.00,0.78,0.50,1"
@@ -40,6 +43,9 @@ def reset():
     LIGHTS.clear()
     FIRES.clear()
     SPOTLIGHTS.clear()
+    BURN_DRUMS.clear()
+    COOLERS.clear()
+    TEDDIES.clear()
 
 
 def light( name, pos, colour, radius, shadows=False, scale=1.0 ):
@@ -493,26 +499,15 @@ def plank_fence( m, pts, height=60.0, z=0.0, collide=True, seed=0, name="plank f
 # Props
 
 def drum( m, c, paint_name="rs_drum_blue", z0=0.0, burning=True, dented=0.0, name="drum" ):
-    """ A 55 gallon drum (22.5 in across, 34.5 tall), its rolling hoops, open top with ash and embers if burning. """
+    """ A 55 gallon burn drum (22.5 in across, 34.5 tall): its hull and fire here, its model (Sources/Zombies/burn-drum-v2/) placed by the
+    scene. Turned by the golden angle per drum, so no two show the same dents. """
     r, h = 11.25, 34.5
-    cylinder( m, c, r, z0, z0 + h, paint_name, 14, bottom=None, surface=METAL )
-    for zz in ( h * 0.33, h * 0.66 ):
-        cylinder( m, c, r + 0.4, z0 + zz - 0.6, z0 + zz + 0.6, "rs_rust", 14 )
-    cylinder( m, c, r + 0.3, z0 + h - 1, z0 + h, "rs_rust", 14 )
-    # The inside, open at the top.
-    dirs = [ v( math.cos( 2 * math.pi * k / 14 ), math.sin( 2 * math.pi * k / 14 ), 0 ) for k in range( 14 ) ]
     cc = v( c[0], c[1], 0 )
-    for k in range( 14 ):
-        d0, d1 = dirs[k], dirs[( k + 1 ) % 14]
-        card( m, "rs_drum_inside", [ cc + d1 * ( r - 0.4 ) + UP * ( z0 + h * 0.55 ), cc + d0 * ( r - 0.4 ) + UP * ( z0 + h * 0.55 ),
-                                     cc + d0 * ( r - 0.4 ) + UP * ( z0 + h ), cc + d1 * ( r - 0.4 ) + UP * ( z0 + h ) ], -( d0 + d1 ) )
-    fill = "rs_ember" if burning else "rs_ash"
-    card( m, fill, [ cc + d * ( r - 0.5 ) + UP * ( z0 + h * 0.75 ) for d in dirs ], UP )
-    # Air holes punched low down, glowing if it's burning.
+    dirs = [ v( math.cos( 2 * math.pi * k / 14 ), math.sin( 2 * math.pi * k / 14 ), 0 ) for k in range( 14 ) ]
+    m.hull( [ cc + d * r + UP * z for d in dirs for z in ( z0, z0 + h ) ], METAL )
+    variant = { "rs_drum_blue": "blue", "rs_drum_red": "red", "rs_rust": "rust" }[paint_name] if burning else "cold"
+    BURN_DRUMS.append( ( name, ( c[0], c[1], z0 ), variant, len( BURN_DRUMS ) * 137.5 ) )
     if burning:
-        for k in range( 6 ):
-            d = dirs[( k * 2 + 1 ) % 14]
-            RP.quad( m, "rs_ember", cc + d * ( r + 0.05 ) + UP * ( z0 + 7 + ( k % 2 ) * 3 ), np.cross( UP, d ), UP, 2.2, 1.6, off=0.0 )
         FIRES.append( ( name, ( c[0], c[1], z0 + h * 0.78 ), "drum" ) )
 
 
@@ -573,51 +568,18 @@ def bag( m, p, along, size ):
             card( m, "rs_sandbag", q, sum( q ) / 4 - p )
 
 
-def cooler( m, c, along=( 1, 0 ), z0=0.0, lid_open=True ):
-    """ A big ice chest: blue body, white lid, open with SOME THINGS SHOULD STAY FORGOTTEN in marker inside its lid. """
+def cooler( m, c, along=( 1, 0 ), z0=0.0 ):
+    """ A big ice chest, open, with SOME THINGS SHOULD STAY FORGOTTEN in marker inside its lid: its collision here, its model
+    (Sources/Zombies/cooler-v2/) placed by the scene, with its length along its own x and its open side its own +y. """
     along = unit( ( along[0], along[1], 0 ) )
-    side = np.cross( UP, along )
     L, W, H = 32.0, 17.0, 16.0
-    base = v( c[0], c[1], z0 )
-    obox( m, base + UP * ( H / 2 ), along, ( L, W, H ), { "default": "rs_cooler", "+z": None }, PLASTIC )
-    obox( m, base + UP * ( H - 0.6 ), along, ( L - 3, W - 3, 1.0 ), "rs_drum_inside" )
-    obox( m, base + UP * 1.0, along, ( L + 0.6, W + 0.6, 2.0 ), "rs_cooler_white" )
-    if lid_open:
-        # The lid hinged at the back (-side), swung up past upright: closed it lay along +side from the hinge.
-        hinge = base + UP * H - side * ( W / 2 )
-        ang = math.radians( 105 )
-        lid_dir = side * math.cos( ang ) + UP * math.sin( ang )
-        inner = side * math.sin( ang ) - UP * math.cos( ang )
-        lid_c = hinge + lid_dir * ( W / 2 ) - inner * 1.2
-        m.oriented_box( lid_c, ( along, unit( np.cross( lid_dir, along ) ), unit( lid_dir ) ), ( L, 2.4, W ), "rs_cooler_white" )
-        # The marker on the lid's inside, facing the front: right = -along makes cross( right, lid_dir ) = inner.
-        sign( m, "cooler_lid", lid_c + inner * 1.3, -along, W * 0.82, up=lid_dir, off=0.0, w=L * 0.86 )
-        # Junk inside: cans.
-        for k in range( 4 ):
-            p = base + along * ( -10 + k * 6 ) + side * ( ( k % 2 ) * 4 - 2 ) + UP * ( H - 6 )
-            cylinder( m, p, 1.3, p[2], p[2] + 4.8, "rs_drum_red" if k % 2 else "rs_alu", 8, top="rs_alu" )
+    obox( m, v( c[0], c[1], z0 ) + UP * ( H / 2 ), along, ( L, W, H ), None, PLASTIC )
+    COOLERS.append( ( ( c[0], c[1], z0 ), K.plan_yaw( along ) ) )
 
 
-def teddy( m, c, facing=( 0, -1 ), z0=0.0, scale=1.0 ):
-    """ A child's teddy bear sat in the mud: body, head, ears, arms and legs from rounded lumps. """
-    f = unit( ( facing[0], facing[1], 0 ) )
-    s = scale
-    base = v( c[0], c[1], z0 )
-    blob( m, base + UP * 5 * s, 5.5 * s, 6.5 * s, "rs_teddy" )
-    blob( m, base + UP * 13 * s + f * 0.8 * s, 4.6 * s, 4.4 * s, "rs_teddy" )
-    side = np.cross( UP, f )
-    for sx in ( -1, 1 ):
-        blob( m, base + UP * 16.5 * s + side * sx * 3.2 * s, 1.5 * s, 1.5 * s, "rs_teddy_dark" )
-        blob( m, base + UP * 6 * s + side * sx * 5.5 * s + f * 1.5 * s, 1.8 * s, 3.6 * s, "rs_teddy" )
-        blob( m, base + UP * 1.8 * s + side * sx * 2.8 * s + f * 4 * s, 2.0 * s, 1.8 * s, "rs_teddy" )
-    blob( m, base + UP * 12.3 * s + f * 4.4 * s, 1.6 * s, 1.3 * s, "rs_teddy_dark" )
-
-
-def blob( m, c, r, h, paint_name, sides=8 ):
-    """ A rounded lump: a squashed sphere r across, h tall. """
-    c = v( *c )
-    prof = [ ( r * math.sin( math.pi * k / 6 ), -math.cos( math.pi * k / 6 ) * h / 2 ) for k in range( 7 ) ]
-    lathe( m, c, [ ( max( pr, 0.0 ), c[2] + pz ) for pr, pz in prof ], paint_name, sides )
+def teddy( c, facing=( 0, -1 ), z0=0.0 ):
+    """ A child's teddy bear sat in the mud: its model (Sources/Zombies/teddy-v2/) placed by the scene, facing its own +x. It has no collision. """
+    TEDDIES.append( ( ( c[0], c[1], z0 ), K.plan_yaw( facing ) ) )
 
 
 def tire( m, c, axis=( 1, 0, 0 ), r=13.0, w=8.0, paint_name="rs_rubber" ):

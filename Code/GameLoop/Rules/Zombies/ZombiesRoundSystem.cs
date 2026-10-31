@@ -928,13 +928,18 @@ public sealed class ZombiesRoundSystem : Component
 
 			default:
 			{
-				// Wall buy: backboard with the actual weapon model on it.
+				// Wall buy: an armoury rack standing on the floor, with the actual weapon model on its rail.
 				var board = new GameObject( go, true, "Board" );
 				board.LocalPosition = new Vector3( -4f, 0, 40f );
-				board.LocalScale = new Vector3( 2f, 60f, 40f ) / 50f;
 				var boardModel = board.Components.Create<ModelRenderer>();
-				boardModel.Model = Model.Load( "models/dev/box.vmdl" );
-				boardModel.Tint = new Color( 0.28f, 0.2f, 0.13f );
+				boardModel.Model = Model.Load( "models/zombies/wall_buy_board_v2/wall_buy_board.vmdl" );
+				if ( boardModel.Model is null || boardModel.Model.IsError )
+				{
+					Log.Warning( "[Zombies] Missing model for the wall buy's rack; using a plain board." );
+					board.LocalScale = new Vector3( 2f, 60f, 40f ) / 50f;
+					boardModel.Model = Model.Load( "models/dev/box.vmdl" );
+					boardModel.Tint = new Color( 0.28f, 0.2f, 0.13f );
+				}
 
 				if ( station.Weapon?.WorldModel is { } weaponModel && !weaponModel.IsError )
 				{

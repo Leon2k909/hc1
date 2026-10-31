@@ -15,7 +15,7 @@ else:
     renderer = read('wm_c4.prefab')['RootObject']['Components'][0]
 equip = next(c for c in obj['Components'] if c['__type'] == 'Facepunch.Equipment')
 equip.pop('ModelRenderer', None)
-obj['__properties']['Metadata']['WorldModel'] = 'weapons/c4/field_device/field_device.vmdl'
+obj['__properties']['Metadata']['WorldModel'] = 'weapons/c4/field_device_v2/field_device.vmdl'
 save('weapon_c4.prefab', weapon)
 go = 'f6543942-f5aa-4a9e-8f81-bec8647ac704'
 hand = '287b5d1d-bf2b-4eaf-a990-647f83d97401'

@@ -135,7 +135,10 @@ public partial class Throwable : WeaponInputAction,
 
 		var grenade = dropped.GetComponent<BaseGrenade>();
 		if ( grenade.IsValid() )
+		{
 			grenade.Player = player;
+			grenade.SkinId = EquipmentSkins.SkinOf( Equipment.Resource, player )?.Id;
+		}
 
 		dropped.Network.SetOrphanedMode( NetworkOrphaned.ClearOwner );
 		dropped.NetworkSpawn();

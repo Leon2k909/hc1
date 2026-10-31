@@ -36,6 +36,8 @@
   - `output/ares/stairs-20261020/` holds backups, source hashes, geometry counts and native moving-camera captures
     for the hall and wing stairs. An independent planar-face audit found 672 overlapping quad pairs between
     hazard and steel/grating within the flights before the repair, and zero afterward.
+  - The rear closures z-fought the same stairs' walls at their corners until 2026-10-30, when their coincident end caps
+    were removed: `Sources/Ares/stair-rear-wall/README.md`. `Sources/Ares/audit_overlaps.py` lists faces that nearly coincide.
 - Animated processing core (2026-10-20): `ar_plasma.vmat` uses `shaders/hc1_ares_plasma.shader`. The existing
   turbulence texture moves upward and around the column through a gently curling field, with broad dark amber
   pockets and brighter moving detail. The two noise layers and curl wrap at the mesh's U=0/2 cylindrical seam.
@@ -156,4 +158,4 @@
   - Point lights in the engine are far dimmer than Cycles shows them: the lights here are 2.5-3.2 times white.
 - Not yet checked: a match played on it (bots, every mode's objects, spawns), its frame time with 102 point lights (10
   with shadows), and any sound (it has no ambience).
-
+- Cases at a distance (2026-10-31): they drew their plain far LOD from 11.6 m and their alpha-tested stencil broke into blotches from about 11 m. LOD thresholds are now 30/80 (LOD 2 from about 38.6 m) and the stencil is blended. See `Sources/Ares/crate-v2/README.md`.

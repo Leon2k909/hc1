@@ -9,6 +9,7 @@ public partial class Client : Component.INetworkListener
 
 	/// <summary> Sent again a second later while the host hasn't got them, rather than every frame until the sync comes back. </summary>
 	private RealTimeSince _timeSinceOperatorPicksSent = 10f;
+	private RealTimeSince _timeSinceSkinPicksSent = 10f;
 
 	/// <summary>
 	/// How long does it take to clean up a player once they disconnect?
@@ -39,6 +40,12 @@ public partial class Client : Component.INetworkListener
 			{
 				_timeSinceOperatorPicksSent = 0f;
 				UpdateOperatorPicks( operatorPicks );
+			}
+			var skinPicks = EquipmentSkins.LocalPicks;
+			if ( EquipmentSkinPicks != skinPicks && _timeSinceSkinPicksSent > 1f )
+			{
+				_timeSinceSkinPicksSent = 0f;
+				UpdateEquipmentSkinPicks( skinPicks );
 			}
 			var voice = Components.Get<PlayerVoiceComponent>();
 			if ( voice.IsValid() )

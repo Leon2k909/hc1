@@ -283,6 +283,7 @@ public partial class Equipment : Component, Component.INetworkListener, IDescrip
 			wmRenderer.SetBodyGroup( "muzzle", 0 );
 		}
 		FitHolderBuild( wm );
+		EquipmentSkins.Apply( wm, Resource, Owner );
 
 		wm.Flags |= GameObjectFlags.NotSaved | GameObjectFlags.NotNetworked;
 		wm.Enabled = true;
@@ -328,6 +329,9 @@ public partial class Equipment : Component, Component.INetworkListener, IDescrip
 			viewModelComponent.PlayDeployEffects = playDeployEffects && !equipWhileSprinting;
 			if ( equipWhileSprinting )
 				viewModelComponent.ModelRenderer?.SetBool( "b_sprint", true );
+			// The skin goes first: the attachments' camo pass pins each material slot to the model's own material, and those
+			// overrides would outlast a later model swap, drawing the stock texture on the skin's mesh.
+			EquipmentSkins.Apply( viewModelGameObject, resource, player );
 			if ( ApplySavedAttachments )
 				Facepunch.Gunsmith.GunsmithLoadoutManager.ApplyAttachments( resource, viewModelGameObject );
 

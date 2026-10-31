@@ -1,0 +1,5 @@
+## Pallet truck v2 (`models/props/railhead/pallet_truck_v2`, `Sources/Railhead/pallet-truck-v2/`, 2026-10-31)
+- Replaced Railhead's two hand pallet trucks in the goods yard at the user's word after seeing both side by side in s&box ("New is better").
+- The scene's "Pallet Trucks" group holds the models, renderers only. `railhead_props.pallet_jack` keeps writing the old collision box and records a placement in `Tools/railhead_pallet_trucks.py`. `railhead_furniture.pallet_jack` still builds the old look, for comparing.
+- `install_trucks.py` cut each old truck's 302 triangles, matching every corner to the old model, from `extinguisher-v2/east-base.obj` and `west-base.obj`, which are what the east and west dress models build from, and from the generator's OBJs. No full map run. Rollback: git for the OBJs and scene.
+- Checked in a hidden copy of the map's scene. **Not yet seen in a live match**, and its collision box still stops short of the tiller, as the old one's did. See the folder's README.

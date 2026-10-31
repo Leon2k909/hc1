@@ -4357,6 +4357,489 @@
       ]
     },
     {
+      "__guid": "6e1efbb4-a4f9-5e7d-a36d-92a8e58e4ea8",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Burn Drums",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [],
+      "Children": [
+        {
+          "__guid": "ba1205f7-204b-516d-bacc-b51c1ea9537e",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Burn Drum store drum",
+          "Position": "460,-170,0",
+          "Rotation": "0,0,0.0000000,1.0000000",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.ModelRenderer",
+              "__guid": "9d31ceb0-06a2-5ca8-a544-bda550abacd3",
+              "__enabled": true,
+              "Flags": 0,
+              "BodyGroups": 18446744073709551615,
+              "Model": "models/zombies/burn_drum_v2/burn_drum_rust.vmdl",
+              "RenderType": "On",
+              "Tint": "1,1,1,1"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "7282fe31-fd26-580e-9e8a-e2b8cb9356da",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Burn Drum pad drum",
+          "Position": "-18,-48,96",
+          "Rotation": "0,0,0.9320079,0.3624380",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.ModelRenderer",
+              "__guid": "4bb77c45-bcd0-5693-882a-82f61d1f4e59",
+              "__enabled": true,
+              "Flags": 0,
+              "BodyGroups": 18446744073709551615,
+              "Model": "models/zombies/burn_drum_v2/burn_drum_blue.vmdl",
+              "RenderType": "On",
+              "Tint": "1,1,1,1"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "45cd8fdb-e0d6-53de-90ee-b0277c4c03d2",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Burn Drum drum",
+          "Position": "-34,-82,96",
+          "Rotation": "0,0,0.6755902,-0.7372773",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.ModelRenderer",
+              "__guid": "d05d7bae-16b9-56fb-a484-ae5c748846f8",
+              "__enabled": true,
+              "Flags": 0,
+              "BodyGroups": 18446744073709551615,
+              "Model": "models/zombies/burn_drum_v2/burn_drum_cold.vmdl",
+              "RenderType": "On",
+              "Tint": "1,1,1,1"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "0b71b0f6-2bb8-5bc2-a032-ccce300895f2",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Burn Drum gate drum",
+          "Position": "-540,-120,96",
+          "Rotation": "0,0,-0.4422887,-0.8968727",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.ModelRenderer",
+              "__guid": "d76d8bf5-1a55-5465-a22e-f778e39ed895",
+              "__enabled": true,
+              "Flags": 0,
+              "BodyGroups": 18446744073709551615,
+              "Model": "models/zombies/burn_drum_v2/burn_drum_red.vmdl",
+              "RenderType": "On",
+              "Tint": "1,1,1,1"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "1477a225-2edc-5d4e-9ada-2b91b9aab507",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Burn Drum drum",
+          "Position": "-140,880,96",
+          "Rotation": "0,0,-0.9961947,0.0871557",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.ModelRenderer",
+              "__guid": "796c0394-02bd-5de8-a4c0-24134cb1141b",
+              "__enabled": true,
+              "Flags": 0,
+              "BodyGroups": 18446744073709551615,
+              "Model": "models/zombies/burn_drum_v2/burn_drum_cold.vmdl",
+              "RenderType": "On",
+              "Tint": "1,1,1,1"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "a47970c7-67d7-51e8-a34e-31578eadb60b",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Burn Drum drum 0",
+          "Position": "600,-20,0",
+          "Rotation": "0,0,-0.2798290,0.9600499",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.ModelRenderer",
+              "__guid": "f0a0c606-d6e4-59df-9db3-ac14ea8f803e",
+              "__enabled": true,
+              "Flags": 0,
+              "BodyGroups": 18446744073709551615,
+              "Model": "models/zombies/burn_drum_v2/burn_drum_blue.vmdl",
+              "RenderType": "On",
+              "Tint": "1,1,1,1"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "6216d89d-43af-58bd-94ae-f39e43e7ece5",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Burn Drum drum 1",
+          "Position": "1020,260,0",
+          "Rotation": "0,0,0.7933533,0.6087614",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.ModelRenderer",
+              "__guid": "5c5321a9-447f-5aa7-873b-1c4ca1220691",
+              "__enabled": true,
+              "Flags": 0,
+              "BodyGroups": 18446744073709551615,
+              "Model": "models/zombies/burn_drum_v2/burn_drum_rust.vmdl",
+              "RenderType": "On",
+              "Tint": "1,1,1,1"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "9d12e6c2-f4d4-5704-bb01-fe53f996f6ee",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Burn Drum drum 2",
+          "Position": "1400,-120,0",
+          "Rotation": "0,0,0.8549119,-0.5187733",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.ModelRenderer",
+              "__guid": "1f72bcab-8e87-553d-a5dd-40a053891d25",
+              "__enabled": true,
+              "Flags": 0,
+              "BodyGroups": 18446744073709551615,
+              "Model": "models/zombies/burn_drum_v2/burn_drum_red.vmdl",
+              "RenderType": "On",
+              "Tint": "1,1,1,1"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "634298d5-862e-5d17-a87a-07cee9da23b6",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Burn Drum drum 3",
+          "Position": "1880,520,0",
+          "Rotation": "0,0,-0.1736482,-0.9848078",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.ModelRenderer",
+              "__guid": "adcca17c-f0c9-5e2a-8167-8992e26ed7ab",
+              "__enabled": true,
+              "Flags": 0,
+              "BodyGroups": 18446744073709551615,
+              "Model": "models/zombies/burn_drum_v2/burn_drum_blue.vmdl",
+              "RenderType": "On",
+              "Tint": "1,1,1,1"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "6243e136-c350-5db2-9c4c-08c422365d88",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Burn Drum drum 4",
+          "Position": "2520,-420,0",
+          "Rotation": "0,0,-0.9807853,-0.1950903",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.ModelRenderer",
+              "__guid": "38b3328d-0fb2-558e-af0e-e0d9489c641d",
+              "__enabled": true,
+              "Flags": 0,
+              "BodyGroups": 18446744073709551615,
+              "Model": "models/zombies/burn_drum_v2/burn_drum_rust.vmdl",
+              "RenderType": "On",
+              "Tint": "1,1,1,1"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "7838febb-104e-59af-8da7-c983e7b58d86",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Burn Drum drum 5",
+          "Position": "1700,1300,0",
+          "Rotation": "0,0,-0.5372996,0.8433914",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.ModelRenderer",
+              "__guid": "a807ba50-b3bd-5874-a39b-7844712d8758",
+              "__enabled": true,
+              "Flags": 0,
+              "BodyGroups": 18446744073709551615,
+              "Model": "models/zombies/burn_drum_v2/burn_drum_red.vmdl",
+              "RenderType": "On",
+              "Tint": "1,1,1,1"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "b4290f38-4e4a-54c9-8e95-22c4738d26e5",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Burn Drum drum 6",
+          "Position": "2560,1720,0",
+          "Rotation": "0,0,0.5913096,0.8064446",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.ModelRenderer",
+              "__guid": "ca567210-fd0c-5bb5-b0c5-cda633252c9c",
+              "__enabled": true,
+              "Flags": 0,
+              "BodyGroups": 18446744073709551615,
+              "Model": "models/zombies/burn_drum_v2/burn_drum_rust.vmdl",
+              "RenderType": "On",
+              "Tint": "1,1,1,1"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "71e0a5f9-6362-53d3-ba99-aacad50d90ff",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Burn Drum drum 7",
+          "Position": "3040,230,0",
+          "Rotation": "0,0,0.9659258,-0.2588190",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.ModelRenderer",
+              "__guid": "6e75991b-e89d-5380-b97d-8304a267bdb6",
+              "__enabled": true,
+              "Flags": 0,
+              "BodyGroups": 18446744073709551615,
+              "Model": "models/zombies/burn_drum_v2/burn_drum_blue.vmdl",
+              "RenderType": "On",
+              "Tint": "1,1,1,1"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "122ff24b-0096-5536-9c4f-7e9fdb9c9e29",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Burn Drum drum 8",
+          "Position": "520,600,96",
+          "Rotation": "0,0,0.1088669,-0.9940563",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.ModelRenderer",
+              "__guid": "be39f2f5-b8f2-52c5-b472-721f38781662",
+              "__enabled": true,
+              "Flags": 0,
+              "BodyGroups": 18446744073709551615,
+              "Model": "models/zombies/burn_drum_v2/burn_drum_rust.vmdl",
+              "RenderType": "On",
+              "Tint": "1,1,1,1"
+            }
+          ],
+          "Children": []
+        }
+      ]
+    },
+    {
+      "__guid": "0aa4069d-e0be-54f0-8e2f-d489676b84df",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Cooler",
+      "Position": "-170.871,23.4456,96",
+      "Rotation": "0,0,0.9920376,0.1259418",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.ModelRenderer",
+          "__guid": "bfc1e9d2-79ec-538f-a11f-52b4ab884a3f",
+          "__enabled": true,
+          "Flags": 0,
+          "BodyGroups": 18446744073709551615,
+          "Model": "models/zombies/cooler_v2/cooler.vmdl",
+          "RenderType": "On",
+          "Tint": "1,1,1,1"
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "283ee1c8-4eac-55ab-a261-fdb0fab25acd",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Teddy",
+      "Position": "-215,24,96",
+      "Rotation": "0,0,-0.9732490,0.2297529",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.ModelRenderer",
+          "__guid": "6ab1cdcb-94c8-5631-9312-79b5b8f33ffd",
+          "__enabled": true,
+          "Flags": 0,
+          "BodyGroups": 18446744073709551615,
+          "Model": "models/zombies/teddy_v2/teddy.vmdl",
+          "RenderType": "On",
+          "Tint": "1,1,1,1"
+        }
+      ],
+      "Children": []
+    },
+    {
       "__guid": "a43f995e-5f8e-5a49-a7b5-d2a8244fe5ca",
       "__version": 2,
       "Flags": 0,

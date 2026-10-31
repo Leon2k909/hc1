@@ -56,7 +56,7 @@
                 "__guid": "2e37e607-2308-56f3-abae-0173530f6baa",
                 "__enabled": true,
                 "BodyGroups": 18446744073709551615,
-                "Model": "models/buildings/town_house/town_house_door_outer.vmdl",
+                "Model": "models/buildings/town_house/door_v2/door_outer.vmdl",
                 "RenderType": "On",
                 "Tint": "1,1,1,1"
               },
@@ -241,7 +241,7 @@
                 "__guid": "6b357fc6-1bf7-5e1b-bd3f-e317c58807fa",
                 "__enabled": true,
                 "BodyGroups": 18446744073709551615,
-                "Model": "models/buildings/town_house/town_house_door_outer.vmdl",
+                "Model": "models/buildings/town_house/door_v2/door_outer.vmdl",
                 "RenderType": "On",
                 "Tint": "1,1,1,1"
               },
@@ -426,7 +426,7 @@
                 "__guid": "8e26a1a9-7732-5107-97c5-af2bd33d79c5",
                 "__enabled": true,
                 "BodyGroups": 18446744073709551615,
-                "Model": "models/buildings/town_house/town_house_door_outer.vmdl",
+                "Model": "models/buildings/town_house/door_v2/door_outer.vmdl",
                 "RenderType": "On",
                 "Tint": "1,1,1,1"
               },
@@ -611,7 +611,7 @@
                 "__guid": "9127cedd-8859-59f8-8c9a-a73966238fc8",
                 "__enabled": true,
                 "BodyGroups": 18446744073709551615,
-                "Model": "models/buildings/town_house/town_house_door_inner.vmdl",
+                "Model": "models/buildings/town_house/door_v2/door_inner.vmdl",
                 "RenderType": "On",
                 "Tint": "1,1,1,1"
               },
@@ -796,7 +796,7 @@
                 "__guid": "157e3f2d-4271-53fe-9dce-340ca22c9ecb",
                 "__enabled": true,
                 "BodyGroups": 18446744073709551615,
-                "Model": "models/buildings/town_house/town_house_door_inner.vmdl",
+                "Model": "models/buildings/town_house/door_v2/door_inner.vmdl",
                 "RenderType": "On",
                 "Tint": "1,1,1,1"
               },
@@ -981,7 +981,7 @@
                 "__guid": "7b4231c2-468c-5e8f-a151-9118b5dc1465",
                 "__enabled": true,
                 "BodyGroups": 18446744073709551615,
-                "Model": "models/buildings/town_house/town_house_door_inner.vmdl",
+                "Model": "models/buildings/town_house/door_v2/door_inner.vmdl",
                 "RenderType": "On",
                 "Tint": "1,1,1,1"
               },
@@ -1166,7 +1166,7 @@
                 "__guid": "128e6ab9-c273-527d-b4af-f50776220bb4",
                 "__enabled": true,
                 "BodyGroups": 18446744073709551615,
-                "Model": "models/buildings/town_house/town_house_door_inner.vmdl",
+                "Model": "models/buildings/town_house/door_v2/door_inner.vmdl",
                 "RenderType": "On",
                 "Tint": "1,1,1,1"
               },
@@ -1351,7 +1351,7 @@
                 "__guid": "bc09fb57-3d7b-5792-86b0-3e0ce789490c",
                 "__enabled": true,
                 "BodyGroups": 18446744073709551615,
-                "Model": "models/buildings/town_house/town_house_door_inner.vmdl",
+                "Model": "models/buildings/town_house/door_v2/door_inner.vmdl",
                 "RenderType": "On",
                 "Tint": "1,1,1,1"
               },
@@ -1536,7 +1536,7 @@
                 "__guid": "6c89f745-35c8-523f-896a-68045df8dc12",
                 "__enabled": true,
                 "BodyGroups": 18446744073709551615,
-                "Model": "models/buildings/town_house/town_house_door_inner.vmdl",
+                "Model": "models/buildings/town_house/door_v2/door_inner.vmdl",
                 "RenderType": "On",
                 "Tint": "1,1,1,1"
               },
@@ -1721,7 +1721,7 @@
                 "__guid": "a9bacb58-9dd1-5572-9a2e-417085174ede",
                 "__enabled": true,
                 "BodyGroups": 18446744073709551615,
-                "Model": "models/buildings/town_house/town_house_door_inner.vmdl",
+                "Model": "models/buildings/town_house/door_v2/door_inner.vmdl",
                 "RenderType": "On",
                 "Tint": "1,1,1,1"
               },
@@ -7589,6 +7589,802 @@
           }
         ],
         "Children": []
+      },
+      {
+        "__guid": "3ac7a7fd-2049-5e10-82a5-645b7047c338",
+        "Flags": 0,
+        "Name": "Shutters",
+        "Position": "0,0,0",
+        "Rotation": "0,0,0,1",
+        "Scale": "1,1,1",
+        "Tags": "",
+        "Enabled": true,
+        "NetworkMode": 2,
+        "Components": [],
+        "Children": [
+          {
+            "__guid": "59f4a1f6-6167-516b-97f2-2afa4a533892",
+            "Flags": 0,
+            "Name": "Shutter 0",
+            "Position": "180,-190.5,32",
+            "Rotation": "0,0,0,1",
+            "Scale": "1,1,1",
+            "Tags": "",
+            "Enabled": true,
+            "NetworkMode": 2,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "827ac978-78a5-50ab-97da-4c766467f9e1",
+                "__enabled": true,
+                "BodyGroups": 18446744073709551615,
+                "Model": "models/props/ridgeback/shutter_v2/shutter_l.vmdl",
+                "RenderType": "On",
+                "Tint": "1,1,1,1"
+              }
+            ],
+            "Children": []
+          },
+          {
+            "__guid": "9a7d4ed8-3fbf-5375-929c-1f01a540394a",
+            "Flags": 0,
+            "Name": "Shutter 1",
+            "Position": "180,-113.5,32",
+            "Rotation": "0,0,0,1",
+            "Scale": "1,1,1",
+            "Tags": "",
+            "Enabled": true,
+            "NetworkMode": 2,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "274d3838-6384-5d3b-83fa-21e9fb37638f",
+                "__enabled": true,
+                "BodyGroups": 18446744073709551615,
+                "Model": "models/props/ridgeback/shutter_v2/shutter_r.vmdl",
+                "RenderType": "On",
+                "Tint": "1,1,1,1"
+              }
+            ],
+            "Children": []
+          },
+          {
+            "__guid": "b489a9ac-957e-5606-851c-27e317399da8",
+            "Flags": 0,
+            "Name": "Shutter 2",
+            "Position": "180,-190.5,152",
+            "Rotation": "0,0,0,1",
+            "Scale": "1,1,1",
+            "Tags": "",
+            "Enabled": true,
+            "NetworkMode": 2,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "d7d10981-7c99-5d8c-b423-d31854b715b4",
+                "__enabled": true,
+                "BodyGroups": 18446744073709551615,
+                "Model": "models/props/ridgeback/shutter_v2/shutter_l.vmdl",
+                "RenderType": "On",
+                "Tint": "1,1,1,1"
+              }
+            ],
+            "Children": []
+          },
+          {
+            "__guid": "0193a4c0-64ae-5ec9-b864-22174881c4e6",
+            "Flags": 0,
+            "Name": "Shutter 3",
+            "Position": "180,-113.5,152",
+            "Rotation": "0,0,0,1",
+            "Scale": "1,1,1",
+            "Tags": "",
+            "Enabled": true,
+            "NetworkMode": 2,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "b3e61e8b-e779-526c-a524-30af98c8e823",
+                "__enabled": true,
+                "BodyGroups": 18446744073709551615,
+                "Model": "models/props/ridgeback/shutter_v2/shutter_r.vmdl",
+                "RenderType": "On",
+                "Tint": "1,1,1,1"
+              }
+            ],
+            "Children": []
+          },
+          {
+            "__guid": "1fa818cd-50b3-56bd-9364-86b1157d2c6d",
+            "Flags": 0,
+            "Name": "Shutter 4",
+            "Position": "180,-34.5,32",
+            "Rotation": "0,0,0,1",
+            "Scale": "1,1,1",
+            "Tags": "",
+            "Enabled": true,
+            "NetworkMode": 2,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "d8a2f118-4251-555e-b307-d6baaf3a5f8c",
+                "__enabled": true,
+                "BodyGroups": 18446744073709551615,
+                "Model": "models/props/ridgeback/shutter_v2/shutter_l.vmdl",
+                "RenderType": "On",
+                "Tint": "1,1,1,1"
+              }
+            ],
+            "Children": []
+          },
+          {
+            "__guid": "5a05bd9e-883d-5cf9-8d91-6531d56c71de",
+            "Flags": 0,
+            "Name": "Shutter 5",
+            "Position": "180,42.5,32",
+            "Rotation": "0,0,0,1",
+            "Scale": "1,1,1",
+            "Tags": "",
+            "Enabled": true,
+            "NetworkMode": 2,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "524ac54e-60c9-591b-9e61-2de168efec1f",
+                "__enabled": true,
+                "BodyGroups": 18446744073709551615,
+                "Model": "models/props/ridgeback/shutter_v2/shutter_r.vmdl",
+                "RenderType": "On",
+                "Tint": "1,1,1,1"
+              }
+            ],
+            "Children": []
+          },
+          {
+            "__guid": "cf674063-8c75-51cf-b88c-f411a853a60d",
+            "Flags": 0,
+            "Name": "Shutter 6",
+            "Position": "180,-34.5,152",
+            "Rotation": "0,0,0,1",
+            "Scale": "1,1,1",
+            "Tags": "",
+            "Enabled": true,
+            "NetworkMode": 2,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "7fbc91bc-5d0e-52bc-99ce-7e0a32ac71a6",
+                "__enabled": true,
+                "BodyGroups": 18446744073709551615,
+                "Model": "models/props/ridgeback/shutter_v2/shutter_l.vmdl",
+                "RenderType": "On",
+                "Tint": "1,1,1,1"
+              }
+            ],
+            "Children": []
+          },
+          {
+            "__guid": "8e9d91e8-b037-5ed6-8bac-e599b8d048de",
+            "Flags": 0,
+            "Name": "Shutter 7",
+            "Position": "180,42.5,152",
+            "Rotation": "0,0,0,1",
+            "Scale": "1,1,1",
+            "Tags": "",
+            "Enabled": true,
+            "NetworkMode": 2,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "7e127c7c-4905-5bbf-990b-db3c0b5a55af",
+                "__enabled": true,
+                "BodyGroups": 18446744073709551615,
+                "Model": "models/props/ridgeback/shutter_v2/shutter_r.vmdl",
+                "RenderType": "On",
+                "Tint": "1,1,1,1"
+              }
+            ],
+            "Children": []
+          },
+          {
+            "__guid": "ee47b3d0-104e-529a-8708-1d6e2370d100",
+            "Flags": 0,
+            "Name": "Shutter 8",
+            "Position": "180,154.5,32",
+            "Rotation": "0,0,0,1",
+            "Scale": "1,1,1",
+            "Tags": "",
+            "Enabled": true,
+            "NetworkMode": 2,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "97315254-2052-539d-8864-42d93161b57c",
+                "__enabled": true,
+                "BodyGroups": 18446744073709551615,
+                "Model": "models/props/ridgeback/shutter_v2/shutter_l.vmdl",
+                "RenderType": "On",
+                "Tint": "1,1,1,1"
+              }
+            ],
+            "Children": []
+          },
+          {
+            "__guid": "6ef680fa-6182-5468-835c-6eb5476a8da3",
+            "Flags": 0,
+            "Name": "Shutter 9",
+            "Position": "180,231.5,32",
+            "Rotation": "0,0,0,1",
+            "Scale": "1,1,1",
+            "Tags": "",
+            "Enabled": true,
+            "NetworkMode": 2,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "17ae7f2d-6dd7-50e6-b5d0-7658f76b40f1",
+                "__enabled": true,
+                "BodyGroups": 18446744073709551615,
+                "Model": "models/props/ridgeback/shutter_v2/shutter_r.vmdl",
+                "RenderType": "On",
+                "Tint": "1,1,1,1"
+              }
+            ],
+            "Children": []
+          },
+          {
+            "__guid": "5f186293-179e-573c-8c43-3052fe66afe3",
+            "Flags": 0,
+            "Name": "Shutter 10",
+            "Position": "180,154.5,152",
+            "Rotation": "0,0,0,1",
+            "Scale": "1,1,1",
+            "Tags": "",
+            "Enabled": true,
+            "NetworkMode": 2,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "a6499e82-0bb6-56de-9dd3-28d29f455a4b",
+                "__enabled": true,
+                "BodyGroups": 18446744073709551615,
+                "Model": "models/props/ridgeback/shutter_v2/shutter_l.vmdl",
+                "RenderType": "On",
+                "Tint": "1,1,1,1"
+              }
+            ],
+            "Children": []
+          },
+          {
+            "__guid": "94626507-d7a8-5cae-a513-9cdf8afb1520",
+            "Flags": 0,
+            "Name": "Shutter 11",
+            "Position": "180,231.5,152",
+            "Rotation": "0,0,0,1",
+            "Scale": "1,1,1",
+            "Tags": "",
+            "Enabled": true,
+            "NetworkMode": 2,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "52a5ffa4-d3b6-50cd-a282-23b0f2dc0dcb",
+                "__enabled": true,
+                "BodyGroups": 18446744073709551615,
+                "Model": "models/props/ridgeback/shutter_v2/shutter_r.vmdl",
+                "RenderType": "On",
+                "Tint": "1,1,1,1"
+              }
+            ],
+            "Children": []
+          },
+          {
+            "__guid": "bb4eb826-3aea-5cbf-bdfa-296b4ee5393c",
+            "Flags": 0,
+            "Name": "Shutter 12",
+            "Position": "-180,-206.5,32",
+            "Rotation": "0,0,1,0",
+            "Scale": "1,1,1",
+            "Tags": "",
+            "Enabled": true,
+            "NetworkMode": 2,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "e50d82e3-2939-585c-95c4-8cd8b035ecbd",
+                "__enabled": true,
+                "BodyGroups": 18446744073709551615,
+                "Model": "models/props/ridgeback/shutter_v2/shutter_r.vmdl",
+                "RenderType": "On",
+                "Tint": "1,1,1,1"
+              }
+            ],
+            "Children": []
+          },
+          {
+            "__guid": "e6167a8a-a6bc-5949-a05a-1cd1240b4c27",
+            "Flags": 0,
+            "Name": "Shutter 13",
+            "Position": "-180,-129.5,32",
+            "Rotation": "0,0,1,0",
+            "Scale": "1,1,1",
+            "Tags": "",
+            "Enabled": true,
+            "NetworkMode": 2,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "230c671b-56c7-5f0e-98d1-8cc8be151ee6",
+                "__enabled": true,
+                "BodyGroups": 18446744073709551615,
+                "Model": "models/props/ridgeback/shutter_v2/shutter_l.vmdl",
+                "RenderType": "On",
+                "Tint": "1,1,1,1"
+              }
+            ],
+            "Children": []
+          },
+          {
+            "__guid": "3e78f90b-08a6-5280-bbc3-31f24850ca79",
+            "Flags": 0,
+            "Name": "Shutter 14",
+            "Position": "-180,-206.5,152",
+            "Rotation": "0,0,1,0",
+            "Scale": "1,1,1",
+            "Tags": "",
+            "Enabled": true,
+            "NetworkMode": 2,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "4a2318c1-4066-5dcf-bb6b-e1784a8748d4",
+                "__enabled": true,
+                "BodyGroups": 18446744073709551615,
+                "Model": "models/props/ridgeback/shutter_v2/shutter_r.vmdl",
+                "RenderType": "On",
+                "Tint": "1,1,1,1"
+              }
+            ],
+            "Children": []
+          },
+          {
+            "__guid": "355824b1-ed1f-5a21-8c93-7905ca536280",
+            "Flags": 0,
+            "Name": "Shutter 15",
+            "Position": "-180,-129.5,152",
+            "Rotation": "0,0,1,0",
+            "Scale": "1,1,1",
+            "Tags": "",
+            "Enabled": true,
+            "NetworkMode": 2,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "d1020f28-5066-5894-84ff-6df680d0eec5",
+                "__enabled": true,
+                "BodyGroups": 18446744073709551615,
+                "Model": "models/props/ridgeback/shutter_v2/shutter_l.vmdl",
+                "RenderType": "On",
+                "Tint": "1,1,1,1"
+              }
+            ],
+            "Children": []
+          },
+          {
+            "__guid": "26f5c6ca-3811-5e65-a3f2-4f230fa93b9c",
+            "Flags": 0,
+            "Name": "Shutter 16",
+            "Position": "-180,-86.5,152",
+            "Rotation": "0,0,1,0",
+            "Scale": "1,1,1",
+            "Tags": "",
+            "Enabled": true,
+            "NetworkMode": 2,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "277961b9-5e60-51e0-996b-37df6cdc58ad",
+                "__enabled": true,
+                "BodyGroups": 18446744073709551615,
+                "Model": "models/props/ridgeback/shutter_v2/shutter_r.vmdl",
+                "RenderType": "On",
+                "Tint": "1,1,1,1"
+              }
+            ],
+            "Children": []
+          },
+          {
+            "__guid": "80610cda-224e-556a-9791-34e623ae22c7",
+            "Flags": 0,
+            "Name": "Shutter 17",
+            "Position": "-180,-9.5,152",
+            "Rotation": "0,0,1,0",
+            "Scale": "1,1,1",
+            "Tags": "",
+            "Enabled": true,
+            "NetworkMode": 2,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "7414b306-6484-5557-969e-aa83404e55e9",
+                "__enabled": true,
+                "BodyGroups": 18446744073709551615,
+                "Model": "models/props/ridgeback/shutter_v2/shutter_l.vmdl",
+                "RenderType": "On",
+                "Tint": "1,1,1,1"
+              }
+            ],
+            "Children": []
+          },
+          {
+            "__guid": "0890de97-63e5-5759-8e36-06f7185975c7",
+            "Flags": 0,
+            "Name": "Shutter 18",
+            "Position": "-180,109.5,152",
+            "Rotation": "0,0,1,0",
+            "Scale": "1,1,1",
+            "Tags": "",
+            "Enabled": true,
+            "NetworkMode": 2,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "3e5f6ec6-009d-5644-af19-8dde161b1464",
+                "__enabled": true,
+                "BodyGroups": 18446744073709551615,
+                "Model": "models/props/ridgeback/shutter_v2/shutter_r.vmdl",
+                "RenderType": "On",
+                "Tint": "1,1,1,1"
+              }
+            ],
+            "Children": []
+          },
+          {
+            "__guid": "a2d408a3-615c-5548-815a-62570a58dcc5",
+            "Flags": 0,
+            "Name": "Shutter 19",
+            "Position": "-180,186.5,152",
+            "Rotation": "0,0,1,0",
+            "Scale": "1,1,1",
+            "Tags": "",
+            "Enabled": true,
+            "NetworkMode": 2,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "64a7f55d-8a7c-5c47-9320-3718c4c69061",
+                "__enabled": true,
+                "BodyGroups": 18446744073709551615,
+                "Model": "models/props/ridgeback/shutter_v2/shutter_l.vmdl",
+                "RenderType": "On",
+                "Tint": "1,1,1,1"
+              }
+            ],
+            "Children": []
+          },
+          {
+            "__guid": "0d93ac88-faf5-549d-9645-352854cda4e8",
+            "Flags": 0,
+            "Name": "Shutter 20",
+            "Position": "113.5,-252,32",
+            "Rotation": "0,0,-0.7071068,0.7071068",
+            "Scale": "1,1,1",
+            "Tags": "",
+            "Enabled": true,
+            "NetworkMode": 2,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "90bdd256-ec73-5104-8575-f01b411912a8",
+                "__enabled": true,
+                "BodyGroups": 18446744073709551615,
+                "Model": "models/props/ridgeback/shutter_v2/shutter_r.vmdl",
+                "RenderType": "On",
+                "Tint": "1,1,1,1"
+              }
+            ],
+            "Children": []
+          },
+          {
+            "__guid": "7cbd9973-317c-59bf-8daf-13adb277abc8",
+            "Flags": 0,
+            "Name": "Shutter 21",
+            "Position": "36.5,-252,32",
+            "Rotation": "0,0,-0.7071068,0.7071068",
+            "Scale": "1,1,1",
+            "Tags": "",
+            "Enabled": true,
+            "NetworkMode": 2,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "5d12355e-72a8-5066-80c2-d6a7ba6d4902",
+                "__enabled": true,
+                "BodyGroups": 18446744073709551615,
+                "Model": "models/props/ridgeback/shutter_v2/shutter_l.vmdl",
+                "RenderType": "On",
+                "Tint": "1,1,1,1"
+              }
+            ],
+            "Children": []
+          },
+          {
+            "__guid": "2d4c5088-23e9-5e36-9c1c-ca7c65661d5a",
+            "Flags": 0,
+            "Name": "Shutter 22",
+            "Position": "113.5,-252,152",
+            "Rotation": "0,0,-0.7071068,0.7071068",
+            "Scale": "1,1,1",
+            "Tags": "",
+            "Enabled": true,
+            "NetworkMode": 2,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "5eebff59-0a58-5c99-89ec-25eae41128b9",
+                "__enabled": true,
+                "BodyGroups": 18446744073709551615,
+                "Model": "models/props/ridgeback/shutter_v2/shutter_r.vmdl",
+                "RenderType": "On",
+                "Tint": "1,1,1,1"
+              }
+            ],
+            "Children": []
+          },
+          {
+            "__guid": "6fb5b83b-ffef-5069-b03c-86e2fdc8e5a5",
+            "Flags": 0,
+            "Name": "Shutter 23",
+            "Position": "36.5,-252,152",
+            "Rotation": "0,0,-0.7071068,0.7071068",
+            "Scale": "1,1,1",
+            "Tags": "",
+            "Enabled": true,
+            "NetworkMode": 2,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "82d1c83f-2915-5d84-af6a-68e8db5b557d",
+                "__enabled": true,
+                "BodyGroups": 18446744073709551615,
+                "Model": "models/props/ridgeback/shutter_v2/shutter_l.vmdl",
+                "RenderType": "On",
+                "Tint": "1,1,1,1"
+              }
+            ],
+            "Children": []
+          },
+          {
+            "__guid": "e7c44167-82e5-5f73-8c11-3fb35ddba158",
+            "Flags": 0,
+            "Name": "Shutter 24",
+            "Position": "-59.5,-252,32",
+            "Rotation": "0,0,-0.7071068,0.7071068",
+            "Scale": "1,1,1",
+            "Tags": "",
+            "Enabled": true,
+            "NetworkMode": 2,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "50233ce8-0d0f-59e8-b0e2-d6797917e904",
+                "__enabled": true,
+                "BodyGroups": 18446744073709551615,
+                "Model": "models/props/ridgeback/shutter_v2/shutter_r.vmdl",
+                "RenderType": "On",
+                "Tint": "1,1,1,1"
+              }
+            ],
+            "Children": []
+          },
+          {
+            "__guid": "5771a0d5-cb69-5776-871d-f85f5abaddda",
+            "Flags": 0,
+            "Name": "Shutter 25",
+            "Position": "-136.5,-252,32",
+            "Rotation": "0,0,-0.7071068,0.7071068",
+            "Scale": "1,1,1",
+            "Tags": "",
+            "Enabled": true,
+            "NetworkMode": 2,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "37397039-083c-5e93-a7e4-ba9846ff988c",
+                "__enabled": true,
+                "BodyGroups": 18446744073709551615,
+                "Model": "models/props/ridgeback/shutter_v2/shutter_l.vmdl",
+                "RenderType": "On",
+                "Tint": "1,1,1,1"
+              }
+            ],
+            "Children": []
+          },
+          {
+            "__guid": "04dcde34-de74-50b2-bb0c-cf5c39f9659b",
+            "Flags": 0,
+            "Name": "Shutter 26",
+            "Position": "-59.5,-252,152",
+            "Rotation": "0,0,-0.7071068,0.7071068",
+            "Scale": "1,1,1",
+            "Tags": "",
+            "Enabled": true,
+            "NetworkMode": 2,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "b796350c-6eff-5192-87f7-021768233492",
+                "__enabled": true,
+                "BodyGroups": 18446744073709551615,
+                "Model": "models/props/ridgeback/shutter_v2/shutter_r.vmdl",
+                "RenderType": "On",
+                "Tint": "1,1,1,1"
+              }
+            ],
+            "Children": []
+          },
+          {
+            "__guid": "2559bdf4-f300-53de-97df-f4aa4af4fac9",
+            "Flags": 0,
+            "Name": "Shutter 27",
+            "Position": "-136.5,-252,152",
+            "Rotation": "0,0,-0.7071068,0.7071068",
+            "Scale": "1,1,1",
+            "Tags": "",
+            "Enabled": true,
+            "NetworkMode": 2,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "e682980e-1674-5cdf-b70b-b466ed09c27c",
+                "__enabled": true,
+                "BodyGroups": 18446744073709551615,
+                "Model": "models/props/ridgeback/shutter_v2/shutter_l.vmdl",
+                "RenderType": "On",
+                "Tint": "1,1,1,1"
+              }
+            ],
+            "Children": []
+          },
+          {
+            "__guid": "450ed953-ec96-5904-b4fd-ff8547a29432",
+            "Flags": 0,
+            "Name": "Shutter 28",
+            "Position": "113.5,252,32",
+            "Rotation": "0,0,0.7071068,0.7071068",
+            "Scale": "1,1,1",
+            "Tags": "",
+            "Enabled": true,
+            "NetworkMode": 2,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "ceb47c81-4e9f-5d7c-84e6-c04a7476dd55",
+                "__enabled": true,
+                "BodyGroups": 18446744073709551615,
+                "Model": "models/props/ridgeback/shutter_v2/shutter_l.vmdl",
+                "RenderType": "On",
+                "Tint": "1,1,1,1"
+              }
+            ],
+            "Children": []
+          },
+          {
+            "__guid": "796b7dfb-1d83-5a61-842f-1b634279e9c4",
+            "Flags": 0,
+            "Name": "Shutter 29",
+            "Position": "36.5,252,32",
+            "Rotation": "0,0,0.7071068,0.7071068",
+            "Scale": "1,1,1",
+            "Tags": "",
+            "Enabled": true,
+            "NetworkMode": 2,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "23b10a25-4a30-5774-bd5c-3c3f988f177b",
+                "__enabled": true,
+                "BodyGroups": 18446744073709551615,
+                "Model": "models/props/ridgeback/shutter_v2/shutter_r.vmdl",
+                "RenderType": "On",
+                "Tint": "1,1,1,1"
+              }
+            ],
+            "Children": []
+          },
+          {
+            "__guid": "a2e6f322-13ba-507a-b2b8-b985dbbc623c",
+            "Flags": 0,
+            "Name": "Shutter 30",
+            "Position": "113.5,252,152",
+            "Rotation": "0,0,0.7071068,0.7071068",
+            "Scale": "1,1,1",
+            "Tags": "",
+            "Enabled": true,
+            "NetworkMode": 2,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "c8fada43-159f-56ba-8d8e-32949f5f7c05",
+                "__enabled": true,
+                "BodyGroups": 18446744073709551615,
+                "Model": "models/props/ridgeback/shutter_v2/shutter_l.vmdl",
+                "RenderType": "On",
+                "Tint": "1,1,1,1"
+              }
+            ],
+            "Children": []
+          },
+          {
+            "__guid": "295f0dee-f196-5a8f-befa-32616c800d5a",
+            "Flags": 0,
+            "Name": "Shutter 31",
+            "Position": "36.5,252,152",
+            "Rotation": "0,0,0.7071068,0.7071068",
+            "Scale": "1,1,1",
+            "Tags": "",
+            "Enabled": true,
+            "NetworkMode": 2,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "a795f01a-21bf-53f1-9527-b5a80b3e2711",
+                "__enabled": true,
+                "BodyGroups": 18446744073709551615,
+                "Model": "models/props/ridgeback/shutter_v2/shutter_r.vmdl",
+                "RenderType": "On",
+                "Tint": "1,1,1,1"
+              }
+            ],
+            "Children": []
+          },
+          {
+            "__guid": "d85790b0-430d-58d9-898f-2bfc47bc52da",
+            "Flags": 0,
+            "Name": "Shutter 32",
+            "Position": "-25.5,252,152",
+            "Rotation": "0,0,0.7071068,0.7071068",
+            "Scale": "1,1,1",
+            "Tags": "",
+            "Enabled": true,
+            "NetworkMode": 2,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "a2b12653-a198-5145-84ed-97d7181e26c8",
+                "__enabled": true,
+                "BodyGroups": 18446744073709551615,
+                "Model": "models/props/ridgeback/shutter_v2/shutter_l.vmdl",
+                "RenderType": "On",
+                "Tint": "1,1,1,1"
+              }
+            ],
+            "Children": []
+          },
+          {
+            "__guid": "b50a6b91-4b30-54fc-a25e-1fd297d694aa",
+            "Flags": 0,
+            "Name": "Shutter 33",
+            "Position": "-102.5,252,152",
+            "Rotation": "0,0,0.7071068,0.7071068",
+            "Scale": "1,1,1",
+            "Tags": "",
+            "Enabled": true,
+            "NetworkMode": 2,
+            "Components": [
+              {
+                "__type": "Sandbox.ModelRenderer",
+                "__guid": "34cb5e1d-d995-50dc-b45e-b3988a337e88",
+                "__enabled": true,
+                "BodyGroups": 18446744073709551615,
+                "Model": "models/props/ridgeback/shutter_v2/shutter_r.vmdl",
+                "RenderType": "On",
+                "Tint": "1,1,1,1"
+              }
+            ],
+            "Children": []
+          }
+        ]
       }
     ]
   },

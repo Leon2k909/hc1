@@ -195,7 +195,8 @@ def write_materials(directory):
         rough={'black':'shell','black_edge':'edge','gasket':'rubber','alloy':'steel','id':'paper','stencil':'paper'}.get(name,name)
         metal=.86 if name=='alloy' else .72 if name=='steel' else 0.
         normal='flat_normal' if name in ('gasket','alloy','id','stencil') else 'shell_normal'
-        alpha=('    F_ALPHA_TEST "1"\n    g_flAlphaTestReference "0.4"\n'
+        # Blended, not alpha tested: the letters' strokes fall under a pixel at about 11 m, where a cutoff breaks them into blotches.
+        alpha=('    F_TRANSLUCENT "1"\n'
                f'    TextureTranslucency "{PREFIX}/stencil_alpha.png"\n') if name=='stencil' else ''
         text=('// Tools/ares_cargo_case.py\n"Layer0"\n{\n    shader "shaders/complex.shader"\n'
               '    F_SPECULAR "1"\n'+alpha+f'    g_flMetalness "{metal}"\n    g_flRoughnessScaleFactor "1"\n'
@@ -221,7 +222,7 @@ def write_models(directory):
                 lods.append(model.triangle_count())
             mats='\n'.join(f'{{ from = "{p}.vmat" to = "{m}" }},' for p,m in MATERIALS.items())
             meshes='\n'.join(f'{{ _class = "RenderMeshFile" name = "lod{l}" filename = "{MODEL_PREFIX}/{tag}-lod{l}.obj" import_translation = [0,0,0] import_rotation = [0,0,0] import_scale = 1.0 align_origin_x_type = "None" align_origin_y_type = "None" align_origin_z_type = "None" }},' for l in range(3))
-            lodgroups='\n'.join(f'{{ _class = "LODGroup" switch_threshold = {threshold} meshes = ["lod{l}"] }},' for l,threshold in enumerate((0.0,10.0,24.0)))
+            lodgroups='\n'.join(f'{{ _class = "LODGroup" switch_threshold = {threshold} meshes = ["lod{l}"] }},' for l,threshold in enumerate((0.0,30.0,80.0)))
             doc=('<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:modeldoc29:version{3cec427c-1b0e-4d48-a90a-0436f33a6041} -->\n'
                  '{ rootNode = { _class = "RootNode" children = [\n'
                  '{ _class = "MaterialGroupList" children = [{ _class = "DefaultMaterialGroup" remaps = [\n'+mats+

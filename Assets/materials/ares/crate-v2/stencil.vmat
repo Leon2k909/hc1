@@ -3,8 +3,7 @@
 {
     shader "shaders/complex.shader"
     F_SPECULAR "1"
-    F_ALPHA_TEST "1"
-    g_flAlphaTestReference "0.4"
+    F_TRANSLUCENT "1"
     TextureTranslucency "materials/ares/crate-v2/stencil_alpha.png"
     g_flMetalness "0.0"
     g_flRoughnessScaleFactor "1"

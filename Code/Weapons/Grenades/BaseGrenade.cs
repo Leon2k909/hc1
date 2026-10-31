@@ -7,6 +7,11 @@ public abstract class BaseGrenade : Component, Component.ICollisionListener
 	[Property] public bool CanDealDamage { get; set; }
 	[Sync] public PlayerPawn Player { get; set; }
 
+	/// <summary> The skin it was thrown in (<see cref="EquipmentSkins"/>), which each machine puts on its own copy. </summary>
+	[Sync, Change( nameof( OnSkinChanged ) )] public string SkinId { get; set; }
+
+	private void OnSkinChanged( string before, string after ) => EquipmentSkins.Apply( GameObject, EquipmentSkins.Find( after ) );
+
 	/// <summary>
 	/// Is this player an enemy of the viewer?
 	/// </summary>
@@ -22,6 +27,7 @@ public abstract class BaseGrenade : Component, Component.ICollisionListener
 	protected override void OnStart()
 	{
 		TimeSinceCreated = 0f;
+		EquipmentSkins.Apply( GameObject, EquipmentSkins.Find( SkinId ) );
 
 		// Its bounces are ours (WorldSounds.GrenadeBounce), once they've compiled.
 		if ( WorldSounds.HasGrenadeBounces && GetComponent<Rigidbody>() is { } rigidbody && rigidbody.PhysicsBody is { } physics )

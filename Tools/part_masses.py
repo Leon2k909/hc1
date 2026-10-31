@@ -271,6 +271,7 @@ def explicit() -> dict[str, float]:
         "gunsmith/scarh/barrel/scarh_suppressor.gnsmth": 0.65,
         "gunsmith/hc1/compact_suppressor/compact_suppressor.gnsmth": 0.51,
         "gunsmith/hc1/rifle_suppressor/rifle_suppressor.gnsmth": 0.65,
+        "gunsmith/hc1/rifle_suppressor_pattern6/rifle_suppressor_pattern6.gnsmth": 0.65,
         "gunsmith/hc1/angled_grip/angled_grip.gnsmth": 0.06, "gunsmith/hc1/vertical_grip/vertical_grip.gnsmth": 0.10,
         # MP5, against the A3's retractable stock, its barrel and a loaded steel 30. The MP5SD is ~0.5 kg over an A3.
         "gunsmith/mpapa5/magazines/magazine_45_round.gnsmth": round(loaded((0.25, 45), "mp5") - mp5_30, 3),

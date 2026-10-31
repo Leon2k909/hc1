@@ -2200,6 +2200,10 @@ def write_scene( written, light_list, props ):
     station["Children"].append( railhead_luggage.scene_group() )
     import railhead_signal_frame
     station["Children"].append( railhead_signal_frame.scene_group() )
+    import railhead_bins
+    station["Children"].append( railhead_bins.scene_group() )
+    import railhead_pallet_trucks
+    station["Children"].append( railhead_pallet_trucks.scene_group() )
     light_objects = [
         K.game_object( ids, name, f"light/{name}", K.to_world( position ), tags="light_point,light", components=[
             K.component( ids, "Sandbox.PointLight", f"light/{name}/light", Attenuation=1,

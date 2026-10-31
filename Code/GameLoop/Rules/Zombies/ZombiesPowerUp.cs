@@ -111,28 +111,17 @@ public sealed class ZombiesPowerUp : Component, IMarkerObject
 
 	internal static void CreateAmmoCase( GameObject parent )
 	{
-		var olive = new Color( 0.24f, 0.3f, 0.12f );
-		var metal = new Color( 0.12f, 0.14f, 0.11f );
-		AddCasePart( parent, "Ammo case", new Vector3( 0, 0, -3 ), new Vector3( 14, 24, 14 ), olive );
-		AddCasePart( parent, "Lid rim", new Vector3( 0, 0, 4 ), new Vector3( 15, 25, 2 ), metal );
-		foreach ( var y in new[] { -8f, 8f } )
-			AddCasePart( parent, "Latch", new Vector3( 7.5f, y, 1 ), new Vector3( 1, 3, 6 ), new Color( 0.55f, 0.5f, 0.3f ) );
-		AddCasePart( parent, "Handle", new Vector3( -8, 0, 7 ), new Vector3( 2, 16, 2 ), metal );
-		foreach ( var y in new[] { -7f, 7f } )
-			AddCasePart( parent, "Handle support", new Vector3( -8, y, 4 ), new Vector3( 2, 2, 6 ), metal );
-
-		// Local weapon asset: no cloud package that can disappear on restart.
-		var magazine = Model.Load( "attachments/rear_mag/m4a1_short_mag/m4a1_short_mag.vmdl" );
-		if ( magazine is null || magazine.IsError ) return;
-		var bounds = magazine.Bounds;
-		var scale = 18f / MathF.Max( bounds.Size.z, 1f );
-		foreach ( var y in new[] { -7f, 0f, 7f } )
+		var model = Model.Load( "models/zombies/ammo_case_v2/ammo_case.vmdl" );
+		if ( model is null || model.IsError )
 		{
-			var mag = new GameObject( parent, true, "Rifle magazine" );
-			mag.LocalScale = scale;
-			mag.LocalPosition = new Vector3( 0, y, 2 ) - new Vector3( bounds.Center.x, bounds.Center.y, bounds.Mins.z ) * scale;
-			mag.Components.Create<ModelRenderer>().Model = magazine;
+			Log.Warning( "[Zombies] Missing model for the ammo case; using plain boxes." );
+			AddCasePart( parent, "Ammo case", new Vector3( 0, 0, -3 ), new Vector3( 14, 24, 14 ), new Color( 0.24f, 0.3f, 0.12f ) );
+			AddCasePart( parent, "Lid rim", new Vector3( 0, 0, 4 ), new Vector3( 15, 25, 2 ), new Color( 0.12f, 0.14f, 0.11f ) );
+			return;
 		}
+
+		var chest = new GameObject( parent, true, "Ammo case" );
+		chest.Components.Create<ModelRenderer>().Model = model;
 	}
 
 	private static void AddCasePart( GameObject parent, string name, Vector3 center, Vector3 size, Color tint )

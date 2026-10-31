@@ -106,6 +106,7 @@ class Model:
         self.doors = []
         self.panes = []                          # dicts, see window_panes
         self.clips = []
+        self.shutters = []                       # dicts, see shutter_place
 
     def polygon( self, paint, points, normal=None, uvs=None ):
         """ A flat polygon, counter-clockwise seen from the front, drawn as a fan from its first point. Given a normal,
@@ -314,6 +315,7 @@ SHATTER_PREFAB = "prefabs/buildings/glass_shatter.prefab"
 # Paints
 OUTSIDE, TRIM, INSIDE = "render_ochre", "render_pale", "whitewash"
 STONE, FRAME, WOOD, SHUTTER = "concrete", "trim_white", "trim_brown", "shutter_green"
+SHUTTER_MODEL = "models/props/ridgeback/shutter_v2/shutter"
 GROUND_FLOOR, UPPER_FLOOR, ROOF, CHIMNEY, METAL = "quarry_tiles", "floorboards", "roof_tiles", "brick", "metal"
 HANDLE, GLASS_PAINT = "iron_black", "glass_clear"
 
@@ -464,6 +466,17 @@ def plan_point( wall, r, d, z ):
     return to_model( r, d, z ) if wall.axis == "a" else to_model( d, r, z )
 
 
+def shutter_place( wall, face, out, r, z, towards_window ):
+    """ Where a shutter leaf's model goes: at its foot on the wall's face, its +X out of the wall, and which of the two mirror images has its hinge
+    on the side towards the window (shutter_l has it at its own +Y, shutter_r at -Y). """
+    at = plan_point( wall, r, face, z )
+    outward = plan_point( wall, r, face + out, z ) - at
+    hinge = plan_point( wall, r + towards_window, face, z ) - at
+    own_y = np.array( ( -outward[1], outward[0], 0.0 ) )
+    return { "position": tuple( float( x ) for x in at ), "yaw": math.degrees( math.atan2( outward[1], outward[0] ) ),
+             "side": "l" if np.dot( hinge, own_y ) > 0 else "r" }
+
+
 def pane_rows( z0, z1 ):
     """ A window's glass rows, bottom to top, as ( y0, y1 ): inside the frame and the sashes' rails, PANES_UP of them
     between the glazing bars. """
@@ -534,8 +547,9 @@ def dress_openings( model, wall ):
         if kind == "window":
             plan_box( model, *wall.lo_hi( r0 - sw - 1, r1 + sw + 1, face + out * 3.0, face - out * 2.0, z0 - 2.5, z0 + 0.75 ),
                       STONE )
-    for q0, q1, y0, y1 in shutters( wall ):
-        plan_box( model, *wall.lo_hi( q0, q1, face, face + out * 1.5, y0, y1 ), SHUTTER )
+    # The leaves are models of their own in the prefab (write_prefab). They're hung in pairs, the one at lower r first, each hinged towards its window.
+    for k, ( q0, q1, y0, y1 ) in enumerate( shutters( wall ) ):
+        model.shutters.append( shutter_place( wall, face, out, ( q0 + q1 ) / 2, y0, 1.0 if k % 2 == 0 else -1.0 ) )
 
 
 def plinth_and_steps( model, walls ):
@@ -1195,6 +1209,13 @@ def pane_object( name, pane, parts ):
         glass ], position=pane["position"], yaw=math.degrees( math.atan2( normal[1], normal[0] ) ), tags="glass" )
 
 
+def shutter_object( name, k, place ):
+    """ A shutter leaf: a renderer only, as the old ones in the house's model had no collision. """
+    key = f"{name}/shutter_{k}"
+    return prefab_object( key, f"Shutter {k}", [ renderer( f"{key}/renderer", f"{SHUTTER_MODEL}_{place['side']}.vmdl" ) ],
+                          position=place["position"], yaw=place["yaw"] )
+
+
 def write_prefab( path, name, title, model_path, model, parts ):
     """ The building (a ModelRenderer and a static ModelCollider), its doors, its window panes and, on one object tagged
     playerclip, a box in each window that stops players. """
@@ -1205,6 +1226,7 @@ def write_prefab( path, name, title, model_path, model, parts ):
         prefab_object( f"{name}/window_clips", "Window Clips",
                        [ box_collider( f"{name}/{clip['key']}", clip["centre"], clip["size"] ) for clip in model.clips ],
                        tags="playerclip" ),
+        prefab_object( f"{name}/shutters", "Shutters", children=[ shutter_object( name, k, place ) for k, place in enumerate( model.shutters ) ] ),
     ]
     prefab = {
         "RootObject": {

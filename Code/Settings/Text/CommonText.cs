@@ -184,6 +184,7 @@ public static partial class GameText
 		["Primary"] = ("Principale", "Primär", "Principal", "Primária"),
 		["Secondary"] = ("Secondaire", "Sekundär", "Secundaria", "Secundária"),
 		["Lethal"] = ("Létal", "Tödlich", "Letal", "Letal"),
+		["Skins"] = ("Apparences", "Skins", "Aspectos", "Visuais"),
 		["Tactical"] = ("Tactique", "Taktisch", "Táctico", "Tático"),
 		["Melee"] = ("Corps à corps", "Nahkampf", "Cuerpo a cuerpo", "Corpo a corpo"),
 		["Assault Rifle"] = ("Fusil d'assaut", "Sturmgewehr", "Fusil de asalto", "Fuzil de assalto"),

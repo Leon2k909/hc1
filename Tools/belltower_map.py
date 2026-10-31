@@ -61,6 +61,7 @@ import belltower_fountain as Fountain
 import belltower_church_windows as ChurchWindows
 import belltower_open_windows as OpenWindows
 import belltower_open_doors as OpenDoors
+import belltower_pews as Pews
 import belltower_furniture as Furniture
 import belltower_market_crates_v3 as MarketCratesV3
 import belltower_interiors as Interiors
@@ -1375,11 +1376,12 @@ def church( model, lights ):
     model.box( ( e0 + T, n0 + T, 0 ), ( e1 - T, -800, 8 ), { "+z": "ashlar", "default": "ashlar_grey" }, STONE )
     model.box( ( -54, -862, 8 ), ( 54, -828, 46 ), { "+z": "canvas_plain", "default": "ashlar" }, STONE )
     model.cylinder( ( 124, -772 ), 20, 0, 58, { "side": "planks_dark", "top": "planks" }, sides=8, surface=WOOD )
-    # Pews, facing the altar, with an aisle down the middle and across at the side doors.
-    for n in ( -440, -484, -528, -572, -700, -744 ):
-        for ea, eb in ( ( e0 + T + 10, -40 ), ( 40, e1 - T - 10 ) ):
-            model.box( ( ea, n - 18, 0 ), ( eb, n, 18 ), { "+z": "planks", "default": "planks_dark" }, WOOD )
-            model.box( ( ea, n - 3, 18 ), ( eb, n, 38 ), "planks_dark", WOOD )
+    # Pews, facing the altar, with an aisle down the middle and across at the side doors. These boxes are their collision only:
+    # belltower_pews places the model in the scene.
+    for n in Pews.ROWS:
+        for ea, eb in Pews.BLOCKS:
+            model.box( ( ea, n - 18, 0 ), ( eb, n, 18 ), None, WOOD )
+            model.box( ( ea, n - 3, 18 ), ( eb, n, 38 ), None, WOOD )
     lights.append( light( "Church Nave", ( 0, -560, 220 ), "0.95,0.88,0.75,1", 520 ) )
     lights.append( light( "Church Chancel", ( 0, -800, 200 ), "1,0.83,0.6,1", 380 ) )
     return ridge
@@ -2935,6 +2937,7 @@ def write_scene( lights, models ):
         model_object( "Hall Entrance Doors", "town/open_doors", OpenDoors.NAME, collide=False ),
         model_object( "Vista", "town/vista", "belltower_vista", collide=False, shadows=False ),
         model_object( "Vista Props", "town/vista_props", VistaProps.NAME, collide=False, shadows=False ),
+        Pews.scene_group( ids ),
     ] )
     light_objects = [
         K.game_object( ids, name, f"light/{name}", K.to_world( position ), tags="light_point,light", components=[

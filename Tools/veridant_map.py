@@ -48,6 +48,7 @@ import veridant_materials as VM
 import veridant_parts as P
 import veridant_planter_bushes as PlanterBushes
 import veridant_courtyard_olive as CourtyardTree
+import veridant_sofas as Sofas
 from riverdale_parts import v, unit, card, box, obox, rod, UP
 
 STONE, METAL, WOOD, PLASTIC, GLASS, FABRIC = "default", "metal", "wood", "plastic", "glass", "fabric"
@@ -1259,7 +1260,8 @@ def write_scene( written, light_list, probe_list, hedge_props=() ):
         for name, title, collide, shadows in SCENE_MODELS if name in written ] + [
         K.game_object( ids, "Beech Hedges", "hedges", children=hedge_objects( hedge_props ) ),
         PlanterBushes.scene_group( ids ),
-        CourtyardTree.scene_object( ids ) ] )
+        CourtyardTree.scene_object( ids ),
+        Sofas.scene_group( ids ) ] )
     light_objects = [
         K.game_object( ids, name, f"light/{name}", K.to_world( position ), tags="light_point,light", components=[
             K.component( ids, "Sandbox.PointLight", f"light/{name}/light", Attenuation=1, FogMode="Enabled", FogStrength=1,

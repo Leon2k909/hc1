@@ -853,18 +853,12 @@ def chair( m, at, facing, z0=0.0, paint="vr_wicker" ):
 
 
 def sofa( m, c, facing, length=84.0, z0=0.0, surface=FABRIC ):
-    """ A low lounge sofa facing facing: a plinth, a deep seat with cushions, a back and arms. """
+    """ A low lounge sofa facing facing: its collision box here, and the model placed in the scene by veridant_sofas. """
+    from veridant_sofas import record
     f = unit( v( facing[0], facing[1], 0 ) )
     s = np.cross( UP, f )
     b = v( c[0], c[1], z0 )
-    obox( m, b + UP * 2, f, ( 34, length - 4, 4 ), "vr_black" )
-    obox( m, b + UP * 10, f, ( 36, length, 12 ), "vr_sofa" )
-    obox( m, b - f * 14 + UP * 24, f, ( 8, length, 18 ), "vr_sofa" )
-    for sg in ( -1, 1 ):
-        obox( m, b + s * ( length / 2 - 4 ) * sg + UP * 20, f, ( 36, 8, 8 ), "vr_sofa" )
-    for i in range( 3 ):
-        q = b + s * ( ( i - 1 ) * ( length - 12 ) / 3 ) - f * 9 + UP * 26
-        obox( m, q, f, ( 6, ( length - 16 ) / 3 - 2, 14 ), "vr_cushion" )
+    record( ( c[0], c[1], z0 ), facing, length )
     m.oriented_box( b + UP * 15, ( f, s, UP ), ( 36, length, 30 ), {}, surface )
 
 

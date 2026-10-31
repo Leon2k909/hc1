@@ -93,7 +93,7 @@ public sealed partial class LpgCanister
 				1.8f, i * 0.018f, 1.5f, 45f );
 		for ( var i = 0; i < 15; i++ )
 			FireSmokeParticles.Emit( _smoke, WorldPosition + Vector3.Random * 12f, 12f, 70f, 50f, 5f, new Color( 0.3f, 0.3f, 0.3f, 0.5f ) );
-		var cap = Model.Load( "models/props/lowtide/lpg_canister_cap.vmdl" );
+		var cap = Model.Load( "models/props/lowtide/lpg_canister_v2/lpg_canister_cap.vmdl" );
 		if ( cap is not null && !cap.IsError )
 		{
 			foreach ( var sign in new[] { -1f, 1f } )

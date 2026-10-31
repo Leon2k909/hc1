@@ -45,6 +45,7 @@ from map_kit import Model
 import railhead_map as R
 import railhead_preview as PV
 import cerroblanco_parts as P
+import cerroblanco_boulders
 import cerroblanco_materials as CM
 from cerroblanco_glass import GlassModel
 
@@ -792,7 +793,11 @@ def garden_circle( m, d ):
     for k, ( a, r, size ) in enumerate( ( ( 45, 320, ( 34, 26, 28 ) ), ( 140, 300, ( 30, 30, 34 ) ), ( 228, 340, ( 38, 28, 30 ) ),
                                          ( 312, 290, ( 26, 24, 26 ) ), ( 70, 400, ( 22, 20, 20 ) ), ( 200, 410, ( 24, 22, 22 ) ) ) ):
         p = ( c[0] + r * math.cos( math.radians( a ) ), c[1] + r * math.sin( math.radians( a ) ), 1.0 )
-        P.boulder( d, p, size, 700 + k )
+        # Four are boulder_v2, placed in the scene with their own collision. Two stay this old shape: the user wanted all three in use.
+        if k in cerroblanco_boulders.NEW:
+            cerroblanco_boulders.record( k, p )
+        else:
+            P.boulder( d, p, size, 700 + k )
     for a in ( 22.5, 112.5, 202.5, 292.5 ):
         p = ( c[0] + 240 * math.cos( math.radians( a ) ), c[1] + 240 * math.sin( math.radians( a ) ) )
         along = "e" if abs( math.cos( math.radians( a ) ) ) < 0.75 else "n"
@@ -1339,6 +1344,7 @@ def write_scene( written, light_list, props, glazing=None, spot_list=() ):
     world = K.game_object( ids, "Cerro Blanco", "world", children=[
         glazing.scene_group( ids ) if name == "cerroblanco_glass" else model_object( title, f"world/{name}", name, collide, shadows )
         for name, title, collide, shadows in SCENE_MODELS if name in written ] )
+    world["Children"].append( cerroblanco_boulders.scene_group( ids ) )
     light_objects = [
         K.game_object( ids, name, f"light/{name}", K.to_world( position ), tags="light_point,light", components=[
             K.component( ids, "Sandbox.PointLight", f"light/{name}/light", Attenuation=1, FogMode="Enabled", FogStrength=1,

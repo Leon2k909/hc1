@@ -243,6 +243,21 @@
                                 </div>
                                 @if ( inClass ) { <i class="gs-choice-check">check</i> }
                             </div>
+                            var skins = EquipmentSkins.For( g );
+                            @if ( skins.Count > 1 )
+                            {
+                                var worn = EquipmentSkins.GetEquipped( g );
+                                <label class="gs-skins-label">@Tr( "SKINS" )</label>
+                                @foreach ( var skin in skins )
+                                {
+                                    var s = skin;
+                                    <div @key="s" class="gs-choice-build skin @(s == worn ? "current" : "")" @onclick=@(() => PickSkin( g, s ))>
+                                        <div class="gs-skin-img" style="background-image: url( '@s.Picture' )" />
+                                        <label class="gs-choice-build-name">@s.Name.ToUpper()</label>
+                                        @if ( s == worn ) { <i class="gs-choice-check">check</i> }
+                                    </div>
+                                }
+                            }
                         }
                     }
                 </div>
@@ -1949,6 +1964,17 @@
 
         GunsmithLoadoutManager.SetSlot( resource.Slot, resource.ResourcePath );
         ClosePicker();
+    }
+
+    /// <summary> A skin puts its equipment in the class too, as a build does its gun. The picker stays open, to compare them. </summary>
+    private void PickSkin( EquipmentResource resource, EquipmentSkin skin )
+    {
+        if ( !resource.IsValid() )
+            return;
+
+        EquipmentSkins.Equip( skin );
+        GunsmithLoadoutManager.SetSlot( resource.Slot, resource.ResourcePath );
+        StateHasChanged();
     }
 
     private void SelectPerk( PerkResource perk )

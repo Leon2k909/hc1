@@ -20,7 +20,7 @@ public static class Hc1AttachmentAudit
 	[ConCmd( "hc1_attachment_refresh" )]
 	public static void Refresh()
 	{
-		foreach ( var name in new[] { "rifle_suppressor", "compact_suppressor", "vertical_grip", "angled_grip" } )
+		foreach ( var name in new[] { "rifle_suppressor", "rifle_suppressor_pattern6", "compact_suppressor", "vertical_grip", "angled_grip" } )
 		{
 			AssetSystem.FindByPath( $"gunsmith/hc1/{name}/{name}.prefab" )?.Compile( true );
 			AssetSystem.FindByPath( $"gunsmith/hc1/{name}/{name}.gnsmth" )?.Compile( true );
@@ -111,6 +111,7 @@ public static class Hc1AttachmentAudit
 	{
 		foreach ( var path in new[] {
 			"attachments/hc1/rifle_suppressor/rifle_suppressor.vmdl",
+			"attachments/hc1/rifle_suppressor_v2/rifle_suppressor.vmdl",
 			"attachments/hc1/compact_suppressor/compact_suppressor.vmdl",
 			"attachments/hc1/vertical_grip/vertical_grip.vmdl",
 			"attachments/hc1/angled_grip/angled_grip.vmdl"

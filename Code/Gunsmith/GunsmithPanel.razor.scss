@@ -1323,7 +1323,30 @@ GunsmithPanel
 
         &.modified { border-left-color: $caution; }
 
+        // A skin's row is tall enough to see its picture, since how it looks is the point.
+        &.skin { height: 76px; }
+
         .gs-choice-check { font-size: 18px; }
+    }
+
+    .gs-skins-label
+    {
+        flex-shrink: 0;
+        margin: 4px 0 0 30px;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        color: $text-dim;
+    }
+
+    .gs-skin-img
+    {
+        width: 68px;
+        height: 68px;
+        flex-shrink: 0;
+        background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center;
     }
 
     .gs-choice-build-icon
