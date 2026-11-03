@@ -55,4 +55,15 @@
   secret door (`T room Door 4`, `AllowDirectUse` false) opens for nobody, so anything spawned there is trapped.
   T Spawn 5 was in it, which slowly trapped the whole T bot team there, with the CTs piled up against the lobby wall.
   Every spawn must have a Complete navmesh path to the other team's spawns.
-
+- Refinery's Defuse markings (`Defuse` in the scene, `Tools/refinery_defuse_decals.py`, 2026-10-30): 10 site signs,
+  12 arrows and 2 crosses, red paint on the walls and floor. They were `DecalRenderer`s, which draw nothing now (an
+  empty obsolete class), and the scene had lost their materials. The art came from Facepunch/sbox-hc1 at
+  `8e422543d2`, the last commit that recorded it. Many old names were wrong, so they are renamed for what they show.
+  - `Decal.Rotation` is a random 0-360 by default. It's a fixed 180 here because the old renderer drew its art half a
+    turn from `Decal`'s: with it all 10 signs are upright and all 12 arrows point towards their site, without it none
+    of the arrows do. Worked out offline from the scene's rotations and `Decals.hlsl`.
+  - `AttenuationAngle` 1 drops surfaces facing away, so a sign doesn't show on the far side of its own wall. Anything
+    else facing out inside the box still takes it, and 17 of them keep the old default depth of 256 (128 each way).
+  - Not seen in the engine. Refinery is in `GameUtils.DisabledMaps`, so players don't see these yet. To check by eye:
+    every marking reaches its wall, and none paints a player walking past (lower `Depth` if one does).
+  - `c4_explosion`, `decoy_grenade_explode` and `molotov_explosion` still hold dead `DecalRenderer`s.

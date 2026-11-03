@@ -1090,7 +1090,7 @@
           "__guid": "c3cabca4-7200-4340-ae9e-3fc10780db2b",
           "__version": 2,
           "Flags": 0,
-          "Name": "decal_arrow",
+          "Name": "decal_arrow_b_1",
           "Position": "-513.412415,138.048706,-963.414917",
           "Rotation": "-1.94707198E-07,-1,-1.94707198E-07,3.79108908E-14",
           "Scale": "1,1,1",
@@ -1103,25 +1103,37 @@
           "OwnerTransfer": 1,
           "Components": [
             {
-              "__type": "Sandbox.DecalRenderer",
+              "__type": "Sandbox.Decal",
               "__guid": "7767cfd4-019e-4038-90d4-033ca9e0c0b9",
               "__enabled": true,
               "Flags": 0,
+              "__version": 3,
+              "AttenuationAngle": 1,
+              "ColorMix": 1,
+              "ColorTint": "1,1,1,1",
+              "CoverageAmount": 1,
+              "CoverageFadeIn": 0,
+              "CoverageRange": 0.07,
+              "Decals": [
+                "decals/refinery/arrow.decal"
+              ],
+              "Depth": 27.8667,
+              "LifeTime": 0,
+              "Looped": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
               "OnComponentFixedUpdate": null,
               "OnComponentStart": null,
               "OnComponentUpdate": null,
-              "RenderOptions": {
-                "GameLayer": true,
-                "OverlayLayer": false,
-                "BloomLayer": false,
-                "AfterUILayer": false
-              },
-              "Size": "64,32,27.8667393",
-              "TintColor": "1,1,1,1",
-              "TriPlanar": false
+              "Parallax": 1,
+              "Rotation": 180,
+              "Scale": 1,
+              "SequenceId": 0,
+              "SheetSequence": false,
+              "Size": "1,1",
+              "SortLayer": 0,
+              "Transient": false
             }
           ],
           "Children": []
@@ -1130,7 +1142,7 @@
           "__guid": "786a0821-472d-4567-80da-2600783b5f84",
           "__version": 2,
           "Flags": 0,
-          "Name": "decal_bombsite_b (6)",
+          "Name": "decal_sign_b_1",
           "Position": "-505.412415,138.048706,-915.414917",
           "Rotation": "-1.94707198E-07,1,1.94707198E-07,3.79108908E-14",
           "Scale": "1,1,1",
@@ -1143,25 +1155,37 @@
           "OwnerTransfer": 1,
           "Components": [
             {
-              "__type": "Sandbox.DecalRenderer",
+              "__type": "Sandbox.Decal",
               "__guid": "d031149f-07de-448f-a9d9-9cd1c9632cb1",
               "__enabled": true,
               "Flags": 0,
+              "__version": 3,
+              "AttenuationAngle": 1,
+              "ColorMix": 1,
+              "ColorTint": "1,1,1,1",
+              "CoverageAmount": 1,
+              "CoverageFadeIn": 0,
+              "CoverageRange": 0.07,
+              "Decals": [
+                "decals/refinery/sign_b.decal"
+              ],
+              "Depth": 27.8667,
+              "LifeTime": 0,
+              "Looped": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
               "OnComponentFixedUpdate": null,
               "OnComponentStart": null,
               "OnComponentUpdate": null,
-              "RenderOptions": {
-                "GameLayer": true,
-                "OverlayLayer": false,
-                "BloomLayer": false,
-                "AfterUILayer": false
-              },
-              "Size": "64,64,27.8667393",
-              "TintColor": "1,1,1,1",
-              "TriPlanar": false
+              "Parallax": 1,
+              "Rotation": 180,
+              "Scale": 1,
+              "SequenceId": 0,
+              "SheetSequence": false,
+              "Size": "1,1",
+              "SortLayer": 0,
+              "Transient": false
             }
           ],
           "Children": []
@@ -1170,7 +1194,7 @@
           "__guid": "252ddb30-2f5d-47b3-87bd-f8608b6ca2c4",
           "__version": 2,
           "Flags": 0,
-          "Name": "decal_cross",
+          "Name": "decal_cross_b",
           "Position": "-1429.68701,-1403.37695,-899.415405",
           "Rotation": "-0.5,0.5,0.5,0.5",
           "Scale": "1,1,1",
@@ -1183,25 +1207,37 @@
           "OwnerTransfer": 1,
           "Components": [
             {
-              "__type": "Sandbox.DecalRenderer",
+              "__type": "Sandbox.Decal",
               "__guid": "4fc1549d-5696-4436-9c73-ab659f75c993",
               "__enabled": true,
               "Flags": 0,
+              "__version": 3,
+              "AttenuationAngle": 1,
+              "ColorMix": 1,
+              "ColorTint": "1,1,1,1",
+              "CoverageAmount": 1,
+              "CoverageFadeIn": 0,
+              "CoverageRange": 0.07,
+              "Decals": [
+                "decals/refinery/cross.decal"
+              ],
+              "Depth": 256,
+              "LifeTime": 0,
+              "Looped": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
               "OnComponentFixedUpdate": null,
               "OnComponentStart": null,
               "OnComponentUpdate": null,
-              "RenderOptions": {
-                "GameLayer": true,
-                "OverlayLayer": false,
-                "BloomLayer": false,
-                "AfterUILayer": false
-              },
-              "Size": "128,128,256",
-              "TintColor": "1,1,1,1",
-              "TriPlanar": false
+              "Parallax": 1,
+              "Rotation": 180,
+              "Scale": 1,
+              "SequenceId": 0,
+              "SheetSequence": false,
+              "Size": "2,2",
+              "SortLayer": 0,
+              "Transient": false
             }
           ],
           "Children": []
@@ -1210,7 +1246,7 @@
           "__guid": "7e7b2f05-7f3e-4dfa-be16-26739eaae1a8",
           "__version": 2,
           "Flags": 0,
-          "Name": "decal_bombsite_b (7)",
+          "Name": "decal_arrow_a_1",
           "Position": "-107.4104,-1477.94995,-827.413513",
           "Rotation": "0.707106709,-0.707106829,-2.66925412E-07,2.66925412E-07",
           "Scale": "1,1,1",
@@ -1223,25 +1259,37 @@
           "OwnerTransfer": 1,
           "Components": [
             {
-              "__type": "Sandbox.DecalRenderer",
+              "__type": "Sandbox.Decal",
               "__guid": "54fbc23e-dc3a-4f12-8e71-082f1d80d4f5",
               "__enabled": true,
               "Flags": 0,
+              "__version": 3,
+              "AttenuationAngle": 1,
+              "ColorMix": 1,
+              "ColorTint": "1,1,1,1",
+              "CoverageAmount": 1,
+              "CoverageFadeIn": 0,
+              "CoverageRange": 0.07,
+              "Decals": [
+                "decals/refinery/arrow.decal"
+              ],
+              "Depth": 256,
+              "LifeTime": 0,
+              "Looped": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
               "OnComponentFixedUpdate": null,
               "OnComponentStart": null,
               "OnComponentUpdate": null,
-              "RenderOptions": {
-                "GameLayer": true,
-                "OverlayLayer": false,
-                "BloomLayer": false,
-                "AfterUILayer": false
-              },
-              "Size": "64,32,256",
-              "TintColor": "1,1,1,1",
-              "TriPlanar": false
+              "Parallax": 1,
+              "Rotation": 180,
+              "Scale": 1,
+              "SequenceId": 0,
+              "SheetSequence": false,
+              "Size": "1,1",
+              "SortLayer": 0,
+              "Transient": false
             }
           ],
           "Children": []
@@ -1250,7 +1298,7 @@
           "__guid": "a3ed7fa3-a8d0-4c14-ab42-f15e4d5fc871",
           "__version": 2,
           "Flags": 0,
-          "Name": "decal_bombsite_b (8)",
+          "Name": "decal_sign_a_1",
           "Position": "-107.4104,-1477.94995,-779.413513",
           "Rotation": "0.707106709,-0.707106829,-1.37678796E-07,1.37678796E-07",
           "Scale": "1,1,1",
@@ -1263,25 +1311,37 @@
           "OwnerTransfer": 1,
           "Components": [
             {
-              "__type": "Sandbox.DecalRenderer",
+              "__type": "Sandbox.Decal",
               "__guid": "fd4c1947-8c85-4bc1-89ec-ce08c76a9b4a",
               "__enabled": true,
               "Flags": 0,
+              "__version": 3,
+              "AttenuationAngle": 1,
+              "ColorMix": 1,
+              "ColorTint": "1,1,1,1",
+              "CoverageAmount": 1,
+              "CoverageFadeIn": 0,
+              "CoverageRange": 0.07,
+              "Decals": [
+                "decals/refinery/sign_a.decal"
+              ],
+              "Depth": 256,
+              "LifeTime": 0,
+              "Looped": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
               "OnComponentFixedUpdate": null,
               "OnComponentStart": null,
               "OnComponentUpdate": null,
-              "RenderOptions": {
-                "GameLayer": true,
-                "OverlayLayer": false,
-                "BloomLayer": false,
-                "AfterUILayer": false
-              },
-              "Size": "64,64,256",
-              "TintColor": "1,1,1,1",
-              "TriPlanar": false
+              "Parallax": 1,
+              "Rotation": 180,
+              "Scale": 1,
+              "SequenceId": 0,
+              "SheetSequence": false,
+              "Size": "1,1",
+              "SortLayer": 0,
+              "Transient": false
             }
           ],
           "Children": []
@@ -1290,7 +1350,7 @@
           "__guid": "ccc7396d-31bc-48ca-931b-c3f6ffc20b7d",
           "__version": 2,
           "Flags": 0,
-          "Name": "decal_bombsite_a (16)",
+          "Name": "decal_sign_b_2",
           "Position": "-715.412109,-1177.86902,-875.416809",
           "Rotation": "0.707106888,0.707106709,1.37678796E-07,1.37678796E-07",
           "Scale": "1,1,1",
@@ -1303,25 +1363,37 @@
           "OwnerTransfer": 1,
           "Components": [
             {
-              "__type": "Sandbox.DecalRenderer",
+              "__type": "Sandbox.Decal",
               "__guid": "61dca4c6-1ca8-479e-aaf0-89cd36ff9655",
               "__enabled": true,
               "Flags": 0,
+              "__version": 3,
+              "AttenuationAngle": 1,
+              "ColorMix": 1,
+              "ColorTint": "1,1,1,1",
+              "CoverageAmount": 1,
+              "CoverageFadeIn": 0,
+              "CoverageRange": 0.07,
+              "Decals": [
+                "decals/refinery/sign_b.decal"
+              ],
+              "Depth": 16,
+              "LifeTime": 0,
+              "Looped": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
               "OnComponentFixedUpdate": null,
               "OnComponentStart": null,
               "OnComponentUpdate": null,
-              "RenderOptions": {
-                "GameLayer": true,
-                "OverlayLayer": false,
-                "BloomLayer": false,
-                "AfterUILayer": false
-              },
-              "Size": "64,64,5",
-              "TintColor": "1,1,1,1",
-              "TriPlanar": false
+              "Parallax": 1,
+              "Rotation": 180,
+              "Scale": 1,
+              "SequenceId": 0,
+              "SheetSequence": false,
+              "Size": "1,1",
+              "SortLayer": 0,
+              "Transient": false
             }
           ],
           "Children": []
@@ -1330,7 +1402,7 @@
           "__guid": "b1c8bcd4-10a6-4206-9496-9c2c0a62710a",
           "__version": 2,
           "Flags": 0,
-          "Name": "decal_bombsite_a (9)",
+          "Name": "decal_sign_b_3",
           "Position": "564.587585,-1285.95105,-819.415527",
           "Rotation": "0.707106888,0.707106709,1.37678796E-07,1.37678796E-07",
           "Scale": "1,1,1",
@@ -1343,25 +1415,37 @@
           "OwnerTransfer": 1,
           "Components": [
             {
-              "__type": "Sandbox.DecalRenderer",
+              "__type": "Sandbox.Decal",
               "__guid": "70e37f4b-b971-4ec5-a20b-76f05c04fe9c",
               "__enabled": true,
               "Flags": 0,
+              "__version": 3,
+              "AttenuationAngle": 1,
+              "ColorMix": 1,
+              "ColorTint": "1,1,1,1",
+              "CoverageAmount": 1,
+              "CoverageFadeIn": 0,
+              "CoverageRange": 0.07,
+              "Decals": [
+                "decals/refinery/sign_b.decal"
+              ],
+              "Depth": 256,
+              "LifeTime": 0,
+              "Looped": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
               "OnComponentFixedUpdate": null,
               "OnComponentStart": null,
               "OnComponentUpdate": null,
-              "RenderOptions": {
-                "GameLayer": true,
-                "OverlayLayer": false,
-                "BloomLayer": false,
-                "AfterUILayer": false
-              },
-              "Size": "64,64,256",
-              "TintColor": "1,1,1,1",
-              "TriPlanar": false
+              "Parallax": 1,
+              "Rotation": 180,
+              "Scale": 1,
+              "SequenceId": 0,
+              "SheetSequence": false,
+              "Size": "1,1",
+              "SortLayer": 0,
+              "Transient": false
             }
           ],
           "Children": []
@@ -1370,7 +1454,7 @@
           "__guid": "3010c6af-fbf3-4249-b2f5-1337d9583e89",
           "__version": 2,
           "Flags": 0,
-          "Name": "decal_bombsite_a (12)",
+          "Name": "decal_sign_b_4",
           "Position": "-43.4123497,346.048706,-915.415527",
           "Rotation": "0.707106829,-0.707106829,-1.37678796E-07,1.37678796E-07",
           "Scale": "1,1,1",
@@ -1383,25 +1467,37 @@
           "OwnerTransfer": 1,
           "Components": [
             {
-              "__type": "Sandbox.DecalRenderer",
+              "__type": "Sandbox.Decal",
               "__guid": "d8e6ab5e-0c02-4359-892c-3873f9f8914c",
               "__enabled": true,
               "Flags": 0,
+              "__version": 3,
+              "AttenuationAngle": 1,
+              "ColorMix": 1,
+              "ColorTint": "1,1,1,1",
+              "CoverageAmount": 1,
+              "CoverageFadeIn": 0,
+              "CoverageRange": 0.07,
+              "Decals": [
+                "decals/refinery/sign_b.decal"
+              ],
+              "Depth": 256,
+              "LifeTime": 0,
+              "Looped": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
               "OnComponentFixedUpdate": null,
               "OnComponentStart": null,
               "OnComponentUpdate": null,
-              "RenderOptions": {
-                "GameLayer": true,
-                "OverlayLayer": false,
-                "BloomLayer": false,
-                "AfterUILayer": false
-              },
-              "Size": "64,64,256",
-              "TintColor": "1,1,1,1",
-              "TriPlanar": false
+              "Parallax": 1,
+              "Rotation": 180,
+              "Scale": 1,
+              "SequenceId": 0,
+              "SheetSequence": false,
+              "Size": "1,1",
+              "SortLayer": 0,
+              "Transient": false
             }
           ],
           "Children": []
@@ -1410,7 +1506,7 @@
           "__guid": "5f44e9c4-953d-40d7-834b-49b66a2691d4",
           "__version": 2,
           "Flags": 0,
-          "Name": "decal_bombsite_a (3)",
+          "Name": "decal_sign_b_5",
           "Position": "-347.412415,1002.04901,-947.415527",
           "Rotation": "0.707106829,-0.707106829,-1.37678796E-07,1.37678796E-07",
           "Scale": "1,1,1",
@@ -1423,25 +1519,37 @@
           "OwnerTransfer": 1,
           "Components": [
             {
-              "__type": "Sandbox.DecalRenderer",
+              "__type": "Sandbox.Decal",
               "__guid": "5eaed8d7-c696-46e9-a644-8f5b93f813f5",
               "__enabled": true,
               "Flags": 0,
+              "__version": 3,
+              "AttenuationAngle": 1,
+              "ColorMix": 1,
+              "ColorTint": "1,1,1,1",
+              "CoverageAmount": 1,
+              "CoverageFadeIn": 0,
+              "CoverageRange": 0.07,
+              "Decals": [
+                "decals/refinery/sign_b.decal"
+              ],
+              "Depth": 256,
+              "LifeTime": 0,
+              "Looped": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
               "OnComponentFixedUpdate": null,
               "OnComponentStart": null,
               "OnComponentUpdate": null,
-              "RenderOptions": {
-                "GameLayer": true,
-                "OverlayLayer": false,
-                "BloomLayer": false,
-                "AfterUILayer": false
-              },
-              "Size": "64,64,256",
-              "TintColor": "1,1,1,1",
-              "TriPlanar": false
+              "Parallax": 1,
+              "Rotation": 180,
+              "Scale": 1,
+              "SequenceId": 0,
+              "SheetSequence": false,
+              "Size": "1,1",
+              "SortLayer": 0,
+              "Transient": false
             }
           ],
           "Children": []
@@ -1450,7 +1558,7 @@
           "__guid": "7fc1f261-bcba-4036-ae95-43ad34fb51b8",
           "__version": 2,
           "Flags": 0,
-          "Name": "decal_bombsite_a (8)",
+          "Name": "decal_arrow_a_2",
           "Position": "724.587585,-1285.95105,-883.415527",
           "Rotation": "2.75357593E-07,2.75357507E-07,-0.707106709,-0.707106888",
           "Scale": "1,1,1",
@@ -1463,25 +1571,37 @@
           "OwnerTransfer": 1,
           "Components": [
             {
-              "__type": "Sandbox.DecalRenderer",
+              "__type": "Sandbox.Decal",
               "__guid": "ee454371-a812-491c-97ba-66f9ec2c3143",
               "__enabled": true,
               "Flags": 0,
+              "__version": 3,
+              "AttenuationAngle": 1,
+              "ColorMix": 1,
+              "ColorTint": "1,1,1,1",
+              "CoverageAmount": 1,
+              "CoverageFadeIn": 0,
+              "CoverageRange": 0.07,
+              "Decals": [
+                "decals/refinery/arrow.decal"
+              ],
+              "Depth": 256,
+              "LifeTime": 0,
+              "Looped": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
               "OnComponentFixedUpdate": null,
               "OnComponentStart": null,
               "OnComponentUpdate": null,
-              "RenderOptions": {
-                "GameLayer": true,
-                "OverlayLayer": false,
-                "BloomLayer": false,
-                "AfterUILayer": false
-              },
-              "Size": "64,32,256",
-              "TintColor": "1,1,1,1",
-              "TriPlanar": false
+              "Parallax": 1,
+              "Rotation": 180,
+              "Scale": 1,
+              "SequenceId": 0,
+              "SheetSequence": false,
+              "Size": "1,1",
+              "SortLayer": 0,
+              "Transient": false
             }
           ],
           "Children": []
@@ -1490,7 +1610,7 @@
           "__guid": "d679663d-4140-4ed5-aa49-346814bdc9a5",
           "__version": 2,
           "Flags": 0,
-          "Name": "decal_bombsite_a (13)",
+          "Name": "decal_arrow_b_2",
           "Position": "-43.4123497,346.048706,-963.415527",
           "Rotation": "2.75357593E-07,-2.75357593E-07,0.707106829,-0.707106829",
           "Scale": "1,1,1",
@@ -1503,25 +1623,37 @@
           "OwnerTransfer": 1,
           "Components": [
             {
-              "__type": "Sandbox.DecalRenderer",
+              "__type": "Sandbox.Decal",
               "__guid": "618a5b5c-8074-4f47-a2ac-723e3995ddb7",
               "__enabled": true,
               "Flags": 0,
+              "__version": 3,
+              "AttenuationAngle": 1,
+              "ColorMix": 1,
+              "ColorTint": "1,1,1,1",
+              "CoverageAmount": 1,
+              "CoverageFadeIn": 0,
+              "CoverageRange": 0.07,
+              "Decals": [
+                "decals/refinery/arrow.decal"
+              ],
+              "Depth": 256,
+              "LifeTime": 0,
+              "Looped": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
               "OnComponentFixedUpdate": null,
               "OnComponentStart": null,
               "OnComponentUpdate": null,
-              "RenderOptions": {
-                "GameLayer": true,
-                "OverlayLayer": false,
-                "BloomLayer": false,
-                "AfterUILayer": false
-              },
-              "Size": "64,32,256",
-              "TintColor": "1,1,1,1",
-              "TriPlanar": false
+              "Parallax": 1,
+              "Rotation": 180,
+              "Scale": 1,
+              "SequenceId": 0,
+              "SheetSequence": false,
+              "Size": "1,1",
+              "SortLayer": 0,
+              "Transient": false
             }
           ],
           "Children": []
@@ -1530,7 +1662,7 @@
           "__guid": "87a3b0c8-8176-4194-a69f-88ed7e180817",
           "__version": 2,
           "Flags": 0,
-          "Name": "decal_bombsite_a (5)",
+          "Name": "decal_arrow_b_3",
           "Position": "-347.412415,1002.04901,-995.415527",
           "Rotation": "2.75357593E-07,-2.75357593E-07,0.707106829,-0.707106829",
           "Scale": "1,1,1",
@@ -1543,25 +1675,37 @@
           "OwnerTransfer": 1,
           "Components": [
             {
-              "__type": "Sandbox.DecalRenderer",
+              "__type": "Sandbox.Decal",
               "__guid": "2a920f0a-7e0e-4f6d-9c1a-136ba22fc631",
               "__enabled": true,
               "Flags": 0,
+              "__version": 3,
+              "AttenuationAngle": 1,
+              "ColorMix": 1,
+              "ColorTint": "1,1,1,1",
+              "CoverageAmount": 1,
+              "CoverageFadeIn": 0,
+              "CoverageRange": 0.07,
+              "Decals": [
+                "decals/refinery/arrow.decal"
+              ],
+              "Depth": 256,
+              "LifeTime": 0,
+              "Looped": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
               "OnComponentFixedUpdate": null,
               "OnComponentStart": null,
               "OnComponentUpdate": null,
-              "RenderOptions": {
-                "GameLayer": true,
-                "OverlayLayer": false,
-                "BloomLayer": false,
-                "AfterUILayer": false
-              },
-              "Size": "64,32,256",
-              "TintColor": "1,1,1,1",
-              "TriPlanar": false
+              "Parallax": 1,
+              "Rotation": 180,
+              "Scale": 1,
+              "SequenceId": 0,
+              "SheetSequence": false,
+              "Size": "1,1",
+              "SortLayer": 0,
+              "Transient": false
             }
           ],
           "Children": []
@@ -1570,7 +1714,7 @@
           "__guid": "b94fcaa5-4e76-4166-9a79-21198fa8c5ec",
           "__version": 2,
           "Flags": 0,
-          "Name": "decal_bombsite_a (17)",
+          "Name": "decal_arrow_b_4",
           "Position": "-715.412109,-1181.297,-923.416809",
           "Rotation": "0.707106888,0.707106709,1.37678796E-07,1.37678796E-07",
           "Scale": "1,1,1",
@@ -1583,25 +1727,37 @@
           "OwnerTransfer": 1,
           "Components": [
             {
-              "__type": "Sandbox.DecalRenderer",
+              "__type": "Sandbox.Decal",
               "__guid": "4883389c-9a12-48d1-a91a-eedea51052b5",
               "__enabled": true,
               "Flags": 0,
+              "__version": 3,
+              "AttenuationAngle": 1,
+              "ColorMix": 1,
+              "ColorTint": "1,1,1,1",
+              "CoverageAmount": 1,
+              "CoverageFadeIn": 0,
+              "CoverageRange": 0.07,
+              "Decals": [
+                "decals/refinery/arrow.decal"
+              ],
+              "Depth": 20,
+              "LifeTime": 0,
+              "Looped": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
               "OnComponentFixedUpdate": null,
               "OnComponentStart": null,
               "OnComponentUpdate": null,
-              "RenderOptions": {
-                "GameLayer": true,
-                "OverlayLayer": false,
-                "BloomLayer": false,
-                "AfterUILayer": false
-              },
-              "Size": "64,32,20",
-              "TintColor": "1,1,1,1",
-              "TriPlanar": false
+              "Parallax": 1,
+              "Rotation": 180,
+              "Scale": 1,
+              "SequenceId": 0,
+              "SheetSequence": false,
+              "Size": "1,1",
+              "SortLayer": 0,
+              "Transient": false
             }
           ],
           "Children": []
@@ -1610,7 +1766,7 @@
           "__guid": "61b22507-3018-429e-82e8-36555c63884f",
           "__version": 2,
           "Flags": 0,
-          "Name": "decal_bombsite_a (7)",
+          "Name": "decal_arrow_b_5",
           "Position": "564.587585,-1285.95105,-883.415527",
           "Rotation": "0.707106888,0.707106709,1.37678796E-07,1.37678796E-07",
           "Scale": "1,1,1",
@@ -1623,25 +1779,37 @@
           "OwnerTransfer": 1,
           "Components": [
             {
-              "__type": "Sandbox.DecalRenderer",
+              "__type": "Sandbox.Decal",
               "__guid": "f8fcb79d-6623-4b27-87be-7cf82b33fa44",
               "__enabled": true,
               "Flags": 0,
+              "__version": 3,
+              "AttenuationAngle": 1,
+              "ColorMix": 1,
+              "ColorTint": "1,1,1,1",
+              "CoverageAmount": 1,
+              "CoverageFadeIn": 0,
+              "CoverageRange": 0.07,
+              "Decals": [
+                "decals/refinery/arrow.decal"
+              ],
+              "Depth": 256,
+              "LifeTime": 0,
+              "Looped": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
               "OnComponentFixedUpdate": null,
               "OnComponentStart": null,
               "OnComponentUpdate": null,
-              "RenderOptions": {
-                "GameLayer": true,
-                "OverlayLayer": false,
-                "BloomLayer": false,
-                "AfterUILayer": false
-              },
-              "Size": "64,32,256",
-              "TintColor": "1,1,1,1",
-              "TriPlanar": false
+              "Parallax": 1,
+              "Rotation": 180,
+              "Scale": 1,
+              "SequenceId": 0,
+              "SheetSequence": false,
+              "Size": "1,1",
+              "SortLayer": 0,
+              "Transient": false
             }
           ],
           "Children": []
@@ -1650,7 +1818,7 @@
           "__guid": "175efc49-42ef-4788-977f-4d568e819ef4",
           "__version": 2,
           "Flags": 0,
-          "Name": "decal_bombsite_a (21)",
+          "Name": "decal_arrow_a_3",
           "Position": "-91.4123535,538.048706,-963.415588",
           "Rotation": "-1.29246601E-07,-1.292467E-07,0.707106888,0.707106709",
           "Scale": "1,1,1",
@@ -1663,25 +1831,37 @@
           "OwnerTransfer": 1,
           "Components": [
             {
-              "__type": "Sandbox.DecalRenderer",
+              "__type": "Sandbox.Decal",
               "__guid": "733280c7-0068-4610-8952-7a4a59f47d27",
               "__enabled": true,
               "Flags": 0,
+              "__version": 3,
+              "AttenuationAngle": 1,
+              "ColorMix": 1,
+              "ColorTint": "1,1,1,1",
+              "CoverageAmount": 1,
+              "CoverageFadeIn": 0,
+              "CoverageRange": 0.07,
+              "Decals": [
+                "decals/refinery/arrow.decal"
+              ],
+              "Depth": 256,
+              "LifeTime": 0,
+              "Looped": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
               "OnComponentFixedUpdate": null,
               "OnComponentStart": null,
               "OnComponentUpdate": null,
-              "RenderOptions": {
-                "GameLayer": true,
-                "OverlayLayer": false,
-                "BloomLayer": false,
-                "AfterUILayer": false
-              },
-              "Size": "64,32,256",
-              "TintColor": "1,1,1,1",
-              "TriPlanar": false
+              "Parallax": 1,
+              "Rotation": 180,
+              "Scale": 1,
+              "SequenceId": 0,
+              "SheetSequence": false,
+              "Size": "1,1",
+              "SortLayer": 0,
+              "Transient": false
             }
           ],
           "Children": []
@@ -1690,7 +1870,7 @@
           "__guid": "5bb45f65-acc3-4999-b16d-6801e1495372",
           "__version": 2,
           "Flags": 0,
-          "Name": "decal_bombsite_a (11)",
+          "Name": "decal_arrow_a_4",
           "Position": "180.587601,362.048706,-963.415527",
           "Rotation": "0.707106829,-0.707106829,-1.37678796E-07,1.37678796E-07",
           "Scale": "1,1,1",
@@ -1703,25 +1883,37 @@
           "OwnerTransfer": 1,
           "Components": [
             {
-              "__type": "Sandbox.DecalRenderer",
+              "__type": "Sandbox.Decal",
               "__guid": "5f894b87-8b9e-4e1a-bac6-9318f3c87463",
               "__enabled": true,
               "Flags": 0,
+              "__version": 3,
+              "AttenuationAngle": 1,
+              "ColorMix": 1,
+              "ColorTint": "1,1,1,1",
+              "CoverageAmount": 1,
+              "CoverageFadeIn": 0,
+              "CoverageRange": 0.07,
+              "Decals": [
+                "decals/refinery/arrow.decal"
+              ],
+              "Depth": 256,
+              "LifeTime": 0,
+              "Looped": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
               "OnComponentFixedUpdate": null,
               "OnComponentStart": null,
               "OnComponentUpdate": null,
-              "RenderOptions": {
-                "GameLayer": true,
-                "OverlayLayer": false,
-                "BloomLayer": false,
-                "AfterUILayer": false
-              },
-              "Size": "64,32,256",
-              "TintColor": "1,1,1,1",
-              "TriPlanar": false
+              "Parallax": 1,
+              "Rotation": 180,
+              "Scale": 1,
+              "SequenceId": 0,
+              "SheetSequence": false,
+              "Size": "1,1",
+              "SortLayer": 0,
+              "Transient": false
             }
           ],
           "Children": []
@@ -1730,7 +1922,7 @@
           "__guid": "8475930d-054f-434b-96a4-bda2af7360ca",
           "__version": 2,
           "Flags": 0,
-          "Name": "decal_bombsite_a (4)",
+          "Name": "decal_arrow_a_5",
           "Position": "-59.4123497,1002.04901,-995.415527",
           "Rotation": "0.707106829,-0.707106829,-1.37678796E-07,1.37678796E-07",
           "Scale": "1,1,1",
@@ -1743,25 +1935,37 @@
           "OwnerTransfer": 1,
           "Components": [
             {
-              "__type": "Sandbox.DecalRenderer",
+              "__type": "Sandbox.Decal",
               "__guid": "f5f97428-b2d6-4f31-8562-afbfc16e1efa",
               "__enabled": true,
               "Flags": 0,
+              "__version": 3,
+              "AttenuationAngle": 1,
+              "ColorMix": 1,
+              "ColorTint": "1,1,1,1",
+              "CoverageAmount": 1,
+              "CoverageFadeIn": 0,
+              "CoverageRange": 0.07,
+              "Decals": [
+                "decals/refinery/arrow.decal"
+              ],
+              "Depth": 256,
+              "LifeTime": 0,
+              "Looped": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
               "OnComponentFixedUpdate": null,
               "OnComponentStart": null,
               "OnComponentUpdate": null,
-              "RenderOptions": {
-                "GameLayer": true,
-                "OverlayLayer": false,
-                "BloomLayer": false,
-                "AfterUILayer": false
-              },
-              "Size": "64,32,256",
-              "TintColor": "1,1,1,1",
-              "TriPlanar": false
+              "Parallax": 1,
+              "Rotation": 180,
+              "Scale": 1,
+              "SequenceId": 0,
+              "SheetSequence": false,
+              "Size": "1,1",
+              "SortLayer": 0,
+              "Transient": false
             }
           ],
           "Children": []
@@ -1770,7 +1974,7 @@
           "__guid": "299a05ae-74c4-49ec-986b-52a267a872bf",
           "__version": 2,
           "Flags": 0,
-          "Name": "decal_bombsite_a (6)",
+          "Name": "decal_sign_a_2",
           "Position": "724.587585,-1285.95105,-819.415527",
           "Rotation": "0.707106888,0.707106709,1.37678796E-07,1.37678796E-07",
           "Scale": "1,1,1",
@@ -1783,25 +1987,37 @@
           "OwnerTransfer": 1,
           "Components": [
             {
-              "__type": "Sandbox.DecalRenderer",
+              "__type": "Sandbox.Decal",
               "__guid": "8b56a3de-006c-4ebd-a198-551321110291",
               "__enabled": true,
               "Flags": 0,
+              "__version": 3,
+              "AttenuationAngle": 1,
+              "ColorMix": 1,
+              "ColorTint": "1,1,1,1",
+              "CoverageAmount": 1,
+              "CoverageFadeIn": 0,
+              "CoverageRange": 0.07,
+              "Decals": [
+                "decals/refinery/sign_a.decal"
+              ],
+              "Depth": 256,
+              "LifeTime": 0,
+              "Looped": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
               "OnComponentFixedUpdate": null,
               "OnComponentStart": null,
               "OnComponentUpdate": null,
-              "RenderOptions": {
-                "GameLayer": true,
-                "OverlayLayer": false,
-                "BloomLayer": false,
-                "AfterUILayer": false
-              },
-              "Size": "64,64,256",
-              "TintColor": "1,1,1,1",
-              "TriPlanar": false
+              "Parallax": 1,
+              "Rotation": 180,
+              "Scale": 1,
+              "SequenceId": 0,
+              "SheetSequence": false,
+              "Size": "1,1",
+              "SortLayer": 0,
+              "Transient": false
             }
           ],
           "Children": []
@@ -1810,7 +2026,7 @@
           "__guid": "7e1ceca5-782b-4776-939a-123ee5a0477c",
           "__version": 2,
           "Flags": 0,
-          "Name": "decal_bombsite_a (20)",
+          "Name": "decal_sign_a_3",
           "Position": "-91.4123535,538.048706,-915.415588",
           "Rotation": "0.707106888,0.707106709,1.37678796E-07,1.37678796E-07",
           "Scale": "1,1,1",
@@ -1823,25 +2039,37 @@
           "OwnerTransfer": 1,
           "Components": [
             {
-              "__type": "Sandbox.DecalRenderer",
+              "__type": "Sandbox.Decal",
               "__guid": "83fdd5d6-3cc5-4ce4-a0bb-2c13af5e0c25",
               "__enabled": true,
               "Flags": 0,
+              "__version": 3,
+              "AttenuationAngle": 1,
+              "ColorMix": 1,
+              "ColorTint": "1,1,1,1",
+              "CoverageAmount": 1,
+              "CoverageFadeIn": 0,
+              "CoverageRange": 0.07,
+              "Decals": [
+                "decals/refinery/sign_a.decal"
+              ],
+              "Depth": 256,
+              "LifeTime": 0,
+              "Looped": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
               "OnComponentFixedUpdate": null,
               "OnComponentStart": null,
               "OnComponentUpdate": null,
-              "RenderOptions": {
-                "GameLayer": true,
-                "OverlayLayer": false,
-                "BloomLayer": false,
-                "AfterUILayer": false
-              },
-              "Size": "64,64,256",
-              "TintColor": "1,1,1,1",
-              "TriPlanar": false
+              "Parallax": 1,
+              "Rotation": 180,
+              "Scale": 1,
+              "SequenceId": 0,
+              "SheetSequence": false,
+              "Size": "1,1",
+              "SortLayer": 0,
+              "Transient": false
             }
           ],
           "Children": []
@@ -1850,7 +2078,7 @@
           "__guid": "184b7812-aa36-4eda-9334-464450046715",
           "__version": 2,
           "Flags": 0,
-          "Name": "decal_bombsite_a (10)",
+          "Name": "decal_sign_a_4",
           "Position": "180.587601,362.048706,-915.415527",
           "Rotation": "0.707106829,-0.707106829,-1.37678796E-07,1.37678796E-07",
           "Scale": "1,1,1",
@@ -1863,25 +2091,37 @@
           "OwnerTransfer": 1,
           "Components": [
             {
-              "__type": "Sandbox.DecalRenderer",
+              "__type": "Sandbox.Decal",
               "__guid": "b7a4ee38-3b96-43b4-903e-6dffcede1b30",
               "__enabled": true,
               "Flags": 0,
+              "__version": 3,
+              "AttenuationAngle": 1,
+              "ColorMix": 1,
+              "ColorTint": "1,1,1,1",
+              "CoverageAmount": 1,
+              "CoverageFadeIn": 0,
+              "CoverageRange": 0.07,
+              "Decals": [
+                "decals/refinery/sign_a.decal"
+              ],
+              "Depth": 256,
+              "LifeTime": 0,
+              "Looped": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
               "OnComponentFixedUpdate": null,
               "OnComponentStart": null,
               "OnComponentUpdate": null,
-              "RenderOptions": {
-                "GameLayer": true,
-                "OverlayLayer": false,
-                "BloomLayer": false,
-                "AfterUILayer": false
-              },
-              "Size": "64,64,256",
-              "TintColor": "1,1,1,1",
-              "TriPlanar": false
+              "Parallax": 1,
+              "Rotation": 180,
+              "Scale": 1,
+              "SequenceId": 0,
+              "SheetSequence": false,
+              "Size": "1,1",
+              "SortLayer": 0,
+              "Transient": false
             }
           ],
           "Children": []
@@ -1890,7 +2130,7 @@
           "__guid": "848fb04f-4388-41fb-af6d-0653ca335057",
           "__version": 2,
           "Flags": 0,
-          "Name": "decal_bombsite_a",
+          "Name": "decal_sign_a_5",
           "Position": "-59.4123497,1002.04901,-947.415527",
           "Rotation": "0.707106829,-0.707106829,-1.37678796E-07,1.37678796E-07",
           "Scale": "1,1,1",
@@ -1903,25 +2143,37 @@
           "OwnerTransfer": 1,
           "Components": [
             {
-              "__type": "Sandbox.DecalRenderer",
+              "__type": "Sandbox.Decal",
               "__guid": "46c26132-b88d-4b15-9b13-989ad9aaf787",
               "__enabled": true,
               "Flags": 0,
+              "__version": 3,
+              "AttenuationAngle": 1,
+              "ColorMix": 1,
+              "ColorTint": "1,1,1,1",
+              "CoverageAmount": 1,
+              "CoverageFadeIn": 0,
+              "CoverageRange": 0.07,
+              "Decals": [
+                "decals/refinery/sign_a.decal"
+              ],
+              "Depth": 256,
+              "LifeTime": 0,
+              "Looped": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
               "OnComponentFixedUpdate": null,
               "OnComponentStart": null,
               "OnComponentUpdate": null,
-              "RenderOptions": {
-                "GameLayer": true,
-                "OverlayLayer": false,
-                "BloomLayer": false,
-                "AfterUILayer": false
-              },
-              "Size": "64,64,256",
-              "TintColor": "1,1,1,1",
-              "TriPlanar": false
+              "Parallax": 1,
+              "Rotation": 180,
+              "Scale": 1,
+              "SequenceId": 0,
+              "SheetSequence": false,
+              "Size": "1,1",
+              "SortLayer": 0,
+              "Transient": false
             }
           ],
           "Children": []
@@ -1930,7 +2182,7 @@
           "__guid": "3063b9f8-c36b-4cd0-acf7-37d623ce2ac9",
           "__version": 2,
           "Flags": 0,
-          "Name": "decal_arrow (1)",
+          "Name": "decal_arrow_a_6",
           "Position": "1317.11597,-608.174805,-952.316528",
           "Rotation": "7.80741516E-08,1.97283399E-07,-0.707106829,-0.70710659",
           "Scale": "2.00792003,1.18617201,1.18434405",
@@ -1943,25 +2195,37 @@
           "OwnerTransfer": 1,
           "Components": [
             {
-              "__type": "Sandbox.DecalRenderer",
+              "__type": "Sandbox.Decal",
               "__guid": "a7721570-4e5c-4e30-8997-57309bbc360a",
               "__enabled": true,
               "Flags": 0,
+              "__version": 3,
+              "AttenuationAngle": 1,
+              "ColorMix": 1,
+              "ColorTint": "1,1,1,1",
+              "CoverageAmount": 1,
+              "CoverageFadeIn": 0,
+              "CoverageRange": 0.07,
+              "Decals": [
+                "decals/refinery/arrow.decal"
+              ],
+              "Depth": 32,
+              "LifeTime": 0,
+              "Looped": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
               "OnComponentFixedUpdate": null,
               "OnComponentStart": null,
               "OnComponentUpdate": null,
-              "RenderOptions": {
-                "GameLayer": true,
-                "OverlayLayer": false,
-                "BloomLayer": false,
-                "AfterUILayer": false
-              },
-              "Size": "64,32,32",
-              "TintColor": "1,1,1,1",
-              "TriPlanar": false
+              "Parallax": 1,
+              "Rotation": 180,
+              "Scale": 1,
+              "SequenceId": 0,
+              "SheetSequence": false,
+              "Size": "1,1",
+              "SortLayer": 0,
+              "Transient": false
             }
           ],
           "Children": []
@@ -1970,7 +2234,7 @@
           "__guid": "cd0b6719-6c73-4956-a41c-debeafd91cd2",
           "__version": 2,
           "Flags": 0,
-          "Name": "decal_arrow (2)",
+          "Name": "decal_arrow_a_7",
           "Position": "2240.71411,-250.356705,-995.415527",
           "Rotation": "-0.707107127,-0.707106709,0,2.98023206E-08",
           "Scale": "1,1,1",
@@ -1983,25 +2247,37 @@
           "OwnerTransfer": 1,
           "Components": [
             {
-              "__type": "Sandbox.DecalRenderer",
+              "__type": "Sandbox.Decal",
               "__guid": "8a6e0101-f05e-4a84-adc4-a74762feec00",
               "__enabled": true,
               "Flags": 0,
+              "__version": 3,
+              "AttenuationAngle": 1,
+              "ColorMix": 1,
+              "ColorTint": "1,1,1,1",
+              "CoverageAmount": 1,
+              "CoverageFadeIn": 0,
+              "CoverageRange": 0.07,
+              "Decals": [
+                "decals/refinery/arrow.decal"
+              ],
+              "Depth": 32,
+              "LifeTime": 0,
+              "Looped": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
               "OnComponentFixedUpdate": null,
               "OnComponentStart": null,
               "OnComponentUpdate": null,
-              "RenderOptions": {
-                "GameLayer": true,
-                "OverlayLayer": false,
-                "BloomLayer": false,
-                "AfterUILayer": false
-              },
-              "Size": "64,32,32",
-              "TintColor": "1,1,1,1",
-              "TriPlanar": false
+              "Parallax": 1,
+              "Rotation": 180,
+              "Scale": 1,
+              "SequenceId": 0,
+              "SheetSequence": false,
+              "Size": "1,1",
+              "SortLayer": 0,
+              "Transient": false
             }
           ],
           "Children": []
@@ -2010,7 +2286,7 @@
           "__guid": "bbcef1a8-93dd-4a5e-b328-0846f06e73ed",
           "__version": 2,
           "Flags": 0,
-          "Name": "decal_cross",
+          "Name": "decal_cross_a",
           "Position": "1739.16699,-382.858612,-978.706726",
           "Rotation": "-0.0574346408,-0.0574345104,0.704770386,0.704770386",
           "Scale": "1,0.479841709,0.541202426",
@@ -2023,25 +2299,37 @@
           "OwnerTransfer": 1,
           "Components": [
             {
-              "__type": "Sandbox.DecalRenderer",
+              "__type": "Sandbox.Decal",
               "__guid": "744f5ddf-cba0-46ac-a1b7-817e91207b0d",
               "__enabled": true,
               "Flags": 0,
+              "__version": 3,
+              "AttenuationAngle": 1,
+              "ColorMix": 1,
+              "ColorTint": "1,1,1,1",
+              "CoverageAmount": 1,
+              "CoverageFadeIn": 0,
+              "CoverageRange": 0.07,
+              "Decals": [
+                "decals/refinery/cross.decal"
+              ],
+              "Depth": 24,
+              "LifeTime": 0,
+              "Looped": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
               "OnComponentFixedUpdate": null,
               "OnComponentStart": null,
               "OnComponentUpdate": null,
-              "RenderOptions": {
-                "GameLayer": true,
-                "OverlayLayer": false,
-                "BloomLayer": false,
-                "AfterUILayer": false
-              },
-              "Size": "96,96,24",
-              "TintColor": "1,1,1,1",
-              "TriPlanar": false
+              "Parallax": 1,
+              "Rotation": 180,
+              "Scale": 1,
+              "SequenceId": 0,
+              "SheetSequence": false,
+              "Size": "1.5,1.5",
+              "SortLayer": 0,
+              "Transient": false
             }
           ],
           "Children": []
