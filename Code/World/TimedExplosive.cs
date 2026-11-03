@@ -232,9 +232,21 @@ public sealed class TimedExplosive : Component, IUse, IMinimapIcon, IDescription
 		return !IsDefused && !HasDetonated && !DefusingPlayer.IsValid() && IsDefenderInReach( player );
 	}
 
-	private bool IsDefenderInReach( PlayerPawn player ) => player.IsValid()
-		&& player.Team == Team.CounterTerrorist && player.HealthComponent.State == LifeState.Alive
-		&& player.WorldPosition.Distance( WorldPosition ) <= player.UseDistance;
+	private bool IsDefenderInReach( PlayerPawn player )
+	{
+		if ( !player.IsValid() || player.Team != Team.CounterTerrorist || !player.HealthComponent.IsValid()
+			|| player.HealthComponent.State != LifeState.Alive
+			|| player.WorldPosition.Distance( WorldPosition ) > player.UseDistance )
+			return false;
+
+		// Keep checking access while Use is held: a closing door must cancel an ongoing defuse.
+		// Aim above the ground origin, and ignore the bomb and defender themselves.
+		return !Scene.Trace.Ray( player.EyePosition, WorldPosition + Vector3.Up * 4f )
+			.IgnoreGameObjectHierarchy( player.GameObject )
+			.IgnoreGameObjectHierarchy( GameObject )
+			.WithoutTags( "trigger", "player", "np_player", "ragdoll", "pickup", "movement" )
+			.Run().Hit;
+	}
 
 	private bool CanContinueDefusing() => IsDefenderInReach( DefusingPlayer ) && DefusingPlayer.IsUsing;
 
