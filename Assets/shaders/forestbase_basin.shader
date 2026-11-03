@@ -76,9 +76,9 @@ PS
         // veins into hard repeated white chips across the front of the pool.
         float foam=saturate(coarse*.65+fine*.35)*churn*.9;
         float wave=sin(p.x*.009+p.y*.011-g_flTime*.6)*.5+.5;
-        m.Albedo=lerp(lerp(float3(.019,.038,.041),float3(.032,.059,.060),wave),float3(.54,.61,.63),foam);
+        m.Albedo=lerp(lerp(float3(.020,.068,.078),float3(.032,.102,.111),wave),float3(.54,.61,.63),foam);
         m.Emission=float3(.035,.045,.05)*foam;
-        m.Roughness=lerp(.085+churn*.065,.51,foam);
+        m.Roughness=lerp(.16+churn*.065,.55,foam);
         m.Metalness=0;
         m.AmbientOcclusion=1;
         m.Opacity=1;

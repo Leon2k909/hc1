@@ -303,7 +303,7 @@ def build(m,material_output=None):
         K.write_text(material_output/f'{paint}.vmat',
             '"Layer0"\n{\n shader "shaders/forestbase_waterfall.shader"\n'
             ' FlowMask "materials/forestbase/waterfall_froth_v2.png"\n'
-            f' FlowTop "{max(water.sources):.3f}"\n FlowPhase "0"\n FlowTiling "4"\n}}\n')
+            f' FlowTop "{max(water.sources):.3f}"\n FlowPhase "0"\n FlowTiling "2"\n}}\n')
         # Adjacent material bands use shared global UVs and identical phases.
         # They join without the four edge fades of the former separate jets.
         mesh_grid(m,paint,lambda u,v:water((stream+u)/4,v),24,128,

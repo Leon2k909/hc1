@@ -26,7 +26,15 @@ struct PixelInput
 VS
 {
     #include "common/vertex.hlsl"
-    PixelInput MainVs(VertexInput i) { return FinalizeVertex(ProcessVertex(i)); }
+    PixelInput MainVs(VertexInput i)
+    {
+        PixelInput o=ProcessVertex(i);
+        // Put low spray in front of the water body instead of behind it.
+        float foot=1-smoothstep(20,240,o.vPositionWs.z);
+        o.vPositionWs.x-=150*foot;
+        o.vPositionPs=Position3WsToPs(o.vPositionWs);
+        return FinalizeVertex(o);
+    }
 }
 PS
 {
@@ -52,18 +60,20 @@ PS
         float2 drift=float2(sin(g_flTime*.35+uv.y*9+phase),cos(g_flTime*.27+uv.x*8+phase))*.025;
         float edge=smoothstep(0,.12,uv.x)*smoothstep(0,.12,1-uv.x)*smoothstep(0,.1,uv.y)*smoothstep(0,.1,1-uv.y);
         edge*=1-smoothstep(.62,1,length((uv-.5)*2));
-        float basin=length((float2(-m.WorldPosition.y,m.WorldPosition.x)-float2(430,3370))/float2(530,440));
+        // Keep the authored basin mask while moving the spray toward the viewer.
+        float originalNorth=m.WorldPosition.x+150*(1-smoothstep(20,240,m.WorldPosition.z));
+        float basin=length((float2(-m.WorldPosition.y,originalNorth)-float2(430,3370))/float2(530,440));
         float foot=1-smoothstep(50,250,m.WorldPosition.z);
         edge*=lerp(1,1-smoothstep(.78,1,basin),ConstrainPlungeBasin*foot);
         m.Albedo=0;
         float coarse=MistTexture.Sample(DetailSampler,uv*2.3+float2(-g_flTime*.031,g_flTime*.046)+phase).r;
         float detail=MistTexture.Sample(DetailSampler,uv*5.7+float2(g_flTime*.045,g_flTime*.067)+phase*.71).r;
         float wisps=.4+.6*smoothstep(.018,.11,coarse*.7+detail*.3);
-        m.Emission=float3(.30,.35,.38);
+        m.Emission=float3(.42,.46,.47);
         m.Roughness=1;
         m.Metalness=0;
         float density=max(0,MistTexture.Sample(MistSampler,uv+drift).r*edge*MistStrength*wisps);
-        m.Opacity=1-exp(-density*1.8);
+        m.Opacity=(1-exp(-density*1.8))*(.15+.85*(1-smoothstep(20,270,m.WorldPosition.z)));
         // Match the engine sprite soft-intersection path at opaque water and rock.
         float3 depthPosition=Depth::GetWorldPosition(m.ScreenPosition.xy);
         m.Opacity*=saturate(distance(depthPosition,m.WorldPosition)/max(MistDepthFeather,.001));
