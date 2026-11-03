@@ -101,7 +101,6 @@ CON_TOP = 320.0
 DOOR_H = 176.0                 # floor doors
 UPPER_DOOR_H = 144.0           # doors at G
 MIDDLE_DOOR = ( -112.0, 112.0 )
-SCREEN_E, SCREEN_N = ( 1260.0, 1276.0 ), ( -170.0, 170.0 )    # the blast screens inside the wings' middle doors (abs e)
 SECTOR_DOOR = ( -420.0, -260.0 )
 NORTH_DOOR = ( 576.0, 704.0 )
 HALL_SOUTH_DOORS = ( 324.0, 516.0 )          # abs e, into the concourse
@@ -118,6 +117,12 @@ NAV_TOP = 430.0                              # over the galleries, under the win
 def configure( model ):
     """ Points the ar_ paints at Ares's materials (atlases mapped 1:1 by their own UVs, the rest at their tile). """
     for paint in list( model.polygons ):
+        if model.material_overrides.get(paint, "").startswith("materials/ares/floor-finish-v4/"):
+            continue
+        if paint.startswith( "ar_os_" ) and paint in model.material_overrides:
+            continue
+        if paint.startswith( "ar_in_" ) and paint in model.material_overrides:
+            continue
         if paint.startswith( "ar_pd_" ) and paint in model.material_overrides:
             continue
         if paint.startswith( "ar_pw_" ) and paint in model.material_overrides:
@@ -229,7 +234,8 @@ def railing( m, a, b, z, lamps=True, collide=True ):
     side = np.cross( UP, along )
     m.beam( a + UP * 41.0, b + UP * 41.0, ( 2.4, 2.6 ), "ar_gunmetal" )
     m.beam( a + UP * 22.0, b + UP * 22.0, ( 1.4, 1.4 ), "ar_brass" )
-    m.oriented_box( ( a + b ) / 2 + UP * 3.0, ( along, side, UP ), ( length, 0.6, 6.0 ), "ar_hazard" )
+    toe_paint = "ar_in_frame" if abs( z - G ) < 0.01 and all( abs( p[0] ) <= HALL_E and HALL_N0 <= p[1] <= DECK_N1 for p in ( a, b ) ) else "ar_hazard"
+    m.oriented_box( ( a + b ) / 2 + UP * 3.0, ( along, side, UP ), ( length, 0.6, 6.0 ), toe_paint )
     posts = max( 2, int( round( length / 60.0 ) ) + 1 )
     for k in range( posts ):
         p = a + along * length * k / ( posts - 1 )
@@ -403,24 +409,8 @@ def case_stack( m, e, n, heading, layers, seed=0, z=0.0, big=False ):
 
 
 def pump_unit( m, e, n, heading ):
-    """ A pump housing beside the column: a steel box with a hazard band, its pipe rising and bending into the
-    column. """
-    F = Frame( e, n, heading )
-    F.box( m, -36, 36, -28, 28, 0, 64, { "default": "ar_steel", "+z": "ar_grating" }, METAL )
-    F.box( m, -36.3, 36.3, -28.3, 28.3, 52, 58, "ar_hazard" )
-    F.box( m, -30, -10, -28.5, -28, 20, 44, { "default": "ar_steel", "-y": None } )
-    uv = [ AM.region_uv( AM.SCREEN, AM.SCREEN_ATLAS, "screen6", s, t )
-           for s, t in ( ( 0, 0 ), ( 1, 0 ), ( 1, 1 ), ( 0, 1 ) ) ]
-    F.quad( m, "ar_screens", [ ( -30, -28.5, 20 ), ( -10, -28.5, 20 ),
-                              ( -10, -28.5, 44 ), ( -30, -28.5, 44 ) ], ( 0, -1, 0 ), uv=uv )
-    for k, x in enumerate( ( -20.0, 20.0 ) ):
-        a = F.p( x, 0, 64 )
-        b = F.p( x, 0, 150 )
-        rod( m, a, b, 6.0, "ar_copper", sides=10 )
-        towards = K.normalise( np.array( ( -e, -n, 0.0 ) ) )
-        c = b + towards * ( math.hypot( e, n ) - RING_R0 + 4 )
-        rod( m, b, c, 6.0, "ar_copper", sides=10 )
-        m.box( b - np.array( ( 7, 7, 7 ) ), b + np.array( ( 7, 7, 7 ) ), "ar_gunmetal" )
+    from ares_interior import pump_unit as draw_pump
+    return draw_pump( m, e, n, heading )
 
 
 def console( m, e, n, heading, screen=0, z=0.0 ):
@@ -532,12 +522,6 @@ def hall_walls( m ):
         for d0, d1, z0, z1 in ( ( *MIDDLE_DOOR, 0.0, DOOR_H ), ( *SECTOR_DOOR, G, G + UPPER_DOOR_H ),
                                 ( *NORTH_DOOR, G, G + UPPER_DOOR_H ) ):
             door_frame( m, "n", d0, d1, e0, e1, z0, z1 )
-        # Pilasters on the hall side, from the deck to the roof, every 300 or so.
-        face = s * HALL_E
-        for nn in ( -600.0, -150.0, 300.0 ):
-            lo = ( face - s * 10.0, nn - 12, G ) if s > 0 else ( face, nn - 12, G )
-            hi = ( face, nn + 12, HALL_TOP ) if s > 0 else ( face + 10.0, nn + 12, HALL_TOP )
-            m.box( lo, hi, "ar_steel" )
     # The south wall: the hall's stretch, 752 high, with its two doors into the concourse.
     doors = [ ( s * sum( HALL_SOUTH_DOORS ) / 2, HALL_SOUTH_DOORS[1] - HALL_SOUTH_DOORS[0], 0.0, DOOR_H ) for s in ( -1, 1 ) ]
     wall( m, "e", ( -HALL_E, HALL_E ), ( HALL_N0 - WALL, HALL_N0 ), ( 0.0, HALL_TOP + 32 ), doors, outward="-n",
@@ -549,8 +533,7 @@ def hall_walls( m ):
     roof_n1 = HALL_N1 + LEAN * HALL_TOP + 40
     m.box( ( -HALL_E - WALL, HALL_N0 - WALL, HALL_TOP ), ( HALL_E + WALL, roof_n1, HALL_TOP + 32 ),
            { "-z": "ar_concrete_dark", "+z": "ar_concrete_dark", "default": "ar_steel" }, STONE )
-    for e in ( -900.0, -600.0, -300.0, 300.0, 600.0, 900.0 ):
-        truss( m, e, HALL_N0, HALL_N1 + LEAN * 640 - 20 )
+    # Curved pressure frames are added by ares_interior.append_hall().
     # Purlins across the trusses.
     for nn in ( -500.0, -100.0, 300.0, 700.0 ):
         m.box( ( -HALL_E, nn - 5, HALL_TOP - 14 ), ( HALL_E, nn + 5, HALL_TOP ), "ar_steel" )
@@ -860,15 +843,7 @@ def wing( m, glass, s ):
     pressure_door( m, ( face, ( hx0 + hx1 ) / 2, 0 ), ( -s, 0 ), width=180, height=180, border=16 )
     lit_sign( m, "airlock03" if s < 0 else "airlock07", ( face - s * 1.0, ( hx0 + hx1 ) / 2, 220.0 ), ( -s, 0 ), 120.0, 30.0 )
     m.collision_box( ( min( face, face - s * 12 ), hx0 - 16, 0 ), ( max( face, face - s * 12 ), hx1 + 16, 196 ), METAL )
-    # The blast screen inside the middle door: a steel partition up to the mezzanine, so nobody sees straight through
-    # the door from the hall into the spawn; you turn round it.
-    be0, be1 = sorted( ( s * SCREEN_E[0], s * SCREEN_E[1] ) )
-    m.box( ( be0, SCREEN_N[0], 0 ), ( be1, SCREEN_N[1], G - DT ), { "default": "ar_wall", "+z": "ar_steel" }, STONE )
-    m.box( ( be0 - 0.4, SCREEN_N[0] - 0.4, 0 ), ( be1 + 0.4, SCREEN_N[1] + 0.4, 24 ), "ar_hazard" )
-    for nn in SCREEN_N:
-        m.box( ( be0 - 3, nn - 4, 0 ), ( be1 + 3, nn + 4, G - DT ), "ar_steel" )
-    sign_panel( m, "poster_mars", ( s * ( SCREEN_E[1] + 0.5 ), 0.0, 110.0 ), ( s, 0 ), 120.0, 96.0 )
-    sign_panel( m, "logo", ( s * ( SCREEN_E[0] - 0.5 ), 0.0, 110.0 ), ( -s, 0 ), 70.0, 70.0 )
+    # Doorway blast screens removed at the user's request.
     # The zone marker on the outer wall over the stair, facing the spawn.
     sign_panel( m, "zone_03" if s < 0 else "zone_b", ( outer - s * 1.0, 330.0, 330.0 ), ( -s, 0 ), 220.0, 192.0 )
     # Pipes along the south wall, over the lockers and the opening.
@@ -1000,9 +975,8 @@ def dressing( m ):
     # The two HUMANITY FURTHER banners and their bars were removed at the user's request.
     banner( m, "banner_habitat", ( 900.0, 640.0, 690.0 ), ( 0, -1 ), 90.0, 270.0 )
     sign_panel( m, "stripe_warning", ( 0.0, -RING_R1 - 4.0, G - DT - 6 ), ( 0, -1 ), 140.0, 19.0, back=None )
-    lit_sign( m, "observation", ( 0.0, 600.0, 420.0 ), ( 0, -1 ), 192.0, 48.0 )
-    for e in ( -80.0, 80.0 ):
-        rod( m, ( e, 598.0, 444.0 ), ( e, 598.0, HALL_TOP ), 0.6, "ar_gunmetal", sides=4 )
+    from ares_observation_sign import append_to as append_observation_sign
+    append_observation_sign( m )
     # Lamps on the hall's side walls at the galleries, and at the arcades.
     for s in ( -1, 1 ):
         for nn in ( -540.0, -60.0, 200.0, 470.0 ):
@@ -1019,7 +993,9 @@ def dressing( m ):
 def floors( m ):
     """ The floor slabs: one under the hall and the wings, one under the concourse, and the foundation round the
     building down to the ground outside. """
-    m.box( ( -WING_E - WALL, HALL_N0 - WALL, -24 ), ( WING_E + WALL, HALL_N1, 0 ), { "+z": "ar_floor", "default": "ar_concrete_dark" }, METAL )
+    m.box( ( -WING_E - WALL, HALL_N0 - WALL, -24 ), ( WING_E + WALL, HALL_N1, 0 ), { "+z": None, "default": "ar_concrete_dark" }, METAL )
+    from ares_interior import outer_floor
+    outer_floor( m )
     m.box( ( -WING_E - WALL, CON_N0 - WALL, -24 ), ( WING_E + WALL, HALL_N0 - WALL, 0 ), { "+z": "ar_floor", "default": "ar_concrete_dark" }, METAL )
     # The foundation: the building's plinth outside, down to the plateau, and the cliff face under the window.
     m.box( ( -WING_E - WALL - 40, HALL_N1, -900 ), ( WING_E + WALL + 40, HALL_N1 + WALL + 20, 0 ),
@@ -1609,6 +1585,11 @@ def write_scene( written, light_list, probe_list, case_props=None ):
         K.prefab_instance( ids, "prefabs/game_modes/bomb_defusal.prefab" ),
         K.prefab_instance( ids, "scenes/maps/defusemap_01/game_setup.prefab" ),
     ]
+    from ares_sliding_doors import scene_objects as automatic_door_objects
+    objects.extend( automatic_door_objects() )
+    from ares_door_thresholds import scene_objects as doorway_threshold_objects
+    objects.extend( doorway_threshold_objects() )
+
     scene = {
         "__guid": ids( "scene" ),
         "GameObjects": objects,
@@ -1657,6 +1638,8 @@ def build():
     control_rooms( hall, glass )
     wings( hall, glass )
     concourse( hall, glass )
+    from ares_interior import append_hall
+    append_hall( hall )
     reactor( column_model, glass )
     dressing( dressed )
     models = {

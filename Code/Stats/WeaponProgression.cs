@@ -13,7 +13,14 @@ public static class WeaponProgression
 
 	/// <summary>Lifetime maximum XP for this weapon (persists through prestige).</summary>
 	public static int GetLifetimeXP( EquipmentResource resource )
-		=> resource is null ? 0 : Math.Max( 0, Game.Cookies.Get( MaxCookieKey( resource ), 0 ) );
+		=> resource is null ? 0 : Math.Max( GetXP( resource ), Math.Max( 0, Game.Cookies.Get( MaxCookieKey( resource ), 0 ) ) );
+
+	/// <summary>Keep known progress from older profiles before prestige clears their current weapon XP.</summary>
+	internal static void PreserveLifetimeXP( EquipmentResource resource )
+	{
+		if ( resource is null ) return;
+		Game.Cookies.Set( MaxCookieKey( resource ), Math.Min( GetLifetimeXP( resource ), GetXPForLevel( MaxLevel ) ) );
+	}
 
 	/// <summary>Current weapon level (1–30).</summary>
 	public static int GetLevel( EquipmentResource resource )
@@ -66,8 +73,8 @@ public static class WeaponProgression
 	{
 		if ( amount <= 0 || resource is null ) return;
 		var xp = GetXP( resource );
-		var next = Math.Min( xp + amount, GetXPForLevel( MaxLevel ) );
-		var nextMax = Math.Min( GetLifetimeXP( resource ) + amount, GetXPForLevel( MaxLevel ) );
+		var next = (int)Math.Min( (long)xp + amount, GetXPForLevel( MaxLevel ) );
+		var nextMax = (int)Math.Min( (long)GetLifetimeXP( resource ) + amount, GetXPForLevel( MaxLevel ) );
 		
 		Game.Cookies.Set( CookieKey( resource ), next );
 		Game.Cookies.Set( MaxCookieKey( resource ), nextMax );

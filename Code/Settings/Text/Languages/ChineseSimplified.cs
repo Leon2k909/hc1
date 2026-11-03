@@ -697,6 +697,9 @@ public static partial class GameText
 		["Red"] = "红色",
 		["Green"] = "绿色",
 		["Blue"] = "蓝色",
+		["Hue"] = "色相",
+		["Saturation"] = "饱和度",
+		["Brightness"] = "亮度",
 		["Search languages"] = "搜索语言",
 		["No languages found"] = "未找到语言",
 

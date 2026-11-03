@@ -1,7 +1,7 @@
 """Temporary models for the before/after in s&box: python cut_compare.py <project root>
 
 Writes shooting_bench_v2/compare/: range_no_bench, the range with its four old benches cut out, and old_bench, the old bench at the 25 m lane on its own.
-The game's own gunsmith_range model isn't touched. The old OBJ's axes are (-world y, z, world x).
+The game's own gunsmith_range model isn't touched. The old OBJ's axes are (world y, z, world x).
 """
 import os
 import sys
@@ -20,14 +20,14 @@ verts = [tuple(map(float, l.split()[1:4])) for l in lines if l.startswith("v ")]
 
 def lane_of(a):
     for lane in LANES:
-        if abs(-a - lane) < 90.0:
+        if abs(a - lane) < 90.0:
             return lane
     return None
 
 
 def in_leg(v):
     a, b, c = v
-    y, z, x = -a, b, c
+    y, z, x = a, b, c
     if not (-0.01 <= z <= 30.01):
         return False
     if min(abs(x + 29.0), abs(x + 9.0)) > 2.01:

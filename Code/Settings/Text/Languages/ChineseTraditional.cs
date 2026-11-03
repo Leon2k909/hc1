@@ -1390,6 +1390,9 @@ public static partial class GameText
 		["Red"] = "紅色",
 		["Green"] = "綠色",
 		["Blue"] = "藍色",
+		["Hue"] = "色相",
+		["Saturation"] = "飽和度",
+		["Brightness"] = "亮度",
 		["Search languages"] = "搜尋語言",
 		["No languages found"] = "找不到符合的語言",
 		// Custom game rules (CreateLobbyPage)

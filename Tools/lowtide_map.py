@@ -244,6 +244,8 @@ def write_materials():
 def configure( model ):
     """ Points the lt_ paints at their materials, then the rest as Railhead's script does (rw_ and building_textures'). """
     for paint in model.polygons:
+        if paint.startswith( "lt_ql_" ) and paint in model.material_overrides:
+            continue
         if paint.startswith( "lt_" ):
             model.material_overrides[paint] = f"materials/lowtide/{paint}.vmat"
             model.tile_overrides[paint] = lt_tile( paint )
@@ -1329,16 +1331,9 @@ def fleet_wall( m, style, n0, n1 ):
 
 
 def quay_ladder( m, n ):
-    """ An iron ladder up the Fleet's wall, from the mud to the coping (there's no climbing in the game: it's dressing). """
-    e = FLEET - 5
-    for side in ( -8, 8 ):
-        m.box( ( e - 1, n + side - 1, BED_Z - 4 ), ( e + 1, n + side + 1, 18 ), "iron_black" )
-    z = BED_Z + 8
-    while z < 0:
-        m.box( ( e - 1, n - 8, z - 0.6 ), ( e + 1, n + 8, z + 0.6 ), "iron_black" )
-        z += 12
-    for side in ( -8, 8 ):
-        m.box( ( e, n + side - 1, -6 ), ( FLEET + 4, n + side + 1, -3 ), "iron_black" )
+    """Approved smooth canal ladder; render only, no new collision."""
+    from lowtide_quay_ladders import append_to
+    append_to(m,n)
 
 
 def ground( m, rects ):

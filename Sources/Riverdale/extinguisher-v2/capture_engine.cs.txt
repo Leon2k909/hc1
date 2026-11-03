@@ -1,0 +1,116 @@
+// Riverdale's hall as s&box draws it, before and after the extinguisher swap: run with sbox-cli --call run_csharp, the config path filled in by capture_engine.py.
+// The hall's visual roots go into an isolated editor scene, so open tabs and any running match aren't touched and nothing is saved. "before" draws temporary copies of the two models
+// made from the before-install OBJs and leaves out the Extinguishers group.
+var configuration = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(@"__CONFIG__")).AsObject();
+var projectRoot = Sandbox.Project.Current.GetRootPath();
+var destination = System.IO.Path.Combine(projectRoot, configuration["out"].GetValue<string>());
+var source = Editor.SceneEditorSession.Active?.Scene;
+var before = new { Game.IsPlaying, Scene = source?.Name, SceneId = source?.Id };
+var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
+var preRender = typeof(Scene).GetMethod("PreRender", flags, null, Type.EmptyTypes, null) ?? throw new MissingMethodException("Scene.PreRender");
+var preCameraRender = typeof(Scene).GetMethod("PreCameraRender", flags, null, Type.EmptyTypes, null) ?? throw new MissingMethodException("Scene.PreCameraRender");
+Vector3 Vec(System.Text.Json.Nodes.JsonNode node) { var a = node.AsArray(); return new(a[0].GetValue<float>(), a[1].GetValue<float>(), a[2].GetValue<float>()); }
+var report = new System.Collections.Generic.List<object>();
+var textureNames = new[] { "g_tColor", "g_tNormal", "g_tRoughness", "g_tAmbientOcclusion", "SkyTexture" };
+foreach (var job in configuration["jobs"].AsArray())
+{
+    var name = job["name"].GetValue<string>();
+    var keep = new System.Collections.Generic.HashSet<string>(job["roots"].AsArray().Select(n => n.GetValue<string>()), StringComparer.OrdinalIgnoreCase);
+    var drop = new System.Collections.Generic.HashSet<string>(job["drop_children"].AsArray().Select(n => n.GetValue<string>()), StringComparer.OrdinalIgnoreCase);
+    var root = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(projectRoot, job["scene"].GetValue<string>()))).AsObject();
+    var objects = new System.Text.Json.Nodes.JsonArray();
+    foreach (var item in root["GameObjects"].AsArray())
+    {
+        if (!keep.Contains(item["Name"]?.GetValue<string>() ?? "")) continue;
+        var copy = item.DeepClone().AsObject();
+        if (copy["Children"] is System.Text.Json.Nodes.JsonArray children)
+        {
+            var kept = new System.Text.Json.Nodes.JsonArray();
+            foreach (var child in children)
+                if (!drop.Contains(child["Name"]?.GetValue<string>() ?? "")) kept.Add(child.DeepClone());
+            copy["Children"] = kept;
+        }
+        objects.Add(copy);
+    }
+    root["GameObjects"] = objects;
+    if (root["SceneProperties"]?["NavMesh"] is System.Text.Json.Nodes.JsonObject nav) nav["Enabled"] = false;
+    if (root["SceneProperties"] is System.Text.Json.Nodes.JsonObject sceneProperties) sceneProperties["WantsSystemScene"] = false;
+    var scene = Scene.CreateEditorScene();
+    try
+    {
+        CameraComponent camera;
+        using (scene.Push())
+        {
+            scene.Deserialize(root);
+            foreach (var tonemap in scene.GetAllComponents<Tonemapping>())
+            {
+                tonemap.AutoExposureEnabled = true;
+                tonemap.MinimumExposure = tonemap.MaximumExposure = job["exposure"].GetValue<float>();
+                tonemap.ExposureCompensation = 0;
+                tonemap.Rate = 10;
+            }
+            if (job["swap"] is System.Text.Json.Nodes.JsonObject swap)
+                foreach (var renderer in scene.GetAllComponents<ModelRenderer>().ToArray())
+                    foreach (var pair in swap)
+                        if ((renderer.Model?.ResourcePath ?? "") == pair.Key)
+                        {
+                            var other = Model.Load(pair.Value.GetValue<string>());
+                            if (other is null || other.IsError) throw new InvalidOperationException(pair.Value + " hasn't compiled.");
+                            renderer.Model = other;
+                        }
+            var holder = new GameObject(false, "Capture camera");
+            camera = holder.Components.Create<CameraComponent>();
+            camera.ZNear = 1;
+            camera.ZFar = 30000;
+            holder.Enabled = true;
+            scene.EditorTick(.016f, .016f);
+            preRender.Invoke(scene, null);
+            preCameraRender.Invoke(scene, null);
+        }
+        // The new model at 2048 and the rest at 1024: the editor is shared, and a whole map at full size has run it out of video memory.
+        var renderers = scene.GetAllComponents<ModelRenderer>().Where(r => r.Model is not null).ToArray();
+        foreach (var material in renderers.SelectMany(r => r.Model.Materials).Distinct())
+            foreach (var texture in textureNames.Select(material.GetTexture).Append(material.FirstTexture).Where(t => t is not null).Distinct())
+                texture.MarkUsed((material.ResourcePath ?? "").Contains("extinguisher-v2") ? 2048 : 1024);
+        for (var wait = 0; wait < configuration["stream_frames"].GetValue<int>(); wait++)
+        {
+            using (scene.Push()) { scene.EditorTick(.016f, .016f); preRender.Invoke(scene, null); }
+            await Task.Delay(33, cancellationToken);
+        }
+        var written = new System.Collections.Generic.List<string>();
+        foreach (var view in configuration["views"].AsArray())
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            var viewName = view["name"].GetValue<string>();
+            using var bitmap = new Bitmap(configuration["width"].GetValue<int>(), configuration["height"].GetValue<int>());
+            var eye = Vec(view["eye"]);
+            var target = Vec(view["target"]);
+            for (var frame = 0; frame < configuration["settle_frames"].GetValue<int>(); frame++)
+            {
+                using (scene.Push())
+                {
+                    camera.WorldPosition = eye;
+                    camera.WorldRotation = Rotation.LookAt(target - eye);
+                    camera.FieldOfView = view["fov"].GetValue<float>();
+                    scene.EditorTick(.016f, .016f);
+                    preRender.Invoke(scene, null);
+                    preCameraRender.Invoke(scene, null);
+                    camera.RenderToBitmap(bitmap);
+                }
+                await Task.Delay(16, cancellationToken);
+            }
+            System.IO.File.WriteAllBytes(System.IO.Path.Combine(destination, $"{viewName}-{name}.png"), bitmap.ToPng());
+            written.Add(viewName);
+        }
+        var placed = renderers.Where(r => (r.Model.ResourcePath ?? "").Contains("extinguisher-v2")).ToArray();
+        report.Add(new
+        {
+            Job = name, Written = written, Renderers = renderers.Length, Placed = placed.Length,
+            Hall = renderers.Where(r => (r.Model.ResourcePath ?? "").Contains("hall_")).Select(r => r.Model.ResourcePath).Distinct().ToArray(),
+            ErrorModels = scene.GetAllComponents<ModelRenderer>().Where(r => r.Model is null || r.Model.IsError).Select(r => r.GameObject.Name).Distinct().ToArray(),
+            ErrorMaterials = placed.SelectMany(r => r.Model.Materials).Distinct().Where(m => m is null || m.IsError).Select(m => m?.ResourcePath).ToArray()
+        });
+    }
+    finally { scene.Destroy(); }
+}
+return new { Before = before, Game.IsPlaying, SourceUnchanged = Editor.SceneEditorSession.Active?.Scene?.Id == before.SceneId, Report = report };

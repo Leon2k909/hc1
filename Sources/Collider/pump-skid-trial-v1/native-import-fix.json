@@ -1,0 +1,206 @@
+{
+  "date": "2026-10-31",
+  "reason": "Native normal/RMA mip generation failed for 2046x1364 atlases.",
+  "method": "Native Bitmap.Resize to 2048x2048; normalized UV layout and raw source maps retained.",
+  "geometryAndPhysicsUnchanged": true,
+  "changes": {
+    "Assets/materials/collider/pump-skid-trial-v1/ps_frame.vmat": {
+      "before": "683ee075cff4be4da0e349511f01e3a6843ef41f2dcbcc2110cddd16b4db9f23",
+      "after": "b4597eac9b5d73d1e2430310afc590b26a154a59d7f04d5aab472f82fe9edc53",
+      "backup": "output/asset-improvement-20261030/tool-cabinet/native-review-20261031/texture-import-fix/remaining/ps_frame-before.vmat",
+      "textures": [
+        {
+          "Source": "materials/collider/pump-skid-trial-v1/atlas_ps_frame_color.png",
+          "Target": "materials/collider/pump-skid-trial-v1/atlas_ps_frame_color_engine.png",
+          "OldWidth": 2046,
+          "OldHeight": 1364,
+          "NewWidth": 2048,
+          "NewHeight": 2048,
+          "SHA256": "c4e2c4f325a31fe7d9c31222067ed9bfb66553e1992733d3adf193080084a20b"
+        },
+        {
+          "Source": "materials/collider/pump-skid-trial-v1/atlas_ps_frame_normal.png",
+          "Target": "materials/collider/pump-skid-trial-v1/atlas_ps_frame_normal_engine.png",
+          "OldWidth": 2046,
+          "OldHeight": 1364,
+          "NewWidth": 2048,
+          "NewHeight": 2048,
+          "SHA256": "86dcb262a4458d734a88c1cefe7be3ead52f032cb26ab1ac35c7996ac72f029b"
+        },
+        {
+          "Source": "materials/collider/pump-skid-trial-v1/atlas_ps_frame_rough.png",
+          "Target": "materials/collider/pump-skid-trial-v1/atlas_ps_frame_rough_engine.png",
+          "OldWidth": 2046,
+          "OldHeight": 1364,
+          "NewWidth": 2048,
+          "NewHeight": 2048,
+          "SHA256": "33c7b7de361bad5f4545a2affc83fcf9297353618782702e3a245c24f73754a9"
+        },
+        {
+          "Source": "materials/collider/pump-skid-trial-v1/atlas_ps_frame_metal.png",
+          "Target": "materials/collider/pump-skid-trial-v1/atlas_ps_frame_metal_engine.png",
+          "OldWidth": 2046,
+          "OldHeight": 1364,
+          "NewWidth": 2048,
+          "NewHeight": 2048,
+          "SHA256": "f056b84d3c031a70d2bd6cdf94dde9f76c8dbc60b7fa88c1b28aff89f719ddb6"
+        }
+      ]
+    },
+    "Assets/materials/collider/pump-skid-trial-v1/ps_guard.vmat": {
+      "before": "2cd219034097c887a86cbf05a21f20826551c5b317bdab70043a6fada17c12be",
+      "after": "63a7e6f64912f6272776a8f3f548ad453696ec7d00b80c576a47773d2c1eac9f",
+      "backup": "output/asset-improvement-20261030/tool-cabinet/native-review-20261031/texture-import-fix/remaining/ps_guard-before.vmat",
+      "textures": [
+        {
+          "Source": "materials/collider/pump-skid-trial-v1/atlas_ps_guard_color.png",
+          "Target": "materials/collider/pump-skid-trial-v1/atlas_ps_guard_color_engine.png",
+          "OldWidth": 2046,
+          "OldHeight": 1364,
+          "NewWidth": 2048,
+          "NewHeight": 2048,
+          "SHA256": "027a93fe48bbe9f3280a40e286475993f9282e9165eb647888ee50e896601e11"
+        },
+        {
+          "Source": "materials/collider/pump-skid-trial-v1/atlas_ps_guard_normal.png",
+          "Target": "materials/collider/pump-skid-trial-v1/atlas_ps_guard_normal_engine.png",
+          "OldWidth": 2046,
+          "OldHeight": 1364,
+          "NewWidth": 2048,
+          "NewHeight": 2048,
+          "SHA256": "8ba09f0c022be78e225be65006f380c01ad7192380fae5a98b62bc68745139c2"
+        },
+        {
+          "Source": "materials/collider/pump-skid-trial-v1/atlas_ps_guard_rough.png",
+          "Target": "materials/collider/pump-skid-trial-v1/atlas_ps_guard_rough_engine.png",
+          "OldWidth": 2046,
+          "OldHeight": 1364,
+          "NewWidth": 2048,
+          "NewHeight": 2048,
+          "SHA256": "74cb36693725ff684ae2dc1cfb57e7980d8a2855faa931983b68759256bbe2f9"
+        },
+        {
+          "Source": "materials/collider/pump-skid-trial-v1/atlas_ps_guard_metal.png",
+          "Target": "materials/collider/pump-skid-trial-v1/atlas_ps_guard_metal_engine.png",
+          "OldWidth": 2046,
+          "OldHeight": 1364,
+          "NewWidth": 2048,
+          "NewHeight": 2048,
+          "SHA256": "e81204216d777536f1cfaafc816687d8fac05d0b2b6dd1d3461d9ea73d6793ae"
+        }
+      ]
+    },
+    "Assets/materials/collider/pump-skid-trial-v1/ps_sheet.vmat": {
+      "before": "b84532f734cdb3c2a09cd2973701a32b97d04eddaa26a7cf1d5adf90907e93d3",
+      "after": "abfec9eb7434b62266325fffc49cfb18bb7d0ad2c998fcdf07a982f837dbbc5d",
+      "backup": "output/asset-improvement-20261030/tool-cabinet/native-review-20261031/texture-import-fix/remaining/ps_sheet-before.vmat",
+      "textures": [
+        {
+          "Source": "materials/collider/pump-skid-trial-v1/atlas_ps_sheet_color.png",
+          "Target": "materials/collider/pump-skid-trial-v1/atlas_ps_sheet_color_engine.png",
+          "OldWidth": 2046,
+          "OldHeight": 1364,
+          "NewWidth": 2048,
+          "NewHeight": 2048,
+          "SHA256": "047dafedce1883eba5726d279dfad96d20177564954fa89a21f9f1400c3f4c85"
+        },
+        {
+          "Source": "materials/collider/pump-skid-trial-v1/atlas_ps_sheet_normal.png",
+          "Target": "materials/collider/pump-skid-trial-v1/atlas_ps_sheet_normal_engine.png",
+          "OldWidth": 2046,
+          "OldHeight": 1364,
+          "NewWidth": 2048,
+          "NewHeight": 2048,
+          "SHA256": "ac666467f0d2ea7f55050581d463f6c5e61f5670bfa344b417f341f8a59c93a6"
+        },
+        {
+          "Source": "materials/collider/pump-skid-trial-v1/atlas_ps_sheet_rough.png",
+          "Target": "materials/collider/pump-skid-trial-v1/atlas_ps_sheet_rough_engine.png",
+          "OldWidth": 2046,
+          "OldHeight": 1364,
+          "NewWidth": 2048,
+          "NewHeight": 2048,
+          "SHA256": "4d40541ac3a1daea02e135c1265953f7b8b901a39dd8ca0fb8d8de7a08cabb6d"
+        },
+        {
+          "Source": "materials/collider/pump-skid-trial-v1/atlas_ps_sheet_metal.png",
+          "Target": "materials/collider/pump-skid-trial-v1/atlas_ps_sheet_metal_engine.png",
+          "OldWidth": 2046,
+          "OldHeight": 1364,
+          "NewWidth": 2048,
+          "NewHeight": 2048,
+          "SHA256": "7e1e9dad874df9a4fa91ab1328baeb47b028522cf6b93881c031365fde6490cf"
+        }
+      ]
+    },
+    "Assets/materials/collider/pump-skid-trial-v1/ps_tray.vmat": {
+      "before": "d9624d6bf08cb3586c977a020a0243e52a3ad35dfb6591e4e86a9881bf1f1bdb",
+      "after": "56f693f0bdeb172a81dd5b76e311cb475ad708125158220a1029f4a1babbf343",
+      "backup": "output/asset-improvement-20261030/tool-cabinet/native-review-20261031/texture-import-fix/remaining/ps_tray-before.vmat",
+      "textures": [
+        {
+          "Source": "materials/collider/pump-skid-trial-v1/atlas_ps_tray_color.png",
+          "Target": "materials/collider/pump-skid-trial-v1/atlas_ps_tray_color_engine.png",
+          "OldWidth": 2046,
+          "OldHeight": 1364,
+          "NewWidth": 2048,
+          "NewHeight": 2048,
+          "SHA256": "3ca87da2aa0e973df6f487fc44d537109d166be5fbdfcaf707a96409db28fc38"
+        },
+        {
+          "Source": "materials/collider/pump-skid-trial-v1/atlas_ps_tray_normal.png",
+          "Target": "materials/collider/pump-skid-trial-v1/atlas_ps_tray_normal_engine.png",
+          "OldWidth": 2046,
+          "OldHeight": 1364,
+          "NewWidth": 2048,
+          "NewHeight": 2048,
+          "SHA256": "d86aa3d62f2f443d5f289777ca4e696d63be92c4ff762233273bcc694a0fa544"
+        },
+        {
+          "Source": "materials/collider/pump-skid-trial-v1/atlas_ps_tray_rough.png",
+          "Target": "materials/collider/pump-skid-trial-v1/atlas_ps_tray_rough_engine.png",
+          "OldWidth": 2046,
+          "OldHeight": 1364,
+          "NewWidth": 2048,
+          "NewHeight": 2048,
+          "SHA256": "d2f4b3a995347b81b2e414adab887523d5efcf22a2b4d87e39f90d274c54c7cc"
+        },
+        {
+          "Source": "materials/collider/pump-skid-trial-v1/atlas_ps_tray_metal.png",
+          "Target": "materials/collider/pump-skid-trial-v1/atlas_ps_tray_metal_engine.png",
+          "OldWidth": 2046,
+          "OldHeight": 1364,
+          "NewWidth": 2048,
+          "NewHeight": 2048,
+          "SHA256": "1610f4ef656f9185324720cd4e96a31654aa8a091633be5a507dd6e8b6773b7f"
+        }
+      ]
+    }
+  },
+  "newTextureSHA256": {
+    "Assets/materials/collider/pump-skid-trial-v1/atlas_ps_frame_color_engine.png": "c4e2c4f325a31fe7d9c31222067ed9bfb66553e1992733d3adf193080084a20b",
+    "Assets/materials/collider/pump-skid-trial-v1/atlas_ps_frame_normal_engine.png": "86dcb262a4458d734a88c1cefe7be3ead52f032cb26ab1ac35c7996ac72f029b",
+    "Assets/materials/collider/pump-skid-trial-v1/atlas_ps_frame_rough_engine.png": "33c7b7de361bad5f4545a2affc83fcf9297353618782702e3a245c24f73754a9",
+    "Assets/materials/collider/pump-skid-trial-v1/atlas_ps_frame_metal_engine.png": "f056b84d3c031a70d2bd6cdf94dde9f76c8dbc60b7fa88c1b28aff89f719ddb6",
+    "Assets/materials/collider/pump-skid-trial-v1/atlas_ps_guard_color_engine.png": "027a93fe48bbe9f3280a40e286475993f9282e9165eb647888ee50e896601e11",
+    "Assets/materials/collider/pump-skid-trial-v1/atlas_ps_guard_normal_engine.png": "8ba09f0c022be78e225be65006f380c01ad7192380fae5a98b62bc68745139c2",
+    "Assets/materials/collider/pump-skid-trial-v1/atlas_ps_guard_rough_engine.png": "74cb36693725ff684ae2dc1cfb57e7980d8a2855faa931983b68759256bbe2f9",
+    "Assets/materials/collider/pump-skid-trial-v1/atlas_ps_guard_metal_engine.png": "e81204216d777536f1cfaafc816687d8fac05d0b2b6dd1d3461d9ea73d6793ae",
+    "Assets/materials/collider/pump-skid-trial-v1/atlas_ps_sheet_color_engine.png": "047dafedce1883eba5726d279dfad96d20177564954fa89a21f9f1400c3f4c85",
+    "Assets/materials/collider/pump-skid-trial-v1/atlas_ps_sheet_normal_engine.png": "ac666467f0d2ea7f55050581d463f6c5e61f5670bfa344b417f341f8a59c93a6",
+    "Assets/materials/collider/pump-skid-trial-v1/atlas_ps_sheet_rough_engine.png": "4d40541ac3a1daea02e135c1265953f7b8b901a39dd8ca0fb8d8de7a08cabb6d",
+    "Assets/materials/collider/pump-skid-trial-v1/atlas_ps_sheet_metal_engine.png": "7e1e9dad874df9a4fa91ab1328baeb47b028522cf6b93881c031365fde6490cf",
+    "Assets/materials/collider/pump-skid-trial-v1/atlas_ps_tray_color_engine.png": "3ca87da2aa0e973df6f487fc44d537109d166be5fbdfcaf707a96409db28fc38",
+    "Assets/materials/collider/pump-skid-trial-v1/atlas_ps_tray_normal_engine.png": "d86aa3d62f2f443d5f289777ca4e696d63be92c4ff762233273bcc694a0fa544",
+    "Assets/materials/collider/pump-skid-trial-v1/atlas_ps_tray_rough_engine.png": "d2f4b3a995347b81b2e414adab887523d5efcf22a2b4d87e39f90d274c54c7cc",
+    "Assets/materials/collider/pump-skid-trial-v1/atlas_ps_tray_metal_engine.png": "1610f4ef656f9185324720cd4e96a31654aa8a091633be5a507dd6e8b6773b7f"
+  },
+  "previousProtectedSourceSnapshot": "output/asset-improvement-20261030/tool-cabinet/native-review-20261031/candidate-before-native-import-fix.json",
+  "originalProtectedSourcesUnchanged": 491,
+  "protectedPumpMaterialsCorrected": [
+    "Assets/materials/collider/pump-skid-trial-v1/ps_frame.vmat",
+    "Assets/materials/collider/pump-skid-trial-v1/ps_guard.vmat",
+    "Assets/materials/collider/pump-skid-trial-v1/ps_sheet.vmat",
+    "Assets/materials/collider/pump-skid-trial-v1/ps_tray.vmat"
+  ]
+}

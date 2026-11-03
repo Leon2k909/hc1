@@ -1,0 +1,63 @@
+// In a running Reef Hall match: test the installed stands' collision with rays, then walk the local player into one with dev_force_move. Run with sbox-cli --call run_csharp.
+// Changes only the running match, and it always turns the dev toggle back off.
+var scene = Game.ActiveScene;
+if (!Game.IsPlaying || scene is null) throw new InvalidOperationException("Not playing.");
+foreach (var rule in scene.GetAllObjects(false).SelectMany(g => g.Components.GetAll<Facepunch.BotFillRule>()).ToArray())
+    rule.Enabled = false;
+Facepunch.LightweightBotManager.Instance?.DevClearBots();
+Facepunch.UI.ClassSelect.CloseAny();
+Facepunch.UI.PauseMenuPanel.CloseAny();
+
+var results = new System.Collections.Generic.List<string>();
+var stands = scene.GetAllObjects(false).SelectMany(g => g.Components.GetAll<ModelRenderer>(FindMode.EverythingInSelf)).Where(r => r.Model?.ResourcePath?.Contains("info_stand_v2/info_stand.vmdl") ?? false).ToArray();
+results.Add($"{stands.Length} stands");
+foreach (var stand in stands)
+{
+    var go = stand.GameObject;
+    var at = go.WorldPosition;
+    var x = go.WorldRotation.Forward;
+    var y = go.WorldRotation.Left;
+    void Ray(string label, Vector3 from, Vector3 to, string expected)
+    {
+        var hit = scene.Trace.Ray(from, to).Run();
+        results.Add($"{go.Name} {label}: {(hit.Hit ? $"hit at {hit.Distance:0.0} on {hit.GameObject?.Name}, {hit.Surface?.ResourceName}" : "miss")} (expected {expected})");
+    }
+    var low = at + Vector3.Up * 14f;
+    Ray("front", low + y * 65f, low, "60 on metal");
+    Ray("back", low - y * 65f, low, "60 on metal");
+    Ray("side", low + x * 68f, low, "60 on metal");
+    var over = at + Vector3.Up * 36f;
+    Ray("across the head, above the post", over + y * 40f, over - y * 40f, "miss: it has no collision, as the old panel had none");
+    results.Add($"{go.Name}: at {at}, colliders {go.Components.GetAll<Collider>(FindMode.EverythingInSelf).Count()}, error model {stand.Model.IsError}");
+}
+
+async Task Walk(string name, Vector3 start, Vector3 toward, string expected)
+{
+    var pawn = Facepunch.Client.Local.PlayerPawn;
+    var yaw = Rotation.LookAt(toward.WithZ(0f)).Yaw();
+    pawn.WorldPosition = start;
+    pawn.Transform.ClearInterpolation();
+    pawn.EyeAngles = new Angles(10f, yaw, 0f);
+    await Task.Delay(300, cancellationToken);
+    ConsoleSystem.Run("dev_force_move 1");
+    try
+    {
+        for (var k = 0; k < 18; k++)
+        {
+            pawn.EyeAngles = new Angles(10f, yaw, 0f);
+            await Task.Delay(200, cancellationToken);
+        }
+    }
+    finally { ConsoleSystem.Run("dev_force_move 0"); }
+    await Task.Delay(300, cancellationToken);
+    var at = pawn.WorldPosition;
+    results.Add($"{name}: from {start.x:0},{start.y:0} stopped at {at.x:0.0},{at.y:0.0},{at.z:0.0} (expected {expected})");
+}
+
+var first = stands.FirstOrDefault()?.GameObject;
+if (first is not null)
+{
+    var front = first.WorldRotation.Left;
+    await Walk("into the first stand's front", first.WorldPosition + front * 110f, -front, $"stopped about 21 in from its centre at {first.WorldPosition.x:0},{first.WorldPosition.y:0}");
+}
+return new { Results = results };

@@ -1,0 +1,1 @@
+Riverdale first aid cabinet v2: the hall's green first aid boxes. Session 5cb3ce6e, 2026-10-31T19:39:02+00:00. Folders: Sources/Riverdale/first-aid-v2, Assets/models/maps/riverdale/first_aid_v2, output/asset-improvement-20261030/first-aid.

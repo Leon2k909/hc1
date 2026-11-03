@@ -1,0 +1,91 @@
+// Disposable native scenes: all variants start from fresh deserialization.
+var project=Sandbox.Project.Current.GetRootPath();
+var folder=System.IO.Path.Combine(project,"output/ares/constructed-interior-v3");
+var config=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"capture-config.json")));
+var editor=Editor.SceneEditorSession.Active;
+var before=new { SceneId=editor.Scene.Id, RuntimeId=Game.ActiveScene?.Id, Game.IsPlaying, Dirty=editor.HasUnsavedChanges };
+var source=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(project,"Assets/scenes/maps/Ares/ares.scene")));
+Vector3 World(System.Text.Json.Nodes.JsonNode n)=>new(n[1].GetValue<float>(),-n[0].GetValue<float>(),n[2].GetValue<float>());
+var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic;
+var preRender=typeof(Scene).GetMethod("PreRender",flags,null,Type.EmptyTypes,null);
+var preCamera=typeof(Scene).GetMethod("PreCameraRender",flags,null,Type.EmptyTypes,null);
+SceneCamera Native(CameraComponent c)=>(SceneCamera)typeof(CameraComponent).GetProperty("SceneCamera",flags).GetValue(c);
+var written=new System.Collections.Generic.List<string>();
+var errors=new System.Collections.Generic.List<string>(); var cameraReport=new System.Collections.Generic.List<object>();
+foreach(var variant in config["variants"].AsArray()) {
+ var name=variant["name"].GetValue<string>();
+ var data=source.DeepClone();var roots=new System.Text.Json.Nodes.JsonArray();
+ foreach(var node in data["GameObjects"].AsArray()) {
+  var label=node["Name"]?.GetValue<string>()??"";
+  if(new[]{"Sun","Sky","Fog","Look","Lights","Reflection Probes"}.Contains(label)||label.StartsWith("Ares"))roots.Add(node.DeepClone());
+ }
+ data["GameObjects"]=roots;data["SceneProperties"]["NavMesh"]["Enabled"]=false;data["SceneProperties"]["WantsSystemScene"]=false;
+ var look=roots.Single(g=>g["Name"]?.GetValue<string>()=="Look");
+ if(variant["exposure"]!=null) {
+  var tone=look["Components"].AsArray().Single(c=>c["__type"]?.GetValue<string>()=="Sandbox.Tonemapping");
+  tone["AutoExposureEnabled"]=true;tone["ExposureCompensation"]=0;
+  tone["MinimumExposure"]=variant["exposure"].GetValue<float>();tone["MaximumExposure"]=variant["exposure"].GetValue<float>();
+ }
+ if(variant["bounce"]!=null) {
+  var gi=roots.Single(g=>g["Name"]?.GetValue<string>()=="Ares bounced lighting")["Components"][0];
+  gi["RuntimeIntensity"]=variant["bounce"].GetValue<float>();
+  gi["RuntimeContrast"]=variant["contrast"]?.GetValue<float>()??1f;
+ }
+ if(variant["lightGain"]!=null) {
+  var lights=roots.Single(g=>g["Name"]?.GetValue<string>()=="Lights");
+  foreach(var g in lights["Children"].AsArray())if((g["Name"]?.GetValue<string>()??"").StartsWith("Hall")) {
+   foreach(var c in g["Components"].AsArray())if(c["__type"]?.GetValue<string>()=="Sandbox.PointLight") {
+    var rgba=c["LightColor"].GetValue<string>().Split(',').Select(float.Parse).ToArray();
+    for(var i=0;i<3;i++)rgba[i]*=variant["lightGain"].GetValue<float>();
+    c["LightColor"]=string.Join(",",rgba);
+    if(variant["temperature"]!=null) {
+     c["LightColor"]=string.Join(",",new[]{2.55f,2.55f,2.55f}.Select(v=>v*variant["lightGain"].GetValue<float>()).Append(1));
+     c["Temperature"]=variant["temperature"].GetValue<float>();
+    }
+    if(variant["shadows"]?.GetValue<bool>()==true) {
+     var key=g["Name"].GetValue<string>().Split(' ');
+     if(Math.Abs(float.Parse(key[1]))==600 && (key[2]=="-50"||key[2]=="350"))c["Shadows"]=true;
+    }
+    if(variant["diffuseWork"]?.GetValue<bool>()==true)c["Contribution"]="Diffuse, Transmissive";
+   }
+  }
+ }
+ var scene=Scene.CreateEditorScene();float elapsed=0;
+ try {
+  CameraComponent camera;
+  using(scene.Push()) {
+   scene.Deserialize(data.AsObject());
+   if(variant["trial"]?.GetValue<bool>()==true) {
+    foreach(var model in new[]{"hall","reactor"}) {
+     var renderer=scene.GetAllComponents<ModelRenderer>().Single(r=>r.Model?.ResourcePath=="models/maps/ares/ares_"+model+".vmdl");
+     renderer.Model=Model.Load("models/maps/ares/constructed-v3/ares_"+model+"_trial.vmdl");
+     foreach(var collider in renderer.GameObject.Components.GetAll<ModelCollider>())collider.Model=renderer.Model;
+     if(renderer.Model.IsError)throw new InvalidOperationException("Trial model error: "+model);
+    }
+   }
+   var holder=new GameObject(false,"Ares surface review camera");camera=holder.Components.Create<CameraComponent>();
+   camera.IsMainCamera=false;camera.EnablePostProcessing=true;camera.ZNear=2;camera.ZFar=120000;camera.CustomSize=new Vector2(2400,1350);
+   holder.Enabled=true;
+  }
+  foreach(var mat in scene.GetAllComponents<ModelRenderer>().Where(r=>r.Model!=null).SelectMany(r=>r.Model.Materials).Distinct())
+   foreach(var tex in new[]{"g_tColor","g_tNormal","g_tRoughness","g_tPlasma"}.Select(mat.GetTexture).Append(mat.FirstTexture).Where(t=>t!=null).Distinct())tex.MarkUsed(4096);
+  bool firstView=true;
+  foreach(var view in config["views"].AsArray()) {
+   cancellationToken.ThrowIfCancellationRequested();using var bitmap=new Bitmap(2400,1350);
+   for(var frame=0;frame<(firstView?100:40);frame++) {
+    using(scene.Push()) {
+     camera.WorldPosition=World(view["eye"]);camera.WorldRotation=Rotation.LookAt(World(view["target"])-camera.WorldPosition);camera.FieldOfView=view["fov"].GetValue<float>();
+     scene.EditorTick(elapsed+=.016f,.016f);preRender.Invoke(scene,null);preCamera.Invoke(scene,null);Native(camera).AntiAliasing=true;camera.RenderToBitmap(bitmap,false);
+    }
+    await Task.Delay(25,cancellationToken);
+   }
+   var path=System.IO.Path.Combine(folder,view["name"].GetValue<string>()+"-"+name+".png");
+   System.IO.File.WriteAllBytes(path,bitmap.ToPng());written.Add(path);
+   firstView=false;
+  }
+  cameraReport.Add(new { Variant=name, AA=Native(camera).AntiAliasing, PostProcessing=Native(camera).EnablePostProcessing });
+  errors.AddRange(scene.GetAllComponents<ModelRenderer>().Where(r=>r.Model==null||r.Model.IsError).Select(r=>r.GameObject.Name));
+ } finally {scene.Destroy();}
+}
+var report=new {Written=written,Camera=cameraReport,ErrorModels=errors,UserStatePreserved=editor.Scene.Id==before.SceneId&&Game.ActiveScene?.Id==before.RuntimeId&&Game.IsPlaying==before.IsPlaying&&editor.HasUnsavedChanges==before.Dirty};
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"capture-report.json"),System.Text.Json.JsonSerializer.Serialize(report,new System.Text.Json.JsonSerializerOptions{WriteIndented=true}));return report;

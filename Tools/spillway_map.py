@@ -436,11 +436,9 @@ def east_works():
     case(m,(1750,-1010),(170,94,86),(1,0),z0=128)
     case(m,(1750,-1010),(130,85,65),(1,0),z0=214)
     case(m,(2290,-920),(120,90,100),(1,0),z0=128)
-    # Canvas-covered equipment and its retaining straps on the B2 loading deck.
-    equipment_cover(m,(1480,1620,-1770,-1640,128,218))
-    for e in (1500,1600):
-        box(m,e-2,e+2,-1771,-1639,218,220,"rv_dark")
-        box(m,e-2,e+2,-1772,-1770,128,220,"rv_dark")
+    # Canvas-covered equipment on the B2 loading deck: only its collision box is drawn here. The canvas and its straps are a model of
+    # their own, placed by scene(): Sources/Spillway/canvas-cover-v2.
+    box(m,1480,1620,-1770,-1640,128,218,{"default":None},STONE)
     P.case_stack(m,(1300,650),(0,1),seed=88)
     P.jersey(m,(1300,1520),(1,0),180)
     container(m,(2070,1830),length=370,paint="rv_steel",num="03")
@@ -485,9 +483,7 @@ def control_house():
     for n in (900,1230):
         P.ceiling_light(m,f"A1 lower {n}",(100,n,190),radius=390,shadows=True)
         P.ceiling_light(m,f"Control upper {n}",(150,n,462),radius=480,shadows=True)
-    for e in (-190,60,310,500):
-        box(m,e-60,e+60,1240,1310,236,270,"rv_desk",METAL)
-        P.screen(m,"schematic",(e,1237,301),(1,0,0),45)
+    # The desks along the back wall are a model of their own, placed by scene(): Sources/Spillway/control-desk-v2.
     # Taller stair/service core and rooftop communications.
     box(m,-400,-190,1150,1450,510,660,"sw_concrete")
     window(m,(-295,1148,590),(1,0,0),140,65)
@@ -514,13 +510,11 @@ def cargo_yard():
     for e,n,L,W,H in ((-280,-400,160,80,70),(325,-1050,170,90,90),(610,-655,110,140,78),(-400,-215,92,150,65),(90,-350,140,85,56)):
         case(m,(e,n),(L,W,H),(1,0),z0=0)
         if H>75:case(m,(e+4,n),(L*.76,W*.9,48),(1,0),z0=H)
-    # A pallet, hose loops and cabinets make the shipping yard read at player scale.
-    for e in range(-285,-105,26):box(m,e,e+20,-712,-663,2,7,"rv_desk")
+    # Pallets, hose loops and cabinets make the shipping yard read at player scale. The pallets by container 02 are a model of their
+    # own, placed by scene(): Sources/Spillway/cargo-props-v2.
     for e in (-325,-280):
         box(m,e-18,e+18,332,358,0,79,"rv_steel",METAL)
-    for j in range(3):
-        pts=[(90+math.cos(t)*(44+j*4),-1080+math.sin(t)*(22+j*2),3+j) for t in np.linspace(0,2*math.pi,32)]
-        for a,b in zip(pts[:-1],pts[1:]):P.rod(m,a,b,1.2,"rv_dark",5)
+    # The continuous yard hose is a separate visual model, placed by scene(): Sources/Spillway/hose-coil-v2.
     P.jersey(m,(300,-120),(0,1),160)
     P.jersey(m,(-310,-100),(1,0),160)
     # A1 stair core wraps the west stairs without crossing their walking volume.
@@ -800,6 +794,24 @@ def scene(written):
                     if comp["__type"]=="Sandbox.BoxCollider":comp["Scale"]=K.vec(spec[3])
         if name=="Riverdale":
             root["Name"]="Spillway"
+            for k,e in enumerate((-190,60,310,500),1):
+                desk="models/props/spillway/control_desk_v2/control_desk.vmdl"
+                root["Children"].append(K.game_object(IDS,f"Control Desk {k}",f"control/desk{k}",K.to_world((e,1275,236)),"0,0,1,0",components=[
+                    K.component(IDS,"Sandbox.ModelRenderer",f"control/desk{k}/renderer",Model=desk,RenderType="On",Tint="1,1,1,1"),
+                    K.component(IDS,"Sandbox.ModelCollider",f"control/desk{k}/collider",Model=desk,Static=True,IsTrigger=False)]))
+            # Two pallets and a stack of two against container 02, a few degrees off square (engine yaws).
+            for k,(p,yaw) in enumerate((((-258,-688,0),92.0),((-198,-690,0),269.0),((-197,-689,4.75),94.5),((-139,-686,0),276.0)),1):
+                pallet="models/maps/spillway/pallet_v2/pallet.vmdl"
+                root["Children"].append(K.game_object(IDS,f"Yard Pallet {k}",f"yard/pallet{k}",K.to_world(p),K.yaw_rotation(yaw),components=[
+                    K.component(IDS,"Sandbox.ModelRenderer",f"yard/pallet{k}/renderer",Model=pallet,RenderType="On",Tint="1,1,1,1"),
+                    K.component(IDS,"Sandbox.ModelCollider",f"yard/pallet{k}/collider",Model=pallet,Static=True,IsTrigger=False)]))
+            hose="models/maps/spillway/hose_coil_v2/hose_coil.vmdl"
+            root["Children"].append(K.game_object(IDS,"Yard Hose","cargo/hose",K.to_world((90,-1080,0)),"0,0,0,1",components=[
+                K.component(IDS,"Sandbox.ModelRenderer","cargo/hose/renderer",Model=hose,RenderType="On",Tint="1,1,1,1")]))
+            # The B2 deck's canvas cover: drawn only, as its collision box is in the east model.
+            cover="models/maps/spillway/canvas_cover_v2/canvas_cover.vmdl"
+            root["Children"].append(K.game_object(IDS,"B2 Canvas Cover","east/canvas_cover",K.to_world((1550,-1705,128)),"0,0,0,1",components=[
+                K.component(IDS,"Sandbox.ModelRenderer","east/canvas_cover/renderer",Model=cover,RenderType="On",Tint="1,1,1,1")]))
             for child in root["Children"]:
                 if child["Name"]=="Dam":
                     for comp in child["Components"]:

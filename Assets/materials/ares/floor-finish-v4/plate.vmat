@@ -1,0 +1,13 @@
+"Layer0"
+{
+ shader "shaders/complex.shader"
+ F_SPECULAR "1"
+ g_flMetalness "0.08"
+ g_flRoughnessScaleFactor "1"
+ TextureColor "materials/ares/floor-finish-v4/plate_color.png"
+ TextureNormal "materials/ares/floor-finish-v4/plate_normal.png"
+ TextureRoughness "materials/ares/floor-finish-v4/plate_rough.png"
+ TextureAmbientOcclusion "materials/default/default_ao.tga"
+ g_vColorTint "[1 1 1 1]"
+ g_flModelTintAmount "1"
+}

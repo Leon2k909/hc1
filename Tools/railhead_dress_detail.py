@@ -459,6 +459,18 @@ def open_chamber( model, e, n, z, along="n" ):
 
 
 def tyre_stack( model, e, n, z0=0.0, count=4, lean=0.0 ):
+    """ A stack's collision: one box. Its tyres are tyre_v2, placed in the scene (railhead_tyres), each 650 mm across and 205 mm tall.
+    tyre_stack_old still builds the old ones, for comparing. """
+    import railhead_tyres
+    R, h = 12.8, 8.07
+    for k in range( count ):
+        de = math.sin( k * 2.1 ) * 1.4 + lean * k
+        dn = math.cos( k * 1.7 ) * 1.2
+        railhead_tyres.record( ( e + de, n + dn, z0 + k * h ), railhead_tyres.index_for( e, n, k ) )
+    model.collision_box( ( e - R - 1.5, n - R - 1.5, z0 ), ( e + R + 1.5, n + R + 1.5, z0 + count * h ), "rubber" )
+
+
+def tyre_stack_old( model, e, n, z0=0.0, count=4, lean=0.0 ):
     """ Old car tyres stacked flat: each 650 mm across, 205 mm tall, its 16-inch hole open. One box of collision. """
     R, r_in, h = 12.8, 8.2, 8.07
     register( model, "dress_tyre" )
@@ -489,7 +501,14 @@ def tyre_stack( model, e, n, z0=0.0, count=4, lean=0.0 ):
     model.collision_box( ( e - R - 1.5, n - R - 1.5, z0 ), ( e + R + 1.5, n + R + 1.5, z0 + count * h ), "rubber" )
 
 
-def skip_bin( model, e, n, facing, z0=0.0, paint="rw_yellow_paint", fill="rw_ballast_old" ):
+def skip_bin( model, e, n, facing="+n", z0=0.0 ):
+    """ A skip: Lowtide's, placed in the scene with its own collision (railhead_skips), long along n, so nothing's drawn here.
+    skip_bin_old still builds the old closed box, for comparing. """
+    import railhead_skips
+    railhead_skips.record( ( e, n, z0 ) )
+
+
+def skip_bin_old( model, e, n, facing, z0=0.0, paint="rw_yellow_paint", fill="rw_ballast_old" ):
     """ A builder's skip (6 m3): a tapered steel box 3.4 m long at its rim, 2.6 m at its floor, 1.7 m wide and
     1.2 m deep, its ribs, lifting lugs and chain pins, half full of rubble. facing is the way its long side runs.
     One box of collision. """

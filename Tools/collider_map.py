@@ -33,6 +33,7 @@ import collider_console as CCN
 import collider_cooling_unit as CU
 import collider_column_base as CB
 import collider_pump_skid as PS
+import collider_tool_cabinet as MC
 import collider_server_rack as SR
 import collider_wall_seams as W
 import collider_ceiling as CE
@@ -72,7 +73,10 @@ ART_VIEW = {"name":"art","eye":[850,-620,G+74],"target":[-650,500,220],"fov":82}
 
 def configure(m):
     for paint in m.polygons:
-        if paint.startswith('ps_'):
+        if paint.startswith('mc_'):
+            m.material_overrides[paint] = f'{MC.MATERIAL_DIR}/{paint}.vmat'
+            m.tile_overrides[paint] = 12.
+        elif paint.startswith('ps_'):
             m.material_overrides[paint] = f'{PS.MATERIAL_DIR}/{paint}.vmat'
             m.tile_overrides[paint] = 12.
         elif paint.startswith('cb_'):
@@ -265,6 +269,9 @@ def portal(m,name,axis,center,cross,z=0,width=160,height=192):
                 box(m,e-.6,e+.6,n-1.1,n+1.1,z+25,z+height-24,"co_red",False)
 
 def hardcase(m,e,n,z=0,w=78,d=46,h=55,heading=0):
+    if (e,n,z,w,d,h,heading)==(-650,160,0,80,42,50,0):
+        MC.append(m)
+        return
     if (e,n,z,w,d,h,heading)==(-850,-350,0,106,58,74,0):
         frame=B.Frame(e,n,heading,z)
         frame.box(m,-w/2,w/2,-d/2,d/2,3,h,None,surface="plastic")
@@ -690,6 +697,9 @@ def scene_data():
     if reflections.is_file():
         saved=json.loads(reflections.read_text())
         next(obj for obj in objects if obj.get("Name")=="Reflection Probes")["Children"]=saved
+    # Keep both reviewed chair versions for in-game comparison; v2 stays removable.
+    chair_review=ROOT/"Sources/Collider/chair-realism-v2/scene-addition.json"
+    if chair_review.is_file(): objects.append(json.loads(chair_review.read_text()))
     return {"__guid":IDS("scene"),"GameObjects":objects,"SceneProperties":{
         "NetworkInterpolation":True,"PhysicsMode":"Physics3D","TimeScale":1,"WantsSystemScene":True,
         "Metadata":{"Title":"Collider","Image":"ui/maps/collider.png","IsVisibleInMenu":"True",

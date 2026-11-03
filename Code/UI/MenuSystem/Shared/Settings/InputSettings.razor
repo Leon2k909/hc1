@@ -151,6 +151,7 @@
     private bool IsSearching => !string.IsNullOrWhiteSpace( Query );
 
     private string BindingAction { get; set; }
+    private readonly KeybindCapture _bindingCapture = new();
 
     public InputSettings()
     {
@@ -226,6 +227,7 @@
 
     private void BeginBind( string action )
     {
+        _bindingCapture.Reset();
         BindingAction = action;
         Focus();
         StateHasChanged();
@@ -233,6 +235,7 @@
 
     private void CancelBind()
     {
+        _bindingCapture.Reset();
         BindingAction = null;
         StateHasChanged();
     }
@@ -245,7 +248,7 @@
 
     public override void OnButtonEvent( ButtonEvent e )
     {
-        if ( BindingAction is null || !e.Pressed )
+        if ( BindingAction is null )
         {
             base.OnButtonEvent( e );
             return;
@@ -253,18 +256,20 @@
 
         e.StopPropagation = true;
         var button = (e.Button ?? "").Trim().ToLowerInvariant();
-        if ( button is "escape" or "esc" )
+        if ( e.Pressed && button is ("escape" or "esc") )
         {
             CancelBind();
             return;
         }
 
-        if ( button is "backspace" or "delete" )
+        if ( e.Pressed && button is ("backspace" or "delete") )
         {
             ControlBindings.Rebind( BindingAction, "" );
             CancelBind();
             return;
         }
+
+        if ( !_bindingCapture.ShouldCapture( button, e.Pressed ) ) return;
 
         var binding = ControlBindings.MakeBinding( button, e.HasCtrl, e.HasShift, e.HasAlt );
         if ( binding is null ) return;

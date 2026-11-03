@@ -205,5 +205,8 @@ public static partial class GameText
 		["Red"] = ("Rouge", "Rot", "Rojo", "Vermelho"),
 		["Green"] = ("Vert", "Grün", "Verde", "Verde"),
 		["Blue"] = ("Bleu", "Blau", "Azul", "Azul"),
+		["Hue"] = ("Teinte", "Farbton", "Tono", "Matiz"),
+		["Saturation"] = ("Saturation", "Sättigung", "Saturación", "Saturação"),
+		["Brightness"] = ("Luminosité", "Helligkeit", "Brillo", "Brilho"),
 	};
 }

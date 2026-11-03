@@ -1,0 +1,13 @@
+var mat=Material.Load("materials/ares/observation-sign-v1/face.vmat");
+object Describe(Texture t) {
+ if(t==null)return null;
+ var values=new System.Collections.Generic.Dictionary<string,object>();
+ foreach(var p in typeof(Texture).GetProperties(System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.Public)) {
+  if(p.GetIndexParameters().Length!=0)continue;
+  try { var v=p.GetValue(t);if(v==null||v is string||v is bool||v is int||v is float||v.GetType().IsEnum)values[p.Name]=v?.ToString(); }catch{}
+ }
+ return values;
+}
+return new { Textures=new[]{"g_tColor","g_tSelfIllumMask"}.Select(k=>new {Key=k,Value=Describe(mat.GetTexture(k))}).ToArray(),
+ TextureProperties=typeof(Texture).GetProperties().Select(p=>new{p.Name,Type=p.PropertyType.FullName,CanWrite=p.CanWrite}).ToArray(),
+ TextureMethods=typeof(Texture).GetMethods().Where(m=>m.Name.Contains("Mip")||m.Name.Contains("Stream")||m.Name.Contains("Load")||m.Name.Contains("Used")).Select(m=>m.ToString()).ToArray() };

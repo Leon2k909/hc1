@@ -13,6 +13,7 @@ public partial class DamageTracker : Component, IGameEventHandler<DamageTakenGlo
 	[Property] public bool ClearOnRespawn { get; set; } = false;
 
 	public Dictionary<Client, List<DamageInfo>> Registry { get; set; } = new();
+	/// <summary>Damage dealt by the local client, keyed by that client rather than the targets.</summary>
 	public Dictionary<Client, List<DamageInfo>> MyInflictedDamage { get; set; } = new();
 
 	[Rpc.Broadcast( NetFlags.HostOnly )]
@@ -49,6 +50,7 @@ public partial class DamageTracker : Component, IGameEventHandler<DamageTakenGlo
 	public struct GroupedDamage
 	{
 		public Component Attacker { get; set; }
+		public Component Victim { get; set; }
 		public int Count { get; set; }
 		public float Damage { get; set; }
 	}
@@ -79,13 +81,14 @@ public partial class DamageTracker : Component, IGameEventHandler<DamageTakenGlo
 		var groups = new List<GroupedDamage>();
 
 		GetMyInflictedDamage( player )
-			.GroupBy( x => x.Attacker )
+			.GroupBy( x => x.Victim )
 			.ToList()
 			.ForEach( group =>
 			{
 				groups.Add( new()
 				{
 					Attacker = group.First().Attacker,
+					Victim = group.Key,
 					Count = group.Count(),
 					Damage = group.Sum( x => x.Damage )
 				} );
@@ -103,39 +106,38 @@ public partial class DamageTracker : Component, IGameEventHandler<DamageTakenGlo
 
 	void IGameEventHandler<DamageTakenGlobalEvent>.OnGameEvent( DamageTakenGlobalEvent eventArgs )
 	{
-		var attacker = eventArgs.DamageInfo.Attacker;
-		var victim = eventArgs.DamageInfo.Victim;
-		var Client = victim is Pawn pawn ? pawn.Client : null;
-
-		if ( !Client.IsValid() )
-			return;
-
-		var attackerClient = attacker is Pawn attackerPawn ? attackerPawn.Client : null;
-		if ( attackerClient == Client.Local )
+		var attackerPlayer = GameUtils.GetPlayerFromComponent( eventArgs.DamageInfo.Attacker );
+		var victimPlayer = GameUtils.GetPlayerFromComponent( eventArgs.DamageInfo.Victim );
+		var damage = eventArgs.DamageInfo with
 		{
-			if ( !MyInflictedDamage.TryGetValue( Client, out var myList ) )
+			Attacker = attackerPlayer.IsValid() ? attackerPlayer : eventArgs.DamageInfo.Attacker,
+			Victim = victimPlayer.IsValid() ? victimPlayer : eventArgs.DamageInfo.Victim
+		};
+		var attackerClient = (damage.Attacker as Pawn)?.Client;
+		var victimClient = (damage.Victim as Pawn)?.Client;
+
+		// Record outgoing hits before requiring a client on the victim: bots and NPCs have none.
+		if ( attackerClient.IsValid() && attackerClient == Client.Local && damage.Victim.IsValid() )
+		{
+			if ( !MyInflictedDamage.TryGetValue( attackerClient, out var myList ) )
 			{
-				MyInflictedDamage.Add( Client, new()
-			{
-				eventArgs.DamageInfo
-			} );
+				MyInflictedDamage.Add( attackerClient, new() { damage } );
 			}
 			else
 			{
-				myList.Add( eventArgs.DamageInfo );
+				myList.Add( damage );
 			}
 		}
 
-		if ( !Registry.TryGetValue( Client, out var list ) )
+		if ( !victimClient.IsValid() ) return;
+
+		if ( !Registry.TryGetValue( victimClient, out var list ) )
 		{
-			Registry.Add( Client, new()
-			{
-				eventArgs.DamageInfo
-			} );
+			Registry.Add( victimClient, new() { damage } );
 		}
 		else
 		{
-			list.Add( eventArgs.DamageInfo );
+			list.Add( damage );
 		}
 	}
 

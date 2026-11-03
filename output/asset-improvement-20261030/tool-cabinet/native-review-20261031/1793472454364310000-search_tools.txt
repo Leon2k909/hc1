@@ -1,0 +1,45 @@
+{
+  "tools": [
+    {
+      "name": "get_network_status",
+      "title": "Get Network Status",
+      "toolset": "bridge_networking",
+      "description": "Check the current multiplayer status. Returns { isActive, isHost, isClient, isConnecting, maxPlayers, serverName } read from Sandbox.Networking — meaningful mostly in play mode with networking active. It does NOT return a player list or networked-object dump; use inspect_networked_object for a specific object's Network/[Sync] state.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "inspect_networked_object",
+      "title": "Inspect Networked Object",
+      "toolset": "bridge_validation",
+      "description": "Inspect the live networking contract of a GameObject. Returns {id, name, network: {active, isProxy, isOwner, isCreator, ownerId, ownerSteamId, ownerTransfer, orphaned, flags}, components: [{component, fields: [{name, type, isSync, syncFlags, value}]}]} — by default only [Sync]-marked fields are listed (components with none are omitted). Unlike get_network_status (session-only), this is per-object — the way to verify a host-authoritative or ownership change actually replicated; works in edit or play mode. Follow up with set_ownership to change the owner, or networking_lint to find the code-level cause of a bad [Sync] value.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of the GameObject to inspect."
+          },
+          "allProps": {
+            "type": "boolean",
+            "description": "Include all component properties, not just [Sync]-marked ones.",
+            "default": false
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    }
+  ],
+  "total": 402
+}

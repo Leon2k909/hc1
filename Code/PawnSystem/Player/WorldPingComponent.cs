@@ -57,6 +57,8 @@ public partial class WorldPingComponent : Component, IMarkerObject, ICustomMinim
 	}
 
 	// IMarkerObject
+	private bool TargetVisible => Receiver is null || (Receiver.IsValid() && Receiver.ShouldShow());
+	bool IMarkerObject.ShouldShow() => TargetVisible;
 	string IMarkerObject.MarkerIcon => MarkerIcon;
 	string IMarkerObject.DisplayText => DisplayText;
 	Vector3 IMarkerObject.MarkerPosition => MarkerPosition;
@@ -94,7 +96,7 @@ public partial class WorldPingComponent : Component, IMarkerObject, ICustomMinim
 	}
 
 	// IMinimapElement
-	bool IMinimapElement.IsVisible( Pawn viewer ) => true;
+	bool IMinimapElement.IsVisible( Pawn viewer ) => TargetVisible;
 
 	/// <summary>
 	/// Triggers the ping to tear off in X seconds.
@@ -110,10 +112,8 @@ public partial class WorldPingComponent : Component, IMarkerObject, ICustomMinim
 
 	protected override void OnUpdate()
 	{
-		if ( !Receiver.IsValid() )
-			return;
-
-		if ( !Receiver.ShouldShow() )
+		// Apply the same visibility rule before either HUD draws and when cleaning up the object.
+		if ( !TargetVisible )
 		{
 			GameObject.Destroy();
 		}

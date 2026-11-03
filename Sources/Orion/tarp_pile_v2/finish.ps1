@@ -12,8 +12,10 @@ function Idle($exe, $list, $log) {
     $p = Start-Process -FilePath $exe -ArgumentList $list -PassThru -NoNewWindow -RedirectStandardOutput "$log.log" -RedirectStandardError "$log.err"
     $p.PriorityClass = 'Idle'
     $p.WaitForExit()
-    Select-String -Path "$log.log" -Pattern '^(frame|simulated|clay|pressed|parts|tris|islands|tp_lod|baked|lod |exported|saved|tarp |coverage)|Traceback|Error' | ForEach-Object { $_.Line }
+    Select-String -Path "$log.log" -Pattern '^(frame|bollard|simulated|clay|pressed|parts|tris|islands|tp_lod|baked|lod |exported|saved|tarp |coverage)|Traceback|Error' | ForEach-Object { $_.Line }
     Get-Content "$log.err" | Select-String -Pattern 'Traceback|Error:|error:' -Context 0,10 | ForEach-Object { '! ' + $_.ToString() }
+    # A failed stage must stop here: the next stages would carry on from the last good build's files and export those.
+    if (Select-String -Path "$log.err" -Pattern 'Traceback' -Quiet) { throw "$log failed" }
 }
 
 if ($Stages) {

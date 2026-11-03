@@ -8,6 +8,7 @@ import json
 import math
 import os
 import sys
+import time
 
 import numpy as np
 
@@ -30,6 +31,7 @@ nor4 = load("bake_cabinet_nor")
 facts4 = load("bake_cabinet_facts")
 ao4 = load("bake_cabinet_ao")
 H, W = pos4.shape[:2]
+K = W / 2048.0  # Filters are in texels, and were set at 2048.
 cover = pos4[..., :3].max(-1) > 1e-3
 pos = (pos4[..., :3] - 0.5) * 400.0
 nor = nor4[..., :3] * 2 - 1
@@ -40,6 +42,7 @@ pos, nor, finish, part, dense = fill_from(cover, pos, nor, finish, part, dense)
 aoc = cover[:: H // ao4.shape[0], :: W // ao4.shape[1]]
 ao = fill_from(aoc, ao4[..., 0])[0]
 ao = np.clip(ndi.zoom(ndi.gaussian_filter(ao, 0.7), W / ao.shape[1], order=1), 0, 1)
+del pos4, nor4, facts4, ao4, aoc
 X, Y, Z = pos[..., 0], pos[..., 1], pos[..., 2]
 px_per_in = density * np.maximum(dense, 0.05)
 
@@ -48,9 +51,9 @@ for axis in (0, 1):
     dn = np.gradient(nor, axis=axis)
     dp = np.gradient(pos, axis=axis)
     curve += (dn * dp).sum(-1) / np.maximum((dp * dp).sum(-1), 1e-5)
-curve[~ndi.binary_erosion(cover, iterations=2)] = 0
+curve[~ndi.binary_erosion(cover, iterations=int(2 * K))] = 0
 convex = np.clip((curve - 1.6) * 0.3, 0, 1)
-edge = np.clip(ndi.gaussian_filter(convex, 1.6) * 2.2 + ndi.gaussian_filter(convex, 4.0) * 2.6, 0, 1)
+edge = np.clip(ndi.gaussian_filter(convex, 1.6 * K) * 2.2 + ndi.gaussian_filter(convex, 4.0 * K) * 2.6, 0, 1)
 pts = pos[cover]
 
 
@@ -208,7 +211,7 @@ chip = (
     edge * smooth(0.28, 0.66, mid * 0.6 + fine * 0.4) * 0.5
     + (big_door - 0.5) * 0.8
     + (mid_door - 0.5) * 0.74
-    - lettering * 0.2
+    - lettering * 0.34
     + (fine - 0.5) * 0.4
     + (micro - 0.5) * 0.16
     + low * 0.16
@@ -327,7 +330,7 @@ metal = np.where(red, 0.6 * r_wear, metal)
 # Plates: the instrument panel is black crackle; the rest are enamel pictures, chipped at their edges.
 plate = finish == PLATE
 facing = plate & front
-p_color = rgb(40, 44, 46) * (0.82 + 0.36 * micro[..., None])
+p_color = rgb(20, 22, 24) * (0.82 + 0.36 * micro[..., None])
 p_chip = smooth(0.44, 0.56, edge * 0.7 + (fine - 0.5) * 0.7 + (mid - 0.5) * 0.7 + (big - 0.5) * 0.4 + crevice * 0.1)
 for picture, y0, y1, z0, z1 in (
     (danger_plate(), -31.0, -6.0, 19.0, 31.0),
@@ -343,7 +346,7 @@ p_color = mix(p_color, mix(rgb(100, 56, 30), rust_c, 0.5), np.clip(runs * 0.75, 
 p_color = mix(p_color, rgb(46, 40, 30), smooth(0.3, 0.72, crevice + (mid - 0.5) * 1.0 + (big - 0.5) * 0.8) * 0.72)
 p_color = mix(p_color, mix(rgb(140, 140, 136), rust_c, smooth(0.4, 0.7, mid)), p_chip)
 color = np.where(plate[..., None], p_color, color)
-rough = np.where(plate, 0.34 + 0.2 * mid + 0.34 * p_chip, rough)
+rough = np.where(plate, 0.5 + 0.2 * mid + 0.24 * p_chip, rough)
 metal = np.where(plate, 0.0, metal)
 height = np.where(plate, 0.002 * (micro - 0.5) + p_chip * 0.006, height)
 
@@ -373,13 +376,13 @@ for index, (gy, gz) in enumerate(facts["gauges"]):
     d_color = np.where(here[..., None], picture, d_color)
 d_color = mix(d_color, rgb(120, 92, 54), smooth(0.35, 0.75, mid * 0.6 + big * 0.4) * 0.55)
 color = np.where(dial[..., None], d_color, color)
-rough = np.where(dial, 0.22, rough)
+rough = np.where(dial, 0.42, rough)
 metal = np.where(dial, 0.0, metal)
 height = np.where(dial, 0.0, height)
 glow = np.where(dial, 0.05, glow)
 
 # Lit lenses glow; the green is the one lit. Glass stays clean enough to read.
-for f, tint, lit in ((LENS_G, (40, 255, 90), 1.0), (LENS_A, (255, 150, 30), 0.14), (LENS_R, (255, 36, 20), 0.14)):
+for f, tint, lit in ((LENS_G, (40, 255, 90), 0.6), (LENS_A, (255, 150, 30), 0.14), (LENS_R, (255, 36, 20), 0.14)):
     lens = finish == f
     color = np.where(lens[..., None], rgb(*tint), color)
     rough = np.where(lens, 0.16, rough)
@@ -401,13 +404,26 @@ metal = metal * (1 - dirt)
 color = color * (0.68 + 0.32 * ao[..., None])
 solid = ndi.binary_erosion(cover, iterations=1)
 height = fill_from(solid, height)[0]
-normal = to_normal(ndi.gaussian_filter(height, 0.5), px_per_in, 1.0)
+normal = to_normal(ndi.gaussian_filter(height, 0.5 * K), px_per_in, 1.0)
 color, rough, metal, normal, glow = fill_from(solid, np.clip(color, 0, 1), np.clip(rough, 0.1, 1), np.clip(metal, 0, 1), normal, glow)
 os.makedirs(OUT, exist_ok=True)
-save_rgb(os.path.join(OUT, f"{NAME}_color.png"), color)
-save_gray(os.path.join(OUT, f"{NAME}_rough.png"), rough)
-save_gray(os.path.join(OUT, f"{NAME}_metal.png"), metal)
-save_gray(os.path.join(OUT, f"{NAME}_ao.png"), np.clip(ao * 1.03, 0, 1))
-save_gray(os.path.join(OUT, f"{NAME}_glow.png"), glow)
-save_normal(os.path.join(OUT, f"{NAME}_normal.png"), normal)
+save_rgb(os.path.join(WORK, f"{NAME}_color.png"), color)
+save_gray(os.path.join(WORK, f"{NAME}_rough.png"), rough)
+save_gray(os.path.join(WORK, f"{NAME}_metal.png"), metal)
+save_gray(os.path.join(WORK, f"{NAME}_ao.png"), np.clip(ao * 1.03, 0, 1))
+save_gray(os.path.join(WORK, f"{NAME}_glow.png"), glow)
+save_normal(os.path.join(WORK, f"{NAME}_normal.png"), normal)
+# The engine can't filter a normal map that isn't a power of two, so the 3072 painting goes up to 4096 where detail shows, and down where it
+# doesn't. An open editor reads these the moment they change, so each is written once, finished, and a locked file is tried again.
+for suffix, size in (("color", 4096), ("normal", 4096), ("rough", 2048), ("metal", 2048), ("ao", 2048), ("glow", 2048)):
+    with Image.open(os.path.join(WORK, f"{NAME}_{suffix}.png")) as picture:
+        fitted = picture.resize((size, size), Image.LANCZOS)
+    for attempt in range(10):
+        try:
+            fitted.save(os.path.join(OUT, f"{NAME}_{suffix}.png"), compress_level=6)
+            break
+        except OSError:
+            time.sleep(2.0)
+    else:
+        raise SystemExit(f"Could not write {suffix}")
 print("cabinet painted, base density %.1f px/in" % density, flush=True)

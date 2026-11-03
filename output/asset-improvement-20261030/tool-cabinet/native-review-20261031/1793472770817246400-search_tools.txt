@@ -1,0 +1,173 @@
+{
+  "tools": [
+    {
+      "name": "add_achievement_trigger",
+      "title": "Add Achievement Trigger",
+      "toolset": "bridge_scaffold_gameplay",
+      "description": "SCENE-MUTATING: generate a data-driven achievement trigger-zone component AND create its GameObject now (named zone with a sized BoxCollider, IsTrigger=true, at the given position). When an object tagged triggerTag enters, the component calls &lt;achievementSetClass&gt;.Instance.Progress(achievementId, amount) — or Unlock() when unlock=true — with a once-only latch and optional destroy-after-fire. Returns { created, path, className, achievementSetClass, achievementId, gameObject, attached, note, nextSteps }. The generated component only attaches to the zone after trigger_hotload — until then `attached` is false and nextSteps carries the exact add_component_with_properties follow-up. The generated code references the set class BY NAME: run create_achievement_set first or the project will not compile (the result warns via `note`). Re-running with the same name fails unless reuseClass=true, which skips codegen and just places another zone (attaching + configuring immediately since the class is already compiled). Refused during play mode.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "achievementId": {
+            "type": "string",
+            "description": "Id of the achievement to progress/unlock (sanitized to [a-z0-9_-])."
+          },
+          "name": {
+            "type": "string",
+            "description": "Class name for the generated trigger component. Defaults to 'AchievementTrigger'."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory for the generated .cs file. Defaults to 'Code'."
+          },
+          "achievementSetClass": {
+            "type": "string",
+            "description": "Class name of the achievement set the zone reports to (from create_achievement_set). Defaults to 'AchievementSet'."
+          },
+          "amount": {
+            "type": "number",
+            "description": "Progress amount added per fire (ignored when unlock=true). Defaults to 1."
+          },
+          "unlock": {
+            "type": "boolean",
+            "description": "Call Unlock() instead of Progress(). Defaults to false."
+          },
+          "triggerTag": {
+            "type": "string",
+            "description": "Tag the entering object must carry (put it on the player via set_tags). Defaults to 'player'."
+          },
+          "onceOnly": {
+            "type": "boolean",
+            "description": "Only the first tagged entry fires. Defaults to true."
+          },
+          "destroyAfterFire": {
+            "type": "boolean",
+            "description": "Destroy the zone GameObject after firing. Defaults to false."
+          },
+          "createObject": {
+            "type": "boolean",
+            "description": "Create the zone GameObject now (with BoxCollider). Defaults to true; false = code-gen only."
+          },
+          "objectName": {
+            "type": "string",
+            "description": "Name for the zone GameObject. Defaults to '&lt;name&gt;Zone'."
+          },
+          "position": {
+            "type": "string",
+            "description": "World position of the zone GameObject. As \"x,y,z\" (or JSON {x,y,z})."
+          },
+          "scale": {
+            "type": "string",
+            "description": "BoxCollider size — uniform number, object {x,y,z}, or comma string \"x,y,z\". Defaults to 100,100,100. As \"x,y,z\" (or JSON {x,y,z})."
+          },
+          "reuseClass": {
+            "type": "boolean",
+            "description": "If the .cs already exists, skip codegen and just place another zone with the existing class. Defaults to false."
+          }
+        },
+        "required": [
+          "achievementId"
+        ]
+      }
+    },
+    {
+      "name": "create_carry_system",
+      "title": "Create Carry System",
+      "toolset": "bridge_scaffold_gameplay",
+      "description": "Generate a first-person pickup / carry / throw component (sealed Component) for physics props. Attach it to the PLAYER (the object that owns the camera). It eye-traces from Scene.Camera for a Rigidbody-bearing GameObject tagged [Property] CarryTag (default 'carryable') within [Property] Range; grabbing routes a host-authoritative [Rpc.Host] request that re-validates the target and caller, hands the object's network ownership to the carrier (GameObject.Network.AssignOwnership), and disables the rigidbody's MotionEnabled while held. The held object follows a hold point ([Property] Vector3 HoldOffset in front of the camera) each FixedUpdate; dropping restores physics, throwing applies an impulse ([Property] float ThrowForce). The held-object id is [Sync(SyncFlags.FromHost)] so proxies see the carrying state, and static OnPickedUp / OnDropped events fire uniformly for SFX/VFX. PAIRS with physics props — give each carryable a Rigidbody + Collider and the CarryTag (set_tags); network-spawn them for multiplayer so ownership + transform replicate. Single-player safe (IsProxy is false and RPCs run locally with no session). Inputs: GrabAction (default 'use') grabs/drops, ThrowAction (default 'attack1') throws. Optionally attach to an existing player GameObject by GUID after a hotload.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class name for the generated component. Defaults to 'CarrySystem'."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory for the generated .cs file. Defaults to 'Code'."
+          },
+          "range": {
+            "type": "number",
+            "description": "Eye-trace reach for grabbing a carryable, in world units. Defaults to 130."
+          },
+          "throwForce": {
+            "type": "number",
+            "description": "Impulse magnitude applied on throw (scales with the prop's mass — tune per game). Defaults to 20000."
+          },
+          "carryTag": {
+            "type": "string",
+            "description": "Only objects with this tag (and a Rigidbody) can be picked up; lower-cased/underscored to match s&box tag convention. Defaults to 'carryable'."
+          },
+          "targetId": {
+            "type": "string",
+            "description": "GUID of the PLAYER GameObject (the one with the camera) to attach to (only attaches if the type is already loaded — hotload first)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "get_tags",
+      "title": "Get Tags",
+      "toolset": "bridge_gameobject",
+      "description": "Read the tags currently on a GameObject. (Pair with set_tags to add/remove/clear, and find_objects to query by tag.).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of the GameObject."
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "set_tags",
+      "title": "Set Tags",
+      "toolset": "bridge_gameobject",
+      "description": "Add, remove, and/or clear gameplay tags on one object (id) or many (ids). Tags drive collision groups, queries, and triggers.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Single GameObject GUID."
+          },
+          "ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Multiple GameObject GUIDs."
+          },
+          "add": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Tags to add."
+          },
+          "remove": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Tags to remove."
+          },
+          "clear": {
+            "type": "boolean",
+            "description": "Remove all existing tags first."
+          }
+        },
+        "required": []
+      }
+    }
+  ],
+  "total": 402
+}

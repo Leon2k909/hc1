@@ -1,0 +1,339 @@
+{
+  "tools": [
+    {
+      "name": "capture_view",
+      "title": "Capture View",
+      "toolset": "bridge_screenshot",
+      "description": "Screenshot the scene from a chosen viewpoint and return it as an inline PNG image. Pass id to auto-frame a GameObject (3/4 elevated view sized to its bounds), or position (+ lookAt or rotation) for a free camera. With neither, captures the main camera view. Uses a temporary camera that is removed afterwards — the scene is left unchanged. KNOWN CAPTURE LIMITS (engine, not bridge): text in ScreenPanel/Razor labels may rasterise as solid boxes (the font atlas is not resolved for the capture pass — images and layout are correct, so a blank HUD here is NOT a HUD bug; verify text another way), and Terrain renders as a truncated ribbon from any temporary camera because its clipmap centres on the editor/main camera — verify terrain scenes with take_screenshot or in play mode.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of a GameObject to auto-frame (from get_scene_hierarchy or find_objects)."
+          },
+          "position": {
+            "type": "string",
+            "description": "Camera position as \"x,y,z\"."
+          },
+          "lookAt": {
+            "type": "string",
+            "description": "Point to aim the camera at, as \"x,y,z\"."
+          },
+          "rotation": {
+            "type": "string",
+            "description": "Camera rotation as \"pitch,yaw,roll\" degrees (alternative to lookAt)."
+          },
+          "fov": {
+            "type": "number",
+            "description": "Field of view in degrees. Default is the camera's default."
+          },
+          "width": {
+            "type": "integer",
+            "description": "Image width in pixels (16-3840). Default 1280.",
+            "default": 1280
+          },
+          "height": {
+            "type": "integer",
+            "description": "Image height in pixels (16-2160). Default 720.",
+            "default": 720
+          },
+          "renderUI": {
+            "type": "boolean",
+            "description": "Include screen-space UI in the capture. Default true.",
+            "default": true
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "debug_draw_box",
+      "title": "Debug Draw Box",
+      "toolset": "bridge_debug",
+      "description": "Draw a wireframe debug box centered at a point. Renders in editor and play. Ideal for visualizing a trigger_zone's bounds or a physics_overlap box volume. Accumulates until debug_clear. Returns { drawn: 'box', count, mode } — count is the total accumulated primitives, mode is 'edit' or 'play' (edit-mode gizmos are NOT in take_screenshot; use capture_view in play mode).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "center": {
+            "type": "string",
+            "description": "Box center, world-space \"x,y,z\"."
+          },
+          "size": {
+            "type": "string",
+            "description": "Full size \"x,y,z\" in units (default \"32,32,32\")."
+          },
+          "color": {
+            "type": "string",
+            "description": "Color as \"r,g,b\" or \"r,g,b,a\" floats 0–1 (default varies per shape)."
+          },
+          "thickness": {
+            "type": "number",
+            "description": "Line thickness for edit-mode gizmos (default 2)."
+          }
+        },
+        "required": [
+          "center"
+        ]
+      }
+    },
+    {
+      "name": "debug_draw_line",
+      "title": "Debug Draw Line",
+      "toolset": "bridge_debug",
+      "description": "Draw a debug line between two world points. Renders in the editor viewport (Gizmo) AND in play mode (DebugOverlay), accumulating until debug_clear. NB: edit-mode gizmos show in the live editor but NOT in take_screenshot/screenshot_from — use capture_view in play mode to see debug draws through the bridge.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": "string",
+            "description": "Start point, world-space \"x,y,z\"."
+          },
+          "to": {
+            "type": "string",
+            "description": "End point, world-space \"x,y,z\"."
+          },
+          "color": {
+            "type": "string",
+            "description": "Color as \"r,g,b\" or \"r,g,b,a\" floats 0–1 (default varies per shape)."
+          },
+          "thickness": {
+            "type": "number",
+            "description": "Line thickness for edit-mode gizmos (default 2)."
+          }
+        },
+        "required": [
+          "from",
+          "to"
+        ]
+      }
+    },
+    {
+      "name": "debug_draw_ray",
+      "title": "Debug Draw Ray",
+      "toolset": "bridge_debug",
+      "description": "Draw a debug ray (drawn as an arrow) from an origin along a direction for a given length. Renders in editor and play. Ideal for visualizing a raycast result or a facing/normal direction. Accumulates until debug_clear. Returns { drawn: 'ray', count, mode } — count is the total accumulated primitives, mode is 'edit' or 'play' (edit-mode gizmos are NOT in take_screenshot; use capture_view in play mode).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "origin": {
+            "type": "string",
+            "description": "Ray origin, world-space \"x,y,z\"."
+          },
+          "direction": {
+            "type": "string",
+            "description": "Direction vector \"x,y,z\" (normalized internally)."
+          },
+          "length": {
+            "type": "number",
+            "description": "Ray length in units (default 64)."
+          },
+          "color": {
+            "type": "string",
+            "description": "Color as \"r,g,b\" or \"r,g,b,a\" floats 0–1 (default varies per shape)."
+          },
+          "thickness": {
+            "type": "number",
+            "description": "Line thickness for edit-mode gizmos (default 2)."
+          }
+        },
+        "required": [
+          "origin",
+          "direction"
+        ]
+      }
+    },
+    {
+      "name": "debug_draw_sphere",
+      "title": "Debug Draw Sphere",
+      "toolset": "bridge_debug",
+      "description": "Draw a wireframe debug sphere at a point. Renders in editor and play. Ideal for visualizing a physics_overlap radius or an NPC's hearing/sight range. Accumulates until debug_clear. Returns { drawn: 'sphere', count, mode } — count is the total accumulated primitives, mode is 'edit' or 'play' (edit-mode gizmos are NOT in take_screenshot; use capture_view in play mode).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "center": {
+            "type": "string",
+            "description": "Sphere center, world-space \"x,y,z\"."
+          },
+          "radius": {
+            "type": "number",
+            "description": "Radius in units (default 32)."
+          },
+          "color": {
+            "type": "string",
+            "description": "Color as \"r,g,b\" or \"r,g,b,a\" floats 0–1 (default varies per shape)."
+          },
+          "thickness": {
+            "type": "number",
+            "description": "Line thickness for edit-mode gizmos (default 2)."
+          }
+        },
+        "required": [
+          "center"
+        ]
+      }
+    },
+    {
+      "name": "frame_camera",
+      "title": "Frame Camera",
+      "toolset": "bridge_debug",
+      "description": "Aim the s&box EDITOR viewport camera at a GameObject (by id) or a world point (position + optional radius), then call take_screenshot to capture that view. This is how Claude points its own screenshots at what it's working on — frame a spawned object, then screenshot to verify it actually looks right.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of a GameObject to frame on."
+          },
+          "position": {
+            "type": "string",
+            "description": "World point to frame on (use instead of id) — object {x,y,z} or comma string \"x,y,z\". As \"x,y,z\" (or JSON {x,y,z})."
+          },
+          "radius": {
+            "type": "number",
+            "description": "Frame radius around the position, in units (default 128)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "pose_citizen",
+      "title": "Pose Citizen",
+      "toolset": "bridge_character",
+      "description": "Pose a Citizen by setting CitizenAnimationHelper params (enables PlayAnimationsInEditorScene so the pose shows in-editor). Set holdType (None/Pistol/Rifle/Shotgun/HoldItem/Punch/Swing), moveStyle (Auto/Walk/Run), specialMove, sitting (bool), and/or duckLevel (0-1). Returns { posed, changed:[...], gameObject } — changed lists which helper params were applied; take_screenshot to verify the pose.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of the Citizen GameObject (must have a CitizenAnimationHelper)."
+          },
+          "holdType": {
+            "type": "string",
+            "description": "Hold pose, e.g. None, Pistol, Rifle, Shotgun, HoldItem."
+          },
+          "moveStyle": {
+            "type": "string",
+            "description": "Movement style, e.g. Auto, Walk, Run."
+          },
+          "specialMove": {
+            "type": "string",
+            "description": "Special move style, e.g. None, LedgeGrab, Roll."
+          },
+          "sitting": {
+            "type": "boolean",
+            "description": "Sit the character (IsSitting)."
+          },
+          "duckLevel": {
+            "type": "number",
+            "description": "Crouch amount, 0-1."
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "screenshot_from",
+      "title": "Screenshot From",
+      "toolset": "bridge_screenshot",
+      "description": "Frame a GameObject or a free camera position and return the shot as an inline PNG image. Same as capture_view (kept under its historical name — existing workflows use it), with the same capture limits: UI text may rasterise as boxes, and Terrain renders truncated from a temporary camera (clipmap centres on the main camera) — verify terrain via take_screenshot.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of a GameObject to auto-frame."
+          },
+          "position": {
+            "type": "string",
+            "description": "Camera position as \"x,y,z\"."
+          },
+          "lookAt": {
+            "type": "string",
+            "description": "Point to aim the camera at, as \"x,y,z\"."
+          },
+          "rotation": {
+            "type": "string",
+            "description": "Camera rotation as \"pitch,yaw,roll\" degrees."
+          },
+          "width": {
+            "type": "integer",
+            "description": "Image width in pixels. Default 1280.",
+            "default": 1280
+          },
+          "height": {
+            "type": "integer",
+            "description": "Image height in pixels. Default 720.",
+            "default": 720
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "set_bodygroup",
+      "title": "Set Bodygroup",
+      "toolset": "bridge_character",
+      "description": "Show/hide a bodygroup on a SkinnedModelRenderer (e.g. hide hands when holding a tool, swap head variants). Provide value (int index) or choice (string name). Returns { set, bodygroup } on success (errors if the object has no SkinnedModelRenderer or neither value nor choice is given); take_screenshot to verify the visual change.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of the GameObject with a SkinnedModelRenderer."
+          },
+          "name": {
+            "type": "string",
+            "description": "Bodygroup name."
+          },
+          "value": {
+            "type": "integer",
+            "description": "Bodygroup choice index."
+          },
+          "choice": {
+            "type": "string",
+            "description": "Bodygroup choice by name (alternative to value)."
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "take_screenshot",
+      "title": "Take Screenshot",
+      "toolset": "bridge_screenshot",
+      "description": "Screenshot the scene's main camera view (the player's view in play mode) and return it as an inline PNG image. To frame a specific object or position instead, use capture_view or screenshot_orbit. KNOWN CAPTURE LIMIT (engine, not bridge): text in ScreenPanel/Razor labels may rasterise as solid boxes while images and layout are correct — a blank HUD in a capture is NOT a HUD bug; verify text another way (e.g. a Log.Info of the bound value).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "width": {
+            "type": "integer",
+            "description": "Image width in pixels (16-3840). Default 1280.",
+            "default": 1280
+          },
+          "height": {
+            "type": "integer",
+            "description": "Image height in pixels (16-2160). Default 720.",
+            "default": 720
+          },
+          "renderUI": {
+            "type": "boolean",
+            "description": "Include screen-space UI (HUD) in the capture. Default true.",
+            "default": true
+          }
+        },
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    }
+  ],
+  "total": 402
+}

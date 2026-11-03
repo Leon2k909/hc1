@@ -1,0 +1,12 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var results=new System.Collections.Generic.List<object>();
+foreach(var relative in new[]{"materials/riverdale/rv_pool_rules_v2.vmat", "models/maps/riverdale/riverdale_hall_detail.vmdl", "models/maps/riverdale/riverdale_hall_fine.vmdl"}) {
+    cancellationToken.ThrowIfCancellationRequested();
+    var asset=Editor.AssetSystem.FindByPath(relative) ?? Editor.AssetSystem.RegisterFile(System.IO.Path.Combine(root,"Assets",relative));
+    if(asset==null)throw new Exception("Asset registration failed: "+relative);
+    var success=asset.Compile(true);
+    results.Add(new {Path=relative,Success=success,asset.IsCompiled,asset.IsCompileFailed});
+    if(!success)throw new Exception("Asset compile failed: "+relative);
+    await Task.Delay(50,cancellationToken);
+}
+return new {Results=results,Game.IsPlaying};

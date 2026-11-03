@@ -1,0 +1,16 @@
+// Execute only after the user approves the shown native review.
+var root=Sandbox.Project.Current.GetRootPath();
+var folder=System.IO.Path.Combine(root,"output/ares/surface-finish-v2");
+var plan=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"install-plan.json")));
+var editor=Editor.SceneEditorSession.Active;
+if(Game.IsPlaying||editor.HasUnsavedChanges)throw new InvalidOperationException("Review current user scene state before installation");
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+foreach(var pair in plan["guards"].AsObject())if(Hash(System.IO.Path.Combine(root,pair.Key))!=pair.Value.GetValue<string>())throw new InvalidOperationException("Published input changed: "+pair.Key);
+foreach(var pair in plan["files"].AsObject())if(Hash(System.IO.Path.Combine(folder,"install-stage",pair.Key))!=pair.Value.GetValue<string>())throw new InvalidOperationException("Staged input changed: "+pair.Key);
+foreach(var pair in plan["files"].AsObject()) {
+ if(pair.Key.Contains("..")||!(pair.Key.StartsWith("Assets/models/maps/ares/")||pair.Key=="Tools/ares_map.py"||pair.Key=="Tools/ares_interior.py"))throw new InvalidOperationException("Unexpected target");
+ var target=System.IO.Path.Combine(root,pair.Key);var tmp=target+".surface-writing";
+ System.IO.File.Copy(System.IO.Path.Combine(folder,"install-stage",pair.Key),tmp,true);System.IO.File.Move(tmp,target,true);
+ if(pair.Key.StartsWith("Assets/"))Editor.AssetSystem.RegisterFile(target);
+}
+return new {Files=plan["files"].AsObject().Count,SceneEdited=false,Next="Compile public hall/reactor; apply the native scene_mutations in install-plan.json; save_scene; capture installed result."};

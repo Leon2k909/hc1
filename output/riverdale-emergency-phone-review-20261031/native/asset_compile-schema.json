@@ -1,0 +1,41 @@
+{
+  "name": "asset_compile",
+  "title": "Asset Compile",
+  "toolset": "asset",
+  "description": "Recompile an asset from its source file. Compile errors and warnings land in the console - check read_console after a failure.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "path": {
+        "type": "string",
+        "description": "Asset path, as returned by asset_search."
+      },
+      "full": {
+        "type": "boolean",
+        "description": "Force a full recompile instead of an incremental one.",
+        "default": false
+      }
+    },
+    "required": [
+      "path"
+    ]
+  },
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "Success": {
+        "type": "boolean"
+      },
+      "Path": {
+        "type": "string"
+      },
+      "CompiledFile": {
+        "type": "string"
+      },
+      "Hint": {
+        "type": "string"
+      }
+    },
+    "required": []
+  }
+}

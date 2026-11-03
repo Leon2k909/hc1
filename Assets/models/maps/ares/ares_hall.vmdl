@@ -13,6 +13,12 @@
 						_class = "DefaultMaterialGroup"
 						remaps =
 						[
+{ from = "ar_in_alloy.vmat" to = "materials/ares/interior-v1/alloy.vmat" },
+{ from = "ar_in_dark.vmat" to = "materials/ares/interior-v1/dark.vmat" },
+{ from = "ar_in_floor.vmat" to = "materials/ares/floor-finish-v4/plate.vmat" },
+{ from = "ar_in_frame.vmat" to = "materials/ares/interior-v1/frame.vmat" },
+{ from = "ar_in_panel.vmat" to = "materials/ares/interior-v1/panel.vmat" },
+{ from = "ar_in_red.vmat" to = "materials/ares/interior-v1/red.vmat" },
 { from = "ar_pd_cassette.vmat" to = "materials/ares/pressure-doors-v3/cassette.vmat" },
 { from = "ar_pd_kick.vmat" to = "materials/ares/pressure-doors-v3/kick.vmat" },
 { from = "ar_pw_rubber.vmat" to = "materials/ares/pipework-v1/rubber.vmat" },
@@ -41,7 +47,7 @@
 							{ from = "ar_copper.vmat" to = "materials/ares/ar_copper.vmat" },
 							{ from = "ar_dark.vmat" to = "materials/ares/ar_dark.vmat" },
 							{ from = "ar_far_light.vmat" to = "materials/ares/ar_far_light.vmat" },
-							{ from = "ar_floor.vmat" to = "materials/ares/ar_floor.vmat" },
+							{ from = "ar_floor.vmat" to = "materials/ares/floor-finish-v4/grip.vmat" },
 							{ from = "ar_grating.vmat" to = "materials/ares/ar_grating.vmat" },
 							{ from = "ar_gunmetal.vmat" to = "materials/ares/ar_gunmetal.vmat" },
 							{ from = "ar_hazard.vmat" to = "materials/ares/ar_hazard.vmat" },
@@ -1827,15 +1833,6 @@
 					{
 						_class = "PhysicsShapeBox"
 						parent_bone = ""
-						surface_prop = "default"
-						collision_tags = "solid"
-						origin = [ 0.0000, 1268.0000, 96.0000 ]
-						angles = [ -0.0000, -90.0000, 0.0000 ]
-						dimensions = [ 16.0000, 340.0000, 192.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
 						surface_prop = "metal"
 						collision_tags = "solid"
 						origin = [ -709.0000, 1286.0000, 42.0000 ]
@@ -2165,15 +2162,6 @@
 						origin = [ -60.0000, -1993.5000, 98.0000 ]
 						angles = [ -0.0000, -90.0000, 0.0000 ]
 						dimensions = [ 12.0000, 212.0000, 196.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "default"
-						collision_tags = "solid"
-						origin = [ 0.0000, -1268.0000, 96.0000 ]
-						angles = [ -0.0000, -90.0000, 0.0000 ]
-						dimensions = [ 16.0000, 340.0000, 192.0000 ]
 					},
 					{
 						_class = "PhysicsShapeBox"

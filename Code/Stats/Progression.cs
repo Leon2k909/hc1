@@ -53,6 +53,7 @@ public static class Progression
 		var weapons = ResourceLibrary.GetAll<EquipmentResource>();
 		foreach ( var wep in weapons )
 		{
+			WeaponProgression.PreserveLifetimeXP( wep );
 			Game.Cookies.Set( $"hc1.weapon.xp.{wep.ResourceName}", 0 );
 		}
 		Gunsmith.GunsmithLoadoutManager.MarkChanged();

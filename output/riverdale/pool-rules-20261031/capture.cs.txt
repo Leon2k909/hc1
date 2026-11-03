@@ -1,0 +1,21 @@
+var scene = Game.ActiveScene;
+var originalId = scene.Id;
+var dir = System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(), "output/riverdale/pool-rules-20261031");
+var name = System.IO.File.ReadAllText(System.IO.Path.Combine(dir, "capture-name.txt")).Trim();
+var obj = scene.CreateObject(true);
+obj.Name = "__pool_rules_temporary_capture";
+try {
+    obj.WorldPosition = new Vector3(1910, 230, 64);
+    obj.WorldRotation = Rotation.LookAt(new Vector3(1998.75f, 215, 56) - obj.WorldPosition);
+    var cam = obj.Components.Create<CameraComponent>();
+    cam.FieldOfView = 47; cam.ZNear = 1;
+    foreach (var r in scene.GetAllComponents<ModelRenderer>().Where(r => r.Model?.ResourcePath?.Contains("riverdale_hall") == true))
+        foreach (var mat in r.Model.Materials)
+            foreach (var t in new[]{ mat.FirstTexture, mat.GetTexture("g_tColor"), mat.GetTexture("g_tNormal") }.Where(t => t != null)) t.MarkUsed(2048);
+    await Task.Delay(1200,cancellationToken);
+    using var bitmap = new Bitmap(1200,1000);
+    for (int i=0;i<8;i++) { cam.RenderToBitmap(bitmap,false); await Task.Delay(40,cancellationToken); }
+    var path = System.IO.Path.Combine(dir,name+".png");
+    System.IO.File.WriteAllBytes(path,bitmap.ToPng());
+    return new { Path=path, Game.IsPlaying, SameScene = Game.ActiveScene.Id==originalId };
+} finally { obj.Destroy(); }

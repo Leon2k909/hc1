@@ -68,12 +68,22 @@ public sealed class PlayerFootsteps : Component
 		if ( !Player.IsValid() )
 			return;
 
-		if ( Player.HealthComponent.State != LifeState.Alive ) return;
+		if ( !Player.HealthComponent.IsValid() || Player.HealthComponent.State != LifeState.Alive ) return;
+		if ( Player.IsNoclipping || Player.IsFrozen || Player.IsMantling || Player.IsPipeClimbing
+			|| Player.IsSliding || Player.IsProne || Player.IsFallKnockedDown || Player.IsPilotingDrone ) return;
+
+		// Remote controllers don't drive movement locally; use the same replicated state as their animation.
+		var local = Player.IsLocallyControlled;
+		var controller = Player.CharacterController;
+		if ( local && !controller.IsValid() ) return;
+		var grounded = local ? controller.IsOnGround : Player.SyncedIsGrounded;
+		if ( !grounded ) return;
 
 		if ( TimeSinceStep < GetStepFrequency() )
 			return;
 
-		if ( Player.CharacterController.Velocity.Length > 50f )
+		var velocity = local ? controller.Velocity : Player.SyncedVelocity;
+		if ( velocity.WithZ( 0f ).LengthSquared > 50f * 50f )
 		{
 			Footstep();
 		}

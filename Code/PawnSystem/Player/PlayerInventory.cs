@@ -312,6 +312,30 @@ public partial class PlayerInventory : Component
 		if ( Has( resource ) )
 			return null;
 
+		if ( !resource.MainPrefab.IsValid() )
+		{
+			Log.Error( $"equipment doesn't have a prefab? {resource}, {resource.MainPrefab}, {resource.ViewModelPrefab}" );
+			return null;
+		}
+
+		// Stage the replacement before removing the old weapon. Disabled equipment stays out of inventory selection.
+		var gameObject = resource.MainPrefab.Clone( new CloneConfig()
+		{
+			Transform = new(),
+			Parent = Player.GameObject,
+			StartEnabled = false
+		} );
+		if ( !gameObject.IsValid() ) return null;
+
+		var component = gameObject.GetComponentInChildren<Equipment>( true );
+		var swbWeapon = component is null ? gameObject.Components.Get<SWB.Base.Weapon>( FindMode.EverythingInSelfAndDescendants ) : null;
+		if ( component is null && !swbWeapon.IsValid() )
+		{
+			gameObject.Destroy();
+			Log.Error( $"equipment prefab has no supported weapon component: {resource}" );
+			return null;
+		}
+
 		if ( pickupResult == PickupResult.Swap )
 		{
 			var slotCurrent = Equipment.FirstOrDefault( equipment => equipment.Enabled && equipment.Resource.Slot == resource.Slot );
@@ -319,24 +343,10 @@ public partial class PlayerInventory : Component
 				Drop( slotCurrent, true );
 		}
 
-		if ( !resource.MainPrefab.IsValid() )
-		{
-			Log.Error( $"equipment doesn't have a prefab? {resource}, {resource.MainPrefab}, {resource.ViewModelPrefab}" );
-			return null;
-		}
-
-		// Create the equipment prefab and put it on the GameObject.
-		var gameObject = resource.MainPrefab.Clone( new CloneConfig()
-		{
-			Transform = new(),
-			Parent = Player.GameObject
-		} );
-		var component = gameObject.GetComponentInChildren<Equipment>( true );
 		if ( component is null )
 		{
 			// SWB weapon — no Equipment component, spawn and enable directly
-			var swbWeapon = gameObject.Components.Get<SWB.Base.Weapon>( FindMode.EverythingInSelfAndDescendants );
-			if ( swbWeapon.IsValid() ) swbWeapon.GunsmithResource = resource;
+			swbWeapon.GunsmithResource = resource;
 			if ( Current.IsValid() )
 				HolsterCurrent();
 			gameObject.NetworkSpawn( Player.Network.Owner );
@@ -367,6 +377,7 @@ public partial class PlayerInventory : Component
 			foreach ( var state in component.GetComponentsInChildren<IDroppedWeaponState>( true ) )
 				state.CopyFromDroppedWeapon( droppedState );
 		}
+		gameObject.Enabled = true;
 		gameObject.NetworkSpawn( Player.Network.Owner );
 
 		if ( makeActive )

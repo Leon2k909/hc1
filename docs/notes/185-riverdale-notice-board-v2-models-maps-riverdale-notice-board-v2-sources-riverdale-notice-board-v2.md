@@ -1,0 +1,8 @@
+## Riverdale's notice board v2 (`models/maps/riverdale/notice_board_v2`, `Sources/Riverdale/notice-board-v2/`, 2026-10-31)
+- Replaced all 5 in the hall at the user's word, after they sent a screenshot of the old one ("this needs to look better") and saw both side by side ("Yes, install it"): the deck's east and west walls, the north wall, and the two control rooms.
+- The old board was one flat atlas picture on a box. This is 12 real sheets that lift and curl over cork, in an aluminium frame with push pins. Everything printed is made up.
+- `riverdale_hall.notice_board` now only records a placement (`Tools/riverdale_notice_boards.py`). `riverdale_map.write_scene` adds a "Notice Boards" group, renderers only, as the old box had no collision. The atlas's `noticeboard` picture is left in place, unused.
+- `board.py` builds the mesh, shadows and maps with numpy and no Blender, because the board is nearly flat. One 4096 colour and normal set for all five, so they're identical.
+- Installed with `install_board.py`, which cuts the faces from the live `riverdale_hall_detail.obj` and `riverdale_hall_fine.obj` by position, as `install_eyewash.py` does, because the hall isn't to be rebuilt whole. The scene group is inserted into the text for the same reason.
+- LOD switches are 30 and 90, about 14 and 43 m. LOD 1 and 2 use one picture of the whole board.
+- Checked from the files (`verify_board.py`) and beside the old one in s&box before the install. s&box was closed for the install, so `check_installed.py` still needs running with it open. Not seen in a live match. See the folder's README.

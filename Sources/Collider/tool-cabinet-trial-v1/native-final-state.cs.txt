@@ -1,0 +1,14 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var sessions=Editor.SceneEditorSession.All.ToArray();
+var reviewNames=new[]{"REVIEW ONLY - original case","REVIEW ONLY - proposed cabinet","__temporary_cabinet_comparison_camera"};
+var leftovers=sessions.SelectMany(s=>s.Scene.GetAllObjects(true)).Where(o=>reviewNames.Contains(o.Name)).Select(o=>o.Name).ToArray();
+var result=new {ProjectRoot=root,Playing=Game.IsPlaying,RuntimeScene=Game.ActiveScene?.Name,
+    ActivePath=Editor.SceneEditorSession.Active?.Scene.Source?.ResourcePath,
+    Sessions=sessions.Select(s=>new{s.Scene.Name,Path=s.Scene.Source?.ResourcePath,s.HasUnsavedChanges}).ToArray(),
+    ComparisonObjectsRemaining=leftovers,ColliderComparisonDocumentClosed=!sessions.Any(s=>s.Scene.Name=="collider"),
+    PreviousRuntimeMapRestored=Game.ActiveScene?.Name=="spillway",NetworkingActive=Networking.IsActive};
+if(leftovers.Length!=0||!result.PreviousRuntimeMapRestored||!result.Playing||!result.ColliderComparisonDocumentClosed)
+    throw new InvalidOperationException("Comparison cleanup or map restoration is incomplete");
+var folder=System.IO.Path.Combine(root,"output/asset-improvement-20261030/tool-cabinet/native-review-20261031");
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"after-editor-state.json"),System.Text.Json.JsonSerializer.Serialize(result,new System.Text.Json.JsonSerializerOptions{WriteIndented=true}));
+return result;

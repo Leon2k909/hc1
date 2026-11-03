@@ -13,8 +13,6 @@
 						_class = "DefaultMaterialGroup"
 						remaps =
 						[
-							{ from = "bench_oak.vmat" to = "materials/gunsmith_range/bench_oak.vmat" },
-							{ from = "bench_oak_endgrain.vmat" to = "materials/gunsmith_range/bench_oak_endgrain.vmat" },
 							{ from = "range_blue.vmat" to = "materials/gunsmith_range/range_blue.vmat" },
 							{ from = "range_orange.vmat" to = "materials/gunsmith_range/range_orange.vmat" },
 							{ from = "range_white.vmat" to = "materials/gunsmith_range/range_white.vmat" },
@@ -129,6 +127,15 @@
 						parent_bone = ""
 						surface_prop = "metal"
 						collision_tags = "solid"
+						origin = [ -29.0000, -450.0000, 15.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 4.0000, 4.0000, 30.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
 						origin = [ -29.0000, -374.0000, 15.0000 ]
 						angles = [ -0.0000, -90.0000, 0.0000 ]
 						dimensions = [ 4.0000, 4.0000, 30.0000 ]
@@ -147,9 +154,81 @@
 						parent_bone = ""
 						surface_prop = "metal"
 						collision_tags = "solid"
+						origin = [ -9.0000, -450.0000, 15.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 4.0000, 4.0000, 30.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
 						origin = [ -9.0000, -374.0000, 15.0000 ]
 						angles = [ -0.0000, -90.0000, 0.0000 ]
 						dimensions = [ 4.0000, 4.0000, 30.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
+						origin = [ -31.0000, -450.0000, 28.3000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 166.0000, 2.5000, 3.4000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
+						origin = [ -7.0000, -450.0000, 28.3000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 166.0000, 2.5000, 3.4000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
+						origin = [ -19.0000, -450.0000, 12.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 152.0000, 2.5000, 2.4000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
+						origin = [ -19.0000, -412.0000, 11.7250 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 74.0000, 19.6000, 1.8500 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
+						origin = [ -21.7000, -427.9000, 16.3500 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 24.6000, 6.1000, 7.4000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "fabric"
+						collision_tags = "solid"
+						origin = [ -10.2000, -450.0000, 36.1500 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 20.0000, 7.4000, 4.3000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "fabric"
+						collision_tags = "solid"
+						origin = [ -27.2000, -450.0000, 35.6900 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 10.5000, 5.8000, 2.9000 ]
 					},
 					{
 						_class = "PhysicsShapeBox"
@@ -183,6 +262,15 @@
 						parent_bone = ""
 						surface_prop = "metal"
 						collision_tags = "solid"
+						origin = [ -29.0000, -150.0000, 15.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 4.0000, 4.0000, 30.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
 						origin = [ -29.0000, -74.0000, 15.0000 ]
 						angles = [ -0.0000, -90.0000, 0.0000 ]
 						dimensions = [ 4.0000, 4.0000, 30.0000 ]
@@ -201,9 +289,81 @@
 						parent_bone = ""
 						surface_prop = "metal"
 						collision_tags = "solid"
+						origin = [ -9.0000, -150.0000, 15.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 4.0000, 4.0000, 30.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
 						origin = [ -9.0000, -74.0000, 15.0000 ]
 						angles = [ -0.0000, -90.0000, 0.0000 ]
 						dimensions = [ 4.0000, 4.0000, 30.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
+						origin = [ -31.0000, -150.0000, 28.3000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 166.0000, 2.5000, 3.4000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
+						origin = [ -7.0000, -150.0000, 28.3000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 166.0000, 2.5000, 3.4000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
+						origin = [ -19.0000, -150.0000, 12.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 152.0000, 2.5000, 2.4000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
+						origin = [ -19.0000, -112.0000, 11.7250 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 74.0000, 19.6000, 1.8500 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
+						origin = [ -21.7000, -127.9000, 16.3500 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 24.6000, 6.1000, 7.4000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "fabric"
+						collision_tags = "solid"
+						origin = [ -10.2000, -150.0000, 36.1500 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 20.0000, 7.4000, 4.3000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "fabric"
+						collision_tags = "solid"
+						origin = [ -27.2000, -150.0000, 35.6900 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 10.5000, 5.8000, 2.9000 ]
 					},
 					{
 						_class = "PhysicsShapeBox"
@@ -237,6 +397,15 @@
 						parent_bone = ""
 						surface_prop = "metal"
 						collision_tags = "solid"
+						origin = [ -29.0000, 150.0000, 15.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 4.0000, 4.0000, 30.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
 						origin = [ -29.0000, 226.0000, 15.0000 ]
 						angles = [ -0.0000, -90.0000, 0.0000 ]
 						dimensions = [ 4.0000, 4.0000, 30.0000 ]
@@ -255,9 +424,81 @@
 						parent_bone = ""
 						surface_prop = "metal"
 						collision_tags = "solid"
+						origin = [ -9.0000, 150.0000, 15.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 4.0000, 4.0000, 30.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
 						origin = [ -9.0000, 226.0000, 15.0000 ]
 						angles = [ -0.0000, -90.0000, 0.0000 ]
 						dimensions = [ 4.0000, 4.0000, 30.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
+						origin = [ -31.0000, 150.0000, 28.3000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 166.0000, 2.5000, 3.4000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
+						origin = [ -7.0000, 150.0000, 28.3000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 166.0000, 2.5000, 3.4000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
+						origin = [ -19.0000, 150.0000, 12.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 152.0000, 2.5000, 2.4000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
+						origin = [ -19.0000, 188.0000, 11.7250 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 74.0000, 19.6000, 1.8500 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
+						origin = [ -21.7000, 172.1000, 16.3500 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 24.6000, 6.1000, 7.4000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "fabric"
+						collision_tags = "solid"
+						origin = [ -10.2000, 150.0000, 36.1500 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 20.0000, 7.4000, 4.3000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "fabric"
+						collision_tags = "solid"
+						origin = [ -27.2000, 150.0000, 35.6900 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 10.5000, 5.8000, 2.9000 ]
 					},
 					{
 						_class = "PhysicsShapeBox"
@@ -291,6 +532,15 @@
 						parent_bone = ""
 						surface_prop = "metal"
 						collision_tags = "solid"
+						origin = [ -29.0000, 450.0000, 15.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 4.0000, 4.0000, 30.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
 						origin = [ -29.0000, 526.0000, 15.0000 ]
 						angles = [ -0.0000, -90.0000, 0.0000 ]
 						dimensions = [ 4.0000, 4.0000, 30.0000 ]
@@ -309,9 +559,81 @@
 						parent_bone = ""
 						surface_prop = "metal"
 						collision_tags = "solid"
+						origin = [ -9.0000, 450.0000, 15.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 4.0000, 4.0000, 30.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
 						origin = [ -9.0000, 526.0000, 15.0000 ]
 						angles = [ -0.0000, -90.0000, 0.0000 ]
 						dimensions = [ 4.0000, 4.0000, 30.0000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
+						origin = [ -31.0000, 450.0000, 28.3000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 166.0000, 2.5000, 3.4000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
+						origin = [ -7.0000, 450.0000, 28.3000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 166.0000, 2.5000, 3.4000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
+						origin = [ -19.0000, 450.0000, 12.0000 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 152.0000, 2.5000, 2.4000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
+						origin = [ -19.0000, 488.0000, 11.7250 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 74.0000, 19.6000, 1.8500 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
+						origin = [ -21.7000, 472.1000, 16.3500 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 24.6000, 6.1000, 7.4000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "fabric"
+						collision_tags = "solid"
+						origin = [ -10.2000, 450.0000, 36.1500 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 20.0000, 7.4000, 4.3000 ]
+					},
+					{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "fabric"
+						collision_tags = "solid"
+						origin = [ -27.2000, 450.0000, 35.6900 ]
+						angles = [ -0.0000, -90.0000, 0.0000 ]
+						dimensions = [ 10.5000, 5.8000, 2.9000 ]
 					},
 					{
 						_class = "PhysicsShapeBox"

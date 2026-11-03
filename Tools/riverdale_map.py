@@ -43,6 +43,13 @@ import map_kit as K
 import railhead_map as R
 import railhead_preview as PV
 import riverdale_materials as RM
+import riverdale_extinguishers as EXTINGUISHERS
+import riverdale_eyewash as EYEWASHES
+import riverdale_notice_boards as NOTICE_BOARDS
+import riverdale_hose_reels as HOSE_REELS
+import riverdale_emergency_phones as EMERGENCY_PHONES
+import riverdale_first_aid as FIRST_AID
+import riverdale_lifebuoys as LIFEBUOYS
 import riverdale_parts as P
 import riverdale_hall as H
 import riverdale_facades as F
@@ -116,7 +123,10 @@ def configure( model ):
         except Exception as error:
             print( f"railhead_materials.paints() failed: {error}" )
     for paint in list( model.polygons ):
-        if paint.startswith( "rv_" ):
+        if paint.startswith( "rv_cam_" ):
+            model.material_overrides[paint] = f"materials/riverdale/cctv_v2/{paint}.vmat"
+            model.tile_overrides[paint] = 7.0
+        elif paint.startswith( "rv_" ):
             model.material_overrides[paint] = f"{RM.RESOURCE_DIR}/{paint}.vmat"
             model.tile_overrides[paint] = RM.TILES.get( paint, 64.0 )
             if paint not in PAINTS:
@@ -1599,6 +1609,13 @@ def write_scene( written, light_list, probe_list ):
         for name, title, collide, shadows in scene_models()
         if name in written and ( ( spatial_ready and name not in TREE_SOURCE_NAMES )
                                  or ( not spatial_ready and name not in TREE_SECTORS ) ) ] )
+    world["Children"].append( EXTINGUISHERS.scene_group( ids ) )
+    world["Children"].append( EYEWASHES.scene_group( ids ) )
+    world["Children"].append( LIFEBUOYS.scene_group( ids ) )
+    world["Children"].append( NOTICE_BOARDS.scene_group( ids ) )
+    world["Children"].append( HOSE_REELS.scene_group( ids ) )
+    world["Children"].append( EMERGENCY_PHONES.scene_group( ids ) )
+    world["Children"].append( FIRST_AID.scene_group( ids ) )
     light_objects = [ light_object( light ) for light in light_list ]
 
     team_spawns = [ spawn_object( f"Red Spawn {k + 1}", f"spawn/red/{k}", p, "Terrorist" ) for k, p in enumerate( RED_SPAWNS ) ]
@@ -1860,6 +1877,7 @@ def partition_trees( source, original_name ):
 
 def build():
     """ Every model by name. """
+    EMERGENCY_PHONES.PLACED.clear()
     P.reset()
     hall, hall_dress, pool, water, glass = H.build()
     middle, west, east, north, boundary = K.Model(), K.Model(), K.Model(), K.Model(), K.Model()

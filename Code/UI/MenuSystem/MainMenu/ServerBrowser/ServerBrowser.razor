@@ -43,7 +43,7 @@
                 {
                     <div class="sb-state">
                         <i>dns</i>
-                        <label class="sb-state-title">@Tr( "No sessions found" )</label>
+                        <label class="sb-state-title">@Tr( SearchFailed ? "Something went wrong" : "No sessions found" )</label>
                         <label class="sb-state-text">@Tr( "Refresh the list or create your own game." )</label>
                     </div>
                 }
@@ -115,6 +115,8 @@
     private List<LobbyInformation> FetchedLobbies { get; set; } = new();
 
     private bool IsSearching = true;
+    private bool SearchFailed;
+    private int SearchVersion;
 
     private string CountLabel
     {
@@ -154,23 +156,41 @@
 
     protected async void FetchLobbies()
     {
+        var searchVersion = ++SearchVersion;
         IsSearching = true;
+        SearchFailed = false;
         FetchedLobbies = new();
         StateHasChanged();
 
-        var lobbies = await Networking.QueryLobbies( Game.Ident );
+        try
+        {
+            var lobbies = await Networking.QueryLobbies( Game.Ident );
+            if ( !this.IsValid() || searchVersion != SearchVersion ) return;
 
-        IsSearching = false;
-        // Sessions this player can join by input first; the others stay listed, dimmed (LobbyInputRules).
-        FetchedLobbies = lobbies.Where( x => !IsEditorLobby( x ) )
-            .OrderByDescending( x => LobbyInputRules.CanJoin( LobbyInputRules.Of( x ) ) )
-            .ToList();
-        StateHasChanged();
+            // Sessions this player can join by input first; the others stay listed, dimmed (LobbyInputRules).
+            FetchedLobbies = lobbies.Where( x => !IsEditorLobby( x ) )
+                .OrderByDescending( x => LobbyInputRules.CanJoin( LobbyInputRules.Of( x ) ) )
+                .ToList();
+        }
+        catch ( Exception e )
+        {
+            if ( !this.IsValid() || searchVersion != SearchVersion ) return;
+            SearchFailed = true;
+            Log.Warning( $"Server browser: couldn't fetch sessions: {e.Message}" );
+        }
+        finally
+        {
+            if ( this.IsValid() && searchVersion == SearchVersion )
+            {
+                IsSearching = false;
+                StateHasChanged();
+            }
+        }
     }
 
     // The details' Input row and hint follow what the player is playing with.
     protected override int BuildHash() => HashCode.Combine( CurrentLobby?.LobbyId, CurrentLobby?.InputAllows, IsSearching,
-        FetchedLobbies.Count, ShowFakeLobbies, LobbyInputRules.Preference, Input.UsingController, GameText.Current );
+        FetchedLobbies.Count, ShowFakeLobbies, LobbyInputRules.Preference, Input.UsingController, (GameText.Current, SearchFailed) );
 
     public void Refresh()
     {

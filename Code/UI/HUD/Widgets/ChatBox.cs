@@ -4,6 +4,11 @@ public class ChatBox : TextEntry
 {
 	public Action OnTabPressed { get; set; }
 
+	public ChatBox()
+	{
+		HistoryMaxItems = 20;
+	}
+
 	public override void OnButtonTyped(ButtonEvent e)
 	{
 		e.StopPropagation = true;

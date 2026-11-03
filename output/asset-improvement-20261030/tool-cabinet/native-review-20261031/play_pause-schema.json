@@ -1,0 +1,33 @@
+{
+  "name": "play_pause",
+  "title": "Play Pause",
+  "toolset": "play",
+  "description": "Pause or resume the running game.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "paused": {
+        "type": "boolean",
+        "description": "True to pause, false to resume.",
+        "default": true
+      }
+    },
+    "required": []
+  },
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "IsPlaying": {
+        "type": "boolean"
+      },
+      "IsPaused": {
+        "type": "boolean"
+      },
+      "Scene": {
+        "type": "string",
+        "description": "The scene being played. Null when not playing."
+      }
+    },
+    "required": []
+  }
+}

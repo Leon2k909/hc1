@@ -150,7 +150,7 @@
 
     /// <summary> People, not lives: a bot that died five times is one bot. </summary>
     static int CountPeople( TheaterReplays.Info info, bool bots ) =>
-        info.Soldiers?.Where( x => x.Bot == bots ).Select( x => x.Name ).Distinct().Count() ?? 0;
+        info.Soldiers?.Where( x => x.Bot == bots ).Select( TheaterReplays.IdentityOf ).Distinct().Count() ?? 0;
 
     protected override int BuildHash() => HashCode.Combine( Replays.Count, SelectedId, MatchRecorder.RecordingOff );
 }

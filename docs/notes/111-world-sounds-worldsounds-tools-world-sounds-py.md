@@ -76,6 +76,12 @@
     `PlayerPawn.BloodImpactSound` (now `bullet_flesh`) plays it on every machine; before, a hit played both. That no
     longer plays for fall damage.
   - `PlayerFootsteps` plays the run while sprinting. Someone else's steps are now occluded: s&box's weren't.
+    Grounded movement update (2026-11-03): steps require a living, grounded player moving horizontally above the
+    existing threshold. Noclip, frozen, mantle, pipe climb, slide, prone, fall knockdown and drone control don't emit
+    walking steps. Local players use their controller; remote players use `SyncedIsGrounded` and `SyncedVelocity`,
+    matching animation replication. Quiet crouch/slow-walk timing, sprint cadence, alternating feet, occlusion and the
+    Ninja volume reduction remain intact. All 29 offline movement-audio checks passed; no editor was used and live
+    listening is pending.
   - `PlayerPawn.PlayFallSound` traces the floor and plays its landing (`LandSound` is the fallback). It's louder the
     faster you land: volume times speed / 300, from 0.6 to 2 (a jump lands at ~280 u/s).
   - Every `"ui.button.press"` / `"ui.button.over"` (Sound.Play and scss `sound-in`) is now `"ui_button_press"` /

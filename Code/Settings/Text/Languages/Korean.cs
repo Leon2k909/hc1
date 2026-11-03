@@ -1417,6 +1417,9 @@ public static partial class GameText
 		["Red"] = "빨강",
 		["Green"] = "초록",
 		["Blue"] = "파랑",
+		["Hue"] = "색조",
+		["Saturation"] = "채도",
+		["Brightness"] = "밝기",
 		// Custom game rules (CreateLobbyPage)
 		["RULES"] = "규칙",
 		["BOT DIFFICULTY"] = "봇 난이도",

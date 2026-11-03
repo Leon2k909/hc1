@@ -1,0 +1,377 @@
+{
+  "tools": [
+    {
+      "name": "create_health_system",
+      "title": "Create Health System",
+      "toolset": "bridge_scaffold_gameplay",
+      "description": "Generate a Health component: MaxHealth, [Sync] CurrentHealth, TakeDamage/Heal, an OnDeath event, optional regen and respawn. Host-authoritative damage when networked, single-player safe. Optionally attached to an existing GameObject by GUID.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class name. Defaults to 'Health'."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory for the .cs file. Defaults to 'Code'."
+          },
+          "maxHealth": {
+            "type": "number",
+            "description": "Starting/maximum health. Defaults to 100."
+          },
+          "regen": {
+            "type": "boolean",
+            "description": "Include passive health regeneration after a delay. Defaults to false."
+          },
+          "respawn": {
+            "type": "boolean",
+            "description": "On death, respawn at a RespawnPoint (wire it with set_component_reference) instead of disabling. Defaults to false."
+          },
+          "targetId": {
+            "type": "string",
+            "description": "GUID of an existing GameObject to attach the Health component to (only attaches if the type is already loaded — hotload first)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_killcam",
+      "title": "Create Killcam",
+      "toolset": "bridge_moviemaker",
+      "description": "Generate a sealed killcam Component: a rolling-buffer MovieRecorder keeps ONLY the last MaxBufferSeconds of a target's gameplay (BufferDuration verified live: the compiled clip's Duration equals the buffer, re-based to 0), and TriggerReplay() plays that history back through a MoviePlayer while the main camera chase-follows the target (Scene.Camera takeover in OnPreRender, restored exactly afterwards; static OnReplayFinished event + IsReplaying flag). Sandbox-safe: live-verified that GAME code can construct and drive MovieRecorder/MoviePlayer at runtime, and killcams/replays are the official recording-api use case — this is the real MovieMaker path, not a transform-history approximation. The replay REWINDS THE LIVE TARGET through its recorded past (classic killcam — the target is dead/inactive when it runs; disable a still-alive controller for the duration). wholeScene:true makes the generated component default to MovieRecorderOptions.Default (all renderers/cameras/sound points/particles — the replay rewinds everything, killer included; heavy in dense scenes), and it stays toggleable per-instance via the RecordWholeScene property. Returns { created, path, className, bufferSeconds, sampleRate, cameraDistance, cameraHeight, nextSteps }. Then: trigger_hotload → attach to a MANAGER object → set_component_reference Target to the player → arm via WatchOnStart or StartWatching() from spawn code → call TriggerReplay() from death code (pairs with create_health_system). LOCAL/visual-only — wrap in an [Rpc.Broadcast] for all clients. Refuses if the file already exists.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Component class/file name (default \"Killcam\")."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Project folder for the .cs file (default \"Code\")."
+          },
+          "bufferSeconds": {
+            "type": "number",
+            "description": "Rolling-buffer length in seconds — the replay shows at most this much history (default 10, clamped 2-120)."
+          },
+          "sampleRate": {
+            "type": "integer",
+            "description": "Recorder samples per second (default 30, clamped 1-120)."
+          },
+          "cameraDistance": {
+            "type": "number",
+            "description": "Replay chase-camera distance behind the target (default 150, clamped 10-2000)."
+          },
+          "cameraHeight": {
+            "type": "number",
+            "description": "Replay chase-camera height above the target (default 60, clamped 0-2000)."
+          },
+          "wholeScene": {
+            "type": "boolean",
+            "description": "Generated default for RecordWholeScene: true = buffer the WHOLE scene via MovieRecorderOptions.Default (replay rewinds everything; heavy in dense scenes), false = only the Target hierarchy (default)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "find_broken_references",
+      "title": "Find Broken References",
+      "toolset": "bridge_validation",
+      "description": "Scan the project for broken references, two layers in one call: (1) every GameObject in the open scene — renderers with no Model (missing_model), component properties pointing at DESTROYED GameObjects/Components (dead_gameobject_ref / dead_component_ref), null component entries whose type no longer exists (missing_component); (2) every .scene/.prefab FILE — prefab references to deleted/renamed files (missing_prefab_file). Returns { total, showing, truncated, objectsScanned, filesScanned, issues } — each issue has { id, name, component, kind, detail } (file-level issues carry the file path in name). Fix missing models with assign_model, dead refs with set_property/set_component_reference, missing prefab files by fixing the path or recreating via create_prefab. Read-only; safe any time. Results cap at `limit` (default 100, max 500).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "Max issues to return (default 100, max 500). total still counts everything."
+          },
+          "scanFiles": {
+            "type": "boolean",
+            "description": "Include the .scene/.prefab file scan for missing prefab references. Default true."
+          }
+        },
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "hammer_set_components",
+      "title": "Set Components",
+      "toolset": "hammer",
+      "description": "Edit a map game object's components - add components, set their properties, remove them. Properties take the serialized forms hammer_get_node shows with includeComponentProperties. Everything validates before anything changes. Hammer can't undo component edits yet, so read the current values first if you might need to put them back.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The game object's node id, from hammer_find_nodes kind:GameObject."
+          },
+          "components": {
+            "type": "object",
+            "description": "A json object of component type to properties, e.g. {\"PointLight\": {\"Radius\": 512}}. A type the object doesn't have yet gets added."
+          },
+          "remove": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Component type names to remove."
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "Angles": {
+            "type": "string"
+          },
+          "Scale": {
+            "type": "string"
+          },
+          "ChildCount": {
+            "type": "integer"
+          },
+          "Children": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "Id": {
+                  "type": "integer"
+                },
+                "Kind": {
+                  "type": "string"
+                },
+                "Name": {
+                  "type": "string"
+                },
+                "ClassName": {
+                  "type": "string"
+                },
+                "Description": {
+                  "type": "string"
+                },
+                "Position": {
+                  "type": "string"
+                },
+                "Parent": {
+                  "type": "integer"
+                },
+                "GameObject": {
+                  "type": "string"
+                },
+                "Selected": {
+                  "type": "boolean"
+                },
+                "Visible": {
+                  "type": "boolean"
+                }
+              },
+              "required": []
+            }
+          },
+          "EntityClassTitle": {
+            "type": "string"
+          },
+          "KeyValues": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "Materials": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "Components": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "Type": {
+                  "type": "string"
+                },
+                "Id": {
+                  "type": "string"
+                },
+                "Enabled": {
+                  "type": "boolean"
+                },
+                "Properties": {}
+              },
+              "required": []
+            }
+          },
+          "Tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "InstanceTarget": {
+            "type": "integer"
+          },
+          "Id": {
+            "type": "integer"
+          },
+          "Kind": {
+            "type": "string"
+          },
+          "Name": {
+            "type": "string"
+          },
+          "ClassName": {
+            "type": "string"
+          },
+          "Description": {
+            "type": "string"
+          },
+          "Position": {
+            "type": "string"
+          },
+          "Parent": {
+            "type": "integer"
+          },
+          "GameObject": {
+            "type": "string"
+          },
+          "Selected": {
+            "type": "boolean"
+          },
+          "Visible": {
+            "type": "boolean"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "set_component",
+      "title": "Set Component",
+      "toolset": "scene",
+      "description": "Set properties on a component. Give the component's id, or its game object's id plus a type name. Values use the same serialized forms get_game_object shows - strings, numbers, 'x,y,z' vectors, colors as 'r,g,b,a', asset paths as strings. Everything validates before anything applies, and the user can undo it.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The component's id, or its game object's id."
+          },
+          "properties": {
+            "type": "object",
+            "description": "A json object of property name to new value."
+          },
+          "type": {
+            "type": "string",
+            "description": "The component type to change, when id is a game object."
+          }
+        },
+        "required": [
+          "id",
+          "properties"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "Id": {
+            "type": "string"
+          },
+          "Type": {
+            "type": "string"
+          },
+          "Applied": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "set_component_reference",
+      "title": "Set Component Reference",
+      "toolset": "bridge_component",
+      "description": "Wire a component's GameObject/Component-typed property to ANOTHER live object in the scene by GUID (e.g. ObjectiveManager.Player = the player, a camera's follow target, a door's hinge). Preferred for object/component refs (can pick a specific component type off the target via targetComponent, and validates). set_property also accepts a GUID for ref props; set_prefab_ref is for prefab assets. Set clear:true to null the reference.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of the GameObject that HOLDS the component you're writing into."
+          },
+          "component": {
+            "type": "string",
+            "description": "Component type name on that object (e.g. 'ObjectiveManager', 'CameraComponent')."
+          },
+          "property": {
+            "type": "string",
+            "description": "The property to set (must be a GameObject- or Component-typed property)."
+          },
+          "targetId": {
+            "type": "string",
+            "description": "GUID of the GameObject to reference. Required unless clear:true."
+          },
+          "targetComponent": {
+            "type": "string",
+            "description": "If the property is a Component subtype, the specific component type to pull off the target object. Omit to auto-match by the property's type."
+          },
+          "clear": {
+            "type": "boolean",
+            "description": "If true, set the reference to null instead of assigning a target."
+          }
+        },
+        "required": [
+          "id",
+          "component",
+          "property"
+        ]
+      }
+    },
+    {
+      "name": "set_property",
+      "title": "Set Property",
+      "toolset": "bridge_component",
+      "description": "Set a property value on a component (editor mode), and PERSIST it (survives save+reload). Handles primitives, enums, value types (Color/Vector3 as comma strings), AND references: pass an asset PATH for Model/Material/Texture/SoundEvent props, or a GameObject GUID for GameObject/Component-typed props (resolved like set_component_reference). Returns success=false with a clear error if a path/GUID can't be resolved (no more silent null). For wiring object refs prefer set_component_reference; for prefab refs use set_prefab_ref.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of the GameObject."
+          },
+          "component": {
+            "type": "string",
+            "description": "Component type name."
+          },
+          "property": {
+            "type": "string",
+            "description": "Property name to set."
+          },
+          "value": {
+            "description": "New value. Primitive: '5', 'true'. Color/Vector3: a comma string ('1,0,0,1' / '0,0,200'), an array ([0,0,200]), or an object ({r,g,b,a} / {x,y,z}). Enum: the member name. Asset ref (Model/Material/...): the asset path e.g. 'models/dev/box.vmdl'. GameObject/Component ref: the target GameObject's GUID. Empty/'null' clears the property. JSON value."
+          }
+        },
+        "required": [
+          "id",
+          "component",
+          "property",
+          "value"
+        ]
+      }
+    }
+  ],
+  "total": 402
+}

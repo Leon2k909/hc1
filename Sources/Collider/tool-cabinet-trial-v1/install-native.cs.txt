@@ -1,0 +1,31 @@
+var root=Sandbox.Project.Current.GetRootPath();
+if(!System.IO.Path.GetFullPath(root).TrimEnd('\\','/').Equals(@"C:\sbox-projects\hc1\forked-shooter-main",StringComparison.OrdinalIgnoreCase))throw new InvalidOperationException("Wrong project");
+if(Editor.SceneEditorSession.All.Any(s=>s.Scene.Name=="collider"))throw new InvalidOperationException("Collider document must be closed for packed model replacement");
+var folder=System.IO.Path.Combine(root,"output/collider-tool-cabinet-accepted-20261031");
+var plan=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"plan.json")));
+string Hash(string path)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+foreach(var item in plan["files"].AsArray())
+{
+    var path=System.IO.Path.Combine(root,item["path"].GetValue<string>());
+    if(Hash(path)!=item["before"].GetValue<string>())throw new InvalidOperationException("Source changed: "+path);
+    if(Hash(System.IO.Path.Combine(root,item["stage"].GetValue<string>()))!=item["after"].GetValue<string>())throw new InvalidOperationException("Stage changed");
+}
+var completed=new System.Collections.Generic.List<string>();
+try
+{
+    foreach(var item in plan["files"].AsArray())
+    {
+        var relative=item["path"].GetValue<string>();var path=System.IO.Path.Combine(root,relative);
+        System.IO.File.WriteAllBytes(path,System.IO.File.ReadAllBytes(System.IO.Path.Combine(root,item["stage"].GetValue<string>())));
+        completed.Add(relative);
+        if(Hash(path)!=item["after"].GetValue<string>())throw new InvalidOperationException("Write verification failed");
+    }
+}
+catch
+{
+    foreach(var relative in completed)System.IO.File.WriteAllBytes(System.IO.Path.Combine(root,relative),System.IO.File.ReadAllBytes(System.IO.Path.Combine(folder,"before",relative)));
+    throw;
+}
+var result=new {Installed=true,Files=completed,SceneFileChanged=false,Playing=Game.IsPlaying,RuntimeScene=Game.ActiveScene?.Name};
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"native-write.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

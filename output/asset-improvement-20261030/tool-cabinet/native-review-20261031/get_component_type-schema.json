@@ -1,0 +1,21 @@
+{
+  "name": "get_component_type",
+  "title": "Get Component Type",
+  "toolset": "component",
+  "description": "Documentation for a component type by name - its class name, display title, description, group, and every inspector property with title, description, type and read-only state. Matches exact names first, then substrings; multiple substring matches come back as a candidate list.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "description": "The component's type name, e.g. 'ModelRenderer'. Case insensitive, substrings work."
+      }
+    },
+    "required": [
+      "name"
+    ]
+  },
+  "annotations": {
+    "readOnlyHint": true
+  }
+}

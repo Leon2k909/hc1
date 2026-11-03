@@ -80,34 +80,35 @@ public sealed class SpectateSystem : SingletonComponent<SpectateSystem>
 
 	private void SpectateNextPlayer( bool direction )
 	{
-		var players = Scene.GetAllComponents<Client>();
-		
-		var idxCur = 0;
-		for ( var i = 0; i < players.Count(); i++ )
-		{
-			if ( players.ElementAt( i ).IsViewer )
-				idxCur = i;
-		}
+		var players = Scene.GetAllComponents<Client>()
+			.Where( client => client.IsValid() && client.IsConnected )
+			.ToList();
 
-		var count = players.Count();
+		// Freecam's Viewer may still be the local client. It isn't a followed player;
+		// start at the first/last candidate rather than skipping a fabricated current index.
+		var idxCur = IsFreecam ? -1 : players.FindIndex( client => client.IsViewer );
+
+		var count = players.Count;
 		for ( var i = 1; i <= count; i++ )
 		{
-			var idx = (idxCur + (direction ? i : -i) + count) % count;
-			var Client = players.ElementAt( idx );
+			var idx = idxCur >= 0
+				? (idxCur + (direction ? i : -i) + count) % count
+				: direction ? i - 1 : count - i;
+			var client = players[idx];
 
-			var controller = Client.PlayerPawn;
+			var controller = client.PlayerPawn;
 
-			if ( !controller.IsValid() )
+			if ( !controller.IsValid() || !controller.HealthComponent.IsValid() )
 				continue;
 
 			if ( controller.HealthComponent.State != LifeState.Alive )
 				continue;
 
 			// Already spectating this guy, no need to reposess (and reset the viewmodel etc)
-			if ( idx == idxCur )
+			if ( controller.IsPossessed )
 				return;
 
-			Client.Possess();
+			client.Possess();
 			return;
 		}
 

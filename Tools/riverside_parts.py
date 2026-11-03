@@ -29,6 +29,8 @@ SPOTLIGHTS = []         # ( name, position, target, "r,g,b,1", radius, angle )
 BURN_DRUMS = []         # ( name, position, variant, yaw ): burn_drum_v2 models the scene places
 COOLERS = []            # ( position, yaw ): cooler_v2 models the scene places
 TEDDIES = []            # ( position, yaw ): teddy_v2 models the scene places
+PROPANE = []            # [ owner, position, yaw, size ]: propane_v2 cylinders the scene places, in owner's frame until carry() moves them into a zone model
+LAWN_CHAIRS = []        # [ owner, position, yaw, colour ]: lawn_chair_v2 instances, carried into the zone's frame
 
 WARM = "1.00,0.72,0.42,1"
 PORCH = "1.00,0.78,0.50,1"
@@ -45,7 +47,9 @@ def reset():
     SPOTLIGHTS.clear()
     BURN_DRUMS.clear()
     COOLERS.clear()
+    PROPANE.clear()
     TEDDIES.clear()
+    LAWN_CHAIRS.clear()
 
 
 def light( name, pos, colour, radius, shadows=False, scale=1.0 ):
@@ -611,24 +615,30 @@ def right_for( f ):
 
 
 def lawn_chair( m, c, facing=( 0, 1 ), z0=0.0, paint_name="rs_lawn_chair", tipped=False ):
-    f = unit( ( facing[0], facing[1], 0 ) )
-    side = np.cross( UP, f )
-    base = v( c[0], c[1], z0 )
-    for sx in ( -1, 1 ):
-        rod( m, base + side * 10 * sx - f * 8, base + side * 10 * sx + f * 8 + UP * 16, 0.5, "rs_alu", 5 )
-        rod( m, base + side * 10 * sx + f * 8, base + side * 10 * sx - f * 6 + UP * 14, 0.5, "rs_alu", 5 )
-        rod( m, base + side * 10 * sx - f * 6 + UP * 14, base + side * 10 * sx - f * 12 + UP * 34, 0.5, "rs_alu", 5 )
-    card( m, paint_name, [ base - side * 10 - f * 6 + UP * 14, base + side * 10 - f * 6 + UP * 14, base + side * 10 + f * 8 + UP * 15,
-                           base - side * 10 + f * 8 + UP * 15 ], UP, both=True )
-    card( m, paint_name, [ base - side * 10 - f * 6 + UP * 14, base + side * 10 - f * 6 + UP * 14, base + side * 10 - f * 12 + UP * 34,
-                           base - side * 10 - f * 12 + UP * 34 ], f, both=True )
+    """ Record the reworked chair model; these decorative chairs have no collision. """
+    LAWN_CHAIRS.append( [ m, ( float( c[0] ), float( c[1] ), float( z0 ) ),
+                         math.degrees( math.atan2( facing[1], facing[0] ) ),
+                         "red" if paint_name == "rs_drum_red" else "green" ] )
 
 
-def propane( m, c, z0=0.0 ):
-    """ A 100 lb propane cylinder: 15 in across, 48 tall, its collar and valve. """
-    cylinder( m, c, 7.5, z0, z0 + 40, "rs_propane", 12, surface=METAL )
-    lathe( m, v( c[0], c[1], 0 ), [ ( 7.5, z0 + 40 ), ( 6.2, z0 + 44 ), ( 3.0, z0 + 46 ) ], "rs_propane", 12, cap="rs_propane" )
-    cylinder( m, c, 4.2, z0 + 44, z0 + 50, "rs_steel", 10 )
+def propane( m, c, z0=0.0, size="100" ):
+    """ A propane cylinder standing at c: its model (Sources/Riverside/propane-v2/, propane_100 or propane_20) placed by the scene, each turned its own way.
+    A 100 lb one keeps the old one's collision here, a 15 x 40 in hull; a 20 lb one never had any. """
+    if size == "100":
+        dirs = [ v( math.cos( 2 * math.pi * k / 12 ), math.sin( 2 * math.pi * k / 12 ), 0.0 ) for k in range( 12 ) ]
+        m.hull( [ v( c[0], c[1], 0.0 ) + d * 7.5 + UP * z for d in dirs for z in ( z0, z0 + 40 ) ], METAL )
+    PROPANE.append( [ m, ( float( c[0] ), float( c[1] ), float( z0 ) ), ( len( PROPANE ) * 137.5 ) % 360.0, size ] )
+
+
+def carry( dst, part, origin, yaw ):
+    """ Moves the model instances in part into dst's frame, as place() does its geometry. """
+    c, s = math.cos( math.radians( yaw ) ), math.sin( math.radians( yaw ) )
+    for item in PROPANE + LAWN_CHAIRS:
+        if item[0] is part:
+            x, y, z = item[1]
+            item[0] = dst
+            item[1] = ( origin[0] + c * x - s * y, origin[1] + s * x + c * y, origin[2] + z )
+            item[2] = ( item[2] + yaw ) % 360.0
 
 
 def puddle( m, c, size, seed=0, z=0.25, paint_name="rs_water" ):
@@ -800,9 +810,9 @@ def rv( seed=5 ):
     for sy in ( -1, 1 ):
         m.beam( v( hx - 6, sy * 26, 16 ), v( hx + 40, 0, 14 ), ( 3, 4 ), "rs_rust" )
     cylinder( m, ( hx + 38, 0 ), 1.6, 0, 16, "rs_rust", 6 )
-    # A propane pair on the tongue.
+    # A propane pair on the tongue: 20 lb cylinders.
     for sy in ( -1, 1 ):
-        cylinder( m, ( hx + 12, sy * 9 ), 6, 18, 36, "rs_propane", 10, top="rs_propane" )
+        propane( m, ( hx + 12, sy * 9 ), 18.0, size="20" )
     m.collision_box( v( -hx, -hy, 0 ), v( hx, hy, T ), SHEET )
     return m
 

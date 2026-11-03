@@ -113,10 +113,6 @@ public partial class PlayerPingComponent : Component
 		if ( Player.IsPilotingDrone )
 			return false;
 
-		var tr = GetTrace();
-		if ( !tr.Hit )
-			return false;
-
 		return Player.HealthComponent.State == LifeState.Alive;
 	}
 
@@ -144,7 +140,9 @@ public partial class PlayerPingComponent : Component
 			if ( WorldPing.IsValid() )
 			{
 				var camera = Player.CameraController.Camera;
-				Vector3 dir = (WorldPing.WorldPosition - camera.WorldPosition).Normal;
+				// Use the marker's displayed position, including moving receivers and
+				// its world-space height offset. Clearing it does not need a surface hit.
+				Vector3 dir = (((IMarkerObject)WorldPing).MarkerPosition - camera.WorldPosition).Normal;
 				float dot = Vector3.Dot( dir, camera.WorldRotation.Forward );
 
 				// Are we looking at this marker?

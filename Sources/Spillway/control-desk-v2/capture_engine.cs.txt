@@ -1,6 +1,6 @@
-// The old and new control desks side by side, drawn by s&box: run with sbox-cli --call run_csharp through capture.py.
+// The installed control desks, drawn by s&box: run with sbox-cli --call run_csharp through capture.py.
 // Loads Spillway's visual roots into an isolated editor scene, so the open scene and play state are never touched and nothing is saved.
-// The new desk stands in the gap between two old ones on the control room's back wall, under the same light.
+// Also fires rays at one desk's collision. The room's light is the map's own.
 var projectRoot = Sandbox.Project.Current.GetRootPath();
 var destination = System.IO.Path.Combine(projectRoot, "%OUT%");
 System.IO.Directory.CreateDirectory(destination);
@@ -21,6 +21,7 @@ try
     var model = Model.Load("models/props/spillway/control_desk_v2/control_desk.vmdl");
     if (model is null || model.IsError) throw new InvalidOperationException("The desk hasn't compiled.");
     CameraComponent camera;
+    var lodProperty = typeof(ModelRenderer).GetProperty("LodOverride");
     using (scene.Push())
     {
         scene.Deserialize(root);
@@ -30,13 +31,6 @@ try
             tonemap.AutoExposureEnabled = true;
             tonemap.MinimumExposure = tonemap.MaximumExposure = hold;
             tonemap.Rate = 10;
-        }
-        foreach (var place in new[] { %PLACES% })
-        {
-            var go = new GameObject(true, "New desk");
-            go.WorldPosition = place;
-            go.WorldRotation = Rotation.FromYaw(180);
-            go.Components.Create<ModelRenderer>().Model = model;
         }
         var holder = new GameObject(false, "Capture camera");
         camera = holder.Components.Create<CameraComponent>();
@@ -60,6 +54,21 @@ try
         using (scene.Push()) { scene.EditorTick(.016f, .016f); preRender.Invoke(scene, null); }
         await Task.Delay(33, cancellationToken);
     }
+    var desks = scene.GetAllComponents<ModelRenderer>().Where(r => r.Model?.ResourcePath == model.ResourcePath).ToArray();
+    if (desks.Length != 4) throw new InvalidOperationException($"{desks.Length} desks in the scene, expected 4.");
+    // Along +X into the desk at plan e 60. The operator's side is at world x 1240, the board's lower box at 1276, its upper box and the screens at about 1292.
+    var rays = new System.Collections.Generic.List<string>();
+    using (scene.Push())
+    {
+        foreach (var (name, height, expected) in new[] { ("pedestal", 20f, "x 1240"), ("worktop's edge", 30f, "x 1240"), ("lower board", 36f, "x 1276"), ("upper board", 50f, "x 1292.6"), ("screen", 70f, "x 1293"), ("over the screens", 90f, "the wall, x 1330") })
+        {
+            var hit = scene.Trace.Ray(new Vector3(1100, -60, 236 + height), new Vector3(1400, -60, 236 + height)).Run();
+            rays.Add($"{name}, {height} up: {(hit.Hit ? $"x {hit.EndPosition.x:0.0}, {hit.Surface?.ResourceName}" : "miss")} (expected {expected})");
+        }
+        // The old box's top was 34: the worktop is lower now.
+        var down = scene.Trace.Ray(new Vector3(1250, -60, 236 + 60), new Vector3(1250, -60, 236)).Run();
+        rays.Add($"down on the worktop: {(down.Hit ? $"z {down.EndPosition.z - 236:0.0} above the floor" : "miss")} (expected 31.7)");
+    }
     var shots = new (string name, Vector3 eye, Vector3 target, float fov)[] { %SHOTS% };
     foreach (var shot in shots)
     {
@@ -73,6 +82,7 @@ try
                 camera.WorldPosition = shot.eye;
                 camera.WorldRotation = Rotation.LookAt(shot.target - shot.eye);
                 camera.FieldOfView = shot.fov;
+                foreach (var desk in desks) lodProperty.SetValue(desk, shot.name.EndsWith("_lod1") ? 1 : shot.name.EndsWith("_lod2") ? 2 : -1);
                 scene.EditorTick(.016f, .016f);
                 preRender.Invoke(scene, null);
                 preCameraRender.Invoke(scene, null);
@@ -82,7 +92,7 @@ try
         }
         System.IO.File.WriteAllBytes(System.IO.Path.Combine(destination, shot.name + ".png"), bitmap.ToPng());
     }
-    return new { Written = shots.Length, Materials = model.Materials.Select(m => m.ResourcePath + " " + (m.GetTexture("g_tColor")?.Width ?? 0) + "x" + (m.GetTexture("g_tColor")?.Height ?? 0)).ToArray(), Bounds = model.Bounds.ToString() };
+    return new { Desks = desks.Length, Rays = rays, OldDesksCut = true, Written = shots.Length, Materials = model.Materials.Select(m => m.ResourcePath + " " + (m.GetTexture("g_tColor")?.Width ?? 0) + "x" + (m.GetTexture("g_tColor")?.Height ?? 0)).ToArray(), Bounds = model.Bounds.ToString() };
 }
 catch (Exception error)
 {

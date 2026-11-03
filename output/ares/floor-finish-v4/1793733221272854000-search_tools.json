@@ -1,0 +1,409 @@
+{
+  "tools": [
+    {
+      "name": "camera_screenshot",
+      "title": "Camera Screenshot",
+      "toolset": "scene",
+      "description": "Render a camera in the scene and return it as an image. Give any CameraComponent's id or its game object's id, or nothing for the scene's main camera. Works in edit and play mode - editor_camera_screenshot shows the editor viewport instead.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "camera": {
+            "type": "string",
+            "description": "A CameraComponent id or its game object's id. Empty uses the scene's main camera."
+          },
+          "width": {
+            "type": "integer",
+            "description": "Image width in pixels.",
+            "minimum": 16,
+            "maximum": 4096,
+            "default": 1280
+          },
+          "height": {
+            "type": "integer",
+            "description": "Image height in pixels.",
+            "minimum": 16,
+            "maximum": 4096,
+            "default": 720
+          },
+          "includeUi": {
+            "type": "boolean",
+            "description": "Include any UI the camera renders.",
+            "default": true
+          }
+        },
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "capture_view",
+      "title": "Capture View",
+      "toolset": "bridge_screenshot",
+      "description": "Screenshot the scene from a chosen viewpoint and return it as an inline PNG image. Pass id to auto-frame a GameObject (3/4 elevated view sized to its bounds), or position (+ lookAt or rotation) for a free camera. With neither, captures the main camera view. Uses a temporary camera that is removed afterwards — the scene is left unchanged. KNOWN CAPTURE LIMITS (engine, not bridge): text in ScreenPanel/Razor labels may rasterise as solid boxes (the font atlas is not resolved for the capture pass — images and layout are correct, so a blank HUD here is NOT a HUD bug; verify text another way), and Terrain renders as a truncated ribbon from any temporary camera because its clipmap centres on the editor/main camera — verify terrain scenes with take_screenshot or in play mode.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of a GameObject to auto-frame (from get_scene_hierarchy or find_objects)."
+          },
+          "position": {
+            "type": "string",
+            "description": "Camera position as \"x,y,z\"."
+          },
+          "lookAt": {
+            "type": "string",
+            "description": "Point to aim the camera at, as \"x,y,z\"."
+          },
+          "rotation": {
+            "type": "string",
+            "description": "Camera rotation as \"pitch,yaw,roll\" degrees (alternative to lookAt)."
+          },
+          "fov": {
+            "type": "number",
+            "description": "Field of view in degrees. Default is the camera's default."
+          },
+          "width": {
+            "type": "integer",
+            "description": "Image width in pixels (16-3840). Default 1280.",
+            "default": 1280
+          },
+          "height": {
+            "type": "integer",
+            "description": "Image height in pixels (16-2160). Default 720.",
+            "default": 720
+          },
+          "renderUI": {
+            "type": "boolean",
+            "description": "Include screen-space UI in the capture. Default true.",
+            "default": true
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_camera_effects",
+      "title": "Create Camera Effects",
+      "toolset": "bridge_scaffold_polish",
+      "description": "Generate static conveniences over the SDK's BUILT-IN camera effects — CameraComponent.AddShake(amplitude, frequency, duration), AddPunch(Vector3 direction, amplitude, frequency, duration, fovAmplitude), AddPunch(Angles, ...) and AddTilt(Angles, duration, easeTime), all fire-and-forget, self-expiring, whitelist-verified in sandboxed game code 2026-07-13: a sealed Component exposing {name}.Shake/ShakeAt/Punch/PunchAngles/Tilt statics that resolve the main camera (Scene.Camera, else IsMainCamera search, else first camera; warn + return null when the scene has none) and return the live Sandbox.CameraEffectSystem.BaseEffect (Stop()/IsDone; ShakeAt sets Epicenter+Radius for distance falloff), plus one-word preset triggers — HitPunch() / ExplosionShake() / ExplosionShakeAt(position, radius) / LandingTilt() — driven by [Property] tunables. Statics work with NO instance placed; place the component only to tune presets in the inspector. RELATIONSHIP: create_camera_shake is the CONTINUOUS trauma model (AddTrauma accumulates and decays); these built-ins are ONE-SHOT engine effects — they compose safely, but don't fire both for the same event or hits feel doubled. Returns {created, path, className, staticApi[], presetTriggers[], propertyNames[], note}. Next: trigger_hotload + get_compile_errors, call the statics from game code (e.g. {name}.Shake(4, 25, 0.8) on explosion) or attach via targetId and trigger presets. Limits & honesty: compile + camera resolution verified; the editor cannot judge FEEL — tune amplitudes in a human playtest; effects are LOCAL visuals (wrap in [Rpc.Broadcast] for everyone). Refused during play mode; refuses to overwrite an existing file.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class/file name. Defaults to 'CameraFx'. Sanitized to a valid C# identifier."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory under the project root for the .cs file. Defaults to 'Code'."
+          },
+          "hitPunchDirection": {
+            "type": "string",
+            "description": "HitPunch preset: punch direction. Defaults to Vector3.Backward (camera kicks back). As \"x,y,z\" (or JSON {x,y,z})."
+          },
+          "hitPunchAmplitude": {
+            "type": "number",
+            "description": "HitPunch preset: positional kick strength. Defaults to 8."
+          },
+          "hitPunchFrequency": {
+            "type": "number",
+            "description": "HitPunch preset: oscillation frequency. Defaults to 20."
+          },
+          "hitPunchDuration": {
+            "type": "number",
+            "description": "HitPunch preset: seconds. Defaults to 0.25."
+          },
+          "hitPunchFovAmplitude": {
+            "type": "number",
+            "description": "HitPunch preset: FOV kick amount (0 = none). Defaults to 3."
+          },
+          "explosionShakeAmplitude": {
+            "type": "number",
+            "description": "ExplosionShake preset: shake strength. Defaults to 5."
+          },
+          "explosionShakeFrequency": {
+            "type": "number",
+            "description": "ExplosionShake preset: oscillation frequency. Defaults to 25."
+          },
+          "explosionShakeDuration": {
+            "type": "number",
+            "description": "ExplosionShake preset: seconds. Defaults to 0.8."
+          },
+          "landingTiltAngles": {
+            "type": "string",
+            "description": "LandingTilt preset as {x: pitch, y: yaw, z: roll} degrees (or 'p,y,r'). Defaults to 5 pitch / 0 yaw / 2 roll. As \"x,y,z\" (or JSON {x,y,z})."
+          },
+          "landingTiltDuration": {
+            "type": "number",
+            "description": "LandingTilt preset: seconds the tilt lasts. Defaults to 0.35."
+          },
+          "landingTiltEase": {
+            "type": "number",
+            "description": "LandingTilt preset: ease-in/out time within the duration. Defaults to 0.15."
+          },
+          "targetId": {
+            "type": "string",
+            "description": "GUID of a GameObject to attach the component to — only needed to tune presets in the inspector; the statics work with no instance (only attaches if the type is already in the TypeLibrary — hotload first)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_cutscene_director",
+      "title": "Create Cutscene Director",
+      "toolset": "bridge_scaffold_polish",
+      "description": "Generate a hand-authored cutscene player component that needs NO .movie asset — the zero-asset alternative to the MovieMaker family (add_movie_player/play_movie, which play keyframed .movie clips authored in the editor's Movie Maker dock). You author the shots directly in the inspector as parallel lists: ShotPositions (Vector3), ShotAngles (pitch/yaw/roll — Angles, not raw quaternions), ShotHoldSeconds, ShotBlendSeconds, and an optional per-shot ShotLookAt GameObject (aim at a target instead of using ShotAngles). At runtime it takes over the main camera (Scene.Camera) in OnPreRender ONLY while playing — smoothstep-eased Vector3.Lerp + Rotation.Slerp between shots — captures the camera's prior transform and restores it exactly when finished (same un-apply discipline as create_camera_shake). Play from any game code via the static &lt;Name&gt;.Play() (first director) or &lt;Name&gt;.Play(\"name\") (matches CutsceneName); subscribe the static &lt;Name&gt;.OnCutsceneFinished, or gate game logic on the static &lt;Name&gt;.IsCutscenePlaying. LockInput freezes player input each frame via Input.ClearActions() while still reading the SkipAction press first so the cutscene stays skippable. Optional letterbox generates a razor_lint-safe black-bars overlay panel (host under a ScreenPanel) shown while IsCutscenePlaying. LOCAL-only (each client renders its own view) — trigger inside an [Rpc.Broadcast] for all clients. Attach to ANY GameObject; it drives the camera itself and does not need to sit on the camera. Returns { created, path, className, skipAction, lockInput, letterbox, nextSteps } — path is the generated .cs (letterbox lists the overlay files when enabled). Follow with trigger_hotload, then get_compile_errors, then attach via add_component_with_properties (component=className).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class name for the generated component. Defaults to 'CutsceneDirector'."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory for the generated files. Defaults to 'Code'."
+          },
+          "skipAction": {
+            "type": "string",
+            "description": "Input action that ends the cutscene early (read before input is cleared, so a locked cutscene is still skippable). Sanitized to a safe token. Empty = not skippable. Defaults to 'jump'."
+          },
+          "lockInput": {
+            "type": "boolean",
+            "description": "Freeze player input during playback via Input.ClearActions() each frame. Defaults to true."
+          },
+          "letterbox": {
+            "type": "boolean",
+            "description": "Also generate a razor_lint-safe letterbox overlay (two black bars, shown while IsCutscenePlaying — host it under a ScreenPanel). Defaults to false."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "drive_player",
+      "title": "Drive Player",
+      "toolset": "bridge_playtest",
+      "description": "EXPERIMENTAL — Drive the active PlayerController DURING PLAY MODE across multiple frames: synthesize sustained look (EyeAngles), analog movement (wish velocity), and/or hold a named action down long enough that Input.Pressed fires its rising edge. This is the reliable alternative to simulate_input, which only sets an action for ONE frame and so MISSES edge-triggered controls (Input.Pressed) and cannot inject analog move/look at all. Requires start_play first. Runs ASYNC across editor frames and returns immediately — the job keeps applying for `frames` (or `durationMs`) frames. After it runs, confirm with drive_player_status, then verify the actual effect with capture_view / get_runtime_property. Provide at least one of look / lookDelta / move / action.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of the GameObject holding the controller. Omit to auto-resolve the first PlayerController (or *Controller with EyeAngles/WishVelocity) in the play scene."
+          },
+          "component": {
+            "type": "string",
+            "description": "Controller component type name to target (e.g. 'PlayerController'). Omit to auto-detect."
+          },
+          "frames": {
+            "type": "integer",
+            "description": "How many editor frames to drive for (1–1800, ~60/sec). Default 30 (~0.5s). Takes precedence over durationMs."
+          },
+          "durationMs": {
+            "type": "integer",
+            "description": "Duration in ms, converted at ~60fps (ignored if `frames` is given). Default ~500ms."
+          },
+          "look": {
+            "type": "string",
+            "description": "Absolute EyeAngles target {pitch,yaw,roll} held for the whole duration (aim the camera/body). Object, [pitch,yaw,roll], or 'pitch,yaw,roll'. pitch is clamped to ±89. As \"pitch,yaw,roll\" degrees."
+          },
+          "lookDelta": {
+            "type": "string",
+            "description": "Per-frame EyeAngles delta added each frame (turn/pan over time, e.g. {yaw:2} to sweep right). Combine with `frames` to control total rotation. As \"pitch,yaw,roll\" degrees."
+          },
+          "move": {
+            "description": "Analog movement in the controller's facing frame: x = forward(+)/back(-), y = left(+)/right(-). Magnitude clamped to 1. e.g. {x:1} walks forward for the whole duration. JSON value."
+          },
+          "moveSpeed": {
+            "type": "number",
+            "description": "Units/sec used when synthesizing WishVelocity from `move` (default 160). Ignored if the controller exposes its own AnalogMove field."
+          },
+          "action": {
+            "type": "string",
+            "description": "A named input action ('jump','use','attack1',…) HELD DOWN every frame for the whole duration, so Input.Pressed catches the edge single-frame simulate_input misses. Auto-released on the final frame."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "editor_camera_screenshot",
+      "title": "Editor Camera Screenshot",
+      "toolset": "scene",
+      "description": "Render what the editor scene camera sees and return it as an image - see the scene the way the viewport does. Move the view first with set_editor_camera.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "width": {
+            "type": "integer",
+            "description": "Image width in pixels.",
+            "minimum": 16,
+            "maximum": 4096,
+            "default": 1280
+          },
+          "height": {
+            "type": "integer",
+            "description": "Image height in pixels.",
+            "minimum": 16,
+            "maximum": 4096,
+            "default": 720
+          }
+        },
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "focus_object",
+      "title": "Focus Object",
+      "toolset": "bridge_gameobject",
+      "description": "Highlight a GameObject by selecting it in the editor. NOTE: s&box exposes no dedicated focus API, so this only sets the selection — it does NOT move any camera (returns { focused, id, note } saying so). To actually point the viewport at an object use frame_camera; to aim a screenshot use screenshot_from.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of the GameObject to focus."
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "frame_camera",
+      "title": "Frame Camera",
+      "toolset": "bridge_debug",
+      "description": "Aim the s&box EDITOR viewport camera at a GameObject (by id) or a world point (position + optional radius), then call take_screenshot to capture that view. This is how Claude points its own screenshots at what it's working on — frame a spawned object, then screenshot to verify it actually looks right.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of a GameObject to frame on."
+          },
+          "position": {
+            "type": "string",
+            "description": "World point to frame on (use instead of id) — object {x,y,z} or comma string \"x,y,z\". As \"x,y,z\" (or JSON {x,y,z})."
+          },
+          "radius": {
+            "type": "number",
+            "description": "Frame radius around the position, in units (default 128)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "get_editor_camera",
+      "title": "Get Editor Camera",
+      "toolset": "scene",
+      "description": "The editor scene camera's transform - where the scene viewport is looking from. Position, angles (pitch yaw roll) and field of view.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "Position": {
+            "type": "string"
+          },
+          "Angles": {
+            "type": "string"
+          },
+          "FieldOfView": {
+            "type": "number"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "list_camera_bookmarks",
+      "title": "List Camera Bookmarks",
+      "toolset": "bridge_screenshot",
+      "description": "List all session-scoped camera bookmarks in stable name order. Returns each resolved position, rotation, optional lookAt/target, FOV, and save time. Read-only; bookmarks reset on addon hotload or editor restart. Feed names into capture_camera_set.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "save_camera_bookmark",
+      "title": "Save Camera Bookmark",
+      "toolset": "bridge_screenshot",
+      "description": "Save or replace a named camera bookmark in editor-session memory. Pass targetId to save the bridge's deterministic framed view of a GameObject, position plus lookAt/rotation for an explicit pose, or omit both to snapshot the current main camera. Returns the resolved pose. Bookmarks reset on addon hotload or editor restart; list them with list_camera_bookmarks and capture an ordered group with capture_camera_set.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Bookmark name (case-insensitive, 1-64 characters)."
+          },
+          "targetId": {
+            "type": "string",
+            "description": "GameObject GUID to resolve into a deterministic framed pose."
+          },
+          "position": {
+            "type": "string",
+            "description": "Explicit camera position as \"x,y,z\"."
+          },
+          "lookAt": {
+            "type": "string",
+            "description": "World point to aim at as \"x,y,z\"; pair with position."
+          },
+          "rotation": {
+            "type": "string",
+            "description": "Explicit camera rotation as \"pitch,yaw,roll\"; alternative to lookAt."
+          },
+          "fov": {
+            "type": "number",
+            "description": "Field of view in degrees (clamped 1-179). Defaults to 80, or the main camera FOV when snapshotting it."
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "set_editor_camera",
+      "title": "Set Editor Camera",
+      "toolset": "scene",
+      "description": "Move the editor scene camera. Give a position and/or angles - anything left empty keeps its current value. Returns the resulting transform.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "position": {
+            "type": "string",
+            "description": "World position as 'x,y,z'."
+          },
+          "angles": {
+            "type": "string",
+            "description": "View angles as 'pitch,yaw,roll'."
+          }
+        },
+        "required": []
+      }
+    }
+  ],
+  "total": 402
+}

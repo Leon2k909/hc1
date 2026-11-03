@@ -93,14 +93,20 @@ public static class RecentFriends
 	private static List<Entry> Load()
 	{
 		var entries = new List<Entry>();
+		var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 		foreach ( var part in (Game.Cookies.Get<string>( Cookie, "" ) ?? "").Split( ';', StringSplitOptions.RemoveEmptyEntries ) )
 		{
 			var bits = part.Split( ':' );
-			if ( bits.Length == 2 && ulong.TryParse( bits[0], out var id ) && long.TryParse( bits[1], out var seen ) )
-				entries.Add( new Entry( id, seen ) );
+			if ( bits.Length == 2 && ulong.TryParse( bits[0], out var id ) && id != 0
+				&& long.TryParse( bits[1], out var seen ) && seen >= 0 )
+				entries.Add( new Entry( id, Math.Min( seen, now ) ) );
 		}
 
-		return entries;
+		// Older or malformed profiles must obey the same uniqueness and size limits as new encounters.
+		return entries.GroupBy( entry => entry.SteamId )
+			.Select( group => new Entry( group.Key, group.Max( entry => entry.LastSeen ) ) )
+			.OrderByDescending( entry => entry.LastSeen )
+			.Take( MaxRemembered ).ToList();
 	}
 
 	private static void Save()

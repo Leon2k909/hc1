@@ -311,6 +311,19 @@ def build_stage():
     # Layers keep their order, so they don't fight when they land on each other.
     cap = 60.0 * np.clip(1.0 - off / 15.5, 0.0, 1.0) + ripple
     flat[:, 2] = np.where(flat[:, 2] > cap, cap + np.minimum(1.1, (flat[:, 2] - cap) * 0.06), flat[:, 2])
+    # The tucking wall can shove the sheet through something as thin as the bollard. So the cloth is pushed back out round it, as a bulge with its peak over the bollard's top.
+    (bx, by), br, _, btop = BOLLARD
+    out, across = np.array((0.55, -0.835)), np.array((0.835, 0.55))
+    rel = flat[:, :2] - np.array((bx, by))
+    along_out, sideways = rel @ out, rel @ across
+
+    def ease(a, b, x):
+        k = np.clip((x - a) / (b - a), 0.0, 1.0)
+        return k * k * (3 - 2 * k)
+
+    # Only the cloth by that corner: the far side of the pile lies in the same band, and mustn't come with it.
+    reach = ease(br + 26.0, br + 1.6, np.abs(sideways)) * ease(btop + 28.0, btop + 2.5, flat[:, 2]) * ease(-56.0, -20.0, along_out)
+    flat[:, :2] += out[None, :] * (np.maximum(br + 1.5 - along_out, 0.0) * reach)[:, None]
     tree = BVHTree.FromPolygons([tuple(p) for p in flat], faces)
 
     # Three ropes: two across and one along. Each ends under a sandbag.
@@ -348,6 +361,21 @@ def build_stage():
         size = np.linalg.norm(lap, axis=2, keepdims=True)
         inner = inner + 0.7 * lap * np.clip((size - 0.1) / 0.3, 0.0, 1.0)
     inner[:, :, 2] = np.maximum(inner[:, :, 2], 0.12)
+    # Is the bollard really under the cloth now? Rays out of its sides and top must all meet the sheet.
+    final = BVHTree.FromPolygons([tuple(p) for p in inner.reshape(-1, 3)], faces)
+    misses = 0
+    for z in (6.0, 14.0, 22.0, 30.0, 38.0, 39.5):
+        for side in (-br, 0.0, br):
+            start = Vector((bx + across[0] * side, by + across[1] * side, z))
+            misses += final.ray_cast(start, Vector((out[0], out[1], 0.0)), 40.0)[0] is None
+    misses += final.ray_cast(Vector((bx, by, btop + 0.2)), Vector((0, 0, 1)), 40.0)[0] is None
+    print("bollard rays that miss the cloth:", misses, flush=True)
+    # A torn or dragged sheet shows as an edge far longer than the 2.2 in it started at.
+    longest = max(np.linalg.norm(np.diff(inner, axis=0), axis=2).max(), np.linalg.norm(np.diff(inner, axis=1), axis=2).max())
+    print("bollard check: longest cloth edge %.1f in" % longest, flush=True)
+    # The solver leaves at most 2.7 in, and laying the corner flaps flat stretches a few to about 8. Dragged across the pile, an edge is 50 or more.
+    if longest > 14.0:
+        raise RuntimeError("The sheet has been dragged: longest edge %.1f in" % longest)
 
     # Thinned before it joins the rest: the flats need few triangles and the folds keep theirs.
     mesh = bpy.data.meshes.new("sheet")

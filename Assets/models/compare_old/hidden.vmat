@@ -1,0 +1,12 @@
+// Draws nothing, and casts no shadow: hides a map model's slot in comparison shots only (Sources/Spillway/canvas-cover-v2).
+
+Layer0
+{
+	shader "shaders/complex.shader"
+	F_ALPHA_TEST 1
+	g_flAlphaTestReference "0.5"
+	TextureTranslucency "[0.0 0.0 0.0 1.0]"
+	TextureColor "[0.0 0.0 0.0 1.0]"
+	g_flMetalness "0.000"
+	g_bFogEnabled "1"
+}

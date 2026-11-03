@@ -1,0 +1,163 @@
+{
+  "ClassName": "ModelCollider",
+  "Namespace": "Sandbox",
+  "Title": "Model Collider",
+  "Description": "Defines a collider based on a model.",
+  "Group": "Physics",
+  "Icon": "check_box_outline_blank",
+  "BaseType": "Collider",
+  "Properties": [
+    {
+      "Name": "ColliderFlags",
+      "Title": "Collider Flags",
+      "Description": "Flags that modify the behavior of this collider",
+      "Type": "ColliderFlags",
+      "Group": null,
+      "ReadOnly": false
+    },
+    {
+      "Name": "Static",
+      "Title": "Static",
+      "Description": null,
+      "Type": "Boolean",
+      "Group": null,
+      "ReadOnly": false
+    },
+    {
+      "Name": "Model",
+      "Title": "Model",
+      "Description": null,
+      "Type": "Model",
+      "Group": null,
+      "ReadOnly": false
+    },
+    {
+      "Name": "Friction",
+      "Title": "Friction",
+      "Description": "Allows overriding the friction for this collider. This value can exceed 1 to to give crazy grippy friction if you want it to, but the normal value is between 0 and 1.",
+      "Type": "Single?",
+      "Group": "Surface Properties",
+      "ReadOnly": false
+    },
+    {
+      "Name": "Elasticity",
+      "Title": "Elasticity",
+      "Description": "Allows overriding the elasticity for this collider. Controls how bouncy this collider is.",
+      "Type": "Single?",
+      "Group": "Surface Properties",
+      "ReadOnly": false
+    },
+    {
+      "Name": "RollingResistance",
+      "Title": "Rolling Resistance",
+      "Description": "Allows overriding the rolling resistance for this collider. Controls how easily rolling shapes (sphere, capsule) roll on surfaces.",
+      "Type": "Single?",
+      "Group": "Surface Properties",
+      "ReadOnly": false
+    },
+    {
+      "Name": "Surface",
+      "Title": "Surface",
+      "Description": null,
+      "Type": "Surface",
+      "Group": null,
+      "ReadOnly": false
+    },
+    {
+      "Name": "SurfaceVelocity",
+      "Title": "Velocity",
+      "Description": "Set the local velocity of the surface so things can slide along it, like a conveyor belt",
+      "Type": "Vector3",
+      "Group": "Surface Properties",
+      "ReadOnly": false
+    },
+    {
+      "Name": "IsTrigger",
+      "Title": "Is Trigger",
+      "Description": null,
+      "Type": "Boolean",
+      "Group": null,
+      "ReadOnly": false
+    },
+    {
+      "Name": "OnTriggerEnter",
+      "Title": "On Collider Enter",
+      "Description": "Called when a collider enters this trigger",
+      "Type": "Action<Collider>",
+      "Group": "Trigger",
+      "ReadOnly": false
+    },
+    {
+      "Name": "OnTriggerExit",
+      "Title": "On Collider Exit",
+      "Description": "Called when a collider exits this trigger",
+      "Type": "Action<Collider>",
+      "Group": "Trigger",
+      "ReadOnly": false
+    },
+    {
+      "Name": "OnComponentEnabled",
+      "Title": "On Component Enabled",
+      "Description": null,
+      "Type": "Action",
+      "Group": "Component",
+      "ReadOnly": false
+    },
+    {
+      "Name": "OnComponentStart",
+      "Title": "On Component Start",
+      "Description": null,
+      "Type": "Action",
+      "Group": "Component",
+      "ReadOnly": false
+    },
+    {
+      "Name": "OnObjectTriggerEnter",
+      "Title": "On Object Enter",
+      "Description": "Called when a gameobject enters this trigger",
+      "Type": "Action<GameObject>",
+      "Group": "Trigger",
+      "ReadOnly": false
+    },
+    {
+      "Name": "OnComponentUpdate",
+      "Title": "On Component Update",
+      "Description": null,
+      "Type": "Action",
+      "Group": "Component",
+      "ReadOnly": false
+    },
+    {
+      "Name": "OnObjectTriggerExit",
+      "Title": "On Object Exit",
+      "Description": "Called when a gameobject exits this trigger",
+      "Type": "Action<GameObject>",
+      "Group": "Trigger",
+      "ReadOnly": false
+    },
+    {
+      "Name": "OnComponentFixedUpdate",
+      "Title": "On Component Fixed Update",
+      "Description": null,
+      "Type": "Action",
+      "Group": "Component",
+      "ReadOnly": false
+    },
+    {
+      "Name": "OnComponentDisabled",
+      "Title": "On Component Disabled",
+      "Description": null,
+      "Type": "Action",
+      "Group": "Component",
+      "ReadOnly": false
+    },
+    {
+      "Name": "OnComponentDestroy",
+      "Title": "On Component Destroy",
+      "Description": null,
+      "Type": "Action",
+      "Group": "Component",
+      "ReadOnly": false
+    }
+  ]
+}

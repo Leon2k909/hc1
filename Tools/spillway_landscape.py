@@ -60,4 +60,36 @@ def terrain(model, rng):
                 if normal[2] < 0:
                     ps = ps[::-1]; ns = ns[::-1]; normal = -normal
                 P.card(model, paint, ps, normal, normals=ns)
+    close_shoreline(model, points[0], normals[0])
     return radii, angles, h
+
+
+def close_shoreline(model, rim_points, rim_normals):
+    """Connect the visual terrain's open 3600-inch rim to a submerged bank.
+
+    Leave the accepted terrain and forest positions intact. The lower edge is
+    below the -245 river plane, outside the playable enclosure, and render-only.
+    """
+    rim_points=np.asarray(rim_points,float)
+    rim_normals=np.asarray(rim_normals,float)
+    radius=np.linalg.norm(rim_points[:,:2],axis=1)
+    radial=rim_points[:,:2]/radius[:,None]
+    angle=np.arctan2(radial[:,0],radial[:,1])
+    inner=3180+55*np.sin(angle*7)+30*np.sin(angle*13+.8)
+    rings=[]; normals=[]
+    for t in np.linspace(0,1,7):
+        r=inner+(radius-inner)*t
+        z=-560+(rim_points[:,2]+560)*(2*t-t*t)
+        slope=2*(rim_points[:,2]+560)*(1-t)/(radius-inner)
+        normal=np.column_stack((-radial*slope[:,None],np.ones(len(radius))))
+        normal/=np.linalg.norm(normal,axis=1)[:,None]
+        rings.append(np.column_stack((radial*r[:,None],z)))
+        normals.append(normal)
+    # Exact seam positions and normals, including the existing waterfall carve.
+    rings[-1]=rim_points.copy(); normals[-1]=rim_normals.copy()
+    for i in range(len(rings)-1):
+        for j in range(len(radius)):
+            j1=(j+1)%len(radius)
+            points=[rings[i][j],rings[i][j1],rings[i+1][j1],rings[i+1][j]]
+            ns=[normals[i][j],normals[i][j1],normals[i+1][j1],normals[i+1][j]]
+            P.card(model,"rv_forest",points,(0,0,1),normals=ns)

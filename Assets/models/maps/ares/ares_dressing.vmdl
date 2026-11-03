@@ -13,6 +13,11 @@
 						_class = "DefaultMaterialGroup"
 						remaps =
 						[
+							{ from = "alloy.vmat" to = "materials/ares/interior-v1/alloy.vmat" },
+							{ from = "dark.vmat" to = "materials/ares/interior-v1/dark.vmat" },
+							{ from = "face.vmat" to = "materials/ares/observation-sign-v1/face.vmat" },
+							{ from = "gasket.vmat" to = "materials/ares/ar_black.vmat" },
+							{ from = "panel.vmat" to = "materials/ares/interior-v1/panel.vmat" },
 							{ from = "ar_bezel.vmat" to = "materials/ares/ar_bezel.vmat" },
 							{ from = "ar_black.vmat" to = "materials/ares/ar_black.vmat" },
 							{ from = "ar_brass.vmat" to = "materials/ares/ar_brass.vmat" },
@@ -38,7 +43,20 @@
 					{
 						_class = "RenderMeshFile"
 						name = "ares_dressing"
-						filename = "models/maps/ares/crate-v2/dressing-base.obj"
+						filename = "models/maps/ares/observation-sign-v1/dressing_without_sign.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "observation_sign"
+						filename = "models/maps/ares/observation-sign-v1/observation_sign.obj"
 						import_translation = [ 0.0, 0.0, 0.0 ]
 						import_rotation = [ 0.0, 0.0, 0.0 ]
 						import_scale = 1.0

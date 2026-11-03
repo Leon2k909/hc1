@@ -1,0 +1,88 @@
+{
+  "tools": [
+    {
+      "name": "create_razor_ui",
+      "title": "Create Razor Ui",
+      "toolset": "bridge_ui",
+      "description": "Create a Razor UI component file (.razor). Returns { created, path, componentName }; errors if the file already exists. NOTE: the current handler generates one fixed basic panel (a root div + label bound to a Title [Property]) from name+directory only — panelType/content/styles/includeStyles are not applied and no .scss is written; for custom markup or a PanelComponent you can host via add_screen_panel, write the files with write_file and check them with razor_lint. Follow with trigger_hotload, then get_compile_errors.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Component name (e.g. 'GameHud', 'MainMenu')."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory under code/ for the file. Defaults to 'UI'."
+          },
+          "panelType": {
+            "type": "string",
+            "description": "Type of panel to generate: 'basic' (simple panel), 'hud' (health/score overlay), 'menu' (title + buttons). Defaults to 'basic'. One of: basic | hud | menu."
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of what this UI panel does."
+          },
+          "includeStyles": {
+            "type": "boolean",
+            "description": "Generate a companion .razor.scss stylesheet. Defaults to true."
+          },
+          "content": {
+            "type": "string",
+            "description": "Raw .razor content (skips boilerplate generation)."
+          },
+          "styles": {
+            "type": "string",
+            "description": "Raw .razor.scss content (only used with raw content mode)."
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "recompile_asset",
+      "title": "Recompile Asset",
+      "toolset": "bridge_asset",
+      "description": "Compile a project asset by path — registers it with the editor's AssetSystem then compiles it (e.g. .vmat → .vmat_c). Use after writing/editing an asset with write_file so the change takes effect without a manual editor step. Verified on materials. NOTE: the engine exposes no reachable particle (.vpcf) compiler, so this can't compile particles — author those in s&box's particle editor, then spawn_vpcf plays them.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Asset path — project-relative (e.g. 'materials/foo.vmat') or absolute."
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
+    },
+    {
+      "name": "write_file",
+      "title": "Write File",
+      "toolset": "bridge_project",
+      "description": "Write or overwrite a file in the s&box project (SILENTLY replaces existing content — read_file first if you need to preserve it). Creates parent directories as needed; paths are confined to the project root (traversal outside it is denied). Returns a confirmation with the path — for C# follow with trigger_hotload so it compiles; for assets (.vmat etc.) follow with recompile_asset.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Relative path for the file (e.g. 'code/Components/Health.cs')."
+          },
+          "content": {
+            "type": "string",
+            "description": "The full file content to write."
+          }
+        },
+        "required": [
+          "path",
+          "content"
+        ]
+      }
+    }
+  ],
+  "total": 402
+}

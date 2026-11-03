@@ -8237,6 +8237,83 @@
           "Children": []
         }
       ]
+    },
+    {
+      "__guid": "dfe9b069-da4c-5645-bcf2-2d7b19200b7b",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Chair comparison - Revised v2 (woven / stitched)",
+      "Position": "20,-1723,256",
+      "Rotation": "0,0,0.707106781,0.707106781",
+      "Scale": "1,1,1",
+      "Tags": "chair,chair_comparison,chair_v2",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.ModelRenderer",
+          "__guid": "a100d3d4-3cca-5d8f-91d2-23d2ce5bca87",
+          "__enabled": true,
+          "Flags": 0,
+          "BodyGroups": 18446744073709551615,
+          "CreateAttachments": false,
+          "LodOverride": null,
+          "MaterialGroup": null,
+          "MaterialOverride": null,
+          "Materials": null,
+          "Model": {
+            "Id": "d569626c-2421-5a9d-a3a2-c17550b17f83",
+            "Path": "models/props/collider/chair-realism-v2/after.vmdl"
+          },
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "RenderOptions": {
+            "GameLayer": true,
+            "OverlayLayer": false,
+            "BloomLayer": false,
+            "AfterUILayer": false
+          },
+          "RenderType": "On",
+          "Tint": "1,1,1,1"
+        },
+        {
+          "__type": "Sandbox.ModelCollider",
+          "__guid": "9f54c384-3820-5ec0-baca-8aa0a6e13e08",
+          "__enabled": true,
+          "Flags": 0,
+          "ColliderFlags": 0,
+          "Elasticity": null,
+          "Friction": null,
+          "IsTrigger": false,
+          "Model": {
+            "Id": "d569626c-2421-5a9d-a3a2-c17550b17f83",
+            "Path": "models/props/collider/chair-realism-v2/after.vmdl"
+          },
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "OnObjectTriggerEnter": null,
+          "OnObjectTriggerExit": null,
+          "OnTriggerEnter": null,
+          "OnTriggerExit": null,
+          "RollingResistance": null,
+          "Static": true,
+          "Surface": null,
+          "SurfaceVelocity": "0,0,0"
+        }
+      ],
+      "Children": []
     }
   ],
   "SceneProperties": {

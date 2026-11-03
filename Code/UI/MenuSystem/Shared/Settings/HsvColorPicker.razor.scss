@@ -1,0 +1,151 @@
+@import "/UI/Styles/Theme.scss";
+
+HsvColorPicker
+{
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 4px;
+    flex-shrink: 0;
+    max-width: 480px;
+
+    .hsv-top
+    {
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px;
+        min-height: 28px;
+    }
+
+    .hsv-swatches
+    {
+        flex-direction: row;
+        gap: 6px;
+        flex-shrink: 0;
+    }
+
+    .hsv-swatch
+    {
+        width: 24px;
+        height: 24px;
+        min-width: 24px;
+        padding: 0;
+        border-radius: 2px;
+        border: 2px solid #ffffff22;
+        cursor: pointer;
+        pointer-events: all;
+
+        &:hover
+        {
+            border-color: #ffffff88;
+        }
+
+        &.selected
+        {
+            border-color: #ffffff;
+        }
+    }
+
+    .hsv-current
+    {
+        flex-direction: row;
+        align-items: center;
+        gap: 6px;
+        flex-shrink: 0;
+    }
+
+    .hsv-chip
+    {
+        width: 26px;
+        height: 26px;
+        border-radius: 2px;
+        border: 1px solid #ffffff44;
+    }
+
+    .hsv-hex
+    {
+        width: 96px;
+        height: 26px;
+        padding: 0 8px;
+        align-items: center;
+        border-radius: 2px;
+        border: 1px solid #ffffff1a;
+        background-color: #ffffff08;
+        color: #ffffffdd;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: text;
+        pointer-events: all;
+
+        &:focus
+        {
+            border-color: #ff7a1a;
+        }
+
+        .prefix
+        {
+            color: #9aa4af;
+            margin-right: 2px;
+        }
+    }
+
+    .hsv-row
+    {
+        flex-direction: row;
+        align-items: center;
+        gap: 10px;
+        height: 24px;
+        flex-shrink: 0;
+    }
+
+    // Under the page's 18px headings (Text.scss), and wide enough for the longest translation (Russian "Saturation").
+    .hsv-name
+    {
+        width: 116px;
+        flex-shrink: 0;
+        font-size: 14px;
+        font-weight: 600;
+        color: #9aa4af;
+        white-space: nowrap;
+    }
+
+    // The thumb's centre runs from end to end, so each bar keeps half a thumb clear either side.
+    HsvStrip
+    {
+        position: relative;
+        flex-grow: 1;
+        height: 18px;
+        margin: 0 9px;
+        cursor: pointer;
+        pointer-events: all;
+
+        .track
+        {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 4px;
+            height: 10px;
+            border-radius: 2px;
+            pointer-events: none;
+        }
+
+        .thumb
+        {
+            position: absolute;
+            top: 0;
+            width: 18px;
+            height: 18px;
+            border-radius: 9px;
+            border: 2px solid #ffffff;
+            box-shadow: 0 0 4px rgba( 0, 0, 0, 0.85 );
+            transform: translateX( -50% );
+            pointer-events: none;
+        }
+
+        &.hue .track
+        {
+            background-image: linear-gradient( to right, #ff0000 0%, #ffff00 16.67%, #00ff00 33.33%, #00ffff 50%, #0000ff 66.67%, #ff00ff 83.33%, #ff0000 100% );
+        }
+    }
+}

@@ -1,0 +1,107 @@
+// Cerro Blanco's cafe cups as installed, rendered by s&box: run with sbox-cli --call run_csharp '{"path":...}'. The scene's own "Cafe Cups" group and the cut dressing model, nothing swapped.
+// Loads cerroblanco.scene's visual roots into an isolated editor scene, so the open scene and play state are never touched and nothing is saved, with the player camera's post stack and exposure held still.
+// Writes <view>-<variant>.png into the work folder's engine/.
+var projectRoot = Sandbox.Project.Current.GetRootPath();
+var destination = System.IO.Path.Combine(projectRoot, "output/asset-improvement-20261030/cerroblanco-cafe-cup/engine");
+System.IO.Directory.CreateDirectory(destination);
+var keep = new System.Collections.Generic.HashSet<string>(new[] { "Sun", "Sky", "Fog", "Look", "Cerro Blanco", "Trees", "Lights", "Art Lights", "Reflection Probes", "Museum indirect light", "Cerro Blanco construction details" }, StringComparer.OrdinalIgnoreCase);
+var root = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(projectRoot, "Assets/scenes/maps/CerroBlanco/cerroblanco.scene"))).AsObject();
+var objects = new System.Text.Json.Nodes.JsonArray();
+foreach (var item in root["GameObjects"].AsArray())
+    if (keep.Contains(item["Name"]?.GetValue<string>() ?? "")) objects.Add(item.DeepClone());
+var prefab = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(projectRoot, "Assets/prefabs/player/cameras/default_player_camera.prefab"))).AsObject();
+var wanted = new[] { "Sandbox.CameraComponent", "Sandbox.Bloom", "Sandbox.Tonemapping", "Sandbox.Sharpen", "Sandbox.AmbientOcclusion", "Sandbox.Vignette", "Facepunch.PhotographicResponse" };
+var components = new System.Text.Json.Nodes.JsonArray();
+foreach (var component in prefab["RootObject"]["Components"].AsArray())
+    if (wanted.Contains(component["__type"]?.GetValue<string>())) components.Add(component.DeepClone());
+objects.Add(new System.Text.Json.Nodes.JsonObject { ["__guid"] = System.Text.Json.Nodes.JsonNode.Parse("\"" + Guid.NewGuid() + "\""), ["Name"] = "Capture camera", ["Enabled"] = true, ["Components"] = components });
+root["GameObjects"] = objects;
+if (root["SceneProperties"]?["NavMesh"] is System.Text.Json.Nodes.JsonObject nav) nav["Enabled"] = false;
+if (root["SceneProperties"] is System.Text.Json.Nodes.JsonObject sceneProperties) sceneProperties["WantsSystemScene"] = false;
+var chair = Model.Load("models/maps/cerroblanco/cafe_cup_v2/cup.vmdl");
+if (chair is null || chair.IsError) throw new InvalidOperationException("The new cup hasn't compiled.");
+var scene = Scene.CreateEditorScene();
+var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
+var preRender = typeof(Scene).GetMethod("PreRender", flags, null, Type.EmptyTypes, null);
+var preCameraRender = typeof(Scene).GetMethod("PreCameraRender", flags, null, Type.EmptyTypes, null);
+Vector3 W(float e, float n, float z) => new Vector3(n, -e, z);
+try
+{
+    CameraComponent camera;
+    var info = new System.Collections.Generic.List<string>();
+    using (scene.Push())
+    {
+        scene.Deserialize(root);
+        var holder = scene.GetAllObjects(false).Single(g => g.Name == "Capture camera");
+        camera = holder.Components.Get<CameraComponent>();
+        camera.ZNear = 1;
+        camera.ZFar = 30000;
+        camera.IsMainCamera = true;
+        foreach (var tonemap in scene.GetAllComponents<Tonemapping>())
+        {
+            var hold = ( tonemap.MinimumExposure + tonemap.MaximumExposure ) / 2f;
+            tonemap.AutoExposureEnabled = true;
+            tonemap.MinimumExposure = tonemap.MaximumExposure = hold;
+            tonemap.ExposureCompensation = 0;
+            tonemap.Rate = 10;
+        }
+        var placed = scene.GetAllObjects(false).Where(g => g.Name == "Cafe Cup").ToList();
+        info.Add("cups " + placed.Count + " " + string.Join(" ", placed.Select(g => g.WorldPosition + "@" + g.Components.Get<ModelRenderer>().Model.ResourceName)));
+        info.Add("dressing " + scene.GetAllObjects(false).Single(g => g.Name == "Dressing").Components.Get<ModelRenderer>().Model.ResourcePath);
+        scene.EditorTick(.016f, .016f);
+        preRender.Invoke(scene, null);
+        preCameraRender.Invoke(scene, null);
+    }
+    var textureNames = new[] { "g_tColor", "g_tNormal", "g_tRoughness", "g_tAmbientOcclusion", "g_tMetalness", "SkyTexture" };
+    foreach (var material in scene.GetAllComponents<ModelRenderer>().Where(r => r.Model is not null && r.Model != chair).SelectMany(r => r.Model.Materials).Distinct())
+        foreach (var texture in textureNames.Select(material.GetTexture).Append(material.FirstTexture).Where(t => t is not null).Distinct())
+            texture.MarkUsed(1024);
+    foreach (var material in chair.Materials)
+        foreach (var texture in textureNames.Select(material.GetTexture).Append(material.FirstTexture).Where(t => t is not null).Distinct())
+            texture.MarkUsed(4096);
+    for (var wait = 0; wait < 130; wait++)
+    {
+        using (scene.Push()) { scene.EditorTick(.016f, .016f); preRender.Invoke(scene, null); }
+        await Task.Delay(33, cancellationToken);
+    }
+    // The courtyard table at ( -540, 870 ): its full cup at ( -537.95, 875.64 ) and its drunk one at ( -543.86, 865.40 ); and the cafe's table at ( 620, 220 ).
+    var views = new (string name, Vector3 eye, Vector3 target, float fov)[]
+    {
+        ("table", W(-528f, 852f, 50f), W(-540f, 870f, 29.5f), 50f),
+        ("full", W(-530.95f, 869.64f, 36f), W(-537.95f, 875.64f, 30.6f), 34f),
+        ("drunk", W(-537.86f, 858.40f, 36.5f), W(-543.86f, 865.40f, 30.5f), 36f),
+        ("above", W(-536.45f, 873.14f, 40f), W(-537.95f, 875.64f, 31.5f), 34f),
+        ("seated", W(-517.4f, 878.2f, 46f), W(-540f, 870f, 30f), 60f),
+        ("cafe", W(680f, 260f, 64f), W(620f, 220f, 26f), 50f),
+    };
+    var variant = "installed";
+    {
+        foreach (var view in views)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            using var bitmap = new Bitmap(1280, 720);
+            for (var frame = 0; frame < 12; frame++)
+            {
+                using (scene.Push())
+                {
+                    camera.WorldPosition = view.eye;
+                    camera.WorldRotation = Rotation.LookAt(view.target - view.eye);
+                    camera.FieldOfView = view.fov;
+                    scene.EditorTick(.016f, .016f);
+                    preRender.Invoke(scene, null);
+                    preCameraRender.Invoke(scene, null);
+                    camera.RenderToBitmap(bitmap);
+                }
+                await Task.Delay(16, cancellationToken);
+            }
+            System.IO.File.WriteAllBytes(System.IO.Path.Combine(destination, $"{view.name}-{variant}.png"), bitmap.ToPng());
+        }
+    }
+    return new { Game.IsPlaying, Info = info, Bounds = chair.Bounds.Size.ToString(), Materials = chair.Materials.Select(m => m.ResourcePath).ToArray() };
+}
+catch (Exception error)
+{
+    System.IO.File.WriteAllText(System.IO.Path.Combine(destination, "capture-error.txt"), error.ToString());
+    throw;
+}
+finally { scene.Destroy(); }

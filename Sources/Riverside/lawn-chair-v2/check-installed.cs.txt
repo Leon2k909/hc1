@@ -1,0 +1,78 @@
+var projectRoot = Sandbox.Project.Current.GetRootPath();
+var output = System.IO.Path.Combine(projectRoot, "output/asset-improvement-20261030/lawn-chair");
+var root = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(projectRoot, "Assets/scenes/maps/Riverside/riverside.scene"))).AsObject();
+var visual = new System.Collections.Generic.HashSet<string>(new[] { "Moon", "Sky", "Fog", "Look", "Riverside", "Lights", "Fires", "Burn Drums", "Cooler", "Teddy", "Propane Cylinders", "Lawn Chairs", "Reflection Probes", "Volumetric Fog" });
+var nodes = new System.Text.Json.Nodes.JsonArray();
+foreach (var item in root["GameObjects"].AsArray()) if (visual.Contains(item["Name"]?.GetValue<string>() ?? "")) nodes.Add(item.DeepClone());
+root["GameObjects"] = nodes;
+root["SceneProperties"]["NavMesh"]["Enabled"] = false;
+root["SceneProperties"]["WantsSystemScene"] = false;
+var scene = Scene.CreateEditorScene();
+var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
+var preRender = typeof(Scene).GetMethod("PreRender", flags, null, Type.EmptyTypes, null);
+var preCamera = typeof(Scene).GetMethod("PreCameraRender", flags, null, Type.EmptyTypes, null);
+try
+{
+    CameraComponent camera;
+    ModelRenderer[] chairs;
+    using (scene.Push())
+    {
+        scene.Deserialize(root);
+        chairs = scene.GetAllComponents<ModelRenderer>().Where(r => r.Model?.ResourcePath.Contains("lawn_chair_v2") == true).ToArray();
+        if (chairs.Length != 4 || chairs.Any(r => r.Model.IsError)) throw new Exception("Four valid installed models required");
+        foreach (var t in scene.GetAllComponents<Tonemapping>())
+        {
+            var exposure = (t.MinimumExposure + t.MaximumExposure) / 2f;
+            t.AutoExposureEnabled = true;
+            t.MinimumExposure = t.MaximumExposure = exposure;
+            t.Rate = 10;
+        }
+        var holder = new GameObject(true, "Verification Camera");
+        camera = holder.Components.Create<CameraComponent>();
+        camera.ZNear = 1;
+        camera.ZFar = 30000;
+        camera.FieldOfView = 65;
+        scene.EditorTick(.016f, .016f);
+        preRender.Invoke(scene, null);
+        preCamera.Invoke(scene, null);
+    }
+    var textures = scene.GetAllComponents<ModelRenderer>().Where(r => r.Model is not null)
+        .SelectMany(r => r.Model.Materials).Distinct()
+        .SelectMany(m => new[] { "g_tColor", "g_tNormal", "g_tRoughness", "g_tAmbientOcclusion", "SkyTexture" }.Select(m.GetTexture).Append(m.FirstTexture))
+        .Where(t => t is not null).Distinct().ToArray();
+    foreach (var t in textures) t.MarkUsed(2048);
+    for (var f = 0; f < 120; f++)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        using (scene.Push()) { scene.EditorTick(.016f, .016f); preRender.Invoke(scene, null); }
+        await Task.Delay(25, cancellationToken);
+    }
+    var names = new[] { "porch-green", "porch-red", "roof", "yard" };
+    var shots = new System.Collections.Generic.List<string>();
+    for (var k = 0; k < chairs.Length; k++)
+    {
+        var chair = chairs[k];
+        using var bitmap = new Bitmap(1200, 800);
+        for (var f = 0; f < 24; f++)
+        {
+            using (scene.Push())
+            {
+                var eye = chair.WorldPosition + chair.WorldRotation * new Vector3(65, -44, 44);
+                var target = chair.WorldPosition + new Vector3(0, 0, 18);
+                camera.WorldPosition = eye;
+                camera.WorldRotation = Rotation.LookAt(target - eye);
+                scene.EditorTick(.016f, .016f);
+                preRender.Invoke(scene, null);
+                preCamera.Invoke(scene, null);
+                camera.RenderToBitmap(bitmap);
+            }
+            foreach (var t in textures) t.MarkUsed(2048);
+            await Task.Delay(16, cancellationToken);
+        }
+        var path = System.IO.Path.Combine(output, "installed-" + names[k] + ".png");
+        System.IO.File.WriteAllBytes(path, bitmap.ToPng());
+        shots.Add(path);
+    }
+    return new { Chairs = chairs.Select(r => new { r.Model.ResourcePath, Position = r.WorldPosition.ToString(), Rotation = r.WorldRotation.Angles().ToString(), r.Model.IsError }).ToArray(), Screenshots = shots, CollidersOnChairs = chairs.Sum(r => r.GameObject.GetComponentsInChildren<Collider>().Count()) };
+}
+finally { scene.Destroy(); }

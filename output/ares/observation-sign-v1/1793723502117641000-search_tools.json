@@ -1,0 +1,191 @@
+{
+  "tools": [
+    {
+      "name": "compile_status",
+      "title": "Compile Status",
+      "toolset": "editor",
+      "description": "The live state of the project's code compilers - is anything building, did each compiler's last build succeed, and every error and warning with file and line. This is how you check whether a code edit hotloaded cleanly.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "IsBuilding": {
+            "type": "boolean",
+            "description": "Whether anything is building right now."
+          },
+          "Compilers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "Name": {
+                  "type": "string",
+                  "description": "The project this compiler builds, like 'base' or 'facepunch.sandbox'."
+                },
+                "IsBuilding": {
+                  "type": "boolean"
+                },
+                "NeedsBuild": {
+                  "type": "boolean"
+                },
+                "Success": {
+                  "type": "boolean",
+                  "description": "Whether the last build succeeded. Null when it hasn't built yet."
+                },
+                "Errors": {
+                  "type": "integer"
+                },
+                "Warnings": {
+                  "type": "integer"
+                },
+                "Diagnostics": {
+                  "type": "array",
+                  "items": {},
+                  "description": "The last build's errors and warnings, errors first, capped at 50."
+                }
+              },
+              "required": []
+            },
+            "description": "Every compiler, each with its last build's outcome."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_idle_income",
+      "title": "Create Idle Income",
+      "toolset": "bridge_scaffold_gameplay",
+      "description": "Generate a host-authoritative passive income component: every tickSeconds the host grants incomePerTick × Multiplier, auto-wiring the first sibling component with an AddMoney(int) method (a create_economy_wallet scaffold plugs in with zero code) or an overridable Grant() seam; TotalEarned is [Sync(FromHost)] and static OnIncomeTick fires per grant. The idle-game kit: wallet (create_economy_wallet) + this + create_offline_progress. Writes a .cs file and returns { created, path, className, nextSteps } — follow with trigger_hotload + compile_status.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class/file name (default 'IdleIncome' -&gt; Code/IdleIncome.cs). Errors if the file exists."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Directory for the .cs file. Default 'Code'."
+          },
+          "incomePerTick": {
+            "type": "number",
+            "description": "Amount granted per tick. Default 1."
+          },
+          "tickSeconds": {
+            "type": "number",
+            "description": "Seconds between grants. Default 1."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_physics_grab_tool",
+      "title": "Create Physics Grab Tool",
+      "toolset": "bridge_vehicle",
+      "description": "Generate a physgun-lite player component: hold attack2 while looking at a Rigidbody prop within Range to grab it — it spring-follows a point in front of your view with physics LIVE (collides and swings, unlike the parented create_carry_system) — attack1 throws it, release lets go. Grab requests route through the host, which assigns the grabber network ownership. Returns { created, path, className, nextSteps } — trigger_hotload + compile_status, attach to the player object; ensure_input_action if attack1/attack2 aren't bound.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class/file name (default 'PhysicsGrabTool' -&gt; Code/PhysicsGrabTool.cs). Errors if the file exists."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Directory for the .cs file. Default 'Code'."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_seat_system",
+      "title": "Create Seat System",
+      "toolset": "bridge_vehicle",
+      "description": "Generate a standalone networked one-occupant seat component: press E (use) to sit — claims route through the host so seats can't be shared — E to stand; the occupant parents to the seat with their controller input disabled and restored on exit, which tries each ExitOffsets entry and takes the first spot with clearance. Static OnOccupantChanged event for camera/UI. For chairs, benches, turret mounts; vehicles get a seat built into create_vehicle_controller. Returns { created, path, className, nextSteps } — trigger_hotload + compile_status, then attach to any prop.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class/file name (default 'Seat' -&gt; Code/Seat.cs). Errors if the file exists."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Directory for the .cs file. Default 'Code'."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_team_assigner",
+      "title": "Create Team Assigner",
+      "toolset": "bridge_scaffold_gameplay",
+      "description": "Generate a host-authoritative balanced team assigner component (smallest-bucket draft): AssignSmallest(steamId) drops a joining player into the emptiest team, announces via [Rpc.Broadcast] so every client's roster agrees, and fires static OnTeamAssigned(steamId, index, name); plus Rebalance(), GetTeam, GetMembers. Writes a .cs file and returns { created, path, className, teams, nextSteps } — follow with trigger_hotload + compile_status, attach to your game manager, call AssignSmallest from your join hook (e.g. INetworkListener.OnActive).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class/file name (default 'TeamAssigner' -&gt; Code/TeamAssigner.cs). Errors if the file exists."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Directory for the .cs file. Default 'Code'."
+          },
+          "teams": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Team names in index order. Default [\"Red\", \"Blue\"]."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_vehicle_controller",
+      "title": "Create Vehicle Controller",
+      "toolset": "bridge_vehicle",
+      "description": "Generate a drivable raycast-car component: 4-corner spring/damper suspension, mass-scaled engine force, speed-scaled yaw steering, lateral grip (lower = drift), and a BUILT-IN driver seat (press E to enter — the driver is hidden while driving so their controller can't fight the vehicle transform, the host assigns them ownership, and a chase camera follows the car — E to exit). Attach it plus a Rigidbody and collider to any prop and it drives. Returns { created, path, className, nextSteps } — follow with trigger_hotload + compile_status, then batch_add_component the parts. Apply handling presets with tune_vehicle. HONEST LIMIT: compiles + runs is verified; driving FEEL needs a human playtest — tune from the inspector while playing.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class/file name (default 'VehicleController' -&gt; Code/VehicleController.cs). Errors if the file exists."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Directory for the .cs file. Default 'Code'."
+          },
+          "engineForce": {
+            "type": "number",
+            "description": "Engine force (mass-scaled). Default 900."
+          },
+          "steerStrength": {
+            "type": "number",
+            "description": "Yaw rate in rad/s at full speed factor. Default 2.0."
+          },
+          "grip": {
+            "type": "number",
+            "description": "Lateral grip 0-1 — fraction of sideways velocity killed per tick; lower = drift. Default 0.85."
+          }
+        },
+        "required": []
+      }
+    }
+  ],
+  "total": 402
+}

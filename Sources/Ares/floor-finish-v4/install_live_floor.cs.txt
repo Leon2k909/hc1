@@ -1,0 +1,18 @@
+var root=Sandbox.Project.Current.GetRootPath();var folder=System.IO.Path.Combine(root,"output/ares/floor-live-v4");
+var plan=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"install-plan.json")));
+var session=Editor.SceneEditorSession.Active;
+if(Game.IsPlaying||session.HasUnsavedChanges)throw new InvalidOperationException("Inspect current scene/play state first");
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+foreach(var pair in plan["guards"].AsObject())if(Hash(System.IO.Path.Combine(root,pair.Key))!=pair.Value.GetValue<string>())throw new InvalidOperationException("Published input changed: "+pair.Key);
+foreach(var item in plan["new_files"].AsArray())if(System.IO.File.Exists(System.IO.Path.Combine(root,item.GetValue<string>())))throw new InvalidOperationException("New source target already exists");
+foreach(var pair in plan["files"].AsObject()) {
+ if(pair.Key.Contains("..")||!(pair.Key.StartsWith("Assets/models/maps/ares/")||pair.Key.StartsWith("Tools/ares_")))throw new InvalidOperationException("Unexpected target");
+ if(Hash(System.IO.Path.Combine(folder,"stage",pair.Key))!=pair.Value.GetValue<string>())throw new InvalidOperationException("Staged input changed: "+pair.Key);
+}
+foreach(var pair in plan["files"].AsObject()) {
+ var target=System.IO.Path.Combine(root,pair.Key);var temporary=target+".floor-writing";
+ System.IO.File.Copy(System.IO.Path.Combine(folder,"stage",pair.Key),temporary,true);System.IO.File.Move(temporary,target,true);
+ if(pair.Key.StartsWith("Assets/"))Editor.AssetSystem.RegisterFile(target);
+}
+var report=new {Files=plan["files"].AsObject().Count,FloorOnly=true,SceneChanged=false,CollisionChanged=false};
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"installed.json"),System.Text.Json.JsonSerializer.Serialize(report));return report;

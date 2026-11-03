@@ -1,0 +1,100 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var folder=System.IO.Path.Combine(root,"output/riverdale-emergency-phone-review-20261031");
+var originalScene=Game.ActiveScene;var playing=Game.IsPlaying;
+var scene=new Scene();var cameras=new System.Collections.Generic.List<object>();
+var checks=new System.Collections.Generic.List<object>();
+var copies=new System.Collections.Generic.List<string>();
+try
+{
+    GameObject before,after;CameraComponent camera;
+    using(scene.Push())
+    using(Editor.EditorUtility.DisableTextureStreaming())
+    {
+        var wall=scene.CreateObject();wall.Name="Shared Riverdale wall";
+        wall.Components.Create<ModelRenderer>().Model=Model.Load("models/props/riverdale/emergency-phone-v1/review_wall.vmdl");
+        GameObject Phone(string name,string file,float y)
+        {
+            var go=scene.CreateObject(false);go.Name=name;go.WorldPosition=new Vector3(0,y,0);
+            var model=Model.Load("models/props/riverdale/emergency-phone-v1/"+file+".vmdl");
+            if(model is null||model.IsError)throw new InvalidOperationException("Missing "+file);
+            go.Components.Create<ModelRenderer>().Model=model;
+            if(file=="after")
+            {
+                var collider=go.Components.Create<ModelCollider>();collider.Model=model;collider.Static=true;
+                go.Tags.Add("phone-preview-after");
+            }
+            go.Enabled=true;return go;
+        }
+        before=Phone("Original saved phone","before",10);after=Phone("Proposed phone","after",-10);
+        var holder=scene.CreateObject(false);holder.Name="Shared comparison camera";
+        camera=holder.Components.Create<CameraComponent>();camera.IsMainCamera=false;camera.ZNear=.5f;camera.ZFar=300;
+        var source=originalScene.GetAllComponents<CameraComponent>().FirstOrDefault(c=>c.IsMainCamera);
+        void Copy<T>() where T:Component,new()
+        {
+            var effect=source?.GameObject.GetComponent<T>(true);
+            if(effect.IsValid()){Facepunch.GameObjectExtensions.CopyPropertiesTo(effect,holder.Components.Create<T>());copies.Add(typeof(T).Name);}
+        }
+        Copy<Tonemapping>();Copy<Bloom>();Copy<Vignette>();Copy<Sharpen>();Copy<Facepunch.PhotographicResponse>();
+        var ao=holder.Components.Create<AmbientOcclusion>();ao.Radius=4;ao.Intensity=.4f;
+        holder.Enabled=true;
+        var light=scene.CreateObject().Components.Create<DirectionalLight>();light.WorldRotation=Rotation.From(new Angles(30,25,0));
+        light.LightColor=new Color(1,.94f,.86f)*2.3f;light.SkyColor=new Color(.82f,.88f,1)*.65f;
+        scene.EditorTick(.016f,.016f);
+        foreach(var renderer in scene.GetAllComponents<ModelRenderer>())
+        for(var slot=0;slot<renderer.Materials.Count;slot++)
+        {
+            var material=renderer.Materials.GetOverride(slot)??renderer.Materials.GetOriginal(slot);
+            if(material is null||material.IsError)throw new InvalidOperationException("Preview material missing");
+            foreach(var key in new[]{"g_tColor","g_tNormal","g_tRma"})
+            {
+                var texture=material.GetTexture(key);
+                if(texture is not null&&!texture.IsError)texture.MarkUsed(Math.Max(texture.Width,texture.Height));
+            }
+        }
+        Vector3 World(Vector3 p)=>after.WorldTransform.PointToWorld(new Vector3(p.y,-p.x,p.z));
+        void Probe(string name,Vector3 a,Vector3 b,bool expected)
+        {
+            var trace=scene.Trace.Ray(World(a),World(b)).WithTag("phone-preview-after").Run();
+            var hit=trace.Hit||trace.StartedSolid;
+            checks.Add(new{Name=name,Expected=expected,Hit=hit,Passed=hit==expected});
+            if(hit!=expected)throw new InvalidOperationException("Collision failed: "+name);
+        }
+        Probe("housing",new Vector3(1,-6,7),new Vector3(1,1,7),true);
+        Probe("receiver grip",new Vector3(-2.15f,-7,6.5f),new Vector3(-2.15f,-4,6.5f),true);
+        Probe("lower receiver",new Vector3(-2.15f,-7,2),new Vector3(-2.15f,-4,2),true);
+        Probe("upper receiver",new Vector3(-2.15f,-7,11),new Vector3(-2.15f,-4,11),true);
+        Probe("gap behind receiver",new Vector3(-2.4f,-3.78f,6.5f),new Vector3(-1.9f,-3.78f,6.5f),false);
+        Probe("no cable blocking box",new Vector3(-3,-4,-1.5f),new Vector3(3,-4,-1.5f),false);
+        Probe("beacon",new Vector3(0,-6,15),new Vector3(0,0,15),true);
+    }
+    await Task.Delay(1800,cancellationToken);
+    using(scene.Push())
+    using(Editor.EditorUtility.DisableTextureStreaming())
+    using(var bitmap=new Bitmap(3840,2160))
+    {
+        var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic;
+        foreach(var view in new[]{new{Name="front",Eye=new Vector3(-55,0,7),Fov=44f},new{Name="angle",Eye=new Vector3(-57,-13,10),Fov=46f}})
+        {
+            cancellationToken.ThrowIfCancellationRequested();camera.WorldPosition=view.Eye;camera.WorldRotation=Rotation.LookAt(new Vector3(-2,0,7)-view.Eye);
+            typeof(Scene).GetMethod("PreRender",flags,null,Type.EmptyTypes,null).Invoke(scene,null);
+            typeof(Scene).GetMethod("PreCameraRender",flags,null,Type.EmptyTypes,null).Invoke(scene,null);
+            typeof(PostProcessSystem).GetMethod("UpdateCamera",flags).Invoke(scene.GetSystem<PostProcessSystem>(),new object[]{camera});
+            for(var frame=0;frame<4;frame++)
+            {
+                camera.WorldPosition=view.Eye;camera.WorldRotation=Rotation.LookAt(new Vector3(-2,0,7)-view.Eye);
+                camera.FieldOfView=view.Fov;camera.FovAxis=CameraComponent.Axis.Horizontal;camera.CustomSize=new Vector2(3840,2160);
+                camera.RenderToBitmap(bitmap,false);
+            }
+            System.IO.File.WriteAllBytes(System.IO.Path.Combine(folder,"comparison-"+view.Name+"-native.png"),bitmap.ToPng());
+            using(var resized=bitmap.Resize(1920,1080,true))System.IO.File.WriteAllBytes(System.IO.Path.Combine(folder,"comparison-"+view.Name+".png"),resized.ToPng());
+            cameras.Add(new{view.Name,Eye=view.Eye.ToString(),view.Fov});
+        }
+    }
+}
+finally{scene.Destroy();}
+var result=new{NativeEngineRendering=true,SharedLightingAndCamera=true,OriginalLeft=true,InstalledInMap=false,
+    SceneType="Isolated prop comparison using Riverdale wall materials",NativePhysicsChecks=checks,
+    RuntimeScenePreserved=ReferenceEquals(originalScene,Game.ActiveScene),PlayStatePreserved=Game.IsPlaying==playing,
+    PostProcessCopies=copies,Views=cameras,NativeWidth=3840,NativeHeight=2160,OutputWidth=1920,OutputHeight=1080};
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"native-review.json"),System.Text.Json.JsonSerializer.Serialize(result,new System.Text.Json.JsonSerializerOptions{WriteIndented=true}));
+return result;

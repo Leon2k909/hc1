@@ -309,7 +309,7 @@
   Not checked yet:
   - a match played on it, its bots, and the modes' objects in play;
   - the indirect light rebake.
-  Still open from the critique: the road vehicles' plain bodies, the EMU's flat red paint, and the yard's skip.
+  Still open from the critique: the road vehicles' plain bodies and the EMU's flat red paint. The yard's skip is now Lowtide's (docs/notes/180).
 - The cab roads' cars are off (2026-10-25, `railhead_map.ROAD_VEHICLES_ENABLED = False`): the user will rework them, so
   their code and placements (`cab_road_vehicles`; `railhead_props.car`, `suv`, `van`) are kept. Set it True to bring
   them back. Their collision was in the dressing models, not the scene, and the spot, reach and Retakes checks pass

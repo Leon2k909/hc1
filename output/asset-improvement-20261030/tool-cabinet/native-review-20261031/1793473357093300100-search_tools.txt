@@ -1,0 +1,88 @@
+{
+  "tools": [
+    {
+      "name": "asset_write",
+      "title": "Asset Write",
+      "toolset": "asset",
+      "description": "Overwrite a game resource asset's json and recompile it. Read the current json with asset_read first, modify it, and pass the whole document back - this replaces the entire file. Doesn't work on binary assets like models and textures.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Asset path, as returned by asset_search."
+          },
+          "json": {
+            "type": "string",
+            "description": "The complete json document to write."
+          }
+        },
+        "required": [
+          "path",
+          "json"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "Success": {
+            "type": "boolean"
+          },
+          "Path": {
+            "type": "string"
+          },
+          "Hint": {
+            "type": "string"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_asset",
+      "title": "Create Asset",
+      "toolset": "asset",
+      "description": "Create a new game resource asset - a prefab, sound event or any other GameResource type. Give starting json to fill it, or leave empty for a default. Fails if the asset already exists - asset_write edits existing ones.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Asset type file extension, e.g. 'prefab' or 'sndevt'. See asset_types."
+          },
+          "path": {
+            "type": "string",
+            "description": "Where to create it, relative to the project's assets folder, e.g. 'weapons/pistol.prefab'."
+          },
+          "json": {
+            "type": "string",
+            "description": "Starting json document. Empty creates a default resource."
+          }
+        },
+        "required": [
+          "type",
+          "path"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "Path": {
+            "type": "string"
+          },
+          "SourceFile": {
+            "type": "string"
+          },
+          "IsCompileFailed": {
+            "type": "boolean"
+          },
+          "Hint": {
+            "type": "string"
+          }
+        },
+        "required": []
+      }
+    }
+  ],
+  "total": 402
+}

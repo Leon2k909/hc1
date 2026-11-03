@@ -124,6 +124,9 @@ def wheel(m,x,y,yaw):
         m.oriented_box(centre,axes,sizes,None,'metal')
         SHAPES.append({'name':f'fork {x} {y} {sign}','kind':'oriented-box','centre':centre.tolist(),'axes':axes.tolist(),'size':sizes.tolist(),'surface':'metal'})
     O.turned(m,(x,y,8.8),UP,[(3.35,0),(3.35,.4),(2.7,.8),(2.7,1.9)],'mc_alloy',40)
+    hull(m,[(x+2.7*math.cos(a),y+2.7*math.sin(a),z)
+            for z in (8.8,10.7) for a in np.linspace(0,math.tau,32,endpoint=False)],
+         f'caster pivot {x} {y}')
     block(m,(x,y,10.7),(8.3,7.6,.9),'mc_frame',.65,.15)
     clip_box(m,(x-4.15,y-3.8,10.25),(x+4.15,y+3.8,11.15),'caster mounting plate')
     # Convex support points follow the tyre's actual bevelled profile.
@@ -162,6 +165,7 @@ def candidate():
     for i,(z0,z1) in enumerate(drawers):
         z=(z0+z1)/2
         block(m,(0,-19.03,z),(72.6,1.45,z1-z0),'mc_paint',.38,.13)
+        clip_box(m,(-36.3,-19.755,z0),(36.3,-18.305,z1),f'drawer {i} closed front')
         block(m,(0,-19.81,z1-.6),(69.7,.14,.25),'mc_stainless',.09,.035)
         # Real grip opening behind the bar, with supports at the two ends only.
         block(m,(0,-19.85,z1-1.5),(62,.12,1.7),'mc_black',.28,.04)
@@ -261,9 +265,11 @@ def materials(m):
             nm[sl]=np.uint8(np.clip((n*.5+.5)*255,0,255))
         for suffix,array in (('color',np.uint8(np.clip(c,0,255))),('rough',np.uint8(rr*255)),('metal',np.uint8(mm*255)),('normal',nm)):
             Image.fromarray(array).save(MD/(paint+'_'+suffix+'.png'))
+            # Native normal/RMA mip generation requires engine-ready atlas dimensions.
+            Image.fromarray(array).resize((2048,2048),Image.Resampling.BICUBIC).save(MD/(paint+'_'+suffix+'_engine.png'))
         path=f'{MAT}/{paint}'
-        text=O.vmat(paint,path+'_color.png',path+'_normal.png',path+'_rough.png')
-        text=text.replace('    g_flMetalness "0.0"',f'    F_METALNESS_TEXTURE "1"\n    TextureMetalness "{path}_metal.png"')
+        text=O.vmat(paint,path+'_color_engine.png',path+'_normal_engine.png',path+'_rough_engine.png')
+        text=text.replace('    g_flMetalness "0.0"',f'    F_METALNESS_TEXTURE "1"\n    TextureMetalness "{path}_metal_engine.png"')
         (MD/(paint+'.vmat')).write_text(text)
     labels=Image.new('RGB',(2048,1024),(192,194,179));d=ImageDraw.Draw(labels)
     rows=[('COLLIDER / TECHNICAL SERVICES','MAINTENANCE 07'),('PRECISION TOOLS','RETURN CLEAN AND DRY'),

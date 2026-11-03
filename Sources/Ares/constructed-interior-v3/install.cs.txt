@@ -1,0 +1,17 @@
+// Run only after the user approves the actual native review images.
+var root=Sandbox.Project.Current.GetRootPath();var folder=System.IO.Path.Combine(root,"output/ares/constructed-interior-v3");
+var plan=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"install-plan.json")));
+var editor=Editor.SceneEditorSession.Active;
+if(Game.IsPlaying||editor.HasUnsavedChanges)throw new InvalidOperationException("Inspect current user state before installation");
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+foreach(var pair in plan["guards"].AsObject())if(Hash(System.IO.Path.Combine(root,pair.Key))!=pair.Value.GetValue<string>())throw new InvalidOperationException("Published input changed: "+pair.Key);
+foreach(var pair in plan["files"].AsObject()) {
+ if(pair.Key.Contains("..")||!(pair.Key.StartsWith("Assets/models/maps/ares/")||pair.Key.StartsWith("Tools/ares_")))throw new InvalidOperationException("Unexpected target");
+ if(Hash(System.IO.Path.Combine(folder,"install-stage",pair.Key))!=pair.Value.GetValue<string>())throw new InvalidOperationException("Staged input changed");
+}
+foreach(var pair in plan["files"].AsObject()) {
+ var target=System.IO.Path.Combine(root,pair.Key);var temp=target+".constructed-writing";
+ System.IO.File.Copy(System.IO.Path.Combine(folder,"install-stage",pair.Key),temp,true);System.IO.File.Move(temp,target,true);
+ if(pair.Key.StartsWith("Assets/"))Editor.AssetSystem.RegisterFile(target);
+}
+return new{Files=plan["files"].AsObject().Count,Next="Compile both public ModelDocs; apply native scene_mutations from the install plan; save_scene; capture installed models."};

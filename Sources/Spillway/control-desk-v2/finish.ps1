@@ -12,7 +12,7 @@ function Idle($exe, $list, $log) {
     $p = Start-Process -FilePath $exe -ArgumentList $list -PassThru -NoNewWindow -RedirectStandardOutput "$log.log" -RedirectStandardError "$log.err"
     $p.PriorityClass = 'Idle'
     $p.WaitForExit()
-    Select-String -Path "$log.log" -Pattern '^(parts|tris|islands|baked|lod |body_lod|exported|saved|painted)|painted$|Traceback|Error' | ForEach-Object { $_.Line }
+    Select-String -Path "$log.log" -Pattern '^(parts|tris|islands|baked|lod |body_lod|exported|saved|painted|hidden|thin)|painted$|Traceback|Error' | ForEach-Object { $_.Line }
     Get-Content "$log.err" | Select-String -Pattern 'Traceback|Error:|error:' -Context 0,12 | ForEach-Object { '! ' + $_.ToString() }
 }
 

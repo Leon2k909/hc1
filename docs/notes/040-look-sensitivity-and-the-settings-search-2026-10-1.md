@@ -16,4 +16,9 @@
   `[Choices( "Hold", "Toggle" )]` so they show as a switch in the results.
 - Compiled with dotnet and hotloaded into the user's match with no errors, with every text in all ten tables. Not yet
   seen: the sliders' effect, the search, or A jumping.
+- Search update (2026-11-03): queries and labels now normalize punctuation and all whitespace, and expand FOV, ADS,
+  PIP, PTT, SFX and UI. Gamepad/controller and colour/color also match in either direction. Every query word must
+  still match, and the existing language/accent folding and keybind matching remain in use. Production search code
+  compiled in an offline smoke check covering abbreviations, pasted whitespace, accented text and keybinds. No editor
+  was used; this update still needs an in-game check.
 

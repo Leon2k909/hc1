@@ -101,6 +101,23 @@ def sign(model,text,x,y,z,scale=2.1):
         yy-=(len(grid[0])+1)*scale
 
 
+def bench_collision(m,y):
+    """The boxes of one shooting bench. Its model (shooting_bench_v2, placed by scene()) has no physics of its own."""
+    box(m,(-34,y-85,30),(-4,y+85,34),None,"wood")
+    for xx in (-29,-9):
+        for yy in (y-76,y,y+76):
+            box(m,(xx-2,yy-2,0),(xx+2,yy+2,30),None,"metal")
+    # The aprons under the top, the stretcher, the shelf in the bay on the shooter's left, and the ammo cans on it.
+    for xx in (-32.25,-8.25):
+        box(m,(xx,y-83,26.6),(xx+2.5,y+83,30),None,"metal")
+    box(m,(-20.25,y-76,10.8),(-17.75,y+76,13.2),None,"metal")
+    box(m,(-28.8,y+1,10.8),(-9.2,y+75,12.65),None,"metal")
+    box(m,(-24.75,y+9.8,12.65),(-18.65,y+34.4,20.05),None,"metal")
+    # The two canvas rests on top, so shots stop at them and not at the wood underneath.
+    box(m,(-13.9,y-10,34),(-6.5,y+10,38.3),None,"fabric")
+    box(m,(-30.1,y-5.25,34.24),(-24.3,y+5.25,37.14),None,"fabric")
+
+
 def level():
     m=K.Model()
     box(m,(-420,-700,-24),(4220,700,0),"rw_asphalt","concrete")
@@ -125,12 +142,9 @@ def level():
     box(m,(0,-680,.01),(2,680,.14),"range_orange")
     for y in (-600,-300,0,300,600):
         box(m,(3,y,.02),(4050,y+1.4,.10),"range_white")
-    for bench,(distance,y) in enumerate(((10,-450),(25,-150),(50,150),(100,450))):
+    for distance,y in ((10,-450),(25,-150),(50,150),(100,450)):
         x=distance*METRE
-        B.tabletop(m,y,bench)
-        for xx in (-29,-9):
-            for yy in (y-76,y+76):
-                box(m,(xx-2,yy-2,0),(xx+2,yy+2,30),"rw_steel_dark","metal")
+        bench_collision(m,y)
         box(m,(-345,y-145,.02),(-12,y-143,.12),"range_white")
         # The target's frame, stand and rail remain visible when the plate drops.
         box(m,(x-16,y-33,0),(x+16,y+33,4),"rw_steel_dark","metal")
@@ -167,6 +181,10 @@ def scene():
         obj("Firing Platform Light","light",(-145,0,142),components=[component("Sandbox.PointLight","light/point",LightColor="1.15,1.25,1.4,1",Radius=900,Shadows=False)]),
     ]
     for distance,y in ((10,-450),(25,-150),(50,150),(100,450)):
+        key=f"bench/{distance}"
+        objects.append(obj(f"{distance} m Bench",key,(-19,y,0),components=[
+            component("Sandbox.ModelRenderer",key+"/renderer",Model=f"{RESOURCE}/shooting_bench_v2/bench.vmdl",Tint="1,1,1,1"),
+        ]))
         key=f"target/{distance}"
         objects.append(obj(f"{distance} m Target",key,(distance*METRE,y,4),components=[
             component("Sandbox.ModelRenderer",key+"/renderer",Model=f"{RESOURCE}/range_target_v2/range_target.vmdl",Tint="1,1,1,1"),

@@ -1,0 +1,319 @@
+{
+  "tools": [
+    {
+      "name": "add_render_target_camera",
+      "title": "Add Render Target Camera",
+      "toolset": "bridge_visuals",
+      "description": "CCTV / security monitor / mirror / simple portal: creates a secondary camera (IsMainCamera=false, Priority param) positioned/rotated or aimed at a target object, a display surface (scaled box with a ModelRenderer), and GENERATES a sealed wiring component that at runtime creates the render-target Texture (Texture.CreateRenderTarget builder), assigns camera.RenderTarget and sets the texture onto an anonymous complex-shader material on the display (attribute 'Color' = albedo; the screen is scene-lit, not emissive/unlit). Returns {created, camera{id,...}, display{id,...}|null, className, path, generatedCode, attachedAndWired, resolution, nextSteps[]}. FIRST call generates the .cs → follow nextSteps: trigger_hotload, then add_component_with_properties on the display with properties {SourceCamera: &lt;camera GUID&gt;}; a REPEAT call reusing the same `name` after the hotload attaches AND wires everything automatically (attachedAndWired=true). The feed only renders in play mode — verify with start_play + capture_view. If `name`'s .cs file exists but isn't compiled yet, the call errors — hotload first. Scene/file-mutating — refused during play mode.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class name for the generated wiring component. Defaults to 'RenderTargetDisplay'. Reuse the same name for extra cameras — after a hotload the class is reused and wired in one shot."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory for the generated .cs file. Defaults to 'Code'."
+          },
+          "cameraName": {
+            "type": "string",
+            "description": "GameObject name for the camera. Defaults to 'RT Camera'."
+          },
+          "position": {
+            "type": "string",
+            "description": "World position of the camera. As \"x,y,z\" (or JSON {x,y,z})."
+          },
+          "rotation": {
+            "type": "string",
+            "description": "World rotation of the camera. As \"pitch,yaw,roll\" degrees."
+          },
+          "lookAtId": {
+            "type": "string",
+            "description": "GUID of a GameObject to aim the camera at (overrides rotation; from get_scene_hierarchy / find_objects)."
+          },
+          "priority": {
+            "type": "number",
+            "description": "CameraComponent.Priority (integer). Defaults to 1."
+          },
+          "fieldOfView": {
+            "type": "number",
+            "description": "Camera field of view in degrees (clamped 5-170). Engine default when omitted."
+          },
+          "resolution": {
+            "type": "string",
+            "description": "Render-target size as 'width,height' pixels (min 16). Defaults to '512,512'."
+          },
+          "backgroundColor": {
+            "type": "string",
+            "description": "Camera background colour. Engine default when omitted. As \"r,g,b[,a]\" (0-1 floats)."
+          },
+          "createDisplay": {
+            "type": "boolean",
+            "description": "Create the display surface GameObject. Defaults to true. Pass false to wire your own surface later."
+          },
+          "displayPosition": {
+            "type": "string",
+            "description": "World position of the display surface. As \"x,y,z\" (or JSON {x,y,z})."
+          },
+          "displayRotation": {
+            "type": "string",
+            "description": "World rotation of the display surface. As \"pitch,yaw,roll\" degrees."
+          },
+          "displaySize": {
+            "type": "string",
+            "description": "Display box extents as 'x,y,z' world units (thin x = a wall screen facing ±x). Defaults to '4,128,72'."
+          },
+          "attribute": {
+            "type": "string",
+            "description": "Material attribute that receives the texture. Defaults to 'Color' (albedo on the complex shader). Sanitized to [A-Za-z0-9_]."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "align_objects",
+      "title": "Align Objects",
+      "toolset": "bridge_gameobject",
+      "description": "Align several GameObjects on one axis so they share a coordinate. mode = first (match the first object), min, max, or average; defaults to first. Returns { aligned, axis, mode, target } — aligned is the object count and target the shared coordinate; verify positions with get_scene_hierarchy or a screenshot.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "GUIDs of the GameObjects to align (&gt;= 2)."
+          },
+          "axis": {
+            "type": "string",
+            "description": "Axis to align on. One of: x | y | z."
+          },
+          "mode": {
+            "type": "string",
+            "description": "Target coordinate to align to (default first). One of: first | min | max | average."
+          }
+        },
+        "required": [
+          "ids",
+          "axis"
+        ]
+      }
+    },
+    {
+      "name": "batch_set_property",
+      "title": "Batch Set Property",
+      "toolset": "bridge_batch",
+      "description": "Set ONE component property to the same value across MANY GameObjects in a single call. Pass dryRun:true first: it performs the same type coercion and reference resolution as apply, reports current/proposed values, and sets wouldChange:false when they already match. Apply skips no-op setters. Returns { total, succeeded, failed, dryRun, changed, unchanged, results }. Scene-mutating: refused during play mode. Value coercion matches set_property.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "GUIDs of the GameObjects to modify (from find_objects, get_scene_hierarchy, or get_selected_objects)."
+          },
+          "component": {
+            "type": "string",
+            "description": "Component type name present on each object, e.g. 'ModelRenderer', 'PointLight'."
+          },
+          "property": {
+            "type": "string",
+            "description": "Property name to set, e.g. 'Tint', 'Enabled', 'LightColor' (see get_all_properties)."
+          },
+          "value": {
+            "description": "New value — number, bool, string, enum name, 'x,y,z' vector, color, or asset path. JSON value."
+          },
+          "dryRun": {
+            "type": "boolean",
+            "description": "true = validate and report current values without changing anything. Default false."
+          }
+        },
+        "required": [
+          "ids",
+          "component",
+          "property",
+          "value"
+        ]
+      }
+    },
+    {
+      "name": "capture_view",
+      "title": "Capture View",
+      "toolset": "bridge_screenshot",
+      "description": "Screenshot the scene from a chosen viewpoint and return it as an inline PNG image. Pass id to auto-frame a GameObject (3/4 elevated view sized to its bounds), or position (+ lookAt or rotation) for a free camera. With neither, captures the main camera view. Uses a temporary camera that is removed afterwards — the scene is left unchanged. KNOWN CAPTURE LIMITS (engine, not bridge): text in ScreenPanel/Razor labels may rasterise as solid boxes (the font atlas is not resolved for the capture pass — images and layout are correct, so a blank HUD here is NOT a HUD bug; verify text another way), and Terrain renders as a truncated ribbon from any temporary camera because its clipmap centres on the editor/main camera — verify terrain scenes with take_screenshot or in play mode.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of a GameObject to auto-frame (from get_scene_hierarchy or find_objects)."
+          },
+          "position": {
+            "type": "string",
+            "description": "Camera position as \"x,y,z\"."
+          },
+          "lookAt": {
+            "type": "string",
+            "description": "Point to aim the camera at, as \"x,y,z\"."
+          },
+          "rotation": {
+            "type": "string",
+            "description": "Camera rotation as \"pitch,yaw,roll\" degrees (alternative to lookAt)."
+          },
+          "fov": {
+            "type": "number",
+            "description": "Field of view in degrees. Default is the camera's default."
+          },
+          "width": {
+            "type": "integer",
+            "description": "Image width in pixels (16-3840). Default 1280.",
+            "default": 1280
+          },
+          "height": {
+            "type": "integer",
+            "description": "Image height in pixels (16-2160). Default 720.",
+            "default": 720
+          },
+          "renderUI": {
+            "type": "boolean",
+            "description": "Include screen-space UI in the capture. Default true.",
+            "default": true
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "describe_project",
+      "title": "Describe Project",
+      "toolset": "bridge_project",
+      "description": "One-call project orientation: identity (name/ident/org/type), the open scene with object count, scene and prefab file lists (capped at 50 each, Libraries/.sbox excluded), code footprint (.cs/.razor counts), custom Component types (up to 100, engine types excluded), and installed libraries. Returns a structured summary — orient here first, then get_scene_hierarchy for the scene, describe_type for components, find_broken_references for project health. Read-only.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "describe_scene",
+      "title": "Describe Scene",
+      "toolset": "bridge_scene",
+      "description": "One-call orientation for the OPEN scene (works in edit and play mode): total/root object counts, component histogram (top 20 types), every camera with position, light count, tag histogram (top 12), and the aggregate world bounds of renderable content. Returns a structured summary — orient here, then find_objects by component/tag, get_scene_hierarchy for structure, find_broken_references for health, screenshot_orbit to look at something. Complements describe_project (project-level). Read-only.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "get_scene_hierarchy",
+      "title": "Get Scene Hierarchy",
+      "toolset": "bridge_gameobject",
+      "description": "Get the scene tree — GameObjects with their names, GUIDs, components, and parent/child relationships. Pair maxDepth with rootId to drill into a subtree without paying for the whole scene. On a dressed scene (hundreds of objects) pass namesOnly:true first — it returns just {id,name,childCount} per object (no components/enabled) for a lighter 'what is in this scene' overview (~30% smaller; size still scales with object count, so keep maxDepth low); then drill into one subtree with rootId.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "maxDepth": {
+            "type": "integer",
+            "description": "Maximum recursion depth. Defaults to 10. Use 1 or 2 for cheap top-level overviews."
+          },
+          "rootId": {
+            "type": "string",
+            "description": "Optional GUID of a GameObject to start traversal from. Omit to walk from the scene roots."
+          },
+          "namesOnly": {
+            "type": "boolean",
+            "description": "true = compact tree: {id, name, childCount, children} only, no components or enabled flags. Default false."
+          }
+        },
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "record_gameplay_clip",
+      "title": "Record Gameplay Clip",
+      "toolset": "bridge_moviemaker",
+      "description": "Start recording live play-mode gameplay into a Sandbox.MovieMaker clip — REQUIRES play mode (start_play first; errors otherwise). Captures the given GameObjects (ids — recommended: small focused clips) or, when ids is omitted, the WHOLE scene (heavy: every object becomes tracks). Returns { started, jobId, sampleRate, maxSeconds, capture, discarded, note } immediately; recording runs ASYNC in the editor frame loop until stop_gameplay_recording or the maxSeconds safety cap (default 60s of clip time, max 600s). Only one recording at a time (a second call errors while active; a stopped-but-unsaved clip is discarded by a new start, reported in 'discarded'). Combine with playtest or drive_player to record a SCRIPTED run, then stop_gameplay_recording to save the .movie and play_movie to replay it.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "GameObject GUIDs to capture (from get_scene_hierarchy WHILE PLAYING — play-mode ids can differ from editor ids). Omit to capture the whole scene (heavy)."
+          },
+          "sampleRate": {
+            "type": "integer",
+            "description": "Samples per second (default 30, clamped 1-120)."
+          },
+          "maxSeconds": {
+            "type": "number",
+            "description": "Safety cap — auto-stops the recording once the clip timeline reaches this many seconds (default 60, clamped 1-600). The clip stays in memory until stop_gameplay_recording saves it."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "record_playtest",
+      "title": "Record Playtest",
+      "toolset": "bridge_moviemaker",
+      "description": "Run a scripted playtest AND record the same run to a .movie clip in ONE call — automated regression footage: a failing playtest comes with a replayable clip of exactly what happened. REQUIRES play mode (start_play first). steps uses the EXACT playtest schema (one verb per step: move / look / lookDelta / action / jump / set / wait / capture / assert — see the playtest tool for the full verb reference). The recording defaults to the playtest's resolved player hierarchy; pass ids to record other objects, or nothing resolvable falls back to whole-scene capture (heavy). Returns { started, steps, recordingJobId, capture, sampleRate, clipName, folder, recorderCapSeconds, note } immediately; both jobs run ASYNC in the editor frame loop and the clip AUTO-SAVES the moment the playtest finishes (a failing or aborted run still saves its footage; play mode ending early is also saved). THE POLL CHAIN: 1) playtest_status until finished:true → the per-step pass/fail transcript. 2) gameplay_recording_status → the saved clip summary { saved, assetPath, durationSeconds, trackCount } (if it still says pendingSave, the save is a frame away — poll again; a save error there means name collision: call stop_gameplay_recording yourself with a new name). Replay the footage with add_movie_player + play_movie. Errors if a playtest or gameplay recording is already active. Only one at a time.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "steps": {
+            "description": "Ordered playtest step objects — identical schema to the playtest tool (move/look/lookDelta/action/jump/set/wait/capture/assert). Runs top-to-bottom in the frame loop. JSON array."
+          },
+          "id": {
+            "type": "string",
+            "description": "GUID of the player/controller GameObject the playtest drives. Omit to auto-resolve the first PlayerController."
+          },
+          "component": {
+            "type": "string",
+            "description": "Controller component type to target (e.g. 'PlayerController'). Omit to auto-detect."
+          },
+          "ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "GameObject GUIDs to RECORD (from get_scene_hierarchy WHILE PLAYING). Omit to record the playtest's player hierarchy (the default and usually what you want)."
+          },
+          "sampleRate": {
+            "type": "integer",
+            "description": "Recording samples per second (default 30, clamped 1-120)."
+          },
+          "clipName": {
+            "type": "string",
+            "description": "Saved .movie asset name without extension (default playtest_&lt;UTC timestamp&gt;; sanitized to [A-Za-z0-9_-])."
+          },
+          "folder": {
+            "type": "string",
+            "description": "Assets subfolder to save the clip into (default \"recordings\")."
+          }
+        },
+        "required": [
+          "steps"
+        ]
+      }
+    }
+  ],
+  "total": 402
+}

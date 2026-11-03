@@ -1,0 +1,1 @@
+Railhead's two yard skips swapped for Lowtide's skip, at the user's word. Session 5cb3ce6e, 2026-10-31T18:22:44+00:00. Folders: Sources/Railhead/skip, Assets/models/props/railhead/skip, output/asset-improvement-20261030/railhead-skip. Touches Tools/railhead_dress_detail.py skip_bin, railhead_dress_{east,west} OBJs and vmdls, railhead.scene.

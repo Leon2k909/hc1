@@ -1,0 +1,17 @@
+var root = Sandbox.Project.Current.GetRootPath();
+if(!System.IO.Path.GetFullPath(root).TrimEnd('\\','/').Equals(@"C:\sbox-projects\hc1\forked-shooter-main",StringComparison.OrdinalIgnoreCase))
+    throw new InvalidOperationException("Wrong project");
+var scene=Game.ActiveScene;
+var result=new {
+    ProjectRoot=root, Playing=Game.IsPlaying, Scene=scene?.Name,
+    ActivePath=Editor.SceneEditorSession.Active?.Scene.Source?.ResourcePath,
+    Unsaved=Editor.SceneEditorSession.Active?.HasUnsavedChanges,
+    Sessions=Editor.SceneEditorSession.All.Select(s=>new { s.Scene.Name, Path=s.Scene.Source?.ResourcePath, s.HasUnsavedChanges }).ToArray(),
+    Cameras=scene.GetAllComponents<CameraComponent>().Select(c=>new {
+        c.GameObject.Name,c.GameObject.Id,Position=c.WorldPosition.ToString(),Rotation=c.WorldRotation.ToString(),
+        Angles=c.WorldRotation.Angles().ToString(),c.FieldOfView,Axis=c.FovAxis.ToString(),c.IsMainCamera }).ToArray()
+};
+var folder=System.IO.Path.Combine(root,"output/asset-improvement-20261030/tool-cabinet/native-review-20261031");
+System.IO.Directory.CreateDirectory(folder);
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"before-editor-state.json"),System.Text.Json.JsonSerializer.Serialize(result,new System.Text.Json.JsonSerializerOptions{WriteIndented=true}));
+return result;

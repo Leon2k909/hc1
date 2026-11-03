@@ -13,11 +13,17 @@ public sealed class SpectateController : Pawn
 
 	protected override void OnUpdate()
 	{
+		if ( !IsLocallyControlled )
+			return;
+
 		EyeAngles += Input.AnalogLook;
 		EyeAngles = EyeAngles.WithPitch( EyeAngles.pitch.Clamp( -90, 90 ) );
 		WorldRotation = EyeAngles.ToRotation();
 
-		WorldPosition += Input.AnalogMove * WorldRotation * FlySpeed * Time.Delta;
+		// Use the player's existing binds: sprint crosses the map quickly, while walk
+		// gives finer camera placement. Precision takes priority if both are held.
+		var speed = FlySpeed * (Input.Down( "Walk" ) ? 0.25f : Input.Down( "Run" ) ? 4f : 1f);
+		WorldPosition += Input.AnalogMove * WorldRotation * speed * Time.Delta;
 	}
 
 	public override void OnDePossess()

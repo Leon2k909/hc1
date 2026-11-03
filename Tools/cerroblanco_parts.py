@@ -13,6 +13,9 @@ import zlib
 import numpy as np
 
 import map_kit as K
+import cerroblanco_chairs
+import cerroblanco_parasols
+import cerroblanco_tables
 from map_kit import Model, Wall
 
 METAL, STONE, WOOD, GLASS, DIRT, FABRIC = "metal", "default", "wood", "glass", "dirt", "fabric"
@@ -969,6 +972,13 @@ def bench( m, e, n, length=96.0, along="e", height=17.0, depth=20.0, teak=True )
 
 
 def cafe_table( m, e, n, z=0.0, r=14.0 ):
+    """ A bistro table, its top at 29.5: cafe_table_v2 is placed in the scene (cerroblanco_tables), so this only records where, and keeps the old table's collision. """
+    cerroblanco_tables.record( e, n, z )
+    m.collision_box( ( e - r * 0.7, n - r * 0.7, z ), ( e + r * 0.7, n + r * 0.7, z + 29.5 ), METAL )
+
+
+def cafe_table_old( m, e, n, z=0.0, r=14.0 ):
+    """ The old one, before cafe_table_v2: a 20-sided white disc on a bar. """
     m.cylinder( ( e, n ), r, z + 28.5, z + 29.5, { "side": STEEL, "top": WHITE, "bottom": STEEL }, sides=20 )
     rod( m, ( e, n, z + 1 ), ( e, n, z + 28.5 ), 1.2, STEEL, sides=6 )
     m.cylinder( ( e, n ), 9, z, z + 1, { "side": STEEL, "top": STEEL, "bottom": None }, sides=12 )
@@ -976,7 +986,13 @@ def cafe_table( m, e, n, z=0.0, r=14.0 ):
 
 
 def cafe_chair( m, e, n, yaw, z=0.0 ):
-    """ A steel bistro chair with a teak seat, its back away from yaw (it faces yaw). """
+    """ A steel bistro chair with a teak seat, facing yaw: cafe_chair_v2 is placed in the scene (cerroblanco_chairs), so this only records where, and keeps the old chair's collision. """
+    cerroblanco_chairs.record( e, n, yaw, z )
+    m.collision_box( ( e - 7, n - 7, z ), ( e + 7, n + 7, z + 18 ), METAL )
+
+
+def cafe_chair_old( m, e, n, yaw, z=0.0 ):
+    """ The old one, before cafe_chair_v2: a teak slab on four square bars, its back away from yaw (it faces yaw). """
     obox( m, ( e, n, z ), yaw, ( 0, 0, 17.5 ), ( 16, 16, 1.2 ), TEAK )
     for px, py in ( ( 7, 7 ), ( 7, -7 ), ( -7, 7 ), ( -7, -7 ) ):
         x, y, _ = turned( 0, 0, yaw )
@@ -991,7 +1007,12 @@ def cafe_chair( m, e, n, yaw, z=0.0 ):
 
 
 def parasol( m, e, n, z=0.0, r=48.0, paint=WHITE ):
-    """ A square cafe umbrella, open. """
+    """ A square cafe umbrella, open: parasol_v2 is placed in the scene (cerroblanco_parasols), so this only records where. It is 88 across, the courtyard's r 44. """
+    cerroblanco_parasols.record( e, n, z )
+
+
+def parasol_old( m, e, n, z=0.0, r=48.0, paint=WHITE ):
+    """ The old one, before parasol_v2: four flat triangles on a bar, on a black box. """
     rod( m, ( e, n, z ), ( e, n, z + 96 ), 1.2, STEEL, sides=6 )
     apex = np.array( ( e, n, z + 100 ) )
     corners = [ np.array( ( e + sx * r, n + sy * r, z + 84 ) ) for sx, sy in ( ( 1, 1 ), ( -1, 1 ), ( -1, -1 ), ( 1, -1 ) ) ]

@@ -8,40 +8,41 @@ public partial class PlayerPingReceiver : Component, IPingReceiver
 	[RequireComponent] PlayerPawn Player { get; set; }
 
 	private Vector3 _lastKnownPosition = Vector3.Zero;
-	private bool _isCurrentlyLost = false;
 	private bool _wasLost = false;
 
 	string IPingReceiver.Text => "";
 	string IPingReceiver.Icon => "ui/minimaps/enemy_icon.png";
 	Color? IPingReceiver.Color => "#EE4B2B";
 
-	bool IPingReceiver.ShouldShow() => !_isCurrentlyLost;
+	bool IPingReceiver.ShouldShow() => UpdateTracking();
 
 	Vector3 IPingReceiver.Position
 	{
 		get
 		{
-			var pos = Player.AimRay.Position;
-			var isSpotted = Player.Spottable.IsSpotted;
-
-			_isCurrentlyLost = !isSpotted;
-
-			if ( !isSpotted && !_wasLost )
-				_wasLost = true;
-
-			if ( !isSpotted || _wasLost ) 
-				return _lastKnownPosition;
-
-			pos += Vector3.Up * 32f;
-			_lastKnownPosition = pos;
-
-			return pos;
+			UpdateTracking();
+			return _lastKnownPosition;
 		}
+	}
+
+	private bool UpdateTracking()
+	{
+		// Either HUD may ask for visibility before position; losing the target stays latched until a new ping.
+		if ( _wasLost ) return false;
+		if ( !Player.IsValid() || !Player.HealthComponent.IsValid() || Player.HealthComponent.State != LifeState.Alive
+			|| !Player.Spottable.IsValid() || !Player.Spottable.IsSpotted )
+		{
+			_wasLost = true;
+			return false;
+		}
+
+		_lastKnownPosition = Player.AimRay.Position + Vector3.Up * 32f;
+		return true;
 	}
 
 	void IPingReceiver.OnPing()
 	{
 		_wasLost = false;
-		_lastKnownPosition = Vector3.Zero;
+		UpdateTracking();
 	}
 }

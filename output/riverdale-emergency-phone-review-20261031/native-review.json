@@ -1,0 +1,76 @@
+{
+  "NativeEngineRendering": true,
+  "SharedLightingAndCamera": true,
+  "OriginalLeft": true,
+  "InstalledInMap": false,
+  "SceneType": "Isolated prop comparison using Riverdale wall materials",
+  "NativePhysicsChecks": [
+    {
+      "Name": "housing",
+      "Expected": true,
+      "Hit": true,
+      "Passed": true
+    },
+    {
+      "Name": "receiver grip",
+      "Expected": true,
+      "Hit": true,
+      "Passed": true
+    },
+    {
+      "Name": "lower receiver",
+      "Expected": true,
+      "Hit": true,
+      "Passed": true
+    },
+    {
+      "Name": "upper receiver",
+      "Expected": true,
+      "Hit": true,
+      "Passed": true
+    },
+    {
+      "Name": "gap behind receiver",
+      "Expected": false,
+      "Hit": false,
+      "Passed": true
+    },
+    {
+      "Name": "no cable blocking box",
+      "Expected": false,
+      "Hit": false,
+      "Passed": true
+    },
+    {
+      "Name": "beacon",
+      "Expected": true,
+      "Hit": true,
+      "Passed": true
+    }
+  ],
+  "RuntimeScenePreserved": true,
+  "PlayStatePreserved": true,
+  "PostProcessCopies": [
+    "Tonemapping",
+    "Bloom",
+    "Vignette",
+    "Sharpen",
+    "PhotographicResponse"
+  ],
+  "Views": [
+    {
+      "Name": "front",
+      "Eye": "-55,0,7",
+      "Fov": 44
+    },
+    {
+      "Name": "angle",
+      "Eye": "-57,-13,10",
+      "Fov": 46
+    }
+  ],
+  "NativeWidth": 3840,
+  "NativeHeight": 2160,
+  "OutputWidth": 1920,
+  "OutputHeight": 1080
+}

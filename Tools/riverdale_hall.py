@@ -66,7 +66,13 @@ from PIL import Image, ImageDraw
 
 import map_kit as K
 import riverdale_materials as RM
+import riverdale_extinguishers as EXTINGUISHERS
+import riverdale_eyewash as EYEWASHES
+import riverdale_notice_boards as NOTICE_BOARDS
+import riverdale_hose_reels as HOSE_REELS
+import riverdale_first_aid as FIRST_AID
 import riverdale_parts as P
+import riverdale_pool_rules as POOL_RULES
 from riverdale_parts import v, card, box, UP, METAL, STONE
 
 # The hall.
@@ -741,6 +747,7 @@ EXTRA_SURFACES = {
     "rv_hall_interior": ( 96.0, 0.0, lambda: interior_paint() ),
     "rv_hall_roof": ( 192.0, 0.0, lambda: roof_membrane() ),
     "rv_hall_signs": ( 64.0, 0.0, lambda: sign_atlas() ),
+    "rv_pool_rules_v2": ( 26.0, 0.0, POOL_RULES.surface ),
 }
 
 
@@ -971,16 +978,8 @@ def indoor():
 # What a plant keeps on its walls
 
 def extinguisher( d, fine, face, s, z=30.0 ):
-    """ A 9 kg extinguisher on its wall bracket (z its foot), its hose, its sign above. """
-    c = face.p( s, 0, 4.2 )
-    P.lathe( d, c, [ ( 3.3, z ), ( 3.6, z + 0.8 ), ( 3.6, z + 16.5 ), ( 3.0, z + 18.6 ), ( 1.3, z + 19.8 ), ( 1.0, z + 20.6 ) ],
-             "rv_hall_red", 12 )
-    head = face.p( s, z + 21.6, 4.2 )
-    P.obox( fine, head, face.a, ( 2.4, 2.0, 2.0 ), "rv_dark" )
-    bar( fine, head + UP * 1.2 - face.a * 0.6, head + UP * 1.7 + face.a * 3.5, 0.9, 0.35, "rv_dark" )
-    P.pipe( fine, [ head + face.a * 1.2, head + face.a * 3.4 - UP * 1.5, face.p( s + 3.9, z + 11, 4.2 ) ], 0.45, "rv_black", 5, caps=False )
-    face.box( fine, s - 1.6, s + 1.6, z + 10, z + 15, 0, 0.9, "rv_dark" )
-    sign_on( fine, face, "fire_ext", s, z + 34, 10 )
+    """ An extinguisher on the wall, z its foot: Railhead's extinguisher-v2 with its own bracket and sign, placed by the scene's Extinguishers group, so nothing's drawn here. """
+    EXTINGUISHERS.record( face.p( s, z, 0.0 ), face.out )
 
 
 def wall_panel( d, fine, face, s, z0, w=30.0, h=48.0, dep=7.0, tag="db3", door="panel_door", tray=None ):
@@ -997,35 +996,21 @@ def wall_panel( d, fine, face, s, z0, w=30.0, h=48.0, dep=7.0, tag="db3", door="
 
 
 def radiation_monitor( d, fine, face, s, z ):
-    """ An area radiation monitor: its box, display and lamps, an amber beacon on top, its label under. """
-    face.box( d, s - 7, s + 7, z, z + 10, 0, 5, "rv_hall_equipment" )
-    face.quad( fine, "rv_screens", s - 5.5, s + 1.5, z + 3.5, z + 8, 5.05, screen_uv( "table" ) )
-    face.quad( fine, "rv_hall_led_green", s + 3, s + 4.6, z + 6.6, z + 8.2, 5.05 )
-    face.quad( fine, "rv_hall_led_amber", s + 3, s + 4.6, z + 3.8, z + 5.4, 5.05 )
-    c = face.p( s + 4, 0, 2.5 )
-    P.cylinder( fine, c, 1.4, z + 10, z + 13, "rv_hall_led_amber", 8, top="rv_hall_led_amber" )
-    sign_on( fine, face, "arm", s, z - 3.2, 4.4 )
+    """ARM-04 enclosure, recessed dose display, pilot lamps and enamel identification plate."""
+    import riverdale_radiation_monitor
+    riverdale_radiation_monitor.monitor( d, fine, face, s, z )
 
 
 def eyewash( d, fine, face, s, z=0.0 ):
-    """ A wall-mounted eye wash: its green supply up the wall, the bowl and its two heads, the push plate, its sign. """
-    zb = z + 36
-    P.pipe( fine, [ face.p( s, z + 6, 1.2 ), face.p( s, zb - 5, 1.2 ), face.p( s, zb - 2, 6.5 ) ], 0.9, "rv_hall_green", 8, caps=False )
-    c = face.p( s, 0, 6.5 )
-    P.lathe( d, c, [ ( 1.2, zb - 2.5 ), ( 4.8, zb - 0.8 ), ( 5.8, zb + 1.0 ) ], "rv_hall_green", 14, cap="rv_stainless" )
-    for k in ( -1, 1 ):
-        P.cylinder( fine, c + face.a * 2.2 * k, 0.7, zb + 1.0, zb + 2.6, "rv_hall_chrome", 8, top="rv_hall_chrome" )
-    face.box( fine, s + 4.5, s + 7.5, zb - 4, zb + 2, 0.5, 9.5, "rv_hall_green" )
-    sign_on( fine, face, "eyewash", s, zb + 20, 12 )
+    """ A wall-mounted eye wash: eyewash_v2 is placed by the scene's Eye Washes group, a renderer only, as this one never had collision. Only its sign is the hall's. """
+    EYEWASHES.record( face.p( s, z, EYEWASHES.STAND_OFF ), face.out )
+    sign_on( fine, face, "eyewash", s, z + 56, 12 )
 
 
 def hose_cabinet( d, fine, face, s, z=30.0 ):
-    """ A fire hose reel cabinet set into the wall: a red frame, a glazed door, its label. """
-    w, h = 30.0, 32.0
-    face.box( d, s - w / 2 - 1.5, s + w / 2 + 1.5, z - 1.5, z + h + 1.5, 0, 1.4, "rv_hall_red" )
-    face.quad( fine, "rv_window_dark", s - w / 2 + 1, s + w / 2 - 1, z + 7, z + h - 1, 1.45 )
-    face.quad( fine, "rv_hall_signs", s - w / 2 + 1, s + w / 2 - 1, z + 1, z + 6.5, 1.45, atlas_uv( "hose_label" ) )
-    face.box( fine, s + w / 2 - 3.5, s + w / 2 - 2.5, z + h / 2 - 3, z + h / 2 + 3, 1.4, 2.4, "rv_hall_chrome" )
+    """ A fire hose reel cabinet, 33 x 35 in with its bottom edge at z - 1.5: hose_reel_v2 is placed by the scene's Hose Reels group, a renderer only, as the old
+    box never had collision. """
+    HOSE_REELS.record( face.p( s, z - 1.5 ), face.out )
 
 
 def call_point( fine, face, s, z ):
@@ -1034,36 +1019,25 @@ def call_point( fine, face, s, z ):
 
 
 def wall_phone( d, fine, face, s, z ):
-    """ A yellow industrial phone: its box, handset and cord, keypad, and a red lamp that flashes when it rings. """
-    face.box( d, s - 4.5, s + 4.5, z - 7, z + 7, 0, 4.5, "rv_door_yellow" )
-    bar( fine, face.p( s - 2.6, z - 5.5, 5.3 ), face.p( s - 2.6, z + 5.5, 5.3 ), 1.6, 1.5, "rv_hall_plastic", hint=face.out )
-    face.quad( fine, "rv_hall_signs", s + 0.6, s + 3.8, z - 4, z + 1.8, 4.55, atlas_uv( "phone" ) )
-    P.pipe( fine, [ face.p( s - 2.6, z - 5.5, 5.0 ), face.p( s - 1.0, z - 9.5, 4.6 ), face.p( s + 1.5, z - 7.5, 4.5 ) ], 0.25, "rv_hall_plastic", 4, caps=False )
-    P.cylinder( fine, face.p( s, 0, 2.2 ), 1.3, z + 7, z + 9.5, "rv_hall_led_red", 8, top="rv_hall_led_red" )
+    """Approved shared phone, including its collider, authored by the scene group."""
+    import riverdale_emergency_phones as EMERGENCY_PHONES
+    EMERGENCY_PHONES.record( face.p( s, z - 7, 0.0 ), face.out )
 
 
 def first_aid( d, fine, face, s, z ):
-    face.box( d, s - 7, s + 7, z, z + 17, 0, 5, "rv_hall_green" )
-    face.quad( fine, "rv_hall_signs", s - 6.4, s + 6.4, z + 0.6, z + 16.4, 5.05, atlas_uv( "first_aid" ) )
+    """ A first aid cabinet: first_aid_v2 is placed by the scene's First Aid Cabinets group, a renderer only, as the old box never had collision. """
+    FIRST_AID.record( face.p( s, z, 0.0 ), face.out )
 
 
-def notice_board( d, fine, face, s, z, w=36.0, h=24.0, kind="noticeboard" ):
-    face.box( d, s - w / 2, s + w / 2, z, z + h, 0, 1.2, "rv_frame" )
-    face.quad( fine, "rv_hall_signs", s - w / 2 + 0.8, s + w / 2 - 0.8, z + 0.8, z + h - 0.8, 1.25, atlas_uv( kind ) )
+def notice_board( d, fine, face, s, z ):
+    """ A cork notice board, z its bottom edge: notice_board_v2 is placed by the scene's Notice Boards group, a renderer only, as the old box never had collision. """
+    NOTICE_BOARDS.record( face.p( s, z ), face.out )
 
 
 def camera( d, fine, face, s, z, target ):
-    """ A CCTV camera on an arm off the wall, looking at target: its housing and sunshield, its lens. """
-    face.box( fine, s - 2.2, s + 2.2, z - 3, z + 3, 0, 0.8, "rv_hall_equipment" )
-    end = face.p( s, z, 10 )
-    bar( fine, face.p( s, z, 0.8 ), end, 1.4, 1.4, "rv_hall_equipment" )
-    look = unit( v( *target ) - end )
-    x, y, zz = axes_along( look, UP )
-    centre = end - UP * 3.2 + x * 2.5
-    bar( fine, end, end - UP * 1.4, 1.2, 1.2, "rv_hall_equipment" )
-    d.oriented_box( centre, ( x, y, zz ), ( 10, 4.4, 4.4 ), "rv_hall_equipment" )
-    d.oriented_box( centre + zz * 2.6 + x * 1.2, ( x, y, zz ), ( 12.5, 5.6, 0.4 ), "rv_hall_equipment" )
-    P.quad( fine, "rv_hall_signs", centre + x * 5.05, y, zz, 4.0, 4.0, atlas_uv( "camera" ) )
+    """ Detailed weatherproof camera, retaining the established anchors and aim. """
+    from riverdale_camera import camera as draw_camera
+    return draw_camera( d, fine, face, s, z, target )
 
 
 def horn( d, fine, face, s, z, target ):
@@ -1126,7 +1100,7 @@ def wall_item( d, fine, face, kind, s, z0, tray=None, arg=None ):
     elif kind == "board":
         notice_board( d, fine, face, s, z0 + 46 )
     elif kind == "rules":
-        notice_board( d, fine, face, s, z0 + 40, 26.0, 28.0, "pool_rules" )
+        POOL_RULES.board( d, fine, face, s, z0 + 40 )
     elif kind == "sign":
         name, z, h = arg
         sign_on( fine, face, name, s, z0 + z, h )
@@ -2149,8 +2123,8 @@ def north_wall( m, detail=None, fine=None ):
         for z in np.arange( UPPER + 160, TOP, 180.0 ):
             box( m, e0 - 40, e0 + 40, face - 32, face, z, z + 3, "rv_steel" )
     for n_off, r in ( ( 10, 4.0 ), ( 22, 5.5 ) ):
-        P.pipe( m, [ ( E0 + n_off, N0 + 200, 236 + r ), ( E0 + n_off, N1 - n_off, 236 + r ), ( E1 - n_off, N1 - n_off, 236 + r ),
-                     ( E1 - n_off, N0 + 200, 236 + r ) ], r, "rv_pipe", 10 )
+        from riverdale_pipe_clearance import perimeter_path
+        P.pipe( m, perimeter_path( n_off, r ), r, "rv_pipe", 10 )
     for sx in ( -1, 1 ):
         for n0 in SIDE_RISERS[::-1]:
             for k, ( dx, r ) in enumerate( ( ( 8, 7.0 ), ( 26, 9.0 ), ( 44, 6.0 ) ) ):
@@ -2413,7 +2387,7 @@ def walls( d, fine ):
     for a, b in ( ( -880.0, -714.0 ), ( -618.0, 618.0 ), ( 714.0, 880.0 ) ):
         ladder_tray( d, fine, north, a, b, zu, 36, 54 )
     for item in ( ( "ext", 545 ), ( "hose", 680 ), ( "panel", 760, "db3" ), ( "arm", 905 ), ( "eyewash", 962 ), ( "ext", -545 ), ( "hose", -680 ),
-                  ( "panel", -760, "lcp" ), ( "phone", -905 ), ( "firstaid", -962 ), ( "firstaid", -95 ), ( "board", 95 ), ( "rules", -200 ) ):
+                      ( "panel", -760, "lcp" ), ( "phone", -905 ), ( "firstaid", -962 ), ( "firstaid", -95 ), ( "board", 95 ), ( "rules", POOL_RULES.NORTH_CENTRE ) ):
         wall_item( d, fine, north, item[0], item[1], 0.0, tray=( zt, 41 ), arg=item[2] if len( item ) > 2 else None )
     for item in ( ( "panel", -230, "db3" ), ( "panel", 230, "lcp" ), ( "ext", -420 ), ( "ext", 420 ), ( "arm", -560 ), ( "arm", 560 ),
                   ( "phone", -880 ), ( "phone", 880 ) ):

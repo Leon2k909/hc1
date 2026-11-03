@@ -1426,6 +1426,9 @@ public static partial class GameText
 		["Red"] = "Красный",
 		["Green"] = "Зелёный",
 		["Blue"] = "Синий",
+		["Hue"] = "Оттенок",
+		["Saturation"] = "Насыщенность",
+		["Brightness"] = "Яркость",
 		["Search languages"] = "Поиск языка",
 		["No languages found"] = "Языки не найдены",
 		// Custom game rules (CreateLobbyPage)

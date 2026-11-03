@@ -1,0 +1,90 @@
+{
+  "name": "asset_info",
+  "title": "Asset Info",
+  "toolset": "asset",
+  "description": "Everything about one asset - name, type, source and compiled file paths, compile state, tags, cloud package, and how many assets it references and is used by. Explore those relationships with asset_dependencies.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "path": {
+        "type": "string",
+        "description": "Asset path, as returned by asset_search. Absolute paths work too."
+      }
+    },
+    "required": [
+      "path"
+    ]
+  },
+  "annotations": {
+    "readOnlyHint": true
+  },
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "Name": {
+        "type": "string"
+      },
+      "Path": {
+        "type": "string"
+      },
+      "Type": {
+        "type": "string"
+      },
+      "Extension": {
+        "type": "string"
+      },
+      "IsGameResource": {
+        "type": "boolean"
+      },
+      "SourceFile": {
+        "type": "string"
+      },
+      "CompiledFile": {
+        "type": "string"
+      },
+      "IsCompiled": {
+        "type": "boolean"
+      },
+      "IsCompiledAndUpToDate": {
+        "type": "boolean"
+      },
+      "IsCompileFailed": {
+        "type": "boolean"
+      },
+      "CanRecompile": {
+        "type": "boolean"
+      },
+      "IsCloud": {
+        "type": "boolean"
+      },
+      "IsTransient": {
+        "type": "boolean"
+      },
+      "IsProcedural": {
+        "type": "boolean"
+      },
+      "IsTrivialChild": {
+        "type": "boolean"
+      },
+      "Package": {
+        "type": "string"
+      },
+      "Tags": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      },
+      "ReferenceCount": {
+        "type": "integer"
+      },
+      "DependantCount": {
+        "type": "integer"
+      },
+      "LastOpened": {
+        "type": "string"
+      }
+    },
+    "required": []
+  }
+}

@@ -26,6 +26,11 @@
   random, and `WinnerIndex` is synced for the cards. Don't put `hud` on the overlay's root: its `pointer-events: none`
   and `cursor: none` made the cards unclickable and hid the cursor. A card's `.art` must stay `position: relative`:
   absolute panels go by the nearest positioned ancestor, so the map name landed in the screen's corner over the hint.
+- Vote rotation update (2026-11-03): options are filtered for the current mode before the card limit is applied;
+  incompatible maps no longer substitute another mode. Current-map detection uses the active scene's source unless
+  supplied explicitly. The current map is left out when other compatible maps exist and retained when it is the only
+  compatible choice. Resource paths and mode IDs compare without case, duplicate map paths are removed, and valid
+  choices remain randomized. All 92 offline selection checks passed; no editor was used and live voting is pending.
 - The vote's ScreenPanel is ZIndex 999 and the pause menu's 1000 (`PauseMenuPanel.ScreenZIndex`, set in its OnStart
   over the prefabs' 999), so Escape over the vote opens the pause menu on top. At 999 each, the vote, made later, drew
   over the menu (the user's screenshot, 2026-10-02). Compiled offline, not yet seen in-game.

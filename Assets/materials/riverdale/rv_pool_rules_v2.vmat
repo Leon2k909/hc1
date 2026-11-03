@@ -1,0 +1,14 @@
+// Tools/riverdale_pool_rules.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    g_flRoughnessScaleFactor "1"
+    g_flMetalness "0"
+    TextureColor "materials/riverdale/rv_pool_rules_v2_color.png"
+    TextureNormal "materials/riverdale/rv_pool_rules_v2_normal.png"
+    TextureRoughness "materials/riverdale/rv_pool_rules_v2_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[1 1 1 1]"
+    g_flModelTintAmount "1"
+}

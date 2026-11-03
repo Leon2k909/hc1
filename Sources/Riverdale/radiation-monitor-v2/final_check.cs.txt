@@ -1,0 +1,13 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var doc=System.IO.File.ReadAllText(System.IO.Path.Combine(root,"Assets/models/maps/riverdale/riverdale_hall_fine.vmdl"));
+if(doc.Contains("riverdale_hall_fine_arm_v2.obj"))throw new Exception("Fine mesh is still using a temporary source");
+// These two exact files were created only for this task's temporary import.
+foreach(var name in new[]{"riverdale_hall_fine_arm_v2.obj","riverdale_hall_fine_arm_v2.obj.meta"}) {
+    var target=System.IO.Path.Combine(root,"Assets/models/maps/riverdale",name);
+    if(System.IO.File.Exists(target))System.IO.File.Delete(target);
+}
+var paths=new[]{"shell","seal","steel","panel","lcd","sign","amber","green"}.Select(n=>$"materials/riverdale/radiation_monitor_v2/rv_arm_{n}.vmat")
+    .Concat(new[]{"models/maps/riverdale/riverdale_hall_detail.vmdl","models/maps/riverdale/riverdale_hall_fine.vmdl"});
+return new { Game.IsPlaying, Scene=Editor.SceneEditorSession.Active.Scene.Name,
+    Assets=paths.Select(p=> {var a=Editor.AssetSystem.FindByPath(p);return new {Path=p,Compiled=a?.IsCompiled,Failed=a?.IsCompileFailed};}).ToArray(),
+    Models=new[]{"detail","fine"}.Select(n=> {var m=Model.Load($"models/maps/riverdale/riverdale_hall_{n}.vmdl");return new {Name=n,m.IsError,MonitorMaterials=m.Materials.Where(a=>a.Name.Contains("rv_arm_")).Select(a=>a.Name).ToArray()};}).ToArray() };

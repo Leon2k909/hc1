@@ -1,0 +1,96 @@
+"""Cerro Blanco's cafe table v2: build, bake and export. Uses the capture flag's mesh toolkit.
+
+blender -b --factory-startup -t 4 --python table.py -- <work dir> <project root> <build|bake|export> ...
+
+A bistro table in place of a 20-sided white disc on a six-sided bar: a 28 in top of white compact laminate, half an inch thick with its black core showing at the edge, on a four-armed steel spider
+screwed up under it, a column and a cast base on levelling glides. Anthracite powder coat, as the courtyard's parasols and the chairs. No maker's names.
+
+Two models come out of the one build. "table" is the whole table, for the cafe inside. "table_top" is the top and its spider only, for the courtyard, where the parasol's socket tube and cast base
+stand under it: its spider's hub sits on the parasol's flange (28.4) and its grommet sits on the top (29.5).
+
+Inches. Z is up and the origin is on the floor at the column. The top's surface is at 29.5, as the old one's, where the fit-out's cups stand.
+"""
+import hashlib
+import json
+import math
+import os
+import sys
+
+sys.dont_write_bytecode = True
+import bmesh
+import bpy
+import numpy as np
+from mathutils import Vector
+
+argv = sys.argv[sys.argv.index("--") + 1 :]
+WORK, ROOT = argv[0], argv[1]
+STAGES = argv[2:]
+os.makedirs(WORK, exist_ok=True)
+sys.path.insert(0, os.path.join(ROOT, "Sources", "Gameplay", "capture-flag-v2"))
+import build as kit  # noqa: E402
+
+from build import Part, add, tube  # noqa: E402
+
+LAMINATE, POWDER, CAST, NYLON, STEEL = 0, 1, 2, 3, 4
+FOLDER = "models/maps/cerroblanco/cafe_table_v2"
+OUT = os.path.join(ROOT, "Assets", "models", "maps", "cerroblanco", "cafe_table_v2")
+BLEND = os.path.join(WORK, "table_build.blend")
+NAME = "table"
+W, H = 2048, 2048
+POS_RANGE = 80.0  # The position bake spans this many inches, centred on the origin.
+
+TOP_Z, TOP_T, TOP_R, EASE = 29.5, 0.5, 14.0, 0.06
+HUB_Z0, HUB_R = 28.4, 2.8
+ARM_R0, ARM_R1, ARM_W, ARM_T = 2.4, 11.4, 1.1, 0.18
+COLUMN_R, BASE_R = 1.5, 9.2
+PEDESTAL = ("column", "collar", "base", "glide")  # Left out of table_top: the parasol stands there instead.
+rng = np.random.default_rng(2631)
+edge_lines = []
+SCREWS = []
+NO_EDGE = ("screw", "glide")
+
+
+def piece(finish, lod, bevel=0.0, segs=1, angle=35.0, name=""):
+    return add(Part(finish, lod, bevel=bevel, segs=segs, angle=angle, name=name))
+
+
+def top():
+    z0 = TOP_Z - TOP_T
+    kit.lathe(piece(LAMINATE, 3, name="top"), [(0, z0), (TOP_R - EASE, z0), (TOP_R, z0 + EASE), (TOP_R, TOP_Z - EASE), (TOP_R - EASE, TOP_Z), (0, TOP_Z)], 72)
+
+
+def spider():
+    z1 = TOP_Z - TOP_T
+    kit.lathe(piece(POWDER, 3, name="hub"), [(0, HUB_Z0), (HUB_R - 0.1, HUB_Z0), (HUB_R, HUB_Z0 + 0.1), (HUB_R, z1 - 0.01), (0, z1 - 0.01)], 28)
+    for k in range(4):
+        a = math.radians(45 + 90 * k)
+        out = Vector((math.cos(a), math.sin(a), 0))
+        m = kit.frame(Vector((0, 0, z1 - ARM_T)), (0, 0, 1), (out.x, out.y, 0))
+        kit.box(piece(POWDER, 2, bevel=0.04, angle=40, name="arm"), (ARM_R0, -ARM_W / 2, 0.0), (ARM_R1, ARM_W / 2, ARM_T - 0.01), m)
+        # The arm's end is turned down a little, as pressed steel is, and two screws go up through it into the top.
+        kit.box(piece(POWDER, 2, bevel=0.03, angle=40, name="arm"), (ARM_R1 - 0.18, -ARM_W / 2, -0.5), (ARM_R1, ARM_W / 2, 0.0), m)
+        for r in (6.0, ARM_R1 - 0.7):
+            at = out * r + Vector((0, 0, z1 - ARM_T))
+            kit.lathe(piece(STEEL, 0, name="screw"), [(0.2, 0.02), (0.2, 0.0), (0.14, -0.06), (0, -0.07)], 10, kit.frame(at))
+            SCREWS.append((tuple(at), (0.0, 0.0, -1.0)))
+
+
+def pedestal():
+    kit.lathe(piece(POWDER, 3, name="column"), [(0, 2.4), (COLUMN_R, 2.4)] + [(COLUMN_R, z) for z in np.linspace(2.6, HUB_Z0 - 0.4, 6)] + [(COLUMN_R, HUB_Z0), (0, HUB_Z0)], 24)
+    kit.lathe(piece(POWDER, 2, name="collar"), [(0, HUB_Z0 - 0.75), (COLUMN_R + 0.22, HUB_Z0 - 0.75), (COLUMN_R + 0.28, HUB_Z0 - 0.65), (COLUMN_R + 0.28, HUB_Z0 - 0.02), (0, HUB_Z0 - 0.02)], 24)
+    kit.lathe(
+        piece(POWDER, 3, name="base"),
+        [(0, 0.3), (BASE_R - 0.2, 0.3), (BASE_R, 0.45), (BASE_R, 0.8), (BASE_R - 0.2, 1.0), (6.5, 1.28), (2.7, 1.56), (2.35, 1.78), (2.05, 2.4), (1.75, 2.55), (COLUMN_R + 0.02, 2.6), (0, 2.6)],
+        56,
+    )
+    for k in range(4):
+        a = math.radians(45 + 90 * k)
+        kit.lathe(piece(NYLON, 1, name="glide"), [(0, 0.0), (0.7, 0.0), (0.76, 0.08), (0.72, 0.32), (0, 0.32)], 12, kit.frame((7.9 * math.cos(a), 7.9 * math.sin(a), 0)))
+
+
+def geometry():
+    top()
+    spider()
+    pedestal()
+
+

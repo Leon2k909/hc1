@@ -7,6 +7,12 @@ $export = "$work\headstone_v2"
 $mats = "$export\materials\belltower\headstone_v2"
 New-Item -ItemType Directory -Force $work, $mats | Out-Null
 python "$PSScriptRoot\read_old.py" $root "$work\old_stones.json"
+if (-not (Test-Path "$work\scan_stone.npy")) {
+    $s = Start-Process -FilePath python -ArgumentList @("`"$PSScriptRoot\scan_stone.py`"", "`"$root`"", "`"$work`"") -PassThru -WindowStyle Hidden -RedirectStandardOutput "$work\scan.log" -RedirectStandardError "$work\scan.err"
+    $s.PriorityClass = 'Idle'
+    $s.WaitForExit()
+    if ($s.ExitCode -ne 0) { "scan exit $($s.ExitCode)"; exit 1 }
+}
 if ($Build) {
     & "$PSScriptRoot\blender_idle.ps1" "$PSScriptRoot\headstone.py" "$work\build.log" $work $root build bake
 }

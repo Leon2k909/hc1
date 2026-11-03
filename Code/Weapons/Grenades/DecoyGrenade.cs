@@ -9,7 +9,6 @@ public sealed class DecoyGrenade : BaseGrenade, ICustomMinimapIcon
 	[Property, Group( "Effects" )] SoundEvent ShotSound { get; set; }
 	[Property, Group( "Effects" )] GameObject Effect { get; set; }
 
-	bool CanChatter;
 	TimeUntil TimeUntilShot = 0;
 	TimeSince TimeSinceShot = 1;
 
@@ -21,22 +20,21 @@ public sealed class DecoyGrenade : BaseGrenade, ICustomMinimapIcon
 
 	protected override void OnUpdate()
 	{
-		CanChatter = Rigidbody.Velocity.Length < ChatterSpeed;
-
-		if ( CanChatter )
+		// The grenade's owner chooses one firing schedule for every listener.
+		if ( !IsProxy && Rigidbody.IsValid() && Rigidbody.Velocity.Length < ChatterSpeed && TimeUntilShot )
 		{
-			if ( TimeUntilShot )
-			{
-				TimeUntilShot = ShotDelay.GetValue();
-				Fire();
-			}
+			TimeUntilShot = ShotDelay.GetValue();
+			Fire();
 		}
 
 		base.OnUpdate();
 	}
 
+	[Rpc.Broadcast]
 	void Fire()
 	{
+		if ( Rpc.Caller is not null && Rpc.Caller != Connection.Host && Rpc.Caller != Network.Owner ) return;
+
 		TimeSinceShot = 0;
 
 		if ( ShotSound is not null )

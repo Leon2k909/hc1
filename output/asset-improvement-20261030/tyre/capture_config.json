@@ -1,0 +1,133 @@
+{
+ "out": "output/asset-improvement-20261030/tyre/draft1",
+ "scene": "Assets/scenes/maps/Railhead/railhead.scene",
+ "roots": [
+  "Sun",
+  "Sky",
+  "Fog",
+  "Look",
+  "Station",
+  "Trees",
+  "Lights",
+  "Reflection Probes",
+  "Station Indirect Light"
+ ],
+ "exposure": 1.9,
+ "width": 1100,
+ "height": 720,
+ "stone_texels": 2048,
+ "stones": [
+  {
+   "model": "models/props/railhead/tyre_v2/tyre_a.vmdl",
+   "at": [
+    -2198.8,
+    -1878.0,
+    0.3
+   ],
+   "yaw": 20.0,
+   "scale": 1.0
+  },
+  {
+   "model": "models/props/railhead/tyre_v2/tyre_b.vmdl",
+   "at": [
+    -2200.1546133931547,
+    -1879.2084931133084,
+    8.370000000000001
+   ],
+   "yaw": 130.0,
+   "scale": 1.0
+  },
+  {
+   "model": "models/props/railhead/tyre_v2/tyre_a.vmdl",
+   "at": [
+    -2201.160157831095,
+    -1876.779793918621,
+    16.44
+   ],
+   "yaw": 250.0,
+   "scale": 1.0
+  },
+  {
+   "model": "models/props/railhead/tyre_v2/tyre_b.vmdl",
+   "at": [
+    -2199.5464267087445,
+    -1878.0235394606782,
+    24.51
+   ],
+   "yaw": 310.0,
+   "scale": 1.0
+  }
+ ],
+ "views": [
+  {
+   "name": "pair",
+   "eye": [
+    -2188.0,
+    -1975.0,
+    60.0
+   ],
+   "target": [
+    -2180.0,
+    -1877.0,
+    16.0
+   ],
+   "fov": 55.0
+  },
+  {
+   "name": "pair_low",
+   "eye": [
+    -2190.0,
+    -1949.0,
+    22.0
+   ],
+   "target": [
+    -2180.0,
+    -1877.0,
+    16.0
+   ],
+   "fov": 60.0
+  },
+  {
+   "name": "new_close",
+   "eye": [
+    -2222.0,
+    -1922.0,
+    42.0
+   ],
+   "target": [
+    -2200.0,
+    -1878.0,
+    22.0
+   ],
+   "fov": 50.0
+  },
+  {
+   "name": "old_close",
+   "eye": [
+    -2138.0,
+    -1920.0,
+    42.0
+   ],
+   "target": [
+    -2160.0,
+    -1876.0,
+    22.0
+   ],
+   "fov": 50.0
+  },
+  {
+   "name": "new_top",
+   "eye": [
+    -2210.0,
+    -1896.0,
+    64.0
+   ],
+   "target": [
+    -2200.0,
+    -1878.0,
+    32.0
+   ],
+   "fov": 55.0
+  }
+ ]
+}

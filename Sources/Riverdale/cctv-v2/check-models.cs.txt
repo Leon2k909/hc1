@@ -1,0 +1,5 @@
+return new [] { "detail", "fine" }.Select(s => {
+    var path = $"models/maps/riverdale/cctv_v2_review/riverdale_hall_{s}.vmdl";
+    var model = Model.Load(path);
+    return new { Path=path, Error=model==null || model.IsError, Materials=model?.Materials.Select(m=>m.ResourcePath).ToArray() };
+}).ToArray();

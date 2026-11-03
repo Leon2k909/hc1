@@ -1,0 +1,2 @@
+object Snapshot()=>new {Game.IsPlaying,Scene=Game.ActiveScene?.Source?.ResourcePath,Id=Game.ActiveScene?.Id,Players=Game.ActiveScene?.GetAllComponents<Facepunch.PlayerPawn>().Count(),Editor=Editor.SceneEditorSession.Active?.Scene?.Id};
+var before=Snapshot();await Task.Delay(100,cancellationToken);var after=Snapshot();return new {before,after};

@@ -10,6 +10,8 @@ public sealed class PlayerStatsRule : Component,
 {
 	void IGameEventHandler<KillEvent>.OnGameEvent( KillEvent eventArgs )
 	{
+		if ( !Networking.IsHost ) return;
+
 		SendToAttacker( eventArgs );
 		SendToVictim( eventArgs );
 	}
@@ -21,10 +23,11 @@ public sealed class PlayerStatsRule : Component,
 			return;
 
 		// Bots don't care about stats
-		if ( player.Client.IsBot )
+		if ( !player.Client.IsValid() || player.Client.IsBot )
 			return;
 
-		// TODO: Don't count team-kills?
+		if ( !KillStatRules.IsEnemyKill( eventArgs.DamageInfo ) )
+			return;
 
 		var inflictor = eventArgs.DamageInfo.Inflictor;
 		if ( inflictor is Equipment wpn && wpn.IsValid() )
@@ -37,7 +40,7 @@ public sealed class PlayerStatsRule : Component,
 	}
 
 	/// <summary>
-	/// Send a death stat to the victim. This can only happen if the killer was a player.
+	/// Send a death stat to the human victim, including deaths to bots, falls and other world damage.
 	/// </summary>
 	/// <param name="eventArgs"></param>
 	private void SendToVictim( KillEvent eventArgs )
@@ -54,12 +57,6 @@ public sealed class PlayerStatsRule : Component,
 		if ( player.Client.IsBot )
 			return;
 
-		var attacker = GameUtils.GetPlayerFromComponent( eventArgs.DamageInfo.Attacker );
-		if ( !attacker.IsValid() )
-			return;
-
-		// TODO: Don't count team-kills?
-
 		using ( Rpc.FilterInclude( player.Network.Owner ) )
 		{
 			SendDeathStat();
@@ -69,7 +66,7 @@ public sealed class PlayerStatsRule : Component,
 	[Rpc.Broadcast( NetFlags.HostOnly )]
 	private void SendKillStat( HitboxTags hitbox = default )
 	{
-		var isHeadshot = hitbox == HitboxTags.Head;
+		var isHeadshot = hitbox.HasFlag( HitboxTags.Head );
 
 		if ( isHeadshot )
 		{

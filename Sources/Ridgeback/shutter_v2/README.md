@@ -1,6 +1,6 @@
 # Ridgeback town house shutter v2
 
-Installed 2026-10-31 at the user's word after comparing both in s&box ("shutters new better"). Nothing is committed. `town_house.obj` has lost its `shutter_green` faces, and the prefab's "Shutters" group places 34 leaves with renderers only, as the old ones had no collision. `docs/notes/168-*` has how.
+Installed 2026-10-31 at the user's word after comparing both in s&box ("shutters new better"). It's on `codex/orion-cable-reel-preview`, not main, in e2a67355 and 5c80147c, from the user's request to put everything on git. `town_house.obj` has lost its `shutter_green` faces, and the prefab's "Shutters" group places 34 leaves with renderers only, as the old ones had no collision. `docs/notes/168-*` has how.
 
 Why this one: Ridgeback, the battle royale map, has no truly standalone small props. Its town house is the map's one building, and its 34 shutters, all one flat box,
 are the most repeated and most visible crude thing on it.

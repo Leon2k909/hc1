@@ -201,6 +201,7 @@ public sealed class PlayerScore : Component,
 
 	[Sync( SyncFlags.FromHost )]
 	public NetList<int> ScoreHistory { get; private set; } = new();
+	private int _scoreAtRoundStart;
 
 	[Sync( SyncFlags.FromHost )]
 	public bool WasBombPlanter { get; private set; }
@@ -398,17 +399,22 @@ public sealed class PlayerScore : Component,
 		BankedUAVs = 0;
 
 		ScoreHistory.Clear();
+		_scoreAtRoundStart = 0;
 
 		WasBombPlanter = false;
 	}
 
 	void IGameEventHandler<RoundCounterIncrementedEvent>.OnGameEvent( RoundCounterIncrementedEvent eventArgs )
 	{
-		ScoreHistory.Add( Score - ScoreHistory.LastOrDefault() );
+		// Last round's contribution is the change in the match total, not the change
+		// from the previous round's contribution. Team balancing reads this history.
+		ScoreHistory.Add( Score - _scoreAtRoundStart );
+		_scoreAtRoundStart = Score;
 	}
 
 	void IGameEventHandler<RoundCounterResetEvent>.OnGameEvent( RoundCounterResetEvent eventArgs )
 	{
 		ScoreHistory.Clear();
+		_scoreAtRoundStart = Score;
 	}
 }

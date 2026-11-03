@@ -46,7 +46,7 @@ import reefhall_map as M  # noqa: E402
 
 K = M.K
 rooms, _ = M.build_rooms()
-benches = [(name, prop) for name, model, _ in rooms for prop in model.props if "model" in prop]
+benches = [(name, prop) for name, model, _ in rooms for prop in model.props if prop.get("kind") == "Bench"]
 report["benches"] = len(benches)
 if len(benches) != 8:
     failures.append(f"{len(benches)} benches, not 8")

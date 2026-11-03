@@ -1,0 +1,35 @@
+// Run through the native editor in its exchange directory. Stage sources stay outside Assets until validated.
+var root = Sandbox.Project.Current.GetRootPath();
+var output = System.IO.Path.Combine(root,"output/riverdale/radiation-monitor-v2");
+var manifest = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(output,"material-fix.json")));
+string Hash(byte[] b) => Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(b)).ToLowerInvariant();
+var entries = manifest["Entries"].AsArray();
+// Check every dependency and destination before the first write, preserving concurrent edits.
+foreach (var item in entries) {
+    var source = item["Source"].GetValue<string>();
+    var target = item["Target"].GetValue<string>();
+    if (!System.IO.Path.GetFullPath(target).StartsWith(System.IO.Path.Combine(root,"Assets") + System.IO.Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase)) throw new Exception("Target outside project Assets");
+    var expected = item["ExpectedSHA256"]?.GetValue<string>();
+    var actual = System.IO.File.Exists(target) ? Hash(System.IO.File.ReadAllBytes(target)) : null;
+    if (expected != actual) throw new Exception("Destination changed since staging: " + target);
+    if (Hash(System.IO.File.ReadAllBytes(source)) != item["SHA256"].GetValue<string>()) throw new Exception("Stage hash mismatch");
+}
+var written = new System.Collections.Generic.List<string>();
+foreach (var item in entries) {
+    var source = item["Source"].GetValue<string>();
+    var target = item["Target"].GetValue<string>();
+    if (System.IO.File.Exists(target)) {
+        var relative = System.IO.Path.GetRelativePath(System.IO.Path.Combine(root,"Assets"),target);
+        var backup = System.IO.Path.Combine(output,"backup",relative);
+        System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(backup));
+        if (!System.IO.File.Exists(backup)) System.IO.File.Copy(target,backup);
+    }
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target));
+    // Source files can be memory-mapped by the asset compiler. Replace their directory
+    // entries atomically instead of truncating a file the engine still has mapped.
+    var temporary = target + ".arm-installing";
+    System.IO.File.Copy(source,temporary,true);
+    System.IO.File.Move(temporary,target,true);
+    written.Add(target);
+}
+return new {Written=written, Game.IsPlaying, Scene=Editor.SceneEditorSession.Active.Scene.Name};

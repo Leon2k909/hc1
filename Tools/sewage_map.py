@@ -19,6 +19,8 @@ RNG = np.random.default_rng(15026)
 IDS = K.SceneIds('d6ab2592-265b-48f5-8afe-97c5206e0c43')
 PAINTS = {}
 LIGHTS = []
+# Power cabinets: plan east, north, up, and the yaw each is placed at.
+CABINETS = [(-958,470,0,-90),(946,600,0,90),(-870,830,352,-90)]
 
 def noise(shape, scale, rng=RNG):
     small = rng.random((max(2, int(shape[0]/scale)), max(2, int(shape[1]/scale)))).astype(np.float32)
@@ -520,10 +522,12 @@ def build():
         detail.cylinder((e,n),20,z,z+54,'rust',sides=24,surface='metal')
         for h in [3,17,40,51]:torus(detail,(e,n,z+h),(0,0,1),20,1.3,'steel',24)
         detail.cylinder((e+8,n-5),3,z+54,z+56,'steel',sides=10)
-    for e,n,z in [(-958,470,0),(946,600,0),(-870,830,352)]:
-        detail.box((e-18,n-38,z),(e+18,n+38,z+115),'steel','metal')
-        for h in range(30,90,8):detail.box((e-19,n-25,z+h),(e+19,n+25,z+h+2),'rust')
-        lamp(detail,(e,n-40,z+104),'green',100,.5)
+    # The cabinets themselves are models/maps/sewage/power_cabinet_v2, placed in the scene. Their bodies' collision stays here, and each green light
+    # stays in this list, at the new model's status lamp.
+    for e,n,z,turn in CABINETS:
+        detail.collision_box((e-18,n-38,z),(e+18,n+38,z+115),'metal')
+        out=1 if turn<0 else -1
+        LIGHTS.append((np.array((e+out*24,n-out*24,z+104.5)),(.08,.34,.165),100,False))
     for _ in range(180):
         side=RNG.choice([-1,1]); e=side*RNG.uniform(900,960); n=RNG.uniform(-900,970)
         sx,sy,sz=RNG.uniform(3,15,3)
@@ -549,6 +553,10 @@ def scene(models):
         c=[comp('Sandbox.ModelRenderer',name+'/render',Model=path)]
         if name not in ('water','cascades','signage'):c.append(comp('Sandbox.ModelCollider',name+'/collision',Model=path,Static=True))
         objects.append(go('Waterworks '+name,name,components=c,tags='sewage'+(',water' if name=='water' else '')))
+    for i,(e,n,z,turn) in enumerate(CABINETS):
+        path='models/maps/sewage/power_cabinet_v2/power_cabinet.vmdl'
+        objects.append(go(f'Power cabinet {i+1}',f'power_cabinet/{i}',position=K.to_world((e,n,z)),rotation=K.angles_rotation(0,turn),components=[
+            comp('Sandbox.ModelRenderer',f'power_cabinet/{i}/render',Model=path),comp('Sandbox.ModelCollider',f'power_cabinet/{i}/collision',Model=path,Static=True)]))
     lights=[]
     for i,(p,color,radius,shadows) in enumerate(LIGHTS):
         lights.append(go(f'Work light {i+1}',f'light/{i}',position=K.to_world(p),components=[comp('Sandbox.PointLight',f'light/{i}/component',LightColor=','.join(map(str,(*color,1))),Radius=radius,Shadows=shadows,Attenuation=1,FogMode='Enabled',FogStrength=.5)]))

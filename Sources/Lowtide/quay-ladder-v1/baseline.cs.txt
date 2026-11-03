@@ -1,0 +1,72 @@
+// Native fixed-camera comparisons. No cubemap bake, source scene change, or editor camera movement.
+var project=Sandbox.Project.Current.GetRootPath();
+var folder=System.IO.Path.Combine(project,"output/lowtide/quay-ladder-v1");
+var config=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"capture-config.json")));
+var editor=Editor.SceneEditorSession.Active;
+var before=new { SceneId=editor.Scene.Id, RuntimeId=Game.ActiveScene?.Id, Game.IsPlaying, Dirty=editor.HasUnsavedChanges };
+var data=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(project,"Assets/scenes/maps/Lowtide/lowtide.scene"))).AsObject();
+var roots=new System.Text.Json.Nodes.JsonArray();
+foreach(var node in data["GameObjects"].AsArray()) {
+ var name=node["Name"]?.GetValue<string>()??"";
+ if(new[]{"Sun","Sky","Fog","Look","Lights","Reflection Probes"}.Contains(name)||name=="Lowtide")roots.Add(node.DeepClone());
+}
+data["GameObjects"]=roots;data["SceneProperties"]["NavMesh"]["Enabled"]=false;data["SceneProperties"]["WantsSystemScene"]=false;
+Vector3 World(System.Text.Json.Nodes.JsonNode n)=>new(n[1].GetValue<float>(),-n[0].GetValue<float>(),n[2].GetValue<float>());
+var scene=Scene.CreateEditorScene();
+var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic;
+var preRender=typeof(Scene).GetMethod("PreRender",flags,null,Type.EmptyTypes,null);
+var preCamera=typeof(Scene).GetMethod("PreCameraRender",flags,null,Type.EmptyTypes,null);
+var written=new System.Collections.Generic.List<string>();
+try {
+ CameraComponent camera;ModelRenderer hall,core;Model oldHall,oldCore;
+ Model newHall=null,newCore=null;
+ var variants=config["variants"].AsArray().Select(n=>n.GetValue<string>()).ToArray();
+ if(variants.Contains("after")) {
+  newHall=Model.Load("models/maps/ares/interior-v1/ares_hall_preview.vmdl");
+  newCore=Model.Load("models/maps/ares/interior-v1/ares_reactor_preview.vmdl");
+  if(newHall.IsError||newCore.IsError)throw new InvalidOperationException("Preview model did not compile");
+ }
+ using(scene.Push()) {
+  scene.Deserialize(data);
+  hall=scene.GetAllComponents<ModelRenderer>().Single(r=>r.Model?.ResourcePath=="models/maps/lowtide/lowtide_east.vmdl");
+  core=scene.GetAllComponents<ModelRenderer>().Single(r=>r.Model?.ResourcePath=="models/maps/lowtide/lowtide_west.vmdl");
+  oldHall=hall.Model;oldCore=core.Model;
+  var holder=new GameObject(false,"Ares interior comparison camera");camera=holder.Components.Create<CameraComponent>();
+  camera.IsMainCamera=false;camera.ZNear=2;camera.ZFar=120000;camera.CustomSize=new Vector2(1600,900);
+  var tone=holder.Components.Create<Tonemapping>();tone.Mode=Tonemapping.TonemappingMode.ACES;
+  // A fixed exposure within the map's existing 1.7..3.35 range makes each
+  // comparison readable without changing any saved map exposure or lights.
+  tone.AutoExposureEnabled=false;tone.ExposureCompensation=2.4f;
+  var ao=holder.Components.Create<AmbientOcclusion>();ao.Radius=48;ao.Intensity=.45f;ao.FalloffRange=.9f;ao.ThinCompensation=1;
+  var bloom=holder.Components.Create<Bloom>();bloom.Strength=.1f;bloom.Threshold=1.6f;
+  holder.Enabled=true;scene.EditorTick(.016f,.016f);preRender.Invoke(scene,null);preCamera.Invoke(scene,null);
+ }
+ var models=scene.GetAllComponents<ModelRenderer>().Where(r=>r.Model!=null).Select(r=>r.Model).ToList();
+ if(newHall!=null) { models.Add(newHall);models.Add(newCore); }
+ for(var frame=0;frame<40;frame++) {
+  using(scene.Push()) { scene.EditorTick(.016f,.016f);preRender.Invoke(scene,null); }
+  await Task.Delay(33,cancellationToken);
+ }
+ foreach(var variant in variants) {
+  using(scene.Push()) {
+   hall.Model=variant=="after"?newHall:oldHall;core.Model=variant=="after"?newCore:oldCore;
+  }
+  foreach(var view in config["views"].AsArray()) {
+   cancellationToken.ThrowIfCancellationRequested();using var bitmap=new Bitmap(1600,900);
+   for(var frame=0;frame<90;frame++) {
+    using(scene.Push()) {
+     camera.WorldPosition=World(view["eye"]);camera.WorldRotation=Rotation.LookAt(World(view["target"])-camera.WorldPosition);camera.FieldOfView=view["fov"].GetValue<float>();
+     scene.EditorTick(.016f,.016f);preRender.Invoke(scene,null);preCamera.Invoke(scene,null);camera.RenderToBitmap(bitmap,false);
+    }
+    await Task.Delay(16,cancellationToken);
+   }
+   var path=System.IO.Path.Combine(folder,view["name"].GetValue<string>()+"-"+variant+".png");
+   System.IO.File.WriteAllBytes(path,bitmap.ToPng());written.Add(path);
+  }
+ }
+ var report=new { Written=written, ErrorModels=scene.GetAllComponents<ModelRenderer>().Where(r=>r.Model==null||r.Model.IsError).Select(r=>r.GameObject.Name).ToArray(),
+  UserStatePreserved=editor.Scene.Id==before.SceneId&&Game.ActiveScene?.Id==before.RuntimeId&&Game.IsPlaying==before.IsPlaying&&editor.HasUnsavedChanges==before.Dirty,
+  HallMaterials=hall.Model.Materials.Where(m=>m.ResourcePath.Contains("interior-v1")).Select(m=>m.ResourcePath).ToArray() };
+ System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"capture-"+string.Join("-",variants)+".json"),System.Text.Json.JsonSerializer.Serialize(report,new System.Text.Json.JsonSerializerOptions{WriteIndented=true}));return report;
+} catch(Exception ex) { System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"capture-error.txt"),ex.ToString());throw; }
+finally { scene.Destroy(); }

@@ -1,16 +1,43 @@
 ## Collider (accelerator laboratory, `Tools/collider_map.py`)
+- Chair comparison added (2026-11-01): the user wants to keep both chair versions for
+  in-game selection. The accepted v1 stays embedded in Structure at world (-55,-1723,256).
+  Revised v2 is one separate scene object, `Chair comparison - Revised v2 (woven / stitched)`,
+  at world (20,-1723,256), yaw 90, in the upper east control/desk row. Its 104,632 reviewed
+  triangles and eight private PBR materials use `models/props/collider/chair-realism-v2/after.vmdl`.
+  Current v1 assets, Structure mesh/physics, other saved scene objects and lighting are unchanged.
+  `Sources/Collider/chair-realism-v2/scene-addition.json` retains it on regeneration; remove
+  that JSON plus the scene object to drop v2 later. Installation/rollback hashes are in
+  `installed.json`. Installed offline with the target project closed; native review is pending.
+- Maintenance cabinet installed (2026-10-31): the approved right-hand cabinet replaces the case at
+  plan (-650,160,0). Exactly 2,420 old render triangles and one full-height box are removed; 23,646 approved
+  triangles, 39 boxes and ten hulls are installed. Detail now totals 304,419 triangles. Four tyre hulls were
+  simplified to 32 sampled original points after native testing exposed two oversized runtime hulls.
+  The visible mesh and materials are unchanged. All 25 installed-model native collision checks pass,
+  including tyre contact rays filtered to the detail model so the structure floor cannot create a false pass.
+  The model is compiled and up to date. Unrelated render triangles, physics blocks, accepted props and
+  the saved scene are preserved. Tools/collider_tool_cabinet.py, accepted-physics.json and the exact selected
+  hardcase branch preserve regeneration. Sources/Collider/tool-cabinet-trial-v1/installed.json and
+  output/collider-tool-cabinet-accepted-20261031/ retain rollback, hashes, checks and a native offscreen view
+  of the installed location. The active play session was not stopped or edited.
 - Maintenance-cabinet proposal (2026-10-30): replaces the saved 2,420-triangle case at plan `(-650,160,0)`
   only after approval. The private 23,646-triangle candidate has a folded shell, separate returned drawer
   fronts, hollow metal pulls, rolled stainless worktop/rubber mat, grounded swivel casters, brakes, rear
   service panel and localized coating wear. The actual before mesh/UVs/normals and saved collider are copied
-  from detail sources. Collision uses 33 small boxes and six disconnected rounded/profiled hulls. Tests read
-  the exported ModelDoc/hull topology and pass 36 solid/empty-space probes, all four ground contacts, open
+  from detail sources. Collision uses 39 small boxes and ten disconnected rounded/profiled hulls, including drawer fronts and caster pivots. Tests read
+  the exported ModelDoc/hull topology and pass 46 solid/empty-space probes, all four ground contacts, open
   underside/handle gaps, original visible-footprint bounds and outside player-width clearance. Maximum
-  collision-vertex distance to a visible vertex is 0.4472 inch at a small bevel; there is no full-height case
-  blocker under the new cabinet. All 495 protected sources remain unchanged, including the accepted pump.
+  collision-vertex distance to a visible vertex is 0.692 inch at a simplified caster housing; there is no full-height case
+  blocker under the new cabinet. Native comparison (2026-10-31) places both whole props side by side in the running
+  Collider map, with a shared camera, player post-processing and map exposure; native 4K captures resolve to 1080p.
+  All 26 runtime physics rays pass. A native mip-generation failure was fixed by retaining raw atlases and using
+  2048x2048 engine maps for six cabinet and four approved-pump materials. Of 495 original protected sources,
+  491 remain identical and only those four pump imports change; originals and exact hashes are archived in
+  native-import-fix.json. Geometry, physics, source UVs and the saved scene are unchanged; sixteen new pump
+  dependencies extend the guard to 511 sources. Temporary comparison props/document were discarded, and the
+  original Ares document plus previous Spillway runtime map/play state were restored.
   `Sources/Collider/tool-cabinet-trial-v1/` and `output/asset-improvement-20261030/tool-cabinet/` retain source,
   collision checks and matched whole-object render evidence. Original map asset retained; not installed.
-  Work is offline, CPU only, idle priority/two threads; native collision/import/appearance checks pending.
+  Original offline renders remain historical evidence; native-review-20261031 contains the current in-game comparison.
 - Pump skid accepted (2026-10-30): the user approved revision 4 after the dark-blotch correction. Exactly
   2,420 saved equipment-case triangles at plan `(-850,-350,0)` are replaced by the reviewed 58,005-triangle
   pump; detail now totals 283,193 triangles. Exact approved positions, UVs, normals and 25 material bindings
@@ -20,7 +47,8 @@
   Matching primary staged detail files were synchronized. Old standalone before resources and rollback map
   sources are archived outside Assets. `Sources/Collider/pump-skid-trial-v1/installed.json` and
   `output/collider-pump-skid-accepted-20261030/` record integration and supersede historical detail/generator
-  hashes. No editor/GPU used; native import, appearance, LOD and performance checks remain pending.
+  hashes. Installation was offline. The later native comparison corrected four NPOT atlas imports as recorded in
+  pump-skid-trial-v1/native-import-fix.json, preserving the approved geometry/finish. LOD/performance checks remain pending.
 - Historical pump-skid proposal review (2026-10-30): copied the saved 2,420-triangle case at plan
   `(-850,-350,0)` before installation. The 58,005-triangle pump was subsequently accepted above.
   Revision 4 adapts the accepted valve surface recipe, with separate 2048 x 4096 unwrapped casting/motor

@@ -1,0 +1,70 @@
+// In a running match: stand the local player at a spot looking at a target, and show the old and new models as output/asset-improvement-20261030/in-game/view.json says.
+// Based on Sources/Boxyard/traffic_cone_v2/match_view.cs.txt. Run with sbox-cli --call run_csharp, then take a screenshot. Changes only the running match, and nothing is saved.
+// view.json: { eye: [x, y, z of the feet], target: [x, y, z], extras: [ { model, at: [x, y, z], yaw } ], hide: [ model path, ... ] }. Extras go when the next view starts, and anything hidden comes back.
+var scene = Game.ActiveScene;
+if (!Game.IsPlaying || scene is null) throw new InvalidOperationException("Not playing.");
+var pawn = Facepunch.Client.Local?.PlayerPawn;
+if (!pawn.IsValid()) return new { Error = "No player yet", Scene = scene.Name };
+
+var folder = System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(), "output/asset-improvement-20261030/in-game");
+var view = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder, "view.json"))).AsObject();
+Vector3 Vec(System.Text.Json.Nodes.JsonNode node) { var a = node.AsArray(); return new(a[0].GetValue<float>(), a[1].GetValue<float>(), a[2].GetValue<float>()); }
+
+// No bots: their shots set off the game's just-been-hit effect, and they walk into frame. The fill rule would only put them back.
+foreach (var rule in scene.GetAllObjects(false).SelectMany(g => g.Components.GetAll<Facepunch.BotFillRule>()).ToArray())
+    rule.Enabled = false;
+Facepunch.LightweightBotManager.Instance?.DevClearBots();
+Facepunch.UI.ClassSelect.CloseAny();
+Facepunch.UI.PauseMenuPanel.CloseAny();
+
+foreach (var go in scene.GetAllObjects(false).Where(g => g.Name == "Comparison").ToArray()) go.Destroy();
+var hide = view["hide"]?.AsArray().Select(x => x.GetValue<string>()).ToArray() ?? Array.Empty<string>();
+var hidden = 0;
+foreach (var renderer in scene.GetAllObjects(false).SelectMany(g => g.Components.GetAll<ModelRenderer>(FindMode.EverythingInSelf)).ToArray())
+{
+    var path = renderer.Model?.ResourcePath;
+    if (path is null || !(path.Contains("bench_v2/bench.vmdl") || path.Contains("mooring_bollard_v2/mooring_bollard.vmdl"))) continue;
+    var hideIt = hide.Any(h => string.Equals(h, path, StringComparison.OrdinalIgnoreCase));
+    renderer.Enabled = !hideIt;
+    if (hideIt) hidden++;
+}
+var made = 0;
+var errors = new System.Collections.Generic.List<string>();
+foreach (var item in view["extras"].AsArray())
+{
+    var path = item["model"].GetValue<string>();
+    var model = Model.Load(path);
+    if (model is null || model.IsError) { errors.Add(path); continue; }
+    foreach (var material in model.Materials)
+        foreach (var key in new[] { "g_tColor", "g_tNormal" })
+            material.GetTexture(key)?.MarkUsed(2048);
+    var go = new GameObject(true, "Comparison");
+    go.NetworkMode = NetworkMode.Never;
+    go.WorldPosition = Vec(item["at"]);
+    go.WorldRotation = Rotation.FromYaw(item["yaw"].GetValue<float>());
+    go.Components.Create<ModelRenderer>().Model = model;
+    made++;
+}
+
+var eyeHeight = 64f;
+var feet = Vec(view["eye"]);
+var target = Vec(view["target"]);
+pawn.WorldPosition = feet;
+pawn.Transform.ClearInterpolation();
+pawn.EyeAngles = Rotation.LookAt(target - (feet + Vector3.Up * eyeHeight)).Angles().WithRoll(0f);
+
+// Let auto exposure settle on this view, as it would for a player standing here, and the textures stream in.
+await Task.Delay(6000, cancellationToken);
+pawn = Facepunch.Client.Local?.PlayerPawn;
+// The aim can wander during the wait, so shots wouldn't line up: set it again just before the shot.
+pawn.WorldPosition = feet;
+pawn.Transform.ClearInterpolation();
+var aim = Rotation.LookAt(target - (feet + Vector3.Up * eyeHeight)).Angles().WithRoll(0f);
+pawn.EyeAngles = aim;
+await Task.Delay(150, cancellationToken);
+pawn.EyeAngles = aim;
+return new
+{
+    Scene = scene.Name, Game.IsPlaying, Pawn = pawn?.WorldPosition.ToString(), Eye = pawn?.EyeAngles.ToString(), Made = made, Hidden = hidden, Errors = errors,
+    Holding = pawn?.CurrentEquipment?.GameObject?.Name, Bots = scene.GetAllObjects(false).Count(g => g.Components.Get<Facepunch.LightweightCombatBot>().IsValid())
+};

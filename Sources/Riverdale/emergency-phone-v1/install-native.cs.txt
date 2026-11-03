@@ -1,0 +1,56 @@
+var root=Sandbox.Project.Current.GetRootPath();
+if(!System.IO.Path.GetFullPath(root).TrimEnd('\\','/').Equals(@"C:\sbox-projects\hc1\forked-shooter-main",StringComparison.OrdinalIgnoreCase))throw new InvalidOperationException("Wrong project");
+var session=Editor.SceneEditorSession.Active;var scene=session?.Scene;
+if(Game.IsPlaying||scene?.Source?.ResourcePath!="scenes/maps/riverdale/riverdale.scene")throw new InvalidOperationException("Riverdale must be the active edit scene");
+if(session.HasUnsavedChanges)throw new InvalidOperationException("Scene has unsaved changes; inspect before installation");
+var folder=System.IO.Path.Combine(root,"output/riverdale-emergency-phone-installed-20261031");
+var plan=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"plan.json")));
+string Hash(string path)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+var sceneFile=System.IO.Path.Combine(root,"Assets/scenes/maps/Riverdale/riverdale.scene");
+if(Hash(sceneFile)!=plan["sceneSHA256"].GetValue<string>())throw new InvalidOperationException("Saved scene changed; refresh the installation plan");
+var disk=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(sceneFile));
+var nativeIds=scene.GetAllObjects(true).Select(o=>o.Id).ToHashSet();
+void CheckIds(System.Text.Json.Nodes.JsonNode node)
+{
+    if(node["__guid"] is not null&&!nativeIds.Contains(Guid.Parse(node["__guid"].GetValue<string>())))throw new InvalidOperationException("Editor scene is stale relative to saved scene");
+    if(node["Children"] is System.Text.Json.Nodes.JsonArray children)foreach(var child in children)CheckIds(child);
+}
+foreach(var node in disk["GameObjects"].AsArray())CheckIds(node);
+foreach(var item in plan["files"].AsArray())
+    if(Hash(System.IO.Path.Combine(root,item["path"].GetValue<string>()))!=item["before"].GetValue<string>())throw new InvalidOperationException("Packed model changed; refresh the plan");
+var model=Model.Load("models/props/riverdale/emergency-phone-v1/after.vmdl");
+if(model is null||model.IsError)throw new InvalidOperationException("Approved phone not loadable");
+if(scene.GetAllObjects(true).Any(o=>o.Name=="Emergency Phones"))throw new InvalidOperationException("Phones already present; inspect before retrying");
+GameObject group=null;var changed=new System.Collections.Generic.List<string>();
+try
+{
+    using(scene.Push())
+    {
+        group=scene.CreateObject(false);group.Deserialize(plan["group"].DeepClone().AsObject());
+        group.Parent=scene.GetAllObjects(true).Single(o=>o.Name=="Riverdale");group.Enabled=true;
+        if(group.Children.Count()!=8)throw new InvalidOperationException("Wrong phone count");
+    }
+    foreach(var item in plan["files"].AsArray())
+    {
+        var relative=item["path"].GetValue<string>();var target=System.IO.Path.Combine(root,relative);var incoming=target+".phone-incoming";
+        System.IO.File.WriteAllBytes(incoming,System.IO.File.ReadAllBytes(System.IO.Path.Combine(folder,"stage",relative)));
+        System.IO.File.Move(incoming,target,true);changed.Add(relative);Editor.AssetSystem.RegisterFile(target);
+        if(Hash(target)!=item["after"].GetValue<string>())throw new InvalidOperationException("Write verification failed");
+    }
+}
+catch
+{
+    if(group.IsValid()){group.Destroy();scene.ProcessDeletes();}
+    foreach(var relative in changed)
+    {
+        var target=System.IO.Path.Combine(root,relative);var incoming=target+".phone-rollback";
+        System.IO.File.WriteAllBytes(incoming,System.IO.File.ReadAllBytes(System.IO.Path.Combine(folder,"before",relative)));
+        System.IO.File.Move(incoming,target,true);
+    }
+    throw;
+}
+var result=new{Installed=true,GroupId=group.Id,Phones=group.Children.Select(go=>new{go.Id,go.Name,Position=go.WorldPosition.ToString(),Rotation=go.WorldRotation.ToString(),
+    Renderer=go.Components.Get<ModelRenderer>()?.Model?.ResourcePath,Collider=go.Components.Get<ModelCollider>()?.Model?.ResourcePath}).ToArray(),
+    PackedFilesChanged=changed,NeedsNativeSave=true};
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"native-install.json"),System.Text.Json.JsonSerializer.Serialize(result,new System.Text.Json.JsonSerializerOptions{WriteIndented=true}));
+return result;

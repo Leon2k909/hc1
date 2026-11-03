@@ -52,6 +52,7 @@ TITLE = "Reef Hall"
 OUT_DIR = K.ASSETS / "models" / "maps" / "reefhall"
 RESOURCE_DIR = "models/maps/reefhall"
 BENCH_MODEL = "models/maps/reefhall/bench_v2/bench.vmdl"
+STAND_MODEL = "models/maps/reefhall/info_stand_v2/info_stand.vmdl"
 SCENE_FILE =K.ASSETS / "scenes" / "maps" / "ReefHall" / "reefhall.scene"
 MINIMAP_FILE = K.ASSETS / "ui" / "minimaps" / "minimap_reefhall.png"
 MINIMAP_PATH = "ui/minimaps/minimap_reefhall.png"
@@ -825,17 +826,14 @@ def bench( model, centre, yaw, length=96.0, z=0.0 ):
     fbox( model, fr, -length / 2, length / 2, -9, 9, z + 15, z + 18, None, WOOD )
     for u in ( -length / 2 + 8, length / 2 - 8 ):
         fbox( model, fr, u - 2, u + 2, -8, 8, z, z + 15, None, METAL )
-    model.props.append( { "model": BENCH_MODEL, "position": tuple( fr.p( 0, 0, z ) ), "along": tuple( fr.d ) } )
+    model.props.append( { "model": BENCH_MODEL, "kind": "Bench", "position": tuple( fr.p( 0, 0, z ) ), "along": tuple( fr.d ) } )
 
 
-def lectern( model, centre, yaw, z=0.0, screen="rh_screen_map" ):
-    """ An information stand: a gunmetal post with a sloping lit panel. """
+def lectern( model, centre, yaw, z=0.0 ):
+    """ An information stand, its post's collision only: STAND_MODEL draws it, placed by write_scene (docs/notes, "Reef Hall information stand v2"). """
     fr = Frame( centre, ( math.cos( math.radians( yaw ) ), math.sin( math.radians( yaw ) ) ) )
-    fbox( model, fr, -8, 8, -5, 5, z, z + 34, "rh_gunmetal", METAL )
-    fbox( model, fr, -12, 12, -9, 9, z, z + 2, "rh_gunmetal" )
-    top = [ fr.p( -14, 6, z + 34 ), fr.p( 14, 6, z + 34 ), fr.p( 14, -8, z + 44 ), fr.p( -14, -8, z + 44 ) ]
-    facing( model, screen, top, fr.vec( 0, 0.6, 0.8 ) )
-    fbox( model, fr, -15, 15, -9, 7, z + 32, z + 34, "rh_gunmetal" )
+    fbox( model, fr, -8, 8, -5, 5, z, z + 34, None, METAL )
+    model.props.append( { "model": STAND_MODEL, "kind": "Stand", "position": tuple( fr.p( 0, 0, z ) ), "along": tuple( fr.d ) } )
 
 
 def display_case( model, centre, size=( 40, 40 ), z=0.0, tank_name="display", rng=None, inside=None ):
@@ -3212,8 +3210,9 @@ def write_scene( rooms, lights ):
             model_object( name.title(), f"aquarium/{name}", f"reefhall_{name}" ),
             *( [] if K.is_empty( inside ) else [ model_object( f"{name.title()} Tanks", f"aquarium/{name}/tanks",
                                                                f"reefhall_{name}_tanks", collide=False, shadows=False ) ] ),
-            *( placed_model_object( f"{name.title()} Bench {k + 1}", f"aquarium/{name}/bench/{k}", prop )
-               for k, prop in enumerate( p for p in model.props if "model" in p ) ) ) ] )
+            *( placed_model_object( f"{name.title()} {kind} {k + 1}", f"aquarium/{name}/{kind.lower()}/{k}", prop )
+               for kind in ( "Bench", "Stand" )
+               for k, prop in enumerate( p for p in model.props if p.get( "kind" ) == kind ) ) ) ] )
     light_objects = [
         K.game_object( ids, name, f"light/{name}", K.to_world( position ), tags="light_point,light", components=[
             K.component( ids, "Sandbox.PointLight", f"light/{name}/light", Attenuation=1, FogMode="Enabled", FogStrength=1,

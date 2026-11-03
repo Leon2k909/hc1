@@ -32,15 +32,19 @@ public partial class Throwable : WeaponInputAction,
 		ThrowState = State.Idle;
 	}
 
-	protected bool CanThrow()
+	protected bool CanThrow() => ThrowState == State.Idle && CanPrepareThrow();
+
+	private bool CanPrepareThrow() => Equipment.IsValid() && Equipment.IsDeployed && Equipment.Owner.IsValid()
+		&& !Equipment.Owner.IsFrozen && !Equipment.Owner.IsMantling && !IsInputSuppressed
+		&& Equipment.Owner.HealthComponent is { State: LifeState.Alive };
+
+	protected override void OnInputSuppressed() => CancelPreparation();
+
+	private void CancelPreparation()
 	{
-		if ( !Equipment.IsValid() || !Equipment.IsDeployed || !Equipment.Owner.IsValid() || ThrowState != State.Idle )
-			return false;
-
-		if ( Equipment.Owner.IsFrozen )
-			return false;
-
-		return true;
+		if ( ThrowState is not (State.Cook or State.Throwing) ) return;
+		ThrowState = State.Idle;
+		TimeSinceAction = 0f;
 	}
 
 	protected override void OnInputDown()
@@ -63,6 +67,12 @@ public partial class Throwable : WeaponInputAction,
 
 	protected override void OnUpdate()
 	{
+		if ( !Equipment.IsValid() || !Equipment.Owner.IsValid() )
+		{
+			CancelPreparation();
+			return;
+		}
+
 		if ( Networking.IsHost && HasThrownOnHost && TimeSinceAction > 0.25f )
 		{
 			// We want to remove the weapon on the host only.
@@ -72,6 +82,13 @@ public partial class Throwable : WeaponInputAction,
 		}
 
 		if ( IsProxy ) return;
+
+		// Frame updates can run before fixed input handling notices a menu or movement lockout.
+		if ( ThrowState is State.Cook or State.Throwing && !CanPrepareThrow() )
+		{
+			CancelPreparation();
+			return;
+		}
 
 		if ( Input.Pressed( "Attack2" ) && ThrowState == State.Cook )
 		{

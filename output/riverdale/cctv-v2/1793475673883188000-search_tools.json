@@ -1,0 +1,122 @@
+{
+  "tools": [
+    {
+      "name": "debug_draw_line",
+      "title": "Debug Draw Line",
+      "toolset": "bridge_debug",
+      "description": "Draw a debug line between two world points. Renders in the editor viewport (Gizmo) AND in play mode (DebugOverlay), accumulating until debug_clear. NB: edit-mode gizmos show in the live editor but NOT in take_screenshot/screenshot_from — use capture_view in play mode to see debug draws through the bridge.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": "string",
+            "description": "Start point, world-space \"x,y,z\"."
+          },
+          "to": {
+            "type": "string",
+            "description": "End point, world-space \"x,y,z\"."
+          },
+          "color": {
+            "type": "string",
+            "description": "Color as \"r,g,b\" or \"r,g,b,a\" floats 0–1 (default varies per shape)."
+          },
+          "thickness": {
+            "type": "number",
+            "description": "Line thickness for edit-mode gizmos (default 2)."
+          }
+        },
+        "required": [
+          "from",
+          "to"
+        ]
+      }
+    },
+    {
+      "name": "focus_object",
+      "title": "Focus Object",
+      "toolset": "bridge_gameobject",
+      "description": "Highlight a GameObject by selecting it in the editor. NOTE: s&box exposes no dedicated focus API, so this only sets the selection — it does NOT move any camera (returns { focused, id, note } saying so). To actually point the viewport at an object use frame_camera; to aim a screenshot use screenshot_from.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of the GameObject to focus."
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "screenshot_from",
+      "title": "Screenshot From",
+      "toolset": "bridge_screenshot",
+      "description": "Frame a GameObject or a free camera position and return the shot as an inline PNG image. Same as capture_view (kept under its historical name — existing workflows use it), with the same capture limits: UI text may rasterise as boxes, and Terrain renders truncated from a temporary camera (clipmap centres on the main camera) — verify terrain via take_screenshot.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of a GameObject to auto-frame."
+          },
+          "position": {
+            "type": "string",
+            "description": "Camera position as \"x,y,z\"."
+          },
+          "lookAt": {
+            "type": "string",
+            "description": "Point to aim the camera at, as \"x,y,z\"."
+          },
+          "rotation": {
+            "type": "string",
+            "description": "Camera rotation as \"pitch,yaw,roll\" degrees."
+          },
+          "width": {
+            "type": "integer",
+            "description": "Image width in pixels. Default 1280.",
+            "default": 1280
+          },
+          "height": {
+            "type": "integer",
+            "description": "Image height in pixels. Default 720.",
+            "default": 720
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "set_forest_seed",
+      "title": "Set Forest Seed",
+      "toolset": "bridge_world",
+      "description": "Set ForestGenerator.Seed and (by default) regenerate — re-rolls the forest layout while keeping POIs, trails, and density regions. Returns `set`, `seed`, and `rebuilt`; take a screenshot afterwards (screenshot_from) to judge the new layout.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "seed": {
+            "type": "integer",
+            "description": "New random seed (integer). Default 77.",
+            "default": 77
+          },
+          "rebuild": {
+            "type": "boolean",
+            "description": "Regenerate the forest after setting (default true).",
+            "default": true
+          },
+          "id": {
+            "type": "string",
+            "description": "GUID of the GameObject holding the ForestGenerator; omit to auto-find the first ForestGenerator in the scene."
+          },
+          "component": {
+            "type": "string",
+            "description": "Override the builder component type name — set this if your project's terrain/cave/forest component is named differently than the default (MapBuilder/CaveBuilder/ForestGenerator)."
+          }
+        },
+        "required": []
+      }
+    }
+  ],
+  "total": 402
+}

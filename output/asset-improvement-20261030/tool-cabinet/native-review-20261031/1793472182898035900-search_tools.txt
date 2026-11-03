@@ -1,0 +1,44 @@
+{
+  "tools": [
+    {
+      "name": "close_scene",
+      "title": "Close Scene",
+      "toolset": "scenefile",
+      "description": "Close a scene tab. Refuses to throw away unsaved work unless you say so.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "scene": {
+            "type": "string",
+            "description": "Scene name or resource path. Empty for the active one."
+          },
+          "discardChanges": {
+            "type": "boolean",
+            "description": "Close even if the scene has unsaved changes.",
+            "default": false
+          }
+        },
+        "required": []
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "Active": {
+            "type": "string"
+          },
+          "ActivePath": {
+            "type": "string"
+          },
+          "Open": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": []
+      }
+    }
+  ],
+  "total": 402
+}

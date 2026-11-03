@@ -1,0 +1,220 @@
+{
+  "tools": [
+    {
+      "name": "author_movie_clip",
+      "title": "Author Movie Clip",
+      "toolset": "bridge_moviemaker",
+      "description": "Author a MovieMaker .movie cutscene clip from a declarative shot list — EDIT MODE ONLY, no Movie Maker dock, no play mode, no real-time waiting (a 30s clip bakes in one call, typically &lt;1s). Builds a hold+blend keyframe timeline from the shots (smoothstep ease by default), steps a camera through it, and hand-pumps MovieRecorder Advance/Capture per synthetic frame, then saves Assets/&lt;folder&gt;/&lt;clipName&gt;.movie (registered + compiled; errors if the file exists — the scene itself is NOT saved). Returns { authored, path, name, durationSeconds, frames, sampleRate, shots, tracks, bakeMs, compiled, loadable, camera, nextSteps }. Camera: omit cameraId for a temp camera (destroyed after the bake — play back with add_movie_player createTargets:true so the missing target is recreated), or pass cameraId of an existing camera GameObject (transform + FOV restored EXACTLY afterwards; the clip then animates THAT object on playback). fovDegrees is baked for real (the clip carries a FieldOfView track). Authored clips animate ONLY the camera the bake moves — other scene objects don't move in edit mode (that's what record_gameplay_clip is for). Total timeline capped at 120s, max 32 shots. Errors during play mode (stop_play first). Verify with list_movies; play via add_movie_player + play_movie in play mode.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "shots": {
+            "description": "The shot list in order (1-32 shots). Timeline = hold₀, then blendᵢ + holdᵢ per following shot. JSON array."
+          },
+          "clipName": {
+            "type": "string",
+            "description": "Asset name without extension (default authored_&lt;UTC timestamp&gt;; sanitized to [A-Za-z0-9_-])."
+          },
+          "folder": {
+            "type": "string",
+            "description": "Assets subfolder to save into (default \"movies\")."
+          },
+          "sampleRate": {
+            "type": "integer",
+            "description": "Clip samples per second (default 30, clamped 1-120)."
+          },
+          "cameraId": {
+            "type": "string",
+            "description": "GUID of an existing camera GameObject (must have a CameraComponent) to bake through — restored EXACTLY afterwards, and playback then animates that object. Omit for a temp camera that is destroyed after the bake."
+          }
+        },
+        "required": [
+          "shots"
+        ]
+      }
+    },
+    {
+      "name": "create_loot_table_resource",
+      "title": "Create Loot Table Resource",
+      "toolset": "bridge_scaffold_gameplay",
+      "description": "Generate GameResource-based loot tables — the data-asset sibling of create_weighted_loot_table. One .cs file containing THREE types: an entry POCO { Name, Weight, optional NestedTable reference }, a [AssetType]-registered GameResource loot-table class (designers author '.loot' files in the editor asset browser — New &gt; Loot Table — after the hotload; NOTE: [AssetType(Name=..., Extension=..., Category=...)] is used because GameResourceAttribute is [Obsolete] on this SDK), and a '&lt;name&gt;Resolver' Component that rolls an assigned table by cumulative weight. Nested tables: an entry with a NestedTable rolls INTO that table instead of dropping its Name, capped at maxDepth (default 4) with a self-reference guard so cycles terminate (at the cap the deepest entry's Name is returned). Resolver.Roll() returns the item name (null + warning when no Table is assigned or the table is empty; entries with weight &lt;= 0 never win; all-zero weights fall back to the first entry) and fires the static OnLoot(GameObject, item) event; roll HOST-SIDE and replicate the result yourself. targetId attaches the RESOLVER (the resource is an asset type, not a component). SURPRISING: pick an extension that is NOT a suffix of a built-in one (e.g. avoid 'cfg') or ResourceLibrary picks up engine files as phantom instances. Returns { created, path, className, resolverClass, extension, maxDepth, placedOn, note, nextSteps }. Next: trigger_hotload -&gt; author .loot assets in the editor -&gt; assign the resolver's Table (set_property with the asset path). Refused during play mode. Use create_weighted_loot_table for a single inline component with no asset files; create_gacha_drop_table for pity + duplicate mechanics.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class name for the generated GameResource (the resolver becomes '&lt;name&gt;Resolver'). Defaults to 'LootTableResource'."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory for the generated .cs file. Defaults to 'Code'."
+          },
+          "extension": {
+            "type": "string",
+            "description": "Asset file extension (lowercase alphanumerics; avoid suffixes of built-in extensions like 'cfg'). Defaults to 'loot'."
+          },
+          "title": {
+            "type": "string",
+            "description": "Display name of the asset type in the editor's New-asset menu. Defaults to 'Loot Table'."
+          },
+          "maxDepth": {
+            "type": "integer",
+            "description": "Default nested-table resolve depth cap baked into the resolver (clamped 0..16; also a [Property]). Defaults to 4."
+          },
+          "targetId": {
+            "type": "string",
+            "description": "GUID of a GameObject to attach the RESOLVER component to (only attaches if the type is already loaded — hotload first)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_scene",
+      "title": "Create Scene",
+      "toolset": "bridge_scene",
+      "description": "Create a new EMPTY .scene file under the project's Assets folder and register it with the AssetSystem so load_scene works immediately. Errors if the scene already exists. NOTE: includeDefaults is not yet honored — the scene is always created empty, so after load_scene add a camera/light/ground yourself (create_gameobject, add_light). Returns a confirmation with the path — pass it to load_scene next.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Relative path for the new scene (e.g. 'scenes/level_01.scene')."
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name for the scene."
+          },
+          "includeDefaults": {
+            "type": "boolean",
+            "description": "If true, includes a Camera, Directional Light, and ground plane. Defaults to true."
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
+    },
+    {
+      "name": "editor_status",
+      "title": "Get Editor Status",
+      "toolset": "editor",
+      "description": "Get the current state of the editor - engine version, which project is open, the active scene and whether it has unsaved changes, whether play mode is running or paused, how many tools are registered, the directory paths that matter (logs, project code and assets), and the state of the code compiler. Check IsCompiling/LastCompileSucceeded here after editing code instead of relying on read_console - a successful compile can scroll out of view or be mistaken for the last failure you saw.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "EngineVersion": {
+            "type": "string"
+          },
+          "Project": {
+            "type": "string"
+          },
+          "ProjectTitle": {
+            "type": "string"
+          },
+          "ActiveScene": {
+            "type": "string"
+          },
+          "ActiveScenePath": {
+            "type": "string"
+          },
+          "SceneHasUnsavedChanges": {
+            "type": "boolean"
+          },
+          "IsPlaying": {
+            "type": "boolean"
+          },
+          "IsPaused": {
+            "type": "boolean"
+          },
+          "ToolCount": {
+            "type": "integer"
+          },
+          "IsCompiling": {
+            "type": "boolean"
+          },
+          "LastCompileSucceeded": {
+            "type": "boolean"
+          },
+          "LastCompileErrors": {
+            "type": "integer"
+          },
+          "Paths": {
+            "type": "object",
+            "properties": {
+              "Engine": {
+                "type": "string"
+              },
+              "Logs": {
+                "type": "string"
+              },
+              "ProjectRoot": {
+                "type": "string"
+              },
+              "ProjectSettings": {
+                "type": "string"
+              }
+            },
+            "required": []
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "recompile_asset",
+      "title": "Recompile Asset",
+      "toolset": "bridge_asset",
+      "description": "Compile a project asset by path — registers it with the editor's AssetSystem then compiles it (e.g. .vmat → .vmat_c). Use after writing/editing an asset with write_file so the change takes effect without a manual editor step. Verified on materials. NOTE: the engine exposes no reachable particle (.vpcf) compiler, so this can't compile particles — author those in s&box's particle editor, then spawn_vpcf plays them.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Asset path — project-relative (e.g. 'materials/foo.vmat') or absolute."
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
+    },
+    {
+      "name": "stop_gameplay_recording",
+      "title": "Stop Gameplay Recording",
+      "toolset": "bridge_moviemaker",
+      "description": "Stop the active gameplay recording and persist it as a project .movie asset the editor can load (written to Assets/&lt;folder&gt;/&lt;name&gt;.movie, registered + compiled — list_movies then shows it with hasCompiledClip). Also saves a job that already auto-stopped (maxSeconds cap, or play mode ended). Returns { saved, assetPath, durationSeconds, trackCount, sampleRate, compiled, stopReason, wired, note } — a trackCount of 0 means nothing was captured and the response warns about it. Pass wireToId to auto-wire a MoviePlayer on that GameObject pointed at the new clip (during play mode that wiring is RUNTIME-ONLY and discarded on stop_play; the .movie asset itself always persists). Errors if the target file already exists (the clip stays in memory — retry with another name). discard:true throws the recording away instead. Replay: add_movie_player + play_movie in play mode.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Asset name without extension (default recording_&lt;UTC timestamp&gt;; sanitized to [A-Za-z0-9_-])."
+          },
+          "folder": {
+            "type": "string",
+            "description": "Assets subfolder to save into (default \"recordings\")."
+          },
+          "wireToId": {
+            "type": "string",
+            "description": "GameObject GUID to auto-wire a MoviePlayer at the new clip (runtime-only if done during play mode)."
+          },
+          "discard": {
+            "type": "boolean",
+            "description": "Throw the recording away instead of saving it."
+          }
+        },
+        "required": []
+      }
+    }
+  ],
+  "total": 402
+}

@@ -8,7 +8,8 @@ instrument panel with meters and pilot lamps, a red main switch, a lock rod with
 of the floor, clamped up its side and over into the roof. A green status lamp stands on its header.
 
 Inches, engine axes. Local +X is out of the doors, origin on the floor at the old box's centre. The carcass fills the old
-box (X +-18, Y +-38, Z 0..115) exactly, so the old collision hull still fits it.
+box (X +-18, Y +-38, Z 0..115) exactly, so the old collision hull still serves it. This model's only collision is a box round
+the conduits, which stand outside that hull.
 """
 import hashlib
 import json
@@ -38,7 +39,7 @@ NAME = "power_cabinet"
 MODEL = "models/maps/sewage/power_cabinet_v2"
 MATS = "materials/maps/sewage/power_cabinet_v2"
 BLEND = os.path.join(WORK, "cabinet_build.blend")
-RES = 2048
+RES = 3072
 
 FRONT, HALF_W, TOP = 18.0, 38.0, 115.0
 SKIN = 18.5  # The doors' outer face.
@@ -101,7 +102,7 @@ def carcass():
         lo, hi = (35.5, HALF_W) if sy > 0 else (-HALF_W, -35.5)
         for x0, x1 in ((15.5, FRONT), (-FRONT, -15.5)):
             box(part(PAINT, 3, bevel=0.1, segs=2, name="post", dense=0.7), (x0, lo, 5.0), (x1, hi, 114.0))
-        for z0, z1 in ((5.0, 8.0), (107.8, 111.0)):
+        for z0, z1 in ((5.0, 8.0), (107.8, 114.0)):
             box(part(PAINT, 3, bevel=0.08, name="side rail", dense=0.55), (-15.5, lo, z0), (15.5, hi, z1))
     p = part(PAINT, 3, bevel=0.09, segs=2, name="sill")
     box(p, (15.5, -35.5, 5.0), (FRONT, 35.5, LEAF_LOW - 0.3))
@@ -117,7 +118,7 @@ def carcass():
     prism(p, [(-17.5, -37.5), (18.2, -37.5), (18.2, 37.5), (-17.5, 37.5)], TOP - 0.4, TOP)
     drop(p, (0, 0, -1))
     p = part(PAINT, 3, name="back sheet", dense=0.22)
-    box(p, (-18.0, -35.5, 8.0), (-17.6, 35.5, 107.8))
+    box(p, (-18.0, -35.5, 5.0), (-17.6, 35.5, 114.0))
     drop(p, (1, 0, 0))
     for z in (36.0, 58.0, 80.0):
         box(part(PAINT, 2, bevel=0.05, name="back rib", dense=0.22), (-18.5, -35.0, z), (-18.0, 35.0, z + 2.6))
@@ -368,7 +369,7 @@ def window_max(a, k):
     return np.maximum(suffix[: n - k + 1], prefix[k - 1 :])
 
 
-def pack_weighted(mesh, weights, names, res=RES, pad_px=4):
+def pack_weighted(mesh, weights, names, res=RES, pad_px=6):
     """The toolkit's real-scale layout with two changes: each island's scale is weighted by its parts' density, and it goes on
     a skyline rather than shelves, which fills far more of the sheet."""
     bm = bmesh.new()
@@ -639,7 +640,7 @@ def bake_stage():
     bake_one(RES, "EMIT", source("pos"), 1, "bake_cabinet_pos")
     bake_one(RES, "EMIT", source("nor"), 1, "bake_cabinet_nor")
     bake_one(RES, "EMIT", source("facts"), 1, "bake_cabinet_facts")
-    bake_one(1024, "AO", None, 24, "bake_cabinet_ao")
+    bake_one(RES // 2, "AO", None, 24, "bake_cabinet_ao")
 
 
 def export_stage():
@@ -750,6 +751,21 @@ def export_stage():
 				children =
 				[
 {groups}
+				]
+			}},
+			{{
+				_class = "PhysicsShapeList"
+				children =
+				[
+					{{
+						_class = "PhysicsShapeBox"
+						parent_bone = ""
+						surface_prop = "metal"
+						collision_tags = "solid"
+						origin = [ 0.0000, -40.7000, 59.5000 ]
+						angles = [ 0.0000, 0.0000, 0.0000 ]
+						dimensions = [ 24.6000, 5.4000, 119.0000 ]
+					}},
 				]
 			}},
 		]

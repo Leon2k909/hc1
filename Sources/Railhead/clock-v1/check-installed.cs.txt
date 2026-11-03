@@ -1,0 +1,2 @@
+var m=Model.Load("models/maps/railhead/railhead_dress_centre.vmdl");
+return new{m.IsError,Materials=m.Materials.Select(x=>x.ResourcePath).ToArray()};

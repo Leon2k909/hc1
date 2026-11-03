@@ -18,6 +18,7 @@ import bmesh
 import bpy
 import numpy as np
 from mathutils import Matrix, Vector
+from mathutils.bvhtree import BVHTree
 
 argv = sys.argv[sys.argv.index("--") + 1 :]
 WORK, ROOT = argv[0], argv[1]
@@ -185,9 +186,9 @@ def pedestals():
     box(add(Part(CHROME, 1, bevel=0.05, name="latch bar")), (31.9, -28.85, 19.7), (32.25, -28.35, 22.3))
     for z in (8.0, 24.5):
         tube(add(Part(CHROME, 1, name="hinge")), [(31.5, -56.15, z - 1.3), (31.5, -56.15, z + 1.3)], 0.2, 8)
-    box(add(Part(PLATE, 1, bevel=0.02, angle=50, name="id plate")), (31.35, -49.0, 20.0), (31.42, -35.0, 24.0))
-    for y in (-48.4, -35.6):
-        for z in (20.6, 23.4):
+    box(add(Part(PLATE, 1, bevel=0.02, angle=50, name="id plate")), (31.35, -48.0, 20.6), (31.42, -36.0, 25.4))
+    for y in (-47.5, -36.5):
+        for z in (21.1, 24.9):
             screw((31.42, y, z), (1, 0, 0), 0.14)
 
     # Right: two drawers, each with a pull and a label.
@@ -201,7 +202,11 @@ def pedestals():
     tube(add(Part(CHROME, 2, name="foot rail")), [(8.0, -24.0, 5.5), (8.0, 24.0, 5.5)], 0.62, 12)
     for s in (-1, 1):
         lathe(add(Part(CHROME, 1, name="rail flange")), [(1.05, 0), (1.05, 0.14), (0.7, 0.26)], 12, frame((8.0, s * 24.0, 5.5), (0, -s, 0)))
-    box(add(Part(BLACK, 1, bevel=0.05, name="gland")), (-6.0, 8.0, 21.0), (-5.75, 14.0, 26.0))
+    ring_solid(add(Part(RUBBER, 1, name="gland")), [(1.1, 0.0), (1.7, 0.0), (1.7, 0.2), (1.1, 0.26)], 14, frame((-6.0, 11.0, 24.0), (1, 0, 0)))
+    box(add(Part(BLACK, 1, name="gland hole")), (-6.02, 9.9, 22.9), (-6.0, 12.1, 25.1))
+    for k, (y, dy) in enumerate(((10.5, 0.8), (11.5, -0.6))):
+        path = spline([(-5.9, y, 24.0), (-5.0, y, 23.2), (-4.7, y + dy * 0.3, 14.0), (-4.3, y + dy, 5.0), (-3.2, y + dy * 1.6, 0.3)], 4)
+        tube(add(Part(RUBBER, 1, name="floor cable")), path, 0.26, 6)
 
     # The back, which nobody sees but the sides do.
     box(add(Part(NAVY, 3, bevel=0.1, name="rear panel")), (-35.0, -58.0, 3.0), (-33.0, 58.0, 57.5))
@@ -461,8 +466,8 @@ def worktop_items():
                        top(a + d_, b - w, 0.16), top(a + d_, b + w, 0.16), top(a - d_, b + w, 0.16), top(a - d_, b - w, 0.16)])
     hx = px - 2.35
     hz = z + 5.0
-    handset_path = spline([(hx, py - 4.3, hz), (hx, py - 3.0, hz + 0.35), (hx, py, hz + 0.45), (hx, py + 3.0, hz + 0.35), (hx, py + 4.3, hz)], 4)
-    tube(add(Part(RED, 2, name="handset")), handset_path, 0.6, 12, flatten=0.82)
+    handset_path = spline([(hx, py - 4.3, hz), (hx, py - 3.0, hz + 0.35), (hx, py, hz + 0.45), (hx, py + 3.0, hz + 0.35), (hx, py + 4.3, hz)], 6)
+    tube(add(Part(RED, 2, name="handset")), handset_path, 0.6, 14, flatten=0.82)
     for s in (-1, 1):
         lathe(add(Part(RED, 2, bevel=0.06, angle=25, name="ear cup")), [(1.02, -0.05), (1.24, 0.3), (1.2, 0.7), (0.74, 0.9)], 14, frame((hx, py + s * 4.35, hz - 0.2), (0, 0, -1)))
     # The coiled cord drops from the handset and lies on the desk before running into the phone's back.
@@ -485,7 +490,8 @@ def worktop_items():
         v = np.cross(d_, u)
         a = 2 * math.pi * k / 5
         coil.append(tuple(c + (u * math.cos(a) + v * math.sin(a)) * 0.24))
-    tube(add(Part(RED, 0, name="phone cord")), coil, 0.065, 4)
+    for k in range(0, len(coil) - 1, 5):
+        tube(add(Part(RED, 0, name="phone cord")), coil[k : k + 6], 0.065, 4)
 
     # Clipboard with the shift log.
     bx, by = 15.0, 30.0
@@ -534,6 +540,103 @@ def mesh_from(name, store, keep=None):
     return ob
 
 
+def drop_hidden(mesh):
+    """Faces shut inside the desk take atlas and are never seen: drop those that no ray from them can leave by. The floor blocks rays too."""
+    bm = bmesh.new()
+    bm.from_mesh(mesh)
+    bm.normal_update()
+    verts = [v.co.copy() for v in bm.verts]
+    bm.verts.index_update()
+    polys = [[v.index for v in f.verts] for f in bm.faces]
+    for store in (panel, glow):
+        base = len(verts)
+        verts.extend(Vector(v) for v in store["v"])
+        polys.extend([base + i for i in f] for f in store["f"])
+    tree = BVHTree.FromPolygons(verts, polys, all_triangles=False, epsilon=0.0)
+    count = 120
+    golden = math.pi * (3 - math.sqrt(5))
+    dirs = []
+    for k in range(count):
+        z = 1 - 2 * (k + 0.5) / count
+        r = math.sqrt(1 - z * z)
+        dirs.append(Vector((r * math.cos(k * golden), r * math.sin(k * golden), z)))
+
+    def seen(f):
+        # A grid over the face: a big one can show through one small gap, as the worktop's underside does in the kneehole.
+        n = f.normal
+        a, b, c = (v.co for v in f.verts[:3])
+        steps = min(14, max(2, int(math.sqrt(f.calc_area()) / 3.5)))
+        for i in range(steps + 1):
+            for j in range(steps + 1 - i):
+                u, w = (i + 0.15) / (steps + 0.45), (j + 0.15) / (steps + 0.45)
+                p = a + (b - a) * u + (c - a) * w
+                o = p + n * 0.03
+                for d in dirs:
+                    if d.dot(n) < 0.03:
+                        continue
+                    hit = tree.ray_cast(o, d, 500.0)
+                    if d.z < -1e-3:
+                        floor = o.z / -d.z
+                        if hit[3] is None or hit[3] > floor:
+                            # It lands on the floor. Under the desk that's hidden; out in the room a camera can look back along it.
+                            land = o + d * floor
+                            if abs(land.x) < 36 and abs(land.y) < 61:
+                                continue
+                            return True
+                    if hit[0] is None:
+                        return True
+        return False
+
+    drop = [f for f in bm.faces if f.calc_area() > 0.6 and not seen(f)]
+    area = sum(f.calc_area() for f in drop)
+    bmesh.ops.delete(bm, geom=drop, context="FACES")
+    bm.to_mesh(mesh)
+    bm.free()
+    print("hidden faces dropped", len(drop), "sq in %.0f" % area, flush=True)
+
+
+def split_thin_islands(mesh):
+    """A chamfer's L-shaped strip has a box far bigger than its area. Each of its triangles goes alone, so the packer can turn them flat."""
+    bm = bmesh.new()
+    bm.from_mesh(mesh)
+    layer = bm.loops.layers.uv.active
+    seen = set()
+    split = 0
+    for seed in bm.faces:
+        if seed.index in seen:
+            continue
+        seen.add(seed.index)
+        stack, faces = [seed], []
+        while stack:
+            f = stack.pop()
+            faces.append(f)
+            for l in f.loops:
+                a, b = l[layer].uv, l.link_loop_next[layer].uv
+                for other in l.link_loops:
+                    g = other.face
+                    if g.index in seen:
+                        continue
+                    c, d = other[layer].uv, other.link_loop_next[layer].uv
+                    if ((a - d).length < 1e-5 and (b - c).length < 1e-5) or ((a - c).length < 1e-5 and (b - d).length < 1e-5):
+                        seen.add(g.index)
+                        stack.append(g)
+        if not 1 < len(faces) <= 60:
+            continue
+        tris = np.array([[tuple(l[layer].uv) for l in f.loops] for f in faces])
+        w, h = np.ptp(tris.reshape(-1, 2), axis=0)
+        area = 0.5 * np.abs((tris[:, 1, 0] - tris[:, 0, 0]) * (tris[:, 2, 1] - tris[:, 0, 1]) - (tris[:, 2, 0] - tris[:, 0, 0]) * (tris[:, 1, 1] - tris[:, 0, 1])).sum()
+        inches = sum(f.calc_area() for f in faces) / max(area, 1e-12)
+        if area < 0.3 * w * h and w * h * inches > 6.0:
+            split += 1
+            for k, f in enumerate(faces):
+                shift = Vector((0.0137 * (k + 1), 0.0071 * (k + 1)))
+                for l in f.loops:
+                    l[layer].uv += shift
+    bm.to_mesh(mesh)
+    bm.free()
+    print("thin islands split", split, flush=True)
+
+
 def build_stage():
     bpy.ops.wm.read_factory_settings(use_empty=True)
     geometry()
@@ -553,6 +656,7 @@ def build_stage():
     bmesh.ops.delete(bm, geom=drop, context="FACES")
     bm.to_mesh(mesh)
     bm.free()
+    drop_hidden(mesh)
     mesh.uv_layers.new(name="UVMap")
     bpy.context.view_layer.objects.active = hw
     hw.select_set(True)
@@ -562,6 +666,7 @@ def build_stage():
     bpy.ops.uv.smart_project(angle_limit=math.radians(52), margin_method="SCALED", rotate_method="AXIS_ALIGNED_Y", island_margin=0.0, area_weight=0.0, correct_aspect=True, scale_to_bounds=False)
     bpy.ops.object.mode_set(mode="OBJECT")
     hw.select_set(False)
+    split_thin_islands(hw.data)
     kit.pack_real_scale(hw.data, ATLAS, 6)
     uv = np.empty(len(mesh.loops) * 2)
     mesh.uv_layers["UVMap"].data.foreach_get("uv", uv)

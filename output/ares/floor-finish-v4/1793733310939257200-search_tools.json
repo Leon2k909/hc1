@@ -1,0 +1,689 @@
+{
+  "tools": [
+    {
+      "name": "add_interaction_prompt",
+      "title": "Add Interaction Prompt",
+      "toolset": "bridge_scaffold_gameplay",
+      "description": "Generate an eye-traced interaction-prompt HUD — a PanelComponent (.razor + .razor.scss pair, like create_leaderboard_panel) that every frame traces a ray from the scene camera (Scene.Trace.Ray, out to [Property] float Range) and, when the crosshair is on a component implementing Component.IPressable, shows a centered \"Press E\"-style pill. The prompt text comes from the target's IPressable.GetTooltip() when it overrides it (most don't), else a [Property] DefaultPrompt built from the action. This is the visible half of the interaction loop: it PAIRS with create_interactable / add_interaction_station (which implement IPressable) — this tool tells the player they CAN press, those tools handle the press. Host it under a ScreenPanel (add_screen_panel), then add the component to that panel object. The generated Razor is razor_lint-safe by construction: PanelComponent + BuildHash override folding the visible state, no switch-expressions and no non-ASCII in @code, and a class root selector in the SCSS. LOCAL/visual-only (no [Sync]).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class/file name for the generated .razor. Defaults to 'InteractionPrompt'."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory for the generated .razor + .razor.scss. Defaults to 'Code/UI'."
+          },
+          "action": {
+            "type": "string",
+            "description": "Verb woven into the default prompt text ('Press E to &lt;action&gt;'). Defaults to 'use'."
+          },
+          "range": {
+            "type": "number",
+            "description": "Eye-trace reach in world units — how close the crosshair must be to a pressable to show the prompt. Defaults to 120."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "bridge_scatter_props",
+      "title": "Native Scatter Props",
+      "toolset": "bridge_helpers",
+      "description": "Scatter model props with a repeatable seed, optional ground snapping, rotation, scaling and grouping. Requires stopped play mode. Uses the existing Bridge helper's scene and undo behaviour.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "model": {
+            "type": "string",
+            "description": "Project-relative model path, as returned by asset_search."
+          },
+          "center": {
+            "type": "string",
+            "description": "World-space centre as x,y,z, in Source units."
+          },
+          "radius": {
+            "type": "number",
+            "description": "Finite, nonnegative scatter radius in Source units.",
+            "default": 256
+          },
+          "count": {
+            "type": "integer",
+            "description": "Number of props, from 1 to 300.",
+            "default": 10
+          },
+          "seed": {
+            "type": "integer",
+            "description": "Nonnegative seed for repeatable placement.",
+            "default": 1
+          },
+          "snapToGround": {
+            "type": "boolean",
+            "description": "Trace downward to place each prop on the ground.",
+            "default": true
+          },
+          "randomYaw": {
+            "type": "boolean",
+            "description": "Randomise each prop's yaw.",
+            "default": true
+          },
+          "scaleMin": {
+            "type": "number",
+            "description": "Positive minimum scale.",
+            "default": 1
+          },
+          "scaleMax": {
+            "type": "number",
+            "description": "Maximum scale, at least scaleMin.",
+            "default": 1
+          },
+          "group": {
+            "type": "boolean",
+            "description": "Parent the props under a new group object.",
+            "default": true
+          },
+          "name": {
+            "type": "string",
+            "description": "Name prefix for the created objects.",
+            "default": "Prop"
+          }
+        },
+        "required": [
+          "model",
+          "center"
+        ]
+      }
+    },
+    {
+      "name": "capture_camera_set",
+      "title": "Capture Camera Set",
+      "toolset": "bridge_screenshot",
+      "description": "Capture 1-8 saved camera bookmarks in the exact requested order and return a labeled JSON manifest followed by one inline PNG per bookmark. Captures are capped at 1600x1200 and eight million aggregate pixels. Every run becomes the session baseline for the same bookmark and settings; comparePrevious uses SkiaSharp RGBA metrics against that prior capture. renderUI defaults false for stable comparisons. Occlusion checks use physics traces and are diagnostic: they never move the saved camera.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "names": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Saved bookmark names in desired output order (1-8, no duplicates)."
+          },
+          "comparePrevious": {
+            "type": "boolean",
+            "description": "Compare each image with the previous session capture using the same name, dimensions, and renderUI setting.",
+            "default": false
+          },
+          "diffThreshold": {
+            "type": "integer",
+            "description": "Per-channel threshold (0-255) used for changedPixelPercent. Default 8.",
+            "default": 8
+          },
+          "width": {
+            "type": "integer",
+            "description": "Image width in pixels (16-1600). Default 960.",
+            "default": 960
+          },
+          "height": {
+            "type": "integer",
+            "description": "Image height in pixels (16-1200). Default 540.",
+            "default": 540
+          },
+          "renderUI": {
+            "type": "boolean",
+            "description": "Include screen-space UI. Defaults false for deterministic visual comparisons.",
+            "default": false
+          },
+          "checkOcclusion": {
+            "type": "boolean",
+            "description": "Trace from camera to lookAt and report blocking physics geometry. Default true.",
+            "default": true
+          }
+        },
+        "required": [
+          "names"
+        ]
+      }
+    },
+    {
+      "name": "commit_placement_plan",
+      "title": "Commit Placement Plan",
+      "toolset": "bridge_gameobject",
+      "description": "Commit a dry-run plan returned by place_along_path, grid_duplicate, or scatter_props. Plans are scene-scoped, capped, and expire after 10 minutes. Success consumes the plan; a complete rollback restores it for retry. The stored transforms are applied without rerolling randomness or repeating ground traces. Creation rolls back on failure; grid commits reject a changed/missing source before creating anything. Returns slot-to-GUID receipts.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "planId": {
+            "type": "string",
+            "description": "Plan id returned by a placement tool with dryRun:true."
+          }
+        },
+        "required": [
+          "planId"
+        ]
+      }
+    },
+    {
+      "name": "create_carry_system",
+      "title": "Create Carry System",
+      "toolset": "bridge_scaffold_gameplay",
+      "description": "Generate a first-person pickup / carry / throw component (sealed Component) for physics props. Attach it to the PLAYER (the object that owns the camera). It eye-traces from Scene.Camera for a Rigidbody-bearing GameObject tagged [Property] CarryTag (default 'carryable') within [Property] Range; grabbing routes a host-authoritative [Rpc.Host] request that re-validates the target and caller, hands the object's network ownership to the carrier (GameObject.Network.AssignOwnership), and disables the rigidbody's MotionEnabled while held. The held object follows a hold point ([Property] Vector3 HoldOffset in front of the camera) each FixedUpdate; dropping restores physics, throwing applies an impulse ([Property] float ThrowForce). The held-object id is [Sync(SyncFlags.FromHost)] so proxies see the carrying state, and static OnPickedUp / OnDropped events fire uniformly for SFX/VFX. PAIRS with physics props — give each carryable a Rigidbody + Collider and the CarryTag (set_tags); network-spawn them for multiplayer so ownership + transform replicate. Single-player safe (IsProxy is false and RPCs run locally with no session). Inputs: GrabAction (default 'use') grabs/drops, ThrowAction (default 'attack1') throws. Optionally attach to an existing player GameObject by GUID after a hotload.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class name for the generated component. Defaults to 'CarrySystem'."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory for the generated .cs file. Defaults to 'Code'."
+          },
+          "range": {
+            "type": "number",
+            "description": "Eye-trace reach for grabbing a carryable, in world units. Defaults to 130."
+          },
+          "throwForce": {
+            "type": "number",
+            "description": "Impulse magnitude applied on throw (scales with the prop's mass — tune per game). Defaults to 20000."
+          },
+          "carryTag": {
+            "type": "string",
+            "description": "Only objects with this tag (and a Rigidbody) can be picked up; lower-cased/underscored to match s&box tag convention. Defaults to 'carryable'."
+          },
+          "targetId": {
+            "type": "string",
+            "description": "GUID of the PLAYER GameObject (the one with the camera) to attach to (only attaches if the type is already loaded — hotload first)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_npc_brain",
+      "title": "Create Npc Brain",
+      "toolset": "bridge_npc",
+      "description": "Generate an NpcBrain Component: a behavior state machine (Idle/Patrol/Wander/Chase/Search/Flee/Ambush) driven by occlusion-aware perception — FOV cone + sight range + a line-of-sight trace (respects walls/trees) + proximity hearing — with last-known-position memory (lose-LOS -&gt; search -&gt; give up -&gt; resume). This is the decision layer on top of bake_navmesh / NavMeshAgent movement. Pick a behavior preset, then tune via the generated [Property] fields with set_property. After generating: trigger_hotload + get_compile_errors, place a route with place_patrol_route + assign_patrol_route, bake_navmesh, and verify perception in EDIT mode with simulate_npc_perception (chase/search behavior needs play mode). The component is added to a GameObject like any other; it auto-adds a NavMeshAgent in OnStart.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class/file name. Defaults to 'NpcBrain'. Sanitized to a valid C# identifier."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory under the project root for the .cs file. Defaults to 'Code'."
+          },
+          "behavior": {
+            "type": "string",
+            "description": "Preset (sets StartState + flee toggle): 'patrol' (walk waypoints), 'guard' (Ambush near spawn until a target enters range), 'hunter' (patrol-&gt;chase-&gt;search, the Sasquatch), 'swarm' (wander/idle-&gt;chase nearest, RUN mobs), 'skittish' (chase but flee on low health). The generated file is the same shape; the preset just changes defaults. Defaults to 'hunter'. One of: patrol | guard | hunter | swarm | skittish."
+          },
+          "targetTag": {
+            "type": "string",
+            "description": "Tag the NPC hunts (its candidates are GameObjects with this tag). Defaults to 'player'."
+          },
+          "moveSpeed": {
+            "type": "number",
+            "description": "Patrol/wander speed (NavMeshAgent MaxSpeed). Default 130."
+          },
+          "chaseSpeed": {
+            "type": "number",
+            "description": "Chase/flee speed. Default 200."
+          },
+          "sightRange": {
+            "type": "number",
+            "description": "Max sight distance. Default 1500."
+          },
+          "fovDegrees": {
+            "type": "number",
+            "description": "Full field-of-view cone angle in degrees. Default 110. (Baked into a cosine threshold for cheap, trig-free checks.)."
+          },
+          "eyeHeight": {
+            "type": "number",
+            "description": "Trace origin height above the NPC's feet. Default 64."
+          },
+          "hearingRadius": {
+            "type": "number",
+            "description": "Proximity-hearing radius — a target within it is investigated (sets last-known-pos) but NOT instantly aggroed. Default 600."
+          },
+          "giveUpTime": {
+            "type": "number",
+            "description": "Seconds to search after losing line-of-sight before giving up and resuming the start state. Default 6."
+          },
+          "searchRadius": {
+            "type": "number",
+            "description": "Wander radius around the last-known position while searching. Default 400."
+          },
+          "waypointStopDistance": {
+            "type": "number",
+            "description": "How close the NPC must get to a waypoint/target before it counts as reached. Default 80."
+          },
+          "canFlee": {
+            "type": "boolean",
+            "description": "Enable the Flee state (else the NPC never flees). Defaults from the preset."
+          },
+          "fleeHealthFrac": {
+            "type": "number",
+            "description": "Flee when CurrentHealthFrac drops to/below this (the game sets CurrentHealthFrac 0..1). Default 0.25."
+          },
+          "networked": {
+            "type": "boolean",
+            "description": "When true (default), emit a host-authoritative brain: 'if (IsProxy) return;' + [Sync] CurrentState. NOTE: a no-session solo playtest makes everything a proxy, so a networked brain won't think until a host session exists — pass false to iterate solo in the edit scene."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "hammer_trace",
+      "title": "Trace Ray",
+      "toolset": "hammer",
+      "description": "Trace a ray through the open map and report the first node it hits, where, and the surface normal - find the floor under a point, check what's in front of the camera, or probe where to place something. Traces Hammer's own geometry, so it works before the map is compiled.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": "string",
+            "description": "Ray start as 'x,y,z'."
+          },
+          "to": {
+            "type": "string",
+            "description": "Ray end as 'x,y,z'."
+          },
+          "meshesOnly": {
+            "type": "boolean",
+            "description": "Only hit mesh geometry, ignoring entities and game objects.",
+            "default": false
+          },
+          "skipToolsMaterials": {
+            "type": "boolean",
+            "description": "Don't hit tools materials like clip or trigger.",
+            "default": false
+          },
+          "hitBackfaces": {
+            "type": "boolean",
+            "description": "Hit faces from behind too. A back face hit (the normal points along the ray) means the ray started inside something.",
+            "default": false
+          }
+        },
+        "required": [
+          "from",
+          "to"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "Hit": {
+            "type": "boolean"
+          },
+          "Position": {
+            "type": "string"
+          },
+          "Normal": {
+            "type": "string"
+          },
+          "Node": {
+            "type": "object",
+            "properties": {
+              "Id": {
+                "type": "integer"
+              },
+              "Kind": {
+                "type": "string"
+              },
+              "Name": {
+                "type": "string"
+              },
+              "ClassName": {
+                "type": "string"
+              },
+              "Description": {
+                "type": "string"
+              },
+              "Position": {
+                "type": "string"
+              },
+              "Parent": {
+                "type": "integer"
+              },
+              "GameObject": {
+                "type": "string"
+              },
+              "Selected": {
+                "type": "boolean"
+              },
+              "Visible": {
+                "type": "boolean"
+              }
+            },
+            "required": []
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "raycast",
+      "title": "Raycast",
+      "toolset": "bridge_physics",
+      "description": "Perform a physics raycast (Scene.Trace.Ray) from start to end — pass both; the handler traces the start→end segment. Useful for line-of-sight checks, object placement, and collision detection. Returns { hit, hitPosition, normal, distance, gameObjectId, gameObjectName } — feed gameObjectId into get_all_properties/set_transform, or visualize the result with debug_draw_ray. A 'Default Surface not found' error is a known transient; call restart_editor and retry.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "start": {
+            "type": "string",
+            "description": "Ray start position (world space) — object {x,y,z} or comma string \"x,y,z\". As \"x,y,z\" (or JSON {x,y,z})."
+          },
+          "end": {
+            "type": "string",
+            "description": "Ray end position. Use either end or direction+maxDistance. As \"x,y,z\" (or JSON {x,y,z})."
+          },
+          "direction": {
+            "type": "string",
+            "description": "Ray direction (normalized). Used with maxDistance instead of end. As \"x,y,z\" (or JSON {x,y,z})."
+          },
+          "maxDistance": {
+            "type": "number",
+            "description": "Maximum ray distance when using direction. Defaults to 10000."
+          },
+          "radius": {
+            "type": "number",
+            "description": "Sphere/box trace radius. 0 = thin ray (default)."
+          },
+          "ignoreIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "GUIDs of GameObjects to ignore."
+          },
+          "all": {
+            "type": "boolean",
+            "description": "If true, returns all hits along the ray. Defaults to false (first hit only)."
+          }
+        },
+        "required": [
+          "start"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "read_console",
+      "title": "Read Console",
+      "toolset": "instance",
+      "description": "Read recent console output, oldest first - what the editor and game logged: prints, warnings, errors, exceptions, compile results. This is how you see the effect of what you just did. Errors come with the top of their stack trace. Every read ends with a cursor - pass it back as 'since' next time to get only what was logged after it, instead of re-reading the same output.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "How many of the most recent matching entries to return.",
+            "minimum": 1,
+            "maximum": 500,
+            "default": 50
+          },
+          "minimumLevel": {
+            "type": "string",
+            "enum": [
+              "Trace",
+              "Info",
+              "Warn",
+              "Error"
+            ],
+            "description": "Lowest severity to include.",
+            "default": "Trace"
+          },
+          "filter": {
+            "type": "string",
+            "description": "Only entries whose message or logger name contains this, case insensitive."
+          },
+          "since": {
+            "type": "integer",
+            "description": "Cursor from a previous read - only entries logged after it come back. 0 reads the most recent.",
+            "default": 0
+          }
+        },
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "scatter_props",
+      "title": "Scatter Props",
+      "toolset": "bridge_gameobject",
+      "description": "Scatter seeded model copies inside a radius. Existing calls mutate immediately and keep the legacy { scattered, groupId, seed } result. Use dryRun:true to resolve random transforms and ground traces once, returning per-slot transforms, ground status, warnings, model bounds, and planId; commit_placement_plan creates exactly that preview with rollback on failure.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "model": {
+            "type": "string",
+            "description": "Model path to scatter, e.g. 'models/dev/box.vmdl'."
+          },
+          "center": {
+            "type": "string",
+            "description": "Centre of the scatter area (default origin). As \"x,y,z\" (or JSON {x,y,z})."
+          },
+          "radius": {
+            "type": "number",
+            "description": "Scatter radius in units (default 256)."
+          },
+          "count": {
+            "type": "integer",
+            "description": "How many to place (default 10, max 300)."
+          },
+          "randomYaw": {
+            "type": "boolean",
+            "description": "Randomly rotate each around Z (default true)."
+          },
+          "snapToGround": {
+            "type": "boolean",
+            "description": "Raycast each onto the surface below (default true)."
+          },
+          "scaleMin": {
+            "type": "number",
+            "description": "Min uniform scale (default 1)."
+          },
+          "scaleMax": {
+            "type": "number",
+            "description": "Max uniform scale (default 1; set &gt;min for size variation)."
+          },
+          "tint": {
+            "type": "string",
+            "description": "Tint applied to every copy — object {r,g,b,a} or comma string \"r,g,b,a\". As \"r,g,b[,a]\" (0-1 floats)."
+          },
+          "seed": {
+            "type": "integer",
+            "description": "PRNG seed for a reproducible layout (default 1)."
+          },
+          "group": {
+            "type": "boolean",
+            "description": "Parent all copies under one group object (default true)."
+          },
+          "name": {
+            "type": "string",
+            "description": "Base name for the props/group (default 'Prop')."
+          },
+          "dryRun": {
+            "type": "boolean",
+            "description": "Preview only: return deterministic transforms and planId without creating props."
+          }
+        },
+        "required": [
+          "model"
+        ]
+      }
+    },
+    {
+      "name": "scene_trace",
+      "title": "Scene Trace",
+      "toolset": "scene",
+      "description": "Trace a ray through the active scene's physics and report what it hits - find the floor, check line of sight, probe where something can be placed.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": "string",
+            "description": "Ray start as 'x,y,z'."
+          },
+          "to": {
+            "type": "string",
+            "description": "Ray end as 'x,y,z'."
+          }
+        },
+        "required": [
+          "from",
+          "to"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "Hit": {
+            "type": "boolean",
+            "description": "Whether the trace hit anything."
+          },
+          "StartedSolid": {
+            "type": "boolean",
+            "description": "Whether the trace started inside something solid."
+          },
+          "EndPosition": {
+            "type": "string",
+            "description": "Where the trace ended - the hit point, or the requested end on a miss."
+          },
+          "Normal": {
+            "type": "string",
+            "description": "The hit surface normal."
+          },
+          "Fraction": {
+            "type": "number",
+            "description": "How far along the ray the hit was, 0 to 1."
+          },
+          "Distance": {
+            "type": "number",
+            "description": "How far the trace travelled, in units."
+          },
+          "GameObject": {
+            "type": "object",
+            "properties": {
+              "Id": {
+                "type": "string"
+              },
+              "Name": {
+                "type": "string"
+              }
+            },
+            "required": [],
+            "description": "The game object hit. Null on a miss."
+          },
+          "Component": {
+            "type": "string",
+            "description": "The component type hit. Null on a miss."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "scene_validate",
+      "title": "Scene Validate",
+      "toolset": "bridge_validation",
+      "description": "Validate the active scene for the silent setup footguns that break controllers/physics/cameras: no CameraComponent, no player controller, multiple root Rigidbodies, a Rigidbody with MotionEnabled=false fighting a kinematic root, IsTrigger colliders that Scene.Trace will ignore, child Rigidbodies breaking collider binding, and missing required child anchors. Returns each issue with the GameObject and the exact fix.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "simulate_npc_perception",
+      "title": "Simulate Npc Perception",
+      "toolset": "bridge_npc",
+      "description": "READ-ONLY edit-mode verifier: evaluate the NPC's perception math RIGHT NOW without entering play mode. Given an NPC (reads its NpcBrain SightRange/FovDegrees/EyeHeight/TargetTag + transform) and either a targetId or a point, it runs the SAME line-of-sight check the brain uses — FOV cone (dot vs the baked cosine), sight-range gate, and an occlusion trace from the eye to the target — and reports the result AND why. This is the keystone verifier: it makes the perception layer checkable in edit mode (no flaky screenshot timing) — e.g. place the Sasquatch, place a camper behind a tree, and confirm the tree blocks LOS. Call params override the brain's values, so it also works before/without an NpcBrain (uses defaults). Safe in play mode too (read-only, like raycast).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "npcId": {
+            "type": "string",
+            "description": "GUID of the NPC GameObject (ideally with an NpcBrain; its perception [Property] values are read)."
+          },
+          "targetId": {
+            "type": "string",
+            "description": "GUID of the target GameObject to test visibility to (e.g. a player). Provide this OR point."
+          },
+          "point": {
+            "type": "string",
+            "description": "A raw world point to test visibility to. Provide this OR targetId. As \"x,y,z\" (or JSON {x,y,z})."
+          },
+          "sightRange": {
+            "type": "number",
+            "description": "Override the sight range for this check (else read from the NpcBrain / default 1500)."
+          },
+          "fovDegrees": {
+            "type": "number",
+            "description": "Override the FOV cone angle for this check (else read from the NpcBrain / default 110)."
+          },
+          "eyeHeight": {
+            "type": "number",
+            "description": "Override the eye height for this check (else read from the NpcBrain / default 64)."
+          },
+          "targetTag": {
+            "type": "string",
+            "description": "Override the target tag (canSee also requires the target to carry this tag; else read from the NpcBrain / default 'player')."
+          }
+        },
+        "required": [
+          "npcId"
+        ]
+      }
+    },
+    {
+      "name": "snap_to_ground",
+      "title": "Snap To Ground",
+      "toolset": "bridge_gameobject",
+      "description": "Drop a GameObject straight down onto the surface below it (physics raycast). Works best on collider-less props (an object with its own collider may self-hit). Optional offset lifts it off the surface. Returns { snapped, groundZ, gameObject } with the object's updated transform — or { snapped: false, reason } (not an error) when no ground was hit below.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of the GameObject to snap."
+          },
+          "offset": {
+            "type": "number",
+            "description": "Height above the surface to place it (default 0)."
+          },
+          "startHeight": {
+            "type": "number",
+            "description": "How far above the object to start the trace (default 2000)."
+          },
+          "maxDistance": {
+            "type": "number",
+            "description": "Max trace distance downward (default 20000)."
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    }
+  ],
+  "total": 402
+}

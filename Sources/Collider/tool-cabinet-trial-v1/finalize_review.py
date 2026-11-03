@@ -6,6 +6,8 @@ from PIL import Image,ImageDraw,ImageFont
 ROOT=Path(__file__).resolve().parents[3];HERE=Path(__file__).parent
 OUT=ROOT/'output/asset-improvement-20261030/tool-cabinet'
 sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+if (OUT/'native-review-20261031/review.json').exists():
+    raise SystemExit('Native review already exists; use finalize_native_review.py to validate it. Offline images do not supersede it.')
 d=json.loads((HERE/'candidate.json').read_text())
 v=json.loads((OUT/'verification.json').read_text())
 r=json.loads((OUT/'render-report.json').read_text())
@@ -15,7 +17,21 @@ assert v['allCollisionProbesPassed'] and v['checkedFromExportedModelDocAndHullFi
 assert r['sameCameraLightingScaleAndExposure'] and r['fullObjectInAllViews'] and not r['GPUUsed']
 assert r['previousModelSHA256']==d['models']['before']['meshSHA256']
 assert r['revisedModelSHA256']==d['models']['after']['meshSHA256']
-for rel,h in {**d['protectedSourceSHA256'],**r['proposalSourceSHA256']}.items():assert sha(ROOT/rel)==h,rel
+assert v['modelsSHA256']['after']==r['revisedModelSHA256']
+refinement_path=OUT/'collision-refinement/change.json'
+refinement=json.loads(refinement_path.read_text()) if refinement_path.exists() else None
+if refinement:
+    assert refinement['visibleOBJUnchanged']==r['revisedModelSHA256']
+    assert refinement['renderMeshAndMaterialBindingsUnchanged']
+changed=refinement['changedFiles'] if refinement else {}
+current_proposal={}
+for rel,h in {**d['protectedSourceSHA256'],**r['proposalSourceSHA256']}.items():
+    if rel in changed:
+        change=changed[rel];assert h in (change['before'],change['after'])
+        assert sha(ROOT/change['backup'])==change['before']
+        assert sha(ROOT/rel)==change['after'],rel
+    else:assert sha(ROOT/rel)==h,rel
+    if rel in r['proposalSourceSHA256']:current_proposal[rel]=sha(ROOT/rel)
 for image in r['images']:
     path=OUT/image['file'];assert sha(path)==image['sha256']
     with Image.open(path) as im:assert im.size==(1600,1200)
@@ -33,7 +49,7 @@ draw.text((20,805),'Actual model renders • same camera, lighting and scale •
 canvas.save(OUT/'before-after.png')
 review=dict(d)
 review.update(status='preview-ready-awaiting-user-approval',geometryAndCollisionVerification=v,
-              proposalSourceSHA256=r['proposalSourceSHA256'],renderImages=r['images'],
+              proposalSourceSHA256=current_proposal,renderImages=r['images'],collisionOnlyRefinement=refinement,
               comparisonImage='output/asset-improvement-20261030/tool-cabinet/before-after.png',
               comparisonSHA256=sha(OUT/'before-after.png'),nativeEngineScreenshot=False,
               renderProcessStopped=True,wholeObjectShown=True,nativeCollisionAndAppearance='pending')

@@ -90,6 +90,8 @@ def reset():
     CLIPS.clear()
     LIGHTS.clear()
     PIPE_SOLIDS.clear()
+    import riverdale_lifebuoys
+    riverdale_lifebuoys.PLACED.clear()
 
 
 def v( *p ):
@@ -956,21 +958,39 @@ def railing( m, pts, z, paint="rv_yellow", height=42.0, post_every=60.0, kick=Tr
             extrude( m, A, B, [ ( -0.12, 0.0 ), ( 0.12, 0.0 ), ( 0.12, 3.75 ), ( -0.12, 3.75 ) ], paint, up=UP, skip=( 0, ), smooth=0 )
         if posts:
             count = max( 1, int( math.ceil( L / post_every ) ) )
+            here = unit( d + UP * ( zb - za ) )
             for i in range( count + ( 1 if k == len( pts ) - 2 and not closed else 0 ) ):
                 f = i / count
                 p = a + d * f
                 zp = za + ( zb - za ) * f
-                _post( m, p + UP * zp, height, paint, unit( d ) )
+                rail_dir = here
+                # At a turn the post stands at the corner and the bent rail misses it, unless the turn is a slight one.
+                if i == 0 and ( k > 0 or loop ):
+                    j = k - 1 if k > 0 else len( pts ) - 2
+                    before = unit( pts[j + 1] - pts[j] + UP * ( zs[j + 1] - zs[j] ) )
+                    rail_dir = unit( before + here ) if np.dot( before, here ) > math.cos( math.radians( 25.0 ) ) else None
+                _post( m, p + UP * zp, height, paint, unit( d ), rail_dir )
         if clip_to is not None:
             clip( name, a, b, min( za, zb ), max( za, zb ) + clip_to )
 
 
-def _post( m, foot, height, paint, along ):
+def _rail_fitting( m, foot, height, paint, rail_dir=None ):
+    """ A cast tee where a post meets the top rail: a capped socket on the post and, along rail_dir, a closed collar round
+    the rail. With no rail_dir (the rail turns a corner here and misses the post) just the capped socket. """
+    r = RAIL_POST + 0.32
+    lathe_axis( m, foot + UP * ( height - 3.4 ), UP, [ ( RAIL_POST, 0.0 ), ( r, 0.4 ), ( r, 3.05 ) ], paint, 8, cap=paint )
+    if rail_dir is not None:
+        t = unit( rail_dir )
+        inner = RAIL_TOP - 0.07
+        lathe_axis( m, foot + UP * height - t * 1.9, t, [ ( 0.0, 0.0 ), ( inner, 0.0 ), ( r, 0.25 ), ( r, 3.55 ), ( inner, 3.8 ), ( 0.0, 3.8 ) ], paint, 8 )
+
+
+def _post( m, foot, height, paint, along, rail_dir=None ):
     """ A round railing post from foot up under the top rail: a base plate and a fitting round the rail. """
     top = foot + UP * ( height - RAIL_TOP * 0.6 )
     rod( m, foot + UP * 0.4, top, RAIL_POST, paint, 8 )
     obox( m, foot + UP * 0.2, along, ( 4.5, 4.5, 0.4 ), { "default": paint, "-z": None } )
-    lathe_axis( m, foot + UP * ( height - 3.4 ), UP, [ ( RAIL_POST, 0.0 ), ( RAIL_POST + 0.32, 0.4 ), ( RAIL_POST + 0.32, 2.6 ) ], paint, 6 )
+    _rail_fitting( m, foot, height, paint, rail_dir )
 
 
 def stairs( m, foot, head, width, z0, z1, tread="rv_grating", side="rv_yellow", rails=( True, True ), rail_paint="rv_yellow",
@@ -1781,7 +1801,7 @@ def bollard( m, e, n, h=40.0 ):
     lathe( m, ( e, n ), prof, paints, 12 )
 
 
-def life_ring( m, at, out, sign=False ):
+def _legacy_life_ring( m, at, out, sign=False ):
     """ A life ring hung on its hook on a wall facing out: an orange ring with four white bands and its grab line
     festooned round it; sign puts the life ring sign over it. """
     out = unit( ( out[0], out[1], 0 ) )
@@ -1806,6 +1826,16 @@ def life_ring( m, at, out, sign=False ):
     tube( m, [ at + out * 0.4 + UP * 9.0, at + out * 5.6 + UP * 9.0, at + out * 5.6 + UP * 11.0 ], 0.45, "rv_frame", 6, bend_radius=0.8 )
     if sign:
         plate( m, "lifering_sign", at + UP * ( R + 16 ), right, 10.0, off=0.3 )
+
+
+def life_ring( m, at, out, sign=False ):
+    """Approved lifebuoy is an instanced renderer; retain its original wall anchor and optional sign."""
+    import riverdale_lifebuoys as lifebuoys
+    at = v( *at )
+    out, _ = _facing( m, at, unit( ( out[0], out[1], 0 ) ) )
+    lifebuoys.record( at, out )
+    if sign:
+        plate( m, "lifering_sign", at + UP * 27, np.cross( UP, out ), 10.0, off=0.3 )
 
 
 def truss( m, a, b, depth, paint="rv_steel", chord=3.0, web=1.5, up=UP, panel=None ):

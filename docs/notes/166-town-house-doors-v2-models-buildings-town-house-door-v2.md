@@ -2,4 +2,5 @@
 - Replaced the town house's ten doors at the user's word, after comparing old and new side by side in s&box ("new doors better").
 - `Assets/prefabs/buildings/town_house.prefab`'s three outer and seven inner doors now point at `door_outer.vmdl` and `door_inner.vmdl`. Nothing else in them changed: position, `BoxCollider` and `FuncDoorRotating` are as they were, and the models share the old pivot and fit inside the old box.
 - Seen in s&box in the real prefab, in an isolated editor scene: all ten load and sit in their frames. Not seen in a match or swung open. The green door's dirt along the bottom is blotchy (see the folder's README), and the user took it as it is.
-- The old `town_house_door_outer` and `_inner` stay in the repository. To undo: `git checkout Assets/prefabs/buildings/town_house.prefab`.
+- `Tools/ridgeback_buildings.py`'s `write_building` names these models for the town house, so a rerun keeps them. It still writes the old door models, and the terrain fit still uses them.
+- The old `town_house_door_outer` and `_inner` stay in the repository. To undo: restore those door paths in `Assets/prefabs/buildings/town_house.prefab` and remove the `DOOR_MODEL` lines from the script.

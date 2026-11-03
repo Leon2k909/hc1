@@ -1,6 +1,6 @@
 # Veridant lounge sofa v2
 
-Installed 2026-10-31 at the user's word after comparing both in s&box ("sofa new better"). Nothing is committed. The old sofas' faces are cut from `lounger-v2/veridant_buildings-base.obj`, which `veridant_buildings.vmdl` builds from, and the scene's "Sofas" group places 9 models with renderers only. The old boxes stay in the merged model as their collision. `docs/notes/167-*` has how.
+Installed 2026-10-31 at the user's word after comparing both in s&box ("sofa new better"). It's on `codex/orion-cable-reel-preview`, not main, in e2a67355 and 5c80147c, from the user's request to put everything on git. The old sofas' faces are cut from `lounger-v2/veridant_buildings-base.obj`, which `veridant_buildings.vmdl` builds from, and the scene's "Sofas" group places 9 models with renderers only. The old boxes stay in the merged model as their collision. `docs/notes/167-*` has how.
 
 Why this one: the old sofa is eight plain boxes in two flat colours, repeated nine times across the lounge, the gallery, the ops lobby and reception, with
 no rebuild of its own, though the chairs, tables, benches and loungers around it have had one.

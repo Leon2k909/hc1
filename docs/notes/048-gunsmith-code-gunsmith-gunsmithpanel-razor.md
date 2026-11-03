@@ -26,9 +26,9 @@
   From a match the card says LEAVE MATCH & TEST BUILD; entry disconnects the local player
   before loading the range. `FiringRangeSystem` uses the regular pawn/weapons, replenishes
   reserve ammunition, and provides target reset, moving targets and shot/damage feedback.
-  `Tools/gunsmith_range_bench.py` supplies generated long-grain/end-grain oak and beveled
-  bench timbers; the range model maps both oak materials. These are current source facts,
-  not a replacement for an end-to-end play test.
+  The benches are `models/gunsmith_range/shooting_bench_v2` (docs/notes/179), placed by
+  `Tools/gunsmith_range.py`. These are current source facts, not a replacement for an
+  end-to-end play test.
 - Every pick saves as it's made, and `PlayerLoadout` sends the saved class to the host every second, so there's no
   apply step (the user had the mockup's APPLY BUILD removed). SAVE LOADOUT, which only confirmed, was removed too at
   the user's ask (2026-10-13). Over a match, picking a class (`SelectClass`) picks it as the class menu does, which swaps

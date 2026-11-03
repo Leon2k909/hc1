@@ -1,0 +1,5 @@
+var paths=new[]{"materials/riverdale/rv_pool_rules_v2.vmat", "models/maps/riverdale/riverdale_hall_detail.vmdl", "models/maps/riverdale/riverdale_hall_fine.vmdl"};
+var assets=paths.Select(p=> {var a=Editor.AssetSystem.FindByPath(p); return new {Path=p,Found=a!=null,Compiled=a?.IsCompiled,Failed=a?.IsCompileFailed};}).ToArray();
+var models=paths.Skip(1).Select(p=> {var m=Model.Load(p); return new {Path=p,Valid=m!=null&&!m.IsError,Materials=m?.Materials.Select(x=>x.ResourcePath).Where(x=>x.Contains("pool_rules")).ToArray()};}).ToArray();
+return new {Assets=assets,Models=models,Game.IsPlaying,Scene=Game.ActiveScene.Name,
+TemporaryCameras=Game.ActiveScene.GetAllObjects(true).Count(o=>o.Name.Contains("pool_rules_temporary"))};

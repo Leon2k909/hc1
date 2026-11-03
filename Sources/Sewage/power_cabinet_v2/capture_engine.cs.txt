@@ -34,7 +34,7 @@ bool InCut(Vector3 p)
         var at = Vec(cabinet["at"]);
         var plinth = Math.Abs(p.x - at.x) <= 38.2f && Math.Abs(p.y - at.y) <= 19.2f && p.z >= at.z - 0.1f && p.z <= at.z + 115.1f;
         // The old lamp sticks out of its south end: plan n - 40 is world x - 40.
-        var lamp = p.x >= at.x - 46.9f && p.x <= at.x - 34.8f && Math.Abs(p.y - at.y) <= 10.1f && p.z >= at.z + 98.2f && p.z <= at.z + 109.1f;
+        var lamp = p.x >= at.x - 47.6f && p.x <= at.x - 34.8f && Math.Abs(p.y - at.y) <= 10.1f && p.z >= at.z + 98.2f && p.z <= at.z + 109.1f;
         if (plinth || lamp) return true;
     }
     return false;
@@ -207,6 +207,52 @@ try
             }
             System.IO.File.WriteAllBytes(System.IO.Path.Combine(destination, $"{name}-{variant}.png"), bitmap.ToPng());
             written.Add($"{name}-{variant}");
+        }
+    }
+
+    // The map's dark hides faults, so the new model alone, brightly lit, far above the map: all round, and at the distances its LODs change.
+    if (configuration["inspect"] is System.Text.Json.Nodes.JsonArray inspect && inspect.Count > 0)
+    {
+        var centre = new Vector3(0, 0, 9000);
+        GameObject subject, lamp;
+        using (scene.Push())
+        {
+            foreach (var go in news) go.Enabled = false;
+            subject = new GameObject(false, "Inspected cabinet");
+            subject.WorldPosition = centre;
+            subject.Components.Create<ModelRenderer>().Model = model;
+            subject.Enabled = true;
+            lamp = new GameObject(false, "Inspection lamp");
+            var bright = lamp.Components.Create<PointLight>();
+            bright.LightColor = Color.White * 1.6f;
+            bright.Radius = 9000;
+            bright.Attenuation = 0.2f;
+            lamp.Enabled = true;
+        }
+        foreach (var view in inspect)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            var name = view["name"].GetValue<string>();
+            using var bitmap = new Bitmap(configuration["width"].GetValue<int>(), configuration["height"].GetValue<int>());
+            var eye = centre + Vec(view["eye"]);
+            var target = centre + Vec(view["target"]);
+            for (var frame = 0; frame < settle; frame++)
+            {
+                using (scene.Push())
+                {
+                    camera.WorldPosition = eye;
+                    camera.WorldRotation = Rotation.LookAt(target - eye);
+                    camera.FieldOfView = view["fov"].GetValue<float>();
+                    lamp.WorldPosition = eye + Vector3.Up * 40;
+                    scene.EditorTick(.016f, .016f);
+                    preRender.Invoke(scene, null);
+                    preCameraRender.Invoke(scene, null);
+                    camera.RenderToBitmap(bitmap);
+                }
+                await Task.Delay(16, cancellationToken);
+            }
+            System.IO.File.WriteAllBytes(System.IO.Path.Combine(destination, $"inspect-{name}.png"), bitmap.ToPng());
+            written.Add($"inspect-{name}");
         }
     }
     return new

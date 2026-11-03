@@ -1,0 +1,104 @@
+{
+ "width": 1600,
+ "height": 900,
+ "stream_frames": 120,
+ "settle_frames": 24,
+ "only": "extinguishers",
+ "jobs": [
+  {
+   "name": "extinguishers",
+   "scene": "Assets/scenes/maps/Riverdale/riverdale.scene",
+   "roots": [
+    "Sun",
+    "Sky",
+    "Fog",
+    "Look",
+    "Riverdale",
+    "Lights",
+    "Reflection Probes",
+    "Indirect Light"
+   ],
+   "drop_children": [
+    "Ground",
+    "Fuel Pool",
+    "Pool Water",
+    "Glass",
+    "Yard Middle",
+    "West",
+    "East",
+    "North Lane",
+    "Boundary",
+    "Backdrop",
+    "Backdrop Near",
+    "Backdrop Land East",
+    "Backdrop Land West",
+    "Backdrop Trees",
+    "Backdrop Trees Near",
+    "Yard Ground Detail",
+    "Yard Props"
+   ],
+   "exposure": 1.6,
+   "fresh": "extinguisher-v2",
+   "merged": "riverdale_hall_detail",
+   "gone_paints": [],
+   "views": [
+    {
+     "name": "close",
+     "eye": [
+      1629.0,
+      -594.0,
+      54.0
+     ],
+     "target": [
+      1621.0,
+      -640.0,
+      51.0
+     ],
+     "fov": 50
+    },
+    {
+     "name": "deck",
+     "eye": [
+      1110.0,
+      -904.0,
+      64.0
+     ],
+     "target": [
+      1090.0,
+      -1000.0,
+      51.0
+     ],
+     "fov": 55
+    },
+    {
+     "name": "upper",
+     "eye": [
+      1280.0,
+      -904.0,
+      352.0
+     ],
+     "target": [
+      1300.0,
+      -1000.0,
+      339.0
+     ],
+     "fov": 55
+    },
+    {
+     "name": "south-wall",
+     "eye": [
+      -90.0,
+      -166.0,
+      64.0
+     ],
+     "target": [
+      -200.0,
+      -140.0,
+      51.0
+     ],
+     "fov": 55
+    }
+   ]
+  }
+ ]
+}

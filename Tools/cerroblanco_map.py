@@ -46,6 +46,12 @@ import railhead_map as R
 import railhead_preview as PV
 import cerroblanco_parts as P
 import cerroblanco_boulders
+import cerroblanco_chairs
+import cerroblanco_cups
+import cerroblanco_espresso
+import cerroblanco_extinguishers
+import cerroblanco_parasols
+import cerroblanco_tables
 import cerroblanco_materials as CM
 from cerroblanco_glass import GlassModel
 
@@ -1345,6 +1351,12 @@ def write_scene( written, light_list, props, glazing=None, spot_list=() ):
         glazing.scene_group( ids ) if name == "cerroblanco_glass" else model_object( title, f"world/{name}", name, collide, shadows )
         for name, title, collide, shadows in SCENE_MODELS if name in written ] )
     world["Children"].append( cerroblanco_boulders.scene_group( ids ) )
+    world["Children"].append( cerroblanco_extinguishers.scene_group( ids ) )
+    world["Children"].append( cerroblanco_parasols.scene_group( ids ) )
+    world["Children"].append( cerroblanco_chairs.scene_group( ids ) )
+    world["Children"].append( cerroblanco_tables.scene_group( ids ) )
+    world["Children"].append( cerroblanco_cups.scene_group( ids ) )
+    world["Children"].append( cerroblanco_espresso.scene_group( ids ) )
     light_objects = [
         K.game_object( ids, name, f"light/{name}", K.to_world( position ), tags="light_point,light", components=[
             K.component( ids, "Sandbox.PointLight", f"light/{name}/light", Attenuation=1, FogMode="Enabled", FogStrength=1,

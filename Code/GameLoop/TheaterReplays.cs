@@ -96,6 +96,14 @@ public static class TheaterReplays
 		public bool IsPresentAt( float time ) => time >= Spawned && (Removed < 0f || time < Removed);
 	}
 
+	/// <summary>A person across recorded lives, without confusing equal display names or allocating a key each frame.</summary>
+	public readonly record struct PersonIdentity( bool Bot, ulong SteamId, Team Team, string Name );
+
+	/// <summary>Steam identifies a player across renames/team changes; bots and older unidentified players use team and name.</summary>
+	public static PersonIdentity IdentityOf( Soldier soldier ) => !soldier.Bot && soldier.SteamId != 0
+		? new( false, soldier.SteamId, Team.Unassigned, "" )
+		: new( soldier.Bot, 0, soldier.Team, soldier.Name ?? "" );
+
 	/// <summary>
 	/// What each life did with its guns, which the recording itself can't show: the first-person gun
 	/// (<see cref="TheaterViewModel"/>) plays it. It's a file of its own, as a long match's is hundreds of kilobytes and

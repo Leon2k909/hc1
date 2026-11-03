@@ -1,4 +1,16 @@
 ## Ares (multiplayer map, `Tools/ares_map.py`)
+- Main hall pressure interior (2026-11-03, concept approved and implementation authorised):
+  `Tools/ares_interior.py` supplies curved pressure frames and wall haunches, private warm off-white panel bays,
+  ducts/trays, gallery fascias, matte floor plates and suspended fixtures at the original 24 hall light positions.
+  The four pump housings now have formed skins, screens, vents, flange collars and curved pipework.
+  `ares_map.py` retains these through narrow geometry/configuration hooks. Hall gallery toe boards use dark metal;
+  stair/door safety markings remain. Existing cover positions, door imports, scene, lights and post-processing remain.
+  Only the targeted truss/pilaster/floor/pump faces were replaced in the current hall base and reactor OBJ; all
+  other geometry was checked exactly. Both ModelDocs retain byte-identical physics suffixes and prior imports,
+  and source-generated collision was checked before/after. Both public models compile and installed native views
+  have no error models. Sources/workflow: `Sources/Ares/interior-v1/README.md`; snapshots, hashes and native
+  before/after/installed captures: `output/ares/interior-v1/`. Do not rerun the one-time migration over installed shapes
+  or replace the whole map from a fresh generator build. Wings and cargo concourse are outside this hall pass.
 - Pipe end closures (2026-10-27): all 16 wall-service runs now have smooth dished heads, closing the 32 missing
   end faces. `ares_pipework.pipe_run` includes them in future generation. The installed repair appends only
   17,472 head triangles to the active base OBJ, retaining every prior byte and the complete ModelDoc/physics.
@@ -123,7 +135,15 @@
     - Each is double height, with an L of mezzanine along its north and inner walls and a stair up its outer wall.
     - Three doors lead into the hall: the floor's middle door, the side gallery's SECTOR 03 / HABITAT B door, and
       the north door onto the observation deck.
-    - A blast screen inside each middle door stops a sightline from site A through the door into the spawn.
+    - The blast screens inside both middle doors were removed at the user's request on 2026-10-31; their render
+      assemblies and collision boxes are removed, opening the sightline into the wings. `Tools/ares_remove_blast_screens.py`
+      updates only the installed hall import, its two collision boxes and the map generator; backups are under
+      `output/ares/remove-blast-screens-20261031/`. The offline change requires native compilation on the next engine session.
+    - 2026-10-31: both middle hall-to-wing entrances have two-leaf automatic sliding doors. They reuse
+      `Facepunch.AutomaticSlidingDoor` and moving model colliders, with an Ares-sized variant of Collider's leaf.
+      `Tools/ares_sliding_doors.py` retains the instances on map rebuild. Offline checks cover scene references,
+      geometry, collision and open/closed clearance; native compilation, navigation and playtesting remain pending.
+      Evidence and backups: `output/ares/sliding-doors-20261031/`.
   - The cargo concourse runs along the whole south side (n -1400..-752, 320 high). Its middle is clear; the rover and
     its collision were removed on 2026-10-15. Bomb site B is the cargo bay at its east end.
 - Lanes: north is the observation deck and the wings' north mezzanines; middle is the hall floor past the column, with

@@ -1,0 +1,3 @@
+var edit = Editor.SceneEditorSession.Active?.Scene;
+return new { Edit = edit?.Name, Runtime = Game.ActiveScene?.Name, Playing = Game.IsPlaying,
+Objects = edit.GetAllObjects(true).SelectMany(o => o.Components.GetAll<ModelRenderer>().Select(r => new {o.Name, o.Id, Position=o.WorldPosition.ToString(), Rotation=o.WorldRotation.ToString(), Model=r.Model?.ResourcePath})).Where(o => o.Model != null && o.Model.Contains("riverdale_hall")).ToArray() };

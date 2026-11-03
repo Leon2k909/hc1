@@ -668,7 +668,7 @@ def yard_clutter( m, s ):
     detail( "cable_drum", m, face + s * 18.0, -1632.0, 0.3, "e" )
     detail( "brick_pallet", m, face + s * 24.0, -1580.0, 0.3, "n" )
     # A skip against the back fence, north of the containers, and a road works pit in the open with cones round it.
-    detail( "skip_bin", m, s * 2158.0, -1575.0, "+n" )
+    detail( "skip_bin", m, s * 2155.0, -1575.0, "+n" )
     detail( "open_chamber", m, s * 1900.0, -1520.0, 0.0, "e" )
     # The road works round it read from the yard: two more cones on its yard side, one knocked over, and a red-and-white
     # barrier across its south side.
@@ -1407,7 +1407,13 @@ def dress_centre():
             detail( "column_kit", m, 0.0, n, cable_side="+n" if k % 4 == 0 else "-n" )
     use( "info_pillar", m, 0.0, 940.0, stand_in=furniture_stand_in( "info_pillar", 0.0, 940.0 ) )
     hanging_sign( m, 0.0, 900.0, S.GUTTER_Z[0], [ "gleis_3_4" ], "n", bottom=150.0 )
-    clock( m, 0.0, 1110.0, 240.0, "n" )
+    # Approved 14:03 clock: keep the legacy housing collision.
+    from railhead_station_clock import append_to as append_station_clock
+    legacy_clock = K.Model()
+    clock( legacy_clock, 0.0, 1110.0, 240.0, "n" )
+    legacy_clock.polygons.clear()
+    m.extend( legacy_clock )
+    append_station_clock( m )
     kiosk( m, KIOSKS[2] )
     for n in ( 460.0, -500.0, -1220.0 ):
         put( "bench", m, -12.0, n, "-e" )
@@ -2204,6 +2210,11 @@ def write_scene( written, light_list, props ):
     station["Children"].append( railhead_bins.scene_group() )
     import railhead_pallet_trucks
     station["Children"].append( railhead_pallet_trucks.scene_group() )
+    import railhead_tyres
+    station["Children"].append( railhead_tyres.scene_group() )
+    import railhead_skips
+    railhead_skips.write_model()
+    station["Children"].append( railhead_skips.scene_group() )
     light_objects = [
         K.game_object( ids, name, f"light/{name}", K.to_world( position ), tags="light_point,light", components=[
             K.component( ids, "Sandbox.PointLight", f"light/{name}/light", Attenuation=1,

@@ -1,0 +1,297 @@
+{
+  "tools": [
+    {
+      "name": "create_game_object",
+      "title": "Create Game Object",
+      "toolset": "scene",
+      "description": "Create a game object in the active scene - empty or from a prefab, optionally with components. For putting a model in the scene, spawn_model is quicker. The user can undo this. Returns the new object's id for the other scene tools.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name for the new object. Empty picks a sensible default."
+          },
+          "parent": {
+            "type": "string",
+            "description": "Parent game object id. Empty parents to the scene root."
+          },
+          "prefab": {
+            "type": "string",
+            "description": "Prefab asset path to instantiate, from asset_search."
+          },
+          "position": {
+            "type": "string",
+            "description": "World position as 'x,y,z'. Default origin."
+          },
+          "angles": {
+            "type": "string",
+            "description": "Rotation as 'pitch,yaw,roll'."
+          },
+          "scale": {
+            "type": "string",
+            "description": "Scale as 'x,y,z', or a single number for uniform."
+          },
+          "components": {
+            "type": "string",
+            "description": "Comma separated component type names to add, e.g. 'ModelRenderer,BoxCollider'."
+          }
+        },
+        "required": []
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "Id": {
+            "type": "string"
+          },
+          "Name": {
+            "type": "string"
+          },
+          "Position": {
+            "type": "string"
+          },
+          "Components": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "Id": {
+                  "type": "string"
+                },
+                "Type": {
+                  "type": "string"
+                },
+                "GameObject": {
+                  "type": "string"
+                }
+              },
+              "required": []
+            }
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "install_asset",
+      "title": "Install Asset",
+      "toolset": "bridge_asset",
+      "description": "Install a community asset package into the project by its ident (e.g. 'facepunch.flatgrass'). Adds it as a project dependency. Returns { installed, ident, name, path, relativePath, restartRecommended, note } — pass the returned path to spawn_model / assign_model. CAUTION: if the package is a code LIBRARY (adds a PackageReference), trigger_hotload will NOT surface its types — call restart_editor so the new package compiles into the project.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "ident": {
+            "type": "string",
+            "description": "Package identifier (e.g. 'facepunch.flatgrass', 'author.package_name')."
+          }
+        },
+        "required": [
+          "ident"
+        ]
+      }
+    },
+    {
+      "name": "install_package",
+      "title": "Install Package",
+      "toolset": "package",
+      "description": "Download and install a cloud package into the project so its assets can be used - after this the returned asset path works anywhere an asset path does, e.g. spawn_model for a model package. Already-installed packages return immediately.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "ident": {
+            "type": "string",
+            "description": "The package ident, like 'facepunch.wooden_crate' or from find_packages."
+          }
+        },
+        "required": [
+          "ident"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "Ident": {
+            "type": "string"
+          },
+          "AssetPath": {
+            "type": "string",
+            "description": "The primary asset's path - works anywhere an asset path does."
+          },
+          "AssetType": {
+            "type": "string"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "list_asset_library",
+      "title": "List Asset Library",
+      "toolset": "bridge_asset",
+      "description": "List assets visible to the editor's AssetSystem — project assets plus mounted engine/installed-package content (it does NOT query the remote sbox.game library; use install_asset to pull in new packages). Returns { count, assets:[{ name, path, relativePath, assetType }] } — pass a returned path to spawn_model, assign_model, or get_asset_info.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Search term, case-insensitive substring match against asset NAMES."
+          },
+          "type": {
+            "type": "string",
+            "description": "Asset type filter, substring-matched against the asset's type (e.g. 'model', 'material', 'sound')."
+          },
+          "maxResults": {
+            "type": "number",
+            "description": "Maximum results. Defaults to 200."
+          }
+        },
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "spawn_model",
+      "title": "Spawn Model",
+      "toolset": "scene",
+      "description": "Create a game object with a ModelRenderer in one call - the fastest way to put a model in the scene. Optionally tint it, override its material, scale it and parent it. The user can undo this. Returns the new object's id.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "model": {
+            "type": "string",
+            "description": "Model asset path, e.g. 'models/dev/box.vmdl'."
+          },
+          "name": {
+            "type": "string",
+            "description": "The new object's name. Empty uses the model filename."
+          },
+          "position": {
+            "type": "string",
+            "description": "World position as 'x,y,z'."
+          },
+          "angles": {
+            "type": "string",
+            "description": "Rotation as 'pitch,yaw,roll'."
+          },
+          "scale": {
+            "type": "string",
+            "description": "Scale as 'x,y,z', or a single number for uniform."
+          },
+          "tint": {
+            "type": "string",
+            "description": "Tint color as 'r,g,b,a' (0-1 floats) or '#rrggbb'."
+          },
+          "material": {
+            "type": "string",
+            "description": "Material asset path to override every surface with."
+          },
+          "parent": {
+            "type": "string",
+            "description": "Parent game object id. Empty parents to the scene root."
+          }
+        },
+        "required": [
+          "model"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "Id": {
+            "type": "string"
+          },
+          "Name": {
+            "type": "string"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "spawn_models",
+      "title": "Spawn Models",
+      "toolset": "scene",
+      "description": "Create many model game objects in one call - each item takes the same fields spawn_model does. Use this to build big arrangements without a round trip per object. One undo step covers the whole batch. Returns the created ids.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "Model": {
+                  "type": "string",
+                  "description": "Model asset path, e.g. 'models/dev/box.vmdl'."
+                },
+                "Name": {
+                  "type": "string",
+                  "description": "The new object's name. Empty uses the model filename."
+                },
+                "Position": {
+                  "type": "string",
+                  "description": "World position as 'x,y,z'."
+                },
+                "Angles": {
+                  "type": "string",
+                  "description": "Rotation as 'pitch,yaw,roll'."
+                },
+                "Scale": {
+                  "type": "string",
+                  "description": "Scale as 'x,y,z', or a single number for uniform."
+                },
+                "Tint": {
+                  "type": "string",
+                  "description": "Tint color as 'r,g,b,a' (0-1 floats) or '#rrggbb'."
+                },
+                "Material": {
+                  "type": "string",
+                  "description": "Material asset path to override every surface with."
+                },
+                "Parent": {
+                  "type": "string",
+                  "description": "Parent game object id. Empty parents to the scene root."
+                }
+              },
+              "required": [
+                "Model"
+              ]
+            },
+            "description": "The models to spawn."
+          }
+        },
+        "required": [
+          "items"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "Count": {
+            "type": "integer"
+          },
+          "Created": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "Id": {
+                  "type": "string"
+                },
+                "Name": {
+                  "type": "string"
+                }
+              },
+              "required": []
+            }
+          }
+        },
+        "required": []
+      }
+    }
+  ],
+  "total": 402
+}

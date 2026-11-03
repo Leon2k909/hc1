@@ -1420,6 +1420,9 @@ public static partial class GameText
 		["Red"] = "赤",
 		["Green"] = "緑",
 		["Blue"] = "青",
+		["Hue"] = "色相",
+		["Saturation"] = "彩度",
+		["Brightness"] = "明度",
 		// Custom game rules (CreateLobbyPage)
 		["RULES"] = "ルール",
 		["BOT DIFFICULTY"] = "ボットの難易度",

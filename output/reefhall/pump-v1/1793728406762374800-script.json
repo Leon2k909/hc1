@@ -1,0 +1,9 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "ArgumentException: mcp-script.cs(22,50): error CS1061: 'T' does not contain a definition for 'CopyPropertiesTo' and no accessible extension method 'CopyPropertiesTo' accepting a first argument of type 'T' could be found (are you missing a using directive or an assembly reference?)\nat Editor.Mcp.ScriptTools.Compile(String code, Assembly[] assemblies, CancellationToken cancellation)\nat System.Threading.Tasks.Task`1.InnerInvoke()\nat System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)\n--- End of stack trace from previous location ---"
+    }
+  ],
+  "isError": true
+}

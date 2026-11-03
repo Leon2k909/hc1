@@ -1,0 +1,42 @@
+{
+  "name": "read_console",
+  "title": "Read Console",
+  "toolset": "instance",
+  "description": "Read recent console output, oldest first - what the editor and game logged: prints, warnings, errors, exceptions, compile results. This is how you see the effect of what you just did. Errors come with the top of their stack trace. Every read ends with a cursor - pass it back as 'since' next time to get only what was logged after it, instead of re-reading the same output.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "limit": {
+        "type": "integer",
+        "description": "How many of the most recent matching entries to return.",
+        "minimum": 1,
+        "maximum": 500,
+        "default": 50
+      },
+      "minimumLevel": {
+        "type": "string",
+        "enum": [
+          "Trace",
+          "Info",
+          "Warn",
+          "Error"
+        ],
+        "description": "Lowest severity to include.",
+        "default": "Trace"
+      },
+      "filter": {
+        "type": "string",
+        "description": "Only entries whose message or logger name contains this, case insensitive."
+      },
+      "since": {
+        "type": "integer",
+        "description": "Cursor from a previous read - only entries logged after it come back. 0 reads the most recent.",
+        "default": 0
+      }
+    },
+    "required": []
+  },
+  "annotations": {
+    "readOnlyHint": true
+  }
+}

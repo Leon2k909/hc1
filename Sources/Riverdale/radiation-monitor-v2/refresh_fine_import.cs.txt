@@ -1,0 +1,18 @@
+// A fresh source filename bypasses the cached imported OBJ, keeping the scene's model path.
+var root = Sandbox.Project.Current.GetRootPath();
+var folder = System.IO.Path.Combine(root,"Assets/models/maps/riverdale");
+var source = System.IO.Path.Combine(folder,"riverdale_hall_fine.obj");
+var target = System.IO.Path.Combine(folder,"riverdale_hall_fine_arm_v2.obj");
+if(System.IO.File.Exists(target)) throw new Exception("Fresh import already exists; inspect before retrying");
+System.IO.File.Copy(source,target);
+var path = System.IO.Path.Combine(folder,"riverdale_hall_fine.vmdl");
+var text = System.IO.File.ReadAllText(path);
+if(!text.Contains("rv_arm_lcd.vmat")) throw new Exception("Expected monitor material remaps missing");
+text = text.Replace("models/maps/riverdale/riverdale_hall_fine.obj", "models/maps/riverdale/riverdale_hall_fine_arm_v2.obj");
+System.IO.File.WriteAllText(path+".arm-installing",text);
+System.IO.File.Move(path+".arm-installing",path,true);
+var asset = Editor.AssetSystem.FindByPath("models/maps/riverdale/riverdale_hall_fine.vmdl");
+var success = asset.Compile(true);
+var result = new {Success=success, asset.IsCompiled, asset.IsCompileFailed, Game.IsPlaying};
+System.IO.File.WriteAllText(System.IO.Path.Combine(root,"output/riverdale/radiation-monitor-v2/fine-import-result.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

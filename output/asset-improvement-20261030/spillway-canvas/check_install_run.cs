@@ -1,0 +1,116 @@
+// The installed canvas cover, drawn by s&box from the scene file as it is now: run with sbox-cli --call run_csharp through check_install.py.
+// Also fires rays at the collision there and counts the covers. Isolated editor scene: nothing is saved, and the open scene isn't touched.
+// never touched and nothing is saved. map_kit's plan (e, n, z) is engine (n, -e, z).
+var projectRoot = Sandbox.Project.Current.GetRootPath();
+var destination = System.IO.Path.Combine(projectRoot, "output/asset-improvement-20261030/spillway-canvas/installed");
+System.IO.Directory.CreateDirectory(destination);
+var visual = new System.Collections.Generic.HashSet<string>(new[] { "Sun", "Sky", "Fog", "Look", "Spillway", "Lights", "Reflection Probes", "Volumetric Fog" }, StringComparer.OrdinalIgnoreCase);
+var root = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(projectRoot, "Assets/scenes/maps/spillway/spillway.scene"))).AsObject();
+var objects = new System.Text.Json.Nodes.JsonArray();
+foreach (var item in root["GameObjects"].AsArray())
+    if (visual.Contains(item["Name"]?.GetValue<string>() ?? "")) objects.Add(item.DeepClone());
+root["GameObjects"] = objects;
+if (root["SceneProperties"]?["NavMesh"] is System.Text.Json.Nodes.JsonObject nav) nav["Enabled"] = false;
+if (root["SceneProperties"] is System.Text.Json.Nodes.JsonObject sceneProperties) sceneProperties["WantsSystemScene"] = false;
+var scene = Scene.CreateEditorScene();
+var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
+var preRender = typeof(Scene).GetMethod("PreRender", flags, null, Type.EmptyTypes, null);
+var preCameraRender = typeof(Scene).GetMethod("PreCameraRender", flags, null, Type.EmptyTypes, null);
+try
+{
+    CameraComponent camera;
+    var hiddenSlots = 0;
+    using (scene.Push())
+    {
+        scene.Deserialize(root);
+        foreach (var tonemap in scene.GetAllComponents<Tonemapping>())
+        {
+            var hold = ( tonemap.MinimumExposure + tonemap.MaximumExposure ) / 2f;
+            tonemap.AutoExposureEnabled = true;
+            tonemap.MinimumExposure = tonemap.MaximumExposure = hold;
+            tonemap.Rate = 10;
+        }
+        foreach (var (path, at, yaw) in new (string, Vector3, float)[] {  })
+        {
+            var model = Model.Load(path);
+            if (model is null || model.IsError) throw new InvalidOperationException($"{path} hasn't compiled.");
+            var go = new GameObject(true, "Compared");
+            go.WorldPosition = at;
+            go.WorldRotation = Rotation.FromYaw(yaw);
+            go.Components.Create<ModelRenderer>().Model = model;
+        }
+        if (false)
+        {
+            var hidden = Material.Load("models/compare_old/hidden.vmat");
+            foreach (var renderer in scene.GetAllComponents<ModelRenderer>().Where(r => r.Model?.ResourcePath?.Contains("spillway_cargo") == true))
+                for (var slot = 0; slot < renderer.Model.Materials.Length; slot++)
+                    if (renderer.Model.Materials[slot]?.ResourcePath?.Contains("rv_desk") == true) { renderer.Materials.SetOverride(slot, hidden); hiddenSlots++; }
+        }
+        var holder = new GameObject(false, "Capture camera");
+        camera = holder.Components.Create<CameraComponent>();
+        camera.ZNear = 1;
+        camera.ZFar = 30000;
+        holder.Enabled = true;
+        scene.EditorTick(.016f, .016f);
+        preRender.Invoke(scene, null);
+        preCameraRender.Invoke(scene, null);
+    }
+    // 1024 at most: the editor is shared, and a whole map's textures at full size have run it out of video memory.
+    var textureNames = new[] { "g_tColor", "g_tNormal", "g_tRoughness", "g_tAmbientOcclusion", "SkyTexture" };
+    var textures = scene.GetAllComponents<ModelRenderer>().Where(r => r.Model is not null).SelectMany(r => r.Model.Materials).Distinct()
+        .SelectMany(m => textureNames.Select(m.GetTexture).Append(m.FirstTexture)).Where(t => t is not null).Distinct().ToArray();
+    var palletModel = Model.Load("models/maps/spillway/pallet_v2/pallet.vmdl");
+    var sharp = palletModel.Materials.Distinct().SelectMany(m => textureNames.Select(m.GetTexture).Append(m.FirstTexture)).Where(t => t is not null).Distinct().ToArray();
+    for (var wait = 0; wait < 120; wait++)
+    {
+        foreach (var texture in textures) texture.MarkUsed(1024);
+        foreach (var texture in sharp) texture.MarkUsed(2048);
+        using (scene.Push()) { scene.EditorTick(.016f, .016f); preRender.Invoke(scene, null); }
+        await Task.Delay(33, cancellationToken);
+    }
+    var placed = scene.GetAllComponents<ModelRenderer>().Where(r => r.Model?.ResourcePath == "models/maps/spillway/canvas_cover_v2/canvas_cover.vmdl").ToArray();
+    var rays = new System.Collections.Generic.List<string>();
+    // Plan (e, n, z) is engine (n, -e, z).
+    Vector3 W(float e, float n, float z) => new Vector3(n, -e, z);
+    using (scene.Push())
+    {
+        foreach (var (name, e, n, expected) in new[] { ("the cover's middle from above", 1550f, -1705f, "the old box's top, z 218"), ("over the skirt, 10 in past the box's north side", 1550f, -1630f, "the deck, z 128"), ("over the skirt past its east side", 1630f, -1705f, "the deck, z 128") })
+        {
+            var hit = scene.Trace.Ray(W(e, n, 400), W(e, n, 100)).Run();
+            rays.Add($"{name}: {(hit.Hit ? $"z {hit.EndPosition.z:0.0} {hit.Surface?.ResourceName} {hit.GameObject?.Name}" : "miss")} (expected {expected})");
+        }
+        {
+            var hit = scene.Trace.Ray(W(1550, -1450, 168), W(1550, -1800, 168)).Run();
+            rays.Add($"from the north at 40 in: {(hit.Hit ? $"n {hit.EndPosition.x:0.0} {hit.Surface?.ResourceName} {hit.GameObject?.Name}" : "miss")} (expected the old box's side, n -1640)");
+        }
+    }
+    var shots = new (string name, Vector3 eye, Vector3 target, float fov)[] { ("installed_north", new Vector3(-1440f, -1600f, 194f), new Vector3(-1705f, -1550f, 168f), 55f), ("installed_northeast", new Vector3(-1560f, -1800f, 200f), new Vector3(-1705f, -1550f, 160f), 55f), ("installed_east_low", new Vector3(-1720f, -1770f, 160f), new Vector3(-1705f, -1550f, 170f), 60f), ("installed_far", new Vector3(-1180f, -1720f, 200f), new Vector3(-1705f, -1550f, 170f), 40f) };
+    foreach (var shot in shots)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        using var bitmap = new Bitmap(1400, 860);
+        for (var frame = 0; frame < 20; frame++)
+        {
+            foreach (var texture in sharp) texture.MarkUsed(2048);
+            using (scene.Push())
+            {
+                camera.WorldPosition = shot.eye;
+                camera.WorldRotation = Rotation.LookAt(shot.target - shot.eye);
+                camera.FieldOfView = shot.fov;
+                scene.EditorTick(.016f, .016f);
+                preRender.Invoke(scene, null);
+                preCameraRender.Invoke(scene, null);
+                camera.RenderToBitmap(bitmap);
+            }
+            await Task.Delay(16, cancellationToken);
+        }
+        System.IO.File.WriteAllBytes(System.IO.Path.Combine(destination, shot.name + ".png"), bitmap.ToPng());
+    }
+    return new { Covers = placed.Length, Colliders = placed.Count(r => r.GameObject.Components.Get<ModelCollider>() is not null), Rays = rays, Written = shots.Length, Errors = scene.GetAllComponents<ModelRenderer>().Where(r => r.Model is null || r.Model.IsError).Select(r => r.GameObject.Name).ToArray() };
+}
+catch (Exception error)
+{
+    System.IO.File.WriteAllText(System.IO.Path.Combine(destination, "capture-error.txt"), error.ToString());
+    throw;
+}
+finally { scene.Destroy(); }

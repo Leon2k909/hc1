@@ -13,6 +13,10 @@
   - SESSIONS lists every lobby, the joinable ones first. A restricted one has a controller or mouse icon, and one the
     player can't join is dimmed. Its details show INPUT and why, and Join Session reads the rule and does nothing.
   - Ranked's matchmaking skips lobbies it can't join.
+- Session refresh reliability (2026-11-03): `ServerBrowser` only applies results from the latest search, ignores
+  completions after its panel is destroyed, and clears Searching on failure with an existing localized error label.
+  Refresh retries normally. Malformed `dev` metadata no longer throws while filtering lobbies. All 24 offline search,
+  race, retry and metadata checks passed; no editor was used and live session-browser verification is pending.
 - Invites and a squad following its leader skip both, so in a match `LobbyInputGuard` (a GameObjectSystem) holds every
   machine's player to the rule:
   - The host syncs it (`GameMode.LobbyInputRule`, FromHost) from its lobby data. Clients don't read their own: the

@@ -1,0 +1,198 @@
+"""Cerro Blanco's cafe espresso machine v2: build, bake and export. Uses the capture flag's mesh toolkit.
+
+blender -b --factory-startup -t 4 --python machine.py -- <work dir> <project root> <build|bake|export> ...
+
+A two-group commercial espresso machine in place of a steel box with two chrome stubs. Brushed stainless side panels on chrome feet and a black base pan; the head over the work area with two
+group heads, their portafilters locked in with black handles and double spouts; a steam wand at each end on a ball joint with a cool-touch sleeve and a lever above it; a hot water spout in the
+middle; two pressure gauges and a keypad over each group; a drip tray with its grate; a cup warmer on top inside a chrome rail, cups upside down on it; and the water and drain hoses down into the
+counter at the back. No maker's names.
+
+Inches. +X is its working front, which faces the barista behind the counter; the customers see its back. Y runs across it and Z is up, with the origin on the counter top under its middle.
+"""
+import hashlib
+import json
+import math
+import os
+import sys
+
+sys.dont_write_bytecode = True
+import bmesh
+import bpy
+import numpy as np
+from mathutils import Vector
+
+argv = sys.argv[sys.argv.index("--") + 1 :]
+WORK, ROOT = argv[0], argv[1]
+STAGES = argv[2:]
+os.makedirs(WORK, exist_ok=True)
+sys.path.insert(0, os.path.join(ROOT, "Sources", "Gameplay", "capture-flag-v2"))
+import build as kit  # noqa: E402
+
+from build import Part, add, tube  # noqa: E402
+
+STEEL, POWDER, CAST, CHROME, BLACK, RUBBER, PORCELAIN, GAUGE = 0, 1, 2, 3, 4, 5, 6, 7  # POWDER and CAST aren't used: the shared stages look for them.
+FOLDER = "models/maps/cerroblanco/espresso_machine_v2"
+OUT = os.path.join(ROOT, "Assets", "models", "maps", "cerroblanco", "espresso_machine_v2")
+BLEND = os.path.join(WORK, "machine_build.blend")
+NAME = "machine"
+W, H = 2048, 2048
+POS_RANGE = 48.0  # The position bake spans this many inches, centred on the origin.
+
+HALF_W = 14.0  # Half its width, to the side panels' outsides.
+BACK_X, FRONT_X = -10.0, 6.5  # The body's back, and the work area's back wall under the head.
+HEAD_X, HEAD_Z = 9.0, 12.0  # The head's front and its underside, where the groups hang.
+BASE_Z, TOP_Z = 2.4, 19.2
+GROUP_Y = 6.5
+GROUP_X = 8.6
+WAND_Y = 11.4
+TRAY_X = 13.0
+GAUGES = ((-2.3, 16.7), (2.3, 16.7))  # ( y, z ) of each gauge's middle on the head's front.
+CUPS = [(-6.6, -9.0, "espresso"), (-4.2, -9.3, "espresso"), (-1.8, -9.0, "espresso"), (-6.4, -5.4, "espresso"), (-3.9, -5.6, "espresso"), (1.6, -6.2, "cappuccino"), (5.4, -6.4, "cappuccino")]
+rng = np.random.default_rng(2651)
+edge_lines = []
+NO_EDGE = ("cup", "hose", "screw")
+
+
+def piece(finish, lod, bevel=0.0, segs=1, angle=35.0, name=""):
+    return add(Part(finish, lod, bevel=bevel, segs=segs, angle=angle, name=name))
+
+
+def rounded(x0, x1, z0, z1, top, bottom, per=6):
+    """A rectangle's outline in ( x, z ), its top corners rounded by top and its bottom ones by bottom, counter-clockwise."""
+    out = []
+    for cx, cz, r, a0 in ((x1 - bottom, z0 + bottom, bottom, -90), (x1 - top, z1 - top, top, 0), (x0 + top, z1 - top, top, 90), (x0 + bottom, z0 + bottom, bottom, 180)):
+        for k in range(per + 1):
+            a = math.radians(a0 + 90.0 * k / per)
+            out.append((cx + r * math.cos(a), cz + r * math.sin(a)))
+    return out
+
+
+def side_frame(y):
+    """Local ( x, y ) is world ( x, z ), and local +z runs toward -y, from world y."""
+    return kit.frame((0, y, 0), (0, -1, 0), (1, 0, 0))
+
+
+def body():
+    # The side panels, stainless, their top corners rounded.
+    for y in (HALF_W, -HALF_W + 0.8):
+        kit.prism(piece(STEEL, 3, bevel=0.12, segs=2, angle=40, name="side panel"), rounded(BACK_X, HEAD_X + 0.3, BASE_Z + 0.8, TOP_Z + 0.2, 1.7, 0.4), 0.0, 0.8, side_frame(y))
+    inner = HALF_W - 0.8
+    kit.box(piece(STEEL, 3, bevel=0.1, angle=40, name="body"), (BACK_X + 0.2, -inner, BASE_Z + 0.8), (FRONT_X, inner, TOP_Z))
+    kit.box(piece(STEEL, 3, bevel=0.18, segs=2, angle=40, name="head"), (FRONT_X - 0.1, -inner, HEAD_Z), (HEAD_X, inner, TOP_Z))
+    # Trim strips across the back, where the customers see it.
+    for z in (6.2, 17.0):
+        kit.box(piece(CHROME, 2, bevel=0.06, angle=40, name="trim"), (BACK_X + 0.05, -inner, z), (BACK_X + 0.25, inner, z + 0.45))
+    # The base pan, black, and chrome feet with rubber pads.
+    kit.box(piece(BLACK, 3, bevel=0.1, angle=40, name="base"), (BACK_X + 0.4, -HALF_W + 0.4, BASE_Z), (HEAD_X - 0.4, HALF_W - 0.4, BASE_Z + 0.8))
+    for x in (-7.6, 5.6):
+        for y in (-11.8, 11.8):
+            kit.lathe(piece(CHROME, 2, name="foot"), [(0, 0.25), (0.62, 0.25), (0.62, 0.45), (0.5, 0.6), (0.5, BASE_Z - 0.2), (0.75, BASE_Z), (0, BASE_Z)], 16, kit.frame((x, y, 0)))
+            kit.lathe(piece(RUBBER, 1, name="foot"), [(0, 0.0), (0.7, 0.0), (0.72, 0.25), (0, 0.25)], 16, kit.frame((x, y, 0)))
+
+
+def group(y):
+    """A group head under the head, its portafilter locked in with the handle out toward the barista."""
+    o = Vector((GROUP_X, y, HEAD_Z))
+    kit.lathe(piece(CHROME, 3, name="group"), [(0, 0.0), (2.05, 0.0), (2.05, -0.5), (1.85, -0.75), (1.8, -2.2), (1.95, -2.35), (1.95, -2.7), (0, -2.7)], 32, kit.frame(o))
+    kit.lathe(piece(RUBBER, 0, name="gasket"), [(0, -2.69), (1.9, -2.69), (1.9, -2.8), (0, -2.8)], 32, kit.frame(o))
+    # The portafilter: its basket's body, the double spout under it, and the handle.
+    kit.lathe(piece(CHROME, 3, name="portafilter"), [(0, -2.8), (1.82, -2.8), (1.86, -3.0), (1.78, -3.5), (1.45, -3.85), (0.5, -4.0), (0, -4.0)], 32, kit.frame(o))
+    for lug in (-1, 1):
+        kit.box(piece(CHROME, 1, bevel=0.05, angle=40, name="portafilter"), (-0.4, -0.25, -0.18), (0.4, 0.25, 0.18), kit.frame(o + Vector((0, lug * 1.95, -2.95)), (0, 0, 1), (0, 1, 0)))
+    kit.lathe(piece(CHROME, 2, name="spout"), [(0, -3.9), (0.45, -3.9), (0.4, -4.3), (0.3, -4.5), (0, -4.5)], 16, kit.frame(o))
+    for side in (-1, 1):
+        a = o + Vector((0.0, side * 0.2, -4.35))
+        b = a + Vector((0.15, side * 0.55, -0.55))
+        tube(piece(CHROME, 1, name="spout"), [a, b], 0.16, 10)
+    neck0 = o + Vector((1.75, 0, -3.25))
+    neck1 = o + Vector((2.7, 0, -3.45))
+    tube(piece(CHROME, 2, name="portafilter"), [neck0, neck1], 0.36, 14)
+    handle = kit.spline([neck1, neck1 + Vector((1.6, 0, -0.32)), neck1 + Vector((3.5, 0, -0.75)), neck1 + Vector((5.0, 0, -1.08))], 4)
+    n = len(handle)
+    tube(piece(BLACK, 3, name="handle"), handle, [0.42 + 0.16 * (k / (n - 1)) ** 0.8 for k in range(n)], 16, caps=True)
+
+
+def wands():
+    for side in (-1, 1):
+        y = side * WAND_Y
+        joint = Vector((HEAD_X - 0.4, y, HEAD_Z - 0.35))
+        kit.lathe(piece(CHROME, 2, name="wand"), [(0, 0.35), (0.42, 0.35), (0.5, 0.1), (0.5, -0.2), (0.4, -0.45), (0, -0.5)], 16, kit.frame(joint))
+        path = kit.spline([joint + Vector((0, 0, -0.4)), joint + Vector((0.5, side * 0.15, -2.0)), joint + Vector((1.3, side * 0.45, -4.5)), joint + Vector((1.85, side * 0.65, -6.4))], 5)
+        tube(piece(CHROME, 3, name="wand"), path, 0.24, 12)
+        sleeve = kit.spline([path[1], path[len(path) // 3], path[len(path) // 2]], 3)
+        tube(piece(RUBBER, 2, name="sleeve"), sleeve, 0.38, 14)
+        tip_axis = (path[-1] - path[-2]).normalized()
+        kit.lathe(piece(CHROME, 2, name="wand"), [(0, -0.05), (0.3, -0.05), (0.32, 0.4), (0.18, 0.55), (0, 0.56)], 12, kit.frame(path[-1], tip_axis))
+        # The lever that opens it, on the head's front above.
+        pivot = Vector((HEAD_X, y, 15.4))
+        kit.lathe(piece(CHROME, 1, name="lever"), [(0, 0.0), (0.7, 0.0), (0.7, 0.3), (0.45, 0.45), (0, 0.48)], 16, kit.frame(pivot, (1, 0, 0)))
+        stick_end = pivot + Vector((1.3, 0, 1.0))
+        tube(piece(CHROME, 1, name="lever"), [pivot + Vector((0.4, 0, 0)), stick_end], 0.15, 10)
+        kit.lathe(piece(BLACK, 1, name="lever"), [(0, -0.48), (0.35, -0.42), (0.48, -0.1), (0.46, 0.2), (0.3, 0.42), (0, 0.48)], 14, kit.frame(stick_end))
+    # The hot water spout and its button.
+    o = Vector((HEAD_X - 0.6, 0, HEAD_Z))
+    path = kit.spline([o, o + Vector((0.3, 0, -1.2)), o + Vector((0.9, 0, -2.6))], 4)
+    tube(piece(CHROME, 2, name="water spout"), path, 0.26, 12)
+
+
+def controls():
+    """Two gauges in the middle of the head's front, and a keypad over each group."""
+    for y, z in GAUGES:
+        m = kit.frame((HEAD_X, y, z), (1, 0, 0))
+        # A ring swept round, not turned: the toolkit's lathe caps its ends, and a turned bezel put a chrome disc over the dial.
+        tube(piece(CHROME, 2, name="bezel"), kit.ring_path(1.26, 40, kit.frame((HEAD_X + 0.2, y, z), (1, 0, 0))), 0.17, 10, closed=True)
+        kit.lathe(piece(GAUGE, 2, name="gauge"), [(0, 0.02), (1.12, 0.02), (1.12, 0.22), (0, 0.22)], 32, m)
+    for y in (-GROUP_Y, GROUP_Y):
+        m = kit.frame((HEAD_X, y, 14.6), (1, 0, 0), (0, 1, 0))
+        kit.box(piece(BLACK, 2, bevel=0.06, angle=40, name="keypad"), (-1.9, -0.75, 0.0), (1.9, 0.75, 0.12), m)
+        for k in range(4):
+            kit.box(piece(STEEL, 1, bevel=0.05, angle=40, name="button"), (-1.55 + 0.85 * k, -0.32, 0.12), (-0.95 + 0.85 * k, 0.32, 0.24), m)
+
+
+def tray():
+    """The drip tray in front of the work area, a grate on top."""
+    kit.box(piece(STEEL, 3, bevel=0.2, segs=2, angle=40, name="drip tray"), (FRONT_X, -HALF_W + 1.2, BASE_Z + 0.8), (TRAY_X, HALF_W - 1.2, BASE_Z + 2.3))
+    kit.box(piece(STEEL, 2, bevel=0.03, angle=40, name="grate"), (FRONT_X + 0.3, -HALF_W + 1.6, BASE_Z + 2.3), (TRAY_X - 0.4, HALF_W - 1.6, BASE_Z + 2.42))
+
+
+def warmer():
+    """The cup warmer on top: a grid inside a chrome rail on posts, cups upside down on it."""
+    inner = HALF_W - 1.1
+    kit.box(piece(STEEL, 3, bevel=0.04, angle=40, name="warmer"), (BACK_X + 1.0, -inner, TOP_Z), (HEAD_X - 1.0, inner, TOP_Z + 0.2))
+    z = TOP_Z + 1.5
+    corners = [(BACK_X + 0.9, -inner), (HEAD_X - 0.9, -inner), (HEAD_X - 0.9, inner), (BACK_X + 0.9, inner)]
+    rail = []
+    for (xa, ya), (xb, yb) in zip(corners, corners[1:] + corners[:1]):
+        for k in range(8):
+            rail.append(Vector((xa + (xb - xa) * k / 8, ya + (yb - ya) * k / 8, z)))
+    tube(piece(CHROME, 2, name="rail"), rail, 0.26, 10, closed=True)
+    for x, y in corners + [((BACK_X + HEAD_X) / 2, -inner), ((BACK_X + HEAD_X) / 2, inner)]:
+        tube(piece(CHROME, 1, name="rail"), [Vector((x, y, TOP_Z + 0.15)), Vector((x, y, z))], 0.2, 10)
+    for x, y, kind in CUPS:
+        if kind == "espresso":
+            profile = [(0, 0.05), (0.58, 0.05), (0.62, 0.0), (0.7, 0.0), (0.74, 0.08), (0.95, 0.5), (1.12, 1.2), (1.18, 1.85), (1.17, 1.98), (1.1, 2.02), (1.03, 1.95), (1.0, 1.7), (0.88, 1.0), (0.6, 0.45), (0, 0.38)]
+        else:
+            profile = [(0, 0.06), (0.82, 0.06), (0.88, 0.0), (0.98, 0.0), (1.03, 0.07), (1.28, 0.45), (1.54, 1.1), (1.7, 2.0), (1.73, 2.47), (1.71, 2.53), (1.62, 2.53), (1.6, 2.45), (1.57, 1.95), (1.38, 1.05), (0.95, 0.4), (0, 0.27)]
+        h = max(zz for _, zz in profile)
+        kit.lathe(piece(PORCELAIN, 2, name="cup"), profile, 24, kit.frame((x, y, TOP_Z + 0.2 + h), (0, 0, -1)))
+
+
+def hoses():
+    """The water feed and the drain, from the back of the base down through a grommet in the counter."""
+    for y, r, finish in ((9.6, 0.28, CHROME), (10.6, 0.42, RUBBER)):
+        path = kit.spline([(BACK_X + 1.2, y, BASE_Z + 0.4), (BACK_X - 0.3, y + 0.2, BASE_Z - 0.4), (BACK_X - 0.9, y + 0.5, 0.2), (BACK_X - 1.0, y + 0.6, -1.5)], 5)
+        tube(piece(finish, 1, name="hose"), path, r, 12)
+    kit.lathe(piece(BLACK, 1, name="grommet"), [(0.0, -0.05), (1.4, -0.05), (1.45, 0.05), (1.2, 0.12), (0, 0.12)], 24, kit.frame((BACK_X - 0.95, 10.6, 0)))
+
+
+def geometry():
+    body()
+    for y in (-GROUP_Y, GROUP_Y):
+        group(y)
+    wands()
+    controls()
+    tray()
+    warmer()
+    hoses()
+
+

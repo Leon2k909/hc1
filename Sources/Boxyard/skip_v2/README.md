@@ -1,7 +1,7 @@
 # Boxyard skip v2: review candidate
 
 Created 2026-10-30 for the user's review. **Nothing plays this model yet, and it isn't in Assets.** `boxyard_map.skip` still draws the old
-skip into Boxyard's merged props. Nothing is committed.
+skip into Boxyard's merged props. These sources went on git in e2a67355, from the user's request to commit everything.
 
 Why this one: it was the crudest thing left in Boxyard, a tight map where players stand right next to its props. The old skip, 154 faces, is four
 flat slabs, a rim and two stubs.

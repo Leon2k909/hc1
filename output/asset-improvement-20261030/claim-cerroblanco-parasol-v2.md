@@ -1,0 +1,3 @@
+Claim: Cerro Blanco courtyard cafe parasols (cerroblanco_parts.parasol, four over the courtyard tables in cerroblanco_map.courtyard), possibly the cafe chairs after. Session local_b6eb2b9b (range bench, Railhead skip, Riverdale first aid). Sources/CerroBlanco/parasol-v2, output/asset-improvement-20261030/cerroblanco-parasol. Started 2026-11-03 16:40. Not installing until the user says.
+
+Done 2026-11-03: built and compared in s&box; INSTALLED 17:10 at the user's word ("ye good install it"): Tools/cerroblanco_parasols.py, the scene's Parasols group, 264 faces cut from quality-v1/cerroblanco_dressing_v2.obj. compare/ deleted.

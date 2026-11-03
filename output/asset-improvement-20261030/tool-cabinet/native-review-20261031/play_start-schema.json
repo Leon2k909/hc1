@@ -1,0 +1,27 @@
+{
+  "name": "play_start",
+  "title": "Play Start",
+  "toolset": "play",
+  "description": "Start playing the current scene, like pressing the editor's play button. Startup errors land in the console - check read_console if things look wrong.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {},
+    "required": []
+  },
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "IsPlaying": {
+        "type": "boolean"
+      },
+      "IsPaused": {
+        "type": "boolean"
+      },
+      "Scene": {
+        "type": "string",
+        "description": "The scene being played. Null when not playing."
+      }
+    },
+    "required": []
+  }
+}

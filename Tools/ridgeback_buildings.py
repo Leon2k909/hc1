@@ -316,6 +316,7 @@ SHATTER_PREFAB = "prefabs/buildings/glass_shatter.prefab"
 OUTSIDE, TRIM, INSIDE = "render_ochre", "render_pale", "whitewash"
 STONE, FRAME, WOOD, SHUTTER = "concrete", "trim_white", "trim_brown", "shutter_green"
 SHUTTER_MODEL = "models/props/ridgeback/shutter_v2/shutter"
+DOOR_MODEL = "models/buildings/town_house/door_v2/door"
 GROUND_FLOOR, UPPER_FLOOR, ROOF, CHIMNEY, METAL = "quarry_tiles", "floorboards", "roof_tiles", "brick", "metal"
 HANDLE, GLASS_PAINT = "iron_black", "glass_clear"
 
@@ -1345,6 +1346,9 @@ def write_building( name ):
         write_obj( out_dir / f"{name}_{part}.obj", part_model )
         write_vmdl( out_dir / f"{name}_{part}.vmdl", resource_dir, f"{name}_{part}", part_model )
         paths[part] = f"{resource_dir}/{name}_{part}.vmdl"
+        # The town house draws the rebuilt doors. The old models are still written, and still used to fit the terrain.
+        if name == "town_house" and part.startswith( "door_" ):
+            paths[part] = f"{DOOR_MODEL}_{part.removeprefix( 'door_' )}.vmdl"
     prefab_dir = ASSETS / "prefabs/buildings"
     prefab_dir.mkdir( parents=True, exist_ok=True )
     write_shatter_prefab( ASSETS / SHATTER_PREFAB )

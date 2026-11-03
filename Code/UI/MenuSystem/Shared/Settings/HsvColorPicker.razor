@@ -1,0 +1,194 @@
+@using Sandbox;
+@using Sandbox.UI;
+@inherits Panel
+@namespace Facepunch.UI
+@attribute [StyleSheet]
+
+@* Settings → Crosshair's colour picker, for the crosshair and the hit marker: the preset swatches as quick picks, a hex
+   box, and hue, saturation and brightness bars (each one a D-pad target, left and right step it). CrosshairPreview,
+   beside it, shows the result as it changes. It reads the colour through Get every frame, so a reset or a copied
+   crosshair shows, and writes it through Set. The bars and the hex box are set from code, so a drag rebuilds nothing. *@
+
+<root>
+    <div class="hsv-top">
+        <div class="hsv-swatches">
+            @foreach ( var preset in Presets ?? Array.Empty<string>() )
+            {
+                var hex = preset;
+                <button class="hsv-swatch @(Same( hex, _hex ) ? "selected" : "")" style="background-color:@hex" @onmousedown=@(() => Pick( hex ))></button>
+            }
+        </div>
+
+        <div class="hsv-current">
+            <div class="hsv-chip" @ref="Chip"></div>
+            <TextEntry @ref="HexEntry" class="hsv-hex" Prefix="#" MaxLength=@(6) CharacterRegex="[0-9a-fA-F]" OnTextEdited=@HexEdited />
+        </div>
+    </div>
+
+    <div class="hsv-row">
+        <label class="hsv-name">@Tr( "Hue" )</label>
+        <HsvStrip @ref="HueStrip" class="hue" />
+    </div>
+
+    <div class="hsv-row">
+        <label class="hsv-name">@Tr( "Saturation" )</label>
+        <HsvStrip @ref="SaturationStrip" />
+    </div>
+
+    <div class="hsv-row">
+        <label class="hsv-name">@Tr( "Brightness" )</label>
+        <HsvStrip @ref="BrightnessStrip" />
+    </div>
+</root>
+
+@code
+{
+    /// <summary> The colour as it stands, "#rrggbb". </summary>
+    [Parameter] public Func<string> Get { get; set; }
+
+    /// <summary> A new colour, "#rrggbb", and whether it's final: false mid-drag, so the caller saves only on true. </summary>
+    [Parameter] public Action<string, bool> Set { get; set; }
+
+    /// <summary> The quick picks, as "#rrggbb". </summary>
+    [Parameter] public string[] Presets { get; set; }
+
+    Panel Chip { get; set; }
+    TextEntry HexEntry { get; set; }
+    HsvStrip HueStrip { get; set; }
+    HsvStrip SaturationStrip { get; set; }
+    HsvStrip BrightnessStrip { get; set; }
+
+    // Kept apart from the hex, so a grey keeps the hue it was picked from and black keeps its saturation too.
+    float _hue, _saturation, _brightness;
+    string _hex;
+    bool _shown;
+
+    public override void Tick()
+    {
+        base.Tick();
+
+        // Set some other way (a swatch here, Reset Defaults, a copied crosshair): the bars go where that colour is.
+        var hex = Normalise( Get?.Invoke() ) ?? "#ffffff";
+        if ( hex != _hex ) FromHex( hex );
+        if ( !_shown ) Show();
+
+        // Text left half typed, or not a colour, goes back to the colour once the box is left.
+        if ( HexEntry.IsValid() && !HexEntry.HasFocus && !string.Equals( HexEntry.Text, HexText, StringComparison.OrdinalIgnoreCase ) )
+            HexEntry.Text = HexText;
+    }
+
+    string HexText => _hex is null ? "" : _hex[1..].ToUpperInvariant();
+
+    // Set here rather than as razor attributes: razor hands a plain C# panel's attributes over as objects.
+    protected override void OnAfterTreeRender( bool firstTime )
+    {
+        // A rebuild can make new bars (a hotload did), which have none of the styles Show set on the old ones.
+        _shown = false;
+
+        if ( HueStrip.IsValid() )
+        {
+            HueStrip.Step = 1f / 360f;
+            HueStrip.Changed = HueChanged;
+        }
+
+        if ( SaturationStrip.IsValid() ) SaturationStrip.Changed = SaturationChanged;
+        if ( BrightnessStrip.IsValid() ) BrightnessStrip.Changed = BrightnessChanged;
+    }
+
+    void HueChanged( float value, bool done ) { _hue = value * 360f; Emit( done ); }
+    void SaturationChanged( float value, bool done ) { _saturation = value; Emit( done ); }
+    void BrightnessChanged( float value, bool done ) { _brightness = value; Emit( done ); }
+
+    void Pick( string preset )
+    {
+        var hex = Normalise( preset );
+        if ( hex is null ) return;
+
+        FromHex( hex );
+        Set?.Invoke( hex, true );
+        Show();
+    }
+
+    void HexEdited( string text )
+    {
+        // Only a whole six digits: three ("3cf") would apply on the way to six.
+        if ( text is null || text.TrimStart( '#' ).Length != 6 ) return;
+
+        var hex = Normalise( text );
+        if ( hex is null || hex == _hex ) return;
+
+        FromHex( hex );
+        Set?.Invoke( hex, true );
+        Show();
+    }
+
+    void Emit( bool done )
+    {
+        _hex = ToHex( Hsv( _hue, _saturation, _brightness ) );
+        Set?.Invoke( _hex, done );
+        Show();
+    }
+
+    void FromHex( string hex )
+    {
+        _hex = hex;
+        _shown = false;
+        if ( !Color.TryParse( hex, out var colour ) ) return;
+
+        var hsv = colour.ToHsv();
+        if ( hsv.Value > 0.001f && hsv.Saturation > 0.001f ) _hue = hsv.Hue;
+        if ( hsv.Value > 0.001f ) _saturation = hsv.Saturation;
+        _brightness = hsv.Value;
+    }
+
+    /// <summary> The bars, the chip and the hex box on the colour. Only what changed is restyled (HsvStrip.Show). </summary>
+    void Show()
+    {
+        if ( !HueStrip.IsValid() || !SaturationStrip.IsValid() || !BrightnessStrip.IsValid() || !Chip.IsValid() ) return;
+
+        var colour = Color.TryParse( _hex, out var parsed ) ? parsed : Color.White;
+
+        HueStrip.Show( _hue / 360f, null, Hsv( _hue, 1f, 1f ) );
+        SaturationStrip.Show( _saturation,
+            $"linear-gradient( to right, {ToHex( Hsv( _hue, 0f, _brightness ) )}, {ToHex( Hsv( _hue, 1f, _brightness ) )} )", colour );
+        BrightnessStrip.Show( _brightness, $"linear-gradient( to right, #000000, {ToHex( Hsv( _hue, _saturation, 1f ) )} )", colour );
+        Chip.Style.BackgroundColor = colour;
+
+        if ( HexEntry.IsValid() && !HexEntry.HasFocus )
+            HexEntry.Text = HexText;
+
+        _shown = true;
+    }
+
+    /// <summary> Rebuilt only when the selected swatch changes, never for a drag. </summary>
+    protected override int BuildHash() =>
+        HashCode.Combine( Presets is null ? -1 : Array.FindIndex( Presets, x => Same( x, _hex ) ), Presets?.Length );
+
+    static Color Hsv( float hue, float saturation, float brightness ) =>
+        new ColorHsv { Hue = hue % 360f, Saturation = saturation, Value = brightness, Alpha = 1f }.ToColor();
+
+    static bool Same( string a, string b ) => a is not null && Normalise( a ) == b;
+
+    /// <summary> "#rrggbb" in lower case, as the presets are written. </summary>
+    public static string ToHex( Color colour )
+    {
+        var c = colour.ToColor32();
+        return $"#{c.r:x2}{c.g:x2}{c.b:x2}";
+    }
+
+    /// <summary> "#rrggbb" from "#rgb", "#rrggbb" or either without the #; null if it isn't one. </summary>
+    public static string Normalise( string text )
+    {
+        var hex = text?.Trim().TrimStart( '#' ).ToLowerInvariant();
+        if ( hex is null ) return null;
+        if ( hex.Length == 3 ) hex = $"{hex[0]}{hex[0]}{hex[1]}{hex[1]}{hex[2]}{hex[2]}";
+        if ( hex.Length != 6 ) return null;
+
+        foreach ( var c in hex )
+        {
+            if ( c is not (>= '0' and <= '9' or >= 'a' and <= 'f') ) return null;
+        }
+
+        return $"#{hex}";
+    }
+}

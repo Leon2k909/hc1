@@ -1,0 +1,39 @@
+// Generate and compare navigation in disposable editor scenes, never the user's scene.
+var root=Sandbox.Project.Current.GetRootPath();var folder=System.IO.Path.Combine(root,"output/ares/constructed-interior-v3");
+var source=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"Assets/scenes/maps/Ares/ares.scene")));
+var editor=Editor.SceneEditorSession.Active;var before=new {Id=editor.Scene.Id,Dirty=editor.HasUnsavedChanges,Game.IsPlaying,Runtime=Game.ActiveScene?.Id};
+Vector3 W(float e,float n,float z)=>new(n,-e,z);
+var points=new[]{W(600,-500,2),W(-600,-500,2),W(600,430,2),W(-600,430,2),W(990,-550,210),W(990,500,210),W(-990,-550,210),W(-990,500,210),W(650,-600,210),W(-650,650,210),W(0,-610,210),W(0,650,210),W(750,0,210),W(-750,0,210)};
+var results=new System.Collections.Generic.List<object>();
+foreach(var trial in new[]{false,true}) {
+ var data=source.DeepClone().AsObject();var roots=new System.Text.Json.Nodes.JsonArray();
+ foreach(var node in data["GameObjects"].AsArray())if((node["Name"]?.GetValue<string>()??"").StartsWith("Ares"))roots.Add(node.DeepClone());
+ data["GameObjects"]=roots;data["SceneProperties"]["WantsSystemScene"]=false;
+ data["SceneProperties"]["NavMesh"]["Enabled"]=true;data["SceneProperties"]["NavMesh"]["EditorAutoUpdate"]=false;
+ var scene=Scene.CreateEditorScene();
+ try {
+  using(scene.Push()) {
+   scene.Deserialize(data);
+   if(trial)foreach(var name in new[]{"hall","reactor"}) {
+    var model=Model.Load("models/maps/ares/constructed-v3/ares_"+name+"_trial.vmdl");if(model.IsError)throw new InvalidOperationException("Invalid trial model");
+    foreach(var renderer in scene.GetAllComponents<ModelRenderer>().Where(r=>r.Model?.ResourcePath=="models/maps/ares/ares_"+name+".vmdl"))renderer.Model=model;
+    foreach(var collider in scene.GetAllComponents<ModelCollider>().Where(c=>c.Model?.ResourcePath=="models/maps/ares/ares_"+name+".vmdl"))collider.Model=model;
+   }
+   scene.EditorTick(.02f,.02f);scene.NavMesh.Generate(scene.PhysicsWorld);
+  }
+  for(var frame=0;frame<1000&&scene.NavMesh.IsGenerating;frame++) {
+   cancellationToken.ThrowIfCancellationRequested();using(scene.Push())scene.EditorTick(.02f*(frame+2),.02f);
+   await Task.Delay(25,cancellationToken);
+  }
+  if(scene.NavMesh.IsGenerating)throw new InvalidOperationException("Navigation generation did not settle");
+  var paths=new System.Collections.Generic.List<object>();
+  using(scene.Push())for(var a=0;a<points.Length;a++)for(var b=a+1;b<points.Length;b++) {
+   var path=scene.NavMesh.CalculatePath(new Sandbox.Navigation.CalculatePathRequest{Start=points[a],Target=points[b]});
+   paths.Add(new{From=a,To=b,Status=path.Status.ToString()});
+  }
+  results.Add(new{Variant=trial?"trial":"current",Paths=paths});
+ }finally {scene.Destroy();}
+}
+var report=new{Results=results,UserStatePreserved=editor.Scene.Id==before.Id&&editor.HasUnsavedChanges==before.Dirty&&Game.IsPlaying==before.IsPlaying&&Game.ActiveScene?.Id==before.Runtime};
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"navigation.json"),System.Text.Json.JsonSerializer.Serialize(report,new System.Text.Json.JsonSerializerOptions{WriteIndented=true}));
+return new{Report="output/ares/constructed-interior-v3/navigation.json",report.UserStatePreserved};

@@ -207,6 +207,8 @@ public sealed class HardpointZone : Component,
 		else
 		{
 			IsContested = false;
+			// An empty hardpoint is neutral and awards no points.
+			ControllingTeam = Team.Unassigned;
 		}
 
 		if ( wasContested != IsContested || oldTeam != ControllingTeam )

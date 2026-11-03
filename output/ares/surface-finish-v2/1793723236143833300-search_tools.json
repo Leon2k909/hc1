@@ -1,0 +1,136 @@
+{
+  "tools": [
+    {
+      "name": "add_component",
+      "title": "Add Component",
+      "toolset": "scene",
+      "description": "Add a component to a game object, optionally setting its properties in the same call. The user can undo this. Returns the component's id.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The game object's id, from scene_tree or find_game_objects."
+          },
+          "type": {
+            "type": "string",
+            "description": "The component type name, e.g. 'ModelRenderer'. get_component_type documents what exists."
+          },
+          "properties": {
+            "type": "object",
+            "description": "Optional json object of property values, e.g. {\"LightColor\": \"1,0.8,0.6,1\", \"Radius\": 512}."
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "Id": {
+            "type": "string"
+          },
+          "Type": {
+            "type": "string"
+          },
+          "GameObject": {
+            "type": "string"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "get_component_type",
+      "title": "Get Component Type",
+      "toolset": "component",
+      "description": "Documentation for a component type by name - its class name, display title, description, group, and every inspector property with title, description, type and read-only state. Matches exact names first, then substrings; multiple substring matches come back as a candidate list.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The component's type name, e.g. 'ModelRenderer'. Case insensitive, substrings work."
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "hammer_create_game_object",
+      "title": "Create Game Object",
+      "toolset": "hammer",
+      "description": "Put a game object in the open map - empty, from a prefab, and/or with components and their properties set in the same call. This is how s&box gameplay goes in a map. The user can undo the creation. Returns the new node, whose GameObject field is the object's guid.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name for the object. Empty uses the prefab's name, or 'GameObject'."
+          },
+          "position": {
+            "type": "string",
+            "description": "World position as 'x,y,z'."
+          },
+          "angles": {
+            "type": "string",
+            "description": "Rotation as 'pitch,yaw,roll'."
+          },
+          "prefab": {
+            "type": "string",
+            "description": "Prefab asset path to instantiate, from asset_search type:prefab."
+          },
+          "components": {
+            "type": "object",
+            "description": "Components to add, as a json object of type name to properties - e.g. {\"ModelRenderer\": {\"Model\": \"models/dev/box.vmdl\"}, \"BoxCollider\": {}}. get_component_type documents types and properties. A type the prefab already has gets its properties set instead."
+          }
+        },
+        "required": []
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "Id": {
+            "type": "integer"
+          },
+          "Kind": {
+            "type": "string"
+          },
+          "Name": {
+            "type": "string"
+          },
+          "ClassName": {
+            "type": "string"
+          },
+          "Description": {
+            "type": "string"
+          },
+          "Position": {
+            "type": "string"
+          },
+          "Parent": {
+            "type": "integer"
+          },
+          "GameObject": {
+            "type": "string"
+          },
+          "Selected": {
+            "type": "boolean"
+          },
+          "Visible": {
+            "type": "boolean"
+          }
+        },
+        "required": []
+      }
+    }
+  ],
+  "total": 402
+}

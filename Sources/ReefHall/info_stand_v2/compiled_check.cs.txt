@@ -1,0 +1,65 @@
+// What the installed stands compiled to, without play and without drawing anything: run with sbox-cli --call run_csharp. Nothing is saved, and it's light enough to run beside a match.
+// Loads only the rotunda's and tunnel's room objects and the stands from reefhall.scene into an isolated editor scene. The rooms must no longer use the old screen's material, which says they
+// compiled from the cut OBJs and not mid-copy, and rays must stop on each stand's post box, with nothing of the post above it.
+var projectRoot = Sandbox.Project.Current.GetRootPath();
+var root = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(projectRoot, "Assets/scenes/maps/ReefHall/reefhall.scene"))).AsObject();
+var keep = new[] { "Rotunda", "Tunnel", "Rotunda Stand 1", "Rotunda Stand 2", "Tunnel Stand 1" };
+var objects = new System.Text.Json.Nodes.JsonArray();
+foreach (var item in root["GameObjects"].AsArray())
+{
+    if (item["Name"]?.GetValue<string>() != "Aquarium") continue;
+    var aquarium = item.DeepClone().AsObject();
+    var children = new System.Text.Json.Nodes.JsonArray();
+    foreach (var child in aquarium["Children"].AsArray())
+        if (keep.Contains(child["Name"]?.GetValue<string>())) children.Add(child.DeepClone());
+    aquarium["Children"] = children;
+    objects.Add(aquarium);
+}
+root["GameObjects"] = objects;
+if (root["SceneProperties"]?["NavMesh"] is System.Text.Json.Nodes.JsonObject nav) nav["Enabled"] = false;
+if (root["SceneProperties"] is System.Text.Json.Nodes.JsonObject sceneProperties) sceneProperties["WantsSystemScene"] = false;
+
+var results = new System.Collections.Generic.List<string>();
+var scene = Scene.CreateEditorScene();
+try
+{
+    using (scene.Push())
+    {
+        scene.Deserialize(root);
+        scene.EditorTick(.016f, .016f);
+    }
+    await Task.Delay(100, cancellationToken);
+    using (scene.Push())
+    {
+        scene.EditorTick(.016f, .016f);
+        foreach (var path in new[] { "models/maps/reefhall/reefhall_rotunda.vmdl", "models/maps/reefhall/reefhall_tunnel.vmdl" })
+        {
+            var model = Model.Load(path);
+            var materials = model.Materials.Select(m => m.ResourcePath).ToArray();
+            results.Add($"{path}: error {model.IsError}, {materials.Length} materials, old screen {materials.Any(m => m.Contains("rh_screen_map"))}, old laminate {materials.Any(m => m.Contains("rh_laminate"))}");
+        }
+        var stands = scene.GetAllObjects(false).SelectMany(g => g.Components.GetAll<ModelRenderer>(FindMode.EverythingInSelf)).Where(r => r.Model?.ResourcePath?.Contains("info_stand_v2/info_stand.vmdl") ?? false).ToArray();
+        results.Add($"{stands.Length} stands placed");
+        foreach (var stand in stands)
+        {
+            var go = stand.GameObject;
+            var at = go.WorldPosition;
+            var x = go.WorldRotation.Forward;
+            var y = go.WorldRotation.Left;
+            void Ray(string label, Vector3 from, Vector3 to, string expected)
+            {
+                var hit = scene.Trace.Ray(from, to).Run();
+                results.Add($"{go.Name} {label}: {(hit.Hit ? $"hit at {hit.Distance:0.00} on {hit.GameObject?.Name}, {hit.Surface?.ResourceName}" : "miss")} (expected {expected})");
+            }
+            var low = at + Vector3.Up * 14f;
+            Ray("front", low + y * 65f, low, "60 on metal");
+            Ray("back", low - y * 65f, low, "60 on metal");
+            Ray("side", low + x * 68f, low, "60 on metal");
+            var over = at + Vector3.Up * 36f;
+            Ray("above the post", over + y * 40f, over - y * 40f, "miss");
+            results.Add($"{go.Name}: at {at}, error model {stand.Model.IsError}, materials {string.Join(", ", stand.Model.Materials.Select(m => System.IO.Path.GetFileName(m.ResourcePath)))}, colliders {go.Components.GetAll<Collider>(FindMode.EverythingInSelf).Count()}");
+        }
+    }
+    return new { Game.IsPlaying, ActiveScene = Game.ActiveScene?.Name, Results = results };
+}
+finally { scene.Destroy(); }

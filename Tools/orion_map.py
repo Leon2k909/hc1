@@ -724,7 +724,7 @@ def fuel( m, glass ):
     slab( m, o0 + 16, o1 - 16, on0 + 16, on1 - 16, G, G + 0.2, top="oa_interior_floor", side=None, under=None, surface=None )
     box( m, o0 + 16, o1 - 16, on1 - 17, on1 - 16, G, OPS_TOP - 14, "oa_interior" )
     box( m, o1 - 17, o1 - 16, on0 + 16, on1 - 16, G, OPS_TOP - 14, "oa_interior" )
-    OP.plate( m, "whiteboard", ( 900, on1 - 17.5, G + 130 ), v( 1, 0, 0 ), 60, off=0.0 )
+    # The whiteboard on this wall is whiteboard_v2, placed by the scene (WHITEBOARDS).
     OP.plate( m, "poster_launch", ( 800, on1 - 17.5, G + 140 ), v( 1, 0, 0 ), 54, off=0.0 )
     OP.plate( m, "poster_mission", ( 760, on1 - 17.5, G + 140 ), v( 1, 0, 0 ), 54, off=0.0 )
     OP.screen( m, "orbit", ( o1 - 17.5, 782, G + 130 ), v( 0, -1, 0 ), 26, off=0.0 )
@@ -769,7 +769,7 @@ def yard_props( m ):
     LCN.build( m, -185, 165, 0, "10", "e", "rw_container_red", door_end=-1 )
     # The forklift by B3's corner, the tarped pile, a lamp post.
     LF.build( m, 240, 230, "-e" )
-    OP.tarp_pile( m, ( 195, 0 ), 110, 80, 78, ( 1, 0.2 ), seed=11 )
+    OP.tarp_pile( m, ( 195, 0 ), 110, 80, 78, ( 1, 0.2 ) )
     P.cylinder( m, ( 181, 171 ), 2.4, 0, 96, "oa_steel", 8 )
     box( m, 176, 186, 160, 172, 92, 100, "oa_dark" )
     card( m, "oa_lamp_warm", [ v( 177, 161, 91.9 ), v( 185, 161, 91.9 ), v( 185, 171, 91.9 ), v( 177, 171, 91.9 ) ], -UP )
@@ -1332,12 +1332,38 @@ def red_crate_object( at, heading, size ):
                      Model=RED_CRATE_MODEL, RenderType="On", Tint="1,1,1,1" ) ] )
 
 
+TARP_PILE_MODEL = "models/props/orion/tarp_pile_v2/tarp_pile.vmdl"
+
+
+def tarp_pile_object( at, heading ):
+    """ The tarp's model where tarp_pile put its collision box. It has no collider of its own. """
+    key = f"world/tarp_pile/{at[0]:g}/{at[1]:g}"
+    return K.game_object( ids, "Tarp pile", key, K.to_world( at ), K.yaw_rotation( heading ), components=[
+        K.component( ids, "Sandbox.ModelRenderer", f"{key}/renderer", BodyGroups=18446744073709551615,
+                     Model=TARP_PILE_MODEL, RenderType="On", Tint="1,1,1,1" ) ] )
+
+
+WHITEBOARD_MODEL = "models/maps/orion/whiteboard_v2/whiteboard.vmdl"
+# Plan ( e, n, z ) of each board's bottom centre on its wall's face, and the way the wall looks: the OPS room's north wall, whose face is at n = OPS[3] - 17.
+WHITEBOARDS = [ ( ( 900.0, OPS[3] - 17.0, G + 100.0 ), ( 0.0, -1.0 ) ) ]
+
+
+def whiteboard_object( at, out ):
+    """ The OPS room's whiteboard, a renderer only: the old one was a picture on the wall, with no collision. """
+    key = f"world/whiteboard/{at[0]:g}/{at[1]:g}"
+    return K.game_object( ids, "Whiteboard", key, K.to_world( at ), K.angles_rotation( 0.0, K.plan_yaw( out ) % 360.0 ), components=[
+        K.component( ids, "Sandbox.ModelRenderer", f"{key}/renderer", BodyGroups=18446744073709551615,
+                     Model=WHITEBOARD_MODEL, RenderType="On", Tint="1,1,1,1" ) ] )
+
+
 def write_scene( written, light_list, path ):
     world = K.game_object( ids, "Orion", "world", children=[
         model_object( title, f"world/{name}", name, collide, shadows )
         for name, title, collide, shadows in SCENE_MODELS if name in written ]
         + ( [ OCR.scene_object(), OG.scene_object() ] if "orion_launch_deck" in written else [] )
-        + [ red_crate_object( *placed ) for placed in OP.RED_CRATES ] )
+        + [ red_crate_object( *placed ) for placed in OP.RED_CRATES ]
+        + [ tarp_pile_object( *placed ) for placed in OP.TARP_PILES ]
+        + [ whiteboard_object( *placed ) for placed in WHITEBOARDS ] )
     light_objects = [
         { **K.game_object( ids, name, f"light/{name}", K.to_world( position ), tags="light_point,light", components=[
             K.component( ids, "Sandbox.PointLight", f"light/{name}/light", Attenuation=1, FogMode="Enabled",

@@ -21,30 +21,14 @@ public sealed class RandomSpawnAssigner : Component, ISpawnAssigner
 	[Property]
 	public float SkipLineOfSightTestDistance { get; set; } = 2048;
 
-	private bool IsValidSpawnPoint( SpawnPointInfo spawn, IReadOnlyList<Transform> allPlayers, IReadOnlyList<Transform> enemyPlayers )
+	private (int Danger, float EnemyDistanceSquared) GetSpawnSafety( SpawnPointInfo spawn, IReadOnlyList<Transform> allPlayers, IReadOnlyList<Transform> enemyPlayers )
 	{
-		// Don't spawn inside another player
-
-		foreach ( var player in allPlayers )
-		{
-			if ( (player.Position - spawn.Position).LengthSquared < 64f * 64f )
-			{
-				return false;
-			}
-		}
-
-		// Don't spawn close to an enemy
-
-		foreach ( var player in enemyPlayers )
-		{
-			if ( (player.Position - spawn.Position).LengthSquared < MinEnemyDistance * MinEnemyDistance )
-			{
-				return false;
-			}
-		}
-
-		// Don't spawn in line of sight of an enemy
-		// TODO: is this too expensive? will a ray not be a good enough test? is there still baked PVS in the map for us to use?
+		var occupied = allPlayers.Any( player => (player.Position - spawn.Position).LengthSquared < 64f * 64f );
+		var nearestEnemySquared = enemyPlayers
+			.Select( player => (player.Position - spawn.Position).LengthSquared )
+			.DefaultIfEmpty( float.PositiveInfinity ).Min();
+		var tooClose = nearestEnemySquared < MinEnemyDistance * MinEnemyDistance;
+		var visible = false;
 
 		foreach ( var player in enemyPlayers )
 		{
@@ -54,23 +38,27 @@ public sealed class RandomSpawnAssigner : Component, ISpawnAssigner
 			}
 
 			var tr = Scene.Trace
-				.FromTo( spawn.Position + Vector3.Up * 64f, player.Position + Vector3.Up )
+				.FromTo( spawn.Position + Vector3.Up * 64f, player.Position + Vector3.Up * 64f )
 				.Size( 0.01f )
-				.WithoutTags( "player", "ragdoll", "glass", "np_player" )
+				.WithoutTags( "player", "ragdoll", "glass", "np_player", "trigger" )
 				.Run();
 
 			if ( !tr.Hit )
 			{
-				return false;
+				visible = true;
+				break;
 			}
 		}
 
-		return true;
+		// Each penalty outweighs every lower priority combined: never choose an occupied
+		// spawn over a free one, then avoid close enemies, then exposed positions.
+		return ((occupied ? 4 : 0) + (tooClose ? 2 : 0) + (visible ? 1 : 0), nearestEnemySquared);
 	}
 
 	SpawnPointInfo ISpawnAssigner.GetSpawnPoint( Client player )
 	{
 		var allPlayers = GameUtils.PlayerPawns
+			.Where( x => x.IsValid() )
 			.Where( x => x.Client != player )
 			.Where( x => x.HealthComponent.State == LifeState.Alive )
 			.Select( x => x.Transform.World )
@@ -80,6 +68,7 @@ public sealed class RandomSpawnAssigner : Component, ISpawnAssigner
 			.ToArray();
 
 		var enemyPlayers = GameUtils.PlayerPawns
+			.Where( x => x.IsValid() )
 			.Where( x => x.Client != player )
 			.Where( x => !x.Client.IsFriendly( player ) )
 			.Where( x => x.HealthComponent.State == LifeState.Alive )
@@ -93,18 +82,32 @@ public sealed class RandomSpawnAssigner : Component, ISpawnAssigner
 		var spawns = GameUtils.GetSpawnPoints( SpawnTags.ToArray() )
 			.Shuffle();
 
+		if ( spawns.Count == 0 )
+		{
+			Log.Warning( $"No matching spawn points for {player.DisplayName}, using a map spawn." );
+			return GameUtils.GetRandomSpawnPoint( Team.Unassigned );
+		}
+
+		var bestSpawn = spawns[0];
+		var bestSafety = (Danger: int.MaxValue, EnemyDistanceSquared: float.NegativeInfinity);
 		foreach ( var spawn in spawns )
 		{
-			if ( IsValidSpawnPoint( spawn, allPlayers, enemyPlayers ) )
+			var safety = GetSpawnSafety( spawn, allPlayers, enemyPlayers );
+			if ( safety.Danger == 0 )
 			{
 				return spawn;
 			}
+
+			if ( safety.Danger < bestSafety.Danger ||
+				(safety.Danger == bestSafety.Danger && safety.EnemyDistanceSquared > bestSafety.EnemyDistanceSquared) )
+			{
+				bestSpawn = spawn;
+				bestSafety = safety;
+			}
 		}
 
-		// Fallback
+		Log.Warning( $"Used safest available fallback spawn for {player.DisplayName}" );
 
-		Log.Warning( $"Used fallback spawn for {player.DisplayName}" );
-
-		return spawns[0];
+		return bestSpawn;
 	}
 }

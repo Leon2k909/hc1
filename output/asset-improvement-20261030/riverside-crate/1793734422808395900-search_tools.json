@@ -1,0 +1,132 @@
+{
+  "tools": [
+    {
+      "name": "asset_compile",
+      "title": "Asset Compile",
+      "toolset": "asset",
+      "description": "Recompile an asset from its source file. Compile errors and warnings land in the console - check read_console after a failure.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Asset path, as returned by asset_search."
+          },
+          "full": {
+            "type": "boolean",
+            "description": "Force a full recompile instead of an incremental one.",
+            "default": false
+          }
+        },
+        "required": [
+          "path"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "Success": {
+            "type": "boolean"
+          },
+          "Path": {
+            "type": "string"
+          },
+          "CompiledFile": {
+            "type": "string"
+          },
+          "Hint": {
+            "type": "string"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "asset_search",
+      "title": "Asset Search",
+      "toolset": "asset",
+      "description": "Search the asset system by keywords and type. An empty query lists every asset, so use limit and offset to page through. Returns relative asset paths - pass one to asset_info, asset_compile, asset_read or asset_dependencies.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Space separated keywords. Every keyword must match the asset's path or one of its tags. Empty matches everything."
+          },
+          "type": {
+            "type": "string",
+            "description": "Filter to one asset type - a file extension (vmdl, vmat, prefab) or friendly name (Model, Material). See asset_types."
+          },
+          "projectOnly": {
+            "type": "boolean",
+            "description": "Only assets belonging to the currently open project, excluding engine content and cloud downloads.",
+            "default": false
+          },
+          "unreferencedOnly": {
+            "type": "boolean",
+            "description": "Only assets nothing else references - useful for finding unused assets. Note map files and code can use an asset without the asset system knowing.",
+            "default": false
+          },
+          "compileFailedOnly": {
+            "type": "boolean",
+            "description": "Only assets whose last compile failed.",
+            "default": false
+          },
+          "uncompiledOnly": {
+            "type": "boolean",
+            "description": "Only assets with no compiled version at all.",
+            "default": false
+          },
+          "limit": {
+            "type": "integer",
+            "description": "How many results to return.",
+            "minimum": 1,
+            "maximum": 500,
+            "default": 50
+          },
+          "offset": {
+            "type": "integer",
+            "description": "How many results to skip, for paging.",
+            "default": 0
+          }
+        },
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "Total": {
+            "type": "integer",
+            "description": "How many assets matched in total, beyond this page."
+          },
+          "Showing": {
+            "type": "integer"
+          },
+          "Offset": {
+            "type": "integer"
+          },
+          "Assets": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "Path": {
+                  "type": "string"
+                },
+                "Type": {
+                  "type": "string"
+                }
+              },
+              "required": []
+            }
+          }
+        },
+        "required": []
+      }
+    }
+  ],
+  "total": 402
+}

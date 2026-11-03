@@ -1,0 +1,1 @@
+return new[]{"models/maps/railhead/clock-v1/station_clock.vmdl","models/maps/railhead/clock-v1/dressing_without_clock.vmdl"}.Select(path=>new{Path=path,IsError=Model.Load(path).IsError}).ToArray();

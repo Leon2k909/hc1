@@ -1,0 +1,13 @@
+"Layer0"
+{
+ shader "shaders/complex.shader"
+ F_SPECULAR "1"
+ g_flMetalness "0"
+ g_flRoughnessScaleFactor "0.85"
+ TextureColor "materials/ares/interior-v1/red_color.png"
+ TextureNormal "materials/ares/interior-v1/red_normal.png"
+ TextureRoughness "materials/ares/interior-v1/red_rough.png"
+ TextureAmbientOcclusion "materials/default/default_ao.tga"
+ g_vColorTint "[1.1 0.94 0.86 1]"
+ g_flModelTintAmount "1"
+}

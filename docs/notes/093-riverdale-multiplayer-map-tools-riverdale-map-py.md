@@ -1,4 +1,14 @@
 ## Riverdale (multiplayer map, `Tools/riverdale_map.py`)
+- Emergency phones approved and installed (2026-10-31): all eight old wall phones are replaced by
+  shared instances of models/props/riverdale/emergency-phone-v1/after.vmdl with static model collision.
+  Exactly 80 detail and 928 fine triangles are removed; unrelated OBJ lines and the rest of the saved
+  scene are preserved. Original wall positions/facing and desk phones are unchanged. The approved model
+  and materials are byte unchanged, with seven native asset-level collision tests already passed.
+  The editor was closed during installation; fresh placed-scene validation and compilation of the two
+  packed hall meshes are pending the next editor session. Their ModelDoc source timestamps are refreshed.
+  Tools/riverdale_emergency_phones.py, riverdale_hall.wall_phone and riverdale_map.write_scene preserve
+  regeneration. Sources/Riverdale/emergency-phone-v1/installed.json and verify_install.py record exact
+  source/scene/transform checks; output/riverdale-emergency-phone-installed-20261031/ retains rollback.
 - The user asked for a new AAA nuclear reactor map "as close as possible" to two reference pictures (2026-10-14): a
   reactor hall round a glowing cyan fuel pool (crane with "RIVERDALE NUCLEAR" and "SWL 125 T", mast in the pool,
   glass control room upper left with a stair, B1/B2 blocks, slogans and the logo on the far wall, water purification
@@ -117,4 +127,6 @@
   - `Sources/Riverdale/editor/editor_call.py` is a short native connection (`--direct-call --script <cs.txt>`).
     `capture.cs.txt` takes `"set": [{ "object", "property", "value" }]` to try a component's value on its copy.
 - To play it: `dev_mode team_deathmatch riverdale`.
+- Hall CCTV (2026-10-31, approved and installed): `riverdale_hall.camera` delegates to `Tools/riverdale_camera.py`; `riverdale_map.configure` preserves its six `rv_cam_*` material paths under `materials/riverdale/cctv_v2/`. All ten cameras retain their anchors and aim, with bevelled housings, folded shields, recessed optics, mounting hardware and cables. Only the old 600 camera triangles were replaced in the published hall detail/fine models; exact face checks preserve all other geometry and recent equipment edits. Both models compile and the installed native render has no error models. Sources and migration notes: `Sources/Riverdale/cctv-v2/README.md`; evidence and original backups: `output/riverdale/cctv-v2/`.
+- Pool rules plates (2026-10-31): `Tools/riverdale_pool_rules.py` supplies the dedicated `rv_pool_rules_v2` print and physical boards through `riverdale_hall.py`. All three boards are 26 × 34 inches. The north board moved from east -200 to -228 to clear the pilaster by 24 inches. Only the old boards' faces were spliced out of the published `riverdale_hall_detail` / `_fine` OBJs; no scene rewrite. Installation and native verification are recorded in `Sources/Riverdale/pool_rules_v2/README.md`, with before/after images and original model backups in `output/riverdale/pool-rules-20261031/`.
 

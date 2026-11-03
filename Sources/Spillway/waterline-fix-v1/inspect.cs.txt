@@ -1,0 +1,10 @@
+var session=Editor.SceneEditorSession.Active;
+var scene=session.Scene;
+return new {
+ Scene=scene.Source?.ResourcePath,
+ Models=scene.GetAllComponents<ModelRenderer>().Where(r=>r.GameObject.Name is "Mountains" or "River" or "Backdrop" or "Forest").Select(r=>new {
+  r.GameObject.Name,Position=r.WorldPosition.ToString(),Scale=r.WorldScale.ToString(),Rotation=r.WorldRotation.ToString(),
+  Model=r.Model?.ResourcePath,Bounds=r.Model?.Bounds.ToString(),Materials=r.Model?.Materials.Select(m=>m.ResourcePath).ToArray()
+ }).ToArray(),
+ Cameras=scene.GetAllComponents<CameraComponent>().Select(c=>new {c.GameObject.Name,Position=c.WorldPosition.ToString(),Rotation=c.WorldRotation.ToString(),c.Enabled}).ToArray()
+};

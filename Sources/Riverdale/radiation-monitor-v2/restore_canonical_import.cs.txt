@@ -1,0 +1,15 @@
+// Rebind to the canonical OBJ after the stale import has been evicted by a fresh import.
+// This retains subsequent edits to the same hall source made by other ongoing work.
+var root=Sandbox.Project.Current.GetRootPath();
+var target=System.IO.Path.Combine(root,"Assets/models/maps/riverdale/riverdale_hall_fine.vmdl");
+var text=System.IO.File.ReadAllText(target);
+if(!text.Contains("riverdale_hall_fine_arm_v2.obj"))throw new Exception("Unexpected model source state");
+text=text.Replace("riverdale_hall_fine_arm_v2.obj","riverdale_hall_fine.obj");
+System.IO.File.WriteAllText(target+".arm-installing",text);
+System.IO.File.Move(target+".arm-installing",target,true);
+var asset=Editor.AssetSystem.FindByPath("models/maps/riverdale/riverdale_hall_fine.vmdl");
+var success=asset.Compile(true);
+var model=Model.Load("models/maps/riverdale/riverdale_hall_fine.vmdl");
+var result=new {Success=success,asset.IsCompileFailed,Materials=model.Materials.Select(m=>m.Name).Where(n=>n.Contains("rv_arm_")).ToArray()};
+System.IO.File.WriteAllText(System.IO.Path.Combine(root,"output/riverdale/radiation-monitor-v2/canonical-import-result.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

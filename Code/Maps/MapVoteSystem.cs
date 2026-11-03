@@ -139,25 +139,35 @@ public partial class MapVoteSystem : SingletonComponent<MapVoteSystem>
 	}
 
 	/// <summary>
-	/// One option per match map, in a random order, each in the mode that was just played (or a random mode the map
-	/// has, if it doesn't have that one). Players vote on the map; the mode stays what the lobby picked. This used to
-	/// pick maps at random with repeats and a different mode for each, so two maps filled five cards with duplicates.
+	/// One option per compatible match map, in random order, keeping the mode the lobby picked.
+	/// Offer different maps when available; replay the current map only when it is the sole compatible choice.
 	/// </summary>
 	public static IEnumerable<Option> GenerateOptions( GameMode currentMode = null, SceneFile currentMap = null, int count = 5 )
 	{
 		currentMode ??= GameMode.Instance;
+		currentMap ??= Game.ActiveScene?.Source as SceneFile;
 		var options = new List<Option>();
+		if ( count <= 0 ) return options;
 
-		foreach ( var map in GameUtils.GetMatchMaps().OrderBy( _ => Game.Random.Float() ).Take( count ) )
+		var maps = GameUtils.GetMatchMaps()
+			.Where( map => map is not null )
+			.DistinctBy( map => map.ResourcePath, StringComparer.OrdinalIgnoreCase )
+			.OrderBy( _ => Game.Random.Float() );
+
+		foreach ( var map in maps )
 		{
-			var modes = GameMode.GetAll( map ).ToList();
-			var mode = modes.FirstOrDefault( x => currentMode.IsValid() && x.Ident == currentMode.Ident ) ?? Game.Random.FromList( modes );
+			var modes = GameMode.GetAll( map ).Where( mode => mode.IsValid() ).ToList();
+			var mode = currentMode.IsValid()
+				? modes.FirstOrDefault( candidate => string.Equals( candidate.Ident, currentMode.Ident, StringComparison.OrdinalIgnoreCase ) )
+				: modes.Count > 0 ? Game.Random.FromList( modes ) : null;
 
 			if ( mode is not null )
 				options.Add( new Option { Map = map, Mode = mode } );
 		}
 
-		return options;
+		var alternatives = options.Where( option => currentMap is null
+			|| !string.Equals( option.Map.ResourcePath, currentMap.ResourcePath, StringComparison.OrdinalIgnoreCase ) ).ToList();
+		return (alternatives.Count > 0 ? alternatives : options).Take( count ).ToList();
 	}
 
 	/// <summary>

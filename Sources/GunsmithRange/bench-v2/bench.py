@@ -281,7 +281,7 @@ def harden_all():
             for e in bm.edges:
                 if len(e.link_faces) == 2 and e.calc_face_angle_signed(0.0) > math.radians(24):
                     a, b = e.verts[0].co, e.verts[1].co
-                    count = max(1, int((b - a).length / 0.25))
+                    count = max(1, int((b - a).length / 0.08))
                     for k in range(count + 1):
                         edge_lines.append(tuple(a.lerp(b, k / count)))
         kit.harden(p)
@@ -310,7 +310,9 @@ def share(finish, normal, centre):
         return 0.55
     if finish in (PLATE, OLIVE, CARTON):
         return 0.9
-    if finish in (OXIDE, ORANGE, BRASS):
+    if finish == OXIDE:
+        return 0.95
+    if finish in (ORANGE, BRASS):
         return 0.75
     if finish == CANVAS:
         return 0.9

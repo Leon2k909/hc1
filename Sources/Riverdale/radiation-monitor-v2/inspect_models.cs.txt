@@ -1,0 +1,1 @@
+return new[]{"models/maps/riverdale/riverdale_hall_detail.vmdl", "models/maps/riverdale/riverdale_hall_fine.vmdl"}.Select(p=>{var m=Model.Load(p);return new {Path=p, m.IsError, Materials=m.Materials.Select(a=>a.Name).ToArray()};}).ToArray();

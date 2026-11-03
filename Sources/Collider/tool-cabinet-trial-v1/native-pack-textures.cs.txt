@@ -1,0 +1,38 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var folder=System.IO.Path.Combine(root,"output/asset-improvement-20261030/tool-cabinet/native-review-20261031");
+var config=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"import-plan.json")));
+var phase=config["phase"].GetValue<string>();
+var changes=new System.Collections.Generic.List<object>();
+string Hash(byte[] bytes)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(bytes)).ToLowerInvariant();
+foreach(var item in config["materials"].AsArray())
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    var relative=item.GetValue<string>();
+    if(!relative.StartsWith("materials/collider/tool-cabinet-trial-v1/")&&!relative.StartsWith("materials/collider/pump-skid-trial-v1/"))
+        throw new InvalidOperationException("Unexpected material path");
+    var file=System.IO.Path.Combine(root,"Assets",relative);var original=System.IO.File.ReadAllText(file);var updated=original;
+    var key=System.IO.Path.GetFileNameWithoutExtension(relative);
+    var archive=System.IO.Path.Combine(folder,"texture-import-fix",phase);System.IO.Directory.CreateDirectory(archive);
+    System.IO.File.WriteAllText(System.IO.Path.Combine(archive,key+"-before.vmat"),original);
+    var textures=new System.Collections.Generic.List<object>();
+    foreach(System.Text.RegularExpressions.Match match in System.Text.RegularExpressions.Regex.Matches(original,"Texture(?:Color|Normal|Roughness|Metalness)\\s+\"([^\"]+\\.png)\""))
+    {
+        var source=match.Groups[1].Value;var path=System.IO.Path.Combine(root,"Assets",source);
+        using var bitmap=Bitmap.CreateFromBytes(System.IO.File.ReadAllBytes(path));
+        if((bitmap.Width&(bitmap.Width-1))==0 && (bitmap.Height&(bitmap.Height-1))==0)continue;
+        int Next(int x){var n=1;while(n<x)n*=2;return n;}
+        var target=source.Substring(0,source.Length-4)+"_engine.png";
+        using var packed=bitmap.Resize(Next(bitmap.Width),Next(bitmap.Height),true);
+        var bytes=packed.ToPng();System.IO.File.WriteAllBytes(System.IO.Path.Combine(root,"Assets",target),bytes);
+        updated=updated.Replace(source,target);
+        textures.Add(new {Source=source,Target=target,OldWidth=bitmap.Width,OldHeight=bitmap.Height,NewWidth=packed.Width,NewHeight=packed.Height,SHA256=Hash(bytes)});
+    }
+    var request=new {path="Assets/"+relative,content=updated};
+    var requestPath=System.IO.Path.Combine(folder,"write-"+key+".json");
+    System.IO.File.WriteAllText(requestPath,System.Text.Json.JsonSerializer.Serialize(request));
+    changes.Add(new {Material=relative,OriginalSHA256=Hash(System.Text.Encoding.UTF8.GetBytes(original)),
+        UpdatedSHA256=Hash(System.Text.Encoding.UTF8.GetBytes(updated)),Textures=textures,NativeWriteRequest=requestPath});
+}
+var result=new {Phase=phase,Changes=changes,NativeBitmapResize=true,OriginalTextureFilesRetained=true};
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"texture-import-"+phase+".json"),System.Text.Json.JsonSerializer.Serialize(result,new System.Text.Json.JsonSerializerOptions{WriteIndented=true}));
+return result;

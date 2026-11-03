@@ -1,0 +1,51 @@
+// Shots from a running Riverdale match without touching the player's view: the player's own camera, with its post effects, is moved, rendered to a bitmap and put back inside one frame.
+// Run with sbox-cli --call run_csharp, the placeholders filled in by live_shots.py. With SPAWN true it also stands the new model at each placement, in this match only, for as long as the old
+// faces are gone but the scene hasn't been reloaded. Nothing is saved.
+var configuration = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(@"__CONFIG__")).AsObject();
+var scene = Game.ActiveScene;
+if (!Game.IsPlaying || scene is null || !string.Equals(scene.Name, "riverdale", StringComparison.OrdinalIgnoreCase)) return new { Error = "Riverdale isn't playing", Scene = scene?.Name };
+var camera = scene.GetAllComponents<CameraComponent>().FirstOrDefault(c => c.IsMainCamera);
+if (!camera.IsValid()) return new { Error = "No main camera", Scene = scene.Name };
+Vector3 Vec(System.Text.Json.Nodes.JsonNode node) { var a = node.AsArray(); return new(a[0].GetValue<float>(), a[1].GetValue<float>(), a[2].GetValue<float>()); }
+var spawned = 0;
+var model = Model.Load("models/props/extinguisher-v2/extinguisher.vmdl");
+if (model is null || model.IsError) return new { Error = "The new model hasn't loaded", Scene = scene.Name };
+if (__SPAWN__ && !scene.GetAllObjects(false).Any(g => g.Name == "New extinguisher (this match)"))
+    foreach (var place in configuration["places"].AsArray())
+    {
+        var go = new GameObject(true, "New extinguisher (this match)");
+        go.NetworkMode = NetworkMode.Never;
+        go.WorldPosition = Vec(place["at"]);
+        go.WorldRotation = Rotation.FromYaw(place["yaw"].GetValue<float>());
+        go.Components.Create<ModelRenderer>().Model = model;
+        spawned++;
+    }
+foreach (var material in model.Materials)
+    foreach (var key in new[] { "g_tColor", "g_tNormal", "g_tRoughness" })
+        material.GetTexture(key)?.MarkUsed(2048);
+await Task.Delay(__WAIT__, cancellationToken);
+var written = new System.Collections.Generic.List<string>();
+var destination = configuration["out"].GetValue<string>();
+System.IO.Directory.CreateDirectory(destination);
+foreach (var view in configuration["views"].AsArray())
+{
+    using var bitmap = new Bitmap(1600, 900);
+    var (position, rotation, fov) = (camera.WorldPosition, camera.WorldRotation, camera.FieldOfView);
+    var eye = Vec(view["eye"]);
+    camera.WorldPosition = eye;
+    camera.WorldRotation = Rotation.LookAt(Vec(view["target"]) - eye);
+    camera.FieldOfView = view["fov"].GetValue<float>();
+    camera.RenderToBitmap(bitmap);
+    camera.RenderToBitmap(bitmap);
+    camera.WorldPosition = position;
+    camera.WorldRotation = rotation;
+    camera.FieldOfView = fov;
+    System.IO.File.WriteAllBytes(System.IO.Path.Combine(destination, view["name"].GetValue<string>() + "-__MODE__.png"), bitmap.ToPng());
+    written.Add(view["name"].GetValue<string>());
+    await Task.Delay(120, cancellationToken);
+}
+return new {
+    Scene = scene.Name, Spawned = spawned, Written = written,
+    NewCount = scene.GetAllObjects(false).Count(g => g.Name == "New extinguisher (this match)"),
+    Errors = model.Materials.Where(m => m is null || m.IsError).Select(m => m?.ResourcePath).ToArray()
+};

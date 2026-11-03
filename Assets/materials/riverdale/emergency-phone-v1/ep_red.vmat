@@ -1,0 +1,18 @@
+// Tools/collider_operators.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    F_SELF_ILLUM "1"
+    g_vSelfIllumTint "[0.50 0.018 0.007 1]"
+    g_flSelfIllumScale "0.7"
+    TextureColor "materials/riverdale/emergency-phone-v1/ep_red_color.png"
+    TextureNormal "materials/riverdale/emergency-phone-v1/ep_red_normal.png"
+    TextureRoughness "materials/riverdale/emergency-phone-v1/ep_red_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    F_METALNESS_TEXTURE "1"
+    TextureMetalness "materials/riverdale/emergency-phone-v1/ep_red_metal.png"
+    g_flRoughnessScaleFactor "1"
+    g_vColorTint "[1 1 1 1]"
+    g_flModelTintAmount "1"
+}

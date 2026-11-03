@@ -1,0 +1,7 @@
+var scene=Editor.SceneEditorSession.Active.Scene;
+return new { scene.Name,IsEditor=scene.IsEditor,Playing=Game.IsPlaying,
+    Models=scene.GetAllComponents<ModelRenderer>().Select(r=>new {
+        r.GameObject.Name,Id=r.GameObject.Id,Path=r.Model?.ResourcePath,Error=r.Model?.IsError,
+        Bounds=r.Model?.Bounds.ToString(),Materials=r.Materials.Count,
+        Position=r.WorldPosition.ToString(),Angles=r.WorldRotation.Angles().ToString()
+    }).ToArray() };

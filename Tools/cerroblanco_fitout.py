@@ -27,6 +27,7 @@ import numpy as np
 
 import map_kit as K
 from map_kit import Model
+import cerroblanco_extinguishers as EXTINGUISHERS
 import cerroblanco_parts as P
 
 RESOURCE = "materials/cerroblanco/fitout"
@@ -632,12 +633,8 @@ def door_fittings( m, room, faces, layout, stats, outdoors ):
             if a - 40 < r < b + 40:
                 r = b + 46
         if r < f.run[1] - 30:
-            base = f.point( r, room.floor + 44, 0.0 )
-            m.oriented_box( base + f.out * 0.6, ( side, f.out, up ), ( 4.0, 1.2, 6.0 ), "cbf_track" )
-            body = base + f.out * 4.4
-            P.rod( m, body - UP * 8, body + UP * 8, 3.1, P.RED, sides=12, caps=True )
-            P.rod( m, body + UP * 8, body + UP * 10.5, 1.1, P.BLACK, sides=8, caps=True )
-            P.rod( m, body + UP * 9 + right * 1.0, body + right * 3.6 - UP * 4, 0.45, P.BLACK, sides=6 )
+            # Railhead's extinguisher-v2 with its own bracket and sign, placed by the scene's Extinguishers group, so nothing's drawn here.
+            EXTINGUISHERS.record( f.point( r, room.floor + 36, 0.0 ), f.out )
             stats["extinguishers"] += 1
         r2 = ( f.run[0] + f.run[1] ) / 2
         clear = all( not ( a - 30 < r2 < b + 30 ) for a, b, z0, z1 in f.openings if z0 < room.floor + 30 )
@@ -791,16 +788,7 @@ def cafe( m, layout, C, log, stats ):
     """ The counter's machines and case, the pendant lights over it, the menu board on the wall behind, cups on the
     tables. The counter is 540..700 along n 600..630, its top at 42. """
     top = 42.0
-    # The espresso machine.
-    e, n = 575.0, 615.0
-    m.box( ( e - 13, n - 9, top ), ( e + 13, n + 9, top + 17 ), { "default": P.STEEL, "-z": None } )
-    m.box( ( e - 13.4, n - 9.4, top + 17 ), ( e + 13.4, n + 9.4, top + 18.5 ), "cbf_track" )
-    for k in range( 2 ):
-        g = np.array( ( e - 6 + 12 * k, n - 9.6, top + 11 ) )
-        P.rod( m, g, g - ( 0, 2.6, 0 ), 1.5, "cbf_chrome", sides=10, caps=True )
-        P.rod( m, g - ( 0, 2.6, 0.5 ), g - ( 0, 6.5, 0.5 ), 0.5, P.BLACK, sides=6 )
-    for k in range( 4 ):
-        lathe( m, "cbf_plastic", ( e - 9 + 6 * k, n + 2, top + 18.5 ), [ ( 0.0, 0.0 ), ( 1.5, 0.0 ), ( 1.9, 3.0 ), ( 1.6, 3.2 ) ], sides=10, cap_top=False )
+    # The espresso machine is espresso_machine_v2, placed in the scene by cerroblanco_espresso at ( 575, 615 ) on this top, so it isn't drawn here.
     # The grinder, the pastry case.
     lathe( m, P.BLACK, ( 600.0, 616.0, top ), [ ( 0.0, 0.0 ), ( 3.4, 0.0 ), ( 3.0, 9.0 ), ( 1.5, 10.0 ) ], sides=12 )
     lathe( m, "cbf_screen", ( 600.0, 616.0, top + 10.0 ), [ ( 1.5, 0.0 ), ( 3.6, 5.5 ), ( 3.8, 6.0 ) ], sides=12 )
@@ -823,13 +811,7 @@ def cafe( m, layout, C, log, stats ):
     sign_card( m, menu, ( 620.0, 650.0, 112.0 ), ( 0.0, -1.0 ), 58.0, 17.3, off=0.0, back="cbf_track", depth=1.2 )
     for e in ( 598.0, 642.0 ):
         P.rod( m, ( e, 650.6, 120.6 ), ( e, 650.6, C.CAFE_TOP ), 0.2, "cbf_track", sides=4 )
-    # Cups and saucers on the tables.
-    for t in log.tables:
-        for k in range( 2 ):
-            a = math.radians( 70 + 160 * k )
-            p = ( t["e"] + 6 * math.cos( a ), t["n"] + 6 * math.sin( a ), 29.5 )
-            m.cylinder( p[:2], 2.6, 29.5, 29.8, { "side": "cbf_plastic", "top": "cbf_plastic", "bottom": None }, sides=12 )
-            lathe( m, "cbf_plastic", ( p[0], p[1], 29.8 ), [ ( 0.0, 0.0 ), ( 1.2, 0.0 ), ( 1.6, 2.4 ), ( 1.7, 2.6 ) ], sides=10, cap_top=False )
+    # The cups and saucers on the tables are cafe_cup_v2, placed in the scene by cerroblanco_cups from the tables, so none are drawn here.
     stats["cafe"] = 1
 
 

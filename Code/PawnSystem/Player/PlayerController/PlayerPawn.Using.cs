@@ -56,12 +56,20 @@ partial class PlayerPawn
 			.HitTriggers()
 			.RunAll() ?? Array.Empty<SceneTraceResult>();
 
-		// Nearest first, so E uses what's under the crosshair and not something behind it.
-		var usables = hits
-			.OrderBy( x => x.Distance )
-			.Select( x => x.GameObject.GetComponentInParent<IUse>() );
+		// RunAll includes hits behind solid geometry. Stop at the first solid surface,
+		// while letting non-interactive trigger volumes pass through.
+		foreach ( var hit in hits.OrderBy( x => x.Distance ) )
+		{
+			var usable = hit.GameObject.IsValid() ? hit.GameObject.GetComponentInParent<IUse>() : null;
+			if ( usable.IsValid() )
+			{
+				yield return usable;
+				yield break;
+			}
 
-		return usables;
+			if ( hit.Collider is not Collider { IsTrigger: true } )
+				yield break;
+		}
 	}
 
 	/// <summary>The dropped gun within <see cref="PickupReach"/> nearest the middle of your view, with nothing in the way.</summary>

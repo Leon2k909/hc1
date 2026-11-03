@@ -71,7 +71,7 @@ public sealed class TheaterController : Component, Component.ISceneStage
 	/// <summary> Whether <see cref="Following"/> is alive at the current time. </summary>
 	public bool FollowingAlive => _followLife?.Soldier?.IsAliveAt( Position ) ?? false;
 
-	public sealed record Person( string Key, string Name, Team Team, bool Bot, ulong SteamId );
+	public sealed record Person( TheaterReplays.PersonIdentity Key, string Name, Team Team, bool Bot, ulong SteamId );
 
 	readonly List<Person> _people = new();
 	readonly List<MapInstance> _maps = new();
@@ -298,7 +298,7 @@ public sealed class TheaterController : Component, Component.ISceneStage
 			: string.Compare( a.Name, b.Name, StringComparison.OrdinalIgnoreCase ) );
 	}
 
-	static string KeyOf( TheaterReplays.Soldier soldier ) => $"{(soldier.Bot ? "bot" : "player")}:{soldier.Name}";
+	static TheaterReplays.PersonIdentity KeyOf( TheaterReplays.Soldier soldier ) => TheaterReplays.IdentityOf( soldier );
 
 	void Fail( string error )
 	{

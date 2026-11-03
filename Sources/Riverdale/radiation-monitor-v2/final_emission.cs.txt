@@ -1,0 +1,15 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var results=new System.Collections.Generic.List<object>();
+foreach(var setting in new[]{(Name:"lcd",Before:"0.23",After:"0.8"),(Name:"green",Before:"0.65",After:"2.2")}) {
+    var relative=$"materials/riverdale/radiation_monitor_v2/rv_arm_{setting.Name}.vmat";
+    var target=System.IO.Path.Combine(root,"Assets",relative);
+    var text=System.IO.File.ReadAllText(target);
+    if(!text.Contains($"g_flSelfIllumBrightness \"{setting.Before}\""))throw new Exception("Unexpected material state");
+    text=text.Replace($"g_flSelfIllumBrightness \"{setting.Before}\"",$"g_flSelfIllumBrightness \"{setting.After}\"");
+    System.IO.File.WriteAllText(target+".arm-installing",text);
+    System.IO.File.Move(target+".arm-installing",target,true);
+    var asset=Editor.AssetSystem.FindByPath(relative);
+    var success=asset.Compile(true);
+    results.Add(new {Path=relative,Success=success,asset.IsCompileFailed});
+}
+return results;

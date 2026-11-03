@@ -1,0 +1,72 @@
+{
+  "variants": [
+    {
+      "name": "review",
+      "lightGain": 1.4,
+      "temperature": 5000,
+      "bounce": 1.8,
+      "contrast": 0.85,
+      "shadows": true,
+      "diffuseWork": true,
+      "trial": true
+    }
+  ],
+  "views": [
+    {
+      "name": "overview",
+      "eye": [
+        800,
+        -680,
+        274
+      ],
+      "target": [
+        -200,
+        640,
+        330
+      ],
+      "fov": 92
+    },
+    {
+      "name": "hero",
+      "eye": [
+        940,
+        -640,
+        280
+      ],
+      "target": [
+        -70,
+        300,
+        330
+      ],
+      "fov": 78
+    },
+    {
+      "name": "floor",
+      "eye": [
+        600,
+        -450,
+        64
+      ],
+      "target": [
+        -300,
+        300,
+        270
+      ],
+      "fov": 88
+    },
+    {
+      "name": "pump",
+      "eye": [
+        390,
+        -410,
+        86
+      ],
+      "target": [
+        270,
+        -270,
+        38
+      ],
+      "fov": 68
+    }
+  ]
+}

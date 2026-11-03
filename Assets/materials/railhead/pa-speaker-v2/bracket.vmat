@@ -1,0 +1,12 @@
+"Layer0"
+{
+ shader "shaders/complex.shader"
+ F_SPECULAR "1"
+ g_flRoughnessScaleFactor "1"
+ g_flMetalness "0.35"
+ TextureColor "[0.14 0.16 0.17 0]"
+ TextureNormal "materials/default/default_normal.tga"
+ TextureRoughness "[0.46 0.46 0.46 0]"
+ TextureAmbientOcclusion "materials/default/default_ao.tga"
+ g_vColorTint "[1 1 1 1]"
+}

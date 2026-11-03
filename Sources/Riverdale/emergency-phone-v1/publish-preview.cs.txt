@@ -1,0 +1,27 @@
+var root=Sandbox.Project.Current.GetRootPath();
+if(!System.IO.Path.GetFullPath(root).TrimEnd('\\','/').Equals(@"C:\sbox-projects\hc1\forked-shooter-main",StringComparison.OrdinalIgnoreCase))throw new InvalidOperationException("Wrong project");
+var folder=System.IO.Path.Combine(root,"output/riverdale-emergency-phone-review-20261031");
+var stage=System.IO.Path.Combine(folder,"stage/Assets");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"publish.json")));
+string Hash(string path)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+foreach(var item in manifest["files"].AsArray())
+{
+    var relative=item["path"].GetValue<string>();
+    if(!relative.StartsWith("models/props/riverdale/emergency-phone-v1/")&&!relative.StartsWith("materials/riverdale/emergency-phone-v1/"))throw new InvalidOperationException("Unexpected asset");
+    if(Hash(System.IO.Path.Combine(stage,relative))!=item["sha256"].GetValue<string>())throw new InvalidOperationException("Stage changed");
+}
+var wrote=new System.Collections.Generic.List<string>();
+foreach(var item in manifest["files"].AsArray())
+{
+    var relative=item["path"].GetValue<string>();var target=System.IO.Path.Combine(root,"Assets",relative);
+    var expected=item["sha256"].GetValue<string>();
+    if(System.IO.File.Exists(target)&&Hash(target)==expected){Editor.AssetSystem.RegisterFile(target);continue;}
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target));
+    var incoming=target+".phone-incoming";
+    System.IO.File.WriteAllBytes(incoming,System.IO.File.ReadAllBytes(System.IO.Path.Combine(stage,relative)));
+    System.IO.File.Move(incoming,target,true);
+    if(Hash(target)!=expected)throw new InvalidOperationException("Write failed");
+    Editor.AssetSystem.RegisterFile(target);
+    wrote.Add(relative);
+}
+return new{PreviewOnly=true,PublishedFiles=wrote,ExistingMapFilesChanged=false};

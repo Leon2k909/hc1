@@ -1,0 +1,40 @@
+// Approved concept implementation; apply only after the native preview passes.
+var root=Sandbox.Project.Current.GetRootPath();
+var folder=System.IO.Path.Combine(root,"output/ares/interior-v1");
+var plan=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"install-plan.json"))).AsArray();
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"manifest.json")));
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+var editor=Editor.SceneEditorSession.Active;
+var before=new { Scene=editor.Scene.Id,Runtime=Game.ActiveScene?.Id,Game.IsPlaying,Dirty=editor.HasUnsavedChanges };
+var scenePath=System.IO.Path.Combine(root,"Assets/scenes/maps/Ares/ares.scene");
+var sceneHash=Hash(scenePath);
+// Every target and stage is checked before any write. Retrying an already
+// completed identical transaction is harmless; mixed states must be inspected.
+foreach(var row in plan) {
+ var target=System.IO.Path.Combine(root,row["relative"].GetValue<string>());
+ var current=System.IO.File.Exists(target)?Hash(target):null;
+ if(current!=row["before"]?.GetValue<string>())throw new InvalidOperationException("Input changed: "+target);
+ var candidate=System.IO.Path.Combine(folder,"install-stage",row["relative"].GetValue<string>());
+ if(Hash(candidate)!=row["after"].GetValue<string>())throw new InvalidOperationException("Stage changed");
+}
+foreach(var model in manifest["models"].AsArray()) {
+ var preview=Model.Load(model["preview"].GetValue<string>());
+ if(preview==null||preview.IsError)throw new InvalidOperationException("Preview model did not load");
+ var text=System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"install-stage",model["document"].GetValue<string>()));
+ var marker="_class = \"PhysicsShapeList\"";var suffix=text.Substring(text.IndexOf(marker,StringComparison.Ordinal));
+ var digest=Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(suffix))).ToLowerInvariant();
+ if(digest!=model["physics_sha256"].GetValue<string>())throw new InvalidOperationException("Physics changed");
+}
+foreach(var row in plan) {
+ var relative=row["relative"].GetValue<string>();var target=System.IO.Path.Combine(root,relative);
+ var incoming=target+".interior-writing";
+ System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target));
+ System.IO.File.Copy(System.IO.Path.Combine(folder,"install-stage",relative),incoming,true);
+ System.IO.File.Move(incoming,target,true);
+ if(relative.StartsWith("Assets/",StringComparison.Ordinal))Editor.AssetSystem.RegisterFile(target);
+}
+var report=new { Installed=true,Files=plan.Count,PhysicsPreserved=true,GeneratedCollisionPreserved=true,
+ SceneFilePreserved=Hash(scenePath)==sceneHash,
+ UserStatePreserved=editor.Scene.Id==before.Scene&&Game.ActiveScene?.Id==before.Runtime&&Game.IsPlaying==before.IsPlaying&&editor.HasUnsavedChanges==before.Dirty };
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"installed.json"),System.Text.Json.JsonSerializer.Serialize(report,new System.Text.Json.JsonSerializerOptions{WriteIndented=true}));
+return report;

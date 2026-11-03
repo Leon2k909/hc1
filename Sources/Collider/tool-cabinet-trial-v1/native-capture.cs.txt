@@ -1,0 +1,87 @@
+if(!Game.IsPlaying || Game.ActiveScene?.Name!="collider")
+    throw new InvalidOperationException("The Collider comparison must be running");
+var scene=Game.ActiveScene;
+var original=scene.GetAllObjects(true).Single(o=>o.Name=="REVIEW ONLY - original case");
+var proposed=scene.GetAllObjects(true).Single(o=>o.Name=="REVIEW ONLY - proposed cabinet");
+var renderers=new[]{original.Components.Get<ModelRenderer>(),proposed.Components.Get<ModelRenderer>()};
+if(renderers.Any(r=>r is null || r.Model is null || r.Model.IsError))
+    throw new InvalidOperationException("A comparison model did not load");
+var camera=scene.GetAllComponents<CameraComponent>().Where(c=>c.Enabled && c.IsMainCamera).OrderBy(c=>c.Priority).Last();
+var oldPosition=camera.WorldPosition;var oldRotation=camera.WorldRotation;
+var oldFov=camera.FieldOfView;var oldAxis=camera.FovAxis;var oldSize=camera.CustomSize;var oldOrtho=camera.Orthographic;
+var folder=System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(),"output/asset-improvement-20261030/tool-cabinet/native-review-20261031");
+System.IO.Directory.CreateDirectory(folder);
+using(scene.Push())
+using(Editor.EditorUtility.DisableTextureStreaming())
+{
+    foreach(var renderer in scene.GetAllComponents<ModelRenderer>().Where(r=>r.Model is not null && !r.Model.IsError))
+    for(var slot=0;slot<renderer.Materials.Count;slot++)
+    {
+        var material=renderer.Materials.GetOverride(slot)??renderer.Materials.GetOriginal(slot);
+        if(material is null || material.IsError)
+        {
+            if(renderers.Contains(renderer))throw new InvalidOperationException("A comparison material is missing");
+            continue;
+        }
+        foreach(var key in new[]{"g_tColor","g_tNormal","g_tRma"})
+        {
+            var texture=material.GetTexture(key);
+            if(texture is not null && !texture.IsError)texture.MarkUsed(Math.Max(texture.Width,texture.Height));
+        }
+    }
+    foreach(var volume in scene.GetAllComponents<IndirectLightVolume>())
+    foreach(var texture in new[]{volume.IrradianceTexture,volume.DistanceTexture,volume.RelocationTexture})
+        if(texture is not null && !texture.IsError)texture.MarkUsed(Math.Max(texture.Width,texture.Height));
+}
+await Task.Delay(1500,cancellationToken);
+if(!ReferenceEquals(scene,Game.ActiveScene) || !Game.IsPlaying)throw new InvalidOperationException("Game changed during texture warmup");
+var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic;
+var views=new[]{
+    new {Name="side-by-side-front",Eye=new Vector3(570,370,64),Target=new Vector3(320,370,28),Fov=60f},
+    new {Name="side-by-side-oblique",Eye=new Vector3(580,480,78),Target=new Vector3(320,370,28),Fov=65f}
+};
+var captures=new System.Collections.Generic.List<object>();
+try
+{
+    using(scene.Push())
+    using(Editor.EditorUtility.DisableTextureStreaming())
+    using(var bitmap=new Bitmap(3840,2160))
+    {
+        foreach(var view in views)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            camera.WorldPosition=view.Eye;camera.WorldRotation=Rotation.LookAt(view.Target-view.Eye);
+            typeof(Scene).GetMethod("PreRender",flags,null,Type.EmptyTypes,null).Invoke(scene,null);
+            typeof(Scene).GetMethod("PreCameraRender",flags,null,Type.EmptyTypes,null).Invoke(scene,null);
+            typeof(PostProcessSystem).GetMethod("UpdateCamera",flags).Invoke(scene.GetSystem<PostProcessSystem>(),new object[]{camera});
+            for(var frame=0;frame<4;frame++)
+            {
+                camera.WorldPosition=view.Eye;camera.WorldRotation=Rotation.LookAt(view.Target-view.Eye);
+                camera.FieldOfView=view.Fov;camera.FovAxis=CameraComponent.Axis.Horizontal;
+                camera.Orthographic=false;camera.CustomSize=new Vector2(3840,2160);
+                camera.RenderToBitmap(bitmap,false);
+            }
+            System.IO.File.WriteAllBytes(System.IO.Path.Combine(folder,view.Name+"-native.png"),bitmap.ToPng());
+            using(var resolved=bitmap.Resize(1920,1080,true))
+                System.IO.File.WriteAllBytes(System.IO.Path.Combine(folder,view.Name+".png"),resolved.ToPng());
+            captures.Add(new {view.Name,Eye=view.Eye.ToString(),Target=view.Target.ToString(),view.Fov,
+                camera.EnablePostProcessing,AutoExposure=camera.AutoExposure.Enabled,
+                MinimumExposure=camera.AutoExposure.MinimumExposure,MaximumExposure=camera.AutoExposure.MaximumExposure});
+        }
+    }
+}
+finally
+{
+    if(camera.IsValid())
+    {
+        camera.WorldPosition=oldPosition;camera.WorldRotation=oldRotation;camera.FieldOfView=oldFov;
+        camera.FovAxis=oldAxis;camera.CustomSize=oldSize;camera.Orthographic=oldOrtho;
+    }
+}
+var result=new { NativeEngineCapture=true,RuntimeScene=true,Playing=Game.IsPlaying,Scene=scene.Source?.ResourcePath,
+    Original=new {original.Name,Position=original.WorldPosition.ToString(),Scale=original.WorldScale.ToString(),Model=renderers[0].Model.ResourcePath},
+    Proposed=new {proposed.Name,Position=proposed.WorldPosition.ToString(),Scale=proposed.WorldScale.ToString(),Model=renderers[1].Model.ResourcePath},
+    Captures=captures,NativeWidth=3840,NativeHeight=2160,OutputWidth=1920,OutputHeight=1080,
+    Supersampling=2,OriginalOnLeft=true,ModelsInstalledInMap=false,CameraRestored=true };
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"capture-report.json"),System.Text.Json.JsonSerializer.Serialize(result,new System.Text.Json.JsonSerializerOptions{WriteIndented=true}));
+return result;

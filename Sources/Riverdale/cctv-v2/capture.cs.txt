@@ -1,0 +1,89 @@
+// Render matched Riverdale views in an isolated editor scene. The user's scene,
+// runtime match, camera, lighting settings and saved scene are never changed.
+var projectRoot = Sandbox.Project.Current.GetRootPath();
+var output = System.IO.Path.Combine(projectRoot, "output/riverdale/cctv-v2");
+var config = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(output,"capture-config.json")));
+Vector3 Vec(System.Text.Json.Nodes.JsonNode n) => new(n[0].GetValue<float>(), n[1].GetValue<float>(), n[2].GetValue<float>());
+var editor = Editor.SceneEditorSession.Active;
+var before = new { SceneId = editor.Scene.Id, GameId = Game.ActiveScene.Id, Game.IsPlaying };
+var sourcePath = System.IO.Path.Combine(projectRoot, "Assets/scenes/maps/Riverdale/riverdale.scene");
+var root = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(sourcePath)).AsObject();
+var visual = new System.Collections.Generic.HashSet<string>(StringComparer.OrdinalIgnoreCase) {
+    "Sun", "Sky", "Fog", "Look", "Riverdale", "Lights", "Reflection Probes", "Volumetric Fog", "Indirect Light"
+};
+var objects = new System.Text.Json.Nodes.JsonArray();
+foreach(var node in root["GameObjects"].AsArray())
+    if(visual.Contains(node["Name"]?.GetValue<string>() ?? "")) objects.Add(node.DeepClone());
+root["GameObjects"] = objects;
+root["SceneProperties"]["NavMesh"]["Enabled"] = false;
+root["SceneProperties"]["WantsSystemScene"] = false;
+var scene = Scene.CreateEditorScene();
+var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
+var preRender = typeof(Scene).GetMethod("PreRender",flags,null,Type.EmptyTypes,null);
+var preCamera = typeof(Scene).GetMethod("PreCameraRender",flags,null,Type.EmptyTypes,null);
+var written = new System.Collections.Generic.List<string>();
+try {
+    CameraComponent camera;
+    ModelRenderer detail, fine;
+    Model detailOld, fineOld;
+    var detailNew = Model.Load("models/maps/riverdale/cctv_v2_review/riverdale_hall_detail.vmdl");
+    var fineNew = Model.Load("models/maps/riverdale/cctv_v2_review/riverdale_hall_fine.vmdl");
+    if(detailNew.IsError || fineNew.IsError) throw new InvalidOperationException("Review models failed to load.");
+    using(scene.Push()) {
+        scene.Deserialize(root);
+        detail = scene.GetAllComponents<ModelRenderer>().Single(r => r.Model?.ResourcePath=="models/maps/riverdale/riverdale_hall_detail.vmdl");
+        fine = scene.GetAllComponents<ModelRenderer>().Single(r => r.Model?.ResourcePath=="models/maps/riverdale/riverdale_hall_fine.vmdl");
+        detailOld = detail.Model; fineOld = fine.Model;
+        var holder = new GameObject(false,"CCTV review camera");
+        camera = holder.Components.Create<CameraComponent>();
+        camera.IsMainCamera = false;
+        camera.ZNear = .5f; camera.ZFar = 120000;
+        camera.CustomSize = new Vector2(1400,1000);
+        var tone = holder.Components.Create<Tonemapping>();
+        tone.Mode = Tonemapping.TonemappingMode.ACES;
+        tone.AutoExposureEnabled = false;
+        tone.ExposureCompensation = .65f;
+        var ao = holder.Components.Create<AmbientOcclusion>();
+        ao.Radius=48; ao.Intensity=.45f; ao.FalloffRange=.9f; ao.ThinCompensation=1;
+        var bloom = holder.Components.Create<Bloom>();
+        bloom.Strength=.1f; bloom.Threshold=1.6f;
+        holder.Enabled=true;
+        scene.EditorTick(.016f,.016f); preRender.Invoke(scene,null); preCamera.Invoke(scene,null);
+    }
+    foreach(var model in scene.GetAllComponents<ModelRenderer>().Where(r=>r.Model!=null).Select(r=>r.Model).Append(detailNew).Append(fineNew).Distinct())
+        foreach(var material in model.Materials)
+            foreach(var texture in new[]{"g_tColor","g_tNormal","g_tRoughness","g_tAmbientOcclusion","g_tMetalness"}.Select(material.GetTexture).Append(material.FirstTexture).Where(t=>t!=null).Distinct())
+                texture.MarkUsed(1024);
+    for(var frame=0;frame<45;frame++) {
+        using(scene.Push()) { scene.EditorTick(.016f,.016f); preRender.Invoke(scene,null); }
+        await Task.Delay(33,cancellationToken);
+    }
+    foreach(var variant in new[]{"before","after"}) {
+        using(scene.Push()) { detail.Model=variant=="after"?detailNew:detailOld; fine.Model=variant=="after"?fineNew:fineOld; }
+        foreach(var view in config["views"].AsArray()) {
+            cancellationToken.ThrowIfCancellationRequested();
+            using var bitmap = new Bitmap(1400,1000);
+            for(var frame=0;frame<12;frame++) {
+                using(scene.Push()) {
+                    camera.WorldPosition=Vec(view["eye"]);
+                    camera.WorldRotation=Rotation.LookAt(Vec(view["target"])-camera.WorldPosition);
+                    camera.FieldOfView=view["fov"].GetValue<float>();
+                    scene.EditorTick(.016f,.016f); preRender.Invoke(scene,null); preCamera.Invoke(scene,null);
+                    camera.RenderToBitmap(bitmap,false);
+                }
+                await Task.Delay(16,cancellationToken);
+            }
+            var path=System.IO.Path.Combine(output,view["name"].GetValue<string>()+"-"+variant+".png");
+            System.IO.File.WriteAllBytes(path,bitmap.ToPng()); written.Add(path);
+        }
+    }
+    var report=new {
+        Before=before, Game.IsPlaying,
+        UserStatePreserved=editor.Scene.Id==before.SceneId && Game.ActiveScene.Id==before.GameId && Game.IsPlaying==before.IsPlaying,
+        Written=written,
+        ErrorModels=scene.GetAllComponents<ModelRenderer>().Where(r=>r.Model==null || r.Model.IsError).Select(r=>r.GameObject.Name).ToArray(),
+        NewCameraMaterials=detailNew.Materials.Where(m=>m.ResourcePath.Contains("cctv_v2")).Select(m=>m.ResourcePath).ToArray()
+    };
+    System.IO.File.WriteAllText(System.IO.Path.Combine(output,"capture-report.json"),System.Text.Json.JsonSerializer.Serialize(report,new System.Text.Json.JsonSerializerOptions{WriteIndented=true}));
+    return report;
+} finally { scene.Destroy(); }

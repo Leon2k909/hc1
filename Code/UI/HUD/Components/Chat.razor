@@ -179,7 +179,7 @@
 
     void ChatFinished()
     {
-        var text = InputBox.Text;
+        var text = (InputBox.Text ?? "").Truncate( 300 );
         InputBox.Text = "";
 
         if ( string.IsNullOrWhiteSpace( text ) )
@@ -195,6 +195,7 @@
             return;
         }
 
+        InputBox.AddToHistory( text );
         CloseChat();
 
         if ( ChatMode == ChatModes.Team )

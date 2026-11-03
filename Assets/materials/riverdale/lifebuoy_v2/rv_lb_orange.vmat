@@ -1,0 +1,15 @@
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    F_METALNESS_TEXTURE "1"
+    g_flRoughnessScaleFactor "1"
+    g_flMetalness "1"
+    g_flModelTintAmount "1"
+    g_vColorTint "[1 1 1 1]"
+    TextureColor "materials/riverdale/lifebuoy_v2/orange_color.png"
+    TextureNormal "materials/riverdale/lifebuoy_v2/orange_normal.png"
+    TextureRoughness "materials/riverdale/lifebuoy_v2/orange_roughness.png"
+    TextureMetalness "materials/riverdale/lifebuoy_v2/orange_metallic.png"
+    TextureAmbientOcclusion "[1 1 1 1]"
+}

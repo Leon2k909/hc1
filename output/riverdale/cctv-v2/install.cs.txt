@@ -1,0 +1,31 @@
+// Run only after the user approves the reviewed camera.
+var root=Sandbox.Project.Current.GetRootPath();
+var folder=System.IO.Path.Combine(root,"output/riverdale/cctv-v2");
+var initialScene=Editor.SceneEditorSession.Active?.Scene?.Id;
+var initialGame=Game.ActiveScene?.Id;
+var initialPlay=Game.IsPlaying;
+var plan=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"install-plan.json"))).AsArray();
+string Sha(string path)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+// Validate every source and candidate before the first write.
+foreach(var change in plan) {
+ var source=change["source"].GetValue<string>();
+ if(Sha(source)!=change["sha256"].GetValue<string>()) throw new InvalidOperationException("Source changed since review: "+source);
+ if(!System.IO.File.Exists(change["staged"].GetValue<string>())) throw new InvalidOperationException("Missing staged source");
+}
+var backup=System.IO.Path.Combine(folder,"retired");
+foreach(var change in plan) {
+ var destination=System.IO.Path.Combine(backup,change["relative"].GetValue<string>());
+ if(System.IO.File.Exists(destination)) throw new InvalidOperationException("Backup already exists; inspect installation before retrying.");
+ System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(destination));
+ System.IO.File.Copy(change["source"].GetValue<string>(),destination);
+}
+foreach(var change in plan) {
+ var path=change["source"].GetValue<string>();
+ System.IO.File.Copy(change["staged"].GetValue<string>(),path+".cctv-writing",true);
+ System.IO.File.Move(path+".cctv-writing",path,true);
+}
+var report=new { Installed=true, Files=plan.Count,
+ SceneUnchanged=Editor.SceneEditorSession.Active?.Scene?.Id==initialScene && Game.ActiveScene?.Id==initialGame,
+ PlayStateUnchanged=Game.IsPlaying==initialPlay, Game.IsPlaying };
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"installed.json"),System.Text.Json.JsonSerializer.Serialize(report));
+return report;

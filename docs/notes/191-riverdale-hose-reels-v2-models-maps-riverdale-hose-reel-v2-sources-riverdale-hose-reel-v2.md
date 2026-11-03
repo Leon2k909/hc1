@@ -1,0 +1,7 @@
+## Riverdale's fire hose reels v2 (`models/maps/riverdale/hose_reel_v2`, `Sources/Riverdale/hose-reel-v2/`, 2026-11-03)
+- Replaced all 5 in the hall at the user's word, after they saw both side by side ("ye very good install"): the deck's west and east walls at n 700, the north wall at e ±680 and the south wall at e 560.
+- The old cabinet was a 1.4 in red box with a flat dark "window" and nothing behind it. The new one is a cabinet 5 in deep with a glazed door (its own translucent material). Behind the glass are a reel of woven hose, the hose run to a nozzle in a clip, and a brass inlet valve with a handwheel. Everything printed is made up.
+- `riverdale_hall.hose_cabinet` now only records a placement (`Tools/riverdale_hose_reels.py`). `riverdale_map.write_scene` adds a "Hose Reels" group, renderers only, as the old box had no collision. The atlas's `hose_label` picture is left in place, unused.
+- The cabinet's back is 0.4 in off the wall, because the hall's dado stands 0.25-0.3 in proud and hid a back closer than that.
+- Installed with `install_hose.py`, which cuts the old box from the live `riverdale_hall_detail.obj` (10 triangles a spot) and its window, label and handle from `riverdale_hall_fine.obj` (14 a spot), as `install_board.py` does. Backups are in `output/asset-improvement-20261030/hose-reel/before-install/`.
+- Seen in s&box after the hall recompiled (`check_installed.py`, the north wall's east cabinet): the new cabinet shows and the old box is gone. The other four weren't looked at. Not seen in a live match.

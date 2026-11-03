@@ -1,0 +1,107 @@
+var projectRoot = Sandbox.Project.Current.GetRootPath();
+var destination = System.IO.Path.Combine(projectRoot, "output/asset-improvement-20261030/riverside-crate");
+var paths = new[] { "materials/riverside/crate_v2/crate.vmat", "models/props/riverside/crate_v2/crate.vmdl", "models/props/riverside/crate_v2/review/pad_without_crate.vmdl" };
+foreach (var path in paths)
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    var asset = Editor.AssetSystem.FindByPath(path);
+    if (asset is null) throw new Exception("Asset not registered: " + path);
+    await asset.CompileIfNeededAsync();
+}
+var newModel = Model.Load(paths[1]);
+var reviewPad = Model.Load(paths[2]);
+if (newModel is null || newModel.IsError || reviewPad is null || reviewPad.IsError) throw new Exception("Model failed to load");
+var root = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(projectRoot, "Assets/scenes/maps/Riverside/riverside.scene"))).AsObject();
+var visual = new System.Collections.Generic.HashSet<string>(new[] { "Moon", "Sky", "Fog", "Look", "Riverside", "Lights", "Fires", "Burn Drums", "Cooler", "Teddy", "Propane Cylinders", "Lawn Chairs", "Reflection Probes", "Volumetric Fog" }, StringComparer.OrdinalIgnoreCase);
+var nodes = new System.Text.Json.Nodes.JsonArray();
+foreach (var node in root["GameObjects"].AsArray())
+    if (visual.Contains(node["Name"]?.GetValue<string>() ?? "")) nodes.Add(node.DeepClone());
+root["GameObjects"] = nodes;
+root["SceneProperties"]["NavMesh"]["Enabled"] = false;
+root["SceneProperties"]["WantsSystemScene"] = false;
+var scene = Scene.CreateEditorScene();
+var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
+var preRender = typeof(Scene).GetMethod("PreRender", flags, null, Type.EmptyTypes, null);
+var preCamera = typeof(Scene).GetMethod("PreCameraRender", flags, null, Type.EmptyTypes, null);
+try
+{
+    CameraComponent camera;
+    ModelRenderer pad;
+    GameObject replacement;
+    var origin = new Vector3(-80, -140, 96);
+    var frame = Rotation.FromYaw(-73.300755766f);
+    using (scene.Push())
+    {
+        scene.Deserialize(root);
+        pad = scene.GetAllComponents<ModelRenderer>().Single(r => r.Model?.ResourcePath == "models/maps/riverside/riverside_pad.vmdl");
+        replacement = new GameObject(false, "Supply crate v2 review");
+        replacement.WorldPosition = origin;
+        replacement.WorldRotation = frame;
+        replacement.Components.Create<ModelRenderer>().Model = newModel;
+        foreach (var tonemap in scene.GetAllComponents<Tonemapping>())
+        {
+            var hold = (tonemap.MinimumExposure + tonemap.MaximumExposure) / 2f;
+            tonemap.AutoExposureEnabled = true;
+            tonemap.MinimumExposure = tonemap.MaximumExposure = hold;
+            tonemap.Rate = 10;
+        }
+        var holder = new GameObject(true, "Review camera");
+        camera = holder.Components.Create<CameraComponent>();
+        camera.ZNear = 1;
+        camera.ZFar = 30000;
+        camera.FieldOfView = 65;
+        scene.EditorTick(.016f, .016f);
+        preRender.Invoke(scene, null);
+        preCamera.Invoke(scene, null);
+    }
+    var oldPad = pad.Model;
+    var materials = scene.GetAllComponents<ModelRenderer>().Where(r => r.Model is not null).SelectMany(r => r.Model.Materials).Concat(newModel.Materials).Distinct().ToArray();
+    var textures = materials.SelectMany(m => new[] { "g_tColor", "g_tNormal", "g_tRoughness", "g_tAmbientOcclusion", "SkyTexture" }.Select(m.GetTexture).Append(m.FirstTexture)).Where(t => t is not null).Distinct().ToArray();
+    foreach (var t in textures) t.MarkUsed(2048);
+    for (var f = 0; f < 150; f++)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        using (scene.Push()) { scene.EditorTick(.016f, .016f); preRender.Invoke(scene, null); }
+        await Task.Delay(25, cancellationToken);
+    }
+    var shots = new (string name, Vector3 eye, Vector3 target)[] {
+        ("angle", new Vector3(53, -60, 47), new Vector3(0, 0, 11)),
+        ("close", new Vector3(27, -37, 29), new Vector3(-1, -4, 11)),
+        ("back", new Vector3(-53, 55, 47), new Vector3(0, 0, 11)),
+        ("player", new Vector3(86, -90, 64), new Vector3(0, 0, 11))
+    };
+    var captures = new System.Collections.Generic.List<string>();
+    foreach (var variant in new[] { "settling", "old", "new" })
+    {
+        using (scene.Push())
+        {
+            replacement.Enabled = variant == "new";
+            pad.Model = variant == "new" ? reviewPad : oldPad;
+        }
+        foreach (var shot in shots)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            using var bitmap = new Bitmap(1500, 1000);
+            for (var f = 0; f < 18; f++)
+            {
+                using (scene.Push())
+                {
+                    camera.WorldPosition = origin + frame * shot.eye;
+                    camera.WorldRotation = Rotation.LookAt(frame * (shot.target - shot.eye));
+                    scene.EditorTick(.016f, .016f);
+                    preRender.Invoke(scene, null);
+                    preCamera.Invoke(scene, null);
+                    camera.RenderToBitmap(bitmap);
+                }
+                foreach (var t in textures) t.MarkUsed(2048);
+                await Task.Delay(16, cancellationToken);
+            }
+            if (variant == "settling") continue;
+            var file = System.IO.Path.Combine(destination, variant + "_" + shot.name + ".png");
+            System.IO.File.WriteAllBytes(file, bitmap.ToPng());
+            captures.Add(file);
+        }
+    }
+    return new { Model = newModel.ResourcePath, newModel.IsError, Bounds = newModel.Bounds.ToString(), Materials = newModel.Materials.Select(m => m.ResourcePath).ToArray(), Screenshots = captures, Installed = false };
+}
+finally { scene.Destroy(); }

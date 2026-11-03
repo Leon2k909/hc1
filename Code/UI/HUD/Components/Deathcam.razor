@@ -53,6 +53,7 @@
                     @foreach ( var entry in inflictedDamageEntries )
                     {
                         <div class="damage-row inflicted-row">
+                            <label class="damage-source">@GetName( entry.Victim )</label>
                             <label class="damage-value">@Tr( "{0} damage in {1} hits", entry.Damage.CeilToInt(), entry.Count )</label>
                         </div>
                     }

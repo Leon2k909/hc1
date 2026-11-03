@@ -33,6 +33,9 @@ public sealed class ZombiesRoundSystem : Component
 
 	[Property] public GameObject ZombiePrefab { get; set; }
 	[Property] public Model ZombieBodyModel { get; set; }
+	/// <summary>Each zombie wears one of these at random (bodies skinned to the citizen, bone-merged onto the driver). Empty, or a
+	/// pick that won't load: <see cref="ZombieBodyModel"/>.</summary>
+	[Property] public List<Model> ZombieBodyModels { get; set; } = new();
 	[Property] public Model WeaponCrateModel { get; set; }
 
 	/// <summary>Killed zombies can drop power-ups (Resupply, One-Hit Kills, Point Boost, Clean Sweep). Off for now.</summary>
@@ -527,13 +530,13 @@ public sealed class ZombiesRoundSystem : Component
 			var driver = Model.Load( ZombieAI.DriverModel );
 			renderer.UseAnimGraph = driver is null || driver.IsError;
 			renderer.Model = renderer.UseAnimGraph ? Model.Load( ZombieAI.CitizenModel ) : driver;
-			if ( ZombieBodyModel is { IsError: false } )
+			if ( PickBodyModel() is { IsError: false } bodyModel )
 			{
 				renderer.RenderType = ModelRenderer.ShadowRenderType.Off;
 				renderer.RenderOptions.Game = false;
 				var bodyGo = new GameObject( zombie, true, "Body" );
 				var body = bodyGo.Components.Create<SkinnedModelRenderer>();
-				body.Model = ZombieBodyModel;
+				body.Model = bodyModel;
 				body.BoneMergeTarget = renderer;
 			}
 			else
@@ -570,6 +573,14 @@ public sealed class ZombiesRoundSystem : Component
 
 		ZombiesRemainingInRound--;
 		ZombiesAlive++;
+	}
+
+	private Model PickBodyModel()
+	{
+		var count = ZombieBodyModels?.Count ?? 0;
+		if ( count > 0 && ZombieBodyModels[Game.Random.Int( 0, count - 1 )] is { IsError: false } model )
+			return model;
+		return ZombieBodyModel;
 	}
 
 	public void OnZombieKilled( Vector3 position )

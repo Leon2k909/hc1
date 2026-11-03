@@ -45,6 +45,7 @@ RV_PAINTS = {
 def reset():
     P.reset()
     RED_CRATES.clear()
+    TARP_PILES.clear()
 
 
 def repaint( model, mapping=RV_PAINTS ):
@@ -505,28 +506,17 @@ def red_crate( m, c, along, size=( 40, 30, 34 ), z0=0.0, surface=METAL ):
     RED_CRATES.append( ( ( c[0], c[1], z0 ), math.degrees( math.atan2( a[1], a[0] ) ), size ) )
 
 
-def tarp_pile( m, centre, L, W, H, along=( 1, 0 ), seed=3, surface=PLASTIC ):
-    """ A heap of gear under a tarp: a lumpy dome, its edges tucked down to the ground, folds and a strap. """
-    rng = np.random.default_rng( seed )
+TARP_PILES = []     # the piles tarp_pile has placed: ( plan position, heading ), for orion_map's write_scene
+
+
+def tarp_pile( m, centre, L, W, H, along=( 1, 0 ), surface=PLASTIC ):
+    """ A heap of gear under a tarp. Only its collision box goes in the merged model. Sources/Orion/tarp_pile_v2's model draws it, placed by the scene, and
+    was simulated on a load that fills this box at L 110, W 80, H 78. """
     a = unit( ( along[0], along[1], 0 ) )
     s = np.cross( UP, a )
     c = v( centre[0], centre[1], 0 )
-    nu, nv = 14, 10
-    lumps = [ ( rng.uniform( -0.35, 0.35 ), rng.uniform( -0.3, 0.3 ), rng.uniform( 0.6, 1.0 ), rng.uniform( 0.2, 0.4 ) ) for _ in range( 5 ) ]
-
-    def hgt( u, w_ ):
-        z = 0.0
-        for lu, lw, lh, lr in lumps:
-            d2 = ( ( u - lu ) / lr ) ** 2 + ( ( w_ - lw ) / ( lr * 1.2 ) ) ** 2
-            z = max( z, lh * max( 0.0, 1 - d2 ) ** 0.6 )
-        edge = min( 0.5 - abs( u ), 0.5 - abs( w_ ) ) * 2
-        return H * z * min( 1.0, edge * 3.5 ) + rng.normal( 0, 0.8 )
-
-    grid = [ [ c + a * ( L * ( i / nu - 0.5 ) ) + s * ( W * ( j / nv - 0.5 ) ) + UP * hgt( i / nu - 0.5, j / nv - 0.5 ) for j in range( nv + 1 ) ] for i in range( nu + 1 ) ]
-    for i in range( nu ):
-        for j in range( nv ):
-            card( m, "oa_tarp", [ grid[i][j], grid[i + 1][j], grid[i + 1][j + 1], grid[i][j + 1] ], UP )
     m.oriented_box( c + UP * ( H * 0.4 ), ( a, s, UP ), ( L * 0.8, W * 0.8, H * 0.8 ), { "default": None }, surface )
+    TARP_PILES.append( ( ( c[0], c[1], 0.0 ), math.degrees( math.atan2( a[1], a[0] ) ) ) )
 
 
 # ---------------------------------------------------------------------------------------------------------------------

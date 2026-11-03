@@ -1,0 +1,4 @@
+return new[]{"ares_hall","ares_reactor"}.Select(name=>{
+ var model=Model.Load($"models/maps/ares/interior-v1/{name}_preview.vmdl");
+ return new { Name=name, Error=model==null||model.IsError, Materials=model?.Materials.Where(m=>m.ResourcePath.Contains("interior-v1")).Select(m=>m.ResourcePath).ToArray() };
+}).ToArray();

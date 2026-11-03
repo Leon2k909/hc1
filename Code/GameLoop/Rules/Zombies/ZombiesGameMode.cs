@@ -7,6 +7,8 @@ public sealed class ZombiesGameMode : Component, IGameEventHandler<PlayerSpawned
 {
 	// Serialized model references keep cloud assets in the game's dependency graph.
 	[Property] public Model ZombieBodyModel { get; set; }
+	/// <summary>The bodies zombies wear, one at random each (<see cref="ZombiesRoundSystem.ZombieBodyModels"/>).</summary>
+	[Property] public List<Model> ZombieBodyModels { get; set; } = new();
 	[Property] public Model WeaponCrateModel { get; set; }
 
 	protected override void OnAwake()
@@ -16,6 +18,7 @@ public sealed class ZombiesGameMode : Component, IGameEventHandler<PlayerSpawned
 		{
 			var rounds = Components.GetOrCreate<ZombiesRoundSystem>();
 			rounds.ZombieBodyModel = ZombieBodyModel;
+			rounds.ZombieBodyModels = ZombieBodyModels;
 			rounds.WeaponCrateModel = WeaponCrateModel;
 		}
 	}

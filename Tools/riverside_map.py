@@ -133,6 +133,7 @@ def configure( model ):
 
 def place_into( m, part, origin, yaw ):
     m.extend( P.place( part, origin, yaw ) )
+    P.carry( m, part, origin, yaw )
 
 
 def ground_z( e, n ):
@@ -1028,6 +1029,30 @@ def teddy_objects():
     return out
 
 
+def propane_objects():
+    """ The propane cylinders' models: the pad's row, the camper's pair and the porch's. P.propane keeps the big ones' collision in the zone models. """
+    out = []
+    for k, ( owner, position, yaw, size ) in enumerate( P.PROPANE ):
+        key = f"propane/{k}"
+        heading = ( math.cos( math.radians( yaw ) ), math.sin( math.radians( yaw ) ) )
+        out.append( K.game_object( ids, "Propane Cylinder", key, K.to_world( position ), K.yaw_rotation( K.plan_yaw( heading ) % 360.0 ), components=[
+            K.component( ids, "Sandbox.ModelRenderer", f"{key}/renderer", BodyGroups=18446744073709551615,
+                         Model=f"models/props/riverside/propane_v2/propane_{size}.vmdl", RenderType="On", Tint="1,1,1,1" ) ] ) )
+    return out
+
+
+def lawn_chair_objects():
+    """ The yard, porch pair and roof lookout, with the originals' transforms and no collision. """
+    out = []
+    for k, ( owner, position, yaw, colour ) in enumerate( P.LAWN_CHAIRS ):
+        key = f"lawn_chair/{k}"
+        heading = ( math.cos( math.radians( yaw ) ), math.sin( math.radians( yaw ) ) )
+        out.append( K.game_object( ids, "Lawn Chair", key, K.to_world( position ), K.yaw_rotation( K.plan_yaw( heading ) % 360.0 ), components=[
+            K.component( ids, "Sandbox.ModelRenderer", f"{key}/renderer", BodyGroups=18446744073709551615,
+                         Model=f"models/props/riverside/lawn_chair_v2/lawn_chair_{colour}.vmdl", RenderType="On", Tint="1,1,1,1" ) ] ) )
+    return out
+
+
 def write_scene( written ):
     world = K.game_object( ids, "Riverside", "world", children=[
         model_object( title, f"world/{name}", name, collide, shadows )
@@ -1102,6 +1127,8 @@ def write_scene( written ):
         K.game_object( ids, "Burn Drums", "drums", children=burn_drum_objects() ),
         *cooler_objects(),
         *teddy_objects(),
+        K.game_object( ids, "Propane Cylinders", "propane", children=propane_objects() ),
+        K.game_object( ids, "Lawn Chairs", "lawn_chairs", children=lawn_chair_objects() ),
         K.game_object( ids, "Reflection Probes", "probes", children=[ probe_object( *p ) for p in PROBES ] ),
         K.game_object( ids, "Volumetric Fog", "haze", children=[ haze_object( *h ) for h in HAZE ] ),
         K.game_object( ids, "Player Spawns", "spawns", children=spawns ),

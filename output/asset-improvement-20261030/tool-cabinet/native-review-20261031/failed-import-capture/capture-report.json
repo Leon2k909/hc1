@@ -1,0 +1,48 @@
+{
+  "NativeEngineCapture": true,
+  "RuntimeScene": true,
+  "Playing": true,
+  "Scene": null,
+  "Original": {
+    "Name": "REVIEW ONLY - original case",
+    "Position": "320,300,0",
+    "Scale": "1,1,1",
+    "Model": "models/props/collider/tool-cabinet-trial-v1/before.vmdl"
+  },
+  "Proposed": {
+    "Name": "REVIEW ONLY - proposed cabinet",
+    "Position": "320,440,0",
+    "Scale": "1,1,1",
+    "Model": "models/props/collider/tool-cabinet-trial-v1/after.vmdl"
+  },
+  "Captures": [
+    {
+      "Name": "side-by-side-front",
+      "Eye": "570,370,64",
+      "Target": "320,370,28",
+      "Fov": 60,
+      "EnablePostProcessing": true,
+      "AutoExposure": true,
+      "MinimumExposure": 1,
+      "MaximumExposure": 2.3
+    },
+    {
+      "Name": "side-by-side-oblique",
+      "Eye": "580,480,78",
+      "Target": "320,370,28",
+      "Fov": 65,
+      "EnablePostProcessing": true,
+      "AutoExposure": true,
+      "MinimumExposure": 1,
+      "MaximumExposure": 2.3
+    }
+  ],
+  "NativeWidth": 3840,
+  "NativeHeight": 2160,
+  "OutputWidth": 1920,
+  "OutputHeight": 1080,
+  "Supersampling": 2,
+  "OriginalOnLeft": true,
+  "ModelsInstalledInMap": false,
+  "CameraRestored": true
+}

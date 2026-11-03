@@ -51,6 +51,13 @@
   `razed` ident's data folder, not this project's (`razedtest`).
 - Playback (`TheaterController`) loads the MapInstances again (120 s timeout), parses the clip on a worker thread and
   drives the scene's MoviePlayer itself (`IsPlaying` false, `Position` set every frame).
+  - Person identity update (2026-11-03): `TheaterReplays.IdentityOf` uses a player's recorded Steam ID across lives,
+    renames and team changes. Bots and older entries with no Steam ID fall back to bot/player kind, team and name;
+    ambiguous same-name/same-team old entries cannot be distinguished without recorded IDs. Playback's people list,
+    life matching, replay detail counts and timeline deaths share this identity, so two current players with the same
+    display name no longer merge or borrow each other's death markers. Identity is a value key, avoiding per-frame
+    key-string allocations. The saved file format is unchanged. All 22 offline identity/integration checks passed;
+    no editor was used and live replay verification is pending.
   - Reading is one job on a worker thread (`TheaterReplays.ReadClip`), never the main thread. It parses the file's bytes
     with a `Utf8JsonReader` given the engine's comment handling and depth (512), skipping a byte order mark. It used
     `ReadAllText`, a string twice the file's size, which `Json.Deserialize` copied back to UTF-8, and fell back to

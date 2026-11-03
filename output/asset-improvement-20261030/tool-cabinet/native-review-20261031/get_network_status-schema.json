@@ -1,0 +1,14 @@
+{
+  "name": "get_network_status",
+  "title": "Get Network Status",
+  "toolset": "bridge_networking",
+  "description": "Check the current multiplayer status. Returns { isActive, isHost, isClient, isConnecting, maxPlayers, serverName } read from Sandbox.Networking \u2014 meaningful mostly in play mode with networking active. It does NOT return a player list or networked-object dump; use inspect_networked_object for a specific object's Network/[Sync] state.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {},
+    "required": []
+  },
+  "annotations": {
+    "readOnlyHint": true
+  }
+}

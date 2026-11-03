@@ -709,6 +709,9 @@ public static partial class GameText
 		["Red"] = "Kırmızı",
 		["Green"] = "Yeşil",
 		["Blue"] = "Mavi",
+		["Hue"] = "Ton",
+		["Saturation"] = "Doygunluk",
+		["Brightness"] = "Parlaklık",
 		["Search languages"] = "Dil ara",
 		["No languages found"] = "Dil bulunamadı",
 

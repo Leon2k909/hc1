@@ -1,6 +1,6 @@
 # Innocent Hotel ice bucket v2
 
-Created 2026-10-31. **Not installed.** The old model is untouched, nothing is committed, and the user decides.
+Created 2026-10-31. **Rejected the same day.** After seeing both in s&box the user said to keep the old one, and gave no reason. It was never installed. The model and materials moved out of `Assets` to `output/asset-improvement-20261030/ice-bucket/retired-ice_bucket_v2/`. The notes below describe the rejected build.
 
 The old `models/3t/maps/inno_hotel/ice_bucket/ice_bucket.vmdl` is a plain tapered cylinder with two rings, on a full-metal
 `steel.vmat`. There are few reflections for that metal to show in this map, so s&box draws it as a black shape with no detail.

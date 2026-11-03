@@ -45,7 +45,7 @@ public static class LobbyInformationExtensions
 	{
 		if ( lobby.Data?.TryGetValue( "dev", out string dev ) ?? false )
 		{
-			return Convert.ToInt16( dev ) == 1;
+			return int.TryParse( dev, out var value ) && value == 1;
 		}
 
 		return false;

@@ -53,6 +53,11 @@ def integrate(nx, ny):
 srgb = channel("diffuse")[..., :3].astype(np.float32) / 255.0
 linear = np.where(srgb <= 0.04045, srgb / 12.92, ((srgb + 0.055) / 1.055) ** 2.4).astype(np.float32)
 del srgb
+# Each block has its own broad tone, which shows as squares once patches meet. Take away everything broader than a few inches: the paint lays its own weather over it.
+log = np.log(linear + 0.01)
+broad = ndi.gaussian_filter(log, (110, 110, 0))
+linear = (np.exp(log - broad + broad.reshape(-1, 3).mean(0)) - 0.01).astype(np.float32)
+del log, broad
 normal = channel("nor_gl")[..., :3].astype(np.float32) / 255.0 * 2 - 1
 slope_x = normal[..., 0] / np.maximum(normal[..., 2], 0.25)
 slope_y = normal[..., 1] / np.maximum(normal[..., 2], 0.25)
@@ -133,7 +138,7 @@ for top in range(0, OUT_SIZE, step):
         if top:
             e = (((cand[:OVERLAP] - here[:OVERLAP]) * LUMA) ** 2).sum(-1).T
             mask[:OVERLAP, :] = np.minimum(mask[:OVERLAP, :], seam_mask(e).T)
-        soft = ndi.gaussian_filter(mask, 2.0)
+        soft = ndi.gaussian_filter(mask, 4.0)
         soft = np.where(mask > 0, np.maximum(soft, 0.5), soft)
         if not left:
             soft[:, :8] = 1

@@ -1,0 +1,42 @@
+{
+  "name": "add_component",
+  "title": "Add Component",
+  "toolset": "scene",
+  "description": "Add a component to a game object, optionally setting its properties in the same call. The user can undo this. Returns the component's id.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "description": "The game object's id, from scene_tree or find_game_objects."
+      },
+      "type": {
+        "type": "string",
+        "description": "The component type name, e.g. 'ModelRenderer'. get_component_type documents what exists."
+      },
+      "properties": {
+        "type": "object",
+        "description": "Optional json object of property values, e.g. {\"LightColor\": \"1,0.8,0.6,1\", \"Radius\": 512}."
+      }
+    },
+    "required": [
+      "id",
+      "type"
+    ]
+  },
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "Id": {
+        "type": "string"
+      },
+      "Type": {
+        "type": "string"
+      },
+      "GameObject": {
+        "type": "string"
+      }
+    },
+    "required": []
+  }
+}

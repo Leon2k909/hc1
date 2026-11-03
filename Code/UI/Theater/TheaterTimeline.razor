@@ -27,7 +27,7 @@
     TheaterController Controller => TheaterController.Current;
 
     IEnumerable<float> Deaths => Controller?.Info?.Soldiers is { } soldiers && Following is { } person
-        ? soldiers.Where( x => x.Died >= 0f && x.Name == person.Name && x.Bot == person.Bot ).Select( x => x.Died )
+        ? soldiers.Where( x => x.Died >= 0f && TheaterReplays.IdentityOf( x ) == person.Key ).Select( x => x.Died )
         : Enumerable.Empty<float>();
 
     float Percent( float seconds ) => Controller is { Duration: > 0f } c ? Math.Clamp( seconds / c.Duration, 0f, 1f ) * 100f : 0f;

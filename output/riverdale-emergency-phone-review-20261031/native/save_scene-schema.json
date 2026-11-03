@@ -1,0 +1,23 @@
+{
+  "name": "save_scene",
+  "title": "Save Scene",
+  "toolset": "scene",
+  "description": "Save the active scene to its file. Edits to objects in other open scenes mark those scenes unsaved instead - switch_scene to one first to save it.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {},
+    "required": []
+  },
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "Saved": {
+        "type": "string"
+      },
+      "HasUnsavedChanges": {
+        "type": "boolean"
+      }
+    },
+    "required": []
+  }
+}

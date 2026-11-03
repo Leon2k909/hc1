@@ -1,0 +1,257 @@
+100 entries, oldest first (1084 buffered):
+17:38:22 [engine/RenderSystem] Warn: Skipping texture streaming: looks like the texture was reloaded while in the streaming list. ( materials/lowtide/interior/concrete_rough_png_5e92e06f.generated.vtex )
+17:38:22 [engine/RenderSystem] Warn: Skipping texture streaming: looks like the texture was reloaded while in the streaming list. ( materials/lowtide/drainage/cast_iron_normal_png_fc0db7f1.generated.vtex )
+17:38:22 [engine/RenderSystem] Warn: Skipping texture streaming: looks like the texture was reloaded while in the streaming list. ( materials/lowtide/concrete-wear/warehouse_use_png_c2bb5a66.generated.vtex )
+17:38:22 [engine/RenderSystem] Warn: Skipping texture streaming: looks like the texture was reloaded while in the streaming list. ( materials/railhead/window_dark_rough_png_3465c121.generated.vtex )
+17:38:22 [engine/RenderSystem] Warn: Skipping texture streaming: looks like the texture was reloaded while in the streaming list. ( materials/lowtide/windows/warehouse_rooms_png_1537fada.generated.vtex )
+17:39:13 [Generic] Warn: GameObject:lowtide: Guid 2e37cfac-7a31-5f80-aa5e-dba7a0dc03b1 is already taken by GameObject:lowtide - changing
+17:39:13 [Generic] Error: OnEnabled on Sandbox.IndirectLightVolume failed from Load: Unable to read texture pixels
+   at Sandbox.CallbackBatch.Group.Execute(CallbackBatch parent)
+   at Sandbox.CallbackBatch.Execute()
+   at Sandbox.CallbackBatch.Dispose()
+   at Sandbox.Scene.Load(SceneLoadOptions options)
+   at Sandbox.Scene.Load(GameResource resource)
+   at McpScript.Run(String exchangeDirectory, CancellationToken cancellationToken)
+   at McpScript.Run(String exchangeDirectory, CancellationToken cancellationToken)
+   at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+   at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+   at Editor.Mcp.ScriptTools.Run(String code, String path)
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext()
+   at Sandbox.Tasks.ExpirableSynchronizationContext.ProcessQueue()
+   at Sandbox.EngineLoop.RunAsyncTasks()
+   at Sandbox.EngineLoop.FrameEnd()
+   at Sandbox.EngineLoop.RunFrame(CMaterialSystem2AppSystemDict appDict, Boolean& wantsQuit)
+   at Sandbox.AppSystem.Run()
+   at Sandbox.Launcher.Main() in C:\actions-runner\_work\sbox\sbox\engine\Launcher\SboxDev\Launcher.cs:line 42
+   at Sandbox.Program.Launch() in C:\actions-runner\_work\sbox\sbox\engine\Launcher\Shared\Startup.cs:line 21
+   at Sandbox.Program.Main() in C:\actions-runner\_work\sbox\sbox\engine\Launcher\Shared\Startup.cs:line 16
+
+    System.Exception: Unable to read texture pixels
+    at Sandbox.IndirectLightVolume.LoadProbesFromRelocationTexture()
+    at Sandbox.IndirectLightVolume.OnEnabled()
+17:39:13 [Generic] Error: OnEnabled on Sandbox.IndirectLightVolume failed from Load: Unable to read texture pixels
+   at Sandbox.CallbackBatch.Group.Execute(CallbackBatch parent)
+   at Sandbox.CallbackBatch.Execute()
+   at Sandbox.CallbackBatch.Dispose()
+   at Sandbox.Scene.Load(SceneLoadOptions options)
+   at Sandbox.Scene.Load(GameResource resource)
+   at McpScript.Run(String exchangeDirectory, CancellationToken cancellationToken)
+   at McpScript.Run(String exchangeDirectory, CancellationToken cancellationToken)
+   at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+   at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+   at Editor.Mcp.ScriptTools.Run(String code, String path)
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext()
+   at Sandbox.Tasks.ExpirableSynchronizationContext.ProcessQueue()
+   at Sandbox.EngineLoop.RunAsyncTasks()
+   at Sandbox.EngineLoop.FrameEnd()
+   at Sandbox.EngineLoop.RunFrame(CMaterialSystem2AppSystemDict appDict, Boolean& wantsQuit)
+   at Sandbox.AppSystem.Run()
+   at Sandbox.Launcher.Main() in C:\actions-runner\_work\sbox\sbox\engine\Launcher\SboxDev\Launcher.cs:line 42
+   at Sandbox.Program.Launch() in C:\actions-runner\_work\sbox\sbox\engine\Launcher\Shared\Startup.cs:line 21
+   at Sandbox.Program.Main() in C:\actions-runner\_work\sbox\sbox\engine\Launcher\Shared\Startup.cs:line 16
+
+    System.Exception: Unable to read texture pixels
+    at Sandbox.IndirectLightVolume.LoadProbesFromRelocationTexture()
+    at Sandbox.IndirectLightVolume.OnEnabled()
+17:40:12 [Generic] Warn: GameObject:menu: Guid 1d8ef449-9ae1-421d-b754-49f414e52d74 is already taken by GameObject:menu - changing
+17:40:13 [Generic] Warn: Missing Component: couldn't find Component type ChargeStation on GameObject:charger_health
+17:40:13 [Generic] Warn: Missing Component: couldn't find Component type GrabAction on GameObject:charger_health
+17:40:13 [Generic] Warn: Missing Component: couldn't find Component type ChargeStation on GameObject:charger_health (1)
+17:40:13 [Generic] Warn: Missing Component: couldn't find Component type GrabAction on GameObject:charger_health (1)
+17:40:13 [Generic] Warn: Missing Component: couldn't find Component type ChargeStation on GameObject:charger_armour
+17:40:13 [Generic] Warn: Missing Component: couldn't find Component type GrabAction on GameObject:charger_armour
+17:40:13 [Generic] Warn: Missing Component: couldn't find Component type ChargeStation on GameObject:charger_armour (1)
+17:40:13 [Generic] Warn: Missing Component: couldn't find Component type GrabAction on GameObject:charger_armour (1)
+17:40:13 [Generic] Warn: Missing Component: couldn't find Component type InventoryPickup on GameObject:item_longjumpmodule
+17:40:13 [Generic] Warn: Missing Component: couldn't find Component type InventoryPickup on GameObject:item_gluon_gun
+17:43:31 [Generic] Warn: GameObject:menu: Guid 1d8ef449-9ae1-421d-b754-49f414e52d74 is already taken by GameObject:menu - changing
+17:43:32 [Generic] Warn: Missing Component: couldn't find Component type ChargeStation on GameObject:charger_health
+17:43:32 [Generic] Warn: Missing Component: couldn't find Component type GrabAction on GameObject:charger_health
+17:43:32 [Generic] Warn: Missing Component: couldn't find Component type ChargeStation on GameObject:charger_health (1)
+17:43:32 [Generic] Warn: Missing Component: couldn't find Component type GrabAction on GameObject:charger_health (1)
+17:43:32 [Generic] Warn: Missing Component: couldn't find Component type ChargeStation on GameObject:charger_armour
+17:43:32 [Generic] Warn: Missing Component: couldn't find Component type GrabAction on GameObject:charger_armour
+17:43:32 [Generic] Warn: Missing Component: couldn't find Component type ChargeStation on GameObject:charger_armour (1)
+17:43:32 [Generic] Warn: Missing Component: couldn't find Component type GrabAction on GameObject:charger_armour (1)
+17:43:32 [Generic] Warn: Missing Component: couldn't find Component type InventoryPickup on GameObject:item_longjumpmodule
+17:43:32 [Generic] Warn: Missing Component: couldn't find Component type InventoryPickup on GameObject:item_gluon_gun
+17:46:23 [Generic] Error: OnEnabled on Sandbox.IndirectLightVolume failed from Deserialize: Unable to read texture pixels
+   at Sandbox.CallbackBatch.Group.Execute(CallbackBatch parent)
+   at Sandbox.CallbackBatch.Execute()
+   at Sandbox.CallbackBatch.Dispose()
+   at Sandbox.Scene.Deserialize(JsonObject node, DeserializeOptions option)
+   at Sandbox.GameObject.Deserialize(JsonObject node)
+   at McpScript.Run(String exchangeDirectory, CancellationToken cancellationToken)
+   at McpScript.Run(String exchangeDirectory, CancellationToken cancellationToken)
+   at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+   at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+   at Editor.Mcp.ScriptTools.Run(String code, String path)
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext()
+   at Sandbox.Tasks.ExpirableSynchronizationContext.ProcessQueue()
+   at Sandbox.EngineLoop.RunAsyncTasks()
+   at Sandbox.EngineLoop.FrameEnd()
+   at Sandbox.EngineLoop.RunFrame(CMaterialSystem2AppSystemDict appDict, Boolean& wantsQuit)
+   at Sandbox.AppSystem.Run()
+   at Sandbox.Launcher.Main() in C:\actions-runner\_work\sbox\sbox\engine\Launcher\SboxDev\Launcher.cs:line 42
+   at Sandbox.Program.Launch() in C:\actions-runner\_work\sbox\sbox\engine\Launcher\Shared\Startup.cs:line 21
+   at Sandbox.Program.Main() in C:\actions-runner\_work\sbox\sbox\engine\Launcher\Shared\Startup.cs:line 16
+
+    System.Exception: Unable to read texture pixels
+    at Sandbox.IndirectLightVolume.LoadProbesFromRelocationTexture()
+    at Sandbox.IndirectLightVolume.OnEnabled()
+17:46:56 [Generic] Warn: GameObject:reefhall: Guid 64c78a8e-b32d-53dd-ac21-33ebc02e2b3b is already taken by GameObject:reefhall - changing
+17:47:24 [Generic] Warn: GameObject:menu: Guid 1d8ef449-9ae1-421d-b754-49f414e52d74 is already taken by GameObject:menu - changing
+17:47:24 [Generic] Warn: Missing Component: couldn't find Component type ChargeStation on GameObject:charger_health
+17:47:24 [Generic] Warn: Missing Component: couldn't find Component type GrabAction on GameObject:charger_health
+17:47:24 [Generic] Warn: Missing Component: couldn't find Component type ChargeStation on GameObject:charger_health (1)
+17:47:24 [Generic] Warn: Missing Component: couldn't find Component type GrabAction on GameObject:charger_health (1)
+17:47:24 [Generic] Warn: Missing Component: couldn't find Component type ChargeStation on GameObject:charger_armour
+17:47:24 [Generic] Warn: Missing Component: couldn't find Component type GrabAction on GameObject:charger_armour
+17:47:24 [Generic] Warn: Missing Component: couldn't find Component type ChargeStation on GameObject:charger_armour (1)
+17:47:24 [Generic] Warn: Missing Component: couldn't find Component type GrabAction on GameObject:charger_armour (1)
+17:47:24 [Generic] Warn: Missing Component: couldn't find Component type InventoryPickup on GameObject:item_longjumpmodule
+17:47:24 [Generic] Warn: Missing Component: couldn't find Component type InventoryPickup on GameObject:item_gluon_gun
+17:50:08 [Generic] Warn: GameObject:reefhall: Guid 64c78a8e-b32d-53dd-ac21-33ebc02e2b3b is already taken by GameObject:reefhall - changing
+17:50:35 [Generic] Warn: GameObject:menu: Guid 1d8ef449-9ae1-421d-b754-49f414e52d74 is already taken by GameObject:menu - changing
+17:50:35 [Generic] Warn: Missing Component: couldn't find Component type ChargeStation on GameObject:charger_health
+17:50:35 [Generic] Warn: Missing Component: couldn't find Component type GrabAction on GameObject:charger_health
+17:50:35 [Generic] Warn: Missing Component: couldn't find Component type ChargeStation on GameObject:charger_health (1)
+17:50:35 [Generic] Warn: Missing Component: couldn't find Component type GrabAction on GameObject:charger_health (1)
+17:50:35 [Generic] Warn: Missing Component: couldn't find Component type ChargeStation on GameObject:charger_armour
+17:50:35 [Generic] Warn: Missing Component: couldn't find Component type GrabAction on GameObject:charger_armour
+17:50:35 [Generic] Warn: Missing Component: couldn't find Component type ChargeStation on GameObject:charger_armour (1)
+17:50:35 [Generic] Warn: Missing Component: couldn't find Component type GrabAction on GameObject:charger_armour (1)
+17:50:35 [Generic] Warn: Missing Component: couldn't find Component type InventoryPickup on GameObject:item_longjumpmodule
+17:50:35 [Generic] Warn: Missing Component: couldn't find Component type InventoryPickup on GameObject:item_gluon_gun
+17:54:26 [Generic] Warn: GameObject:reefhall: Guid 64c78a8e-b32d-53dd-ac21-33ebc02e2b3b is already taken by GameObject:reefhall - changing
+17:54:54 [Generic] Warn: GameObject:menu: Guid 1d8ef449-9ae1-421d-b754-49f414e52d74 is already taken by GameObject:menu - changing
+17:54:54 [Generic] Warn: Missing Component: couldn't find Component type ChargeStation on GameObject:charger_health
+17:54:54 [Generic] Warn: Missing Component: couldn't find Component type GrabAction on GameObject:charger_health
+17:54:54 [Generic] Warn: Missing Component: couldn't find Component type ChargeStation on GameObject:charger_health (1)
+17:54:54 [Generic] Warn: Missing Component: couldn't find Component type GrabAction on GameObject:charger_health (1)
+17:54:54 [Generic] Warn: Missing Component: couldn't find Component type ChargeStation on GameObject:charger_armour
+17:54:54 [Generic] Warn: Missing Component: couldn't find Component type GrabAction on GameObject:charger_armour
+17:54:54 [Generic] Warn: Missing Component: couldn't find Component type ChargeStation on GameObject:charger_armour (1)
+17:54:54 [Generic] Warn: Missing Component: couldn't find Component type GrabAction on GameObject:charger_armour (1)
+17:54:54 [Generic] Warn: Missing Component: couldn't find Component type InventoryPickup on GameObject:item_longjumpmodule
+17:54:54 [Generic] Warn: Missing Component: couldn't find Component type InventoryPickup on GameObject:item_gluon_gun
+17:56:14 [Generic] Error: OnEnabled on Sandbox.IndirectLightVolume failed from Deserialize: Unable to read texture pixels
+   at Sandbox.CallbackBatch.Group.Execute(CallbackBatch parent)
+   at Sandbox.CallbackBatch.Execute()
+   at Sandbox.CallbackBatch.Dispose()
+   at Sandbox.Scene.Deserialize(JsonObject node, DeserializeOptions option)
+   at Sandbox.GameObject.Deserialize(JsonObject node)
+   at McpScript.Run(String exchangeDirectory, CancellationToken cancellationToken)
+   at McpScript.Run(String exchangeDirectory, CancellationToken cancellationToken)
+   at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+   at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+   at Editor.Mcp.ScriptTools.Run(String code, String path)
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext()
+   at Sandbox.Tasks.ExpirableSynchronizationContext.ProcessQueue()
+   at Sandbox.EngineLoop.RunAsyncTasks()
+   at Sandbox.EngineLoop.FrameEnd()
+   at Sandbox.EngineLoop.RunFrame(CMaterialSystem2AppSystemDict appDict, Boolean& wantsQuit)
+   at Sandbox.AppSystem.Run()
+   at Sandbox.Launcher.Main() in C:\actions-runner\_work\sbox\sbox\engine\Launcher\SboxDev\Launcher.cs:line 42
+   at Sandbox.Program.Launch() in C:\actions-runner\_work\sbox\sbox\engine\Launcher\Shared\Startup.cs:line 21
+   at Sandbox.Program.Main() in C:\actions-runner\_work\sbox\sbox\engine\Launcher\Shared\Startup.cs:line 16
+
+    System.Exception: Unable to read texture pixels
+    at Sandbox.IndirectLightVolume.LoadProbesFromRelocationTexture()
+    at Sandbox.IndirectLightVolume.OnEnabled()
+17:56:14 [Generic] Warn: NavMesh is already generating
+17:56:14 [Generic] Warn: NavMesh is already generating
+17:56:14 [Generic] Warn: NavMesh is already generating
+17:56:14 [Generic] Warn: NavMesh is already generating
+17:56:15 [Generic] Error: OnEnabled on Sandbox.IndirectLightVolume failed from Deserialize: Unable to read texture pixels
+   at Sandbox.CallbackBatch.Group.Execute(CallbackBatch parent)
+   at Sandbox.CallbackBatch.Execute()
+   at Sandbox.CallbackBatch.Dispose()
+   at Sandbox.Scene.Deserialize(JsonObject node, DeserializeOptions option)
+   at Sandbox.GameObject.Deserialize(JsonObject node)
+   at McpScript.Run(String exchangeDirectory, CancellationToken cancellationToken)
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext()
+   at Sandbox.Tasks.ExpirableSynchronizationContext.ProcessQueue()
+   at Sandbox.EngineLoop.RunAsyncTasks()
+   at Sandbox.EngineLoop.FrameEnd()
+   at Sandbox.EngineLoop.RunFrame(CMaterialSystem2AppSystemDict appDict, Boolean& wantsQuit)
+   at Sandbox.AppSystem.Run()
+   at Sandbox.Launcher.Main() in C:\actions-runner\_work\sbox\sbox\engine\Launcher\SboxDev\Launcher.cs:line 42
+   at Sandbox.Program.Launch() in C:\actions-runner\_work\sbox\sbox\engine\Launcher\Shared\Startup.cs:line 21
+   at Sandbox.Program.Main() in C:\actions-runner\_work\sbox\sbox\engine\Launcher\Shared\Startup.cs:line 16
+
+    System.Exception: Unable to read texture pixels
+    at Sandbox.IndirectLightVolume.LoadProbesFromRelocationTexture()
+    at Sandbox.IndirectLightVolume.OnEnabled()
+17:56:15 [Generic] Warn: NavMesh is already generating
+17:56:15 [Generic] Warn: NavMesh is already generating
+17:56:15 [Generic] Warn: NavMesh is already generating
+17:56:15 [Generic] Warn: NavMesh is already generating
+18:10:06 [Generic] Warn: Missing Component: couldn't find Component type ChargeStation on GameObject:charger_health
+18:10:06 [Generic] Warn: Missing Component: couldn't find Component type GrabAction on GameObject:charger_health
+18:10:06 [Generic] Warn: Missing Component: couldn't find Component type ChargeStation on GameObject:charger_health (1)
+18:10:06 [Generic] Warn: Missing Component: couldn't find Component type GrabAction on GameObject:charger_health (1)
+18:10:06 [Generic] Warn: Missing Component: couldn't find Component type ChargeStation on GameObject:charger_armour
+18:10:06 [Generic] Warn: Missing Component: couldn't find Component type GrabAction on GameObject:charger_armour
+18:10:06 [Generic] Warn: Missing Component: couldn't find Component type ChargeStation on GameObject:charger_armour (1)
+18:10:06 [Generic] Warn: Missing Component: couldn't find Component type GrabAction on GameObject:charger_armour (1)
+18:10:06 [Generic] Warn: Missing Component: couldn't find Component type InventoryPickup on GameObject:item_longjumpmodule
+18:10:06 [Generic] Warn: Missing Component: couldn't find Component type InventoryPickup on GameObject:item_gluon_gun
+18:10:06 [Generic] Error: OnEnabled on Sandbox.IndirectLightVolume failed from Load: Unable to read texture pixels
+   at Sandbox.CallbackBatch.Group.Execute(CallbackBatch parent)
+   at Sandbox.CallbackBatch.Execute()
+   at Sandbox.CallbackBatch.Dispose()
+   at Sandbox.Scene.Load(SceneLoadOptions options)
+   at Sandbox.Scene.Load(GameResource resource)
+   at McpScript.Run(String exchangeDirectory, CancellationToken cancellationToken)
+   at McpScript.Run(String exchangeDirectory, CancellationToken cancellationToken)
+   at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+   at System.RuntimeMethodHandle.InvokeMethod(ObjectHandleOnStack target, Void** arguments, ObjectHandleOnStack sig, BOOL isConstructor, ObjectHandleOnStack result)
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithFewArgs(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+   at System.Reflection.RuntimeMethodInfo.Invoke(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+   at Editor.Mcp.ScriptTools.Run(String code, String path)
+   at System.Threading.ExecutionContext.RunInternal(ExecutionContext executionContext, ContextCallback callback, Object state)
+   at System.Runtime.CompilerServices.AsyncTaskMethodBuilder`1.AsyncStateMachineBox`1.MoveNext()
+   at Sandbox.Tasks.ExpirableSynchronizationContext.ProcessQueue()
+   at Sandbox.EngineLoop.RunAsyncTasks()
+   at Sandbox.EngineLoop.FrameEnd()
+   at Sandbox.EngineLoop.RunFrame(CMaterialSystem2AppSystemDict appDict, Boolean& wantsQuit)
+   at Sandbox.AppSystem.Run()
+   at Sandbox.Launcher.Main() in C:\actions-runner\_work\sbox\sbox\engine\Launcher\SboxDev\Launcher.cs:line 42
+   at Sandbox.Program.Launch() in C:\actions-runner\_work\sbox\sbox\engine\Launcher\Shared\Startup.cs:line 21
+   at Sandbox.Program.Main() in C:\actions-runner\_work\sbox\sbox\engine\Launcher\Shared\Startup.cs:line 16
+
+    System.Exception: Unable to read texture pixels
+    at Sandbox.IndirectLightVolume.LoadProbesFromRelocationTexture()
+    at Sandbox.IndirectLightVolume.OnEnabled()
+18:12:34 [engine/ToolsStallMonitor] Warn: Stall detected.
+18:19:38 [engine/ResourceSystem] Warn: Error loading resource file "materials/cables/cable_metal_wire_a.vmat_c" (Error: ERROR_FILEOPEN: File not found) - from maps/depot/worldnodes/node000_lr0_b715_s_cb_vism0_mt_cable_metal_wire_a.vmesh
+18:19:40 [Generic] Warn: Missing Component: couldn't find Component type ChargeStation on GameObject:charger_health
+18:19:40 [Generic] Warn: Missing Component: couldn't find Component type GrabAction on GameObject:charger_health
+18:19:40 [Generic] Warn: Missing Component: couldn't find Component type ChargeStation on GameObject:charger_health (1)
+18:19:40 [Generic] Warn: Missing Component: couldn't find Component type GrabAction on GameObject:charger_health (1)
+18:19:40 [Generic] Warn: Missing Component: couldn't find Component type ChargeStation on GameObject:charger_armour
+18:19:40 [Generic] Warn: Missing Component: couldn't find Component type GrabAction on GameObject:charger_armour
+18:19:40 [Generic] Warn: Missing Component: couldn't find Component type ChargeStation on GameObject:charger_armour (1)
+18:19:40 [Generic] Warn: Missing Component: couldn't find Component type GrabAction on GameObject:charger_armour (1)
+18:19:40 [Generic] Warn: Missing Component: couldn't find Component type InventoryPickup on GameObject:item_longjumpmodule
+18:19:40 [Generic] Warn: Missing Component: couldn't find Component type InventoryPickup on GameObject:item_gluon_gun
+Cursor: 1084

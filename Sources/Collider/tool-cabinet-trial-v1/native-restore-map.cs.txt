@@ -1,0 +1,11 @@
+if(!Game.IsPlaying||Game.ActiveScene is null)throw new InvalidOperationException("Play session has not started");
+if(Networking.IsActive)throw new InvalidOperationException("Unexpected active network session; refusing to change its map");
+var root=Sandbox.Project.Current.GetRootPath();
+var folder=System.IO.Path.Combine(root,"output/asset-improvement-20261030/tool-cabinet/native-review-20261031");
+var previous=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"before-editor-state.json")));
+var path=previous["ActivePath"].GetValue<string>();
+if(path!="scenes/maps/spillway/spillway.scene")throw new InvalidOperationException("Unexpected previous runtime map");
+var map=ResourceLibrary.Get<SceneFile>(path);
+if(map is null)throw new InvalidOperationException("Previous runtime map not found");
+Game.ActiveScene.Load(map);
+return new {RequestedMap=path,Playing=Game.IsPlaying,NetworkingActive=Networking.IsActive};

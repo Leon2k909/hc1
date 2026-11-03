@@ -1,0 +1,27 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var folder=System.IO.Path.Combine(root,"output/spillway/waterline-fix-v1");
+var plan=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"install-plan.json")));
+var session=Editor.SceneEditorSession.Active;
+var before=new{EditorScene=session.Scene.Id,RuntimeScene=Game.ActiveScene?.Id,Game.IsPlaying,Dirty=session.HasUnsavedChanges};
+// This publishes only a Spillway visual asset and its offline Python generator.
+// Preserve any separately running map and never stop it to perform this import.
+if(Game.IsPlaying && (Game.ActiveScene?.Source?.ResourcePath?.Contains("/spillway/",StringComparison.OrdinalIgnoreCase)==true || Game.ActiveScene?.Name?.Equals("spillway",StringComparison.OrdinalIgnoreCase)==true))
+ throw new InvalidOperationException("Spillway itself is currently running; inspect before replacing its terrain");
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+foreach(var pair in plan["guards"].AsObject())
+ if(Hash(System.IO.Path.Combine(root,pair.Key))!=pair.Value.GetValue<string>())throw new InvalidOperationException("Input changed: "+pair.Key);
+var allowed=new[]{"Assets/models/maps/spillway/spillway_mountains.obj","Tools/spillway_landscape.py"};
+foreach(var pair in plan["files"].AsObject()) {
+ if(!allowed.Contains(pair.Key))throw new InvalidOperationException("Unexpected target");
+ if(Hash(System.IO.Path.Combine(folder,"stage",pair.Key))!=pair.Value.GetValue<string>())throw new InvalidOperationException("Stage changed: "+pair.Key);
+}
+foreach(var pair in plan["files"].AsObject()) {
+ var target=System.IO.Path.Combine(root,pair.Key);
+ System.IO.File.Copy(System.IO.Path.Combine(folder,"stage",pair.Key),target+".waterline-writing",true);
+ System.IO.File.Move(target+".waterline-writing",target,true);
+ if(pair.Key.StartsWith("Assets/"))Editor.AssetSystem.RegisterFile(target);
+}
+Editor.AssetSystem.RegisterFile(System.IO.Path.Combine(root,"Assets/models/maps/spillway/spillway_mountains.vmdl"));
+var result=new{Files=plan["files"].AsObject().Count,SceneChanged=false,CollisionChanged=false,OriginalTerrainPreserved=true,
+ UserStatePreserved=session.Scene.Id==before.EditorScene&&Game.ActiveScene?.Id==before.RuntimeScene&&Game.IsPlaying==before.IsPlaying&&session.HasUnsavedChanges==before.Dirty};
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"installed.json"),System.Text.Json.JsonSerializer.Serialize(result));return result;

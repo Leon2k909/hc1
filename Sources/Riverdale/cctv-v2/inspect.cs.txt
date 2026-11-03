@@ -1,0 +1,12 @@
+var scene = Game.ActiveScene;
+var editor = Editor.SceneEditorSession.Active?.Scene;
+return new {
+    Game.IsPlaying,
+    Scene = scene?.Name,
+    EditorScene = editor?.Name,
+    Models = scene.GetAllComponents<ModelRenderer>().Where(r => r.Model?.ResourcePath?.Contains("riverdale_hall_") == true)
+        .Select(r => new { r.GameObject.Name, r.Id, Path = r.Model.ResourcePath, Position = r.WorldPosition.ToString(), Rotation = r.WorldRotation.ToString() }).ToArray(),
+    Cameras = scene.GetAllComponents<CameraComponent>().Where(c => c.Enabled)
+        .Select(c => new { c.GameObject.Name, Position = c.WorldPosition.ToString(), Angles = c.WorldRotation.Angles().ToString(), c.FieldOfView }).ToArray(),
+    RootObjects = editor.GetAllObjects(true).Where(o => o.Parent == null).Select(o => o.Name).ToArray()
+};

@@ -1,4 +1,9 @@
 ## Picking up dropped guns (`PlayerPawn.Using.cs`)
+- Use targeting stops at the nearest solid trace hit (2026-11-03). `RunAll` includes objects behind walls, so
+  `GetUsables` now walks hits in distance order, returning the first valid usable or stopping at a solid obstruction.
+  Non-interactive trigger colliders remain transparent to interaction; interactive triggers can still be used.
+  Hover and pressing Use share this selection. `Tools/UseChecks` passes 32 offline regression checks against the
+  production interaction code; no editor or in-game check was performed.
 - E first tries the usual trace, then `FindDroppedEquipmentInView`: the dropped gun closest to the middle of your
   view, within `PickupReach` (96) and about 30 degrees of your aim, with a clear line of sight. A gun lying flat on the
   floor is too thin to hit with the trace. `DroppedEquipment` (`Code/Weapons/DroppedWeapon.cs`) centres its collider

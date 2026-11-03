@@ -10,6 +10,8 @@ public sealed class WeaponStatsRule : Component,
 {
 	void IGameEventHandler<KillEvent>.OnGameEvent( KillEvent eventArgs )
 	{
+		if ( !Networking.IsHost ) return;
+
 		var player = GameUtils.GetPlayerFromComponent( eventArgs.DamageInfo.Attacker );
 		if ( !player.IsValid() )
 			return;
@@ -18,8 +20,11 @@ public sealed class WeaponStatsRule : Component,
 		if ( !player.Client.IsValid() || player.Client.IsBot )
 			return;
 
+		if ( !KillStatRules.IsEnemyKill( eventArgs.DamageInfo ) )
+			return;
+
 		var inflictor = eventArgs.DamageInfo.Inflictor;
-		if ( inflictor is Equipment wpn && wpn.IsValid() )
+		if ( inflictor is Equipment wpn && wpn.IsValid() && wpn.Resource.IsValid() )
 		{
 			using ( Rpc.FilterInclude( player.Network.Owner ) )
 			{
@@ -34,7 +39,7 @@ public sealed class WeaponStatsRule : Component,
 		var resource = ResourceLibrary.Get<EquipmentResource>( resourcePath );
 		if ( resource is not null )
 		{
-			var isHeadshot = hitbox == HitboxTags.Head;
+			var isHeadshot = hitbox.HasFlag( HitboxTags.Head );
 
 			if ( isHeadshot )
 			{

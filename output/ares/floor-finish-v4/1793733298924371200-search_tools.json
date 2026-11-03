@@ -1,0 +1,34 @@
+{
+  "tools": [
+    {
+      "name": "get_editor_camera",
+      "title": "Get Editor Camera",
+      "toolset": "scene",
+      "description": "The editor scene camera's transform - where the scene viewport is looking from. Position, angles (pitch yaw roll) and field of view.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "Position": {
+            "type": "string"
+          },
+          "Angles": {
+            "type": "string"
+          },
+          "FieldOfView": {
+            "type": "number"
+          }
+        },
+        "required": []
+      }
+    }
+  ],
+  "total": 402
+}

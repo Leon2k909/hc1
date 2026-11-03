@@ -1424,6 +1424,9 @@ public static partial class GameText
 		["Red"] = "Червоний",
 		["Green"] = "Зелений",
 		["Blue"] = "Синій",
+		["Hue"] = "Відтінок",
+		["Saturation"] = "Насиченість",
+		["Brightness"] = "Яскравість",
 		["Search languages"] = "Пошук мови",
 		["No languages found"] = "Мов не знайдено",
 		// Custom game rules (CreateLobbyPage)

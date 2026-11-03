@@ -1,4 +1,4 @@
-"""Write capture_installed.cs.txt's config for one map, from what its scene file really holds: python check_config.py <project root> <boxyard|orion>
+"""Write capture_installed.cs.txt's config for one map, from what its scene file really holds: python check_config.py <project root> <boxyard|orion> [only this prop]
 
 Finds each placed prop by its model and aims a view and rays at it, using its own position, turn and scale. A ray that starts outside a prop's collision box and aims at its middle should stop at that box's face,
 so "expect" is the distance to the face the map's script gave it. The boxes are the old props' and the scripts didn't change them.
@@ -17,6 +17,7 @@ BOXES = {
     "ibc_tote": (19.7, 23.6, 45.8, 0.0),
     "wheelie_bin": (12.0, 16.25, 42.2, -0.25),
     "red_crate": (17.0, 22.0, 40.0, 0.0),
+    "tarp_pile": (32.0, 44.0, 62.4, 0.0),
 }
 SETUP = {
     "boxyard": dict(scene="Assets/scenes/maps/Boxyard/boxyard.scene", visual=["Sun", "Sky", "Fog", "Look", "Boxyard", "Lights", "Reflection Probes"], exposure=1.4),
@@ -49,7 +50,7 @@ for item in walk(scene["GameObjects"]):
         if component.get("__type") != "Sandbox.ModelRenderer" or not path:
             continue
         kind = next((k for k in BOXES if k in path), None)
-        if kind is None:
+        if kind is None or (len(sys.argv) > 3 and kind != sys.argv[3]):
             continue
         models.add(path)
         at = list(map(float, item["Position"].split(",")))

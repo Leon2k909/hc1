@@ -1,0 +1,279 @@
+{
+  "tools": [
+    {
+      "name": "get_selection",
+      "title": "Get Selection",
+      "toolset": "scene",
+      "description": "What's selected in the editor - the game objects and components the user (or you) has picked.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "GameObjects": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "Id": {
+                  "type": "string"
+                },
+                "Name": {
+                  "type": "string"
+                }
+              },
+              "required": []
+            }
+          },
+          "Components": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "Id": {
+                  "type": "string"
+                },
+                "Type": {
+                  "type": "string"
+                },
+                "GameObject": {
+                  "type": "string"
+                }
+              },
+              "required": []
+            }
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "hammer_get_node",
+      "title": "Get Node",
+      "toolset": "hammer",
+      "description": "Everything about one map node - transform, parent and children, and depending on its kind: an entity's class and every keyvalue, a mesh's face materials, a game object's id and components, or an instance's target.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The node id, from hammer_find_nodes or hammer_get_selection."
+          },
+          "includeComponentProperties": {
+            "type": "boolean",
+            "description": "Include the full serialized properties of a game object's components, not just their types.",
+            "default": false
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "Angles": {
+            "type": "string"
+          },
+          "Scale": {
+            "type": "string"
+          },
+          "ChildCount": {
+            "type": "integer"
+          },
+          "Children": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "Id": {
+                  "type": "integer"
+                },
+                "Kind": {
+                  "type": "string"
+                },
+                "Name": {
+                  "type": "string"
+                },
+                "ClassName": {
+                  "type": "string"
+                },
+                "Description": {
+                  "type": "string"
+                },
+                "Position": {
+                  "type": "string"
+                },
+                "Parent": {
+                  "type": "integer"
+                },
+                "GameObject": {
+                  "type": "string"
+                },
+                "Selected": {
+                  "type": "boolean"
+                },
+                "Visible": {
+                  "type": "boolean"
+                }
+              },
+              "required": []
+            }
+          },
+          "EntityClassTitle": {
+            "type": "string"
+          },
+          "KeyValues": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "Materials": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "Components": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "Type": {
+                  "type": "string"
+                },
+                "Id": {
+                  "type": "string"
+                },
+                "Enabled": {
+                  "type": "boolean"
+                },
+                "Properties": {}
+              },
+              "required": []
+            }
+          },
+          "Tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "InstanceTarget": {
+            "type": "integer"
+          },
+          "Id": {
+            "type": "integer"
+          },
+          "Kind": {
+            "type": "string"
+          },
+          "Name": {
+            "type": "string"
+          },
+          "ClassName": {
+            "type": "string"
+          },
+          "Description": {
+            "type": "string"
+          },
+          "Position": {
+            "type": "string"
+          },
+          "Parent": {
+            "type": "integer"
+          },
+          "GameObject": {
+            "type": "string"
+          },
+          "Selected": {
+            "type": "boolean"
+          },
+          "Visible": {
+            "type": "boolean"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "hammer_get_selection",
+      "title": "Get Selection",
+      "toolset": "hammer",
+      "description": "What's selected in Hammer - the selection mode (Groups, Objects, Meshes, Vertices, Edges, Faces...), the pivot position, and the selected nodes. In a component mode like Faces the nodes list is the objects owning the selection.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "Mode": {
+            "type": "string"
+          },
+          "Pivot": {
+            "type": "string"
+          },
+          "Count": {
+            "type": "integer"
+          },
+          "Nodes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "Id": {
+                  "type": "integer"
+                },
+                "Kind": {
+                  "type": "string"
+                },
+                "Name": {
+                  "type": "string"
+                },
+                "ClassName": {
+                  "type": "string"
+                },
+                "Description": {
+                  "type": "string"
+                },
+                "Position": {
+                  "type": "string"
+                },
+                "Parent": {
+                  "type": "integer"
+                },
+                "GameObject": {
+                  "type": "string"
+                },
+                "Selected": {
+                  "type": "boolean"
+                },
+                "Visible": {
+                  "type": "boolean"
+                }
+              },
+              "required": []
+            }
+          }
+        },
+        "required": []
+      }
+    }
+  ],
+  "total": 402
+}

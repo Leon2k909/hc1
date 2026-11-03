@@ -1,0 +1,41 @@
+{
+  "name": "set_tags",
+  "title": "Set Tags",
+  "toolset": "bridge_gameobject",
+  "description": "Add, remove, and/or clear gameplay tags on one object (id) or many (ids). Tags drive collision groups, queries, and triggers.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "description": "Single GameObject GUID."
+      },
+      "ids": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "Multiple GameObject GUIDs."
+      },
+      "add": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "Tags to add."
+      },
+      "remove": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "Tags to remove."
+      },
+      "clear": {
+        "type": "boolean",
+        "description": "Remove all existing tags first."
+      }
+    },
+    "required": []
+  }
+}

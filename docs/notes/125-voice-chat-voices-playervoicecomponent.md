@@ -20,6 +20,12 @@
     muting someone did nothing.
   - `PlayerVoiceComponent.ShouldHearVoice` now drops a muted player's voice as it arrives: the engine asks it, with
     `Rpc.Caller`, before playing.
+  - Persistent mutes (2026-11-03): `CommunicationMuteState` saves text and voice independently in versioned cookies
+    scoped to the local Steam account and muted player's Steam ID. They reload after restarting or reconnecting;
+    account changes clear the in-memory cache. Each player's saved values are read once per account, keeping voice
+    lookups cheap. Players without a Steam ID can still be muted temporarily, without saving a connection/client ID.
+    All 23 offline persistence checks passed (restart, reconnect, account isolation, unmute, caching and temporary
+    identities). No editor was used; live voice/chat verification is pending.
 - `dev_voices_sample` adds made-up rows (you, a squadmate, a dead enemy, a spectator) to check the layout.
 - Not yet checked in-game. The list, the meter's gain and the mute fix compiled (2026-09-28), but nobody has talked with
   them yet.

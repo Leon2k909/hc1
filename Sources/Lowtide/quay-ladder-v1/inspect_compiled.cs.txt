@@ -1,0 +1,1 @@
+return new[]{"models/maps/lowtide/quay-ladder-v1/quay_ladder.vmdl","models/maps/lowtide/quay-ladder-v1/east_without_ladder.vmdl"}.Select(path=> {var model=Model.Load(path);return new {Path=path,model.IsError,Bounds=model.Bounds.ToString(),Materials=model.Materials.Select(m=>m.ResourcePath).ToArray()};}).ToArray();

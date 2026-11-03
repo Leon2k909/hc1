@@ -1,0 +1,2448 @@
+{
+  "sceneName": "spillway",
+  "objectCount": 285,
+  "maxDepth": 2,
+  "hierarchy": [
+    {
+      "id": "d13dadeb-e681-5b28-bf07-5099e7181750",
+      "name": "Scene Information",
+      "enabled": true,
+      "components": [
+        "SceneInformation",
+        "MapInformation",
+        "MapSpawnSettings"
+      ],
+      "children": []
+    },
+    {
+      "id": "7c147abb-de95-5f05-b70d-b4265ba54312",
+      "name": "Minimap Renderer",
+      "enabled": true,
+      "components": [
+        "MinimapRenderer"
+      ],
+      "children": [
+        {
+          "id": "4c373d2f-64f7-4fe9-9ecb-42df6ff672fd",
+          "name": "GameObject",
+          "enabled": true,
+          "components": [
+            "CameraComponent"
+          ],
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "faff56ce-e2c2-5183-9977-298bea3a8309",
+      "name": "Sun",
+      "enabled": true,
+      "components": [
+        "DirectionalLight"
+      ],
+      "children": []
+    },
+    {
+      "id": "43b54e42-26b3-5a5f-b743-c43c90b3bb1f",
+      "name": "Sky",
+      "enabled": true,
+      "components": [
+        "SkyBox2D"
+      ],
+      "children": []
+    },
+    {
+      "id": "5de43c42-9e35-5ccc-a782-187adf7bb19e",
+      "name": "Fog",
+      "enabled": true,
+      "components": [
+        "GradientFog"
+      ],
+      "children": []
+    },
+    {
+      "id": "9999ab98-92f6-5525-b5c6-4a43464d27a2",
+      "name": "Look",
+      "enabled": true,
+      "components": [
+        "PostProcessVolume",
+        "AmbientOcclusion",
+        "ColorGrading",
+        "Vignette",
+        "Bloom",
+        "ScreenSpaceReflections",
+        "Tonemapping"
+      ],
+      "children": []
+    },
+    {
+      "id": "e267eddd-1392-52d2-ac77-58c544508092",
+      "name": "Spillway",
+      "enabled": true,
+      "components": [],
+      "children": [
+        {
+          "id": "0c39e332-e571-5570-8a07-77c602b4bfb8",
+          "name": "Ground",
+          "enabled": true,
+          "components": [
+            "ModelRenderer",
+            "ModelCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "7215c15b-ddcf-546b-be2e-25c4eed535c5",
+          "name": "West",
+          "enabled": true,
+          "components": [
+            "ModelRenderer",
+            "ModelCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "1f6d9bdb-7809-58bc-907a-a3e857835af1",
+          "name": "East",
+          "enabled": true,
+          "components": [
+            "ModelRenderer",
+            "ModelCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "7db7acdb-098d-55c4-85ef-76ed47df20a2",
+          "name": "Control",
+          "enabled": true,
+          "components": [
+            "ModelRenderer",
+            "ModelCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "1705b3df-5335-5c0b-b520-8fd730284627",
+          "name": "Cargo",
+          "enabled": true,
+          "components": [
+            "ModelRenderer",
+            "ModelCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "30061ec4-3295-5940-a706-8e27708df6aa",
+          "name": "Dam",
+          "enabled": true,
+          "components": [
+            "ModelRenderer"
+          ],
+          "children": []
+        },
+        {
+          "id": "a8d72b93-79fa-527f-8fe4-81ebd564bb8a",
+          "name": "Falls",
+          "enabled": true,
+          "components": [
+            "ModelRenderer"
+          ],
+          "children": []
+        },
+        {
+          "id": "7990548c-edeb-5590-ad83-55ae1c6e124c",
+          "name": "Mountains",
+          "enabled": true,
+          "components": [
+            "ModelRenderer"
+          ],
+          "children": []
+        },
+        {
+          "id": "385d3dbe-eb1e-5b2c-bcf3-997859cd3212",
+          "name": "Forest",
+          "enabled": true,
+          "components": [
+            "ModelRenderer"
+          ],
+          "children": []
+        },
+        {
+          "id": "32e59cd4-3f3c-534c-937d-2adf0644f57d",
+          "name": "Backdrop",
+          "enabled": true,
+          "components": [
+            "ModelRenderer"
+          ],
+          "children": []
+        },
+        {
+          "id": "65e8e56d-55bc-5f2d-af14-8580dd55003b",
+          "name": "River",
+          "enabled": true,
+          "components": [
+            "ModelRenderer",
+            "LowtideWaterReflections"
+          ],
+          "children": []
+        },
+        {
+          "id": "914945fc-36c8-5507-81fe-c1276bd94334",
+          "name": "Control Desk 1",
+          "enabled": true,
+          "components": [
+            "ModelRenderer",
+            "ModelCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "5657be53-827d-53aa-8cc4-5ca2a2e66e8d",
+          "name": "Control Desk 2",
+          "enabled": true,
+          "components": [
+            "ModelRenderer",
+            "ModelCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "13041ff9-a84c-5694-8afa-4c4cf4dd88cb",
+          "name": "Control Desk 3",
+          "enabled": true,
+          "components": [
+            "ModelRenderer",
+            "ModelCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "9f1a7e94-54af-539e-a4d2-fd57c23d0a46",
+          "name": "Control Desk 4",
+          "enabled": true,
+          "components": [
+            "ModelRenderer",
+            "ModelCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "637e1125-3f25-59c2-bc62-630135b52d76",
+          "name": "Yard Pallet 1",
+          "enabled": true,
+          "components": [
+            "ModelRenderer",
+            "ModelCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "bb060c31-d066-5502-a5c2-f05e53fc764a",
+          "name": "Yard Pallet 2",
+          "enabled": true,
+          "components": [
+            "ModelRenderer",
+            "ModelCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "b05c66d9-0cdd-59a0-b5c9-15906d7bc1b8",
+          "name": "Yard Pallet 3",
+          "enabled": true,
+          "components": [
+            "ModelRenderer",
+            "ModelCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "ea4fab28-9cde-59b5-9de7-f05894c10b27",
+          "name": "Yard Pallet 4",
+          "enabled": true,
+          "components": [
+            "ModelRenderer",
+            "ModelCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "68feead7-4352-516b-ad62-4ef23c5184a6",
+          "name": "B2 Canvas Cover",
+          "enabled": true,
+          "components": [
+            "ModelRenderer"
+          ],
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "500c54cb-499c-5198-9852-5c3ac5ca1488",
+      "name": "Lights",
+      "enabled": true,
+      "components": [],
+      "children": [
+        {
+          "id": "ca7eeef9-8930-5df6-aa55-3718b9747df0",
+          "name": "Turbine interior 360",
+          "enabled": true,
+          "components": [
+            "PointLight"
+          ],
+          "children": []
+        },
+        {
+          "id": "0b81b9f2-7e69-5e52-8636-6967305b85f0",
+          "name": "Turbine interior 850",
+          "enabled": true,
+          "components": [
+            "PointLight"
+          ],
+          "children": []
+        },
+        {
+          "id": "4201bc7b-d9c2-5953-8041-64ff29d73767",
+          "name": "Turbine east 300",
+          "enabled": true,
+          "components": [
+            "PointLight"
+          ],
+          "children": []
+        },
+        {
+          "id": "e71b4319-7453-54bf-a3b9-104bbfceb0c6",
+          "name": "Turbine east 600",
+          "enabled": true,
+          "components": [
+            "PointLight"
+          ],
+          "children": []
+        },
+        {
+          "id": "7aea3756-d4d6-58cc-bb5d-fc7c45565942",
+          "name": "Turbine east 900",
+          "enabled": true,
+          "components": [
+            "PointLight"
+          ],
+          "children": []
+        },
+        {
+          "id": "a2e95617-b30d-5957-aa59-d4d368731506",
+          "name": "Turbine east 1200",
+          "enabled": true,
+          "components": [
+            "PointLight"
+          ],
+          "children": []
+        },
+        {
+          "id": "a6142a1d-1a3f-55cc-a3e6-638baa6f6c44",
+          "name": "Red shelter",
+          "enabled": true,
+          "components": [
+            "PointLight"
+          ],
+          "children": []
+        },
+        {
+          "id": "68d68233-0111-5f6c-b079-a425dd42b0a9",
+          "name": "Tower west 20",
+          "enabled": true,
+          "components": [
+            "PointLight"
+          ],
+          "children": []
+        },
+        {
+          "id": "25c51ff8-64ad-55f1-a8f2-75a88e11ee6d",
+          "name": "Tower west 430",
+          "enabled": true,
+          "components": [
+            "PointLight"
+          ],
+          "children": []
+        },
+        {
+          "id": "a26d4efc-8953-58de-a9a5-a7cb4c13c0e4",
+          "name": "Pumps interior",
+          "enabled": true,
+          "components": [
+            "PointLight"
+          ],
+          "children": []
+        },
+        {
+          "id": "da8eb3df-c692-58e1-8ac4-16d24bdd0da9",
+          "name": "B2 shelter",
+          "enabled": true,
+          "components": [
+            "PointLight"
+          ],
+          "children": []
+        },
+        {
+          "id": "98f55961-642b-5294-9f2a-572acdb2f59f",
+          "name": "A1 porch -110",
+          "enabled": true,
+          "components": [
+            "PointLight"
+          ],
+          "children": []
+        },
+        {
+          "id": "2456e5c2-26c1-57f0-b818-712e429b4653",
+          "name": "A1 porch 180",
+          "enabled": true,
+          "components": [
+            "PointLight"
+          ],
+          "children": []
+        },
+        {
+          "id": "9ce3493c-7cf2-5424-97c6-bcec81938263",
+          "name": "A1 porch 480",
+          "enabled": true,
+          "components": [
+            "PointLight"
+          ],
+          "children": []
+        },
+        {
+          "id": "4ca2a06d-eb51-5e76-b141-f8bbef36eb5a",
+          "name": "A1 lower 900",
+          "enabled": true,
+          "components": [
+            "PointLight"
+          ],
+          "children": []
+        },
+        {
+          "id": "6d0c6402-a81a-5120-ace5-e427278ce29e",
+          "name": "Control upper 900",
+          "enabled": true,
+          "components": [
+            "PointLight"
+          ],
+          "children": []
+        },
+        {
+          "id": "3c055c4a-d34a-500b-9f92-4525a394c38a",
+          "name": "A1 lower 1230",
+          "enabled": true,
+          "components": [
+            "PointLight"
+          ],
+          "children": []
+        },
+        {
+          "id": "524f6fe3-7c9f-5e34-a204-beeb9aa906fb",
+          "name": "Control upper 1230",
+          "enabled": true,
+          "components": [
+            "PointLight"
+          ],
+          "children": []
+        },
+        {
+          "id": "63468974-d6e9-574d-8325-d083b1afe9e8",
+          "name": "Stair core entrance",
+          "enabled": true,
+          "components": [
+            "PointLight"
+          ],
+          "children": []
+        },
+        {
+          "id": "fa657277-2a92-5aff-85bf-4eb1f24d47e6",
+          "name": "Yard mast 570 -35",
+          "enabled": true,
+          "components": [
+            "PointLight"
+          ],
+          "children": []
+        },
+        {
+          "id": "c921d8aa-35b8-5485-956e-33b358f76d10",
+          "name": "Yard mast 570 35",
+          "enabled": true,
+          "components": [
+            "PointLight"
+          ],
+          "children": []
+        },
+        {
+          "id": "f40cf21d-54a2-5e4a-b8fd-e8ee79dc5ee5",
+          "name": "Yard mast -1110 -35",
+          "enabled": true,
+          "components": [
+            "PointLight"
+          ],
+          "children": []
+        },
+        {
+          "id": "9d7fd1d9-fccd-5f0b-89f7-c678cbf5b653",
+          "name": "Yard mast -1110 35",
+          "enabled": true,
+          "components": [
+            "PointLight"
+          ],
+          "children": []
+        },
+        {
+          "id": "41960ad6-f30c-5cb6-8273-187781bc0f46",
+          "name": "Yard mast 1290 -35",
+          "enabled": true,
+          "components": [
+            "PointLight"
+          ],
+          "children": []
+        },
+        {
+          "id": "e2c8dfe4-ea6b-52d1-96ad-f56a0cb9763b",
+          "name": "Yard mast 1290 35",
+          "enabled": true,
+          "components": [
+            "PointLight"
+          ],
+          "children": []
+        },
+        {
+          "id": "fb352a69-e54f-5af0-8e68-2d923ee6fec1",
+          "name": "Yard mast 1630 -35",
+          "enabled": true,
+          "components": [
+            "PointLight"
+          ],
+          "children": []
+        },
+        {
+          "id": "36a305bc-ae95-50a9-91cb-1979abeefcc4",
+          "name": "Yard mast 1630 35",
+          "enabled": true,
+          "components": [
+            "PointLight"
+          ],
+          "children": []
+        },
+        {
+          "id": "fcb6c68c-f7c0-55bc-9971-2b1d5345b164",
+          "name": "Turbine fill west",
+          "enabled": true,
+          "components": [
+            "PointLight"
+          ],
+          "children": []
+        },
+        {
+          "id": "427d09b4-19ee-50a8-91fb-6fa50d5b7e99",
+          "name": "Turbine fill east",
+          "enabled": true,
+          "components": [
+            "PointLight"
+          ],
+          "children": []
+        },
+        {
+          "id": "c73321e3-dc42-547a-bd70-5775d859d027",
+          "name": "Tower fill low",
+          "enabled": true,
+          "components": [
+            "PointLight"
+          ],
+          "children": []
+        },
+        {
+          "id": "a0bf7d8f-4673-516f-8be9-0f8ac9f80ffd",
+          "name": "Tower fill high",
+          "enabled": true,
+          "components": [
+            "PointLight"
+          ],
+          "children": []
+        },
+        {
+          "id": "68da04db-0936-50d7-8cc8-9005e32499fc",
+          "name": "Pumps fill",
+          "enabled": true,
+          "components": [
+            "PointLight"
+          ],
+          "children": []
+        },
+        {
+          "id": "42708fbf-b010-5e8b-971e-8684e17f9a18",
+          "name": "Red shelter fill",
+          "enabled": true,
+          "components": [
+            "PointLight"
+          ],
+          "children": []
+        },
+        {
+          "id": "a4d72b8d-afd4-5658-982b-db6c9c49191f",
+          "name": "B2 shelter fill",
+          "enabled": true,
+          "components": [
+            "PointLight"
+          ],
+          "children": []
+        },
+        {
+          "id": "36541ed2-22de-58a4-8584-c3da53f1bc6a",
+          "name": "Control lower fill",
+          "enabled": true,
+          "components": [
+            "PointLight"
+          ],
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "8d82152b-8c87-5c50-b344-44928000e570",
+      "name": "Reflection Probes",
+      "enabled": true,
+      "components": [],
+      "children": [
+        {
+          "id": "12001003-e6c7-5f72-a693-8bdf9131c320",
+          "name": "Probe Yard",
+          "enabled": true,
+          "components": [
+            "EnvmapProbe"
+          ],
+          "children": []
+        },
+        {
+          "id": "2da2af69-f08c-57d9-85e3-84f38b7cc937",
+          "name": "Probe Turbine",
+          "enabled": true,
+          "components": [
+            "EnvmapProbe"
+          ],
+          "children": []
+        },
+        {
+          "id": "8da29448-b33e-53f4-a0bd-f5fa795eeead",
+          "name": "Probe Control lower",
+          "enabled": true,
+          "components": [
+            "EnvmapProbe"
+          ],
+          "children": []
+        },
+        {
+          "id": "6df82235-3fd0-5d2a-a00b-66c858f4670f",
+          "name": "Probe Control upper",
+          "enabled": true,
+          "components": [
+            "EnvmapProbe"
+          ],
+          "children": []
+        },
+        {
+          "id": "26eb95ff-5c80-557b-bde2-f5bb7f4c3f05",
+          "name": "Probe Pump room",
+          "enabled": true,
+          "components": [
+            "EnvmapProbe"
+          ],
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "4b0d93f3-ef23-52bf-8141-6751fa24a9e1",
+      "name": "Volumetric Fog",
+      "enabled": true,
+      "components": [],
+      "children": [
+        {
+          "id": "59a05eb0-15bc-565f-9465-a03e3d452a9d",
+          "name": "Dam spray",
+          "enabled": true,
+          "components": [
+            "VolumetricFogVolume"
+          ],
+          "children": []
+        },
+        {
+          "id": "08bd4339-c6f8-5b26-98a1-2469abb42fbf",
+          "name": "Tailrace mist",
+          "enabled": true,
+          "components": [
+            "VolumetricFogVolume"
+          ],
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "50e470ed-6c66-59fe-aa6d-f56c91a86ed2",
+      "name": "Team Spawns",
+      "enabled": true,
+      "components": [
+        "GameModeObject"
+      ],
+      "children": [
+        {
+          "id": "1dde69c3-58d6-55a1-80d8-f219f23a1007",
+          "name": "Red Spawn 1",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "bd15e921-e633-5d5e-83d2-d86709f5a2c0",
+          "name": "Red Spawn 2",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "615abd9b-10d5-5b8d-b1ae-020708ba3512",
+          "name": "Red Spawn 3",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "ecd24cc2-a8f0-5a13-8758-cbf6f18c79c5",
+          "name": "Red Spawn 4",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "0a098852-d3f0-5eed-b808-aa9ac983e1ee",
+          "name": "Red Spawn 5",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "e97c6115-37e0-515f-8e3d-4dcd972f61d5",
+          "name": "Red Spawn 6",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "e9a85331-530d-5718-8aa1-7a2da2084ddd",
+          "name": "Red Spawn 7",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "5e59615f-b6e9-5d5d-a286-ac9a8a355820",
+          "name": "Red Spawn 8",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "8095fcfd-5b1f-5018-bad1-21da92beee91",
+          "name": "Red Spawn 9",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "8e7916ab-26ed-52ef-bf4e-f12a9a9c3f2e",
+          "name": "Red Spawn 10",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "a6ad3c7e-8104-570e-b57a-3314e5abdbe1",
+          "name": "Red Spawn 11",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "2e04d8ea-ae45-5abe-9b58-6bef59ce2e38",
+          "name": "Red Spawn 12",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "70021831-21de-5659-87f5-3b55fbcd85e4",
+          "name": "Blue Spawn 1",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "7d31fdec-15ba-54a8-a4f2-b0ed536f0461",
+          "name": "Blue Spawn 2",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "2b4adf46-184c-5720-be0a-a0d9f0100b57",
+          "name": "Blue Spawn 3",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "2258530c-6183-5729-867e-142becfcc091",
+          "name": "Blue Spawn 4",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "d39767fc-1264-5949-b4ce-ff4df91eefac",
+          "name": "Blue Spawn 5",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "432dd3c5-f91f-54f5-8018-7d252b06336d",
+          "name": "Blue Spawn 6",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "f122d5f1-f332-5230-906e-6c9f8fc611a8",
+          "name": "Blue Spawn 7",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "43eaeb8a-5cda-5051-bbd9-8f747e08b30b",
+          "name": "Blue Spawn 8",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "d250f83c-5e87-512a-b75e-1ae5f0838e1c",
+          "name": "Blue Spawn 9",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "3ed6be53-6942-5d86-89cb-efe89f00b908",
+          "name": "Blue Spawn 10",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "0d9c35b0-6ae2-5f10-a6a0-3bfd0a4c1eee",
+          "name": "Blue Spawn 11",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "184bf3f5-6ead-510b-b0dd-8cc6b3cef7e9",
+          "name": "Blue Spawn 12",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "e35aa7b7-6ce0-50ca-a205-3d463752b305",
+      "name": "Deathmatch Spawns",
+      "enabled": true,
+      "components": [
+        "GameModeObject"
+      ],
+      "children": [
+        {
+          "id": "f2a04c07-a081-5808-9b24-cad800ce5d5a",
+          "name": "DM Spawn 1",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "6c3a45f9-5488-5221-a28f-8fb4cf2e1df2",
+          "name": "DM Spawn 2",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "10c25bcb-48af-5fd1-8cea-0082243113c5",
+          "name": "DM Spawn 3",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "5cabfacf-62da-515f-9751-4d6970f4124d",
+          "name": "DM Spawn 4",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "793db86e-8879-5731-a336-c263a36bb30a",
+          "name": "DM Spawn 5",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "24a37260-08d7-5c37-9ee4-ada47c3227a1",
+          "name": "DM Spawn 6",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "5225cabd-2566-50fa-bc3e-0722673f0101",
+          "name": "DM Spawn 7",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "ac3e2101-85f9-537d-a8e1-898b954c54ed",
+          "name": "DM Spawn 8",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "d1c1093d-2b43-5246-8e71-da9b000754ca",
+          "name": "DM Spawn 9",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "d7845040-c110-5341-a6c7-12f1cba69180",
+          "name": "DM Spawn 10",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "8236aa14-f0c7-5a5f-86ff-ede9aae40455",
+          "name": "DM Spawn 11",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "ae33cfe5-b8b1-56e9-9ca5-11ae6cb51382",
+          "name": "DM Spawn 12",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "ac9e3335-c423-5e1a-9c2f-6c2ca7426475",
+          "name": "DM Spawn 13",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "a4c785e9-e758-509b-ab41-6bdfba8d69b9",
+          "name": "DM Spawn 14",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "1e121296-7779-5c87-b213-777f7a2eef93",
+          "name": "DM Spawn 15",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "97f4609b-4fa9-5e77-94be-912b062dcc80",
+          "name": "DM Spawn 16",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "80d12085-cad9-588c-8a80-e27b8a6efd89",
+          "name": "DM Spawn 17",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "c894a302-858a-5d70-a7ef-a47806edcbb2",
+          "name": "DM Spawn 18",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "a799828e-1cf7-59e6-a091-086d84eca48e",
+      "name": "Retakes Spawns",
+      "enabled": true,
+      "components": [
+        "GameModeObject"
+      ],
+      "children": [
+        {
+          "id": "9d000581-958b-5b3c-8b03-b98c4ef447b5",
+          "name": "bombsite_a planter 1",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "c86e08e9-0dbd-517f-b7bc-3175aeb90217",
+          "name": "bombsite_a planter 2",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "63b7dfd2-3ea8-5cc8-8cd4-454e362aedc4",
+          "name": "bombsite_a defender 1",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "4ecad69f-f1d1-54a3-94b9-314c3da6ba5f",
+          "name": "bombsite_a defender 2",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "b3766ce3-594e-5d7d-9717-851d0e4fda89",
+          "name": "bombsite_a defender 3",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "c8a2756d-cdeb-5279-9be4-e6ae8fa4f54a",
+          "name": "bombsite_a attacker 1",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "6f889cba-7b07-5861-bd92-dacbed03b0e3",
+          "name": "bombsite_a attacker 2",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "50c06e36-ae72-59f8-bb09-7d834e5fe456",
+          "name": "bombsite_a attacker 3",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "6f1ff62d-d80b-51ee-9346-91a7dadca5cb",
+          "name": "bombsite_a attacker 4",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "d52ff0e5-9ea9-50dd-b296-4276e01efc84",
+          "name": "bombsite_a attacker 5",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "f3245f1e-5fb4-5a98-ab10-f7bb2812d27b",
+          "name": "bombsite_a attacker 6",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "075fec43-4169-547e-9a02-6a7b3dce536e",
+          "name": "bombsite_b planter 1",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "8fbe3817-0e49-58dc-a176-ba660e69636a",
+          "name": "bombsite_b planter 2",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "26b46b3c-c816-5b27-a034-66111f318bb1",
+          "name": "bombsite_b defender 1",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "8431c58b-b5e6-51dd-b516-d74fbfd015ec",
+          "name": "bombsite_b defender 2",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "35df208d-adb8-5efb-96e0-bc62f55cf44a",
+          "name": "bombsite_b defender 3",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "1f48ab24-2911-5ac9-b3b2-d1300661aef1",
+          "name": "bombsite_b attacker 1",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "431892ef-6812-5037-955a-9edc2a198a15",
+          "name": "bombsite_b attacker 2",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "20a77c4f-6331-5db1-911e-fb1620bc86cd",
+          "name": "bombsite_b attacker 3",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "28e38483-b702-5f0e-95ba-1e286c94f1b2",
+          "name": "bombsite_b attacker 4",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "4b11a152-720f-5aed-88a3-358f6d2d7256",
+          "name": "bombsite_b attacker 5",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        },
+        {
+          "id": "b164cc02-bd27-5f8c-bbc5-0da2c2bb51c0",
+          "name": "bombsite_b attacker 6",
+          "enabled": true,
+          "components": [
+            "TeamSpawnPoint"
+          ],
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "4290aef8-875d-5799-9b4c-8aa0cca9bc54",
+      "name": "Bomb Sites",
+      "enabled": true,
+      "components": [],
+      "children": [
+        {
+          "id": "da411db3-fadb-5f2e-bad2-38e8c6069641",
+          "name": "bombsite_a",
+          "enabled": true,
+          "components": [
+            "BombSite",
+            "Zone",
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "1fcc80ce-cc04-5b16-a449-a37edb78239d",
+          "name": "bombsite_b",
+          "enabled": true,
+          "components": [
+            "BombSite",
+            "Zone",
+            "BoxCollider"
+          ],
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "b4f9cadc-1769-545d-9eca-b525380d8ad9",
+      "name": "Buy Zones",
+      "enabled": true,
+      "components": [],
+      "children": [
+        {
+          "id": "0cf228df-6db9-5081-a679-596230480be9",
+          "name": "buyzone_t",
+          "enabled": true,
+          "components": [
+            "BuyZone",
+            "Zone",
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "5f2344bf-4d04-53e1-b6b7-0117a1b040c8",
+          "name": "buyzone_ct",
+          "enabled": true,
+          "components": [
+            "BuyZone",
+            "Zone",
+            "BoxCollider"
+          ],
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "dadc9388-16d5-5569-97fe-e3e28f6286d0",
+      "name": "Callouts",
+      "enabled": true,
+      "components": [],
+      "children": [
+        {
+          "id": "d417083a-b941-5443-9194-d713e780dad5",
+          "name": "RED / GENERATORS",
+          "enabled": true,
+          "components": [
+            "MapLocation",
+            "Zone",
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "9acc4995-7cab-5dce-9efc-6d50aca7d8bf",
+          "name": "TURBINE HALL",
+          "enabled": true,
+          "components": [
+            "MapLocation",
+            "Zone",
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "908944d1-dbea-593e-94e8-800ccd5cc51c",
+          "name": "WEST RACE",
+          "enabled": true,
+          "components": [
+            "MapLocation",
+            "Zone",
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "b1f62223-fef5-5622-babc-f809dc16be7f",
+          "name": "CARGO YARD",
+          "enabled": true,
+          "components": [
+            "MapLocation",
+            "Zone",
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "e34cfa35-1afb-53cc-a1b6-2790175aeb2c",
+          "name": "A1 / CONTROL",
+          "enabled": true,
+          "components": [
+            "MapLocation",
+            "Zone",
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "c115e1f5-42ab-591d-9473-432a64c943b6",
+          "name": "A1 / SERVICE",
+          "enabled": true,
+          "components": [
+            "MapLocation",
+            "Zone",
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "866fbd74-793e-5bd9-ae53-a8e4c21d4266",
+          "name": "B2 / LOADING",
+          "enabled": true,
+          "components": [
+            "MapLocation",
+            "Zone",
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "ff0fb029-e567-5c32-8c69-fbddb9c77f72",
+          "name": "EAST RACE",
+          "enabled": true,
+          "components": [
+            "MapLocation",
+            "Zone",
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "f9074613-c3c7-54df-8955-8760bad4ca5f",
+          "name": "PUMP HOUSE",
+          "enabled": true,
+          "components": [
+            "MapLocation",
+            "Zone",
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "cf935f1e-b12c-5a21-8f96-6a749353a1a3",
+          "name": "DAM ACCESS",
+          "enabled": true,
+          "components": [
+            "MapLocation",
+            "Zone",
+            "BoxCollider"
+          ],
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "28447e49-87d5-55a4-afe6-bd3dcc49088b",
+      "name": "Play Area",
+      "enabled": true,
+      "components": [
+        "Zone",
+        "PlayArea",
+        "BoxCollider"
+      ],
+      "children": []
+    },
+    {
+      "id": "171090c7-59e5-5480-94c3-c8a406b4a83f",
+      "name": "Player Clips",
+      "enabled": true,
+      "components": [],
+      "children": [
+        {
+          "id": "f4a589a3-2818-559a-bd2b-c122ccb392d7",
+          "name": "Player Clip waterside 0",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "094b250a-9ab9-5ca4-b4b0-dd4a2bd3a8a3",
+          "name": "Player Clip waterside 1",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "3d04252a-7894-55c9-9cac-098e8b9dc1d8",
+          "name": "Player Clip waterside 2",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "d119240e-45eb-5dfa-b653-9c81c7949497",
+          "name": "Player Clip waterside 3",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "cd5747fe-b797-5bee-9f99-5d7ac7d2845e",
+          "name": "Player Clip waterside 4",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "d6ca1d14-76a0-550c-82eb-7a38ded163a5",
+          "name": "Player Clip waterside 5",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "784a57af-f70f-52b1-b1c5-dd3e463bbd64",
+          "name": "Player Clip waterside 6",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "e2984206-4b0a-5960-87ec-f8337eebaa66",
+          "name": "Player Clip waterside 7",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "7b3b3206-c65c-57b4-96f5-a565b58d2926",
+          "name": "Player Clip waterside 8",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "d81fb22e-f7f9-58d6-a4c3-83098a64cd2c",
+          "name": "Player Clip waterside 9",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "8f31d4db-c30b-55ec-9018-1b8bf6758e83",
+          "name": "Player Clip waterside 10",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "0758e659-55b8-5cd4-93a3-e3082599bcf1",
+          "name": "Player Clip waterside 11",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "13154568-2f92-523f-b04e-7e53370fffa5",
+          "name": "Player Clip B2 north rail 12",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "5eb1ade1-3dc2-5b45-a7ff-24942e414077",
+          "name": "Player Clip B2 north rail 13",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "e2170ad2-32a7-5bb6-80f5-a32667fc2796",
+          "name": "Player Clip B2 west rail 14",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "019fdc84-36a4-56db-98d7-bc3b005114d3",
+          "name": "Player Clip B2 west rail 15",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "f06df390-bbf0-501a-adf5-545c9f812003",
+          "name": "Player Clip waterside 16",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "7186c6bf-ffc2-56e4-8461-c50792ae5735",
+          "name": "Player Clip waterside 17",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "7a76b4d5-d638-5800-bd90-734d3175d2e8",
+          "name": "Player Clip waterside 18",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "edffabfb-2a8c-5abf-9393-2ff065e769fb",
+          "name": "Player Clip waterside 19",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "86ba2cc0-fb39-5c7a-bf40-5d7ee8db2a82",
+          "name": "Player Clip waterside 20",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "f006c4d7-1334-5f5a-b9f4-91873079f971",
+          "name": "Player Clip waterside 21",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "bdce37f3-1b19-5eb5-83e4-7d60c1ba53b1",
+          "name": "Player Clip waterside 22",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "146404ab-e73b-5503-8cc4-fd8641561c7f",
+          "name": "Player Clip waterside 23",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "3fb5ce5e-aa09-5003-af45-e682cbf77930",
+          "name": "Player Clip waterside 24",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "12844356-d571-5239-88ea-4835ec3d32d6",
+          "name": "Player Clip waterside 25",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "f61d01eb-d130-5063-bb47-9125d39024da",
+          "name": "Player Clip waterside 26",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "2b409980-62aa-5530-87ec-85693b3052fa",
+          "name": "Player Clip waterside 27",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "af888611-17b8-5368-acc1-7835c5f8ff60",
+          "name": "Player Clip waterside 28",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "8c717f8a-64eb-5369-b3f2-c93ba129cf98",
+          "name": "Player Clip waterside 29",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "e380e732-2221-5c2f-99ab-4f585db78b03",
+          "name": "Player Clip waterside 30",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "fee6ad53-31a7-58dc-8bdd-e50eced81b71",
+          "name": "Player Clip waterside 31",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "d25595f8-727b-5bba-9aa0-15936a416318",
+          "name": "Player Clip waterside 32",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "44b43791-2ab5-5157-9914-55f2e95bed39",
+          "name": "Player Clip waterside 33",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "45ac2bcf-15c3-50a3-8d80-86edb11afe2e",
+          "name": "Player Clip waterside 34",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "51291bdb-6ec4-5545-b988-f412f035461a",
+          "name": "Player Clip waterside 35",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "ddf2b1d8-7adf-57a3-bb57-375fa7c742e8",
+          "name": "Player Clip waterside 36",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "f25f8130-b17e-58c6-8ebd-79d7dadf0881",
+          "name": "Player Clip waterside 37",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "75e47674-74e0-567d-9162-07d6854f2f28",
+          "name": "Player Clip waterside 38",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "d9428336-ae5a-5134-ac8f-9924a44d3410",
+          "name": "Player Clip perimeter 39",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "6e2fc701-de3f-5ab8-91ad-13f864f0fb13",
+          "name": "Player Clip perimeter 40",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "52962ed1-4189-5580-b665-ebc009d2c15c",
+          "name": "Player Clip rear perimeter 41",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "e0574292-755d-547e-a10b-64d7cd07c3b2",
+          "name": "Player Clip waterside 42",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "add9401b-0a42-50ce-91e7-bcad1688545e",
+          "name": "Player Clip waterside 43",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "2369198f-a14b-5efb-8837-0c9a2a6af63e",
+          "name": "Player Clip waterside 44",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "cbc21fbc-0d9c-5237-83ca-ecb7aabcfd8c",
+          "name": "Player Clip waterside 45",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "fe1f2e9d-38ce-5734-a7ef-fe932189e8be",
+          "name": "Player Clip waterside 46",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "f03cd012-00c4-5b4f-bd77-9795d3c7dadd",
+          "name": "Player Clip Control west rail 47",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "73dbb235-beee-569c-9a91-995b5f9e9b9a",
+          "name": "Player Clip Control west rail 48",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "02ecbeed-6117-5dbb-b1b9-d1467d77ab40",
+          "name": "Player Clip Control east rail 49",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "5cfe3662-92a7-5528-8a38-d3876337f18b",
+          "name": "Player Clip Control east rail 50",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "ae138b36-e2d9-5718-b629-ff525cd9e7b9",
+          "name": "Player Clip Turbine roof",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "a229c076-cf20-5aea-8ae5-d3eb1d0c9011",
+          "name": "Player Clip Tower roof",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "8da932a0-40ec-5a32-828f-efeb1e98092b",
+          "name": "Player Clip Pump roof",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "21d29e80-4d9a-5141-936e-70f5e0459404",
+          "name": "Player Clip Control roof",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "9fab9d82-6f55-5e45-a70f-40d7e010a05e",
+          "name": "Player Clip Red shelter roof",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        },
+        {
+          "id": "b166eacb-a4cd-52c2-8273-0b62b2f8e2bd",
+          "name": "Player Clip Blue shelter roof",
+          "enabled": true,
+          "components": [
+            "BoxCollider"
+          ],
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "4b9cdd30-66d7-5e2f-82b3-2d4583d72119",
+      "name": "Catch Floor",
+      "enabled": true,
+      "components": [
+        "BoxCollider"
+      ],
+      "children": []
+    },
+    {
+      "id": "eee89031-e5ed-5b0e-a3f3-9349c1f2b1ce",
+      "name": "Objective Spots",
+      "enabled": true,
+      "components": [],
+      "children": [
+        {
+          "id": "fbe250d5-0977-517c-afe8-1a463538de07",
+          "name": "Domination A",
+          "enabled": true,
+          "components": [
+            "ObjectiveSpot"
+          ],
+          "children": []
+        },
+        {
+          "id": "196a6dce-5f5f-56e3-8cd6-a0e3c3500103",
+          "name": "Domination B",
+          "enabled": true,
+          "components": [
+            "ObjectiveSpot"
+          ],
+          "children": []
+        },
+        {
+          "id": "b8708884-43d7-5f95-b10a-eac301a18bfa",
+          "name": "Domination C",
+          "enabled": true,
+          "components": [
+            "ObjectiveSpot"
+          ],
+          "children": []
+        },
+        {
+          "id": "c73a7b5a-c9c9-57b6-8eb0-9eeec627a5f0",
+          "name": "Hot Zone Cargo",
+          "enabled": true,
+          "components": [
+            "ObjectiveSpot"
+          ],
+          "children": []
+        },
+        {
+          "id": "23f25a34-4242-5b6f-91d4-e659d2b81c16",
+          "name": "Hot Zone Control",
+          "enabled": true,
+          "components": [
+            "ObjectiveSpot"
+          ],
+          "children": []
+        },
+        {
+          "id": "4807f557-7ca4-57ce-8457-b0f8019eef86",
+          "name": "Hot Zone Turbine",
+          "enabled": true,
+          "components": [
+            "ObjectiveSpot"
+          ],
+          "children": []
+        },
+        {
+          "id": "778d7c00-888c-55bd-a42c-75b87a015377",
+          "name": "Hot Zone Tailrace",
+          "enabled": true,
+          "components": [
+            "ObjectiveSpot"
+          ],
+          "children": []
+        },
+        {
+          "id": "20d0e0e1-9282-5b22-92b8-5286e5cc7d0e",
+          "name": "Hot Zone Service",
+          "enabled": true,
+          "components": [
+            "ObjectiveSpot"
+          ],
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "e9a04fef-a869-5ebd-9c06-fced4ea0d1a3",
+      "name": "Cash Grab",
+      "enabled": true,
+      "components": [
+        "GameModeObject"
+      ],
+      "children": [
+        {
+          "id": "5aaf7d54-3bc5-574c-b3c2-012cca589c2e",
+          "name": "Cash Grab (Cargo)",
+          "enabled": true,
+          "components": [
+            "CashPoint"
+          ],
+          "children": [
+            {
+              "id": "0a9f8849-9c58-514c-94f4-cf3475d60faf",
+              "name": "Extract Cargo",
+              "enabled": true,
+              "components": [
+                "ExtractionPoint",
+                "BoxCollider"
+              ],
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "c90a8ded-37c8-5a36-9e55-a5d34a58f032",
+          "name": "Cash Grab (Control)",
+          "enabled": true,
+          "components": [
+            "CashPoint"
+          ],
+          "children": [
+            {
+              "id": "17123b84-8422-51ca-8985-e5a84eae8f07",
+              "name": "Extract Control",
+              "enabled": true,
+              "components": [
+                "ExtractionPoint",
+                "BoxCollider"
+              ],
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "ecf71922-50d0-53d9-af89-ee0357ddcddc",
+          "name": "Cash Grab (Service)",
+          "enabled": true,
+          "components": [
+            "CashPoint"
+          ],
+          "children": [
+            {
+              "id": "b6453073-860a-590a-b8ca-7f70a6f9fe30",
+              "name": "Extract Service",
+              "enabled": true,
+              "components": [
+                "ExtractionPoint",
+                "BoxCollider"
+              ],
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2d784d88-e157-536f-bf88-9693938537dc",
+      "name": "team_deathmatch",
+      "enabled": true,
+      "components": [
+        "GameMode",
+        "TeamScoring",
+        "TeamSpawnAssigner",
+        "DefaultEquipment",
+        "TeamAssigner",
+        "BotManager",
+        "PlayerRagdollBehavior",
+        "DamageTracker",
+        "WeaponStatsRule",
+        "PlayerStatsRule",
+        "BotFillRule",
+        "BotWeaponAllocator",
+        "EquipmentDropper",
+        "MatchRecorder"
+      ],
+      "children": [
+        {
+          "id": "91e4a035-44c3-582a-aefe-ffe76c5c2b13",
+          "name": "States",
+          "enabled": true,
+          "components": [
+            "StateMachineComponent"
+          ],
+          "children": [
+            {
+              "id": "a1a5e3b7-5d1e-5ed5-aa61-5896199b5fea",
+              "name": "Waiting",
+              "enabled": true,
+              "components": [
+                "StateComponent",
+                "WaitForPlayers",
+                "ShowStatusText",
+                "ShowCountDown",
+                "EnableBuyMenu",
+                "PlayerAutoRespawner",
+                "DefaultBalance"
+              ],
+              "children": []
+            },
+            {
+              "id": "5ad81850-1508-5e9f-85cd-514058009ae5",
+              "name": "Preparing",
+              "enabled": true,
+              "components": [
+                "StateComponent",
+                "ShowCountDown",
+                "ShowStatusText",
+                "ShowToast",
+                "FreezePlayers"
+              ],
+              "children": []
+            },
+            {
+              "id": "a98955cf-9fa3-5168-b1a6-f9ec532840e1",
+              "name": "Play Game",
+              "enabled": true,
+              "components": [
+                "StateComponent",
+                "ShowStatusText",
+                "PlayRadio",
+                "ShowCountDown",
+                "ResetScores",
+                "RespawnPlayers",
+                "EnableBuyMenuDuringSpawnProtection",
+                "TeamEarlyWinCondition",
+                "PlayerAutoRespawner",
+                "SpawnProtection",
+                "TeamDeathmatchScoring"
+              ],
+              "children": []
+            },
+            {
+              "id": "6524db1b-fa7d-5c1d-b8b0-5aca5d655a89",
+              "name": "Game Over",
+              "enabled": true,
+              "components": [
+                "StateComponent",
+                "ShowStatusText",
+                "FreezePlayers"
+              ],
+              "children": []
+            },
+            {
+              "id": "9f1c167c-04ad-59ab-bcb6-37ab5fd4af0b",
+              "name": "Post Game",
+              "enabled": true,
+              "components": [
+                "StateComponent",
+                "FreezePlayers",
+                "StartMapVotingOnEnd"
+              ],
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "269964d9-f466-5d62-9993-59334a471178",
+      "name": "bomb_defusal",
+      "enabled": true,
+      "components": [
+        "GameMode",
+        "TeamScoring",
+        "RoundBasedTeamScoring",
+        "RoundCounter",
+        "TeamSpawnAssigner",
+        "DefaultEquipment",
+        "LossBonus",
+        "KillRewards",
+        "DefuseObjectiveRewards",
+        "BotManager",
+        "BotFillRule",
+        "DamageTracker",
+        "WeaponStatsRule",
+        "PlayerStatsRule",
+        "MatchRecorder"
+      ],
+      "children": [
+        {
+          "id": "350b37c2-68ed-5355-a295-adf87d94ea7d",
+          "name": "States",
+          "enabled": true,
+          "components": [
+            "StateMachineComponent"
+          ],
+          "children": [
+            {
+              "id": "9749cbd6-cc2a-5681-96b7-588f069965fc",
+              "name": "Waiting",
+              "enabled": true,
+              "components": [
+                "StateComponent",
+                "TeamAssigner",
+                "WaitForPlayers",
+                "ShowStatusText",
+                "ShowCountDown",
+                "EnableBuyMenu",
+                "PlayerAutoRespawner",
+                "DefaultBalance",
+                "EquipmentDropper"
+              ],
+              "children": []
+            },
+            {
+              "id": "71d179f4-4138-550c-b8a6-6e848b1137bd",
+              "name": "Preparing",
+              "enabled": true,
+              "components": [
+                "StateComponent",
+                "ShowCountDown",
+                "ShowStatusText",
+                "ShowToast",
+                "FreezePlayers",
+                "TeamAssigner"
+              ],
+              "children": []
+            },
+            {
+              "id": "933ac6c0-ff35-50ee-a143-46834c18b811",
+              "name": "Play Game",
+              "enabled": true,
+              "components": [
+                "StateComponent",
+                "EquipmentDropper",
+                "DefaultBalance",
+                "ResetScores",
+                "TeamAssigner",
+                "ClientCleanupTime",
+                "TeamVoiceChatFilter"
+              ],
+              "children": []
+            },
+            {
+              "id": "d17fba15-32b3-53b3-b154-2ef369727eda",
+              "name": "Post Game",
+              "enabled": true,
+              "components": [
+                "StateComponent",
+                "FreezePlayers",
+                "StartMapVotingOnEnd",
+                "StatIncrementerHighestTeam"
+              ],
+              "children": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "09ab0e14-b5c3-5d1e-b35a-503b504a084e",
+      "name": "game_setup",
+      "enabled": true,
+      "components": [],
+      "children": [
+        {
+          "id": "650d9ff9-25e2-5b03-884c-4f6442c23d53",
+          "name": "Networking",
+          "enabled": true,
+          "components": [
+            "GameNetworkManager"
+          ],
+          "children": []
+        },
+        {
+          "id": "0671a91f-396e-5d89-ae37-6289fa45a4b4",
+          "name": "HUD",
+          "enabled": true,
+          "components": [
+            "MainHUD",
+            "Chat",
+            "DeveloperMenu",
+            "ScreenPanel",
+            "Crosshair"
+          ],
+          "children": []
+        },
+        {
+          "id": "dd06d30d-19ea-5dac-a642-6c90b2c782cb",
+          "name": "Spectating",
+          "enabled": true,
+          "components": [
+            "SpectateSystem"
+          ],
+          "children": [
+            {
+              "id": "7a9d3bef-6178-59a1-a041-25a9061d4929",
+              "name": "SpectatePawn",
+              "enabled": true,
+              "components": [
+                "SpectateController",
+                "PawnCameraController"
+              ],
+              "children": []
+            }
+          ]
+        },
+        {
+          "id": "eab82db5-35fb-5e69-acc4-a70c6d6f7f78",
+          "name": "PauseMenu",
+          "enabled": true,
+          "components": [
+            "PauseMenuPanel",
+            "ScreenPanel"
+          ],
+          "children": []
+        },
+        {
+          "id": "7166c68c-b96e-5955-8d49-12422bc2d1d4",
+          "name": "ScreenShaker",
+          "enabled": true,
+          "components": [
+            "ScreenShaker"
+          ],
+          "children": []
+        }
+      ]
+    },
+    {
+      "id": "a75267a1-a465-5e52-9465-7c78f3c50cc1",
+      "name": "Sky Fill",
+      "enabled": true,
+      "components": [
+        "AmbientLight"
+      ],
+      "children": []
+    },
+    {
+      "id": "04264575-63be-423e-b1a9-62758a72d854",
+      "name": "Spillway indirect light",
+      "enabled": true,
+      "components": [
+        "IndirectLightVolume"
+      ],
+      "children": []
+    },
+    {
+      "id": "e37b1bf7-32ac-4311-9012-ec37aba0c5bd",
+      "name": "editor_camera",
+      "enabled": true,
+      "components": [
+        "CameraComponent"
+      ],
+      "children": []
+    }
+  ]
+}

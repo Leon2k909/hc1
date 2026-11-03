@@ -5,8 +5,8 @@
 <root>
     @foreach ( var entry in Entries )
     {
-        var mine = entry.Attacker is not null && IsMe( entry.Attacker );
-        var died = entry.Victim is not null && IsMe( entry.Victim );
+        var mine = IsMe( entry.AttackerSteamId );
+        var died = IsMe( entry.VictimSteamId );
 
         <div @key="entry.Id" class="entry">
             <div class="plate @(died ? "died" : mine ? "mine" : "")">
@@ -89,13 +89,13 @@
         Instance = this;
     }
 
-    public bool IsMe( string name )
+    public bool IsMe( ulong steamId )
     {
-        return Sandbox.Utility.Steam.PersonaName.Equals( name );
+        return steamId != 0 && Client.Local.IsValid() && !Client.Local.IsBot && Client.Local.SteamId == steamId;
     }
 
     public record KillFeedEntry( int Id, string Attacker, Color AttackerColor, string Inflictor, string Victim, Color VictimColor, HitboxTags HitboxTags, DamageFlags DamageFlags,
-        RealTimeSince TimeSinceAdded )
+        RealTimeSince TimeSinceAdded, ulong AttackerSteamId, ulong VictimSteamId )
     {
         public string AttackerIcon => Attacker.Replace("icon:", "");
         public string InflictorIcon => Inflictor.Replace("icon:", "");
@@ -107,12 +107,13 @@
     private float Lifetime => 10f;
 
     [Rpc.Broadcast]
-    public static void BroadcastKillFeedEvent( string attacker, Color attackerColor, string inflictor, string victim, Color victimColor, HitboxTags tags, DamageFlags flags )
+    public static void BroadcastKillFeedEvent( string attacker, Color attackerColor, string inflictor, string victim, Color victimColor, HitboxTags tags, DamageFlags flags,
+        ulong attackerSteamId, ulong victimSteamId )
     {
         if ( !Instance.IsValid() )
             return;
 
-        Instance.Entries.Add( new KillFeedEntry( ++_nextId, attacker, attackerColor, inflictor, victim, victimColor, tags, flags, 0 ) );
+        Instance.Entries.Add( new KillFeedEntry( ++_nextId, attacker, attackerColor, inflictor, victim, victimColor, tags, flags, 0, attackerSteamId, victimSteamId ) );
         Instance.StateHasChanged();
     }
 
@@ -140,9 +141,18 @@
             victim, victimDesc?.Color ?? Color.White,
             //
             damageInfo.Hitbox,
-            damageInfo.Flags
+            damageInfo.Flags,
+            SteamIdOf( damageInfo.Attacker ),
+            SteamIdOf( damageInfo.Victim )
         );
 
+    }
+
+    // Capture identity with the event so renames and duplicate display names cannot change its highlights.
+    private static ulong SteamIdOf( Component component )
+    {
+        var player = GameUtils.GetPlayerFromComponent( component );
+        return player.IsValid() && player.Client.IsValid() && !player.Client.IsBot ? player.Client.SteamId : 0;
     }
 
     private static EquipmentResource WeaponOf( Component inflictor ) => inflictor switch

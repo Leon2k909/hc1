@@ -713,13 +713,17 @@ public partial class Shootable : WeaponInputAction,
 
 			if ( !CanShoot() )
 			{
-				// Dry fire
-				if ( !AmmoComponent.HasAmmo )
+				// Empty trigger pulls reload when possible, otherwise give the usual dry click.
+				if ( AmmoComponent.IsValid() && !AmmoComponent.HasAmmo )
 				{
 					if ( TimeSinceShoot < DryShootDelay )
 						return;
 
 					if ( Tags.Has( "reloading" ) )
+						return;
+
+					if ( Time.Now >= _nextShotTime && Equipment.GetComponentInChildren<Reloadable>() is { } reloadable
+						&& reloadable.AmmoComponent == AmmoComponent && reloadable.TryReloadEmpty() )
 						return;
 
 					DryShoot();

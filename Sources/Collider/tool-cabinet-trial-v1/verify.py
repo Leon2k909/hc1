@@ -120,7 +120,10 @@ def main():
             ('space behind drawer grip',(0,-20.55,18.55),False),('drawer grip',(0,-21.3,18.55),True),
             ('space behind push grip',(38.6,0,40),False),('push grip',(39.5,0,40),True)]
     for i,w in enumerate(d['wheels']):
-        c=np.array(w['centre']);probes.extend([(f'wheel {i} centre',c.tolist(),True),(f'wheel {i} ground',(c-UP*4.2).tolist(),True)])
+        c=np.array(w['centre']);probes.extend([(f'wheel {i} centre',c.tolist(),True),(f'wheel {i} ground',(c-UP*4.2).tolist(),True),
+                                              (f'caster {i} pivot',(float(c[0]),float(c[1]),9.8),True)])
+    for i,z in enumerate((16.45,23.14,28.84,34.24,39.29,43.89)):
+        probes.append((f'drawer {i} closed front',(0,-19.70,z),True))
     for axis in (0,1):
         for sign in (-1,1):
             for z in (2,8,18,35,48):
@@ -137,11 +140,13 @@ def main():
             centre=np.zeros(3);centre[axis]=sign*distance
             assert all(np.linalg.norm(q[:2]-centre[:2])>16 for q in points)
     result={'installedInMap':False,'originalRetained':True,'protectedSourcesUnchanged':len(d['protectedSourceSHA256']),
+            'modelsSHA256':{name:sha(DEST/(name+'.obj')) for name in ('before','after')},
             'variants':reports,'collisionBoxes':len(expected_boxes),'collisionHulls':len(exported_hulls),
             'checkedFromExportedModelDocAndHullFiles':True,'collisionProbeCount':len(probes),'allCollisionProbesPassed':True,
             'undersideAndHandleGapsClear':True,'allFourTyresTouchGround':True,'insideOriginalVisibleFootprint':True,
             'maximumCollisionVertexDistanceToVisibleVertexInches':round(float(dist.max()),4),
-            'outsidePlayerWidthClearancePassed':True,'editorUsed':False,'nativeCollisionAndAppearance':'pending'}
+            'outsidePlayerWidthClearancePassed':True,'editorUsed':False,
+            'nativeCollisionAndAppearance':'see native-review-20261031/review.json' if (OUT/'native-review-20261031/review.json').exists() else 'pending'}
     (OUT/'verification.json').write_text(json.dumps(result,indent=2)+'\n')
     print(json.dumps(result))
 

@@ -1,0 +1,35 @@
+var scene=Game.ActiveScene;
+if(!Game.IsPlaying || scene?.Name!="collider")throw new InvalidOperationException("Collider must be running");
+var proposed=scene.GetAllObjects(true).Single(o=>o.Name=="REVIEW ONLY - proposed cabinet");
+var original=scene.GetAllObjects(true).Single(o=>o.Name=="REVIEW ONLY - original case");
+Vector3 World(GameObject go,Vector3 plan)=>go.WorldTransform.PointToWorld(new Vector3(plan.y,-plan.x,plan.z));
+var checks=new System.Collections.Generic.List<object>();var failures=new System.Collections.Generic.List<string>();
+void Probe(string name,GameObject go,string tag,Vector3 a,Vector3 b,bool expected)
+{
+    var trace=scene.Trace.Ray(World(go,a),World(go,b)).WithTag(tag).Run();
+    var hit=trace.Hit||trace.StartedSolid;var passed=hit==expected;
+    checks.Add(new {Name=name,ExpectedHit=expected,Hit=hit,Passed=passed,HitObject=trace.GameObject?.Name,End=trace.EndPosition.ToString()});
+    if(!passed)failures.Add(name);
+}
+var tag="cabinet-review-after";
+Probe("cabinet body",proposed,tag,new Vector3(0,-35,29),new Vector3(0,35,29),true);
+Probe("clear under chassis",proposed,tag,new Vector3(0,-35,6),new Vector3(0,35,6),false);
+Probe("worktop",proposed,tag,new Vector3(0,0,60),new Vector3(0,0,47.5f),true);
+Probe("drawer grip",proposed,tag,new Vector3(0,-23,18.55f),new Vector3(0,-20.8f,18.55f),true);
+Probe("gap behind drawer grip",proposed,tag,new Vector3(-10,-20.55f,18.55f),new Vector3(10,-20.55f,18.55f),false);
+Probe("push grip",proposed,tag,new Vector3(40.8f,0,40),new Vector3(38.8f,0,40),true);
+Probe("gap behind push grip",proposed,tag,new Vector3(38.6f,-6,40),new Vector3(38.6f,6,40),false);
+foreach(var z in new[]{16.45f,23.14f,28.84f,34.24f,39.29f,43.89f})
+    Probe("closed drawer front "+z,proposed,tag,new Vector3(0,-20.4f,z),new Vector3(0,-18.5f,z),true);
+foreach(var x in new[]{-31.5f,31.5f})
+foreach(var y in new[]{-13.8f,13.8f})
+{
+    Probe("tyre "+x+","+y,proposed,tag,new Vector3(x-8,y,4.2f),new Vector3(x+8,y,4.2f),true);
+    Probe("caster pivot "+x+","+y,proposed,tag,new Vector3(x-8,y,9.8f),new Vector3(x+8,y,9.8f),true);
+    Probe("tyre ground contact "+x+","+y,proposed,tag,new Vector3(x,y,-2),new Vector3(x,y,1),true);
+}
+Probe("original case solid base",original,"cabinet-review-before",new Vector3(0,-35,6),new Vector3(0,35,6),true);
+var result=new { NativePhysics=true,Scene=scene.Name,Count=checks.Count,Passed=failures.Count==0,Failures=failures,Checks=checks };
+var file=System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(),"output/asset-improvement-20261030/tool-cabinet/native-review-20261031/collision-report.json");
+System.IO.File.WriteAllText(file,System.Text.Json.JsonSerializer.Serialize(result,new System.Text.Json.JsonSerializerOptions{WriteIndented=true}));
+return result;

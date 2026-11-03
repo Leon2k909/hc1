@@ -278,52 +278,6 @@ public partial class DroppedEquipment : Component, IUse, Component.ICollisionLis
 	/// </summary>
 	public int RoundsLeft => GetComponent<WeaponAmmo>() is { } a ? a.Ammo + a.ReserveAmmo : 0;
 
-	/// <summary>
-	/// The player's weapon that could use this gun's ammo: the same weapon, or one of the same category
-	/// (rifles share rifle rounds, pistols share pistol rounds…). Null if none, or it's already full.
-	/// </summary>
-	public WeaponAmmo FindScavengeTarget( PlayerPawn player )
-	{
-		if ( !player.IsValid() || RoundsLeft <= 0 ) return null;
-
-		var candidates = player.Inventory.Equipment
-			.Where( x => x.IsValid() && x.Resource is not null )
-			.Where( x => x.Resource == Resource
-				|| ( x.Resource.Category == Resource.Category && x.Resource.Slot is EquipmentSlot.Primary or EquipmentSlot.Secondary ) )
-			.OrderByDescending( x => x.Resource == Resource );
-
-		foreach ( var equipment in candidates )
-		{
-			var ammo = equipment.GetComponentInChildren<WeaponAmmo>( true );
-			if ( ammo.IsValid() && ammo.ReserveAmmo < ammo.GetMaxReserve() ) return ammo;
-		}
-		return null;
-	}
-
-	/// <summary>
-	/// Take spare rounds on contact while leaving the dropped gun available for an explicit pickup.
-	/// </summary>
-	private bool TryScavenge( PlayerPawn player )
-	{
-		var target = FindScavengeTarget( player );
-		if ( !target.IsValid() ) return false;
-
-		var source = GetComponent<WeaponAmmo>();
-		var room = target.GetMaxReserve() - target.ReserveAmmo;
-		// Leave at least one magazine round in the gun so Use can still pick up a usable weapon.
-		var taken = Math.Min( room, source.ReserveAmmo + Math.Max( 0, source.Ammo - 1 ) );
-		if ( taken <= 0 ) return false;
-
-		// Empty the spare ammo first, then the magazine.
-		var fromReserve = Math.Min( taken, source.ReserveAmmo );
-		source.ReserveAmmo -= fromReserve;
-		source.Ammo -= taken - fromReserve;
-
-		target.ReceiveReserve( taken );
-
-		return true;
-	}
-
 	private bool _isUsed;
 
 	public void OnUse( PlayerPawn player )

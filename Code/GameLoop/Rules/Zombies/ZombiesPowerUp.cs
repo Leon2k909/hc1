@@ -103,6 +103,14 @@ public sealed class ZombiesPowerUp : Component, IMarkerObject
 			if ( pawn.WorldPosition.WithZ( 0 ).Distance( _base.WithZ( 0 ) ) > PickupRadius ) continue;
 			if ( MathF.Abs( pawn.WorldPosition.z - _base.z ) > 120f ) continue;
 
+			// Nearby drops still need a clear path through the world to the collector.
+			var blocked = Scene.Trace.Ray( pawn.EyePosition, _base )
+				.IgnoreGameObjectHierarchy( pawn.GameObject )
+				.IgnoreGameObjectHierarchy( GameObject )
+				.WithoutTags( "player", "enemy", "ragdoll", "movement", "trigger", "pickup" )
+				.Run().Hit;
+			if ( blocked ) continue;
+
 			ZombiesRoundSystem.Current?.ActivatePowerUp( Type, pawn );
 			GameObject.Destroy();
 			return;

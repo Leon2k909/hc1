@@ -102,10 +102,15 @@ public abstract class WeaponInputAction : EquipmentComponent,
 		//
 	}
 
-	/// <summary>Cancel queued actions when the gunsmith takes weapon input.</summary>
+	/// <summary>Cancel queued actions when a menu or climbing takes weapon input.</summary>
 	protected virtual void OnInputSuppressed()
 	{
 	}
+
+	/// <summary>Shared by input callbacks and frame-based actions that must stop as soon as a menu opens.</summary>
+	protected bool IsInputSuppressed => Input.Suppressed || Input.MouseCursorVisible
+		|| GameUtils.IsGunsmithStudioOpen() || UI.ClassSelect.IsAnyOpen || UI.TacticalBuyMenu.IsAnyOpen
+		|| UI.ZombiesWorkbenchPanel.IsAnyOpen || Equipment.Owner.IsPipeClimbing;
 
 	protected override void OnFixedUpdate()
 	{
@@ -125,7 +130,7 @@ public abstract class WeaponInputAction : EquipmentComponent,
 
 		// UI clicks must never reach OnInputUpdate (semi/burst fire reads input there).
 		// Keep the release latch set even if the UI consumes the raw mouse button.
-		if ( GameUtils.IsGunsmithStudioOpen() )
+		if ( IsInputSuppressed )
 		{
 			RunningWhileDeployed = true;
 			_heldInputChecked = true;
@@ -156,12 +161,9 @@ public abstract class WeaponInputAction : EquipmentComponent,
 
 		bool matched = false;
 
-		// Clicking a class in the class menu, or anything at the Zombies workbench, isn't weapon input.
-		var menuOpen = UI.ClassSelect.IsAnyOpen || UI.TacticalBuyMenu.IsAnyOpen || UI.ZombiesWorkbenchPanel.IsAnyOpen || Equipment.Owner.IsPipeClimbing;
-
 		foreach ( var action in InputActions )
 		{
-			var down = !menuOpen && Input.Down( action );
+			var down = Input.Down( action );
 
 			if ( RequiresAllInputActions && !down )
 			{

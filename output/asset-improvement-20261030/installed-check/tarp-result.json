@@ -1,0 +1,71 @@
+{
+  "Before": {
+    "IsPlaying": false,
+    "Scene": "orion",
+    "SceneId": "265832a6-be9b-519a-a16f-936f873ad1be",
+    "GameSceneId": null
+  },
+  "IsPlaying": false,
+  "SourceUnchanged": true,
+  "Written": [
+    "tarp_pile_1",
+    "tarp_pile_1_close"
+  ],
+  "Renderers": 23,
+  "ErrorModels": [],
+  "Placed": [
+    {
+      "Name": "Tarp pile",
+      "Model": "models/props/orion/tarp_pile_v2/tarp_pile.vmdl",
+      "Position": "0,-195,0",
+      "Scale": "1,1,1",
+      "Colliders": 0,
+      "Bounds": "120.8286,129.9503,61.6299",
+      "Materials": [
+        "materials/orion/tarp_pile_v2/tp_tarp.vmat"
+      ]
+    }
+  ],
+  "Rays": [
+    {
+      "Label": "tarp_pile_1 +x",
+      "Hit": true,
+      "Distance": 60,
+      "Expect": 60,
+      "Object": "Yard Props",
+      "Surface": "plastic"
+    },
+    {
+      "Label": "tarp_pile_1 -x",
+      "Hit": true,
+      "Distance": 60,
+      "Expect": 60,
+      "Object": "Yard Props",
+      "Surface": "plastic"
+    },
+    {
+      "Label": "tarp_pile_1 +y",
+      "Hit": true,
+      "Distance": 60,
+      "Expect": 60,
+      "Object": "Yard Props",
+      "Surface": "plastic"
+    },
+    {
+      "Label": "tarp_pile_1 -y",
+      "Hit": true,
+      "Distance": 0,
+      "Expect": 60,
+      "Object": "Fuel Processing",
+      "Surface": "default"
+    },
+    {
+      "Label": "tarp_pile_1 over the top",
+      "Hit": false,
+      "Distance": -1,
+      "Expect": -1,
+      "Object": null,
+      "Surface": "ejected_9mm"
+    }
+  ]
+}

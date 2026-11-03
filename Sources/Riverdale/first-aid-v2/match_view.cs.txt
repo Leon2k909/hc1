@@ -1,0 +1,63 @@
+// In a running Riverdale match: stand the local player at a spot looking at a target, and show the cabinets in their own scan-based finish, in the kept code-painted one, or a code-painted copy beside the east wall's.
+// Run with sbox-cli --call run_csharp, with the placeholders filled in by match_shots.py. Changes only the running match, and nothing is saved.
+var scene = Game.ActiveScene;
+if (!Game.IsPlaying || scene is null) throw new InvalidOperationException("Not playing.");
+var pawn = Facepunch.Client.Local?.PlayerPawn;
+if (!pawn.IsValid()) return new { Error = "No player yet", Scene = scene.Name };
+
+// No bots: their shots set off the game's just-been-hit effect, and they walk into frame. The fill rule would only put them back.
+foreach (var rule in scene.GetAllObjects(false).SelectMany(g => g.Components.GetAll<Facepunch.BotFillRule>()).ToArray())
+    rule.Enabled = false;
+Facepunch.LightweightBotManager.Instance?.DevClearBots();
+Facepunch.UI.ClassSelect.CloseAny();
+Facepunch.UI.PauseMenuPanel.CloseAny();
+
+var eyeHeight = 64f;
+var eye = new Vector3(EYE_X, EYE_Y, 0f);
+var target = new Vector3(TARGET_X, TARGET_Y, TARGET_Z);
+pawn.WorldPosition = eye;
+pawn.Transform.ClearInterpolation();
+pawn.EyeAngles = Rotation.LookAt(target - (eye + Vector3.Up * eyeHeight)).Angles().WithRoll(0f);
+
+var painted = Material.Load("models/maps/riverdale/first_aid_v2/first_aid.vmat");
+var model = Model.Load("models/maps/riverdale/first_aid_v2/first_aid.vmdl");
+if (painted is null || painted.IsError || model is null || model.IsError) throw new InvalidOperationException("The cabinet or its code-painted finish hasn't compiled.");
+foreach (var material in model.Materials.Append(painted))
+    foreach (var key in new[] { "g_tColor", "g_tNormal" })
+        material.GetTexture(key)?.MarkUsed(2048);
+
+var mode = "MODE";
+var cabinets = scene.GetAllObjects(false).Where(g => g.Name == "First Aid Cabinet").ToArray();
+foreach (var go in cabinets)
+{
+    var renderer = go.Components.Get<ModelRenderer>();
+    if (renderer.IsValid()) renderer.MaterialOverride = mode == "painted" ? painted : null;
+}
+foreach (var go in scene.GetAllObjects(false).Where(g => g.Name == "First Aid Cabinet (comparison)").ToArray())
+    go.Destroy();
+if (mode == "pair")
+{
+    // The code-painted finish beside the east wall's cabinet, on the same wall and turned the same way, to its right as you face them.
+    var east = cabinets.OrderBy(g => g.WorldPosition.Distance(new Vector3(985f, 1000f, 54f))).First();
+    var copy = new GameObject(true, "First Aid Cabinet (comparison)");
+    copy.NetworkMode = NetworkMode.Never;
+    copy.WorldPosition = east.WorldPosition + new Vector3(PAIR_GAP, 0f, 0f);
+    copy.WorldRotation = east.WorldRotation;
+    var renderer = copy.Components.Create<ModelRenderer>();
+    renderer.Model = model;
+    renderer.MaterialOverride = painted;
+}
+
+// Let auto exposure settle on this view, as it would for a player standing here, and the textures stream in.
+await Task.Delay(6000, cancellationToken);
+pawn = Facepunch.Client.Local?.PlayerPawn;
+// The aim can wander during the wait, so the shots wouldn't line up: set it again just before the shot.
+var aim = Rotation.LookAt(target - (eye + Vector3.Up * eyeHeight)).Angles().WithRoll(0f);
+pawn.EyeAngles = aim;
+await Task.Delay(150, cancellationToken);
+pawn.EyeAngles = aim;
+return new
+{
+    Scene = scene.Name, Game.IsPlaying, Mode = mode, Pawn = pawn?.WorldPosition.ToString(), Cabinets = cabinets.Length,
+    Holding = pawn?.CurrentEquipment?.GameObject?.Name, Bots = scene.GetAllObjects(false).Count(g => g.Components.Get<Facepunch.LightweightCombatBot>().IsValid())
+};

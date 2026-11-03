@@ -1,0 +1,68 @@
+// A matched before and after in a running Belltower match, from one camera spot. Run with sbox-cli --call run_csharp, with the placeholders filled in by match_shots.py.
+// "before" is the map as it stands. "after" swaps the West Half renderer to a copy with the old stones cut out (preview_model.py) and stands a new stone at each old stone's exact place and turn.
+// Changes only the running match, and nothing is saved. Collision stays the real model's.
+var scene = Game.ActiveScene;
+if (!Game.IsPlaying || scene is null) throw new InvalidOperationException("Not playing.");
+var pawn = Facepunch.Client.Local?.PlayerPawn;
+if (!pawn.IsValid()) return new { Error = "No player yet", Scene = scene.Name };
+
+// No bots: their shots set off the game's just-been-hit effect, and they walk into frame. The fill rule would only put them back.
+foreach (var rule in scene.GetAllObjects(false).SelectMany(g => g.Components.GetAll<Facepunch.BotFillRule>()).ToArray())
+    rule.Enabled = false;
+Facepunch.LightweightBotManager.Instance?.DevClearBots();
+Facepunch.UI.ClassSelect.CloseAny();
+Facepunch.UI.PauseMenuPanel.CloseAny();
+
+var mode = "MODE";
+var west = scene.GetAllComponents<ModelRenderer>().FirstOrDefault(r => (r.Model?.ResourcePath ?? "").Contains("belltower_west"));
+if (!west.IsValid()) throw new InvalidOperationException("No West Half renderer.");
+var realWest = Model.Load("models/maps/belltower/belltower_west.vmdl");
+var cutWest = Model.Load("models/compare_old/headstone-preview/belltower_west_nostones.vmdl");
+if (cutWest is null || cutWest.IsError) throw new InvalidOperationException("The preview model hasn't compiled.");
+foreach (var old in scene.GetAllObjects(false).Where(g => g.Name == "New headstone (comparison)").ToArray())
+    old.Destroy();
+
+var folder = "models/props/belltower/headstone_v2/headstone_";
+var stones = new (string Kind, Vector3 At, float Yaw)[] {
+STONES
+};
+var models = stones.Select(s => s.Kind).Distinct().Select(k => Model.Load(folder + k + ".vmdl")).ToArray();
+if (models.Any(m => m is null || m.IsError)) throw new InvalidOperationException("A stone hasn't compiled.");
+west.Model = mode == "after" ? cutWest : realWest;
+if (mode == "after")
+    foreach (var (kind, at, yaw) in stones)
+    {
+        var go = new GameObject(true, "New headstone (comparison)");
+        go.NetworkMode = NetworkMode.Never;
+        go.WorldPosition = at;
+        go.WorldRotation = Rotation.FromYaw(yaw);
+        go.Components.Create<ModelRenderer>().Model = models.First(m => m.ResourcePath.EndsWith(kind + ".vmdl"));
+    }
+// Only this one material's textures, as the shared editor has run out of video memory on a whole map's.
+foreach (var material in models.SelectMany(m => m.Materials).Distinct())
+    foreach (var key in new[] { "g_tColor", "g_tNormal", "g_tRoughness" })
+        material.GetTexture(key)?.MarkUsed(4096);
+
+var eyeHeight = 64f;
+var eye = new Vector3(EYE_X, EYE_Y, 0f);
+var target = new Vector3(TARGET_X, TARGET_Y, TARGET_Z);
+pawn.WorldPosition = eye;
+pawn.Transform.ClearInterpolation();
+pawn.EyeAngles = Rotation.LookAt(target - (eye + Vector3.Up * eyeHeight)).Angles().WithRoll(0f);
+
+// Let auto exposure settle on this view, as it would for a player standing here, and the textures stream in.
+await Task.Delay(6000, cancellationToken);
+pawn = Facepunch.Client.Local?.PlayerPawn;
+// The aim and footing can wander during the wait, so before and after wouldn't line up: set them again just before the shot.
+pawn.WorldPosition = eye;
+pawn.Transform.ClearInterpolation();
+var aim = Rotation.LookAt(target - (eye + Vector3.Up * eyeHeight)).Angles().WithRoll(0f);
+pawn.EyeAngles = aim;
+await Task.Delay(200, cancellationToken);
+pawn.EyeAngles = aim;
+return new
+{
+    Scene = scene.Name, Mode = mode, Pawn = pawn?.WorldPosition.ToString(), Eye = pawn?.EyeAngles.ToString(), West = west.Model?.ResourcePath,
+    NewStones = scene.GetAllObjects(false).Count(g => g.Name == "New headstone (comparison)"),
+    Errors = models.SelectMany(m => m.Materials).Distinct().Where(m => m.IsError).Select(m => m.ResourcePath).ToArray(), Bots = scene.GetAllComponents<Facepunch.LightweightCombatBot>().Count()
+};

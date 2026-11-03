@@ -24,6 +24,19 @@ public partial class TeamVoiceChatFilter : Component, IVoiceFilter
 
 	private bool DontSendFilter( Client player )
 	{
+		var mode = ActiveMode;
+
+		// Party Only must also exclude spectators and recent killers outside the party.
+		if ( !GameSettingsSystem.Current.VoiceProximity && mode == VoiceChatMode.PartyOnly )
+		{
+			if ( PartySystem.Current.IsValid() && PartySystem.Current.LocalIsInParty && player.Connection is not null )
+			{
+				return !PartySystem.Current.IsInParty( player.Connection.Id );
+			}
+			// Without a party, only the local player is included.
+			return player != Client.Local;
+		}
+
 		// Send voices to spectators
 		if ( player.Team == Team.Unassigned ) return false;
 
@@ -46,18 +59,7 @@ public partial class TeamVoiceChatFilter : Component, IVoiceFilter
 		}
 
 		// Don't send to enemies if Team Only Voice is enabled
-		var mode = ActiveMode;
-
-		if ( mode == VoiceChatMode.PartyOnly )
-		{
-			if ( PartySystem.Current.IsValid() && PartySystem.Current.LocalIsInParty && player.Connection is not null )
-			{
-				return !PartySystem.Current.IsInParty( player.Connection.Id );
-			}
-			// If not in a party, exclude everyone else (only talk to yourself)
-			return player != Client.Local;
-		}
-		else if ( mode == VoiceChatMode.TeamOnly )
+		if ( mode == VoiceChatMode.TeamOnly )
 		{
 			return !player.IsFriendly( Client.Local );
 		}

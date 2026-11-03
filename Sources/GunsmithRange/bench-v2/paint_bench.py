@@ -211,7 +211,7 @@ timber = mix(timber, timber * 0.42 + rgb(16, 15, 14) * 0.25, np.clip(blast * 0.4
 pale = rgb(196, 158, 112) * (0.84 + 0.26 * fine[..., None])
 outer = np.maximum(smooth(HD - 1.0, HD - 0.05, np.abs(X)), smooth(HL - 1.0, HL - 0.05, np.abs(Y)))
 timber = mix(timber, pale, np.clip(soft(smooth(0.42, 0.74, outer * edge * (0.45 + 0.55 * smooth(0.25, 0.7, fine)) + outer * front_rub * 0.24 + (micro - 0.5) * 0.15), 0.7) * 0.72, 0, 0.8))
-timber = mix(timber, pale * 0.92, np.clip(scratch * 0.55, 0, 1))
+timber = mix(timber, pale * 0.9, np.clip(scratch * 0.4, 0, 1))
 timber = mix(timber, timber * 0.56, ring * 0.7)
 timber = mix(timber, timber * 0.7, ding * 0.55)
 timber = mix(timber, rgb(186, 182, 170) * (0.72 + 0.34 * fine[..., None]), stencil * 0.58)
@@ -224,7 +224,7 @@ boots = frame_ * upward * (np.abs(Z - 12.5) < 1.2) * smooth(0.28, 0.7, mid)
 # Chips come in patches along an edge, not in a line down the whole of it.
 patches = smooth(0.46, 0.72, field(noise(pts, 0.2, 41, 3)))
 f_chip = soft(smooth(0.36, 0.62, edge * patches * (0.45 + 0.55 * smooth(0.3, 0.7, fine)) + kicks * 0.42 + boots * 0.26 + (fine - 0.5) * 0.14), 0.7) * frame_
-f_color = rgb(34, 50, 74) * (0.88 + 0.24 * mid[..., None])
+f_color = rgb(46, 70, 104) * (0.88 + 0.24 * mid[..., None])
 bare = rgb(126, 124, 120) * (0.72 + 0.4 * fine[..., None])
 rust_c = mix(rgb(70, 40, 24), rgb(118, 70, 40), smooth(0.35, 0.8, field(noise(pts, 3.1, 8, 3))))
 rust = frame_ * soft(smooth(0.6, 0.88, crevice * 0.5 + field(noise(pts, 0.9, 9, 3)) * 0.55 + f_chip * 0.3 + smooth(10.0, 0.0, Z) * 0.14), 0.8)
@@ -235,7 +235,7 @@ f_metal = 0.06 + f_chip * 0.62 * (1 - rust)
 
 # ---- Blacked steel: the tray and the small ironwork. ----
 o_wear = soft(smooth(0.42, 0.7, edge * smooth(0.35, 0.7, mid) + (fine - 0.5) * 0.3), 0.6)
-o_color = mix(rgb(24, 24, 26) * (0.8 + 0.4 * mid[..., None]), rgb(120, 118, 114), o_wear * 0.8)
+o_color = mix(rgb(46, 47, 50) * (0.82 + 0.36 * mid[..., None]), rgb(128, 126, 122), o_wear * 0.8)
 o_rough = 0.62 + 0.14 * fine - 0.16 * o_wear
 o_metal = 0.12 + 0.5 * o_wear
 
@@ -252,7 +252,9 @@ m_color = mix(m_color, rgb(70, 72, 66) * (0.88 + 0.2 * fine[..., None]), m_used 
 m_color = mix(m_color, rgb(10, 11, 10), groove[..., None] * tread_on[..., None] * (1 - m_used[..., None] * 0.45) * 0.85)
 along = np.where(HX - np.abs(X - M_X) < HY - np.abs(Y - M_Y), Y, X)
 stitch = mat * smooth(0.075, 0.035, np.abs(inset - 0.42)) * (np.mod(along / 0.42, 1.0) < 0.62)
-m_color = mix(m_color, rgb(150, 146, 128), stitch * 0.8)
+scuffs = mat * smooth(0.52, 0.8, field(noise(pts * np.array((1.0, 0.25, 1.0), np.float32), 0.7, 53, 3)))
+m_color = mix(m_color, rgb(92, 90, 80) * (0.8 + 0.3 * fine[..., None]), scuffs * 0.4)
+m_color = mix(m_color, rgb(92, 88, 74), stitch * 0.55)
 m_rough = 0.8 - m_used * 0.2 + 0.05 * fine
 m_height = (1 - groove) * tread_on * 0.03 * (1 - m_used * 0.55) + stitch * 0.004
 
@@ -267,18 +269,19 @@ for bag in facts_file["bags"]:
     ux, uy = (X - bag["x"]) / (bag["lx"] / 2), (Y - bag["y"]) / (bag["ly"] / 2)
     near = (np.abs(ux) < 1.15) & (np.abs(uy) < 1.15) & (np.abs(Z - bag["z"]) < 6.0) & canvas
     turn = np.arctan2(uy, ux)
-    pucker = np.where(near, np.sin(turn * 46.0 + (mid - 0.5) * 9.0) * smooth(0.55, 0.97, np.hypot(ux, uy)) * smooth(2.4, 0.3, np.abs(Z - bag["z"])), pucker)
+    wrinkle = 0.6 * np.sin(turn * 21.0 + (mid - 0.5) * 16.0) + 0.4 * np.sin(turn * 53.0 + (big - 0.5) * 30.0)
+    pucker = np.where(near, wrinkle * smooth(0.74, 0.99, np.hypot(ux, uy)) * smooth(1.5, 0.25, np.abs(Z - bag["z"])), pucker)
     piping = np.where(near, np.maximum(piping, smooth(0.2, 0.1, np.abs(Z - bag["z"]))), piping)
 lumps = field(noise(pts, 0.9, 51, 2))
 c_color = rgb(136, 116, 80) * (0.95 + 0.08 * mid[..., None]) * (0.86 + 0.2 * weave[..., None])
-c_color = mix(c_color, rgb(72, 62, 44), np.clip(piping * 0.65 + (pucker < -0.15) * np.abs(pucker) * 0.4, 0, 1))
+c_color = mix(c_color, rgb(72, 62, 44), np.clip(piping * 0.65 + np.maximum(-pucker, 0) * 0.14, 0, 1))
 c_color = mix(c_color, c_color * 0.62, crevice[..., None] * 0.3)
 c_rough = 0.88 - 0.05 * weave
-c_height = weave * 0.009 + 0.05 * (lumps - 0.5) + pucker * 0.035
+c_height = weave * 0.009 + 0.05 * (lumps - 0.5) + pucker * 0.022
 
 # ---- Ammo cans: olive enamel with yellow stencils, chipped at their corners. ----
 a_chip = soft(smooth(0.52, 0.76, edge * (0.3 + 0.55 * smooth(0.3, 0.7, fine)) + (fine - 0.5) * 0.25), 0.6) * olive
-a_color = rgb(52, 62, 34) * (0.88 + 0.26 * mid[..., None])
+a_color = rgb(68, 82, 44) * (0.88 + 0.26 * mid[..., None])
 a_print = np.zeros((H, W), np.float32)
 for can in facts_file["cans"]:
     img = stencil_image(list(can["text"]), (760, 420), bridge=False)
@@ -306,7 +309,7 @@ s_metal = s_chip * 0.62
 
 # ---- The carton: printed card, red with a white band, soft at its corners. ----
 carton_text = stencil_image(["5.56 MM"], (760, 240), bridge=False)
-k_print = soft(sample_image(carton_text, (-38.8 - Y) / 2.4, (X + 8.6) / 5.4) * (nor[..., 2] > 0.7), 0.45) * carton
+k_print = soft(sample_image(carton_text, (X + 8.1) / 5.5, (Y + 41.1) / 2.2) * (nor[..., 2] > 0.7), 0.45) * carton
 k_band = carton * smooth(0.12, 0.05, np.abs(X + 8.9) - 0.42)
 k_wear = soft(smooth(0.42, 0.72, edge * smooth(0.3, 0.7, mid) + (fine - 0.5) * 0.3), 0.7) * carton
 k_color = rgb(168, 36, 26) * (0.92 + 0.16 * mid[..., None])

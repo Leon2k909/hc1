@@ -1,0 +1,53 @@
+{
+  "name": "get_selection",
+  "title": "Get Selection",
+  "toolset": "scene",
+  "description": "What's selected in the editor - the game objects and components the user (or you) has picked.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {},
+    "required": []
+  },
+  "annotations": {
+    "readOnlyHint": true
+  },
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "GameObjects": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "Id": {
+              "type": "string"
+            },
+            "Name": {
+              "type": "string"
+            }
+          },
+          "required": []
+        }
+      },
+      "Components": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "Id": {
+              "type": "string"
+            },
+            "Type": {
+              "type": "string"
+            },
+            "GameObject": {
+              "type": "string"
+            }
+          },
+          "required": []
+        }
+      }
+    },
+    "required": []
+  }
+}

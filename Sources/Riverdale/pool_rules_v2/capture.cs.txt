@@ -1,0 +1,53 @@
+// Check the saved Riverdale map without changing the user's current scene or play session.
+var rootPath=Sandbox.Project.Current.GetRootPath();
+var output=System.IO.Path.Combine(rootPath,"output/riverdale/pool-rules-20261031");
+var sourceId=Game.ActiveScene?.Id;
+var editId=Editor.SceneEditorSession.Active?.Scene?.Id;
+var playing=Game.IsPlaying;
+var root=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(rootPath,"Assets/scenes/maps/Riverdale/riverdale.scene"))).AsObject();
+var visual=new System.Collections.Generic.HashSet<string>(StringComparer.OrdinalIgnoreCase){"Sun","Sky","Fog","Look","Riverdale","Lights","Reflection Probes","Volumetric Fog","Indirect Light"};
+var objects=new System.Text.Json.Nodes.JsonArray();
+foreach(var node in root["GameObjects"].AsArray())if(visual.Contains(node["Name"]?.GetValue<string>()??""))objects.Add(node.DeepClone());
+root["GameObjects"]=objects;
+root["SceneProperties"]["NavMesh"]["Enabled"]=false;
+root["SceneProperties"]["WantsSystemScene"]=false;
+var scene=Scene.CreateEditorScene();
+var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic;
+var pre=typeof(Scene).GetMethod("PreRender",flags,null,Type.EmptyTypes,null);
+var precam=typeof(Scene).GetMethod("PreCameraRender",flags,null,Type.EmptyTypes,null);
+try {
+    CameraComponent camera;
+    using(scene.Push()){
+        scene.Deserialize(root);
+        var holder=new GameObject(false,"Pool rules isolated camera");
+        camera=holder.Components.Create<CameraComponent>();camera.ZNear=1;camera.ZFar=120000;holder.Enabled=true;
+        scene.EditorTick(.016f,.016f);pre.Invoke(scene,null);precam.Invoke(scene,null);
+    }
+    foreach(var r in scene.GetAllComponents<ModelRenderer>().Where(r=>r.Model!=null))
+        foreach(var mat in r.Model.Materials)
+            foreach(var t in new[]{mat.FirstTexture,mat.GetTexture("g_tColor"),mat.GetTexture("g_tNormal"),mat.GetTexture("g_tRoughness")}.Where(t=>t!=null))t.MarkUsed(2048);
+    for(int i=0;i<45;i++){
+        using(scene.Push()){scene.EditorTick(.016f,.016f);pre.Invoke(scene,null);}
+        await Task.Delay(33,cancellationToken);
+    }
+    var views=new[]{
+        (Name:"north-final",Eye:new Vector3(1928,208,64),Target:new Vector3(1998.88f,223,57),Fov:50f),
+        (Name:"west-upper",Eye:new Vector3(1860,910,351),Target:new Vector3(1880,998.88f,345),Fov:48f),
+        (Name:"east-upper",Eye:new Vector3(1900,-910,351),Target:new Vector3(1880,-998.88f,345),Fov:48f)
+    };
+    var images=new System.Collections.Generic.List<string>();
+    using var bitmap=new Bitmap(1200,1000);
+    foreach(var view in views){
+        for(int i=0;i<15;i++){
+            cancellationToken.ThrowIfCancellationRequested();
+            using(scene.Push()){
+                camera.WorldPosition=view.Eye;camera.WorldRotation=Rotation.LookAt(view.Target-view.Eye);camera.FieldOfView=view.Fov;
+                scene.EditorTick(.016f,.016f);pre.Invoke(scene,null);precam.Invoke(scene,null);camera.RenderToBitmap(bitmap,false);
+            }
+            await Task.Delay(16,cancellationToken);
+        }
+        var path=System.IO.Path.Combine(output,view.Name+".png");System.IO.File.WriteAllBytes(path,bitmap.ToPng());images.Add(path);
+    }
+    return new{Images=images,Unchanged=Game.ActiveScene?.Id==sourceId&&Editor.SceneEditorSession.Active?.Scene?.Id==editId&&Game.IsPlaying==playing,
+        Missing=scene.GetAllComponents<ModelRenderer>().Where(r=>r.Model==null||r.Model.IsError).Select(r=>r.GameObject.Name).ToArray()};
+}finally{scene.Destroy();}

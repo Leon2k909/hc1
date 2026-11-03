@@ -1,0 +1,327 @@
+{
+  "tools": [
+    {
+      "name": "add_component",
+      "title": "Add Component",
+      "toolset": "scene",
+      "description": "Add a component to a game object, optionally setting its properties in the same call. The user can undo this. Returns the component's id.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The game object's id, from scene_tree or find_game_objects."
+          },
+          "type": {
+            "type": "string",
+            "description": "The component type name, e.g. 'ModelRenderer'. get_component_type documents what exists."
+          },
+          "properties": {
+            "type": "object",
+            "description": "Optional json object of property values, e.g. {\"LightColor\": \"1,0.8,0.6,1\", \"Radius\": 512}."
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "Id": {
+            "type": "string"
+          },
+          "Type": {
+            "type": "string"
+          },
+          "GameObject": {
+            "type": "string"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "delete_game_object",
+      "title": "Delete Game Object",
+      "toolset": "scene",
+      "description": "Delete a game object and its children. The user can undo this.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The game object's id, from scene_tree or find_game_objects."
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "get_game_object",
+      "title": "Get Game Object",
+      "toolset": "scene",
+      "description": "Everything about one game object - enabled state, tags, world transform, parent, children, and its components. Set includeComponentProperties to also get every component's serialized properties.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The game object's id, from scene_tree or find_game_objects."
+          },
+          "includeComponentProperties": {
+            "type": "boolean",
+            "description": "Include the full serialized properties of every component, not just their types.",
+            "default": false
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "Scene": {
+            "type": "string"
+          },
+          "Name": {
+            "type": "string"
+          },
+          "Id": {
+            "type": "string"
+          },
+          "Enabled": {
+            "type": "boolean"
+          },
+          "ActiveInHierarchy": {
+            "type": "boolean"
+          },
+          "Tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "Parent": {
+            "type": "object",
+            "properties": {
+              "Id": {
+                "type": "string"
+              },
+              "Name": {
+                "type": "string"
+              }
+            },
+            "required": [],
+            "description": "The parent. Null when parented to the scene root."
+          },
+          "WorldPosition": {
+            "type": "string"
+          },
+          "WorldRotation": {
+            "type": "string"
+          },
+          "WorldScale": {
+            "type": "string"
+          },
+          "Components": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "Type": {
+                  "type": "string"
+                },
+                "Id": {
+                  "type": "string"
+                },
+                "Enabled": {
+                  "type": "boolean"
+                },
+                "Properties": {
+                  "description": "The serialized properties. Null unless includeComponentProperties was set."
+                }
+              },
+              "required": []
+            }
+          },
+          "Children": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "Id": {
+                  "type": "string"
+                },
+                "Name": {
+                  "type": "string"
+                },
+                "Enabled": {
+                  "type": "boolean"
+                }
+              },
+              "required": []
+            }
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "scene_tree",
+      "title": "Scene Tree",
+      "toolset": "scene",
+      "description": "The game object hierarchy of an open scene - every object's name, id, enabled state and component types, nested like the editor's hierarchy panel. Use the ids with get_game_object to dig into a specific object.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "scene": {
+            "type": "string",
+            "description": "Scene name or resource path from list_scenes. Empty for the active scene."
+          },
+          "maxDepth": {
+            "type": "integer",
+            "description": "How many levels deep to descend. 0 for unlimited.",
+            "default": 0
+          }
+        },
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "Scene": {
+            "type": "string"
+          },
+          "ResourcePath": {
+            "type": "string"
+          },
+          "Objects": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "Name": {
+                  "type": "string"
+                },
+                "Id": {
+                  "type": "string"
+                },
+                "Enabled": {
+                  "type": "boolean"
+                },
+                "Components": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "Children": {
+                  "type": "array",
+                  "items": {},
+                  "description": "Child objects. Null when the depth limit or node budget cut them off."
+                },
+                "ChildrenNotShown": {
+                  "type": "integer",
+                  "description": "How many children weren't shown."
+                }
+              },
+              "required": []
+            }
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "set_game_object",
+      "title": "Set Game Object",
+      "toolset": "scene",
+      "description": "Change a game object - rename, enable/disable, reparent, move, rotate or scale. Only the arguments you give change; everything else stays. The user can undo this.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The game object's id, from scene_tree or find_game_objects."
+          },
+          "name": {
+            "type": "string",
+            "description": "New name."
+          },
+          "enabled": {
+            "type": "boolean",
+            "description": "Enable or disable the object."
+          },
+          "parent": {
+            "type": "string",
+            "description": "New parent game object id, or 'root' for the scene root."
+          },
+          "position": {
+            "type": "string",
+            "description": "World position as 'x,y,z'."
+          },
+          "angles": {
+            "type": "string",
+            "description": "Rotation as 'pitch,yaw,roll'."
+          },
+          "scale": {
+            "type": "string",
+            "description": "Scale as 'x,y,z', or a single number for uniform."
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "Id": {
+            "type": "string"
+          },
+          "Name": {
+            "type": "string"
+          },
+          "Enabled": {
+            "type": "boolean"
+          },
+          "Parent": {
+            "type": "object",
+            "properties": {
+              "Id": {
+                "type": "string"
+              },
+              "Name": {
+                "type": "string"
+              }
+            },
+            "required": [],
+            "description": "The parent. Null when parented to the scene root."
+          },
+          "Position": {
+            "type": "string"
+          },
+          "Angles": {
+            "type": "string"
+          },
+          "Scale": {
+            "type": "string"
+          }
+        },
+        "required": []
+      }
+    }
+  ],
+  "total": 402
+}

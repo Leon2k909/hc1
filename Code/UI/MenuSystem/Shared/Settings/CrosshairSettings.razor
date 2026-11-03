@@ -45,18 +45,16 @@
                     <SettingEntry Target=@GameSettingsSystem.Current Description=@property />
                 }
             </div>
+
+            @* Its colour has the same picker as the custom crosshair's, not the settings' hue field. *@
+            <div class="ch-label mt">@Tr( "Color" )</div>
+            <HsvColorPicker Presets=@ColorPresets Get=@NativeColor Set=@SetNativeColor />
         }
 
         @if ( Cfg.Style == "custom" )
         {
             <div class="ch-label mt">@Tr( "Color" )</div>
-            <div class="ch-chips">
-                @foreach ( var hex in ColorPresets )
-                {
-                    var h = hex;
-                    <button class="ch-swatch @(Cfg.Color == h ? "selected" : "")" style="background-color:@h" @onmousedown=@(() => { Cfg.Color = h; Save(); })></button>
-                }
-            </div>
+            <HsvColorPicker Presets=@ColorPresets Get=@(() => Cfg.Color) Set=@SetColor />
 
             <div class="ch-label mt">@Tr( "Alpha - {0}%", Math.Round( Cfg.Alpha * 100 ) )</div>
             <div class="ch-chips">
@@ -136,13 +134,7 @@
         </div>
 
         <div class="ch-label mt">@Tr( "Color" )</div>
-        <div class="ch-chips">
-            @foreach ( var hex in ColorPresets )
-            {
-                var h = hex;
-                <button class="ch-swatch @(Cfg.HitColor == h ? "selected" : "")" style="background-color:@h" @onmousedown=@(() => { Cfg.HitColor = h; Save(); })></button>
-            }
-        </div>
+        <HsvColorPicker Presets=@ColorPresets Get=@(() => Cfg.HitColor) Set=@SetHitColor />
 
         <div class="ch-label mt">@Tr( "Alpha - {0}%", Math.Round( Cfg.HitAlpha * 100 ) )</div>
         <div class="ch-chips">
@@ -238,8 +230,34 @@
 
     CrosshairPreview Preview { get; set; }
 
+    // The colour is left out for the picker under them.
     static IEnumerable<PropertyDescription> NativeSettings =>
-        TypeLibrary.GetPropertyDescriptions( GameSettingsSystem.Current ).Where( x => x.Group == "Crosshair" );
+        TypeLibrary.GetPropertyDescriptions( GameSettingsSystem.Current )
+            .Where( x => x.Group == "Crosshair" && x.Name != nameof( GameSettings.CrosshairColor ) );
+
+    // The pickers' colours. Each change shows at once (the HUD and the preview read the settings as they draw), and
+    // is saved when it's final: a drag let go, a swatch, a D-pad step, a hex typed in.
+    void SetColor( string hex, bool done )
+    {
+        Cfg.Color = hex;
+        if ( done ) CrosshairManager.SaveConfig();
+    }
+
+    void SetHitColor( string hex, bool done )
+    {
+        Cfg.HitColor = hex;
+        if ( done ) CrosshairManager.SaveConfig();
+    }
+
+    static string NativeColor() => HsvColorPicker.ToHex( GameSettingsSystem.Current.CrosshairColor );
+
+    void SetNativeColor( string hex, bool done )
+    {
+        var settings = GameSettingsSystem.Current;
+        if ( Color.TryParse( hex, out var colour ) )
+            settings.CrosshairColor = colour.WithAlpha( settings.CrosshairColor.a );
+        if ( done ) GameSettingsSystem.Save();
+    }
 
     void SetTab( string tab )
     {
@@ -279,7 +297,7 @@
         hash.Add( Cfg.Style );
         hash.Add( Cfg.Enabled );
         hash.Add( Cfg.HideOnAds );
-        hash.Add( Cfg.Color );
+        // Not the colours: the pickers show them, so a drag doesn't rebuild the page every frame.
         hash.Add( Cfg.Alpha );
         hash.Add( Cfg.Thickness );
         hash.Add( Cfg.Size );
@@ -290,7 +308,6 @@
         hash.Add( Cfg.OutlineThickness );
         hash.Add( Cfg.OutlineAlpha );
         hash.Add( Cfg.HitStyle );
-        hash.Add( Cfg.HitColor );
         hash.Add( Cfg.HitAlpha );
         hash.Add( Cfg.HitThickness );
         hash.Add( Cfg.HitSize );

@@ -1,0 +1,44 @@
+{
+  "tools": [
+    {
+      "name": "bridge_list_handlers",
+      "title": "Native List Handlers",
+      "toolset": "bridge_helpers",
+      "description": "List the live Bridge helpers, their read-only status and their play-mode restrictions. Use bridge_describe_handler to inspect arguments, then bridge_read or bridge_call.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "bridge_read",
+      "title": "Native Read",
+      "toolset": "bridge_helpers",
+      "description": "Run an allowlisted read-only Bridge helper directly inside the editor, without file IPC. Use bridge_describe_handler for parameters. Mutating commands are rejected.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "command": {
+            "type": "string",
+            "description": "Read-only command from bridge_list_handlers."
+          },
+          "parameters": {
+            "type": "object",
+            "description": "The helper's JSON parameters; omit for helpers with no arguments."
+          }
+        },
+        "required": [
+          "command"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    }
+  ],
+  "total": 402
+}

@@ -373,9 +373,11 @@ def atlas(name,base,rough):
     stem='atlas_'+name
     for suffix,array in (('color',colour),('rough',rr),('metal',metal),('normal',normal)):
         Image.fromarray(array).save(B.MD/(stem+'_'+suffix+'.png'))
+        # Retain authoring charts; use POT maps for native normal/RMA mip generation.
+        Image.fromarray(array).resize((2048,2048),Image.Resampling.BICUBIC).save(B.MD/(stem+'_'+suffix+'_engine.png'))
     path=f'{B.MAT}/{stem}'
-    text=O.vmat(name,path+'_color.png',path+'_normal.png',path+'_rough.png')
-    text=text.replace('    g_flMetalness "0.0"',f'    F_METALNESS_TEXTURE "1"\n    TextureMetalness "{path}_metal.png"')
+    text=O.vmat(name,path+'_color_engine.png',path+'_normal_engine.png',path+'_rough_engine.png')
+    text=text.replace('    g_flMetalness "0.0"',f'    F_METALNESS_TEXTURE "1"\n    TextureMetalness "{path}_metal_engine.png"')
     (B.MD/(name+'.vmat')).write_text(text)
 
 def materials():

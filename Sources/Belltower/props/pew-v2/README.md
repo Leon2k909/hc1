@@ -1,6 +1,6 @@
 # Belltower church pew v2
 
-Installed 2026-10-31 at the user's word after comparing both in s&box ("pew new better"). Nothing is committed. The old pews' faces are cut from the two OBJs `belltower_centre.vmdl` builds from, and the scene's "Church Pews" group places 12 models with renderers only. The old boxes stay in the merged model as their collision. `docs/notes/166-*` has how.
+Installed 2026-10-31 at the user's word after comparing both in s&box ("pew new better"). It's on `codex/orion-cable-reel-preview`, not main, in e2a67355 and 5c80147c, from the user's request to put everything on git. The old pews' faces are cut from the two OBJs `belltower_centre.vmdl` builds from, and the scene's "Church Pews" group places 12 models with renderers only. The old boxes stay in the merged model as their collision. `docs/notes/166-*` has how.
 
 Why this one: each old pew is two boxes, a solid seat block and a slab, with plank scans laid across them. There are twelve in the church, which links the square
 to the terrace, and the map script counts them as cover.

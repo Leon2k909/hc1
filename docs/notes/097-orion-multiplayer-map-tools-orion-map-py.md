@@ -76,4 +76,17 @@
   navigation targets from both teams and a direct upper stair path passed. No live
   match or frame-time benchmark. Sources: `Sources/Orion/cable-reel-trial-v1/`;
   installation receipts and captures: `output/orion-cable-reel-installed-20261030/`.
+- 2026-10-31: the approved generator replaces the plain box at plan
+  `(265,1335,240)` beside the reel. The saved scene adds one render-only
+  `ORION standby generator` using `models/props/orion/generator_v1/generator.vmdl`,
+  twelve private materials and four LODs (51,658 / 20,662 / 7,232 / 2,324 triangles).
+  Only the old twelve render triangles are removed from `orion_launch_deck.obj`;
+  the packed ModelDoc and all collision stay byte-identical. `Tools/orion_generator.py`
+  and the `orion_map.py` hooks preserve the accepted instance and original collision
+  on rebuild. Installation finished offline at the user's request. Static checks
+  passed resource paths, scene/GUID integrity, geometry/UV/normal preservation,
+  unchanged other scene data and a comparison against the actual prior generator.
+  Native compilation, in-engine appearance and performance remain unverified.
+  Sources: `Sources/Orion/generator-trial-v1/`; receipts and backups:
+  `output/orion-generator-installed-20261030/`.
 

@@ -1,0 +1,43 @@
+var path = "scenes/maps/Riverside/riverside.scene";
+if (Editor.SceneEditorSession.All.Any(s => s.Scene?.Name.Equals("riverside", StringComparison.OrdinalIgnoreCase) == true))
+    throw new Exception("Riverside is open in another editor session; inspect its state before installing.");
+var data = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText("%PLAN_PATH%"));
+var resource = SceneFile.Load(path);
+if (resource.GameObjects.Any(g => g["Name"]?.GetValue<string>() == "Lawn Chairs"))
+    return new { AlreadyInstalled = true };
+var oldObjects = resource.GameObjects;
+var isolated = Scene.CreateEditorScene();
+try
+{
+    System.Text.Json.Nodes.JsonObject serialized;
+    using (isolated.Push())
+    {
+        var group = new GameObject(false, "Lawn Chairs");
+        group.Deserialize(data["group"].AsObject());
+        var renderers = group.GetComponentsInChildren<ModelRenderer>().ToArray();
+        if (renderers.Length != 4 || renderers.Any(r => r.Model is null || r.Model.IsError))
+            throw new Exception("Expected four successfully loaded chair models.");
+        serialized = group.Serialize();
+    }
+    var file = System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(), "Assets", path);
+    var before = System.IO.File.ReadAllText(file);
+    var backup = System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(), "output/asset-improvement-20261030/lawn-chair/before-install/riverside.scene");
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(backup));
+    if (!System.IO.File.Exists(backup)) System.IO.File.WriteAllText(backup, before);
+    var objects = oldObjects.ToList();
+    objects.Insert(objects.FindIndex(g => g["Name"]?.GetValue<string>() == "Propane Cylinders") + 1, serialized);
+    resource.GameObjects = objects.ToArray();
+    if (!Editor.AssetSystem.FindByPath(path).SaveToDisk(resource)) throw new Exception("Editor asset save failed.");
+    var beforeJson = System.Text.Json.Nodes.JsonNode.Parse(before);
+    var afterJson = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(file));
+    var added = afterJson["GameObjects"].AsArray().Single(g => g["Name"]?.GetValue<string>() == "Lawn Chairs");
+    afterJson["GameObjects"].AsArray().Remove(added);
+    var unchanged = System.Text.Json.Nodes.JsonNode.DeepEquals(beforeJson, afterJson);
+    return new { SavedThroughEditor = true, OnlyAddedChairGroup = unchanged, Chairs = serialized["Children"].AsArray().Count, Backup = backup };
+}
+catch
+{
+    resource.GameObjects = oldObjects;
+    throw;
+}
+finally { isolated.Destroy(); }

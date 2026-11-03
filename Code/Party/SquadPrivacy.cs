@@ -34,6 +34,7 @@ public static class SquadPrivacy
 
 	/// <summary> The squad's MaxMembers before Private closed it; 0 while it's open. </summary>
 	private static int _openLimit;
+	private static PartyRoom _limitedParty;
 
 	private static RealTimeSince _sinceEnforced = 1f;
 
@@ -78,7 +79,7 @@ public static class SquadPrivacy
 	public static int Limit( PartyRoom party )
 	{
 		if ( party is null ) return SquadLimit;
-		if ( _openLimit > 0 ) return _openLimit;
+		if ( _openLimit > 0 && ReferenceEquals( party, _limitedParty ) ) return _openLimit;
 
 		try { return party.MaxMembers; }
 		catch { return SquadLimit; }
@@ -162,6 +163,12 @@ public static class SquadPrivacy
 		_sinceEnforced = 0;
 
 		var party = Party;
+		// Capacity saved for a private room must never be applied to another room.
+		if ( !ReferenceEquals( party, _limitedParty ) )
+		{
+			_limitedParty = party;
+			_openLimit = 0;
+		}
 		if ( party is null )
 		{
 			_openLimit = 0;

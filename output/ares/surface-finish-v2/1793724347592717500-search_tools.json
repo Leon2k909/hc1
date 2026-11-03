@@ -1,0 +1,78 @@
+{
+  "tools": [
+    {
+      "name": "batch_add_component",
+      "title": "Batch Add Component",
+      "toolset": "bridge_batch",
+      "description": "Add one component type to MANY GameObjects in one call (e.g. BoxCollider on every crate). Skips objects that already have the component unless skipExisting:false. dryRun:true validates the type and reports per-object alreadyHas WITHOUT adding. Returns { total, succeeded, failed, skipped, dryRun, results }. Follow with batch_set_property to configure the new components. Scene-mutating: refused during play mode.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "GUIDs of the target GameObjects (from find_objects or get_selected_objects)."
+          },
+          "component": {
+            "type": "string",
+            "description": "Component type name to add, e.g. 'BoxCollider', 'PointLight' (search with list_available_components)."
+          },
+          "skipExisting": {
+            "type": "boolean",
+            "description": "Skip objects that already have this component type. Default true."
+          },
+          "dryRun": {
+            "type": "boolean",
+            "description": "true = validate and report without adding anything. Default false."
+          }
+        },
+        "required": [
+          "ids",
+          "component"
+        ]
+      }
+    },
+    {
+      "name": "batch_set_property",
+      "title": "Batch Set Property",
+      "toolset": "bridge_batch",
+      "description": "Set ONE component property to the same value across MANY GameObjects in a single call. Pass dryRun:true first: it performs the same type coercion and reference resolution as apply, reports current/proposed values, and sets wouldChange:false when they already match. Apply skips no-op setters. Returns { total, succeeded, failed, dryRun, changed, unchanged, results }. Scene-mutating: refused during play mode. Value coercion matches set_property.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "GUIDs of the GameObjects to modify (from find_objects, get_scene_hierarchy, or get_selected_objects)."
+          },
+          "component": {
+            "type": "string",
+            "description": "Component type name present on each object, e.g. 'ModelRenderer', 'PointLight'."
+          },
+          "property": {
+            "type": "string",
+            "description": "Property name to set, e.g. 'Tint', 'Enabled', 'LightColor' (see get_all_properties)."
+          },
+          "value": {
+            "description": "New value — number, bool, string, enum name, 'x,y,z' vector, color, or asset path. JSON value."
+          },
+          "dryRun": {
+            "type": "boolean",
+            "description": "true = validate and report current values without changing anything. Default false."
+          }
+        },
+        "required": [
+          "ids",
+          "component",
+          "property",
+          "value"
+        ]
+      }
+    }
+  ],
+  "total": 402
+}

@@ -1,0 +1,1062 @@
+{
+  "tools": [
+    {
+      "name": "add_achievement_trigger",
+      "title": "Add Achievement Trigger",
+      "toolset": "bridge_scaffold_gameplay",
+      "description": "SCENE-MUTATING: generate a data-driven achievement trigger-zone component AND create its GameObject now (named zone with a sized BoxCollider, IsTrigger=true, at the given position). When an object tagged triggerTag enters, the component calls &lt;achievementSetClass&gt;.Instance.Progress(achievementId, amount) — or Unlock() when unlock=true — with a once-only latch and optional destroy-after-fire. Returns { created, path, className, achievementSetClass, achievementId, gameObject, attached, note, nextSteps }. The generated component only attaches to the zone after trigger_hotload — until then `attached` is false and nextSteps carries the exact add_component_with_properties follow-up. The generated code references the set class BY NAME: run create_achievement_set first or the project will not compile (the result warns via `note`). Re-running with the same name fails unless reuseClass=true, which skips codegen and just places another zone (attaching + configuring immediately since the class is already compiled). Refused during play mode.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "achievementId": {
+            "type": "string",
+            "description": "Id of the achievement to progress/unlock (sanitized to [a-z0-9_-])."
+          },
+          "name": {
+            "type": "string",
+            "description": "Class name for the generated trigger component. Defaults to 'AchievementTrigger'."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory for the generated .cs file. Defaults to 'Code'."
+          },
+          "achievementSetClass": {
+            "type": "string",
+            "description": "Class name of the achievement set the zone reports to (from create_achievement_set). Defaults to 'AchievementSet'."
+          },
+          "amount": {
+            "type": "number",
+            "description": "Progress amount added per fire (ignored when unlock=true). Defaults to 1."
+          },
+          "unlock": {
+            "type": "boolean",
+            "description": "Call Unlock() instead of Progress(). Defaults to false."
+          },
+          "triggerTag": {
+            "type": "string",
+            "description": "Tag the entering object must carry (put it on the player via set_tags). Defaults to 'player'."
+          },
+          "onceOnly": {
+            "type": "boolean",
+            "description": "Only the first tagged entry fires. Defaults to true."
+          },
+          "destroyAfterFire": {
+            "type": "boolean",
+            "description": "Destroy the zone GameObject after firing. Defaults to false."
+          },
+          "createObject": {
+            "type": "boolean",
+            "description": "Create the zone GameObject now (with BoxCollider). Defaults to true; false = code-gen only."
+          },
+          "objectName": {
+            "type": "string",
+            "description": "Name for the zone GameObject. Defaults to '&lt;name&gt;Zone'."
+          },
+          "position": {
+            "type": "string",
+            "description": "World position of the zone GameObject. As \"x,y,z\" (or JSON {x,y,z})."
+          },
+          "scale": {
+            "type": "string",
+            "description": "BoxCollider size — uniform number, object {x,y,z}, or comma string \"x,y,z\". Defaults to 100,100,100. As \"x,y,z\" (or JSON {x,y,z})."
+          },
+          "reuseClass": {
+            "type": "boolean",
+            "description": "If the .cs already exists, skip codegen and just place another zone with the existing class. Defaults to false."
+          }
+        },
+        "required": [
+          "achievementId"
+        ]
+      }
+    },
+    {
+      "name": "add_component",
+      "title": "Add Component",
+      "toolset": "scene",
+      "description": "Add a component to a game object, optionally setting its properties in the same call. The user can undo this. Returns the component's id.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The game object's id, from scene_tree or find_game_objects."
+          },
+          "type": {
+            "type": "string",
+            "description": "The component type name, e.g. 'ModelRenderer'. get_component_type documents what exists."
+          },
+          "properties": {
+            "type": "object",
+            "description": "Optional json object of property values, e.g. {\"LightColor\": \"1,0.8,0.6,1\", \"Radius\": 512}."
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "Id": {
+            "type": "string"
+          },
+          "Type": {
+            "type": "string"
+          },
+          "GameObject": {
+            "type": "string"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "add_component_to_new_object",
+      "title": "Add Component To New Object",
+      "toolset": "bridge_component",
+      "description": "Create a new GameObject, add a component, set its properties, and optionally parent/position/tag it — all in one atomic call. Collapses the create_gameobject → add_component_with_properties → set_parent sequence. NOTE: a freshly GENERATED component type only resolves after a trigger_hotload; generate the script, hotload, THEN call this.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "component": {
+            "type": "string",
+            "description": "Component type name to add (e.g. 'CameraComponent', 'ObjectiveManager'). Use list_available_components to find valid types."
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name for the new GameObject. Defaults to the component type name."
+          },
+          "properties": {
+            "description": "Key-value map of property names to values, auto-converted to the right type (same convention as add_component_with_properties). JSON value."
+          },
+          "position": {
+            "type": "string",
+            "description": "World position. As \"x,y,z\" (or JSON {x,y,z})."
+          },
+          "rotation": {
+            "type": "string",
+            "description": "World rotation. As \"pitch,yaw,roll\" degrees."
+          },
+          "scale": {
+            "type": "string",
+            "description": "World scale (per-axis). As \"x,y,z\" (or JSON {x,y,z})."
+          },
+          "parentId": {
+            "type": "string",
+            "description": "GUID of a parent GameObject. Omit for scene root."
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Tags to add to the new GameObject (e.g. ['player'])."
+          }
+        },
+        "required": [
+          "component"
+        ]
+      }
+    },
+    {
+      "name": "add_component_with_properties",
+      "title": "Add Component With Properties",
+      "toolset": "bridge_component",
+      "description": "Add a component to a GameObject and configure its properties in one call (properties PERSIST through save+reload). Use list_available_components to find valid types. Returns appliedProperties + failedProperties so you can see exactly what stuck.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of the GameObject."
+          },
+          "component": {
+            "type": "string",
+            "description": "Component type name (e.g. 'ModelRenderer', 'Rigidbody', 'BoxCollider')."
+          },
+          "properties": {
+            "description": "Key-value map of property names to values, each auto-converted to the property's real type. Primitives '5'/true; Color/Vector3 as comma strings '1,0,0,1'; enum member names; ASSET refs as a path ('Model':'models/dev/box.vmdl', 'MaterialOverride':'materials/x.vmat'); GameObject/Component refs as a target GUID. Best-effort per key — failures are reported in failedProperties, not silently dropped. JSON value."
+          }
+        },
+        "required": [
+          "id",
+          "component"
+        ]
+      }
+    },
+    {
+      "name": "add_leaderboard_stat",
+      "title": "Add Leaderboard Stat",
+      "toolset": "bridge_scaffold_gameplay",
+      "description": "Generate a batched write-side stat reporter component for Sandbox.Services.Stats — the write partner of create_leaderboard_panel. Gameplay code calls the static &lt;Name&gt;.Report(\"kills\", 1) from anywhere; amounts accumulate locally and flush as Stats.Increment deltas on a timer (default every 12 s, also on disable/destroy). Baseline-delta bookkeeping means a partial flush retries the un-sent remainder instead of double-counting, and deltas larger than maxChunk are sent in chunks. Returns { created, path, className, placedOn, note, nextSteps }. Place ONE in the scene after trigger_hotload (add_component_to_new_object), or pass targetId to attach immediately when the type is already compiled. Stats are PER LOCAL PLAYER (each client reports its own) and only exist on leaderboards once the stat is registered for the project ident on sbox.game. Fails if the file already exists.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class name for the generated component. Defaults to 'StatReporter'."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory for the generated .cs file. Defaults to 'Code'."
+          },
+          "flushIntervalSeconds": {
+            "type": "number",
+            "description": "Seconds between batched flushes to the backend. Defaults to 12, clamped to &gt;= 1."
+          },
+          "maxChunk": {
+            "type": "number",
+            "description": "Largest amount sent in a single Stats.Increment call; bigger deltas are chunked. Defaults to 1000, clamped to &gt;= 1."
+          },
+          "targetId": {
+            "type": "string",
+            "description": "GUID of a GameObject to attach to (only attaches if the type is already loaded — hotload first)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "add_render_target_camera",
+      "title": "Add Render Target Camera",
+      "toolset": "bridge_visuals",
+      "description": "CCTV / security monitor / mirror / simple portal: creates a secondary camera (IsMainCamera=false, Priority param) positioned/rotated or aimed at a target object, a display surface (scaled box with a ModelRenderer), and GENERATES a sealed wiring component that at runtime creates the render-target Texture (Texture.CreateRenderTarget builder), assigns camera.RenderTarget and sets the texture onto an anonymous complex-shader material on the display (attribute 'Color' = albedo; the screen is scene-lit, not emissive/unlit). Returns {created, camera{id,...}, display{id,...}|null, className, path, generatedCode, attachedAndWired, resolution, nextSteps[]}. FIRST call generates the .cs → follow nextSteps: trigger_hotload, then add_component_with_properties on the display with properties {SourceCamera: &lt;camera GUID&gt;}; a REPEAT call reusing the same `name` after the hotload attaches AND wires everything automatically (attachedAndWired=true). The feed only renders in play mode — verify with start_play + capture_view. If `name`'s .cs file exists but isn't compiled yet, the call errors — hotload first. Scene/file-mutating — refused during play mode.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class name for the generated wiring component. Defaults to 'RenderTargetDisplay'. Reuse the same name for extra cameras — after a hotload the class is reused and wired in one shot."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory for the generated .cs file. Defaults to 'Code'."
+          },
+          "cameraName": {
+            "type": "string",
+            "description": "GameObject name for the camera. Defaults to 'RT Camera'."
+          },
+          "position": {
+            "type": "string",
+            "description": "World position of the camera. As \"x,y,z\" (or JSON {x,y,z})."
+          },
+          "rotation": {
+            "type": "string",
+            "description": "World rotation of the camera. As \"pitch,yaw,roll\" degrees."
+          },
+          "lookAtId": {
+            "type": "string",
+            "description": "GUID of a GameObject to aim the camera at (overrides rotation; from get_scene_hierarchy / find_objects)."
+          },
+          "priority": {
+            "type": "number",
+            "description": "CameraComponent.Priority (integer). Defaults to 1."
+          },
+          "fieldOfView": {
+            "type": "number",
+            "description": "Camera field of view in degrees (clamped 5-170). Engine default when omitted."
+          },
+          "resolution": {
+            "type": "string",
+            "description": "Render-target size as 'width,height' pixels (min 16). Defaults to '512,512'."
+          },
+          "backgroundColor": {
+            "type": "string",
+            "description": "Camera background colour. Engine default when omitted. As \"r,g,b[,a]\" (0-1 floats)."
+          },
+          "createDisplay": {
+            "type": "boolean",
+            "description": "Create the display surface GameObject. Defaults to true. Pass false to wire your own surface later."
+          },
+          "displayPosition": {
+            "type": "string",
+            "description": "World position of the display surface. As \"x,y,z\" (or JSON {x,y,z})."
+          },
+          "displayRotation": {
+            "type": "string",
+            "description": "World rotation of the display surface. As \"pitch,yaw,roll\" degrees."
+          },
+          "displaySize": {
+            "type": "string",
+            "description": "Display box extents as 'x,y,z' world units (thin x = a wall screen facing ±x). Defaults to '4,128,72'."
+          },
+          "attribute": {
+            "type": "string",
+            "description": "Material attribute that receives the texture. Defaults to 'Color' (albedo on the complex shader). Sanitized to [A-Za-z0-9_]."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "add_tts_voice",
+      "title": "Add Tts Voice",
+      "toolset": "bridge_audio",
+      "description": "Generate a text-to-speech speaker component over Sandbox.Speech.Synthesizer (the OS speech engine — dynamic NPC dialog with zero recorded VO): call &lt;class&gt;.Say(\"text\") from game code and it builds a Synthesizer (TrySetVoice by exact VoiceName, else gender/age hint, else OS default) -&gt; WithText -&gt; WithRate -&gt; Play(), returning a tracked SoundHandle — positional 3D parented to the speaker (default) or flat 2D, with stop-previous-on-say interruption, IsSpeaking, StopSpeaking(), and LogVoices() to enumerate installed OS voices. Returns {created, path, className, propertyNames[], note}. Next: trigger_hotload + get_compile_errors, attach (targetId or add_component_with_properties), then Say from game code — LOCAL audio only, wrap the Say call in an [Rpc.Broadcast] handler for everyone to hear. Limits & honesty: the editor cannot playtest audio, so RUNTIME speech is UNVERIFIED (the API surface compiles — verify with your ears in play mode); voices are machine/OS-specific and TrySetVoice is best-effort; LIPSYNC IS NOT AUTO-WIRED — s&box's Sandbox.LipSync component consumes a BaseSoundComponent, not the raw SoundHandle TTS produces, and Synthesizer.OnVisemeReached's delegate arg types can't be confirmed via reflection; enableVisemeData:true enables Handle.LipSync.Visemes for your own mouth-drive code (runtime-unverified). Refuses to overwrite an existing file; refused during play mode.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class/file name. Defaults to 'TtsSpeaker'. Sanitized to a valid C# identifier."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory under the project root for the .cs file. Defaults to 'Code'."
+          },
+          "voiceName": {
+            "type": "string",
+            "description": "Exact installed OS voice name (machine-specific — the generated LogVoices() lists them at runtime). Empty = use voiceGender/voiceAge, or the OS default."
+          },
+          "voiceGender": {
+            "type": "string",
+            "description": "Voice gender hint used only when voiceName is empty (e.g. 'Female', 'Male'). Must be paired with voiceAge. Passed through unvalidated."
+          },
+          "voiceAge": {
+            "type": "string",
+            "description": "Voice age hint paired with voiceGender (e.g. 'Adult', 'Child', 'Senior'). Passed through unvalidated."
+          },
+          "rate": {
+            "type": "number",
+            "description": "Speaking rate offset (integer): negative = slower, positive = faster. Defaults to 0 (normal)."
+          },
+          "volume": {
+            "type": "number",
+            "description": "Playback volume for spoken lines. Defaults to 1."
+          },
+          "positional": {
+            "type": "boolean",
+            "description": "true (default): 3D sound parented to the speaker GameObject (follows it). false: flat 2D voice on the listener (narrator/UI style)."
+          },
+          "stopPreviousOnSay": {
+            "type": "boolean",
+            "description": "true (default): a new Say() fades out the still-playing previous line. false: lines overlap."
+          },
+          "stopFadeSeconds": {
+            "type": "number",
+            "description": "Fade-out duration used when interrupting/stopping a line. Defaults to 0.1."
+          },
+          "enableVisemeData": {
+            "type": "boolean",
+            "description": "true: sets Handle.LipSync.Enabled on each played line so custom mouth-drive code can read Handle.LipSync.Visemes. Runtime behavior unverified (editor can't playtest audio). Defaults to false."
+          },
+          "targetId": {
+            "type": "string",
+            "description": "GUID of the speaker GameObject to attach to (only attaches if the type is already in the TypeLibrary — hotload first)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "batch_add_component",
+      "title": "Batch Add Component",
+      "toolset": "bridge_batch",
+      "description": "Add one component type to MANY GameObjects in one call (e.g. BoxCollider on every crate). Skips objects that already have the component unless skipExisting:false. dryRun:true validates the type and reports per-object alreadyHas WITHOUT adding. Returns { total, succeeded, failed, skipped, dryRun, results }. Follow with batch_set_property to configure the new components. Scene-mutating: refused during play mode.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "GUIDs of the target GameObjects (from find_objects or get_selected_objects)."
+          },
+          "component": {
+            "type": "string",
+            "description": "Component type name to add, e.g. 'BoxCollider', 'PointLight' (search with list_available_components)."
+          },
+          "skipExisting": {
+            "type": "boolean",
+            "description": "Skip objects that already have this component type. Default true."
+          },
+          "dryRun": {
+            "type": "boolean",
+            "description": "true = validate and report without adding anything. Default false."
+          }
+        },
+        "required": [
+          "ids",
+          "component"
+        ]
+      }
+    },
+    {
+      "name": "create_currency_account",
+      "title": "Create Currency Account",
+      "toolset": "bridge_scaffold_gameplay",
+      "description": "Generate a host-authoritative currency ACCOUNT component (sealed) — the audited sibling of create_economy_wallet (wallet = simple money, account = money + a ledger). Balance is [Sync(SyncFlags.FromHost)] so clients can't author their own money; host-guarded Deposit(amount, reason), Withdraw(amount, reason) -&gt; bool, and TryTransfer(otherAccount, amount, reason) -&gt; bool each record a Transaction { Time (Time.Now), signed Amount, Reason, BalanceAfter } into a fixed-size ring buffer (historySize, default 32; oldest entries overwritten SILENTLY). GetRecentTransactions(max) returns them NEWEST FIRST — the ledger is HOST-SIDE ONLY and does not replicate (Balance does); proxies get an empty list. Bind the instance OnBalanceChanged(long) for HUD labels. Single-player safe. Returns { created, path, className, startingBalance, historySize, placedOn, note, nextSteps }. Next: trigger_hotload, then attach via targetId re-run or add_component_to_new_object. Refuses if the file already exists; refused during play mode. Use create_economy_wallet when you don't need the audit trail; pair with create_idle_economy (it auto-wires this account's Money/TrySpend).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class name for the generated component. Defaults to 'CurrencyAccount'."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory for the generated .cs file. Defaults to 'Code'."
+          },
+          "startingBalance": {
+            "type": "integer",
+            "description": "Balance the account opens with (host seeds it in OnStart). Defaults to 0."
+          },
+          "historySize": {
+            "type": "integer",
+            "description": "Transaction ring-buffer capacity (clamped 1..4096); fixed once the first transaction is recorded, oldest overwritten silently after that. Defaults to 32."
+          },
+          "targetId": {
+            "type": "string",
+            "description": "GUID of a per-player/bank GameObject to attach to (only attaches if the type is already loaded — hotload first)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_cutscene_director",
+      "title": "Create Cutscene Director",
+      "toolset": "bridge_scaffold_polish",
+      "description": "Generate a hand-authored cutscene player component that needs NO .movie asset — the zero-asset alternative to the MovieMaker family (add_movie_player/play_movie, which play keyframed .movie clips authored in the editor's Movie Maker dock). You author the shots directly in the inspector as parallel lists: ShotPositions (Vector3), ShotAngles (pitch/yaw/roll — Angles, not raw quaternions), ShotHoldSeconds, ShotBlendSeconds, and an optional per-shot ShotLookAt GameObject (aim at a target instead of using ShotAngles). At runtime it takes over the main camera (Scene.Camera) in OnPreRender ONLY while playing — smoothstep-eased Vector3.Lerp + Rotation.Slerp between shots — captures the camera's prior transform and restores it exactly when finished (same un-apply discipline as create_camera_shake). Play from any game code via the static &lt;Name&gt;.Play() (first director) or &lt;Name&gt;.Play(\"name\") (matches CutsceneName); subscribe the static &lt;Name&gt;.OnCutsceneFinished, or gate game logic on the static &lt;Name&gt;.IsCutscenePlaying. LockInput freezes player input each frame via Input.ClearActions() while still reading the SkipAction press first so the cutscene stays skippable. Optional letterbox generates a razor_lint-safe black-bars overlay panel (host under a ScreenPanel) shown while IsCutscenePlaying. LOCAL-only (each client renders its own view) — trigger inside an [Rpc.Broadcast] for all clients. Attach to ANY GameObject; it drives the camera itself and does not need to sit on the camera. Returns { created, path, className, skipAction, lockInput, letterbox, nextSteps } — path is the generated .cs (letterbox lists the overlay files when enabled). Follow with trigger_hotload, then get_compile_errors, then attach via add_component_with_properties (component=className).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class name for the generated component. Defaults to 'CutsceneDirector'."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory for the generated files. Defaults to 'Code'."
+          },
+          "skipAction": {
+            "type": "string",
+            "description": "Input action that ends the cutscene early (read before input is cleared, so a locked cutscene is still skippable). Sanitized to a safe token. Empty = not skippable. Defaults to 'jump'."
+          },
+          "lockInput": {
+            "type": "boolean",
+            "description": "Freeze player input during playback via Input.ClearActions() each frame. Defaults to true."
+          },
+          "letterbox": {
+            "type": "boolean",
+            "description": "Also generate a razor_lint-safe letterbox overlay (two black bars, shown while IsCutscenePlaying — host it under a ScreenPanel). Defaults to false."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_dialogue_system",
+      "title": "Create Dialogue System",
+      "toolset": "bridge_scaffold_polish",
+      "description": "Generate an NPC/story dialogue system — a sealed state+data Component paired with a razor_lint-safe Razor HUD panel. Lines are authored in the inspector as a List&lt;string&gt; using the 'Speaker: text' convention (the part before the first colon is the speaker). The generated HUD panel binds to &lt;Name&gt;.Current automatically (no wiring) and renders the current line with a TimeSince-driven typewriter reveal at CharsPerSecond, folding the visible substring into BuildHash so it re-renders as characters appear. Press the AdvanceAction once to snap the whole line into view instantly, again to move to the next line; dismissing the last line ends the conversation. Start from any game code via the static &lt;Name&gt;.StartDialogue(string[] lines) or set Lines and call the instance Begin(). Static events for hooks: OnLineShown(index, speaker) — pair with add_lipsync to drive facial morphs / audio per line — and OnDialogueFinished when the conversation ends. Pairs with create_interactable to trigger dialogue on use. LOCAL-only (per-client HUD) — call StartDialogue inside an [Rpc.Broadcast] if every client should see it. Attach the panel under a ScreenPanel (add_screen_panel) so the HUD renders. Returns { created, path, className, charsPerSecond, advanceAction, panel, nextSteps } — panel lists the generated '&lt;Name&gt;Panel' HUD files. Follow with trigger_hotload, then get_compile_errors, then attach both components via add_component_with_properties.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class name for the generated dialogue component (the HUD panel is generated as '&lt;Name&gt;Panel'). Defaults to 'DialogueSystem'."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory for the generated files. Defaults to 'Code'."
+          },
+          "charsPerSecond": {
+            "type": "number",
+            "description": "Typewriter reveal speed in characters per second (clamped to &gt;= 1). Defaults to 40."
+          },
+          "advanceAction": {
+            "type": "string",
+            "description": "Input action that completes the reveal / advances to the next line. Sanitized to a safe token. Defaults to 'use'."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_game_manager",
+      "title": "Create Game Manager",
+      "toolset": "bridge_scaffold_gameplay",
+      "description": "Generate a minimal game-manager Component: a static Instance singleton, [Property] MaxPlayers / GameState, and a Component.INetworkListener OnActive hook that logs player connects. Writes &lt;name&gt;.cs and returns { created, path, className }. NOTE: the includeScore/includeTimer/includeSpawning params are not currently applied — the same minimal manager is always generated (for richer game-loop scaffolds see create_round_phase_machine / create_objective_system / create_economy_wallet). Follow with trigger_hotload, then get_compile_errors, then place via add_component_to_new_object.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class name. Defaults to 'GameManager'."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory under code/ for the file."
+          },
+          "includeScore": {
+            "type": "boolean",
+            "description": "Include score tracking (currently not applied by the handler)."
+          },
+          "includeTimer": {
+            "type": "boolean",
+            "description": "Include round timer with countdown (currently not applied by the handler)."
+          },
+          "includeSpawning": {
+            "type": "boolean",
+            "description": "Include player spawning from prefab at spawn point (currently not applied by the handler)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_lobby_manager",
+      "title": "Create Lobby Manager",
+      "toolset": "bridge_networking",
+      "description": "Generate a lobby manager Component implementing Component.INetworkListener: a static Instance singleton, a [Sync] PlayerCount maintained in OnActive/OnDisconnected, and a LobbyState [Property] that flips to 'playing' when the lobby fills. Writes &lt;name&gt;.cs and returns { created, path, className }. Follow with trigger_hotload, then get_compile_errors, then place via add_component_to_new_object.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class name. Defaults to 'LobbyManager'."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory under code/."
+          },
+          "maxPlayers": {
+            "type": "number",
+            "description": "Currently not applied by the handler — the generated MaxPlayers [Property] defaults to 16; tune it per-instance with set_property."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_needs_system",
+      "title": "Create Needs System",
+      "toolset": "bridge_scaffold_gameplay",
+      "description": "Generate a sim/tycoon needs engine component: a [Property] list of need definitions (name, decay rate/s, critical threshold, weight) with per-need 0..100 values that decay over Time.Delta, Satisfy(name, amount) to restore, an aggregate Happiness (weighted mean, [Sync(FromHost)] when networked), and static OnNeedCritical (edge-triggered: fires once crossing below threshold, re-arms above) + OnHappinessChanged (&gt;0.25-point moves) events. Returns {created, path, className, needs[], propertyNames[], note}. Next: trigger_hotload, get_compile_errors, then attach via targetId re-call or add_component_with_properties; drive from game code (e.g. a create_interactable that calls Satisfy). Limits: per-need values live on the simulating machine only (host) — sync per-need UI yourself via RPCs; events fire on the simulating machine only; networked default true means a no-session solo playtest won't tick (everything is a proxy) — pass networked:false to iterate solo. Refused during play mode; refuses to overwrite an existing file.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class/file name. Defaults to 'NeedsSystem'. Sanitized to a valid C# identifier."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory under the project root for the .cs file. Defaults to 'Code'."
+          },
+          "needs": {
+            "description": "Need definitions baked as inspector-editable defaults. Defaults to the classic sim trio: Hunger(0.8/s), Energy(0.5/s), Fun(0.3/s). JSON array."
+          },
+          "networked": {
+            "type": "boolean",
+            "description": "true (default): host-authoritative (IsProxy guard) + [Sync(FromHost)] Happiness — needs a host session. false: local build that ticks in a solo playtest."
+          },
+          "targetId": {
+            "type": "string",
+            "description": "GUID of a GameObject to attach the component to (only attaches if the type is already in the TypeLibrary — hotload first, then re-call or use add_component_with_properties)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_npc_schedule_brain",
+      "title": "Create Npc Schedule Brain",
+      "toolset": "bridge_npc",
+      "description": "Generate a daily-routine NPC brain: a [Property] list of schedule entries (startHour/endHour 0..24, taskName, target = named scene GameObject or fixed position), the hour read from any create_day_night_clock component (capability match: a float TimeOfDay property, same GameObject first then scene-wide) with an HONEST fallback to its own internal clock when none exists (check the generated UsingClockComponent bool), walking the NPC to the active entry's target and idling outside the schedule, plus a static OnTaskChanged(brain, taskName) event and [Sync(FromHost)] CurrentTask. Entries with endHour &lt; startHour wrap past midnight. Returns {created, path, className, tasks[], propertyNames[], note}. Next: trigger_hotload + get_compile_errors, attach (targetId or add_component_with_properties), create the named target GameObjects (e.g. 'WorkSpot'), pair with create_day_night_clock for shared time, verify via get_runtime_property CurrentTask in play mode. Limits: default movement is a direct transform walk (walks through walls) — pass useNavMeshAgent:true for pathfinding (then bake_navmesh is REQUIRED); a clock with a different shape (e.g. 0..1 DayProgress) will NOT bind; networked default true won't tick in a no-session solo playtest (networked:false to iterate). Refused during play mode; refuses to overwrite an existing file.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class/file name. Defaults to 'NpcScheduleBrain'. Sanitized to a valid C# identifier."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory under the project root for the .cs file. Defaults to 'Code'."
+          },
+          "schedule": {
+            "description": "Schedule entries baked as inspector-editable defaults. Defaults to Work 8-17 @ 'WorkSpot', Relax 17-22 @ 'HomeSpot' (idles/sleeps otherwise). JSON array."
+          },
+          "moveSpeed": {
+            "type": "number",
+            "description": "Walk speed in world units/s. Defaults to 100."
+          },
+          "arriveDistance": {
+            "type": "number",
+            "description": "Distance at which the NPC counts as arrived and idles at the spot. Defaults to 32."
+          },
+          "useNavMeshAgent": {
+            "type": "boolean",
+            "description": "true: move via NavMeshAgent.MoveTo (real pathfinding — REQUIRES bake_navmesh or the NPC won't move). Defaults to false (direct transform walk, no navmesh needed, walks through walls)."
+          },
+          "fallbackDayLengthSeconds": {
+            "type": "number",
+            "description": "Internal fallback clock only: real seconds per 24 in-game hours when NO TimeOfDay clock component exists. Defaults to 600."
+          },
+          "fallbackStartHour": {
+            "type": "number",
+            "description": "Internal fallback clock only: starting hour 0..24. Defaults to 8."
+          },
+          "networked": {
+            "type": "boolean",
+            "description": "true (default): host-authoritative (IsProxy guard) + [Sync(FromHost)] CurrentTask. false: local build for solo iteration."
+          },
+          "targetId": {
+            "type": "string",
+            "description": "GUID of the NPC GameObject to attach to (only attaches if the type is already in the TypeLibrary — hotload first)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_objective_system",
+      "title": "Create Objective System",
+      "toolset": "bridge_scaffold_gameplay",
+      "description": "Generate an ObjectiveManager component — the win/lose brain of a game. Tracks an objective (collect_all / reach_goal / survive_time / eliminate_all), fires a win, and handles a lose condition (fall below kill-Z / timer / out of lives). Self-contained C#; other systems call ObjectiveManager.Instance. Optionally placed as a scene singleton. Returns { created, path, className, gameObject, note } — gameObject is the placed singleton, or null with a note when the fresh type isn't in the TypeLibrary yet. Follow with trigger_hotload, then get_compile_errors; if placement was skipped, place with add_component_to_new_object after the hotload.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class name. Defaults to 'ObjectiveManager'."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory for the .cs file. Defaults to 'Code'."
+          },
+          "objective": {
+            "type": "string",
+            "description": "Win condition. Defaults to 'reach_goal'. One of: collect_all | reach_goal | survive_time | eliminate_all."
+          },
+          "targetCount": {
+            "type": "integer",
+            "description": "How many to collect/eliminate (for collect_all / eliminate_all). Defaults to 3."
+          },
+          "timeLimit": {
+            "type": "number",
+            "description": "Seconds — survive this long to win (survive_time) or before losing (loseOn=timer). Defaults to 60."
+          },
+          "loseOn": {
+            "type": "string",
+            "description": "Lose condition. 'fall' = player drops below killZ. Defaults to 'fall'. One of: fall | timer | lives | none."
+          },
+          "killZ": {
+            "type": "number",
+            "description": "World Z below which the player is considered fallen out of the world. Defaults to -1000."
+          },
+          "lives": {
+            "type": "integer",
+            "description": "Lives before game over (loseOn=lives). Defaults to 1."
+          },
+          "placeInScene": {
+            "type": "boolean",
+            "description": "Place the manager as a scene singleton. Defaults to true. (Only attaches if the type is already loaded — generate, hotload, then it places; otherwise add it after hotload.)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_player_controller",
+      "title": "Create Player Controller",
+      "toolset": "bridge_scaffold_gameplay",
+      "description": "Generate a player controller script with WASD movement, mouse look, jumping, and sprint. Supports first-person, third-person, and top-down movement modes. Optionally places a player rig (GameObject + CharacterController + Camera) in the scene — note the generated component is attached AFTER a trigger_hotload (it isn't in the TypeLibrary until a recompile).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class name. Defaults to 'PlayerController'."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory under code/ for the file."
+          },
+          "type": {
+            "type": "string",
+            "description": "Movement mode: 'first_person' (mouse-look body+camera, WASD relative to facing), 'third_person' (mouse yaw, WASD relative to facing, boom camera), or 'top_down' (screen-relative WASD, fixed overhead camera, no jump). Defaults to 'first_person'. One of: first_person | third_person | top_down."
+          },
+          "moveSpeed": {
+            "type": "number",
+            "description": "Movement speed in units/sec. Defaults to 300."
+          },
+          "jumpForce": {
+            "type": "number",
+            "description": "Jump force (ignored for top_down). Defaults to 350."
+          },
+          "sprintMultiplier": {
+            "type": "number",
+            "description": "Sprint speed multiplier (held 'run' action). Defaults to 1.5."
+          },
+          "placeInScene": {
+            "type": "boolean",
+            "description": "If true, build a player rig in the scene: a GameObject (tagged 'player') with a CharacterController and (unless createCamera=false) a Camera. The generated controller component is NOT attached in this call — trigger_hotload then add_component_with_properties on the returned GameObject. Defaults to false (file-only)."
+          },
+          "createCamera": {
+            "type": "boolean",
+            "description": "When placeInScene is true, also create a Camera (FP/TP: child at eye/boom offset; top_down: fixed overhead). Defaults to true."
+          },
+          "spawnPosition": {
+            "type": "string",
+            "description": "When placeInScene is true, the world position to spawn the player rig at — object {x,y,z} or comma string \"x,y,z\". Defaults to the origin. As \"x,y,z\" (or JSON {x,y,z})."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_proxy_nametag",
+      "title": "Create Proxy Nametag",
+      "toolset": "bridge_scaffold_polish",
+      "description": "Generate a sealed Component that floats the OWNER'S display name above a networked player. TextRenderer-based (not WorldPanel): a nametag is one short string with a distance fade, so a TextRenderer on a managed child object is far simpler than a WorldPanel + Razor + WorldInput stack — no UI assets, no panel host, per-frame alpha is a one-liner (mirrors create_floating_combat_text). Reads GameObject.Network.Owner.DisplayName (Owner and OwnerConnection are the same Connection on this SDK; falls back to the object name offline). Visibility is the INVERSE of the usual proxy guard: it renders only when GameObject.Network.IsProxy is true — i.e. on OTHER clients' copies of the player — so you never see a tag over your own head (offline / no networking =&gt; IsProxy false everywhere =&gt; no tags, expected). Spawns a CHILD GameObject for the text so billboarding never rotates the player model; cleaned up on disable. [Property] MaxDistance fades the tag out with distance, HeightOffset floats it above the head, FontSize sizes it. Attach to the ROOT of your networked player object. Pairs with create_networked_player (add it to the generated player prefab so every remote player is labeled). Returns { created, path, className, maxDistance, heightOffset, note, nextSteps }. Follow with trigger_hotload, then get_compile_errors, then attach via add_component_with_properties (component=className).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class name for the generated component. Defaults to 'ProxyNametag'."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory for the generated .cs file. Defaults to 'Code'."
+          },
+          "maxDistance": {
+            "type": "number",
+            "description": "Full alpha up close; fades to zero as the camera approaches this distance and is hidden past it, in world units. Defaults to 2000."
+          },
+          "heightOffset": {
+            "type": "number",
+            "description": "Height above the object's origin to float the tag, in world units (~72 clears a Citizen's head). Defaults to 72."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_round_timer_hud",
+      "title": "Create Round Timer Hud",
+      "toolset": "bridge_scaffold_polish",
+      "description": "Generate a Razor screen-panel HUD (.razor + .razor.scss) showing the active round/phase time remaining as mm:ss with the phase/state name above it. NO code coupling to your round machine: at runtime it discovers one by TypeLibrary property reflection — same-GameObject components first, then the whole scene, re-scanning every 2s while unbound — matching either shipped machine shape: create_round_phase_machine output (a [Sync] TimeUntil 'PhaseTimer' + 'CurrentPhase' enum for the label) or create_round_state_machine output (a manager with 'StateIndex' + 'Current', whose active state carries a [Sync] TimeUntil 'TimeLeft' + 'Identifier'). First matching component wins; any hand-written machine exposing those member names also binds. Adaptive BuildHash folds the WHOLE second remaining so the panel re-renders at 1 Hz, not every frame. Optional low-time warning: at/below lowTimeSeconds the clock gets the 'low' CSS class (red by default). Shows '--:--' (and fades out via the 'unbound' class) until a machine exists. Returns { created, razorPath, scssPath, className, lowTimeSeconds, note, nextSteps }. Renders NOTHING without a ScreenPanel host: follow with trigger_hotload, then add_screen_panel, then add_component_with_properties (component=className) on the same object; verify with capture_view (renderUI=true) in play mode.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class name for the generated panel. Defaults to 'RoundTimerHud'."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory for the generated .razor + .razor.scss. Defaults to 'Code/UI'."
+          },
+          "lowTimeSeconds": {
+            "type": "number",
+            "description": "Remaining-seconds threshold at/below which the clock gets the 'low' warning class (clamped to &gt;= 0; 0 disables). Editable per-instance via the LowTimeSeconds [Property]. Defaults to 10."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_script",
+      "title": "Create Script",
+      "toolset": "bridge_project",
+      "description": "Create a new C# component script in the project — a minimal s&box Component class (name is sanitized to a valid identifier), or your exact code when content is provided. Errors if the file already exists. Returns { path, created, className } — the new type is NOT live until a recompile, so call trigger_hotload, then attach it with add_component_with_properties (component=className).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class name for the component (e.g. 'PlayerController'). Will also be the filename."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory under code/ to place the script (e.g. 'Components'). Defaults to 'code/'."
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of what this component does — used to generate appropriate code."
+          },
+          "properties": {
+            "description": "List of [Property] fields to include in the component. JSON array."
+          },
+          "content": {
+            "type": "string",
+            "description": "Full C# file content. If provided, ignores name/properties and writes this directly."
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "create_speedrun_leaderboard",
+      "title": "Create Speedrun Leaderboard",
+      "toolset": "bridge_scaffold_gameplay",
+      "description": "Generate a speedrun timer component plus a leaderboard display panel. The timer (&lt;Name&gt;.cs) is TimeSince-based with a static Instance: StartTimer() at run start, StopTimer() at the finish (pairs with a trigger zone), ResetTimer() to abort. StopTimer persists the local best via FileSystem.Data and submits Stats.SetValue(statName, seconds) ONLY when the run beats it — configure the stat with MIN aggregation on sbox.game so the global board keeps best times. The panel (&lt;Name&gt;Panel.razor + .razor.scss, razor_lint clean) fetches via Leaderboards.GetFromStat with min aggregation + ascending sort, has a clickable Friends-only filter button, and overlays a local-best row read from the same save file. Returns { created, path, className, panelRazorPath, panelScssPath, panelClassName, statName, placedOn, note, nextSteps }. After trigger_hotload: place ONE timer (add_component_to_new_object or targetId) and host the panel under a ScreenPanel/WorldPanel (add_screen_panel). maxRows clamps to 1..50; makePanel=false skips the panel files. Fails if the .cs or panel .razor already exists.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class name for the generated timer component (panel becomes &lt;name&gt;Panel). Defaults to 'SpeedrunTimer'."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory for all generated files. Defaults to 'Code'."
+          },
+          "statName": {
+            "type": "string",
+            "description": "Sandbox.Services stat the best time is written to (sanitized to [a-z0-9_-]). Defaults to 'best_time'."
+          },
+          "fileName": {
+            "type": "string",
+            "description": "Save file name inside FileSystem.Data for the local best. Defaults to 'speedrun.json'."
+          },
+          "title": {
+            "type": "string",
+            "description": "Panel title text. Defaults to 'Best Times'."
+          },
+          "maxRows": {
+            "type": "number",
+            "description": "Leaderboard rows fetched/shown. Defaults to 10, clamped to 1..50."
+          },
+          "makePanel": {
+            "type": "boolean",
+            "description": "Also emit the &lt;name&gt;Panel.razor + .razor.scss display panel. Defaults to true."
+          },
+          "targetId": {
+            "type": "string",
+            "description": "GUID of a GameObject to attach the timer to (only attaches if the type is already loaded — hotload first)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_vehicle_controller",
+      "title": "Create Vehicle Controller",
+      "toolset": "bridge_vehicle",
+      "description": "Generate a drivable raycast-car component: 4-corner spring/damper suspension, mass-scaled engine force, speed-scaled yaw steering, lateral grip (lower = drift), and a BUILT-IN driver seat (press E to enter — the driver is hidden while driving so their controller can't fight the vehicle transform, the host assigns them ownership, and a chase camera follows the car — E to exit). Attach it plus a Rigidbody and collider to any prop and it drives. Returns { created, path, className, nextSteps } — follow with trigger_hotload + compile_status, then batch_add_component the parts. Apply handling presets with tune_vehicle. HONEST LIMIT: compiles + runs is verified; driving FEEL needs a human playtest — tune from the inspector while playing.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class/file name (default 'VehicleController' -&gt; Code/VehicleController.cs). Errors if the file exists."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Directory for the .cs file. Default 'Code'."
+          },
+          "engineForce": {
+            "type": "number",
+            "description": "Engine force (mass-scaled). Default 900."
+          },
+          "steerStrength": {
+            "type": "number",
+            "description": "Yaw rate in rad/s at full speed factor. Default 2.0."
+          },
+          "grip": {
+            "type": "number",
+            "description": "Lateral grip 0-1 — fraction of sideways velocity killed per tick; lower = drift. Default 0.85."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "duplicate_gameobject",
+      "title": "Duplicate Gameobject",
+      "toolset": "bridge_gameobject",
+      "description": "Clone a GameObject with all its components. Returns { duplicated, original, gameObject } — gameObject.id is the clone's new GUID; pass it to set_transform / add_component_with_properties. If offset is omitted the clone lands exactly on top of the original.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of the GameObject to duplicate."
+          },
+          "name": {
+            "type": "string",
+            "description": "New name for the clone."
+          },
+          "offset": {
+            "type": "string",
+            "description": "Position offset from original so the clone doesn't overlap. As \"x,y,z\" (or JSON {x,y,z})."
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "generate_lipsync_dialogue",
+      "title": "Generate Lipsync Dialogue",
+      "toolset": "bridge_scaffold_polish",
+      "description": "Generate a lipsync dialogue performer — NPCs SPEAK their lines with MOVING MOUTHS: a sealed Component holding a [Property] line list (speaker GameObject name + text) that, per line, (a) mirrors the line into a generated create_dialogue_system HUD when one exists (loose TypeLibrary capability bind: List&lt;string&gt; Lines + Begin() + bool IsActive — neither system references the other), (b) speaks the text via Sandbox.Speech.Synthesizer positionally AT the speaker (per-speaker voice name/gender/age/rate via the Voices list), (c) drives the speaker's SkinnedModelRenderer mouth morphs from the live viseme stream — Handle.LipSync.Visemes (IReadOnlyList&lt;float&gt; in the engine's 15-viseme order, read live from Sandbox.LipSync.VisemeNames 2026-07-13) multiplied through the model's own baked viseme-&gt;morph table (Model.GetVisemeMorph — verified nonzero on Citizen, e.g. viseme_AA -&gt; openjawL/R; NOT a hand-guessed morph map), with MorphScale + smoothing, and (d) advances when the audio handle stops (LineGapSeconds pause, LineTimeoutSeconds safety-skip, Skip() to cut a line short, StopDialogue() to abort). Static events: OnLineStarted(dialogue, lineIndex, speaker) + OnDialogueFinished(dialogue). Returns {created, path, className, lineCount, voiceCount, propertyNames[], note}. Next: trigger_hotload + get_compile_errors, attach (targetId re-call or add_component_with_properties), fill Lines/Voices in the inspector or bake them via params, call Begin() from game code (or autoStart:true; pair with create_interactable). Limits & honesty: the editor cannot playtest audio, so the LIVE viseme stream is RUNTIME-UNVERIFIED — the generated LogVisemes() helper + DebugLogVisemes property confirm it in seconds in play mode (the API surface and mapping data ARE live-verified); models without baked viseme data log a warning and stay audio-only (Citizen has it); voices are machine/OS-specific and TrySetVoice is best-effort; LOCAL-only — call Begin() inside an [Rpc.Broadcast] for everyone; a bound HUD's own advance input stays active (it only ends that HUD's display, not the audio). Refused during play mode; refuses to overwrite an existing file.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class/file name. Defaults to 'LipsyncDialogue'. Sanitized to a valid C# identifier."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory under the project root for the .cs file. Defaults to 'Code'."
+          },
+          "lines": {
+            "description": "Dialogue lines baked as inspector-editable defaults. Defaults to a two-line demo on the own GameObject. JSON array."
+          },
+          "voices": {
+            "description": "Per-speaker voice settings baked as defaults. Defaults to empty (every speaker uses the OS default voice). JSON array."
+          },
+          "volume": {
+            "type": "number",
+            "description": "Playback volume for spoken lines. Defaults to 1."
+          },
+          "positional": {
+            "type": "boolean",
+            "description": "true (default): 3D audio parented to the speaker GameObject. false: flat 2D narrator voice."
+          },
+          "driveMouth": {
+            "type": "boolean",
+            "description": "true (default): drive the speaker's SkinnedModelRenderer mouth morphs from the viseme stream. false: audio-only."
+          },
+          "morphScale": {
+            "type": "number",
+            "description": "Multiplier on viseme-derived morph weights (same idea as Sandbox.LipSync.MorphScale). Defaults to 1."
+          },
+          "mouthSmoothSeconds": {
+            "type": "number",
+            "description": "Seconds of exponential smoothing on mouth morphs (0 = raw viseme weights). Defaults to 0.05."
+          },
+          "lineGapSeconds": {
+            "type": "number",
+            "description": "Pause between a line's audio ending and the next line starting. Defaults to 0.2."
+          },
+          "lineTimeoutSeconds": {
+            "type": "number",
+            "description": "Safety: a line whose audio never starts (synthesis pending/failed) is skipped after this many seconds. Defaults to 20."
+          },
+          "bindHud": {
+            "type": "boolean",
+            "description": "true (default): loosely bind a create_dialogue_system HUD in the scene (TypeLibrary capability match) and mirror each line into it. false: no HUD mirroring."
+          },
+          "autoStart": {
+            "type": "boolean",
+            "description": "true: Begin() fires in OnStart. Defaults to false (call Begin() from game code)."
+          },
+          "debugLogVisemes": {
+            "type": "boolean",
+            "description": "true: log the live viseme stream ~4x/second while speaking — the fast way to runtime-verify the mouth drive. Defaults to false."
+          },
+          "targetId": {
+            "type": "string",
+            "description": "GUID of a GameObject to attach the component to (only attaches if the type is already in the TypeLibrary — hotload first, then re-call or use add_component_with_properties)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "get_selected_objects",
+      "title": "Get Selected Objects",
+      "toolset": "bridge_gameobject",
+      "description": "Get the GameObjects currently selected by the user in the s&box editor. Returns { count, selected } where each entry is a serialized GameObject (id, name, enabled, position, rotation, scale, components, childCount) — use the ids with set_transform, add_component_with_properties, etc. Handy for 'do X to what I have selected' requests.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "list_available_components",
+      "title": "List Available Components",
+      "toolset": "bridge_component",
+      "description": "List all instantiable component types in the TypeLibrary — built-in AND your project's custom components (abstract types excluded); filter does a substring match on the type name. Returns { count, components } with { name, title, description, fullName } per type, sorted by name — the unfiltered list is LARGE, so pass filter. Use the returned name with add_component_with_properties, and describe_type for a type's full property list.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "filter": {
+            "type": "string",
+            "description": "Search filter — matches against component name and title."
+          },
+          "category": {
+            "type": "string",
+            "description": "Filter by category/group (e.g. 'Rendering', 'Physics', 'Audio')."
+          }
+        },
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "list_libraries",
+      "title": "List Libraries",
+      "toolset": "bridge_discovery",
+      "description": "List the s&box libraries/addons installed in this project (reads Libraries/ + each .sbproj). Discovers what's available to build ON — e.g. character controllers (fish.scc = Shrimple Character Controller, facepunch.playercontroller), world/spline/road tools — so you can leverage an installed library (add its components via add_component_with_properties, or generate code against its API) instead of writing from scratch. Returns `count` and `libraries` [{folder, ident, org, title, type, enabled}] — ALL libraries, no limit or pagination; `enabled` is false when the library's .sbproj has been disabled (renamed .sbproj.disabled). Read-only.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "scaffold_map_vote_flow",
+      "title": "Scaffold Map Vote Flow",
+      "toolset": "bridge_scaffold_gameplay",
+      "description": "Scaffold an end-of-round map vote. Three files: &lt;Name&gt;.cs (sealed host-authoritative controller) + &lt;Name&gt;Panel.razor + &lt;Name&gt;Panel.razor.scss (vote UI: one button per map, live tallies, countdown, own-pick highlight, winner banner). Flow: host calls StartVote() (usually from a post-round phase/state, or set the AutoStart [Property]) -&gt; clients click -&gt; votes route client-to-host via [Rpc.Host] SubmitVote with the caller re-resolved HOST-SIDE from Rpc.Caller (null-checked — Connection has no IsValid on this SDK) and the map index re-validated (re-votes overwrite, keyed by SteamId) -&gt; tallies replicate via [Sync(FromHost)] NetList&lt;int&gt; -&gt; when the [Sync] TimeUntil countdown expires the host picks the winner (most votes; ties break deterministically via one LCG scramble of a time seed — no System.Random) -&gt; after resultLingerSeconds the HOST calls Scene.LoadFromFile(winner) (API verified live on this SDK; clients follow via the scene networking layer — verify the client hand-off in a real multi-client session). Static event OnVoteFinished(sceneFile) fires on every machine. Returns { created, componentPath, razorPath, scssPath, className, panelClassName, maps, voteDurationSeconds, resultLingerSeconds, autoStart, note, nextSteps }. REQUIREMENTS: the controller must sit on a NETWORK-SPAWNED object in multiplayer or [Sync] never replicates; if maps is omitted the MapScenes list is generated EMPTY and StartVote() refuses with a warning until you fill it in the inspector. Follow with trigger_hotload, attach via add_component_with_properties, host the panel under add_screen_panel.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class name for the controller; the panel is generated as &lt;Name&gt;Panel. Defaults to 'MapVote'."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory for the generated .cs + .razor + .razor.scss. Defaults to 'Code'."
+          },
+          "maps": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Scene files to vote between, e.g. [\"scenes/arena.scene\", \"scenes/docks.scene\"] (find them with list_scenes). Baked into the MapScenes [Property] list, editable later in the inspector. Defaults to an EMPTY list (StartVote() then refuses until it's filled)."
+          },
+          "voteDurationSeconds": {
+            "type": "number",
+            "description": "Seconds the vote stays open once StartVote() is called (clamped to &gt;= 3). Defaults to 20."
+          },
+          "resultLingerSeconds": {
+            "type": "number",
+            "description": "Seconds the winner banner shows before the host loads the winning scene (clamped to &gt;= 0). Defaults to 4."
+          },
+          "autoStart": {
+            "type": "boolean",
+            "description": "Start the vote automatically on spawn (host only). Usually false — call StartVote() from your round machine's post-round state instead. Defaults to false."
+          }
+        },
+        "required": []
+      }
+    }
+  ],
+  "total": 402
+}

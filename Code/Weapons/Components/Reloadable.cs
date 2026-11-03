@@ -50,6 +50,18 @@ public partial class Reloadable : WeaponInputAction,
 		}
 	}
 
+	/// <summary>Trying to fire an empty gun reloads it when spare rounds are available.</summary>
+	public bool TryReloadEmpty()
+	{
+		if ( SWB.Base.WeaponSettings.Instance is { AutoReload: false } ) return false;
+		if ( !Equipment.IsValid() || !Equipment.IsDeployed || !Player.IsValid() || !Player.IsLocallyControlled ) return false;
+		if ( Player.IsFrozen || Player.IsPipeClimbing || Equipment.Tags.Has( "no_shooting" ) ) return false;
+		if ( !AmmoComponent.IsValid() || AmmoComponent.HasAmmo || !CanReload() ) return false;
+
+		StartReload();
+		return true;
+	}
+
 	protected override void OnUpdate()
 	{
 		if ( !Player.IsValid() )

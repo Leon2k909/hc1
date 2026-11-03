@@ -1,0 +1,360 @@
+{
+  "guards": {
+    "Assets/models/maps/ares/ares_hall.vmdl": "8438f54d7eb05534de058e0d39182d8061763cbb3b0c97817609743a220aa3d7",
+    "Assets/models/maps/ares/ares_reactor.vmdl": "dd9880acf52f2dd1cd62f8243c5a0194668ab8dce7928d2719e14b68ab2d9d17",
+    "Assets/models/maps/ares/ares_reactor.obj": "24c62d37d950b8fc48989135996b04150d633f3a065123b0c3153b0a167d9c53",
+    "Assets/models/maps/ares/pressure-doors-v2/hall_base.obj": "9cf6f86e2eaac21dc474d83ee4531263e47fb7e57a4d745a9160cdad357b1f49",
+    "Assets/scenes/maps/Ares/ares.scene": "630dbaf63c2b610d058df12327dc6c86f95296bdb6c3caf810ecc72a5b5a966a",
+    "Tools/ares_interior.py": "15193e6a2d082c5e9ff823a407674f4c7eff10b4dd69afee197e1029d2806ffc",
+    "Tools/ares_map.py": "da5bab02dda6723b050c2bb2871979e546231c1f8468ac90c9815712307016c0"
+  },
+  "files": {
+    "Tools/ares_constructed.py": "109b1f6d1f58d0b382d06dde8cd66244aa546d7ddf494be6383197f07158ed61",
+    "Tools/ares_interior.py": "c9e9cf369d132ffcbbb1a5561a4ebee399f65f7b1bb4b520116c10116ed2f166",
+    "Tools/ares_map.py": "3d233a500894d7f4fd4eb558795619114f22f81c8955b604fc7802bf917cbcbc",
+    "Assets/models/maps/ares/ares_hall.vmdl": "659dcb1aa04381874549917ddd6ec92b56818f1cc55ebb7c558f5a4d189e74ae",
+    "Assets/models/maps/ares/ares_reactor.mtl": "5fdb2feda9f39f3209157fec090d6b84175f61715574883768b0c8e520d6d210",
+    "Assets/models/maps/ares/ares_reactor.obj": "effb9b133e8fd1c6b1fa88c4a7128045fd0e3fb490cf3903655d2c4f104463c4",
+    "Assets/models/maps/ares/ares_reactor.vmdl": "1849ab63a1894f68faef99446dda350298b7f53dbb719f9b53749476b72fd5f9",
+    "Assets/models/maps/ares/pressure-doors-v2/hall_base.mtl": "bcc8b4a47be13bf6345cf9f6bfe9bcb46d24bc3e8b7a316a8c322455a71935f5",
+    "Assets/models/maps/ares/pressure-doors-v2/hall_base.obj": "371327c051b7795b2392c9d5f5f7e6ccdd49b7ecc76314deb95055f8d5e8ed96"
+  },
+  "scene_mutations": [
+    {
+      "tool": "set_component",
+      "args": {
+        "id": "692c4f87-693d-5ddf-abc7-683cd1573d97",
+        "type": "PointLight",
+        "properties": {
+          "LightColor": "3.57,3.57,3.57,1",
+          "Temperature": 5000,
+          "Shadows": false,
+          "Contribution": "Diffuse, Transmissive"
+        }
+      }
+    },
+    {
+      "tool": "set_component",
+      "args": {
+        "id": "a0d71b91-97af-5934-a659-bf8c8147f329",
+        "type": "PointLight",
+        "properties": {
+          "LightColor": "3.57,3.57,3.57,1",
+          "Temperature": 5000,
+          "Shadows": false,
+          "Contribution": "Diffuse, Transmissive"
+        }
+      }
+    },
+    {
+      "tool": "set_component",
+      "args": {
+        "id": "2fabeb11-0819-5024-8bd0-49b69c76fc69",
+        "type": "PointLight",
+        "properties": {
+          "LightColor": "3.57,3.57,3.57,1",
+          "Temperature": 5000,
+          "Shadows": false,
+          "Contribution": "Diffuse, Transmissive"
+        }
+      }
+    },
+    {
+      "tool": "set_component",
+      "args": {
+        "id": "53355540-8ee4-5565-a464-39eac2c309ad",
+        "type": "PointLight",
+        "properties": {
+          "LightColor": "3.57,3.57,3.57,1",
+          "Temperature": 5000,
+          "Shadows": false,
+          "Contribution": "Diffuse, Transmissive"
+        }
+      }
+    },
+    {
+      "tool": "set_component",
+      "args": {
+        "id": "42b7a854-32ec-5de3-8e61-a443d3d4634a",
+        "type": "PointLight",
+        "properties": {
+          "LightColor": "3.57,3.57,3.57,1",
+          "Temperature": 5000,
+          "Shadows": false,
+          "Contribution": "Diffuse, Transmissive"
+        }
+      }
+    },
+    {
+      "tool": "set_component",
+      "args": {
+        "id": "fef5f479-b9ba-5f3f-b3f9-09911bb743b2",
+        "type": "PointLight",
+        "properties": {
+          "LightColor": "3.57,3.57,3.57,1",
+          "Temperature": 5000,
+          "Shadows": true,
+          "Contribution": "Diffuse, Transmissive"
+        }
+      }
+    },
+    {
+      "tool": "set_component",
+      "args": {
+        "id": "304136a0-9290-5f25-be82-f571d12f3178",
+        "type": "PointLight",
+        "properties": {
+          "LightColor": "3.57,3.57,3.57,1",
+          "Temperature": 5000,
+          "Shadows": true,
+          "Contribution": "Diffuse, Transmissive"
+        }
+      }
+    },
+    {
+      "tool": "set_component",
+      "args": {
+        "id": "416bcb27-c9cf-55f0-8a87-246176d30edd",
+        "type": "PointLight",
+        "properties": {
+          "LightColor": "3.57,3.57,3.57,1",
+          "Temperature": 5000,
+          "Shadows": false,
+          "Contribution": "Diffuse, Transmissive"
+        }
+      }
+    },
+    {
+      "tool": "set_component",
+      "args": {
+        "id": "5cd3b842-6a2b-5517-ad5f-4455fc5474d0",
+        "type": "PointLight",
+        "properties": {
+          "LightColor": "3.57,3.57,3.57,1",
+          "Temperature": 5000,
+          "Shadows": false,
+          "Contribution": "Diffuse, Transmissive"
+        }
+      }
+    },
+    {
+      "tool": "set_component",
+      "args": {
+        "id": "728f77a6-5acb-51ed-8e7f-806b13f57bff",
+        "type": "PointLight",
+        "properties": {
+          "LightColor": "3.57,3.57,3.57,1",
+          "Temperature": 5000,
+          "Shadows": false,
+          "Contribution": "Diffuse, Transmissive"
+        }
+      }
+    },
+    {
+      "tool": "set_component",
+      "args": {
+        "id": "c0fc8e16-3f3c-50e4-9a30-a4dd2e0a6568",
+        "type": "PointLight",
+        "properties": {
+          "LightColor": "3.57,3.57,3.57,1",
+          "Temperature": 5000,
+          "Shadows": false,
+          "Contribution": "Diffuse, Transmissive"
+        }
+      }
+    },
+    {
+      "tool": "set_component",
+      "args": {
+        "id": "f09a9a68-0ae4-5749-b868-330b9430481f",
+        "type": "PointLight",
+        "properties": {
+          "LightColor": "3.57,3.57,3.57,1",
+          "Temperature": 5000,
+          "Shadows": false,
+          "Contribution": "Diffuse, Transmissive"
+        }
+      }
+    },
+    {
+      "tool": "set_component",
+      "args": {
+        "id": "eb5a0ad5-d4a9-5f5c-a3d0-8c63834b54e7",
+        "type": "PointLight",
+        "properties": {
+          "LightColor": "3.57,3.57,3.57,1",
+          "Temperature": 5000,
+          "Shadows": false,
+          "Contribution": "Diffuse, Transmissive"
+        }
+      }
+    },
+    {
+      "tool": "set_component",
+      "args": {
+        "id": "d388f345-16d3-59ce-82f1-ede34fca1590",
+        "type": "PointLight",
+        "properties": {
+          "LightColor": "3.57,3.57,3.57,1",
+          "Temperature": 5000,
+          "Shadows": false,
+          "Contribution": "Diffuse, Transmissive"
+        }
+      }
+    },
+    {
+      "tool": "set_component",
+      "args": {
+        "id": "bfed391d-af48-554e-b773-069e533c417c",
+        "type": "PointLight",
+        "properties": {
+          "LightColor": "3.57,3.57,3.57,1",
+          "Temperature": 5000,
+          "Shadows": false,
+          "Contribution": "Diffuse, Transmissive"
+        }
+      }
+    },
+    {
+      "tool": "set_component",
+      "args": {
+        "id": "ed311876-769c-5f31-b504-af76e0c2ceb5",
+        "type": "PointLight",
+        "properties": {
+          "LightColor": "3.57,3.57,3.57,1",
+          "Temperature": 5000,
+          "Shadows": false,
+          "Contribution": "Diffuse, Transmissive"
+        }
+      }
+    },
+    {
+      "tool": "set_component",
+      "args": {
+        "id": "90f92a0e-97ff-5c54-8e1c-c4fa3a978cbc",
+        "type": "PointLight",
+        "properties": {
+          "LightColor": "3.57,3.57,3.57,1",
+          "Temperature": 5000,
+          "Shadows": false,
+          "Contribution": "Diffuse, Transmissive"
+        }
+      }
+    },
+    {
+      "tool": "set_component",
+      "args": {
+        "id": "fd261b7e-0381-532f-8f32-bd576f05bb4d",
+        "type": "PointLight",
+        "properties": {
+          "LightColor": "3.57,3.57,3.57,1",
+          "Temperature": 5000,
+          "Shadows": true,
+          "Contribution": "Diffuse, Transmissive"
+        }
+      }
+    },
+    {
+      "tool": "set_component",
+      "args": {
+        "id": "29dce69b-8174-5fe8-8d87-60a58d8620d5",
+        "type": "PointLight",
+        "properties": {
+          "LightColor": "3.57,3.57,3.57,1",
+          "Temperature": 5000,
+          "Shadows": true,
+          "Contribution": "Diffuse, Transmissive"
+        }
+      }
+    },
+    {
+      "tool": "set_component",
+      "args": {
+        "id": "31bfcfb7-110e-5380-95e3-88ec613f47d6",
+        "type": "PointLight",
+        "properties": {
+          "LightColor": "3.57,3.57,3.57,1",
+          "Temperature": 5000,
+          "Shadows": false,
+          "Contribution": "Diffuse, Transmissive"
+        }
+      }
+    },
+    {
+      "tool": "set_component",
+      "args": {
+        "id": "04e3be1a-4953-5349-b209-2f913a578509",
+        "type": "PointLight",
+        "properties": {
+          "LightColor": "3.57,3.57,3.57,1",
+          "Temperature": 5000,
+          "Shadows": false,
+          "Contribution": "Diffuse, Transmissive"
+        }
+      }
+    },
+    {
+      "tool": "set_component",
+      "args": {
+        "id": "dc1912ab-6ada-52a3-942c-eca3beabc914",
+        "type": "PointLight",
+        "properties": {
+          "LightColor": "3.57,3.57,3.57,1",
+          "Temperature": 5000,
+          "Shadows": false,
+          "Contribution": "Diffuse, Transmissive"
+        }
+      }
+    },
+    {
+      "tool": "set_component",
+      "args": {
+        "id": "92ab9094-9bc5-5da6-9abc-c9a22b7e160e",
+        "type": "PointLight",
+        "properties": {
+          "LightColor": "3.57,3.57,3.57,1",
+          "Temperature": 5000,
+          "Shadows": false,
+          "Contribution": "Diffuse, Transmissive"
+        }
+      }
+    },
+    {
+      "tool": "set_component",
+      "args": {
+        "id": "340b50bf-8514-5f9f-b292-db461b68a5fd",
+        "type": "PointLight",
+        "properties": {
+          "LightColor": "3.57,3.57,3.57,1",
+          "Temperature": 5000,
+          "Shadows": false,
+          "Contribution": "Diffuse, Transmissive"
+        }
+      }
+    },
+    {
+      "tool": "set_component",
+      "args": {
+        "id": "2e32f51c-4d4f-4d37-aaba-3129664be376",
+        "type": "IndirectLightVolume",
+        "properties": {
+          "RuntimeIntensity": 1.8,
+          "RuntimeContrast": 0.85
+        }
+      }
+    }
+  ],
+  "review": [
+    "hero-review.png",
+    "overview-review.png",
+    "floor-review.png",
+    "pump-review.png"
+  ],
+  "approved": false,
+  "original_imports_retained": true,
+  "original_physics_retained": true,
+  "additional_collision": {
+    "hall_support_boxes": 28,
+    "reactor_skirt_hulls": 1
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "name": "spawn_model",
+  "title": "Spawn Model",
+  "toolset": "scene",
+  "description": "Create a game object with a ModelRenderer in one call - the fastest way to put a model in the scene. Optionally tint it, override its material, scale it and parent it. The user can undo this. Returns the new object's id.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "model": {
+        "type": "string",
+        "description": "Model asset path, e.g. 'models/dev/box.vmdl'."
+      },
+      "name": {
+        "type": "string",
+        "description": "The new object's name. Empty uses the model filename."
+      },
+      "position": {
+        "type": "string",
+        "description": "World position as 'x,y,z'."
+      },
+      "angles": {
+        "type": "string",
+        "description": "Rotation as 'pitch,yaw,roll'."
+      },
+      "scale": {
+        "type": "string",
+        "description": "Scale as 'x,y,z', or a single number for uniform."
+      },
+      "tint": {
+        "type": "string",
+        "description": "Tint color as 'r,g,b,a' (0-1 floats) or '#rrggbb'."
+      },
+      "material": {
+        "type": "string",
+        "description": "Material asset path to override every surface with."
+      },
+      "parent": {
+        "type": "string",
+        "description": "Parent game object id. Empty parents to the scene root."
+      }
+    },
+    "required": [
+      "model"
+    ]
+  },
+  "outputSchema": {
+    "type": "object",
+    "properties": {
+      "Id": {
+        "type": "string"
+      },
+      "Name": {
+        "type": "string"
+      }
+    },
+    "required": []
+  }
+}

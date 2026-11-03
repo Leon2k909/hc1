@@ -1,0 +1,23 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var folder=System.IO.Path.Combine(root,"output/ares/surface-finish-v2");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"manifest.json")));
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+var report=new System.Collections.Generic.List<object>();
+foreach(var name in new[]{"wall","floor"})foreach(var channel in new[]{"color","normal"}) {
+ var source=System.IO.Path.Combine(root,"Sources/Ares/surface-finish-v2/generated/"+name+"-"+channel+"-v1.png");
+ var target=System.IO.Path.Combine(root,"Assets/materials/ares/surface-finish-v2/"+name+"_"+channel+".png");
+ System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target));
+ using var raw=Bitmap.CreateFromBytes(System.IO.File.ReadAllBytes(source));
+ using var packed=raw.Resize(2048,2048,true);
+ System.IO.File.WriteAllBytes(target,packed.ToPng());Editor.AssetSystem.RegisterFile(target);
+ report.Add(new { Source=source, Target=target, OriginalWidth=raw.Width, OriginalHeight=raw.Height, Width=packed.Width, Height=packed.Height, SHA256=Hash(target) });
+}
+foreach(var pair in manifest["files"].AsObject()) {
+ if(pair.Key.Contains("..")||!pair.Key.Contains("/surface-finish-v2/"))throw new InvalidOperationException("Unexpected target");
+ var source=System.IO.Path.Combine(folder,"stage",pair.Key);
+ if(Hash(source)!=pair.Value.GetValue<string>())throw new InvalidOperationException("Staged asset changed");
+ var target=System.IO.Path.Combine(root,pair.Key);System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target));
+ System.IO.File.Copy(source,target,true);Editor.AssetSystem.RegisterFile(target);
+}
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"texture-import.json"),System.Text.Json.JsonSerializer.Serialize(report,new System.Text.Json.JsonSerializerOptions{WriteIndented=true}));
+return new { Textures=report, Files=manifest["files"].AsObject().Count, PreviewOnly=true };

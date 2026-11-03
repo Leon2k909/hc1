@@ -41,6 +41,10 @@ def text(d, xy, s, f, fill, anchor="mm"):
     d.text(xy, s, fill=fill, font=f, anchor=anchor)
 
 
+def font_wide(size):
+    return font(size, False)
+
+
 def paint_body():
     facts = json.load(open(os.path.join(WORK, "desk.json")))
     density = facts["density"]
@@ -95,18 +99,32 @@ def paint_body():
     high = smooth(40.0, 64.0, Z)
 
     # Blue enamel over grey primer over steel. Chips are big enough and soft enough not to read as pixels.
+    # Knocks and scrapes on the fronts, from chairs, boots and bags, laid as strokes on a plan of the front.
+    fs = 14
+    front_plan = Image.new("L", (int(120 * fs), int(30 * fs)), 0)
+    dp = ImageDraw.Draw(front_plan)
+    rs = np.random.default_rng(29)
+    for _ in range(170):
+        y0, z0 = rs.uniform(0, front_plan.size[0]), rs.uniform(0, 1) ** 1.8 * front_plan.size[1]
+        a = rs.normal(0, 0.28) + (math.pi / 2 if rs.random() < 0.12 else 0)
+        n = rs.uniform(8, 70) * (0.5 + 0.5 * rs.random())
+        dp.line((y0, front_plan.size[1] - z0, y0 + math.cos(a) * n, front_plan.size[1] - z0 + math.sin(a) * n), fill=int(rs.uniform(110, 255)), width=int(rs.integers(1, 4)))
+    front_plan = np.asarray(front_plan.filter(ImageFilter.GaussianBlur(1.0)), np.float32) / 255
+    scrapes = ndi.map_coordinates(front_plan, ((30.0 - Z) * fs, (Y + 60.0) * fs), order=1, mode="constant", cval=0.0) * smooth(0.5, 0.85, nor[..., 0]) * (Z < 30.0)
+
     chip = (
-        edge * smooth(0.25, 0.7, mid * 0.6 + fine * 0.4) * 1.0
+        edge * smooth(0.2, 0.62, mid * 0.6 + fine * 0.4) * 1.0
         + (mid - 0.5) * 0.46
         + (big - 0.5) * 0.3
         + (fine - 0.5) * 0.56
         + kick * 0.13
         + drawers * 0.1
         + latch * 0.12
+        + scrapes * 0.42
     )
-    to_primer = smooth(0.64, 0.72, chip)
-    to_steel = smooth(0.74, 0.84, chip)
-    primer = full((122, 118, 106)) * (0.85 + 0.3 * fine[..., None])
+    to_primer = smooth(0.52, 0.6, chip)
+    to_steel = smooth(0.64, 0.76, chip)
+    primer = full((148, 144, 128)) * (0.85 + 0.3 * fine[..., None])
     bare = full((128, 126, 122)) * (0.7 + 0.45 * micro[..., None])
     rust = mix(full((62, 36, 22)), full((116, 68, 38)), smooth(0.35, 0.8, field(noise(pts, 1.4, 8, 3))))
     rusty = smooth(0.42, 0.75, field(noise(pts, 0.7, 9, 3)) + smooth(30.0, 0.0, Z) * 0.14)
@@ -143,7 +161,7 @@ def paint_body():
     rubbed = np.clip(drawers * smooth(0.4, 0.7, mid) * 0.8 + latch * 0.8, 0, 1)
     painted_rough = painted_rough - rubbed * 0.12
 
-    put(finish == NAVY, layered(enamel((42, 66, 124), (66, 88, 136))), painted_rough, painted_metal, painted_height)
+    put(finish == NAVY, layered(enamel((46, 64, 108), (70, 86, 120))), painted_rough, painted_metal, painted_height)
     put(finish == GREY, layered(enamel((96, 102, 108), (118, 122, 124))), painted_rough, painted_metal, painted_height)
     put(finish == YELLOW, layered(enamel((226, 160, 8), (200, 150, 30))), painted_rough, painted_metal, painted_height)
 
@@ -206,8 +224,14 @@ def paint_body():
     is_log = (finish == PAPER) & (Z > 31.0)
     ink = lines * is_log
     paper = full((190, 184, 164)) * (0.93 + 0.12 * mid[..., None]) * np.where(is_log, 1.0, 0.45)[..., None]
-    put(finish == PAPER, mix(paper, full((50, 54, 84)), ink * 0.55), 0.8, 0.0, 0.0)
-    put(finish == PLATE, full((120, 120, 112)) * (0.88 + 0.2 * mid[..., None]), 0.35 + 0.1 * mid, 0.0, 0.0)
+    put(finish == PAPER, mix(paper, full((70, 74, 100)), ink * 0.32), 0.8, 0.0, 0.0)
+    tag = Image.new("L", (12 * 40, int(4.8 * 40)), 0)
+    dt = ImageDraw.Draw(tag)
+    text(dt, (tag.size[0] / 2, tag.size[1] * 0.32), "CONTROL DESK", font(1.34 * 40), 255)
+    text(dt, (tag.size[0] / 2, tag.size[1] * 0.72), "UNIT BOARD C-2", font(1.2 * 40), 255)
+    tag = np.asarray(tag.filter(ImageFilter.GaussianBlur(0.8)), np.float32) / 255
+    print_ = ndi.map_coordinates(tag, ((25.4 - Z) * 40, (Y + 48.0) * 40), order=1, mode="constant", cval=0.0) * (X > 31.3)
+    put(finish == PLATE, mix(full((136, 136, 126)) * (0.88 + 0.2 * mid[..., None]), full((12, 12, 12)), print_ * (finish == PLATE)), 0.35 + 0.1 * mid, 0.0, 0.0)
     put(finish == BOARD, full((70, 52, 34)) * (0.85 + 0.3 * field(noise(pts * np.array((0.4, 6.0, 1.0), np.float32), 1.0, 18, 2))[..., None]), 0.62, 0.0, 0.0)
 
     # Dust settles on what faces up and in the corners, thin indoors; a scuffed band of boot marks in the kneehole's rail and fronts.
@@ -353,7 +377,7 @@ def paint_panel():
     u0, v0, u1, v1 = L.CHART
     x0, y1_ = uxy(u0, v0)
     x1, y0_ = uxy(u1, v1)
-    d.rectangle((x0, y0_, x1, y1_), fill=(226, 222, 200))
+    d.rectangle((x0, y0_, x1, y1_), fill=(196, 192, 170))
     for j in range(1, 16):
         xx = x0 + (x1 - x0) * j / 16
         d.line((xx, y0_, xx, y1_), fill=(190, 150, 140), width=1 if j % 5 else 2)
@@ -435,8 +459,8 @@ def paint_glow():
     def header(x, y, w, h, title, right="SCADA  UNIT 2"):
         d.rectangle((x, y, x + w, y + h), fill=(6, 22, 48))
         d.rectangle((x, y, x + w, y + h * 0.075), fill=(20, 72, 140))
-        text(d, (x + w * 0.02, y + h * 0.04), title, font(h * 0.045), white, "lm")
-        text(d, (x + w * 0.98, y + h * 0.04), right, font(h * 0.04), pale, "rm")
+        text(d, (x + w * 0.02, y + h * 0.04), title, font_wide(h * 0.045), white, "lm")
+        text(d, (x + w * 0.98, y + h * 0.04), right, font_wide(h * 0.04), pale, "rm")
 
     # Main: the turbine seen from above, wicket gates round the runner, with the unit's numbers beside it.
     x, y, w, h = rect("main")
@@ -465,8 +489,8 @@ def paint_glow():
     for j, (name, value, unit, frac, col) in enumerate((("OUTPUT", "48.6", "MW", 0.71, cyan), ("SPEED", "150.0", "RPM", 0.5, cyan), ("NET HEAD", "61.2", "M", 0.64, cyan), ("FLOW", "87.4", "M3/S", 0.68, cyan), ("GATE", "68", "%", 0.68, cyan), ("BEARING", "62", "C", 0.57, amber), ("EXCITER", "312", "A", 0.46, cyan))):
         yy = y + h * (0.14 + 0.118 * j)
         lx = x + w * 0.66
-        text(d, (lx, yy), name, font(h * 0.04), pale, "lm")
-        text(d, (x + w * 0.97, yy), f"{value} {unit}", font(h * 0.05), white, "rm")
+        text(d, (lx, yy), name, font_wide(h * 0.04), pale, "lm")
+        text(d, (x + w * 0.97, yy), f"{value} {unit}", font_wide(h * 0.05), white, "rm")
         bar_y = yy + h * 0.04
         d.rectangle((lx, bar_y, x + w * 0.97, bar_y + h * 0.018), fill=(16, 44, 84))
         d.rectangle((lx, bar_y, lx + (x + w * 0.97 - lx) * frac, bar_y + h * 0.018), fill=col)
@@ -474,7 +498,7 @@ def paint_glow():
         tx = x + w * (0.02 + 0.13 * j)
         ty = y + h * 0.9
         d.rectangle((tx, ty, tx + w * 0.115, ty + h * 0.07), fill=(26, 100, 60) if j != 2 else (120, 84, 20))
-        text(d, (tx + w * 0.0575, ty + h * 0.035), state, font(h * 0.04), white)
+        text(d, (tx + w * 0.0575, ty + h * 0.035), state, font_wide(h * 0.04), white)
 
     # Trends: three plots.
     x, y, w, h = rect("trend")
@@ -494,7 +518,7 @@ def paint_glow():
             v = float(np.clip(v + r.normal(0, 0.03) + (level - v) * 0.05, 0.08, 0.92))
             line.append((x + w * (0.04 + 0.93 * t), gy + gh * (1 - v)))
         d.line(line, fill=col, width=5)
-        text(d, (x + w * 0.055, gy + gh * 0.14), title, font(h * 0.042), col, "lm")
+        text(d, (x + w * 0.055, gy + gh * 0.14), title, font_wide(h * 0.042), col, "lm")
 
     # Alarms: a list, the newest in red.
     x, y, w, h = rect("alarms")
@@ -504,8 +528,8 @@ def paint_glow():
         yy = y + h * (0.115 + 0.087 * j)
         if j < 3:
             d.rectangle((x + w * 0.015, yy, x + w * 0.985, yy + h * 0.074), fill=(70, 18, 16) if j == 0 else (60, 42, 12))
-        text(d, (x + w * 0.03, yy + h * 0.037), t, font(h * 0.046), pale, "lm")
-        text(d, (x + w * 0.26, yy + h * 0.037), msg, font(h * 0.05), col, "lm")
+        text(d, (x + w * 0.03, yy + h * 0.037), t, font_wide(h * 0.046), pale, "lm")
+        text(d, (x + w * 0.26, yy + h * 0.037), msg, font_wide(h * 0.05), col, "lm")
 
     # The small touch panel: big buttons.
     x, y, w, h = rect("hmi")
@@ -515,7 +539,7 @@ def paint_glow():
         bx, by = x + w * (0.035 + 0.32 * col_), y + h * (0.13 + 0.42 * row_)
         fill = {0: (24, 48, 80), 1: (24, 110, 66), 2: (140, 96, 20)}[on]
         d.rectangle((bx, by, bx + w * 0.29, by + h * 0.37), fill=fill, outline=pale, width=4)
-        text(d, (bx + w * 0.145, by + h * 0.185), label, font(h * 0.085), white)
+        text(d, (bx + w * 0.145, by + h * 0.185), label, font_wide(h * 0.085), white)
 
     # A soft falloff to the edges and a faint pixel grid, so they read as lit panels and not as flat paint.
     a = np.asarray(img.resize((W, H), Image.LANCZOS), np.float32) / 255.0

@@ -13,6 +13,11 @@
 						_class = "DefaultMaterialGroup"
 						remaps =
 						[
+							{ from = "dark.vmat" to = "materials/lowtide/structure/lt_cast_iron_v2.vmat" },
+							{ from = "grip.vmat" to = "materials/lowtide/drainage/lt_grate_cast_iron.vmat" },
+							{ from = "hardware.vmat" to = "materials/lowtide/lt_steel.vmat" },
+							{ from = "paint.vmat" to = "materials/lowtide/structure/lt_cast_iron_v2.vmat" },
+							{ from = "worn.vmat" to = "materials/lowtide/lt_steel.vmat" },
 							{ from = "ashlar_grey.vmat" to = "materials/lowtide/finish/lt_quay_stone.vmat" },
 							{ from = "brick.vmat" to = "materials/lowtide/lt_brick.vmat" },
 							{ from = "copper.vmat" to = "materials/buildings/copper.vmat" },
@@ -49,7 +54,20 @@
 					{
 						_class = "RenderMeshFile"
 						name = "lowtide_east"
-						filename = "models/maps/lowtide/lowtide_east.obj"
+						filename = "models/maps/lowtide/quay-ladder-v1/installed/east_without_ladders.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "east_ladders"
+						filename = "models/maps/lowtide/quay-ladder-v1/installed/east_ladders.obj"
 						import_translation = [ 0.0, 0.0, 0.0 ]
 						import_rotation = [ 0.0, 0.0, 0.0 ]
 						import_scale = 1.0

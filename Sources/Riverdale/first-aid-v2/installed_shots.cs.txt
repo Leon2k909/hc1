@@ -1,0 +1,100 @@
+// The installed cabinets, rendered by s&box from riverdale.scene as it is on disk: run with sbox-cli --call run_csharp '{"path":...}'.
+// An isolated editor scene with the player camera's post stack and exposure held still, nothing added, nothing saved, and no tab or play state touched. Writes installed-<view>.png, and reports what rays meet where each old box was.
+var projectRoot = Sandbox.Project.Current.GetRootPath();
+var destination = System.IO.Path.Combine(projectRoot, "output/asset-improvement-20261030/first-aid/engine");
+var keep = new System.Collections.Generic.HashSet<string>(new[] { "Sun", "Sky", "Fog", "Look", "Riverdale", "Lights", "Reflection Probes", "Volumetric Fog", "Indirect Light" }, StringComparer.OrdinalIgnoreCase);
+var root = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(projectRoot, "Assets/scenes/maps/Riverdale/riverdale.scene"))).AsObject();
+var objects = new System.Text.Json.Nodes.JsonArray();
+foreach (var item in root["GameObjects"].AsArray())
+    if (keep.Contains(item["Name"]?.GetValue<string>() ?? "")) objects.Add(item.DeepClone());
+var prefab = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(projectRoot, "Assets/prefabs/player/cameras/default_player_camera.prefab"))).AsObject();
+var wanted = new[] { "Sandbox.CameraComponent", "Sandbox.Bloom", "Sandbox.Tonemapping", "Sandbox.Sharpen", "Sandbox.AmbientOcclusion", "Sandbox.Vignette", "Facepunch.PhotographicResponse" };
+var components = new System.Text.Json.Nodes.JsonArray();
+foreach (var component in prefab["RootObject"]["Components"].AsArray())
+    if (wanted.Contains(component["__type"]?.GetValue<string>())) components.Add(component.DeepClone());
+objects.Add(new System.Text.Json.Nodes.JsonObject { ["__guid"] = System.Text.Json.Nodes.JsonNode.Parse("\"" + Guid.NewGuid() + "\""), ["Name"] = "Capture camera", ["Enabled"] = true, ["Components"] = components });
+root["GameObjects"] = objects;
+if (root["SceneProperties"]?["NavMesh"] is System.Text.Json.Nodes.JsonObject nav) nav["Enabled"] = false;
+if (root["SceneProperties"] is System.Text.Json.Nodes.JsonObject sceneProperties) sceneProperties["WantsSystemScene"] = false;
+var scene = Scene.CreateEditorScene();
+var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
+var preRender = typeof(Scene).GetMethod("PreRender", flags, null, Type.EmptyTypes, null);
+var preCameraRender = typeof(Scene).GetMethod("PreCameraRender", flags, null, Type.EmptyTypes, null);
+try
+{
+    CameraComponent camera;
+    var cabinets = new System.Collections.Generic.List<string>();
+    var rays = new System.Collections.Generic.List<string>();
+    using (scene.Push())
+    {
+        scene.Deserialize(root);
+        var holder = scene.GetAllObjects(false).Single(g => g.Name == "Capture camera");
+        camera = holder.Components.Get<CameraComponent>();
+        camera.ZNear = 1;
+        camera.ZFar = 30000;
+        camera.IsMainCamera = true;
+        foreach (var tonemap in scene.GetAllComponents<Tonemapping>())
+        {
+            var hold = ( tonemap.MinimumExposure + tonemap.MaximumExposure ) / 2f;
+            tonemap.AutoExposureEnabled = true;
+            tonemap.MinimumExposure = tonemap.MaximumExposure = hold;
+            tonemap.ExposureCompensation = 0;
+            tonemap.Rate = 10;
+        }
+        scene.EditorTick(.016f, .016f);
+        preRender.Invoke(scene, null);
+        preCameraRender.Invoke(scene, null);
+        foreach (var go in scene.GetAllObjects(false).Where(g => g.Name == "First Aid Cabinet"))
+        {
+            var model = go.Components.Get<ModelRenderer>()?.Model;
+            cabinets.Add(go.WorldPosition + " yaw " + go.WorldRotation.Yaw() + " " + model?.ResourcePath + " error=" + model?.IsError);
+            // The old boxes never had collision, and these don't: a ray from the room to the wall should reach the wall.
+            var front = go.WorldPosition + go.WorldRotation.Forward * 40f + Vector3.Up * 8f;
+            var hit = scene.Trace.Ray(front, go.WorldPosition + Vector3.Up * 8f - go.WorldRotation.Forward * 1f).Run();
+            rays.Add(go.WorldPosition + ": " + (hit.Hit ? hit.HitPosition + " " + hit.GameObject?.Name : "nothing"));
+        }
+    }
+    var textureNames = new[] { "g_tColor", "g_tNormal", "g_tRoughness", "g_tAmbientOcclusion", "g_tMetalness", "SkyTexture" };
+    foreach (var material in scene.GetAllComponents<ModelRenderer>().Where(r => r.Model is not null).SelectMany(r => r.Model.Materials).Distinct())
+        foreach (var texture in textureNames.Select(material.GetTexture).Append(material.FirstTexture).Where(t => t is not null).Distinct())
+            texture.MarkUsed(material.ResourcePath.Contains("first_aid_v2") ? 2048 : 1024);
+    for (var wait = 0; wait < 110; wait++)
+    {
+        using (scene.Push()) { scene.EditorTick(.016f, .016f); preRender.Invoke(scene, null); }
+        await Task.Delay(33, cancellationToken);
+    }
+    var views = new (string name, Vector3 eye, Vector3 target, float fov)[]
+    {
+        ("east", new Vector3(1030f, 950f, 72f), new Vector3(985f, 1000f, 62f), 55f),
+        ("west", new Vector3(1030f, -950f, 72f), new Vector3(985f, -1000f, 62f), 55f),
+        ("north_a", new Vector3(1950f, 930f, 70f), new Vector3(2000f, 962f, 62f), 55f),
+        ("north_b", new Vector3(1950f, 60f, 70f), new Vector3(2000f, 95f, 62f), 55f),
+    };
+    foreach (var view in views)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        using var bitmap = new Bitmap(1280, 720);
+        for (var frame = 0; frame < 12; frame++)
+        {
+            using (scene.Push())
+            {
+                camera.WorldPosition = view.eye;
+                camera.WorldRotation = Rotation.LookAt(view.target - view.eye);
+                camera.FieldOfView = view.fov;
+                scene.EditorTick(.016f, .016f);
+                preRender.Invoke(scene, null);
+                preCameraRender.Invoke(scene, null);
+                camera.RenderToBitmap(bitmap);
+            }
+            await Task.Delay(16, cancellationToken);
+        }
+        System.IO.File.WriteAllBytes(System.IO.Path.Combine(destination, $"installed-{view.name}.png"), bitmap.ToPng());
+    }
+    return new { Game.IsPlaying, Cabinets = cabinets, Rays = rays };
+}
+catch (Exception error)
+{
+    System.IO.File.WriteAllText(System.IO.Path.Combine(destination, "capture-error.txt"), error.ToString());
+    throw;
+}
+finally { scene.Destroy(); }

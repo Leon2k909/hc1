@@ -25,6 +25,7 @@ def world(e, n, z):
 
 CABINETS = [dict(at=world(-958, 470, 0), yaw=-90), dict(at=world(946, 600, 0), yaw=90), dict(at=world(-870, 830, 352), yaw=-90)]
 VIEWS = {
+    "hero": ((-790, 395, 64), (-955, 465, 60), 60),
     "a_wide": ((-740, 400, 64), (-958, 470, 58), 70),
     "a_door": ((-850, 450, 66), (-940, 462, 62), 75),
     "a_low": ((-860, 395, 56), (-950, 430, 40), 70),
@@ -32,10 +33,19 @@ VIEWS = {
     "a_side": ((-760, 300, 64), (-958, 430, 62), 70),
     "a_south": ((-890, 330, 70), (-958, 432, 52), 70),
     "a_far": ((-400, 290, 64), (-958, 470, 58), 70),
-    "a_far2": ((60, 120, 64), (-958, 470, 58), 70),
     "b_wide": ((745, 660, 64), (946, 600, 58), 70),
     "c_wide": ((-700, 760, 416), (-870, 830, 410), 75),
 }
+# The new model alone, in plain light. In its own axes: +X out of the doors, Z up. Far views go past each LOD's threshold.
+INSPECT = [
+    dict(name="front_left", eye=[170, -130, 90], target=[0, 0, 62], fov=60),
+    dict(name="back_right", eye=[-170, 130, 110], target=[0, 0, 62], fov=60),
+    dict(name="conduit_side", eye=[60, -190, 150], target=[0, -20, 72], fov=60),
+    dict(name="top", eye=[110, -60, 230], target=[0, 0, 110], fov=55),
+    dict(name="lod1", eye=[800, -300, 90], target=[0, 0, 60], fov=70),
+    dict(name="lod2", eye=[1900, -700, 90], target=[0, 0, 60], fov=70),
+    dict(name="lod3", eye=[4000, -1400, 90], target=[0, 0, 60], fov=70),
+]
 EXPOSURE = 2.0
 
 picked = sys.argv[1:] or list(VIEWS)
@@ -52,7 +62,8 @@ config = dict(
     width=1280,
     height=800,
     variants=["before", "after"],
-    views=[dict(name=k, eye=world(*VIEWS[k][0]), target=world(*VIEWS[k][1]), fov=VIEWS[k][2]) for k in picked],
+    views=[dict(name=k, eye=world(*VIEWS[k][0]), target=world(*VIEWS[k][1]), fov=VIEWS[k][2]) for k in picked if k in VIEWS],
+    inspect=INSPECT if "inspect" in picked else [],
 )
 with open(os.path.join(ENGINE, "config.json"), "w") as h:
     json.dump(config, h, indent=1)
@@ -61,11 +72,11 @@ run = subprocess.run([CLI, "--call", "run_csharp", json.dumps({"path": os.path.j
 print((run.stdout + run.stderr).decode("utf-8", "replace")[:1800], f"{time.time() - started:.0f}s", flush=True)
 
 font = ImageFont.truetype(r"C:\Windows\Fonts\bahnschrift.ttf", 30)
-for name in picked:
+for name in [k for k in picked if k in VIEWS]:
     pair = [Image.open(os.path.join(ENGINE, f"{name}-{v}.png")).convert("RGB") for v in ("before", "after")]
     w, h = pair[0].size
     # The far edge of a shot should match in both: if it doesn't, the exposure drifted and the comparison is unfair.
-    edges = [sum(p.crop((0, h // 4, w // 12, h * 3 // 4)).convert("L").resize((1, 1)).getdata()) for p in pair]
+    edges = [p.crop((0, h // 4, w // 12, h * 3 // 4)).convert("L").resize((1, 1)).getpixel((0, 0)) for p in pair]
     print(name, "left edge, before and after:", edges, flush=True)
     sheet = Image.new("RGB", (w * 2 + 12, h), (18, 18, 18))
     sheet.paste(pair[0], (0, 0))
@@ -75,3 +86,13 @@ for name in picked:
         d.text((x + 2, 16), label, fill=(0, 0, 0), font=font)
         d.text((x, 14), label, fill=(240, 236, 220), font=font)
     sheet.save(os.path.join(FINAL, f"{name}.png"))
+
+# The one sheet to show: the cabinet from the walkway, then close up.
+rows = [k for k in ("hero", "a_door") if k in picked]
+if len(rows) == 2:
+    pictures = [Image.open(os.path.join(FINAL, f"{k}.png")) for k in rows]
+    w, h = pictures[0].size
+    sheet = Image.new("RGB", (w, h * 2 + 12), (18, 18, 18))
+    for row, picture in enumerate(pictures):
+        sheet.paste(picture, (0, row * (h + 12)))
+    sheet.save(os.path.join(FINAL, "power_cabinet_before_after.png"))

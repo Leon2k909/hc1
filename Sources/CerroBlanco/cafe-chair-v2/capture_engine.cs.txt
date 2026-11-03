@@ -1,0 +1,149 @@
+// Before and after of Cerro Blanco's cafe chairs, rendered by s&box: run with sbox-cli --call run_csharp '{"path":...}'.
+// Loads cerroblanco.scene's visual roots into an isolated editor scene, so the open scene and play state are never touched and nothing is saved, with the player camera's post stack and exposure held still.
+// "after" swaps the dressing model for cafe_chair_v2/compare's copy without the old chairs (cut_compare.py) and stands the new one at each of the 20 places (chairs.py). Plan ( e, n ) is world ( n, -e ).
+// Writes <view>-<variant>.png into the work folder's engine/.
+var projectRoot = Sandbox.Project.Current.GetRootPath();
+var destination = System.IO.Path.Combine(projectRoot, "output/asset-improvement-20261030/cerroblanco-cafe-chair/engine");
+System.IO.Directory.CreateDirectory(destination);
+var keep = new System.Collections.Generic.HashSet<string>(new[] { "Sun", "Sky", "Fog", "Look", "Cerro Blanco", "Trees", "Lights", "Art Lights", "Reflection Probes", "Museum indirect light", "Cerro Blanco construction details" }, StringComparer.OrdinalIgnoreCase);
+var root = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(projectRoot, "Assets/scenes/maps/CerroBlanco/cerroblanco.scene"))).AsObject();
+var objects = new System.Text.Json.Nodes.JsonArray();
+foreach (var item in root["GameObjects"].AsArray())
+    if (keep.Contains(item["Name"]?.GetValue<string>() ?? "")) objects.Add(item.DeepClone());
+var prefab = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(projectRoot, "Assets/prefabs/player/cameras/default_player_camera.prefab"))).AsObject();
+var wanted = new[] { "Sandbox.CameraComponent", "Sandbox.Bloom", "Sandbox.Tonemapping", "Sandbox.Sharpen", "Sandbox.AmbientOcclusion", "Sandbox.Vignette", "Facepunch.PhotographicResponse" };
+var components = new System.Text.Json.Nodes.JsonArray();
+foreach (var component in prefab["RootObject"]["Components"].AsArray())
+    if (wanted.Contains(component["__type"]?.GetValue<string>())) components.Add(component.DeepClone());
+objects.Add(new System.Text.Json.Nodes.JsonObject { ["__guid"] = System.Text.Json.Nodes.JsonNode.Parse("\"" + Guid.NewGuid() + "\""), ["Name"] = "Capture camera", ["Enabled"] = true, ["Components"] = components });
+root["GameObjects"] = objects;
+if (root["SceneProperties"]?["NavMesh"] is System.Text.Json.Nodes.JsonObject nav) nav["Enabled"] = false;
+if (root["SceneProperties"] is System.Text.Json.Nodes.JsonObject sceneProperties) sceneProperties["WantsSystemScene"] = false;
+var chair = Model.Load("models/maps/cerroblanco/cafe_chair_v2/chair.vmdl");
+if (chair is null || chair.IsError) throw new InvalidOperationException("The new chair hasn't compiled.");
+var cut = Model.Load("models/maps/cerroblanco/cafe_chair_v2/compare/cerroblanco_dressing_cut.vmdl");
+if (cut is null || cut.IsError) throw new InvalidOperationException("The dressing's cut copy hasn't compiled.");
+var scene = Scene.CreateEditorScene();
+var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
+var preRender = typeof(Scene).GetMethod("PreRender", flags, null, Type.EmptyTypes, null);
+var preCameraRender = typeof(Scene).GetMethod("PreCameraRender", flags, null, Type.EmptyTypes, null);
+Vector3 W(float e, float n, float z) => new Vector3(n, -e, z);
+try
+{
+    CameraComponent camera;
+    ModelRenderer dressing;
+    Model original;
+    var added = new System.Collections.Generic.List<GameObject>();
+    var info = new System.Collections.Generic.List<string>();
+    using (scene.Push())
+    {
+        scene.Deserialize(root);
+        var holder = scene.GetAllObjects(false).Single(g => g.Name == "Capture camera");
+        camera = holder.Components.Get<CameraComponent>();
+        camera.ZNear = 1;
+        camera.ZFar = 30000;
+        camera.IsMainCamera = true;
+        foreach (var tonemap in scene.GetAllComponents<Tonemapping>())
+        {
+            var hold = ( tonemap.MinimumExposure + tonemap.MaximumExposure ) / 2f;
+            tonemap.AutoExposureEnabled = true;
+            tonemap.MinimumExposure = tonemap.MaximumExposure = hold;
+            tonemap.ExposureCompensation = 0;
+            tonemap.Rate = 10;
+        }
+        dressing = scene.GetAllObjects(false).Single(g => g.Name == "Dressing").Components.Get<ModelRenderer>();
+        original = dressing.Model;
+        info.Add("dressing " + original.ResourcePath);
+        // World ( x, y ) and yaw of each chair, from chairs.py.
+        foreach (var (x, y, yaw) in new[] { (232.000f, -640.785f, 120.0f), (232.000f, -599.215f, 240.0f), (196.000f, -620.000f, 0.0f), (172.000f, -820.785f, 120.0f), (172.000f, -779.215f, 240.0f), (136.000f, -800.000f, 0.0f), (432.000f, -880.785f, 120.0f), (432.000f, -839.215f, 240.0f), (396.000f, -860.000f, 0.0f), (452.000f, -660.785f, 120.0f), (452.000f, -619.215f, 240.0f), (416.000f, -640.000f, 0.0f), (878.208f, 517.447f, 110.0f), (861.792f, 562.553f, 290.0f), (948.208f, 397.447f, 110.0f), (931.792f, 442.553f, 290.0f), (998.208f, 517.447f, 110.0f), (981.792f, 562.553f, 290.0f), (928.208f, 277.447f, 110.0f), (911.792f, 322.553f, 290.0f) })
+        {
+            var go = new GameObject(false, "New chair");
+            go.WorldPosition = new Vector3(x, y, 0f);
+            go.WorldRotation = Rotation.FromYaw(yaw);
+            go.Components.Create<ModelRenderer>().Model = chair;
+            added.Add(go);
+        }
+        scene.EditorTick(.016f, .016f);
+        preRender.Invoke(scene, null);
+        preCameraRender.Invoke(scene, null);
+    }
+    var textureNames = new[] { "g_tColor", "g_tNormal", "g_tRoughness", "g_tAmbientOcclusion", "g_tMetalness", "SkyTexture" };
+    foreach (var material in scene.GetAllComponents<ModelRenderer>().Where(r => r.Model is not null && r.Model != chair).SelectMany(r => r.Model.Materials).Distinct())
+        foreach (var texture in textureNames.Select(material.GetTexture).Append(material.FirstTexture).Where(t => t is not null).Distinct())
+            texture.MarkUsed(1024);
+    foreach (var material in chair.Materials)
+        foreach (var texture in textureNames.Select(material.GetTexture).Append(material.FirstTexture).Where(t => t is not null).Distinct())
+            texture.MarkUsed(2048);
+    for (var wait = 0; wait < 130; wait++)
+    {
+        using (scene.Push()) { scene.EditorTick(.016f, .016f); preRender.Invoke(scene, null); }
+        await Task.Delay(33, cancellationToken);
+    }
+    // A courtyard table's pair at ( -540, 870 ), and the cafe's table at ( 620, 220 ) with its three.
+    var views = new (string name, Vector3 eye, Vector3 target, float fov)[]
+    {
+        ("pair", W(-585f, 830f, 52f), W(-540f, 870f, 20f), 62f),
+        ("close", W(-498f, 858f, 36f), W(-517.4f, 878.2f, 20f), 48f),
+        ("back", W(-600f, 900f, 46f), W(-562.6f, 861.8f, 24f), 50f),
+        ("seat", W(-505f, 890f, 40f), W(-517.4f, 878.2f, 18f), 42f),
+        ("cafe", W(680f, 260f, 64f), W(620f, 220f, 22f), 65f),
+        ("courtyard", W(-300f, 700f, 66f), W(-450f, 920f, 40f), 70f),
+        ("legs", W(-490f, 850f, 12f), W(-517.4f, 878.2f, 8f), 55f),
+    };
+    // The first frames come out dark while the scene's light settles: render the first view a while and throw it away.
+    using (var warm = new Bitmap(640, 360))
+        for (var frame = 0; frame < 60; frame++)
+        {
+            using (scene.Push())
+            {
+                camera.WorldPosition = views[0].eye;
+                camera.WorldRotation = Rotation.LookAt(views[0].target - views[0].eye);
+                camera.FieldOfView = views[0].fov;
+                scene.EditorTick(.016f, .016f);
+                preRender.Invoke(scene, null);
+                preCameraRender.Invoke(scene, null);
+                camera.RenderToBitmap(warm);
+            }
+            await Task.Delay(16, cancellationToken);
+        }
+    foreach (var variant in new[] { "before", "after" })
+    {
+        using (scene.Push())
+        {
+            dressing.Model = variant == "after" ? cut : original;
+            foreach (var go in added) go.Enabled = variant == "after";
+        }
+        for (var settle = 0; settle < 20; settle++)
+        {
+            using (scene.Push()) { scene.EditorTick(.016f, .016f); preRender.Invoke(scene, null); }
+            await Task.Delay(33, cancellationToken);
+        }
+        foreach (var view in views)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            using var bitmap = new Bitmap(1280, 720);
+            for (var frame = 0; frame < 12; frame++)
+            {
+                using (scene.Push())
+                {
+                    camera.WorldPosition = view.eye;
+                    camera.WorldRotation = Rotation.LookAt(view.target - view.eye);
+                    camera.FieldOfView = view.fov;
+                    scene.EditorTick(.016f, .016f);
+                    preRender.Invoke(scene, null);
+                    preCameraRender.Invoke(scene, null);
+                    camera.RenderToBitmap(bitmap);
+                }
+                await Task.Delay(16, cancellationToken);
+            }
+            System.IO.File.WriteAllBytes(System.IO.Path.Combine(destination, $"{view.name}-{variant}.png"), bitmap.ToPng());
+        }
+    }
+    return new { Game.IsPlaying, Info = info, Bounds = chair.Bounds.Size.ToString(), Materials = chair.Materials.Select(m => m.ResourcePath).ToArray() };
+}
+catch (Exception error)
+{
+    System.IO.File.WriteAllText(System.IO.Path.Combine(destination, "capture-error.txt"), error.ToString());
+    throw;
+}
+finally { scene.Destroy(); }
