@@ -218,3 +218,4 @@ This file is kept short on purpose. The full notes that used to live here (~900 
 
 - [Riverside lawn chairs v2 (all 4, 2026-11-03)](docs/notes/196-riverside-lawn-chairs-v2.md) (1 KB)
 - [Zombie in the open shirt (`zombie_male_02`, a third zombie body, random body per zombie, 2026-11-03)](docs/notes/197-zombie-male-02-meshy-scan-on-the-citizen-skeleton-tools-zombie-male-02-py.md) (4 KB)
+- [Crosshair settings preview (`CrosshairPreview`, 2026-10-27)](docs/notes/151-crosshair-settings-preview-crosshairpreview-2026-10-27.md) (1 KB)
