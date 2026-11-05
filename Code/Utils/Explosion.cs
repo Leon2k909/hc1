@@ -48,13 +48,18 @@ public static class Explosion
 				continue;
 			}
 
-			// If the object isn't in line of sight, fuck it off
+			if ( damagedRoots.Contains( obj.Root ) ) continue;
+
+			// A blocked collider must not rule out another exposed part of the same target.
 			var tr = trace.Ray( point, obj.WorldPosition ).Run();
 			if ( tr.Hit && tr.GameObject.IsValid() )
 			{
 				if ( !obj.Root.IsDescendant( tr.GameObject ) )
 					continue;
 			}
+
+			// One blast per body/prop, regardless of how many collider objects the query returned.
+			damagedRoots.Add( obj.Root );
 
 			var distance = obj.WorldPosition.Distance( point );
 			var damage = baseDamage * falloff.Evaluate( distance / radius );

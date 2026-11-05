@@ -14,3 +14,15 @@ this change. No scenes, prefabs or graphics assets were edited.
 
 Validation: 85 production-rule checks cover several radii, strictly diminishing impulse, the radius boundary,
 preserved midpoint scale and invalid/extreme inputs. No editor connection or live gameplay check was performed.
+
+## One damage application per target — 2026-11-05
+
+`Explosion.AtPoint` now also deduplicates HealthComponent/Prop targets by root after a successful line-of-sight
+check. Several collider objects belonging to one target previously multiplied its damage and impulse. An occluded
+collider does not claim the target, so a later exposed collider can still receive the blast. The set is local to
+each explosion; another detonation can damage the same target normally. Damage curves and cover traces are unchanged.
+
+`Tools/ExplosionTargetChecks` executes the production explosion loop with engine seams, covering one/two/eight
+collider objects, player and prop damage, successive detonations, separate bodies, full cover and partial cover
+where the first collider is hidden. All 21 checks and offline game compilation passed. No editor was used;
+live physics queries and multiplayer remain unverified.
