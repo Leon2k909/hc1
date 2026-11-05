@@ -1,0 +1,10 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var directory=System.IO.Path.Combine(root,"Assets/models/props/riverside/shed_downlight_reuse_v1/review");
+var archive=System.IO.Path.Combine(root,"output/riverside/shed-downlight-reuse-v1/retired-review-assets");
+foreach(var session in Editor.SceneEditorSession.All)if(session.Scene?.Serialize().ToJsonString().Contains("shed_downlight_reuse_v1/review/")==true)throw new Exception("Open scene uses review assets");
+System.IO.Directory.CreateDirectory(archive);
+var files=System.IO.Directory.GetFiles(directory);
+foreach(var file in files)System.IO.File.Copy(file,System.IO.Path.Combine(archive,System.IO.Path.GetFileName(file)),true);
+foreach(var file in files.Where(f=>f.EndsWith(".vmdl"))){var path=System.IO.Path.GetRelativePath(System.IO.Path.Combine(root,"Assets"),file).Replace('\\','/');Editor.AssetSystem.FindByPath(path)?.Delete();}
+foreach(var file in System.IO.Directory.GetFiles(directory))System.IO.File.Delete(file);
+return new {ArchivedFiles=files.Length};

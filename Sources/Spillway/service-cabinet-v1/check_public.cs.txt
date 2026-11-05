@@ -1,0 +1,4 @@
+var model=Model.Load("models/maps/spillway/spillway_cargo.vmdl");
+var paths=model.Materials.Select(m=>m.ResourcePath).Where(p=>p.Contains("service-cabinet-v1")).Order().ToArray();
+if(model.IsError||paths.Length!=10)throw new InvalidOperationException("Public cargo model does not resolve the reviewed materials");
+return new{PublicModel=model.ResourcePath,Error=model.IsError,CabinetMaterials=paths};

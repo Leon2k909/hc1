@@ -15,7 +15,14 @@ public sealed class MapFire : Component, Component.ExecuteInEditor
 	/// <summary> How tall its flames reach. </summary>
 	[Property] public float FlameHeight { get; set; } = 30f;
 
+	/// <summary> Emission rate for open fires. Contained fires use continuous sources attached to their fuel. </summary>
 	[Property] public float FlamesPerSecond { get; set; } = 16f;
+
+	/// <summary> Inner radius of a drum or brazier opening; 0 leaves an open fire unrestricted. </summary>
+	[Property] public float OpeningRadius { get; set; }
+
+	/// <summary> Height of the rim above this emitter's fuel bed. </summary>
+	[Property] public float OpeningHeight { get; set; }
 
 	/// <summary> Smoke puffs a second; 0 for none. A drum's rubbish smokes a little, a burning trailer a column. </summary>
 	[Property] public float SmokePerSecond { get; set; } = 2f;
@@ -42,6 +49,9 @@ public sealed class MapFire : Component, Component.ExecuteInEditor
 	private PointLight _light;
 	private WorldWind _wind;
 	private float _flameDebt, _smokeDebt, _emberDebt, _seed;
+	private bool _containedVisuals;
+	private const int VisualVersion = 2;
+	private int _visualVersion;
 
 	protected override void OnEnabled()
 	{
@@ -52,7 +62,13 @@ public sealed class MapFire : Component, Component.ExecuteInEditor
 		_visuals.Flags |= GameObjectFlags.NotSaved | GameObjectFlags.NotNetworked | GameObjectFlags.Hidden;
 		_visuals.NetworkMode = NetworkMode.Never;
 
-		_flames = FireParticles.Create<FlameParticles>( _visuals, "Flames", FireParticles.Flame, 160, additive: true, upright: true, feather: 8f );
+		_containedVisuals = OpeningRadius > 0f;
+		_visualVersion = VisualVersion;
+		_flames = _containedVisuals
+			? FireParticles.Create<BarrelFlameParticles>( _visuals, "Fuel Flames", FireParticles.Flame, 16,
+				additive: true, upright: true, feather: 2f )
+			: FireParticles.Create<FlameParticles>( _visuals, "Flames", FireParticles.Flame, 160,
+				additive: true, upright: true, feather: 8f );
 		if ( SmokePerSecond > 0f )
 			_smoke = FireParticles.Create<FireSmokeParticles>( _visuals, "Smoke", FireParticles.Smoke, Math.Clamp( (int)(SmokePerSecond * SmokeLife * 1.5f), 8, 200 ),
 				additive: false, lit: true, sorted: true, feather: 24f );
@@ -79,6 +95,12 @@ public sealed class MapFire : Component, Component.ExecuteInEditor
 
 	protected override void OnUpdate()
 	{
+		// Rebuild if hotload or an editor property change switches between open and contained fire.
+		if ( _visuals.IsValid() && (_visualVersion != VisualVersion || _containedVisuals != (OpeningRadius > 0f)) )
+		{
+			OnDisabled();
+			OnEnabled();
+		}
 		if ( !_flames.IsValid() ) return;
 
 		var dt = Time.Delta;
@@ -88,12 +110,21 @@ public sealed class MapFire : Component, Component.ExecuteInEditor
 		var detail = distance < DetailDistance ? 1f : MathF.Max( 0.2f, DetailDistance / distance );
 
 		var wind = SampleWind( at );
-		_flames.GetComponent<FlameParticles>().Wind = wind;
+		var contained = OpeningRadius > 0f;
+		var fireTime = Time.Now + _seed;
+		var burn = contained ? Math.Clamp( 0.82f + 0.16f * MathF.Sin( fireTime * 1.7f )
+			+ 0.1f * MathF.Sin( fireTime * 4.1f + 0.7f ), 0.55f, 1.08f ) : 1f;
+		if ( contained )
+		{
+			_flames.GetComponent<BarrelFlameParticles>().UpdateFuel( at, OpeningRadius, OpeningHeight, FlameHeight, burn );
+		}
+		else
+			_flames.GetComponent<FlameParticles>().Wind = wind;
 		if ( _smoke.IsValid() ) _smoke.GetComponent<FireSmokeParticles>().Wind = wind;
 		if ( _embers.IsValid() ) _embers.GetComponent<SparkParticles>().Wind = wind;
 
 		var random = Random.Shared;
-		_flameDebt += FlamesPerSecond * detail * dt;
+		_flameDebt += contained ? 0f : FlamesPerSecond * detail * dt;
 		while ( _flameDebt >= 1f )
 		{
 			_flameDebt -= 1f;
@@ -111,9 +142,11 @@ public sealed class MapFire : Component, Component.ExecuteInEditor
 			{
 				_smokeDebt -= 1f;
 				var p = at + new Vector3( random.Float( -0.4f, 0.4f ) * Width, random.Float( -0.4f, 0.4f ) * Width, FlameHeight * 0.85f );
+				if ( contained ) p.z = at.z + OpeningHeight + FlameHeight * 0.25f;
 				var shade = SmokeShade * random.Float( 0.85f, 1.15f );
 				FireSmokeParticles.Emit( _smoke, p, SmokeSize * random.Float( 0.2f, 0.3f ), SmokeSize * random.Float( 0.8f, 1.3f ),
-					random.Float( 60f, 110f ), SmokeLife * random.Float( 0.8f, 1.2f ), new Color( shade, shade * 0.96f, shade * 0.92f, 0.6f ) );
+					contained ? random.Float( 30f, 55f ) : random.Float( 60f, 110f ), SmokeLife * random.Float( 0.8f, 1.2f ),
+					new Color( shade, shade * 0.96f, shade * 0.92f, contained ? 0.2f : 0.6f ) );
 			}
 		}
 
@@ -125,8 +158,14 @@ public sealed class MapFire : Component, Component.ExecuteInEditor
 				_emberDebt -= 1f;
 				var p = at + new Vector3( random.Float( -0.4f, 0.4f ) * Width, random.Float( -0.4f, 0.4f ) * Width, FlameHeight * random.Float( 0.3f, 0.9f ) );
 				var velocity = new Vector3( random.Float( -25f, 25f ), random.Float( -25f, 25f ), random.Float( 80f, 180f ) );
-				SparkParticles.Emit( _embers, p, velocity, random.Float( 0.7f, 1.4f ), random.Float( 1150f, 1350f ),
-					random.Float( 1.0f, 2.2f ), gravity: 60f, drag: 1.5f, brightness: 8f );
+				if ( contained )
+				{
+					p.z = at.z + OpeningHeight + random.Float( 0f, FlameHeight * 0.3f );
+					velocity = new Vector3( random.Float( -10f, 10f ), random.Float( -10f, 10f ), random.Float( 40f, 85f ) );
+				}
+				SparkParticles.Emit( _embers, p, velocity, contained ? random.Float( 0.3f, 0.65f ) : random.Float( 0.7f, 1.4f ), random.Float( 1150f, 1350f ),
+					contained ? random.Float( 1f, 1.5f ) : random.Float( 1.0f, 2.2f ), gravity: contained ? 16f : 60f,
+					drag: contained ? 1.8f : 1.5f, brightness: contained ? 4f : 8f );
 			}
 		}
 
@@ -134,6 +173,13 @@ public sealed class MapFire : Component, Component.ExecuteInEditor
 		{
 			var t = Time.Now + _seed;
 			var flicker = 0.78f + 0.12f * MathF.Sin( t * 13.1f ) + 0.07f * MathF.Sin( t * 29.3f + 1.3f ) + 0.05f * MathF.Sin( t * 5.7f + 0.4f );
+			if ( contained )
+			{
+				flicker = (0.86f + 0.08f * MathF.Sin( t * 5.3f ) + 0.06f * MathF.Sin( t * 2.1f + 0.7f )
+					+ 0.03f * MathF.Sin( t * 13.1f )) * (0.8f + 0.2f * burn);
+				var lightPosition = Vector3.Up * (OpeningHeight + FlameHeight * 0.2f);
+				if ( _light.LocalPosition != lightPosition ) _light.LocalPosition = lightPosition;
+			}
 			_light.LightColor = new Color( 1f, 0.55f, 0.22f ) * (LightBrightness * flicker);
 		}
 	}

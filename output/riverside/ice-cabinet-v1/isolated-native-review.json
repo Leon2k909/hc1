@@ -1,0 +1,384 @@
+{
+  "PreviewOnly": true,
+  "UserStatePreserved": true,
+  "Images": [
+    "C:/sbox-projects/hc1/ice-cabinet-review/output/riverside/ice-cabinet-v1\\isolated-before.png",
+    "C:/sbox-projects/hc1/ice-cabinet-review/output/riverside/ice-cabinet-v1\\isolated-after.png"
+  ],
+  "Models": [
+    {
+      "Variant": "before",
+      "Resource": "models/maps/riverside/ice-cabinet-v1/legacy_ice.vmdl",
+      "IsError": false,
+      "Mesh": {
+        "TotalVertices": 28,
+        "TotalTriangles": 14,
+        "TotalDrawCalls": 2,
+        "LodCount": 0,
+        "LodSwitchDistances": [],
+        "Meshes": [
+          {
+            "Name": "legacy_ice",
+            "Vertices": 28,
+            "Triangles": 14,
+            "LodMask": 255,
+            "MeshGroupMask": 18446744073709551615,
+            "TranslucencyType": 0,
+            "BoundsMin": "-15.1999998,-19,0",
+            "BoundsMax": "15,19,60",
+            "DrawCalls": [
+              {
+                "Vertices": 28,
+                "Indices": 36,
+                "PrimitiveType": 5,
+                "UvDensity": 63.999996,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 0,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "c4c689cd-ec2d-40db-bb52-13a689997920",
+                  "Path": "materials/riverside/rs_fridge.vmat"
+                }
+              },
+              {
+                "Vertices": 28,
+                "Indices": 6,
+                "PrimitiveType": 5,
+                "UvDensity": 63.999992,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 36,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "94489c8b-ebc4-4b6b-b1b2-5a801d1b53e3",
+                  "Path": "materials/riverside/rs_lit.vmat"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "Variant": "after",
+      "Resource": "models/maps/riverside/ice-cabinet-v1/ice_cabinet.vmdl",
+      "IsError": false,
+      "Mesh": {
+        "TotalVertices": 11016,
+        "TotalTriangles": 8384,
+        "TotalDrawCalls": 19,
+        "LodCount": 3,
+        "LodSwitchDistances": [
+          0,
+          20,
+          45
+        ],
+        "Meshes": [
+          {
+            "Name": "lod0",
+            "Vertices": 6056,
+            "Triangles": 4692,
+            "LodMask": 1,
+            "MeshGroupMask": 18446744073709551615,
+            "TranslucencyType": 0,
+            "BoundsMin": "-16.8400002,-19.2700005,0",
+            "BoundsMax": "15,19,60",
+            "DrawCalls": [
+              {
+                "Vertices": 6056,
+                "Indices": 30,
+                "PrimitiveType": 5,
+                "UvDensity": 35.268063,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 0,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "a599dfa8-0399-41ab-b5f7-d851e10b57ba",
+                  "Path": "materials/riverside/ice-cabinet-v1/door.vmat"
+                }
+              },
+              {
+                "Vertices": 6056,
+                "Indices": 2316,
+                "PrimitiveType": 5,
+                "UvDensity": 40.16737,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 30,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "1f4e821b-0e28-45dc-950e-2d69cc5c312e",
+                  "Path": "materials/riverside/ice-cabinet-v1/enamel.vmat"
+                }
+              },
+              {
+                "Vertices": 6056,
+                "Indices": 30,
+                "PrimitiveType": 5,
+                "UvDensity": 35.268063,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 2346,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "78ae64ba-264d-4d09-b45c-8915f035ee96",
+                  "Path": "materials/riverside/ice-cabinet-v1/header.vmat"
+                }
+              },
+              {
+                "Vertices": 6056,
+                "Indices": 3432,
+                "PrimitiveType": 5,
+                "UvDensity": 39.973553,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 2376,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "9512b75c-a96c-4201-ad85-bb5ac2647041",
+                  "Path": "materials/riverside/ice-cabinet-v1/recess.vmat"
+                }
+              },
+              {
+                "Vertices": 6056,
+                "Indices": 1836,
+                "PrimitiveType": 5,
+                "UvDensity": 40.15863,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 5808,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "d847861d-3ddb-4fe3-8f76-1d032474e189",
+                  "Path": "materials/riverside/ice-cabinet-v1/rubber.vmat"
+                }
+              },
+              {
+                "Vertices": 6056,
+                "Indices": 528,
+                "PrimitiveType": 5,
+                "UvDensity": 42.412216,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 7644,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "b2856e20-06c6-41c3-ab3a-961b37d47c7c",
+                  "Path": "materials/riverside/ice-cabinet-v1/rust.vmat"
+                }
+              },
+              {
+                "Vertices": 6056,
+                "Indices": 5904,
+                "PrimitiveType": 5,
+                "UvDensity": 39.463387,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 8172,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "b8f7bbf1-9c52-4c71-b3bf-099121c24064",
+                  "Path": "materials/riverside/ice-cabinet-v1/steel.vmat"
+                }
+              }
+            ]
+          },
+          {
+            "Name": "lod1",
+            "Vertices": 3208,
+            "Triangles": 2444,
+            "LodMask": 2,
+            "MeshGroupMask": 18446744073709551615,
+            "TranslucencyType": 0,
+            "BoundsMin": "-16.8400002,-19.2700005,0",
+            "BoundsMax": "15,19,60",
+            "DrawCalls": [
+              {
+                "Vertices": 3208,
+                "Indices": 30,
+                "PrimitiveType": 5,
+                "UvDensity": 35.268063,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 0,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "a599dfa8-0399-41ab-b5f7-d851e10b57ba",
+                  "Path": "materials/riverside/ice-cabinet-v1/door.vmat"
+                }
+              },
+              {
+                "Vertices": 3208,
+                "Indices": 2052,
+                "PrimitiveType": 5,
+                "UvDensity": 40.158558,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 30,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "1f4e821b-0e28-45dc-950e-2d69cc5c312e",
+                  "Path": "materials/riverside/ice-cabinet-v1/enamel.vmat"
+                }
+              },
+              {
+                "Vertices": 3208,
+                "Indices": 30,
+                "PrimitiveType": 5,
+                "UvDensity": 35.268063,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 2082,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "78ae64ba-264d-4d09-b45c-8915f035ee96",
+                  "Path": "materials/riverside/ice-cabinet-v1/header.vmat"
+                }
+              },
+              {
+                "Vertices": 3208,
+                "Indices": 264,
+                "PrimitiveType": 5,
+                "UvDensity": 40.152145,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 2112,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "9512b75c-a96c-4201-ad85-bb5ac2647041",
+                  "Path": "materials/riverside/ice-cabinet-v1/recess.vmat"
+                }
+              },
+              {
+                "Vertices": 3208,
+                "Indices": 1260,
+                "PrimitiveType": 5,
+                "UvDensity": 40.15477,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 2376,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "d847861d-3ddb-4fe3-8f76-1d032474e189",
+                  "Path": "materials/riverside/ice-cabinet-v1/rubber.vmat"
+                }
+              },
+              {
+                "Vertices": 3208,
+                "Indices": 3696,
+                "PrimitiveType": 5,
+                "UvDensity": 40.12167,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 3636,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "b8f7bbf1-9c52-4c71-b3bf-099121c24064",
+                  "Path": "materials/riverside/ice-cabinet-v1/steel.vmat"
+                }
+              }
+            ]
+          },
+          {
+            "Name": "lod2",
+            "Vertices": 1752,
+            "Triangles": 1248,
+            "LodMask": 4,
+            "MeshGroupMask": 18446744073709551615,
+            "TranslucencyType": 0,
+            "BoundsMin": "-16.8400002,-19,0",
+            "BoundsMax": "15,19,60",
+            "DrawCalls": [
+              {
+                "Vertices": 1752,
+                "Indices": 30,
+                "PrimitiveType": 5,
+                "UvDensity": 35.268063,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 0,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "a599dfa8-0399-41ab-b5f7-d851e10b57ba",
+                  "Path": "materials/riverside/ice-cabinet-v1/door.vmat"
+                }
+              },
+              {
+                "Vertices": 1752,
+                "Indices": 1524,
+                "PrimitiveType": 5,
+                "UvDensity": 40.158375,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 30,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "1f4e821b-0e28-45dc-950e-2d69cc5c312e",
+                  "Path": "materials/riverside/ice-cabinet-v1/enamel.vmat"
+                }
+              },
+              {
+                "Vertices": 1752,
+                "Indices": 30,
+                "PrimitiveType": 5,
+                "UvDensity": 35.268063,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 1554,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "78ae64ba-264d-4d09-b45c-8915f035ee96",
+                  "Path": "materials/riverside/ice-cabinet-v1/header.vmat"
+                }
+              },
+              {
+                "Vertices": 1752,
+                "Indices": 264,
+                "PrimitiveType": 5,
+                "UvDensity": 40.152145,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 1584,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "9512b75c-a96c-4201-ad85-bb5ac2647041",
+                  "Path": "materials/riverside/ice-cabinet-v1/recess.vmat"
+                }
+              },
+              {
+                "Vertices": 1752,
+                "Indices": 840,
+                "PrimitiveType": 5,
+                "UvDensity": 40.15255,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 1848,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "d847861d-3ddb-4fe3-8f76-1d032474e189",
+                  "Path": "materials/riverside/ice-cabinet-v1/rubber.vmat"
+                }
+              },
+              {
+                "Vertices": 1752,
+                "Indices": 1056,
+                "PrimitiveType": 5,
+                "UvDensity": 40.154743,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 2688,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "b8f7bbf1-9c52-4c71-b3bf-099121c24064",
+                  "Path": "materials/riverside/ice-cabinet-v1/steel.vmat"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

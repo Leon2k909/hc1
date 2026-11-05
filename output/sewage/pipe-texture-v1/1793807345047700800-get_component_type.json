@@ -1,0 +1,139 @@
+{
+  "ClassName": "ModelRenderer",
+  "Namespace": "Sandbox",
+  "Title": "Model Renderer",
+  "Description": "Renders a model in the world",
+  "Group": "Rendering",
+  "Icon": "free_breakfast",
+  "BaseType": "Renderer",
+  "Properties": [
+    {
+      "Name": "RenderOptions",
+      "Title": "Render Options",
+      "Description": null,
+      "Type": "RenderOptions",
+      "Group": "Advanced Rendering",
+      "ReadOnly": true
+    },
+    {
+      "Name": "MaterialOverride",
+      "Title": "Material Override",
+      "Description": null,
+      "Type": "Material",
+      "Group": null,
+      "ReadOnly": false
+    },
+    {
+      "Name": "Model",
+      "Title": "Model",
+      "Description": null,
+      "Type": "Model",
+      "Group": null,
+      "ReadOnly": false
+    },
+    {
+      "Name": "Tint",
+      "Title": "Tint",
+      "Description": null,
+      "Type": "Color",
+      "Group": null,
+      "ReadOnly": false
+    },
+    {
+      "Name": "CreateAttachments",
+      "Title": "Create Attachments",
+      "Description": null,
+      "Type": "Boolean",
+      "Group": null,
+      "ReadOnly": false
+    },
+    {
+      "Name": "BodyGroups",
+      "Title": "Body Groups",
+      "Description": null,
+      "Type": "UInt64",
+      "Group": null,
+      "ReadOnly": false
+    },
+    {
+      "Name": "Materials",
+      "Title": "Materials",
+      "Description": "Access to the materials",
+      "Type": "MaterialAccessor",
+      "Group": "Materials",
+      "ReadOnly": true
+    },
+    {
+      "Name": "MaterialGroup",
+      "Title": "Material Group",
+      "Description": null,
+      "Type": "String",
+      "Group": null,
+      "ReadOnly": false
+    },
+    {
+      "Name": "RenderType",
+      "Title": "Cast Shadows",
+      "Description": null,
+      "Type": "ShadowRenderType",
+      "Group": "Lighting",
+      "ReadOnly": false
+    },
+    {
+      "Name": "LodOverride",
+      "Title": "LOD Override",
+      "Description": "Force a level of detail. Unset uses automatic LOD.",
+      "Type": "Int32?",
+      "Group": null,
+      "ReadOnly": false
+    },
+    {
+      "Name": "OnComponentEnabled",
+      "Title": "On Component Enabled",
+      "Description": null,
+      "Type": "Action",
+      "Group": "Component",
+      "ReadOnly": false
+    },
+    {
+      "Name": "OnComponentStart",
+      "Title": "On Component Start",
+      "Description": null,
+      "Type": "Action",
+      "Group": "Component",
+      "ReadOnly": false
+    },
+    {
+      "Name": "OnComponentUpdate",
+      "Title": "On Component Update",
+      "Description": null,
+      "Type": "Action",
+      "Group": "Component",
+      "ReadOnly": false
+    },
+    {
+      "Name": "OnComponentFixedUpdate",
+      "Title": "On Component Fixed Update",
+      "Description": null,
+      "Type": "Action",
+      "Group": "Component",
+      "ReadOnly": false
+    },
+    {
+      "Name": "OnComponentDisabled",
+      "Title": "On Component Disabled",
+      "Description": null,
+      "Type": "Action",
+      "Group": "Component",
+      "ReadOnly": false
+    },
+    {
+      "Name": "OnComponentDestroy",
+      "Title": "On Component Destroy",
+      "Description": null,
+      "Type": "Action",
+      "Group": "Component",
+      "ReadOnly": false
+    }
+  ]
+}

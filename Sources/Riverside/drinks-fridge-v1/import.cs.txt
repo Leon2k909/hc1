@@ -1,0 +1,26 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var folder=System.IO.Path.Combine(root,"output/riverside/drinks-fridge-v1");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"manifest.json")));
+var session=Editor.SceneEditorSession.Active;
+var before=new { Scene=session.Scene.Id, Runtime=Game.ActiveScene?.Id, Game.IsPlaying, Dirty=session.HasUnsavedChanges };
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+var files=manifest["files"].AsObject();
+foreach(var pair in files) {
+ if(!(pair.Key.StartsWith("Assets/models/maps/riverside/drinks-fridge-v1/")||pair.Key.StartsWith("Assets/materials/riverside/drinks-fridge-v1/"))||pair.Key.Contains(".."))throw new InvalidOperationException("Unexpected target");
+ var source=System.IO.Path.Combine(folder,"stage",pair.Key);
+ if(Hash(source)!=pair.Value.GetValue<string>())throw new InvalidOperationException("Staged file changed: "+pair.Key);
+}
+int Priority(string path)=>path.EndsWith(".png")?0:path.EndsWith(".vmat")?1:path.EndsWith(".mtl")?2:path.EndsWith(".obj")?3:4;
+var written=new System.Collections.Generic.List<string>();
+foreach(var pair in files.OrderBy(p=>Priority(p.Key))) {
+ var target=System.IO.Path.Combine(root,pair.Key);
+ if(System.IO.File.Exists(target)&&Hash(target)==pair.Value.GetValue<string>())continue;
+ System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target));
+ var temporary=target+".interior-writing";
+ System.IO.File.Copy(System.IO.Path.Combine(folder,"stage",pair.Key),temporary,true);
+ System.IO.File.Move(temporary,target,true);written.Add(pair.Key);
+}
+foreach(var pair in files.OrderBy(p=>Priority(p.Key)))Editor.AssetSystem.RegisterFile(System.IO.Path.Combine(root,pair.Key));
+var report=new { PreviewOnly=true, Written=written, UserStatePreserved=session.Scene.Id==before.Scene && Game.ActiveScene?.Id==before.Runtime && Game.IsPlaying==before.IsPlaying && session.HasUnsavedChanges==before.Dirty };
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"preview-import.json"),System.Text.Json.JsonSerializer.Serialize(report));
+return report;

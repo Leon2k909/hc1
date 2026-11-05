@@ -68,8 +68,8 @@ class Clip:
 # bent back towards the zombie. Their hands are kept turned palm down instead, so the bent wrists droop like a zombie's.
 CLAW_TURN = (100.0, 170.0)
 
-# The walk is made, not ported (zombie_walk.py): a person's brisk walk at the Walkers' 70 u/s. None of NMRIH's shambles
-# walks like a person. The classic zombie's a_WalkN (the walk until 2026-10-01) is a crouched waddle: hips 1-5" low,
+# The walk is made, not ported (zombie_walk.py): an asymmetric zombie shamble at the Walkers' 70 u/s. Its foot-contact
+# constraints avoid the old knee snaps. The classic zombie's a_WalkN (the walk until 2026-10-01) is a crouched waddle: hips 1-5" low,
 # knees bent throughout, feet 19" apart, the arms up and bent with the hands clawed (the user: "we're exaggerating what
 # a zombie would look like"). walk7 walks upright but shuffles (15" steps at ~132 a minute: 33 u/s) with the forearms
 # held up; with its legs replaced by IK steps twice as long it still walked "a bit weird", the knees snapping straight

@@ -16,6 +16,9 @@ public sealed class SpectateController : Pawn
 		if ( !IsLocallyControlled )
 			return;
 
+		if ( Input.Suppressed || GameUtils.IsInteractiveMouseUiOpen() )
+			return;
+
 		EyeAngles += Input.AnalogLook;
 		EyeAngles = EyeAngles.WithPitch( EyeAngles.pitch.Clamp( -90, 90 ) );
 		WorldRotation = EyeAngles.ToRotation();

@@ -1,0 +1,14 @@
+var root=Sandbox.Project.Current.GetRootPath();var folder=System.IO.Path.Combine(root,"output/railhead/road-barrier-v1");
+var plan=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"install-plan.json")));
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+foreach(var item in plan["before"].AsObject())if(Hash(System.IO.Path.Combine(root,item.Key))!=item.Value.GetValue<string>())throw new InvalidOperationException("Installed source changed: "+item.Key);
+foreach(var item in plan["files"].AsObject()) {
+ if(!item.Key.StartsWith("Assets/models/maps/railhead/")||item.Key.Contains(".."))throw new InvalidOperationException("Unexpected destination");
+ if(Hash(System.IO.Path.Combine(folder,"install-stage",item.Key))!=item.Value.GetValue<string>())throw new InvalidOperationException("Staged source changed");
+}
+var written=new System.Collections.Generic.List<string>();
+foreach(var item in plan["files"].AsObject().OrderBy(p=>p.Key.EndsWith(".vmdl")?2:p.Key.EndsWith(".obj")?1:0)) {
+ var target=System.IO.Path.Combine(root,item.Key);System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target));
+ System.IO.File.Copy(System.IO.Path.Combine(folder,"install-stage",item.Key),target,true);Editor.AssetSystem.RegisterFile(target);written.Add(item.Key);
+}
+return new {InstalledBarriers=1,Written=written};

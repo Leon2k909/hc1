@@ -1,0 +1,24 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var plan=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/sewage/tower-deck-v1/plan.json")));
+var path=System.IO.Path.Combine(root,"Assets/models/maps/sewage/tower-rails-v1/base_tower.obj");
+var hash=Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+if(hash!=plan["original_sha256"].GetValue<string>())throw new Exception("Tower changed; rebuild the deck splice first.");
+var session=Editor.SceneEditorSession.All.Single(x=>x.Scene.Name=="sewage");
+if(Game.IsPlaying&&Editor.SceneEditorSession.Active==session)throw new Exception("Wait for edit mode.");
+var tower=session.Scene.GetAllObjects(true).Single(x=>x.Name=="Waterworks tower").Components.Get<ModelRenderer>();
+if(tower.Model?.ResourcePath!="models/maps/sewage/tower-rails-v1/base_tower.vmdl")throw new Exception("Unexpected tower model.");
+if(session.Scene.GetAllObjects(true).Any(x=>x.Name=="Waterworks tower open grating"))throw new Exception("Grating already installed.");
+var body=Model.Load("models/maps/sewage/tower-deck-v1/base_tower.vmdl");
+var deck=Model.Load("models/maps/sewage/tower-deck-v1/deck.vmdl");
+if(body is null||body.IsError||deck is null||deck.IsError)throw new Exception("Deck models failed to load.");
+using(session.Scene.Push())
+{
+    var holder=new GameObject(false,"Waterworks tower open grating");
+    holder.Tags.Add("sewage");
+    holder.Components.Create<ModelRenderer>().Model=deck;
+    tower.Model=body;
+    holder.Enabled=true;
+}
+session.HasUnsavedChanges=true;session.Save(false);
+var disk=System.IO.File.ReadAllText(System.IO.Path.Combine(root,"Assets/scenes/maps/sewage/sewage.scene"));
+return new{Saved=!session.HasUnsavedChanges,OnDisk=disk.Contains("Waterworks tower open grating")&&disk.Contains("models/maps/sewage/tower-deck-v1/base_tower.vmdl"),OldAssetRetained=System.IO.File.Exists(path),ActiveScene=Editor.SceneEditorSession.Active.Scene.Name};

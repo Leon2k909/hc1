@@ -1,0 +1,11 @@
+Layer0
+{
+ shader "shaders/complex.shader"
+ F_SPECULAR 1
+ TextureColor "materials/gunsmith_range/bench_oak_color.png"
+ TextureNormal "materials/gunsmith_range/bench_oak_normal.png"
+ TextureRoughness "materials/gunsmith_range/bench_oak_roughness.png"
+ g_flRoughnessScaleFactor "1"
+ g_flMetalness "0"
+ g_vColorTint "[0.7 0.6 0.47 1]"
+}

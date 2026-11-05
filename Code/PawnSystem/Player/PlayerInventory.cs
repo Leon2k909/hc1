@@ -87,10 +87,14 @@ public partial class PlayerInventory : Component
 	[Rpc.Broadcast]
 	private void DropHost( Equipment weapon, bool forceRemove )
 	{
-		if ( !Networking.IsHost )
+		if ( !Networking.IsHost || !Player.IsValid() )
 			return;
 
-		if ( !weapon.IsValid() )
+		// Only the holder or host can drop equipment, and the gun must still belong to this inventory.
+		if ( Rpc.Caller is not null && Rpc.Caller != Connection.Host && Rpc.Caller != Player.Network.Owner )
+			return;
+
+		if ( !weapon.IsValid() || !Equipment.Contains( weapon ) )
 			return;
 
 		var canDrop = GameMode.Instance?.Get<EquipmentDropper>() is { } dropper && dropper.CanDrop( Player, weapon );
@@ -105,12 +109,11 @@ public partial class PlayerInventory : Component
 			var position = tr.Hit ? tr.HitPosition + tr.Normal * weapon.Resource.WorldModel.Bounds.Size.Length : Player.AimRay.Position + Player.AimRay.Forward * 32f;
 			var rotation = Rotation.From( 0, Player.EyeAngles.yaw + 90, 90 );
 
-			var baseVelocity = Player.CharacterController.Velocity;
 			var droppedWeapon = DroppedEquipment.Create( weapon.Resource, position, rotation, weapon );
 
 			if ( !tr.Hit )
 			{
-				droppedWeapon.Rigidbody.Velocity = baseVelocity + Player.AimRay.Forward * 200.0f + Vector3.Up * 50;
+				droppedWeapon.Rigidbody.Velocity += Player.AimRay.Forward * 200.0f + Vector3.Up * 50;
 				droppedWeapon.Rigidbody.AngularVelocity = Vector3.Random * 8.0f;
 			}
 		}

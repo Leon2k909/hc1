@@ -46,6 +46,25 @@ Input.AnalogLook = new Angles( -200, 0, 0 );
 Step( looking );
 Near( looking.EyeAngles.pitch, -90, "Look must preserve the downward pitch limit." );
 
+foreach ( var suppressed in new[] { false, true } )
+foreach ( var menuOpen in new[] { false, true } )
+{
+	if ( !suppressed && !menuOpen ) continue;
+	Input.Suppressed = suppressed;
+	GameUtils.MenuOpen = menuOpen;
+	Input.AnalogMove = new Vector3( 1, 0, 0 );
+	Input.AnalogLook = new Angles( 5, 10, 0 );
+	var camera = new SpectateController { EyeAngles = new Angles( 20, 30, 0 ), WorldPosition = new Vector3( 10, 20, 30 ) };
+	Step( camera );
+	Check( camera.EyeAngles == new Angles( 20, 30, 0 ) && camera.WorldPosition == new Vector3( 10, 20, 30 ),
+		"Suppressed input and interactive menus must preserve both freecam position and view direction." );
+	Input.Suppressed = false;
+	GameUtils.MenuOpen = false;
+	Step( camera );
+	Check( camera.EyeAngles == new Angles( 25, 40, 0 ) && camera.WorldPosition.x > 10,
+		"Freecam controls must resume immediately when the UI releases input." );
+}
+
 Console.WriteLine( $"PASS: {checks} freecam checks against production SpectateController." );
 
 // Engine seams supply input, time and identity rotation. The production controller applies all movement and guards.
@@ -73,6 +92,7 @@ namespace Sandbox
 	public static class Input
 	{
 		public static bool Run, Walk;
+		public static bool Suppressed;
 		public static Angles AnalogLook;
 		public static Vector3 AnalogMove;
 		public static bool Down( string action ) => action switch { "Run" => Run, "Walk" => Walk, _ => false };
@@ -80,6 +100,11 @@ namespace Sandbox
 }
 namespace Facepunch
 {
+	public static class GameUtils
+	{
+		public static bool MenuOpen;
+		public static bool IsInteractiveMouseUiOpen() => MenuOpen;
+	}
 	public abstract class Pawn : Component
 	{
 		public bool IsLocallyControlled { get; set; } = true;

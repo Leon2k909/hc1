@@ -1,0 +1,24 @@
+"""Publish the approved chairs through the existing editor and retire old review meshes."""
+from pathlib import Path
+import ast,json,subprocess,sys,tempfile
+ROOT=Path(__file__).resolve().parents[3]
+HERE=Path(__file__).parent
+sys.path.insert(0,str(ROOT/'Sources/Belltower/terracotta-pot-v2'))
+import native
+OUT=Path(tempfile.gettempdir())/'belltower-bistro-chair-v2'
+native.OUT=OUT
+tree=ast.parse((ROOT/'Sources/Belltower/terracotta-pot-v2/finish_install.py').read_text())
+command=next(ast.literal_eval(n.value) for n in tree.body if isinstance(n,ast.Assign) and any(isinstance(t,ast.Name) and t.id=='command' for t in n.targets))
+cleanup=subprocess.Popen(['powershell','-NoProfile','-Command',command],stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,creationflags=subprocess.CREATE_NO_WINDOW)
+try:
+    print('Install:',native.script(HERE/'install.cs.txt','install'),flush=True)
+    manifest=json.loads((OUT/'install-stage/manifest.json').read_text())
+    for relative in manifest['compile_models']:
+        path=relative.removeprefix('Assets/')
+        result=native.call('asset_compile',{'path':path},'installed-compile-'+Path(path).stem)
+        assert result['Success'],result
+        print('Compiled:',path,flush=True)
+    print('Retired:',native.script(HERE/'delete-old.cs.txt','delete-old'),flush=True)
+finally:
+    if cleanup.poll() is None:cleanup.terminate()
+    cleanup.communicate(timeout=25)

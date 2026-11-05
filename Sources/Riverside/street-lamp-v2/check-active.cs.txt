@@ -1,0 +1,6 @@
+var session=Editor.SceneEditorSession.Active;
+var group=session.Scene.GetAllObjects(true).SingleOrDefault(g=>g.Name=="Streetlight Heads");
+if (group is null) throw new Exception("Streetlight group missing from editor scene");
+var renderers=group.GetComponentsInChildren<ModelRenderer>().ToArray();
+if (renderers.Length!=4 || renderers.Any(r=>r.Model is null || r.Model.IsError)) throw new Exception("Expected four valid editor heads");
+return new {Heads=renderers.Select(r=>new {Position=r.WorldPosition.ToString(),Model=r.Model.ResourcePath}).ToArray(),session.HasUnsavedChanges,session.IsPlaying};

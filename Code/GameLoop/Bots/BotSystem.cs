@@ -23,7 +23,7 @@ public sealed class BotSystem : GameObjectSystem<BotSystem>
 	public BotSystem( Scene scene ) : base( scene )
 	{
 		Listen( Stage.StartUpdate, -100, Refresh, "BotSystem.Refresh" );
-		// After UpdateBones, finish both the weapon mount and support arm from the same animated pose.
+		// After UpdateBones, finish weapon/support-arm poses and layer zombie impacts over the animated driver.
 		Listen( Stage.FinishUpdate, -100, FollowHands, "BotSystem.FollowHands" );
 		Listen( Stage.FinishUpdate, 10000, EndFrame, "BotSystem.EndFrame" );
 	}
@@ -318,6 +318,10 @@ public sealed class BotSystem : GameObjectSystem<BotSystem>
 		{
 			if ( bot.IsValid() )
 				bot.FinishWeaponPose();
+		}
+		foreach ( var zombie in Zombies )
+		{
+			if ( zombie.IsValid() ) zombie.FinishHitReaction();
 		}
 	}
 

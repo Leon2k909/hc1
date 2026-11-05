@@ -54,7 +54,17 @@ public sealed class SpectateSystem : SingletonComponent<SpectateSystem>
 		if ( !Client.Viewer.IsValid() )
 			return;
 
-		if ( Input.Pressed( "SpectatorNext" ) || !Client.Viewer.Pawn.IsValid() )
+		// Losing a followed pawn still needs a replacement while menus are open.
+		if ( !Client.Viewer.Pawn.IsValid() )
+		{
+			SpectateNextPlayer( true );
+			return;
+		}
+
+		if ( Input.Suppressed || GameUtils.IsInteractiveMouseUiOpen() )
+			return;
+
+		if ( Input.Pressed( "SpectatorNext" ) )
 		{
 			SpectateNextPlayer( true );
 		}

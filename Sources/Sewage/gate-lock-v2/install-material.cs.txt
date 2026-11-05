@@ -1,0 +1,6 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var path=System.IO.Path.Combine(root,"Assets/materials/sewage/gate-lock-v2/brass.vmat");
+if(System.IO.File.Exists(path))throw new Exception("Material already exists");
+System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(path));
+System.IO.File.Copy(System.IO.Path.Combine(root,"Sources/sewage/gate-lock-v2/brass.vmat.txt"),path);
+Editor.AssetSystem.RegisterFile(path);return new{Imported=true};

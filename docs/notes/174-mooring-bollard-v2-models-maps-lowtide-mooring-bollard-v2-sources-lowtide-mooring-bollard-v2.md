@@ -5,3 +5,8 @@
 - **Don't rerun `lowtide_map.py` into Assets.** Other tools have passed over its output: an unchanged dry run differs from the live files in 14 models and 262 scene objects. `install_bollards.py` asks the map's code where the bollards are, cuts their 102 `iron_black` faces each from the live dressing OBJs, moves the two boxes in the vmdls, and adds the group to the scene. A dry run into scratch, with and without the edit, showed the script's own output differs only by those things.
 - Checked in an isolated editor scene, not in a match: see the folder's README. Shots are in `output/asset-improvement-20261030/bench-bollard-check/lowtide/`.
 - To roll back: restore `lowtide_dress_east/west.obj` and `.vmdl` from git, revert the script, and delete the "Quay Bollards" group from the scene. Don't restore the scene from git: it holds other uncommitted work.
+- 2026-11-04 detail pass approved: a weathered three-and-a-half-turn mooring line, hanging tail and cut-end fibres, with path-following three-strand grooves.
+  Atlas increased to 2048; mesh counts 6,836 / 3,256 / 1,110, still one material. Casting, map placements and collision were retained. Native model/material
+  compilation and the existing offline geometry/reference/12-placement/collision checks passed. Approved isolated-scene renders, forced LOD views and current
+  work are in `output/bollard-rope-20261104/after`, `lods` and `work`; live-match LOD thresholds and performance remain untested. After approval, the OLD gallery
+  group/label, local old_bollard comparison asset and mesh inputs, superseded build folder and before/comparison files were deleted.

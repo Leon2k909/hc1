@@ -44,6 +44,18 @@
                     <label class="cat-desc">@Tr( "Choose your player card style" )</label>
                 </div>
 
+                <div class="barracks-cat" @onclick=@OpenSprays>
+                    <i class="cat-icon">format_paint</i>
+                    <label class="cat-name">@Tr( "SPRAYS" )</label>
+                    <label class="cat-desc">@Tr( "Choose your in-match spray" )</label>
+                </div>
+
+                <div class="barracks-cat" @onclick=@OpenLoadingScreens>
+                    <i class="cat-icon">wallpaper</i>
+                    <label class="cat-name">@Tr( "LOADING SCREENS" )</label>
+                    <label class="cat-desc">@Tr( "Choose loading artwork or use your own image" )</label>
+                </div>
+
                 <a class="barracks-cat" href="/theater">
                     <i class="cat-icon">videocam</i>
                     <label class="cat-name">@Tr( "THEATER" )</label>
@@ -64,6 +76,15 @@
 
             </div>
         </div>
+    }
+
+    @if ( ActiveSection == BarracksSection.Sprays )
+    {
+        <CosmeticCollectionPanel />
+    }
+    @if ( ActiveSection == BarracksSection.LoadingScreens )
+    {
+        <CosmeticCollectionPanel IsLoadingScreen=@true />
     }
 
     @* ── Emblems ──────────────────────────────────────────────── *@
@@ -148,7 +169,7 @@
 
 @code
 {
-    private enum BarracksSection { None, Emblems, CallingCards, Titles }
+    private enum BarracksSection { None, Emblems, CallingCards, Titles, Sprays, LoadingScreens }
 
     private BarracksSection ActiveSection { get; set; } = BarracksSection.None;
     private EmblemEditor EmblemEditorRef { get; set; }
@@ -158,6 +179,8 @@
         BarracksSection.Emblems      => "EMBLEM EDITOR",
         BarracksSection.CallingCards => "CALLING CARDS",
         BarracksSection.Titles       => "TITLES",
+        BarracksSection.Sprays       => "SPRAYS",
+        BarracksSection.LoadingScreens => "LOADING SCREENS",
         _                            => "BACK"
     };
 
@@ -182,6 +205,9 @@
         ActiveSection = BarracksSection.CallingCards;
         StateHasChanged();
     }
+
+    private void OpenSprays() { ActiveSection = BarracksSection.Sprays; StateHasChanged(); }
+    private void OpenLoadingScreens() { ActiveSection = BarracksSection.LoadingScreens; StateHasChanged(); }
 
     private void OpenTitles()
     {

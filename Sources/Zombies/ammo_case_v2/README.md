@@ -1,8 +1,8 @@
 # Zombies ammo case v2
 
-Created 2026-10-30. The user compared it with the old case and told me to install it, so `ZombiesPowerUp.CreateAmmoCase` now loads it,
-falling back to two plain boxes with a log warning if the model doesn't load. The comparison is
-`output/asset-improvement-20261030/ammo-case/ammo_case_before_after.png`.
+Created 2026-10-30 and refined 2026-11-04. The approved detailed case replaces the previous meshes and textures at the
+same asset path, which `ZombiesPowerUp.CreateAmmoCase` already loads. Superseded bake and comparison files have been
+removed. The current build is in `output/ammo-case-detail-20261104/work/`, with native captures in `after/`.
 
 ## Why this one
 
@@ -16,10 +16,11 @@ model loads.
 A pressed-steel ammunition chest with its lid stood open on two stay cables: bands, a rolled rim, riveted angle-iron
 corners, skids, draw latches hanging undone, drop handles with rubber grips, a gasket and a packing list inside the lid.
 Inside are 23 loaded curved magazines in a slotted tray (black, tan and grey, a brass round on each, four slots empty) and
-three cartons of rounds. Olive enamel, yellow stencils. Lettering is generic, with no brand, real or game.
+three cartons of rounds. Olive enamel, yellow stencils. Lettering is generic, with no brand, real or game. The 2026-11-04
+detail pass adds physical curved stiffening ribs, reinforced throats and folded feed lips around the cartridges.
 
-- Triangles: 11,152 / 3,704 / 1,326 (LOD 0-2). The old case is 7 cubes plus three magazines of 6,000 triangles each, so
-  about 18,000 with no LODs: this is cheaper as well as better.
+- Triangles after the magazine detail pass: 21,548 / 9,422 / 3,078 (LOD 0-2), up from 11,152 / 3,704 / 1,326.
+  The extra geometry is concentrated in the contents, which players see enlarged at the two buy stations.
 - One material, one 2048 atlas, about 16 px/in.
 - Same origin. Bounds are x -9.75 to 7.76, y -12.71 to 12.71, z -10 to 18.46, against the old -9 to 8, -12.5 to 12.5 and -10 to 20.
 - No physics, as before: the old case has only renderers, and the buy station has its own box collider.
@@ -34,6 +35,7 @@ paint after it: the export refuses to run otherwise.
 | `ammo_case.py` (`run.ps1 build,bake`) | Meshes, UVs, LODs; position, normal, finish and AO bakes |
 | `paint_ammo.py <work> <materials>` | Every map, in numpy, with wear worked out in 3D |
 | `ammo_case.py` (`run.ps1 export`) | OBJs, vmdl, vmat |
+| `ammo_case.py` (`export-meshes` stage) | Replace only the three OBJ inputs; preserve the existing ModelDoc and material resources when the editor is open |
 | `verify_ammo.py <root>` | The checks below |
 | `render_ammo.py`, `make_sheets.py` | Matched comparison renders and the sheet |
 
@@ -45,9 +47,11 @@ Checked from the files by `verify_ammo.py`: LOD 0 has 0 pieces inside out; every
 in the atlas and its bounds are near the old case's; every file the vmdl and vmat name exists; no physics; the code loads it
 (`verify_ammo.py <root> installed`).
 
-**Not checked: it has not been seen in s&box.** The images are Blender Cycles renders with ray-traced light, which flatter any
-asset. An open editor may compile the files when it sees them, so look for `_c` files before saying it was never compiled.
-Still unknown in the engine: the materials and the LOD thresholds (estimates).
+The 2026-11-04 pass was compiled through the native editor (`asset_compile`, full model and material rebuilds) and
+inspected in matched native whole-model and contents captures. Bounds are unchanged, and the model still uses one material.
+All three LODs pass the offline winding, normal, UV, bounds, reference and installation checks; 325 LOD0 solids face outward.
+The native LOD switching thresholds and a live-match view remain to be checked. The approved native captures are in
+`output/ammo-case-detail-20261104/after/`; build/bake data is in `work/`. Old comparison files were removed after approval.
 
 ## Known limits
 

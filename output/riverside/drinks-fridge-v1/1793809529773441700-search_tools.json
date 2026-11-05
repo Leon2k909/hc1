@@ -1,0 +1,46 @@
+{
+  "tools": [
+    {
+      "name": "restore_checkpoint",
+      "title": "Restore Checkpoint",
+      "toolset": "bridge_workflow",
+      "description": "REPLACE the open scene's entire contents with a checkpoint_scene snapshot: destroys every current root object, then rebuilds the snapshot's tree (guids preserved, so internal references stay wired). DESTRUCTIVE — requires an explicit id (from checkpoint_scene or list_checkpoints), never guesses. Returns { restored, id, destroyedRoots, restoredRoots }. The scene FILE on disk is untouched until save_scene. Scene-mutating: refused during play mode.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Checkpoint id to restore (e.g. 'cp_20260709_153000_before-batch-tint')."
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    {
+      "name": "save_scene",
+      "title": "Save Scene",
+      "toolset": "scene",
+      "description": "Save the active scene to its file. Edits to objects in other open scenes mark those scenes unsaved instead - switch_scene to one first to save it.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "Saved": {
+            "type": "string"
+          },
+          "HasUnsavedChanges": {
+            "type": "boolean"
+          }
+        },
+        "required": []
+      }
+    }
+  ],
+  "total": 402
+}

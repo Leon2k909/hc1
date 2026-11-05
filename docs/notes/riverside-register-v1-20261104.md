@@ -1,0 +1,5 @@
+# Lucky Stop cash register v1 — installed 2026-11-04
+
+Approved register installed in `riverside_store.vmdl`. Its private store input removes exactly 12 old register triangles and preserves every other mesh. Three translated register meshes have 2,720/2,328/1,716 triangles and private `regv1_` material aliases. The combined ModelDoc has five LOD groups at 0/10/20/25/45 to preserve both the register and ice cabinet thresholds. Shared store/drinks meshes use mask 31, ice meshes 3/12/16, register meshes 1/6/24. The original physics section and saved scene are unchanged.
+
+Actual offline gameplay verification: `output/riverside/register-v1/in-game-installed.png`, `installed-runtime.json`, `installed-state-restored.json`, `installed.json`. One player, no error models, no runtime substitutions, no extra lights, existing gameplay camera effects. All three approved local meshes are reproduced exactly by `Tools/riverside_register.py`; only the register authoring hook in `Tools/riverside_map.py` changed. No full-map regeneration was run. Native guarded scripts and pre-install inputs: `Sources/Riverside/register-v1` and `output/riverside/register-v1/install-before`.

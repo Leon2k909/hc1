@@ -1,0 +1,6 @@
+var previous=Editor.SceneEditorSession.Active;var runtime=Game.ActiveScene?.Id;var playing=Game.IsPlaying;
+var session=Editor.SceneEditorSession.All.FirstOrDefault(s=>s.Scene.IsEditor && s.Scene.Source?.ResourcePath=="scenes/maps/belltower/belltower.scene");
+if(session is null)session=Editor.SceneEditorSession.CreateFromPath(System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(),"Assets/scenes/maps/Belltower/belltower.scene"));
+if(ReferenceEquals(Editor.SceneEditorSession.Active,session) && !ReferenceEquals(previous,session))previous.MakeActive(false);
+if(!ReferenceEquals(previous,Editor.SceneEditorSession.Active)||Game.ActiveScene?.Id!=runtime||Game.IsPlaying!=playing)throw new InvalidOperationException("Previous editor state changed.");
+return new{Loaded=session is not null,ActivePreserved=true};

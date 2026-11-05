@@ -14,10 +14,11 @@ partial class GameMode
 
 	public string DisplayedStatus => TeamStatusText.GetValueOrDefault( Client.Local.Team );
 
+	// Round elapsed or remaining time, so fractional start times cannot shift the displayed second.
 	public TimeSpan? DisplayedTime => TimerMode switch
 	{
-		DisplayedTimerMode.CountUp => TimeSpan.FromSeconds( Math.Clamp( Time.Now.CeilToInt() - TimerStart, 0f, TimerDuration ) ),
-		DisplayedTimerMode.CountDown => TimeSpan.FromSeconds( Math.Clamp( TimerStart + TimerDuration - Time.Now.CeilToInt() + 1f, 0f, TimerDuration ) ),
+		DisplayedTimerMode.CountUp => TimeSpan.FromSeconds( Math.Floor( Math.Clamp( Time.Now - TimerStart, 0f, TimerDuration ) ) ),
+		DisplayedTimerMode.CountDown => TimeSpan.FromSeconds( Math.Ceiling( Math.Clamp( TimerStart + TimerDuration - Time.Now, 0f, TimerDuration ) ) ),
 		DisplayedTimerMode.StateCountDown => StateCountDown,
 		_ => null
 	};
@@ -31,7 +32,7 @@ partial class GameMode
 			if ( !float.IsFinite( next ) )
 				return null;
 
-			return TimeSpan.FromSeconds( Math.Max( next - Time.Now.CeilToInt() + 1f, 0f ) );
+			return TimeSpan.FromSeconds( Math.Ceiling( Math.Max( next - Time.Now, 0f ) ) );
 		}
 	}
 

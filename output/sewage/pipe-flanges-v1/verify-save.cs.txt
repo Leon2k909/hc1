@@ -1,0 +1,7 @@
+var session=Editor.SceneEditorSession.All.Single(x=>x.Scene.Name=="sewage");
+return new {
+    session.HasUnsavedChanges,
+    Objects=session.Scene.GetAllObjects(true).Where(x=>x.Name.Contains("flange",StringComparison.OrdinalIgnoreCase)).Select(x=>new{x.Id,x.Name}).ToArray(),
+    SaveParameters=session.GetType().GetMethods().Where(x=>x.Name=="Save").SelectMany(x=>x.GetParameters()).Select(x=>new{x.Name,x.IsOptional,x.DefaultValue}).ToArray(),
+    Dirty=session.GetType().GetProperties().Where(x=>x.Name.Contains("Unsaved")).Select(x=>new{x.Name,x.CanWrite}).ToArray()
+};

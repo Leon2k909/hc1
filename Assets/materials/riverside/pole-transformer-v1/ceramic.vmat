@@ -1,0 +1,13 @@
+"Layer0"
+{
+ shader "shaders/complex.shader"
+ F_SPECULAR "1"
+ g_flMetalness "0"
+ g_flRoughnessScaleFactor "0.3"
+ TextureColor "materials/riverside/pole-transformer-v1/hardware_color.png"
+ TextureNormal "materials/riverside/pole-transformer-v1/tank_normal.png"
+ TextureRoughness "materials/riverside/pole-transformer-v1/tank_rough.png"
+ TextureAmbientOcclusion "materials/default/default_ao.tga"
+ g_vColorTint "[0.64 0.57 0.43 1]"
+ g_flModelTintAmount "1"
+}

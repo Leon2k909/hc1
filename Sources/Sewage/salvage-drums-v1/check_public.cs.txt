@@ -1,0 +1,9 @@
+var model=Model.Load("models/maps/sewage/sewage_details.vmdl");
+if(model.IsError)throw new InvalidOperationException("Public details model failed");
+var paths=model.Materials.Select(m=>m.ResourcePath).ToArray();
+foreach(var mat in new[]{"olive","oxide"})if(!paths.Contains("materials/sewage/salvage-drums-v1/"+mat+".vmat"))throw new InvalidOperationException("Missing drum material: "+mat);
+var old=Model.Load("models/maps/sewage/salvage-drums-v1/before.vmdl");
+if(old.IsError)throw new InvalidOperationException("Old alternate unavailable");
+var report=new{Model=model.ResourcePath,Error=model.IsError,DrumMaterials=2,OldAlternate=old.ResourcePath};
+System.IO.File.WriteAllText(System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(),"output/sewage/salvage-drums-v1/public-resource.json"),System.Text.Json.JsonSerializer.Serialize(report));
+return report;

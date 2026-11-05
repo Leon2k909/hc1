@@ -1,0 +1,19 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var folder=System.IO.Path.Combine(root,"output/sewage/salvage-drums-v1");
+var plan=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"preview-plan.json")));
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+var files=plan["files"].AsObject().Where(p=>p.Key.StartsWith("Assets/materials/sewage/salvage-drums-v1/")||p.Key.StartsWith("Assets/models/maps/sewage/salvage-drums-v1/")).ToArray();
+foreach(var pair in files) {
+ var source=System.IO.Path.Combine(folder,"stage",pair.Key);
+ if(Hash(source)!=pair.Value.GetValue<string>())throw new InvalidOperationException("Stage changed: "+pair.Key);
+}
+var changed=new System.Collections.Generic.List<string>();
+foreach(var pair in files) {
+ var source=System.IO.Path.Combine(folder,"stage",pair.Key);var target=System.IO.Path.Combine(root,pair.Key);
+ System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target));
+ if(!System.IO.File.Exists(target)||Hash(target)!=pair.Value.GetValue<string>()) {
+  System.IO.File.Copy(source,target,true);changed.Add(pair.Key);
+ }
+ Editor.AssetSystem.RegisterFile(target);
+}
+return new {Imported=changed,PublicMapChanged=false};

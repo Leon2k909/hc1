@@ -1,0 +1,16 @@
+Layer0
+{
+ shader "shaders/complex.shader"
+ F_SPECULAR 1
+ TextureColor "materials/riverside/sandbag_v2/sandbag_color.png"
+ TextureNormal "materials/riverside/sandbag_v2/sandbag_normal.png"
+ TextureRoughness "materials/riverside/sandbag_v2/sandbag_rough.png"
+ TextureAmbientOcclusion "materials/riverside/sandbag_v2/sandbag_ao.png"
+ g_flRoughnessScaleFactor "1.0"
+ g_flMetalness "0.0"
+ g_flAmbientOcclusionDirectDiffuse "0.3"
+ g_flAmbientOcclusionDirectSpecular "0.5"
+ g_flModelTintAmount "1.0"
+ g_vColorTint "[1 1 1 0]"
+ g_bFogEnabled "1"
+}

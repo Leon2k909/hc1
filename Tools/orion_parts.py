@@ -42,10 +42,16 @@ RV_PAINTS = {
 }
 
 
+LAUNCH_VEHICLES = []  # (base, height, radius, logo direction): approved launch vehicle
+CHAIRS = []  # (plan ground position, facing): accepted shared Collider chair
+
+
 def reset():
     P.reset()
     RED_CRATES.clear()
     TARP_PILES.clear()
+    CHAIRS.clear()
+    LAUNCH_VEHICLES.clear()
 
 
 def repaint( model, mapping=RV_PAINTS ):
@@ -175,7 +181,11 @@ def tube_light( m, name, at, out, length=48.0, kind="cool", radius=300, light=Tr
 def work_lamp( m, at, light_name=None, radius=160 ):
     """ A small caged lamp on the service towers: a lit bulb in a dark cage. """
     c = v( *at )
-    box( m, c[0] - 3.5, c[0] + 3.5, c[1] - 3.5, c[1] + 3.5, c[2] - 3.5, c[2] + 3.5, "oa_lamp_warm" )
+    from orion_mount_lamps import CENTRES, build as draw_mount_lamp
+    if any(np.allclose(c, position) for position in CENTRES):
+        draw_mount_lamp(m,c)
+    else:
+        box( m, c[0] - 3.5, c[0] + 3.5, c[1] - 3.5, c[1] + 3.5, c[2] - 3.5, c[2] + 3.5, "oa_lamp_warm" )
     if light_name:
         P.LIGHTS.append( ( light_name, tuple( c ), SODIUM, radius, False ) )
 
@@ -184,53 +194,9 @@ def work_lamp( m, at, light_name=None, radius=160 ):
 # The launch vehicle, its mount and service towers
 
 def rocket( m, base, height=1226.0, r=78.0, sides=28, logo_facing=( 0, -1 ) ):
-    """ A two-stage launch vehicle standing on base (plan, the bottom of its engine skirt): a flared skirt over four
-    engine bells, four swept fins, the white first stage, a dark interstage band, the second stage, a gold band, then the
-    payload fairing's ogive. The mark and ORN run down its side towards logo_facing. Returns its axis' top. """
-    c = v( *base )
-    z0 = c[2]
-    H = height
-    # The picture's: a long white first stage, a thin dark interstage band, a white ring, a narrow gold band, the white
-    # second stage, then a blunt ogive fairing whose tip just reaches the picture's top edge.
-    skirt, s1, inter, gold0, band, fairing = 0.05, 0.719, 0.729, 0.770, 0.788, 0.901
-    prof = [ ( r * 1.06, z0 ), ( r * 1.06, z0 + H * 0.02 ), ( r, z0 + H * skirt ) ]
-    P.lathe( m, ( c[0], c[1] ), prof, "oa_rocket_dark", sides )
-    P.lathe( m, ( c[0], c[1] ), [ ( r, z0 + H * skirt ), ( r, z0 + H * s1 ) ], "oa_rocket", sides )
-    P.lathe( m, ( c[0], c[1] ), [ ( r, z0 + H * s1 ), ( r, z0 + H * inter ) ], "oa_rocket_dark", sides )
-    P.lathe( m, ( c[0], c[1] ), [ ( r, z0 + H * inter ), ( r, z0 + H * gold0 ) ], "oa_rocket", sides )
-    P.lathe( m, ( c[0], c[1] ), [ ( r, z0 + H * gold0 ), ( r, z0 + H * band ) ], "oa_gold", sides )
-    P.lathe( m, ( c[0], c[1] ), [ ( r * 0.98, z0 + H * band ), ( r * 0.98, z0 + H * fairing ) ], "oa_rocket", sides )
-    # The fairing: an ogive to a rounded tip.
-    ogive = []
-    for k in range( 9 ):
-        t = k / 8
-        ogive.append( ( r * math.sqrt( max( 0.0, 1 - t * t ) ) * ( 1 - 0.04 * t ), z0 + H * fairing + H * ( 1 - fairing ) * t ) )
-    ogive[-1] = ( 0.0, z0 + H )
-    P.lathe( m, ( c[0], c[1] ), [ ( r * 0.98, z0 + H * fairing ) ] + ogive[1:], "oa_rocket", sides )
-    # Engine bells under the skirt.
-    for k in range( 4 ):
-        a = math.pi / 4 + k * math.pi / 2
-        q = ( c[0] + math.cos( a ) * r * 0.45, c[1] + math.sin( a ) * r * 0.45 )
-        P.lathe( m, q, [ ( r * 0.32, z0 - 26 ), ( r * 0.22, z0 - 6 ), ( r * 0.12, z0 + 2 ) ], "oa_nozzle", 12 )
-    # Four fins, swept, at the base.
-    for k in range( 4 ):
-        a = k * math.pi / 2 + math.pi / 4
-        d = v( math.cos( a ), math.sin( a ), 0 )
-        s = np.cross( UP, d )
-        root0, root1 = c + d * r * 0.98 + UP * ( H * 0.012 ), c + d * r * 0.98 + UP * ( H * 0.2 )
-        tip0, tip1 = c + d * ( r * 1.9 ) + UP * ( -H * 0.012 ), c + d * ( r * 1.75 ) + UP * ( H * 0.07 )
-        th = s * 2.2
-        for sg in ( -1, 1 ):
-            card( m, "oa_rocket", [ root0 + th * sg, tip0 + th * sg, tip1 + th * sg, root1 + th * sg ], s * sg )
-        card( m, "oa_rocket_dark", [ tip0 - th, tip0 + th, tip1 + th, tip1 - th ], d )
-        card( m, "oa_rocket", [ tip1 - th, tip1 + th, root1 + th, root1 - th ], UP + d * 0.4 )
-        card( m, "oa_rocket_dark", [ root0 - th, root0 + th, tip0 + th, tip0 - th ], -UP )
-    # The mark and ORN down the side.
-    f = unit( ( logo_facing[0], logo_facing[1], 0 ) )
-    right = np.cross( UP, f )
-    letters( m, "mark", c + f * ( r + 0.6 ) + UP * ( z0 - c[2] + H * 0.478 ), right, r * 1.2, "dark", off=0.0 )
-    letters( m, "orn", c + f * ( r + 0.6 ) + UP * ( z0 - c[2] + H * 0.342 ), right, r * 2.6, "dark", off=0.0 )
-    return c + UP * H
+    """Register the approved standalone vehicle; the original pad keeps all collision."""
+    LAUNCH_VEHICLES.append((tuple(base),float(height),float(r),tuple(logo_facing)))
+    return v(*base)+UP*height
 
 
 def launch_mount( m, centre, top_z, w=520.0, d=520.0, hole=220.0, name="mount" ):
@@ -608,12 +574,5 @@ def desk( m, c, along, w=72.0, d=30.0, h=30.0, monitors=2, screen_names=( "telem
 
 
 def chair( m, c, facing ):
-    f = unit( ( facing[0], facing[1], 0 ) )
-    s = np.cross( UP, f )
-    cc = v( c[0], c[1], 0 )
-    P.cylinder( m, ( c[0], c[1] ), 1.5, 2, 18, "oa_dark", 6 )
-    obox( m, cc + UP * 19, f, ( 18, 18, 3 ), "oa_chair" )
-    obox( m, cc - f * 8 + UP * 30, f, ( 2.5, 17, 20 ), "oa_chair" )
-    for k in range( 5 ):
-        ang = 2 * math.pi * k / 5
-        beam( m, cc + UP * 2, cc + v( math.cos( ang ) * 11, math.sin( ang ) * 11, 1.5 ), 1.6, "oa_dark" )
+    """Register the shared accepted chair; this helper adds no mesh or new collision."""
+    CHAIRS.append((tuple(float(x) for x in c),tuple(float(x) for x in facing)))

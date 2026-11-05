@@ -1,0 +1,30 @@
+var root=Sandbox.Project.Current.GetRootPath();
+if(Game.IsPlaying)throw new InvalidOperationException("Cleanup requires stopped play");
+var folder=System.IO.Path.Combine(root,"output/belltower/picnic-table-v1");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"manifest.json")));
+var names=new[]{"west_without_table.vmdl","base_wood.obj","base_wood.mtl","base_dark.obj","base_dark.mtl"};
+var prefix="Assets/models/maps/belltower/picnic-table-v1/";
+var assets=System.IO.Path.GetFullPath(System.IO.Path.Combine(root,"Assets"));
+var targets=names.Select(n=>prefix+n).ToArray();
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+foreach(var rel in targets) {
+ var target=System.IO.Path.GetFullPath(System.IO.Path.Combine(root,rel));
+ var archive=System.IO.Path.Combine(folder,"stage",rel);
+ if(!target.StartsWith(System.IO.Path.GetFullPath(System.IO.Path.Combine(root,prefix)),StringComparison.OrdinalIgnoreCase))throw new InvalidOperationException("Outside preview folder");
+ if(!System.IO.File.Exists(archive)||Hash(archive)!=manifest["files"][rel].GetValue<string>())throw new InvalidOperationException("Missing matching archive");
+ if(System.IO.File.Exists(target)&&Hash(target)!=Hash(archive))throw new InvalidOperationException("Preview changed: "+rel);
+}
+foreach(var extension in new[]{"*.vmdl","*.scene","*.prefab"})
+foreach(var file in System.IO.Directory.EnumerateFiles(assets,extension,System.IO.SearchOption.AllDirectories)) {
+ var rel=System.IO.Path.GetRelativePath(root,file).Replace('\\','/');if(targets.Contains(rel))continue;
+ var text=System.IO.File.ReadAllText(file);
+ foreach(var target in targets)if(text.Contains(target.Substring("Assets/".Length)))throw new InvalidOperationException("Still referenced by "+rel);
+}
+var deleted=new System.Collections.Generic.List<string>();
+foreach(var rel in targets)foreach(var suffix in new[]{"",".meta","_c","_c.meta"}) {
+ var path=System.IO.Path.Combine(root,rel+suffix);
+ if(System.IO.File.Exists(path)){System.IO.File.Delete(path);deleted.Add(rel+suffix);}
+}
+var report=new {Deleted=deleted,ProductionReferences=0,SourceArchivesRetained=true};
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"obsolete-preview-cleanup.json"),System.Text.Json.JsonSerializer.Serialize(report));
+return report;

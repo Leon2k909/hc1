@@ -1,0 +1,342 @@
+{
+  "PreviewOnly": true,
+  "UserStatePreserved": true,
+  "Images": [
+    "C:/sbox-projects/hc1/counter-review/output/riverside/counter-v1\\isolated-before.png",
+    "C:/sbox-projects/hc1/counter-review/output/riverside/counter-v1\\isolated-after.png"
+  ],
+  "Models": [
+    {
+      "Variant": "before",
+      "Resource": "models/maps/riverside/counter-v1/legacy_counter.vmdl",
+      "IsError": false,
+      "Mesh": {
+        "TotalVertices": 24,
+        "TotalTriangles": 12,
+        "TotalDrawCalls": 2,
+        "LodCount": 0,
+        "LodSwitchDistances": [],
+        "Meshes": [
+          {
+            "Name": "legacy_counter",
+            "Vertices": 24,
+            "Triangles": 12,
+            "LodMask": 255,
+            "MeshGroupMask": 18446744073709551615,
+            "TranslucencyType": 0,
+            "BoundsMin": "-15,-55,0",
+            "BoundsMax": "15,55,40",
+            "DrawCalls": [
+              {
+                "Vertices": 24,
+                "Indices": 6,
+                "PrimitiveType": 5,
+                "UvDensity": 191.99944,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 0,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "42a6b430-bd8e-4462-93b5-d02b5b753772",
+                  "Path": "materials/riverside/rs_concrete.vmat"
+                }
+              },
+              {
+                "Vertices": 24,
+                "Indices": 30,
+                "PrimitiveType": 5,
+                "UvDensity": 64,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 6,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "80a9ffae-85d9-4652-b553-5bb5b082c671",
+                  "Path": "materials/riverside/rs_wood.vmat"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "Variant": "after",
+      "Resource": "models/maps/riverside/counter-v1/counter.vmdl",
+      "IsError": false,
+      "Mesh": {
+        "TotalVertices": 12614,
+        "TotalTriangles": 10360,
+        "TotalDrawCalls": 16,
+        "LodCount": 3,
+        "LodSwitchDistances": [
+          0,
+          15,
+          35
+        ],
+        "Meshes": [
+          {
+            "Name": "lod0",
+            "Vertices": 6038,
+            "Triangles": 5296,
+            "LodMask": 1,
+            "MeshGroupMask": 18446744073709551615,
+            "TranslucencyType": 0,
+            "BoundsMin": "-15.0200005,-55,0",
+            "BoundsMax": "15,55,40",
+            "DrawCalls": [
+              {
+                "Vertices": 6038,
+                "Indices": 396,
+                "PrimitiveType": 5,
+                "UvDensity": 31.011005,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 0,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "3dd9dc09-84f9-414f-9acf-e1847d5aef2d",
+                  "Path": "materials/riverside/counter-v1/core.vmat"
+                }
+              },
+              {
+                "Vertices": 6038,
+                "Indices": 30,
+                "PrimitiveType": 5,
+                "UvDensity": 29.64155,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 396,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "8e38bd9b-f245-4624-89d3-f8cd417a820a",
+                  "Path": "materials/riverside/counter-v1/laminate.vmat"
+                }
+              },
+              {
+                "Vertices": 6038,
+                "Indices": 1188,
+                "PrimitiveType": 5,
+                "UvDensity": 31.011005,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 426,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "712d1e76-c3ec-4e6a-b447-fe5f82a4ef47",
+                  "Path": "materials/riverside/counter-v1/recess.vmat"
+                }
+              },
+              {
+                "Vertices": 6038,
+                "Indices": 10356,
+                "PrimitiveType": 5,
+                "UvDensity": 27.073385,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 1614,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "d9fbba7b-5bb4-4cb8-9d9e-c8c2e50e1963",
+                  "Path": "materials/riverside/counter-v1/steel.vmat"
+                }
+              },
+              {
+                "Vertices": 6038,
+                "Indices": 1806,
+                "PrimitiveType": 5,
+                "UvDensity": 31.011005,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 11970,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "822495a3-31ac-466a-a2a8-253317de5360",
+                  "Path": "materials/riverside/counter-v1/trim.vmat"
+                }
+              },
+              {
+                "Vertices": 6038,
+                "Indices": 2112,
+                "PrimitiveType": 5,
+                "UvDensity": 30.27432,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 13776,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "ae1ca02d-08a7-4466-845f-1043210e10d0",
+                  "Path": "materials/riverside/counter-v1/wood.vmat"
+                }
+              }
+            ]
+          },
+          {
+            "Name": "lod1",
+            "Vertices": 4238,
+            "Triangles": 3436,
+            "LodMask": 2,
+            "MeshGroupMask": 18446744073709551615,
+            "TranslucencyType": 0,
+            "BoundsMin": "-15,-55,0",
+            "BoundsMax": "15,55,40",
+            "DrawCalls": [
+              {
+                "Vertices": 4238,
+                "Indices": 30,
+                "PrimitiveType": 5,
+                "UvDensity": 57.44522,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 0,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "8e38bd9b-f245-4624-89d3-f8cd417a820a",
+                  "Path": "materials/riverside/counter-v1/laminate.vmat"
+                }
+              },
+              {
+                "Vertices": 4238,
+                "Indices": 1188,
+                "PrimitiveType": 5,
+                "UvDensity": 31.832354,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 30,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "712d1e76-c3ec-4e6a-b447-fe5f82a4ef47",
+                  "Path": "materials/riverside/counter-v1/recess.vmat"
+                }
+              },
+              {
+                "Vertices": 4238,
+                "Indices": 6612,
+                "PrimitiveType": 5,
+                "UvDensity": 27.304861,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 1218,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "d9fbba7b-5bb4-4cb8-9d9e-c8c2e50e1963",
+                  "Path": "materials/riverside/counter-v1/steel.vmat"
+                }
+              },
+              {
+                "Vertices": 4238,
+                "Indices": 366,
+                "PrimitiveType": 5,
+                "UvDensity": 29.393782,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 7830,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "822495a3-31ac-466a-a2a8-253317de5360",
+                  "Path": "materials/riverside/counter-v1/trim.vmat"
+                }
+              },
+              {
+                "Vertices": 4238,
+                "Indices": 2112,
+                "PrimitiveType": 5,
+                "UvDensity": 29.95417,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 8196,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "ae1ca02d-08a7-4466-845f-1043210e10d0",
+                  "Path": "materials/riverside/counter-v1/wood.vmat"
+                }
+              }
+            ]
+          },
+          {
+            "Name": "lod2",
+            "Vertices": 2338,
+            "Triangles": 1628,
+            "LodMask": 4,
+            "MeshGroupMask": 18446744073709551615,
+            "TranslucencyType": 0,
+            "BoundsMin": "-15,-55,0",
+            "BoundsMax": "15,55,40",
+            "DrawCalls": [
+              {
+                "Vertices": 2338,
+                "Indices": 30,
+                "PrimitiveType": 5,
+                "UvDensity": 57.44582,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 0,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "8e38bd9b-f245-4624-89d3-f8cd417a820a",
+                  "Path": "materials/riverside/counter-v1/laminate.vmat"
+                }
+              },
+              {
+                "Vertices": 2338,
+                "Indices": 1188,
+                "PrimitiveType": 5,
+                "UvDensity": 31.442493,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 30,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "712d1e76-c3ec-4e6a-b447-fe5f82a4ef47",
+                  "Path": "materials/riverside/counter-v1/recess.vmat"
+                }
+              },
+              {
+                "Vertices": 2338,
+                "Indices": 1188,
+                "PrimitiveType": 5,
+                "UvDensity": 31.442493,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 1218,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "d9fbba7b-5bb4-4cb8-9d9e-c8c2e50e1963",
+                  "Path": "materials/riverside/counter-v1/steel.vmat"
+                }
+              },
+              {
+                "Vertices": 2338,
+                "Indices": 366,
+                "PrimitiveType": 5,
+                "UvDensity": 29.393906,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 2406,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "822495a3-31ac-466a-a2a8-253317de5360",
+                  "Path": "materials/riverside/counter-v1/trim.vmat"
+                }
+              },
+              {
+                "Vertices": 2338,
+                "Indices": 2112,
+                "PrimitiveType": 5,
+                "UvDensity": 29.393906,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 2772,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "ae1ca02d-08a7-4466-845f-1043210e10d0",
+                  "Path": "materials/riverside/counter-v1/wood.vmat"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+var model=Model.Load("models/maps/riverside/riverside_dressing.vmdl");
+var materials=model.Materials.Select(m=>m.ResourcePath).Where(p=>p.Contains("pole-transformer-v1")).Order().ToArray();
+if(model.IsError||materials.Length!=7)throw new InvalidOperationException("The public model does not resolve the transformer materials");
+return new{PublicModel=model.ResourcePath,Error=model.IsError,TransformerMaterials=materials};

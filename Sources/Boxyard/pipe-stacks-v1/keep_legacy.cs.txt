@@ -1,0 +1,27 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var output=System.IO.Path.Combine(root,"output/boxyard/pipe-stacks-v1");
+var receipts=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(output,"retirement.json")));
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+var protect=new[]{"Assets/models/maps/boxyard/boxyard_props.obj","Assets/models/maps/boxyard/boxyard_props.vmdl","Assets/models/maps/boxyard/boxyard_props.mtl","Assets/scenes/maps/Boxyard/boxyard.scene","Tools/boxyard_map.py","Tools/boxyard_pipe_stacks.py"};
+var hashes=protect.ToDictionary(p=>p,p=>Hash(System.IO.Path.Combine(root,p)));
+var targetFolder=System.IO.Path.Combine(root,"Assets/models/maps/boxyard/pipe-stacks-v1");
+var editor=Editor.SceneEditorSession.Active;
+var state=new{Scene=editor.Scene.Id,Runtime=Game.ActiveScene?.Id,Game.IsPlaying,Dirty=editor.HasUnsavedChanges};
+var files=new System.Collections.Generic.Dictionary<string,string>();
+foreach(var ext in new[]{"obj","mtl","vmdl"}) {
+ var original="Assets/models/maps/boxyard/pipe-stacks-v1/before."+ext;
+ var entry=receipts[original];var source=System.IO.Path.Combine(root,entry["Archive"].GetValue<string>());
+ if(Hash(source)!=entry["Sha256"].GetValue<string>())throw new InvalidOperationException("Archive changed: "+original);
+ var content=System.IO.File.ReadAllText(source);
+ content=content.Replace("before.mtl","legacy_pipes.mtl").Replace("before.obj","legacy_pipes.obj").Replace("o before","o legacy_pipes").Replace("name = \"before\"","name = \"legacy_pipes\"");
+ var target=System.IO.Path.Combine(targetFolder,"legacy_pipes."+ext);
+ if(System.IO.File.Exists(target)&&System.IO.File.ReadAllText(target)!=content)throw new InvalidOperationException("Alternate already exists with different content");
+ files[target]=content;
+}
+foreach(var pair in files){System.IO.File.WriteAllText(pair.Key,pair.Value);Editor.AssetSystem.RegisterFile(pair.Key);}
+foreach(var pair in hashes)if(Hash(System.IO.Path.Combine(root,pair.Key))!=pair.Value)throw new InvalidOperationException("Active map changed: "+pair.Key);
+var report=new{Active="new",Alternate="models/maps/boxyard/pipe-stacks-v1/legacy_pipes.vmdl",ActiveMapUnchanged=true,
+ Files=files.Keys.ToDictionary(p=>System.IO.Path.GetRelativePath(root,p).Replace('\\','/'),Hash),
+ ProtectedHashes=hashes,UserStatePreserved=editor.Scene.Id==state.Scene&&Game.ActiveScene?.Id==state.Runtime&&Game.IsPlaying==state.IsPlaying&&editor.HasUnsavedChanges==state.Dirty};
+System.IO.File.WriteAllText(System.IO.Path.Combine(output,"retained-variants.json"),System.Text.Json.JsonSerializer.Serialize(report,new System.Text.Json.JsonSerializerOptions{WriteIndented=true}));
+return new{report.Active,report.Alternate,report.ActiveMapUnchanged,report.UserStatePreserved};

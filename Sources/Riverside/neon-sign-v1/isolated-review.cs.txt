@@ -1,0 +1,19 @@
+var session=Editor.SceneEditorSession.Active;var before=new{Scene=session.Scene.Id,Dirty=session.HasUnsavedChanges,Playing=Game.IsPlaying};
+var folder="C:/sbox-projects/hc1/neon-sign-review/output/riverside/neon-sign-v1";var images=new System.Collections.Generic.List<string>();
+foreach(var variant in new[]{"before","after"})
+{
+ var model=Model.Load("models/maps/riverside/neon-sign-v1/"+(variant=="before"?"legacy_neon.vmdl":"neon_sign.vmdl"));
+ if(model.IsError || model.Materials.Any(m=>m==null || m.IsError))throw new Exception("Neon preview resource failed");
+ var world=new SceneWorld();
+ try
+ {
+  new SceneObject(world,model,Transform.Zero);
+  new SceneLight(world,new Vector3(-85,-90,495),700,new Color(.35f,.42f,.55f)*15);
+  new SceneLight(world,new Vector3(40,80,350),600,new Color(.15f,.20f,.28f)*7);
+  var position=new Vector3(-180,-90,420);var camera=new SceneCamera("Neon geometry comparison") {World=world,Position=position,Rotation=Rotation.LookAt(new Vector3(0,0,410)-position),FieldOfView=45,ZNear=.5f,ZFar=2000,Size=new Vector2(1200,1200),AmbientLightColor=new Color(.11f,.13f,.16f),BackgroundColor=new Color(.025f,.032f,.045f),AntiAliasing=true,EnablePostProcessing=true};
+  var pixmap=new Editor.Pixmap(1200,1200);Sandbox.SandboxToolExtensions.RenderToPixmap(camera,pixmap,false);var path=System.IO.Path.Combine(folder,"engine-"+variant+".png");pixmap.SavePng(path);images.Add(path);
+ }
+ finally{world.Delete();}
+}
+var result=new{PreviewOnly=true,IsolatedEnginePreview=true,UserStatePreserved=before.Scene==session.Scene.Id && before.Dirty==session.HasUnsavedChanges && before.Playing==Game.IsPlaying,Paths=images};
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"engine-review.json"),Json.Serialize(result));return result;

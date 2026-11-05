@@ -1,0 +1,26 @@
+
+var project=Sandbox.Project.Current.GetRootPath();
+var folder=System.IO.Path.Combine(project,"output/riverside/trailer-hitch-v1");
+var stage=System.IO.Path.Combine(folder,"stage");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"manifest.json")));
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+foreach(var pair in manifest["protected"].AsObject())
+    if(Hash(System.IO.Path.Combine(project,pair.Key))!=pair.Value.GetValue<string>())throw new Exception("Source changed: regenerate the review before importing: "+pair.Key);
+var session=Editor.SceneEditorSession.Active;
+var before=new {Id=session.Scene.Id,Dirty=session.HasUnsavedChanges,Playing=Game.IsPlaying};
+var files=manifest["files"].AsObject();
+int Priority(string p)=>p.EndsWith(".png")?0:p.EndsWith(".vmat")?1:p.EndsWith(".mtl")?2:p.EndsWith(".obj")?3:4;
+foreach(var pair in files)
+{
+    if(pair.Key.Contains("..") || !(pair.Key.StartsWith("Assets/models/props/riverside/trailer_hitch_v1/") || pair.Key.StartsWith("Assets/materials/riverside/trailer_hitch_v1/")))throw new Exception("Unexpected target");
+    if(Hash(System.IO.Path.Combine(stage,pair.Key))!=pair.Value.GetValue<string>())throw new Exception("Staged input changed");
+}
+foreach(var pair in files.OrderBy(p=>Priority(p.Key)))
+{
+    var target=System.IO.Path.Combine(project,pair.Key);
+    if(System.IO.File.Exists(target)&&Hash(target)==pair.Value.GetValue<string>())continue;
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target));
+    System.IO.File.Copy(System.IO.Path.Combine(stage,pair.Key),target,true);
+    Editor.AssetSystem.RegisterFile(target);
+}
+return new {PreviewOnly=true,Files=files.Count,UserStatePreserved=session.Scene.Id==before.Id&&session.HasUnsavedChanges==before.Dirty&&Game.IsPlaying==before.Playing};

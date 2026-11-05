@@ -1,0 +1,672 @@
+{
+  "AllMaterialsLoaded": true,
+  "PrintedFaceHasNoEmission": true,
+  "LampsRemainLit": true,
+  "Geometry": {
+    "TotalVertices": 19067,
+    "TotalTriangles": 16812,
+    "TotalDrawCalls": 19,
+    "LodCount": 3,
+    "LodSwitchDistances": [
+      0,
+      20,
+      45
+    ],
+    "Meshes": [
+      {
+        "Name": "lod0",
+        "Vertices": 9845,
+        "Triangles": 9016,
+        "LodMask": 1,
+        "MeshGroupMask": 18446744073709551615,
+        "TranslucencyType": 0,
+        "BoundsMin": "-17.8999996,-84,0",
+        "BoundsMax": "39.5,84,84.8209991",
+        "DrawCalls": [
+          {
+            "Vertices": 9845,
+            "Indices": 1080,
+            "PrimitiveType": 5,
+            "UvDensity": 76.65078,
+            "InstanceCount": 0,
+            "AlphaBlended": false,
+            "StartIndex": 0,
+            "BaseVertex": 0,
+            "Material": {
+              "Id": "76acb842-e7d0-4187-8946-74f27d568d09",
+              "Path": "materials/riverside/shop-sign-v1/bulb.vmat"
+            }
+          },
+          {
+            "Vertices": 9845,
+            "Indices": 30,
+            "PrimitiveType": 5,
+            "UvDensity": 72.67279,
+            "InstanceCount": 0,
+            "AlphaBlended": false,
+            "StartIndex": 1080,
+            "BaseVertex": 0,
+            "Material": {
+              "Id": "d0500900-1b42-4827-9812-00773140d305",
+              "Path": "materials/riverside/shop-sign-v1/face_toned.vmat"
+            }
+          },
+          {
+            "Vertices": 9845,
+            "Indices": 1002,
+            "PrimitiveType": 5,
+            "UvDensity": 76.98179,
+            "InstanceCount": 0,
+            "AlphaBlended": false,
+            "StartIndex": 1110,
+            "BaseVertex": 0,
+            "Material": {
+              "Id": "2a3362a4-a3f4-4bbc-bb5e-22650b6f4c12",
+              "Path": "materials/riverside/shop-sign-v1/inside.vmat"
+            }
+          },
+          {
+            "Vertices": 9845,
+            "Indices": 9780,
+            "PrimitiveType": 5,
+            "UvDensity": 74.66217,
+            "InstanceCount": 0,
+            "AlphaBlended": false,
+            "StartIndex": 2112,
+            "BaseVertex": 0,
+            "Material": {
+              "Id": "bd7bf9fa-26b3-4bfd-b025-eb44e0687e18",
+              "Path": "materials/riverside/shop-sign-v1/paint.vmat"
+            }
+          },
+          {
+            "Vertices": 9845,
+            "Indices": 2832,
+            "PrimitiveType": 5,
+            "UvDensity": 74.89387,
+            "InstanceCount": 0,
+            "AlphaBlended": false,
+            "StartIndex": 11892,
+            "BaseVertex": 0,
+            "Material": {
+              "Id": "5f5f9ca6-33f8-4b46-8bf8-4fee37dffc18",
+              "Path": "materials/riverside/shop-sign-v1/rubber.vmat"
+            }
+          },
+          {
+            "Vertices": 9845,
+            "Indices": 396,
+            "PrimitiveType": 5,
+            "UvDensity": 72.99355,
+            "InstanceCount": 0,
+            "AlphaBlended": false,
+            "StartIndex": 14724,
+            "BaseVertex": 0,
+            "Material": {
+              "Id": "495d887e-f55c-4463-8836-7cf238f8b96a",
+              "Path": "materials/riverside/shop-sign-v1/rust.vmat"
+            }
+          },
+          {
+            "Vertices": 9845,
+            "Indices": 11928,
+            "PrimitiveType": 5,
+            "UvDensity": 74.43362,
+            "InstanceCount": 0,
+            "AlphaBlended": false,
+            "StartIndex": 15120,
+            "BaseVertex": 0,
+            "Material": {
+              "Id": "a02b20e7-d42a-4b0a-9e2a-a94d5f6cdb5f",
+              "Path": "materials/riverside/shop-sign-v1/steel.vmat"
+            }
+          }
+        ]
+      },
+      {
+        "Name": "lod1",
+        "Vertices": 6415,
+        "Triangles": 5548,
+        "LodMask": 2,
+        "MeshGroupMask": 18446744073709551615,
+        "TranslucencyType": 0,
+        "BoundsMin": "-17.8999996,-84,0",
+        "BoundsMax": "39.5,84,84.8209991",
+        "DrawCalls": [
+          {
+            "Vertices": 6415,
+            "Indices": 648,
+            "PrimitiveType": 5,
+            "UvDensity": 73.66596,
+            "InstanceCount": 0,
+            "AlphaBlended": false,
+            "StartIndex": 0,
+            "BaseVertex": 0,
+            "Material": {
+              "Id": "76acb842-e7d0-4187-8946-74f27d568d09",
+              "Path": "materials/riverside/shop-sign-v1/bulb.vmat"
+            }
+          },
+          {
+            "Vertices": 6415,
+            "Indices": 30,
+            "PrimitiveType": 5,
+            "UvDensity": 73.368065,
+            "InstanceCount": 0,
+            "AlphaBlended": false,
+            "StartIndex": 648,
+            "BaseVertex": 0,
+            "Material": {
+              "Id": "d0500900-1b42-4827-9812-00773140d305",
+              "Path": "materials/riverside/shop-sign-v1/face_toned.vmat"
+            }
+          },
+          {
+            "Vertices": 6415,
+            "Indices": 642,
+            "PrimitiveType": 5,
+            "UvDensity": 73.66596,
+            "InstanceCount": 0,
+            "AlphaBlended": false,
+            "StartIndex": 678,
+            "BaseVertex": 0,
+            "Material": {
+              "Id": "2a3362a4-a3f4-4bbc-bb5e-22650b6f4c12",
+              "Path": "materials/riverside/shop-sign-v1/inside.vmat"
+            }
+          },
+          {
+            "Vertices": 6415,
+            "Indices": 6540,
+            "PrimitiveType": 5,
+            "UvDensity": 83.34558,
+            "InstanceCount": 0,
+            "AlphaBlended": false,
+            "StartIndex": 1320,
+            "BaseVertex": 0,
+            "Material": {
+              "Id": "bd7bf9fa-26b3-4bfd-b025-eb44e0687e18",
+              "Path": "materials/riverside/shop-sign-v1/paint.vmat"
+            }
+          },
+          {
+            "Vertices": 6415,
+            "Indices": 696,
+            "PrimitiveType": 5,
+            "UvDensity": 73.66596,
+            "InstanceCount": 0,
+            "AlphaBlended": false,
+            "StartIndex": 7860,
+            "BaseVertex": 0,
+            "Material": {
+              "Id": "5f5f9ca6-33f8-4b46-8bf8-4fee37dffc18",
+              "Path": "materials/riverside/shop-sign-v1/rubber.vmat"
+            }
+          },
+          {
+            "Vertices": 6415,
+            "Indices": 8088,
+            "PrimitiveType": 5,
+            "UvDensity": 73.65204,
+            "InstanceCount": 0,
+            "AlphaBlended": false,
+            "StartIndex": 8556,
+            "BaseVertex": 0,
+            "Material": {
+              "Id": "a02b20e7-d42a-4b0a-9e2a-a94d5f6cdb5f",
+              "Path": "materials/riverside/shop-sign-v1/steel.vmat"
+            }
+          }
+        ]
+      },
+      {
+        "Name": "lod2",
+        "Vertices": 2807,
+        "Triangles": 2248,
+        "LodMask": 4,
+        "MeshGroupMask": 18446744073709551615,
+        "TranslucencyType": 0,
+        "BoundsMin": "-17.8999996,-84,0",
+        "BoundsMax": "39.5,84,84.7580032",
+        "DrawCalls": [
+          {
+            "Vertices": 2807,
+            "Indices": 432,
+            "PrimitiveType": 5,
+            "UvDensity": 75.05206,
+            "InstanceCount": 0,
+            "AlphaBlended": false,
+            "StartIndex": 0,
+            "BaseVertex": 0,
+            "Material": {
+              "Id": "76acb842-e7d0-4187-8946-74f27d568d09",
+              "Path": "materials/riverside/shop-sign-v1/bulb.vmat"
+            }
+          },
+          {
+            "Vertices": 2807,
+            "Indices": 30,
+            "PrimitiveType": 5,
+            "UvDensity": 74.891556,
+            "InstanceCount": 0,
+            "AlphaBlended": false,
+            "StartIndex": 432,
+            "BaseVertex": 0,
+            "Material": {
+              "Id": "d0500900-1b42-4827-9812-00773140d305",
+              "Path": "materials/riverside/shop-sign-v1/face_toned.vmat"
+            }
+          },
+          {
+            "Vertices": 2807,
+            "Indices": 462,
+            "PrimitiveType": 5,
+            "UvDensity": 75.108604,
+            "InstanceCount": 0,
+            "AlphaBlended": false,
+            "StartIndex": 462,
+            "BaseVertex": 0,
+            "Material": {
+              "Id": "2a3362a4-a3f4-4bbc-bb5e-22650b6f4c12",
+              "Path": "materials/riverside/shop-sign-v1/inside.vmat"
+            }
+          },
+          {
+            "Vertices": 2807,
+            "Indices": 4344,
+            "PrimitiveType": 5,
+            "UvDensity": 74.939064,
+            "InstanceCount": 0,
+            "AlphaBlended": false,
+            "StartIndex": 924,
+            "BaseVertex": 0,
+            "Material": {
+              "Id": "bd7bf9fa-26b3-4bfd-b025-eb44e0687e18",
+              "Path": "materials/riverside/shop-sign-v1/paint.vmat"
+            }
+          },
+          {
+            "Vertices": 2807,
+            "Indices": 264,
+            "PrimitiveType": 5,
+            "UvDensity": 75.050804,
+            "InstanceCount": 0,
+            "AlphaBlended": false,
+            "StartIndex": 5268,
+            "BaseVertex": 0,
+            "Material": {
+              "Id": "5f5f9ca6-33f8-4b46-8bf8-4fee37dffc18",
+              "Path": "materials/riverside/shop-sign-v1/rubber.vmat"
+            }
+          },
+          {
+            "Vertices": 2807,
+            "Indices": 1212,
+            "PrimitiveType": 5,
+            "UvDensity": 75.050804,
+            "InstanceCount": 0,
+            "AlphaBlended": false,
+            "StartIndex": 5532,
+            "BaseVertex": 0,
+            "Material": {
+              "Id": "a02b20e7-d42a-4b0a-9e2a-a94d5f6cdb5f",
+              "Path": "materials/riverside/shop-sign-v1/steel.vmat"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "Reference": {
+    "TotalVertices": 19067,
+    "TotalTriangles": 16812,
+    "TotalDrawCalls": 19,
+    "LodCount": 3,
+    "LodSwitchDistances": [
+      0,
+      20,
+      45
+    ],
+    "Meshes": [
+      {
+        "Name": "lod0",
+        "Vertices": 9845,
+        "Triangles": 9016,
+        "LodMask": 1,
+        "MeshGroupMask": 18446744073709551615,
+        "TranslucencyType": 0,
+        "BoundsMin": "-17.8999996,-84,0",
+        "BoundsMax": "39.5,84,84.8209991",
+        "DrawCalls": [
+          {
+            "Vertices": 9845,
+            "Indices": 1080,
+            "PrimitiveType": 5,
+            "UvDensity": 76.65078,
+            "InstanceCount": 0,
+            "AlphaBlended": false,
+            "StartIndex": 0,
+            "BaseVertex": 0,
+            "Material": {
+              "Id": "fc147155-632a-4a78-b104-328fd0c82884",
+              "Path": "materials/riverside/rs_lamp_warm.vmat"
+            }
+          },
+          {
+            "Vertices": 9845,
+            "Indices": 30,
+            "PrimitiveType": 5,
+            "UvDensity": 72.67279,
+            "InstanceCount": 0,
+            "AlphaBlended": false,
+            "StartIndex": 1080,
+            "BaseVertex": 0,
+            "Material": {
+              "Id": "4ec2d961-214c-4f97-be3c-b279b7914d11",
+              "Path": "materials/riverside/shop-sign-v1/face_bright.vmat"
+            }
+          },
+          {
+            "Vertices": 9845,
+            "Indices": 1002,
+            "PrimitiveType": 5,
+            "UvDensity": 76.98179,
+            "InstanceCount": 0,
+            "AlphaBlended": false,
+            "StartIndex": 1110,
+            "BaseVertex": 0,
+            "Material": {
+              "Id": "2a3362a4-a3f4-4bbc-bb5e-22650b6f4c12",
+              "Path": "materials/riverside/shop-sign-v1/inside.vmat"
+            }
+          },
+          {
+            "Vertices": 9845,
+            "Indices": 9780,
+            "PrimitiveType": 5,
+            "UvDensity": 74.66217,
+            "InstanceCount": 0,
+            "AlphaBlended": false,
+            "StartIndex": 2112,
+            "BaseVertex": 0,
+            "Material": {
+              "Id": "bd7bf9fa-26b3-4bfd-b025-eb44e0687e18",
+              "Path": "materials/riverside/shop-sign-v1/paint.vmat"
+            }
+          },
+          {
+            "Vertices": 9845,
+            "Indices": 2832,
+            "PrimitiveType": 5,
+            "UvDensity": 74.89387,
+            "InstanceCount": 0,
+            "AlphaBlended": false,
+            "StartIndex": 11892,
+            "BaseVertex": 0,
+            "Material": {
+              "Id": "5f5f9ca6-33f8-4b46-8bf8-4fee37dffc18",
+              "Path": "materials/riverside/shop-sign-v1/rubber.vmat"
+            }
+          },
+          {
+            "Vertices": 9845,
+            "Indices": 396,
+            "PrimitiveType": 5,
+            "UvDensity": 72.99355,
+            "InstanceCount": 0,
+            "AlphaBlended": false,
+            "StartIndex": 14724,
+            "BaseVertex": 0,
+            "Material": {
+              "Id": "495d887e-f55c-4463-8836-7cf238f8b96a",
+              "Path": "materials/riverside/shop-sign-v1/rust.vmat"
+            }
+          },
+          {
+            "Vertices": 9845,
+            "Indices": 11928,
+            "PrimitiveType": 5,
+            "UvDensity": 74.43362,
+            "InstanceCount": 0,
+            "AlphaBlended": false,
+            "StartIndex": 15120,
+            "BaseVertex": 0,
+            "Material": {
+              "Id": "a02b20e7-d42a-4b0a-9e2a-a94d5f6cdb5f",
+              "Path": "materials/riverside/shop-sign-v1/steel.vmat"
+            }
+          }
+        ]
+      },
+      {
+        "Name": "lod1",
+        "Vertices": 6415,
+        "Triangles": 5548,
+        "LodMask": 2,
+        "MeshGroupMask": 18446744073709551615,
+        "TranslucencyType": 0,
+        "BoundsMin": "-17.8999996,-84,0",
+        "BoundsMax": "39.5,84,84.8209991",
+        "DrawCalls": [
+          {
+            "Vertices": 6415,
+            "Indices": 648,
+            "PrimitiveType": 5,
+            "UvDensity": 73.66596,
+            "InstanceCount": 0,
+            "AlphaBlended": false,
+            "StartIndex": 0,
+            "BaseVertex": 0,
+            "Material": {
+              "Id": "fc147155-632a-4a78-b104-328fd0c82884",
+              "Path": "materials/riverside/rs_lamp_warm.vmat"
+            }
+          },
+          {
+            "Vertices": 6415,
+            "Indices": 30,
+            "PrimitiveType": 5,
+            "UvDensity": 73.368065,
+            "InstanceCount": 0,
+            "AlphaBlended": false,
+            "StartIndex": 648,
+            "BaseVertex": 0,
+            "Material": {
+              "Id": "4ec2d961-214c-4f97-be3c-b279b7914d11",
+              "Path": "materials/riverside/shop-sign-v1/face_bright.vmat"
+            }
+          },
+          {
+            "Vertices": 6415,
+            "Indices": 642,
+            "PrimitiveType": 5,
+            "UvDensity": 73.66596,
+            "InstanceCount": 0,
+            "AlphaBlended": false,
+            "StartIndex": 678,
+            "BaseVertex": 0,
+            "Material": {
+              "Id": "2a3362a4-a3f4-4bbc-bb5e-22650b6f4c12",
+              "Path": "materials/riverside/shop-sign-v1/inside.vmat"
+            }
+          },
+          {
+            "Vertices": 6415,
+            "Indices": 6540,
+            "PrimitiveType": 5,
+            "UvDensity": 83.34558,
+            "InstanceCount": 0,
+            "AlphaBlended": false,
+            "StartIndex": 1320,
+            "BaseVertex": 0,
+            "Material": {
+              "Id": "bd7bf9fa-26b3-4bfd-b025-eb44e0687e18",
+              "Path": "materials/riverside/shop-sign-v1/paint.vmat"
+            }
+          },
+          {
+            "Vertices": 6415,
+            "Indices": 696,
+            "PrimitiveType": 5,
+            "UvDensity": 73.66596,
+            "InstanceCount": 0,
+            "AlphaBlended": false,
+            "StartIndex": 7860,
+            "BaseVertex": 0,
+            "Material": {
+              "Id": "5f5f9ca6-33f8-4b46-8bf8-4fee37dffc18",
+              "Path": "materials/riverside/shop-sign-v1/rubber.vmat"
+            }
+          },
+          {
+            "Vertices": 6415,
+            "Indices": 8088,
+            "PrimitiveType": 5,
+            "UvDensity": 73.65204,
+            "InstanceCount": 0,
+            "AlphaBlended": false,
+            "StartIndex": 8556,
+            "BaseVertex": 0,
+            "Material": {
+              "Id": "a02b20e7-d42a-4b0a-9e2a-a94d5f6cdb5f",
+              "Path": "materials/riverside/shop-sign-v1/steel.vmat"
+            }
+          }
+        ]
+      },
+      {
+        "Name": "lod2",
+        "Vertices": 2807,
+        "Triangles": 2248,
+        "LodMask": 4,
+        "MeshGroupMask": 18446744073709551615,
+        "TranslucencyType": 0,
+        "BoundsMin": "-17.8999996,-84,0",
+        "BoundsMax": "39.5,84,84.7580032",
+        "DrawCalls": [
+          {
+            "Vertices": 2807,
+            "Indices": 432,
+            "PrimitiveType": 5,
+            "UvDensity": 75.05206,
+            "InstanceCount": 0,
+            "AlphaBlended": false,
+            "StartIndex": 0,
+            "BaseVertex": 0,
+            "Material": {
+              "Id": "fc147155-632a-4a78-b104-328fd0c82884",
+              "Path": "materials/riverside/rs_lamp_warm.vmat"
+            }
+          },
+          {
+            "Vertices": 2807,
+            "Indices": 30,
+            "PrimitiveType": 5,
+            "UvDensity": 74.891556,
+            "InstanceCount": 0,
+            "AlphaBlended": false,
+            "StartIndex": 432,
+            "BaseVertex": 0,
+            "Material": {
+              "Id": "4ec2d961-214c-4f97-be3c-b279b7914d11",
+              "Path": "materials/riverside/shop-sign-v1/face_bright.vmat"
+            }
+          },
+          {
+            "Vertices": 2807,
+            "Indices": 462,
+            "PrimitiveType": 5,
+            "UvDensity": 75.108604,
+            "InstanceCount": 0,
+            "AlphaBlended": false,
+            "StartIndex": 462,
+            "BaseVertex": 0,
+            "Material": {
+              "Id": "2a3362a4-a3f4-4bbc-bb5e-22650b6f4c12",
+              "Path": "materials/riverside/shop-sign-v1/inside.vmat"
+            }
+          },
+          {
+            "Vertices": 2807,
+            "Indices": 4344,
+            "PrimitiveType": 5,
+            "UvDensity": 74.939064,
+            "InstanceCount": 0,
+            "AlphaBlended": false,
+            "StartIndex": 924,
+            "BaseVertex": 0,
+            "Material": {
+              "Id": "bd7bf9fa-26b3-4bfd-b025-eb44e0687e18",
+              "Path": "materials/riverside/shop-sign-v1/paint.vmat"
+            }
+          },
+          {
+            "Vertices": 2807,
+            "Indices": 264,
+            "PrimitiveType": 5,
+            "UvDensity": 75.050804,
+            "InstanceCount": 0,
+            "AlphaBlended": false,
+            "StartIndex": 5268,
+            "BaseVertex": 0,
+            "Material": {
+              "Id": "5f5f9ca6-33f8-4b46-8bf8-4fee37dffc18",
+              "Path": "materials/riverside/shop-sign-v1/rubber.vmat"
+            }
+          },
+          {
+            "Vertices": 2807,
+            "Indices": 1212,
+            "PrimitiveType": 5,
+            "UvDensity": 75.050804,
+            "InstanceCount": 0,
+            "AlphaBlended": false,
+            "StartIndex": 5532,
+            "BaseVertex": 0,
+            "Material": {
+              "Id": "a02b20e7-d42a-4b0a-9e2a-a94d5f6cdb5f",
+              "Path": "materials/riverside/shop-sign-v1/steel.vmat"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "Materials": [
+    {
+      "ResourcePath": "materials/riverside/shop-sign-v1/bulb.vmat",
+      "IsError": false,
+      "Emission": 1
+    },
+    {
+      "ResourcePath": "materials/riverside/shop-sign-v1/face_toned.vmat",
+      "IsError": false,
+      "Emission": 0
+    },
+    {
+      "ResourcePath": "materials/riverside/shop-sign-v1/inside.vmat",
+      "IsError": false,
+      "Emission": 0
+    },
+    {
+      "ResourcePath": "materials/riverside/shop-sign-v1/paint.vmat",
+      "IsError": false,
+      "Emission": 0
+    },
+    {
+      "ResourcePath": "materials/riverside/shop-sign-v1/rubber.vmat",
+      "IsError": false,
+      "Emission": 0
+    },
+    {
+      "ResourcePath": "materials/riverside/shop-sign-v1/rust.vmat",
+      "IsError": false,
+      "Emission": 0
+    },
+    {
+      "ResourcePath": "materials/riverside/shop-sign-v1/steel.vmat",
+      "IsError": false,
+      "Emission": 0
+    }
+  ]
+}

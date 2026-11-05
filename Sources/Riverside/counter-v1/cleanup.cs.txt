@@ -1,0 +1,30 @@
+var project=Sandbox.Project.Current.GetRootPath();
+var folder="C:/sbox-projects/hc1/counter-review/output/riverside/counter-v1";
+var plan=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"cleanup-plan.json")));
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+foreach(var p in plan["before"].AsObject())if(Hash(System.IO.Path.Combine(project,p.Key))!=p.Value.GetValue<string>())throw new Exception("A store source changed before cleanup");
+foreach(var p in plan["files"].AsObject())if(Hash(System.IO.Path.Combine(folder,"cleanup-stage",p.Key))!=p.Value.GetValue<string>())throw new Exception("Cleanup stage changed");
+foreach(var p in plan["delete"].AsObject())
+{
+ if(!p.Key.StartsWith("Assets/models/maps/riverside/counter-v1/legacy_counter") || p.Key.Contains(".."))throw new Exception("Unexpected deletion target");
+ if(Hash(System.IO.Path.Combine(project,p.Key))!=p.Value.GetValue<string>())throw new Exception("Legacy asset changed before cleanup");
+}
+var session=Editor.SceneEditorSession.Active;var before=new{Scene=session.Scene.Id,Dirty=session.HasUnsavedChanges,Playing=Game.IsPlaying};
+foreach(var p in plan["files"].AsObject())
+{
+ var target=System.IO.Path.Combine(project,p.Key);System.IO.File.Copy(System.IO.Path.Combine(folder,"cleanup-stage",p.Key),target,true);Editor.AssetSystem.RegisterFile(target);
+}
+// Use the native asset deletion route for the two registered assets; it sends sources to the recycle bin.
+foreach(var resource in new[]{"models/maps/riverside/counter-v1/legacy_counter.vmdl","models/maps/riverside/counter-v1/legacy_counter.obj"})
+{
+ var asset=Editor.AssetSystem.FindByPath(resource);if(asset!=null)asset.Delete();
+}
+foreach(var p in plan["delete"].AsObject())
+{
+ var path=System.IO.Path.GetFullPath(System.IO.Path.Combine(project,p.Key));
+ var expected=System.IO.Path.GetFullPath(System.IO.Path.Combine(project,"Assets/models/maps/riverside/counter-v1"));
+ if(!string.Equals(System.IO.Path.GetDirectoryName(path),expected,StringComparison.OrdinalIgnoreCase))throw new Exception("Deletion escaped the counter directory");
+ if(System.IO.File.Exists(path))System.IO.File.Delete(path);
+}
+var result=new{OldCounterDeleted=true,InlineSourcesCleaned=plan["files"].AsObject().Count,UserStatePreserved=session.Scene.Id==before.Scene && session.HasUnsavedChanges==before.Dirty && Game.IsPlaying==before.Playing};
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"cleanup.json"),Json.Serialize(result));return result;

@@ -1,0 +1,51 @@
+if(!Game.IsPlaying || Game.ActiveScene?.Source?.ResourcePath!="scenes/maps/riverside/riverside.scene" || Networking.IsActive)throw new Exception("Requires offline Riverside play");
+var scene=Game.ActiveScene;var editor=Editor.SceneEditorSession.Active;var dirty=editor.HasUnsavedChanges;
+var store=scene.GetAllComponents<ModelRenderer>().Single(r=>r.Model?.ResourcePath=="models/maps/riverside/riverside_store.vmdl");var original=store.Model;
+var without=Model.Load("models/maps/riverside/shop-sign-v1/store_without_shop_sign.vmdl");
+var bright=Model.Load("models/maps/riverside/shop-sign-v1/bright_reference.vmdl");var toned=Model.Load("models/maps/riverside/shop-sign-v1/shop_sign.vmdl");
+if(without.IsError || bright.IsError || toned.IsError)throw new Exception("A lighting review resource failed to load");
+var signLight=scene.GetAllComponents<PointLight>().Single(l=>l.GameObject.Name.StartsWith("store sign") && (l.WorldPosition-new Vector3(454,-220,210)).Length<.25f);
+var originalIntensity=signLight.Intensity;
+if(MathF.Abs(originalIntensity-1f)>.0001f)throw new Exception("The sign light baseline changed; inspect before applying a multiplier");
+var otherLights=scene.GetAllComponents<PointLight>().Where(l=>l!=signLight).Select(l=>(Light:l,Intensity:l.Intensity,Color:l.LightColor,Radius:l.Radius)).ToArray();
+var gameplay=scene.GetAllComponents<CameraComponent>().First(c=>c.IsMainCamera);var mains=scene.GetAllComponents<CameraComponent>().Select(c=>(Camera:c,Main:c.IsMainCamera)).ToArray();
+GameObject holder=null,item=null;var paths=new System.Collections.Generic.List<string>();
+var output="C:/sbox-projects/hc1/shop-sign-review/output/riverside/shop-sign-v1";
+try
+{
+ using(scene.Push())
+ {
+  holder=new GameObject(true,"Sign lighting verification camera");var camera=holder.Components.Create<CameraComponent>();
+  void Copy<T>() where T:Component,new(){var source=gameplay.GameObject.GetComponent<T>(true);if(source!=null)Facepunch.GameObjectExtensions.CopyPropertiesTo(source,holder.Components.Create<T>());}
+  Copy<Bloom>();Copy<Tonemapping>();Copy<Sharpen>();Copy<AmbientOcclusion>();Copy<Vignette>();Copy<Facepunch.PhotographicResponse>();Copy<ColorAdjustments>();
+  foreach(var old in mains)old.Camera.IsMainCamera=false;
+  camera.IsMainCamera=true;camera.ZNear=.5f;camera.ZFar=50000;camera.BackgroundColor=gameplay.BackgroundColor;camera.CustomSize=new Vector2(1200,900);
+  camera.WorldPosition=new Vector3(310,-320,85);camera.WorldRotation=Rotation.LookAt(new Vector3(514,-220,200)-camera.WorldPosition);camera.FieldOfView=55;
+  item=new GameObject(true,"Temporary revised Lucky Stop sign");item.WorldPosition=new Vector3(514,-220,150);var renderer=item.Components.Create<ModelRenderer>();
+  store.Model=without;
+  foreach(var variant in new[]{"before","after"})
+  {
+   renderer.Model=variant=="before"?bright:toned;signLight.Intensity=variant=="before"?originalIntensity:originalIntensity*.20f;
+   using var bitmap=new Bitmap(1200,900);
+   for(int frame=0;frame<100;frame++)
+   {
+    if(!Game.IsPlaying||Game.ActiveScene!=scene)throw new Exception("Runtime scene changed");
+    cancellationToken.ThrowIfCancellationRequested();camera.RenderToBitmap(bitmap,false);await Task.Delay(20,cancellationToken);
+   }
+   var path=System.IO.Path.Combine(output,"lighting-"+variant+".png");System.IO.File.WriteAllBytes(path,bitmap.ToPng());paths.Add(path);
+  }
+ }
+ // Map animation can update other runtime lights naturally. Record it rather
+ // than stopping those animations or changing their settings for the capture.
+ var animated=otherLights.Where(l=>l.Light.IsValid() && (!l.Light.Intensity.Equals(l.Intensity) || !l.Light.LightColor.Equals(l.Color) || !l.Light.Radius.Equals(l.Radius))).Select(l=>new{Name=l.Light.GameObject.Name,BeforeIntensity=l.Intensity,AfterIntensity=l.Light.Intensity}).ToArray();
+ if(MathF.Abs(signLight.Intensity-originalIntensity*.20f)>.0001f)throw new Exception("Sign intensity did not retain the proposed setting");
+ var errors=scene.GetAllComponents<ModelRenderer>().Where(r=>r.Model?.IsError==true).Select(r=>r.GameObject.Name).ToArray();
+ var report=new{PreviewOnly=true,ActualPlayMode=Game.IsPlaying,PlayerCount=scene.GetAllComponents<Facepunch.PlayerPawn>().Count(),ErrorModels=errors,NoExtraLights=true,OnlySignLightEdited=true,NaturalRuntimeLightAnimation=animated,CameraEffectsUnchanged=true,OriginalIntensity=originalIntensity,TonedIntensity=signLight.Intensity,LightColor=signLight.LightColor.ToString(),Radius=signLight.Radius,Paths=paths,Bright=bright.MeshInfo,Toned=toned.MeshInfo};
+ System.IO.File.WriteAllText(System.IO.Path.Combine(output,"lighting-runtime.json"),Json.Serialize(report));return new{report.PreviewOnly,report.ActualPlayMode,report.PlayerCount,report.ErrorModels,report.OnlySignLightEdited,report.OriginalIntensity,report.TonedIntensity,report.Paths};
+}
+finally
+{
+ if(store.IsValid())store.Model=original;if(signLight.IsValid())signLight.Intensity=originalIntensity;
+ item?.Destroy();holder?.Destroy();foreach(var old in mains)if(old.Camera.IsValid())old.Camera.IsMainCamera=old.Main;
+ if(editor.HasUnsavedChanges!=dirty)throw new Exception("Lighting preview changed editor dirty state");
+}

@@ -1,0 +1,26 @@
+{
+  "tools": [
+    {
+      "name": "set_selection",
+      "title": "Set Selection",
+      "toolset": "scene",
+      "description": "Replace the editor selection. Selecting something highlights it for the user - useful for showing them what you're talking about. An empty list clears the selection.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Game object or component ids to select."
+          }
+        },
+        "required": [
+          "ids"
+        ]
+      }
+    }
+  ],
+  "total": 402
+}

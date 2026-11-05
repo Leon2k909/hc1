@@ -1,0 +1,27 @@
+var project = Sandbox.Project.Current.GetRootPath();
+var assetsRoot = System.IO.Path.GetFullPath(System.IO.Path.Combine(project,"Assets"));
+var archive = System.IO.Path.Combine(project,"output/asset-improvement-20261030/riverside-ice-freezer/superseded-assets");
+var report = new System.Collections.Generic.List<object>();
+foreach (var relative in new[] { "models/props/riverside/ice_freezer_v2", "materials/riverside/ice_freezer_v2" })
+{
+    var full = System.IO.Path.GetFullPath(System.IO.Path.Combine(assetsRoot,relative));
+    if (!full.StartsWith(assetsRoot + System.IO.Path.DirectorySeparatorChar,StringComparison.OrdinalIgnoreCase)) throw new Exception("Invalid asset folder");
+    if (!System.IO.Directory.Exists(full)) continue;
+    var files = System.IO.Directory.GetFiles(full,"*",System.IO.SearchOption.AllDirectories);
+    foreach (var file in files)
+    {
+        var copy = System.IO.Path.Combine(archive,relative,System.IO.Path.GetRelativePath(full,file));
+        if (!System.IO.File.Exists(copy)) throw new Exception("Missing archive: " + file);
+        if (!System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(file)).SequenceEqual(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(copy)))) throw new Exception("Archive mismatch: " + file);
+    }
+    var sources = files.Where(f => new[] { ".vmdl", ".vmat", ".obj", ".png" }.Contains(System.IO.Path.GetExtension(f))).OrderBy(f => System.IO.Path.GetExtension(f)==".vmdl" ? 0 : System.IO.Path.GetExtension(f)==".vmat" ? 1 : 2).ToArray();
+    foreach (var file in sources)
+    {
+        var path = System.IO.Path.GetRelativePath(assetsRoot,file).Replace('\\','/');
+        var asset = Editor.AssetSystem.FindByPath(path);
+        if (asset is not null && !asset.Delete()) throw new Exception("Delete refused: " + path);
+    }
+    System.IO.Directory.Delete(full,true);
+    report.Add(new { Folder=relative,ArchivedFiles=files.Length,RemovedFromAssets=!System.IO.Directory.Exists(full) });
+}
+return new { ArchivedDuplicate=true,Folders=report,PreservedApprovedCabinet=System.IO.File.Exists(System.IO.Path.Combine(assetsRoot,"models/maps/riverside/ice-cabinet-v1/installed_lod0.obj")) };

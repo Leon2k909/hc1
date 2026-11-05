@@ -1,0 +1,8 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var folder=System.IO.Path.Combine(root,"Assets/models/maps/reefhall/office-desk-v1");
+var source=System.IO.Path.Combine(folder,"before.vmdl");
+var target=System.IO.Path.Combine(folder,"legacy_workstation.vmdl");
+if(System.IO.File.Exists(target))throw new InvalidOperationException("Legacy alias already exists; inspect");
+System.IO.File.Copy(source,target);Editor.AssetSystem.RegisterFile(target);
+var receipt=new{OldModel="models/maps/reefhall/office-desk-v1/legacy_workstation.vmdl",OriginalComparison="models/maps/reefhall/office-desk-v1/before.vmdl",NewModel="models/maps/reefhall/office-desk-v1/desk.vmdl",OldAssetsRetained=true};
+System.IO.File.WriteAllText(System.IO.Path.Combine(root,"Sources/ReefHall/office-desk-v1/review/retained-variants.json"),System.Text.Json.JsonSerializer.Serialize(receipt));return receipt;

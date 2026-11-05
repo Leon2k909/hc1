@@ -133,13 +133,17 @@ public partial class Throwable : WeaponInputAction,
 
 	protected virtual void SpawnProjectile( PlayerPawn player )
 	{
-		var tr = Scene.Trace.Ray( new( player.AimRay.Position, player.AimRay.Forward ), 10f )
+		var aim = player.AimRay;
+		var desired = aim.Position + aim.Forward * 32f + player.EyeAngles.ToRotation().Right * 10f;
+		// Check the whole offset to the releasing hand, including its lateral displacement. A short
+		// centre ray followed by an unchecked offset could create a grenade on the far side of cover.
+		// EndPosition is the swept sphere's centre at contact, not the point on the wall's surface.
+		var tr = Scene.Trace.Sphere( 2f, aim.Position, desired )
 			.IgnoreGameObjectHierarchy( GameObject.Root )
-			.WithoutTags( "trigger" )
+			.WithoutTags( "trigger", "playerclip", "movement" )
 			.Run();
 
-		var position = tr.Hit ? tr.HitPosition + tr.Normal * Equipment.Resource.WorldModel.Bounds.Size.Length : player.AimRay.Position + player.AimRay.Forward * 32f;
-		position += player.EyeAngles.ToRotation().Right * 10f;
+		var position = tr.EndPosition;
 
 		var rotation = Rotation.From( 0, player.EyeAngles.yaw + 180f, 90f );
 		var baseVelocity = player.CharacterController.Velocity;

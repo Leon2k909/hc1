@@ -849,13 +849,11 @@ def wing( m, glass, s ):
     # Pipes along the south wall, over the lockers and the opening.
     for k, ( z, r, paint ) in enumerate( ( ( 300.0, 7.0, "ar_pipe" ), ( 322.0, 5.0, "ar_copper" ), ( 342.0, 9.0, "ar_pipe" ) ) ):
         pipe_run( m, ( inner, HALL_N0 + 14 + 22 * k, z ), ( outer, HALL_N0 + 14 + 22 * k, z ), r, paint )
-    # Lockers along the south wall's east (west) part.
+    # The approved lockers retain the bank's original cover collider below.
+    from ares_lockers import append_to as append_approved_locker
     for k in range( 7 ):
         e = s * ( 1200.0 + k * 26.0 )
-        lo = ( e - 12.5, HALL_N0, 0 )
-        hi = ( e + 12.5, HALL_N0 + 22, 84 )
-        m.box( lo, hi, { "default": "ar_steel", "+n": "ar_gunmetal" } )
-        m.box( ( e - 2, HALL_N0 + 22, 50 ), ( e + 2, HALL_N0 + 23, 56 ), "ar_brass" )
+        append_approved_locker( m, e, k + 1 if s > 0 else k + 8, HALL_N0 + 11 )
     m.box( ( min( s * 1187, s * 1385 ), HALL_N0, 0 ), ( max( s * 1187, s * 1385 ), HALL_N0 + 22, 84 ), { "default": None }, METAL )
     # Signs: the wing's name over its doors on the hall side, and inside.
     name = "sector03" if s < 0 else "habitatb"

@@ -1,0 +1,15 @@
+Layer0
+{
+ shader "shaders/complex.shader"
+ F_ALPHA_TEST 1
+ F_SPECULAR 1
+ TextureColor "materials/riverside/roof_vent_v1/screen_color.png"
+ TextureTranslucency "materials/riverside/roof_vent_v1/screen_mask.png"
+ TextureNormal "materials/default/default_normal.tga"
+ g_flAlphaTestReference ".35"
+ g_flAntiAliasedEdgeStrength "1"
+ g_flMetalness ".6"
+ g_flRoughnessScaleFactor ".7"
+ g_vColorTint "[1 1 1 0]"
+ g_bFogEnabled "1"
+}

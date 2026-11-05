@@ -75,6 +75,10 @@
     /// </summary>
     public void Show( string status, ToastType type = ToastType.Generic, float duration = 5f, params object[] args )
     {
+        // Keep the round result visible. Empty or expired notifications still allow an explicit clear.
+        if ( IsWin( Type ) && IsActive && !IsWin( type ) && duration > 0f && !string.IsNullOrEmpty( status ) )
+            return;
+
         Status = status;
         StatusArgs = args;
         Type = type;

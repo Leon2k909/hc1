@@ -1,0 +1,218 @@
+{
+  "PreviewOnly": true,
+  "ActualPlayMode": true,
+  "PlayerCount": 1,
+  "ErrorModels": [],
+  "NoExtraLights": true,
+  "CameraEffectsCopied": true,
+  "GameplayPostProcessing": true,
+  "Paths": [
+    "C:/sbox-projects/hc1/roof-ladder-review/output/riverside/roof-ladder-v1\\in-game-whole-before.png",
+    "C:/sbox-projects/hc1/roof-ladder-review/output/riverside/roof-ladder-v1\\in-game-whole-after.png",
+    "C:/sbox-projects/hc1/roof-ladder-review/output/riverside/roof-ladder-v1\\in-game-detail-before.png",
+    "C:/sbox-projects/hc1/roof-ladder-review/output/riverside/roof-ladder-v1\\in-game-detail-after.png"
+  ],
+  "Candidate": {
+    "TotalVertices": 18630,
+    "TotalTriangles": 13216,
+    "TotalDrawCalls": 11,
+    "LodCount": 3,
+    "LodSwitchDistances": [
+      0,
+      20,
+      45
+    ],
+    "Meshes": [
+      {
+        "Name": "lod0",
+        "Vertices": 9406,
+        "Triangles": 6904,
+        "LodMask": 1,
+        "MeshGroupMask": 18446744073709551615,
+        "TranslucencyType": 0,
+        "BoundsMin": "-11.75,-48.1669998,0",
+        "BoundsMax": "11.75,1.12,242",
+        "DrawCalls": [
+          {
+            "Vertices": 9406,
+            "Indices": 648,
+            "PrimitiveType": 5,
+            "UvDensity": 9.205229,
+            "InstanceCount": 0,
+            "AlphaBlended": false,
+            "StartIndex": 0,
+            "BaseVertex": 0,
+            "Material": {
+              "Id": "a4a0eda2-8955-5d5c-af62-10eca65c6fa2",
+              "Path": "materials/lowtide/structure/lt_cast_iron_v2.vmat"
+            }
+          },
+          {
+            "Vertices": 9406,
+            "Indices": 5832,
+            "PrimitiveType": 5,
+            "UvDensity": 11.97905,
+            "InstanceCount": 0,
+            "AlphaBlended": false,
+            "StartIndex": 648,
+            "BaseVertex": 0,
+            "Material": {
+              "Id": "7d4e0fd0-4fb5-5821-82b8-eb3081cf4577",
+              "Path": "materials/lowtide/drainage/lt_grate_cast_iron.vmat"
+            }
+          },
+          {
+            "Vertices": 9406,
+            "Indices": 1368,
+            "PrimitiveType": 5,
+            "UvDensity": 11.985288,
+            "InstanceCount": 0,
+            "AlphaBlended": false,
+            "StartIndex": 6480,
+            "BaseVertex": 0,
+            "Material": {
+              "Id": "7e0ee8be-fc04-457b-be51-15bf9ee204be",
+              "Path": "materials/lowtide/lt_steel.vmat"
+            }
+          },
+          {
+            "Vertices": 9406,
+            "Indices": 12864,
+            "PrimitiveType": 5,
+            "UvDensity": 9.8558235,
+            "InstanceCount": 0,
+            "AlphaBlended": false,
+            "StartIndex": 7848,
+            "BaseVertex": 0,
+            "Material": {
+              "Id": "c9d3e0b6-f866-44b9-b390-b6561d1e2228",
+              "Path": "materials/riverside/tower_ladder_legacy_steel/steel.vmat"
+            }
+          }
+        ]
+      },
+      {
+        "Name": "lod1",
+        "Vertices": 6180,
+        "Triangles": 4252,
+        "LodMask": 2,
+        "MeshGroupMask": 18446744073709551615,
+        "TranslucencyType": 0,
+        "BoundsMin": "-11.75,-48.1170006,0",
+        "BoundsMax": "11.75,1.10899997,241.990005",
+        "DrawCalls": [
+          {
+            "Vertices": 6180,
+            "Indices": 528,
+            "PrimitiveType": 5,
+            "UvDensity": 9.184796,
+            "InstanceCount": 0,
+            "AlphaBlended": false,
+            "StartIndex": 0,
+            "BaseVertex": 0,
+            "Material": {
+              "Id": "a4a0eda2-8955-5d5c-af62-10eca65c6fa2",
+              "Path": "materials/lowtide/structure/lt_cast_iron_v2.vmat"
+            }
+          },
+          {
+            "Vertices": 6180,
+            "Indices": 3240,
+            "PrimitiveType": 5,
+            "UvDensity": 11.979213,
+            "InstanceCount": 0,
+            "AlphaBlended": false,
+            "StartIndex": 528,
+            "BaseVertex": 0,
+            "Material": {
+              "Id": "7d4e0fd0-4fb5-5821-82b8-eb3081cf4577",
+              "Path": "materials/lowtide/drainage/lt_grate_cast_iron.vmat"
+            }
+          },
+          {
+            "Vertices": 6180,
+            "Indices": 1080,
+            "PrimitiveType": 5,
+            "UvDensity": 11.992257,
+            "InstanceCount": 0,
+            "AlphaBlended": false,
+            "StartIndex": 3768,
+            "BaseVertex": 0,
+            "Material": {
+              "Id": "7e0ee8be-fc04-457b-be51-15bf9ee204be",
+              "Path": "materials/lowtide/lt_steel.vmat"
+            }
+          },
+          {
+            "Vertices": 6180,
+            "Indices": 7908,
+            "PrimitiveType": 5,
+            "UvDensity": 9.514587,
+            "InstanceCount": 0,
+            "AlphaBlended": false,
+            "StartIndex": 4848,
+            "BaseVertex": 0,
+            "Material": {
+              "Id": "c9d3e0b6-f866-44b9-b390-b6561d1e2228",
+              "Path": "materials/riverside/tower_ladder_legacy_steel/steel.vmat"
+            }
+          }
+        ]
+      },
+      {
+        "Name": "lod2",
+        "Vertices": 3044,
+        "Triangles": 2060,
+        "LodMask": 4,
+        "MeshGroupMask": 18446744073709551615,
+        "TranslucencyType": 0,
+        "BoundsMin": "-11.75,-48.0870018,0",
+        "BoundsMax": "11.75,1.09200001,241.975006",
+        "DrawCalls": [
+          {
+            "Vertices": 3044,
+            "Indices": 432,
+            "PrimitiveType": 5,
+            "UvDensity": 11.44893,
+            "InstanceCount": 0,
+            "AlphaBlended": false,
+            "StartIndex": 0,
+            "BaseVertex": 0,
+            "Material": {
+              "Id": "a4a0eda2-8955-5d5c-af62-10eca65c6fa2",
+              "Path": "materials/lowtide/structure/lt_cast_iron_v2.vmat"
+            }
+          },
+          {
+            "Vertices": 3044,
+            "Indices": 1080,
+            "PrimitiveType": 5,
+            "UvDensity": 11.987155,
+            "InstanceCount": 0,
+            "AlphaBlended": false,
+            "StartIndex": 432,
+            "BaseVertex": 0,
+            "Material": {
+              "Id": "7e0ee8be-fc04-457b-be51-15bf9ee204be",
+              "Path": "materials/lowtide/lt_steel.vmat"
+            }
+          },
+          {
+            "Vertices": 3044,
+            "Indices": 4668,
+            "PrimitiveType": 5,
+            "UvDensity": 7.271352,
+            "InstanceCount": 0,
+            "AlphaBlended": false,
+            "StartIndex": 1512,
+            "BaseVertex": 0,
+            "Material": {
+              "Id": "c9d3e0b6-f866-44b9-b390-b6561d1e2228",
+              "Path": "materials/riverside/tower_ladder_legacy_steel/steel.vmat"
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

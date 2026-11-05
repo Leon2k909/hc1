@@ -28,7 +28,7 @@ public sealed class SpentCasing : Component
 	private int _bounces;
 	private bool _launched;
 
-	public void Launch( Rotation weaponRotation, Vector3 inheritedVelocity, GameObject ignore )
+	public void Launch( Rotation weaponRotation, Vector3 inheritedVelocity, GameObject ignore, string weaponPath = null )
 	{
 		_ignore = ignore;
 		_age = 0f;
@@ -36,9 +36,10 @@ public sealed class SpentCasing : Component
 		GameObject.NetworkMode = NetworkMode.Never;
 		GameObject.Flags |= GameObjectFlags.NotSaved | GameObjectFlags.NotNetworked;
 		GameObject.Tags.Add( "particles" );
-		Velocity = inheritedVelocity + weaponRotation.Right * Game.Random.Float( 85f, 115f )
-			+ weaponRotation.Up * Game.Random.Float( 55f, 80f )
-			- weaponRotation.Forward * Game.Random.Float( 12f, 30f );
+		var launch = CasingEjectionRules.Sample( weaponPath, Game.Random.Float( 0f, 1f ),
+			Game.Random.Float( 0f, 1f ), Game.Random.Float( 0f, 1f ) );
+		Velocity = inheritedVelocity + weaponRotation.Right * launch.Right
+			+ weaponRotation.Up * launch.Up + weaponRotation.Forward * launch.Forward;
 		_spin = new Vector3( Game.Random.Float( 480f, 850f ), Game.Random.Float( -600f, 600f ), Game.Random.Float( 600f, 1100f ) );
 
 		// Bound the cost even with several automatic weapons firing together: the oldest in this scene go first.

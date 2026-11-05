@@ -5,7 +5,11 @@
 - It keeps the old board's origin, axes, width and top, and fills the station's BoxCollider, which isn't changed. The gun's code isn't
   changed either.
 - `CreateStation` falls back to the old box if the model doesn't load, as `CreateBenchModel` does.
-- Built offline, and the game's code compiles with the swap, but it's **not yet been compiled as an asset or seen in s&box**: check
-  for the fallback's warning, the LOD distances and a pistol on the rail. See the folder's README.
+- Timber/lettering refresh (2026-11-04): shorter grain, pores, saw marks and roughness/normal detail reduce the smeared
+  plank bands. Cleaner sprayed letters remove the doubled-line appearance. Meshes, LODs, UVs and atlas size are unchanged.
+  Native full model/material compilation and offline asset checks passed; matched native captures are in
+  `output/wall-rack-detail-20261104/`. Live station viewing, LOD distances and a pistol on the rail remain to be checked.
+- Approved and installed at the same model/material paths. The gallery's OLD rack and superseded build/comparison
+  files were removed; current inputs and approved native shots remain in the detail-pass folder.
 - `Code/hc1.csproj` names an old s&box path (`SteamLibrary/...`), so a plain `dotnet build` fails on it, whatever the code. Regenerate
   it, or pass the real paths through `-p:CustomAfterMicrosoftCommonTargets`.

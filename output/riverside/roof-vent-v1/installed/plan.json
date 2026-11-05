@@ -1,0 +1,55 @@
+{
+  "source": "Assets/models/maps/riverside/riverside_low.obj",
+  "before_sha256": "22ae464985d1739f7b5097c527f0dc98254afb2ad6326278c39b284445369cff",
+  "after_sha256": "b71aa332fdf4915c011f73dcea3c05dc15339cb2c13ad0a075eb9469ee533bfe",
+  "model_sha256": "6b82180726da8b121095a51fd5d1d787747e2cb168fbe7b3321889297239730d",
+  "scene_sha256": "4240f40551db238f43de85b9affad27199f33c704c19967f53a820067e12ee48",
+  "removed_triangles": 12,
+  "group": {
+    "__guid": "e3948fd9-e9f2-5259-935c-321b15063301",
+    "__version": 2,
+    "Flags": 0,
+    "Name": "Passive Roof Vents",
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Tags": "",
+    "Enabled": true,
+    "NetworkMode": 2,
+    "NetworkFlags": 0,
+    "NetworkOrphaned": 0,
+    "NetworkTransmit": true,
+    "OwnerTransfer": 1,
+    "Components": [],
+    "Children": [
+      {
+        "__guid": "b4cad946-ae52-5904-ac30-1c006cb5d269",
+        "__version": 2,
+        "Flags": 0,
+        "Name": "T2 Passive Roof Vent",
+        "Position": "1033.911476,765.044280,122.000000",
+        "Rotation": "0,0,-0.0000000,1.0000000",
+        "Scale": "1,1,1",
+        "Tags": "",
+        "Enabled": true,
+        "NetworkMode": 2,
+        "NetworkFlags": 0,
+        "NetworkOrphaned": 0,
+        "NetworkTransmit": true,
+        "OwnerTransfer": 1,
+        "Components": [
+          {
+            "__type": "Sandbox.ModelRenderer",
+            "__guid": "8bba0b18-ced5-5523-98a0-a1213e58ad99",
+            "__enabled": true,
+            "Flags": 0,
+            "Model": "models/props/riverside/roof_vent_v1/vent.vmdl",
+            "RenderType": "On",
+            "Tint": "1,1,1,1"
+          }
+        ],
+        "Children": []
+      }
+    ]
+  }
+}

@@ -599,7 +599,7 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 	}
 
 	/// <summary>Up from prone but not yet at crouch height (-16): you can't run off the floor before you're up.</summary>
-	private bool IsGettingUp => !IsProne && _smoothEyeHeight < -17f;
+	internal bool IsGettingUp => !IsProne && _smoothEyeHeight < -17f;
 
 	public SceneTraceResult TraceBBox( Vector3 start, Vector3 end, float liftFeet = 0.0f, float liftHead = 0.0f )
 	{

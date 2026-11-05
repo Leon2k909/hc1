@@ -1,0 +1,9 @@
+var output=new System.Collections.Generic.List<object>();
+foreach(var name in new[]{"before","fan","spillway_west_preview","spillway_east_preview"}) {
+ var model=Model.Load("models/maps/spillway/roof-fans-v1/"+name+".vmdl");
+ if(model.IsError)throw new InvalidOperationException("Failed model "+name);
+ if(name!="before")foreach(var mat in new[]{"shell","blade","guard","dark"})
+  if(!model.Materials.Any(m=>m.ResourcePath=="materials/spillway/roof-fans-v1/"+mat+".vmat"))throw new InvalidOperationException("Missing material "+mat);
+ output.Add(new{Model=model.ResourcePath,Error=model.IsError,Materials=model.Materials.Count()});
+}
+System.IO.File.WriteAllText(System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(),"Sources/Spillway/roof-fans-v1/review/resource-check.json"),System.Text.Json.JsonSerializer.Serialize(output));return output;

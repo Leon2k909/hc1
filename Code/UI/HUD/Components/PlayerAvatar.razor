@@ -3,6 +3,8 @@
 
 @attribute [StyleSheet]
 
+@if ( !Player.IsValid() ) { return; }
+
 <root class="@AvatarClasses">
     <div class="avatar" style="@(IsFriendly && Player.IsValid() ? $"border: 0.5px solid {PlayerColor.Hex}" : "")">
         <img class="image" src="avatar:@Player.SteamId" />
@@ -15,7 +17,7 @@
         return;
     }
 
-    @if (ShowBomb && Pawn.Inventory.HasBomb && IsFriendly)
+    @if ( HasBomb )
     {
         <Icon File="/ui/bomb.png" size="24" class="bomb-indicator"></Icon>
     }
@@ -23,7 +25,7 @@
     @if (ShowHealth && Pawn.HealthComponent.State == LifeState.Alive && IsFriendly)
     {
         <div class="health">
-            <div class="health-inner" style="width:@(Player.PlayerPawn.HealthComponent.Health)%" />
+            <div class="health-inner" style="width:@(HealthPercent)%" />
         </div>
     }
 </root>
@@ -32,9 +34,21 @@
 {
     public PlayerPawn Pawn => Player.IsValid() ? Player.PlayerPawn : null;
     public Client Player { get; set; }
-    public bool IsFriendly => Client.Local.IsFriendly( Player );
+    public bool IsFriendly => Client.Local.IsValid() && Player.IsValid() && Client.Local.IsFriendly( Player );
     public Color PlayerColor => Player.IsValid() ? Player.PlayerColor : Color.White;
-    private bool IsDead => !Pawn.IsValid() || Pawn?.HealthComponent.State != LifeState.Alive;
+    private bool IsDead => !Pawn.IsValid() || !Pawn.HealthComponent.IsValid() || Pawn.HealthComponent.State != LifeState.Alive;
+
+    private bool HasBomb => ShowBomb && !IsDead && IsFriendly && Pawn.Inventory.IsValid() && Pawn.Inventory.HasBomb;
+
+    private int HealthPercent
+    {
+        get
+        {
+            var health = Pawn.IsValid() ? Pawn.HealthComponent : null;
+            return health.IsValid() && health.MaxHealth > 0f
+                ? (int)Math.Round( Math.Clamp( health.Health / health.MaxHealth, 0f, 1f ) * 100f ) : 0;
+        }
+    }
 
     public bool ShowBomb { get; set; } = true;
     public bool ShowHealth { get; set; } = true;
@@ -50,11 +64,7 @@
 
     protected override int BuildHash()
     {
-        var hash = HashCode.Combine( Player.SteamId, IsFriendly );
-
-        if ( Pawn.IsValid() )
-            hash = HashCode.Combine( hash, Pawn.HealthComponent.Health, Pawn.HealthComponent.State, Player.PlayerColor );
-        
-        return hash;
+        return !Player.IsValid() ? 0 : HashCode.Combine( Player.SteamId, IsFriendly, IsDead,
+            ShowHealth, HasBomb, ShowHealth && IsFriendly ? HealthPercent : 0, PlayerColor );
     }
 }

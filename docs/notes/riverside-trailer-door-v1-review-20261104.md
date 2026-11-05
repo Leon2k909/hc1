@@ -1,0 +1,6 @@
+## Riverside trailer entry door v1 — T2 installed, 2026-11-04
+
+- User approved the reviewed T2 door: one saved renderer under `Trailer Entry Doors`, engine `995,891.826513,30`, yaw 180. Exactly 16 original backing/panel/handle faces removed; original lit window/UVs/emission, all other lowland mesh lines, complete ModelDoc/physics, steps and door lighting retained.
+- Painted aluminum panel, jambs/seals, rounded window bezel, hinge knuckles/pins, paddle latch/cylinder, deadbolt, kick plate, threshold and rain cap. `models/props/riverside/trailer_door_v1/door.vmdl`: 4,468 / 2,596 / 996 triangles, one procedural 1k PBR atlas/material. No added lights, collision, external assets or opening logic.
+- Narrow retained generator hook targets T2 only. Native inactive-session save, public lowland compilation, saved-file checks and actual saved-group screenshots passed. Reconciled the saved camper missing from a stale editor session and preserved concurrent approved shop-sign intensity .20. Later hitch installation independently removed 48 faces; combined verification confirms no other changed lowland lines and unchanged physics.
+- Recipe: `Sources/Riverside/trailer-door-v1/README.md`; receipts/captures: `output/riverside/trailer-door-v1/installed/`. No gameplay/LOD test. Original gate remains. Do not regenerate the map; historical candidate scripts are archival.

@@ -1,0 +1,11 @@
+var path = "materials/riverside/rs_crate.vmat";
+var root = Sandbox.Project.Current.GetRootPath();
+var full = System.IO.Path.Combine(root, "Assets", path);
+var backup = System.IO.Path.Combine(root, "output/asset-improvement-20261030/riverside-crate/installed/before-install/rs_crate.vmat");
+if (!System.IO.File.Exists(full)) return new { AlreadyDeleted = true };
+if (!System.IO.File.Exists(backup)) System.IO.File.Copy(full, backup);
+if (System.IO.File.Exists(full + ".meta") && !System.IO.File.Exists(backup + ".meta")) System.IO.File.Copy(full + ".meta", backup + ".meta");
+var asset = Editor.AssetSystem.FindByPath(path);
+if (asset is null) throw new Exception("Legacy material is not registered");
+var deleted = asset.Delete();
+return new { Deleted = deleted, SourceRemains = System.IO.File.Exists(full), CompiledRemains = System.IO.File.Exists(full + "_c"), MetaRemains = System.IO.File.Exists(full + ".meta") };

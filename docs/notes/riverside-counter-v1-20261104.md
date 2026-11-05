@@ -1,0 +1,7 @@
+# Lucky Stop checkout counter v1 — installed 2026-11-04
+
+User approved replacement and deletion of the old counter. `riverside_store.vmdl` imports `counter-v1/store_without_counter.obj` and three translated `ctrv1_` counter meshes. Three approved LODs: 5,296/3,436/1,628 triangles; counter masks 3/28/96 across combined distances 0/10/15/20/25/35/45. Store/drinks masks 127, ice 7/56/64, register 1/14/112. The original ModelDoc physics section and saved scene are unchanged. A concurrent porch-light removal was preserved during integration.
+
+The old standalone `counter-v1/legacy_counter` asset, OBJ/MTL and sidecars were deleted through the editor. Exactly 12 old counter triangles were also removed from each of four old store source variants, preserving all unrelated records. No old counter faces remain in Riverside game OBJ sources. Shared materials were retained. `Tools/riverside_counter.py` reproduces all approved LODs and replaces the old counter authoring box in `Tools/riverside_map.py`; no full-map regeneration was run.
+
+Actual public-model play verification: `output/riverside/counter-v1/in-game-front-installed.png`, `installed-runtime.json`, `installed-state-restored.json`, `installed.json`. One player, zero error models, original camera effects, no added lights or runtime model substitution. Guarded sources, cleanup plans and receipts: `Sources/Riverside/counter-v1` and `output/riverside/counter-v1`. Earlier review assets/hash guards describe pre-install baselines and must not be reapplied blindly.

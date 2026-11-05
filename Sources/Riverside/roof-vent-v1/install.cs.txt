@@ -1,0 +1,55 @@
+var session=Editor.SceneEditorSession.All.Single(s=>s.Scene?.Name.Equals("riverside",StringComparison.OrdinalIgnoreCase)==true && !s.IsPlaying);
+if (session?.Scene is null || !session.Scene.Name.Equals("riverside",StringComparison.OrdinalIgnoreCase) || session.IsPlaying || session.HasUnsavedChanges) throw new Exception("Need clean Riverside edit mode");
+var project=Sandbox.Project.Current.GetRootPath();
+var folder=System.IO.Path.Combine(project,"output/riverside/roof-vent-v1/installed");
+var plan=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"plan.json")));
+string Hash(byte[] b)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(b)).ToLowerInvariant();
+var source=System.IO.Path.Combine(project,plan["source"].GetValue<string>());
+var modelSource=System.IO.Path.ChangeExtension(source,".vmdl");
+void Guard()
+{
+    var hash=Hash(System.IO.File.ReadAllBytes(source));
+    if (hash!=plan["before_sha256"].GetValue<string>() && hash!=plan["after_sha256"].GetValue<string>()) throw new Exception("Dressing changed after staging");
+    if (Hash(System.IO.File.ReadAllBytes(modelSource))!=plan["model_sha256"].GetValue<string>()) throw new Exception("Dressing ModelDoc changed after staging");
+}
+void GuardScene()
+{
+    var scenePath=System.IO.Path.Combine(project,"Assets/scenes/maps/Riverside/riverside.scene");
+    if(Hash(System.IO.File.ReadAllBytes(scenePath))!=plan["scene_sha256"].GetValue<string>())throw new Exception("Saved scene changed after staging");
+    var previous=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"session-before.json")));
+    void Normalize(System.Text.Json.Nodes.JsonNode node)
+    {
+        if(node is System.Text.Json.Nodes.JsonObject obj)
+        {
+            obj.Remove("__PrefabIdToInstanceId");
+            foreach(var child in obj.ToArray())if(child.Value is not null)Normalize(child.Value);
+        }
+        else if(node is System.Text.Json.Nodes.JsonArray array)foreach(var child in array)if(child is not null)Normalize(child);
+    }
+    var prior=previous["GameObjects"].DeepClone();var now=session.Scene.Serialize()["GameObjects"].DeepClone();
+    Normalize(prior);Normalize(now);
+    if(!System.Text.Json.Nodes.JsonNode.DeepEquals(prior,now))throw new Exception("Live Riverside changed after audit");
+}
+Guard();GuardScene();
+foreach (var name in new[] { "vent" })
+{
+    var path="models/props/riverside/roof_vent_v1/"+name+".vmdl";
+    var asset=Editor.AssetSystem.FindByPath(path) ?? throw new Exception("Missing approved model: "+path);
+    await asset.CompileIfNeededAsync();
+    if (Model.Load(path).IsError) throw new Exception("Invalid model: "+path);
+}
+Guard();GuardScene();
+var staged=System.IO.File.ReadAllBytes(System.IO.Path.Combine(folder,"low-without-old-vent.obj"));
+if(session.IsPlaying || session.HasUnsavedChanges)throw new Exception("Riverside session changed during model load");
+if (Hash(staged)!=plan["after_sha256"].GetValue<string>()) throw new Exception("Staged cut mismatch");
+System.IO.File.WriteAllBytes(source,staged);
+using (session.Scene.Push())
+{
+    var group=session.Scene.GetAllObjects(true).SingleOrDefault(g=>g.Name=="Passive Roof Vents");
+    if (group is null) { group=new GameObject(false,"Passive Roof Vents");group.Deserialize(plan["group"].AsObject()); }
+    var renderers=group.GetComponentsInChildren<ModelRenderer>().ToArray();
+    if (renderers.Length!=1 || renderers.Any(r=>r.Model is null || r.Model.IsError)) throw new Exception("Expected one valid approved roof vent");
+    session.HasUnsavedChanges=true;
+    session.Save(false);
+    return new {Vents=renderers.Length,OldFacesRemoved=12,AddedLights=group.GetComponentsInChildren<Light>().Count(),AddedColliders=group.GetComponentsInChildren<Collider>().Count(),NeedsSave=session.HasUnsavedChanges};
+}

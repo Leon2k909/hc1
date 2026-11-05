@@ -1,0 +1,146 @@
+{
+  "tools": [
+    {
+      "name": "create_game_object",
+      "title": "Create Game Object",
+      "toolset": "scene",
+      "description": "Create a game object in the active scene - empty or from a prefab, optionally with components. For putting a model in the scene, spawn_model is quicker. The user can undo this. Returns the new object's id for the other scene tools.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name for the new object. Empty picks a sensible default."
+          },
+          "parent": {
+            "type": "string",
+            "description": "Parent game object id. Empty parents to the scene root."
+          },
+          "prefab": {
+            "type": "string",
+            "description": "Prefab asset path to instantiate, from asset_search."
+          },
+          "position": {
+            "type": "string",
+            "description": "World position as 'x,y,z'. Default origin."
+          },
+          "angles": {
+            "type": "string",
+            "description": "Rotation as 'pitch,yaw,roll'."
+          },
+          "scale": {
+            "type": "string",
+            "description": "Scale as 'x,y,z', or a single number for uniform."
+          },
+          "components": {
+            "type": "string",
+            "description": "Comma separated component type names to add, e.g. 'ModelRenderer,BoxCollider'."
+          }
+        },
+        "required": []
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "Id": {
+            "type": "string"
+          },
+          "Name": {
+            "type": "string"
+          },
+          "Position": {
+            "type": "string"
+          },
+          "Components": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "Id": {
+                  "type": "string"
+                },
+                "Type": {
+                  "type": "string"
+                },
+                "GameObject": {
+                  "type": "string"
+                }
+              },
+              "required": []
+            }
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "hammer_create_game_object",
+      "title": "Create Game Object",
+      "toolset": "hammer",
+      "description": "Put a game object in the open map - empty, from a prefab, and/or with components and their properties set in the same call. This is how s&box gameplay goes in a map. The user can undo the creation. Returns the new node, whose GameObject field is the object's guid.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name for the object. Empty uses the prefab's name, or 'GameObject'."
+          },
+          "position": {
+            "type": "string",
+            "description": "World position as 'x,y,z'."
+          },
+          "angles": {
+            "type": "string",
+            "description": "Rotation as 'pitch,yaw,roll'."
+          },
+          "prefab": {
+            "type": "string",
+            "description": "Prefab asset path to instantiate, from asset_search type:prefab."
+          },
+          "components": {
+            "type": "object",
+            "description": "Components to add, as a json object of type name to properties - e.g. {\"ModelRenderer\": {\"Model\": \"models/dev/box.vmdl\"}, \"BoxCollider\": {}}. get_component_type documents types and properties. A type the prefab already has gets its properties set instead."
+          }
+        },
+        "required": []
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "Id": {
+            "type": "integer"
+          },
+          "Kind": {
+            "type": "string"
+          },
+          "Name": {
+            "type": "string"
+          },
+          "ClassName": {
+            "type": "string"
+          },
+          "Description": {
+            "type": "string"
+          },
+          "Position": {
+            "type": "string"
+          },
+          "Parent": {
+            "type": "integer"
+          },
+          "GameObject": {
+            "type": "string"
+          },
+          "Selected": {
+            "type": "boolean"
+          },
+          "Visible": {
+            "type": "boolean"
+          }
+        },
+        "required": []
+      }
+    }
+  ],
+  "total": 402
+}

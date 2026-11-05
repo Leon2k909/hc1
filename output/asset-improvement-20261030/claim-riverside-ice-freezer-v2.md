@@ -1,0 +1,1 @@
+Riverside Lucky Stop ice freezer v2: claimed 2026-11-04 in the sandbag/crate improvement chat. Sources/Riverside/ice-freezer-v2/. New review candidate only; preserve the active drinks-fridge and pole-transformer work.

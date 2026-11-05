@@ -706,21 +706,9 @@ def skip( m, e, n, heading ):
 def pipes( m, e, n, heading ):
     """ Six rusty steel pipes, 8.6 in across and 160 long, stacked 3-2-1 on two timber bearers. """
     F = Frame( e, n, heading )
-    for x in ( -55.0, 55.0 ):
-        F.box( m, x - 2.0, x + 2.0, -14.0, 14.0, 0.0, 3.0, "rw_wood" )
+    from boxyard_pipe_stacks import stack as draw_pipe_stack
+    draw_pipe_stack(m,e,n,heading)
     r = 4.3
-    rows = [ ( 3.0 + r, ( -2 * r, 0.0, 2 * r ) ), ( 3.0 + r + 2 * r * math.sin( math.pi / 3 ), ( -r, r ) ),
-             ( 3.0 + r + 4 * r * math.sin( math.pi / 3 ), ( 0.0, ) ) ]
-    for z, ys in rows:
-        for y in ys:
-            shift = ( keyed( "pipe", e, n, z, y ) % 9 ) - 4.0
-            a, b = F.p( -80.0 + shift, y, z ), F.p( 80.0 + shift, y, z )
-            rod( m, a, b, r, "bx_rust", sides=10 )
-            for end, towards in ( ( a, -F.x ), ( b, F.x ) ):
-                side = np.cross( F.x, ( 0, 0, 1 ) )
-                ring = [ end + ( side * math.cos( 2 * math.pi * k / 10 ) + np.array( ( 0, 0, 1.0 ) ) * math.sin( 2 * math.pi * k / 10 ) ) * ( r - 0.4 )
-                         for k in range( 10 ) ]
-                card( m, "bx_dark", ring, towards )
     F.box( m, -84.0, 84.0, -14.0, 14.0, 0.0, 3.0 + r + 4 * r * math.sin( math.pi / 3 ) + r, surface=METAL )
 
 
@@ -783,25 +771,22 @@ COLOURS = [ c for c in BM.COLOURS ]
 MASTS = [ ( -1100.0, -1150.0 ), ( 1100.0, -1150.0 ), ( -1100.0, 1150.0 ), ( 1100.0, 1150.0 ) ]
 
 
+CRANES = []  # (plan e,n,yaw,colour): approved separate RTG crane models
+
+
 def gantry_crane( m, e, n, heading, paint ):
-    """ A rubber-tyred gantry crane straddling six rows: legs 925 apart across them, 710 high. """
-    F = Frame( e, n, heading )
-    span, base, top = 462.0, 140.0, 710.0
-    for sy in ( -1, 1 ):
-        for sx in ( -1, 1 ):
-            F.box( m, sx * base - 12, sx * base + 12, sy * span - 10, sy * span + 10, 40.0, top, paint )
-            F.box( m, sx * base - 30, sx * base + 30, sy * span - 16, sy * span + 16, 0.0, 40.0, "bx_rubber" )
-        F.box( m, -base - 20, base + 20, sy * span - 14, sy * span + 14, 40.0, 70.0, paint )
-        F.box( m, -base - 20, base + 20, sy * span - 16, sy * span + 16, top, top + 50.0, paint )
-        F.box( m, -base - 40, -base + 40, sy * ( span + 30 ), sy * ( span + 90 ), top - 20, top + 60, "bx_crane_white" )
-    for sx in ( -1, 1 ):
-        F.box( m, sx * base - 14, sx * base + 14, -span - 20, span + 20, top + 10, top + 60, paint )
-    F.box( m, -60, 60, -110, 0, top + 60, top + 110, "bx_crane_white" )
-    F.box( m, -40, 40, -40, 20, top - 120, top - 20, "bx_crane_white" )
-    F.box( m, -36, 36, -41, 21, top - 100, top - 40, "bx_cab_glass" )
-    F.box( m, -50, 50, -60, 60, 300, 330, "bx_dark" )
-    F.rod( m, ( -30, 0, top ), ( -30, 0, 330 ), 1.0, "bx_dark", sides=4 )
-    F.rod( m, ( 30, 0, top ), ( 30, 0, 330 ), 1.0, "bx_dark", sides=4 )
+    """Register the approved draw-only gantry; no original block geometry or collision."""
+    CRANES.append((e,n,heading,paint))
+
+
+def gantry_objects():
+    out=[]
+    for idx,(e,n,yaw,paint) in enumerate(CRANES,1):
+        identifier=f"{idx:02}";key=f"world/gantry/{idx}"
+        out.append(K.game_object(ids, f"Gantry Crane {identifier}", key, K.to_world((e,n,0)), K.yaw_rotation(yaw), components=[
+            K.component(ids, "Sandbox.ModelRenderer", f"{key}/renderer", BodyGroups=18446744073709551615,
+                        Model=f"models/props/boxyard/gantry_crane_v1/gantry_{identifier}.vmdl",RenderType="On",Tint="1,1,1,1")]))
+    return out
 
 
 def light_mast( m, e, n ):
@@ -815,6 +800,7 @@ def light_mast( m, e, n ):
 
 
 def backdrop():
+    CRANES.clear()
     m = Model()
     # The ground round the yard.
     for e0, e1, n0, n1 in ( ( -6000, 6000, 872, 6000 ), ( -6000, 6000, -6000, -872 ), ( 840, 6000, -872, 872 ),
@@ -1141,7 +1127,8 @@ def write_scene( written, light_list, probe_list, tops ):
         *( drum_object( *placed ) for placed in DRUMS ),
         *( cone_object( *placed ) for placed in CONES ),
         *( ibc_object( *placed ) for placed in IBCS ),
-        *( bin_object( *placed ) for placed in BINS ) ] )
+        *( bin_object( *placed ) for placed in BINS ),
+        *gantry_objects() ] )
     light_objects = [
         K.game_object( ids, name, f"light/{name}", K.to_world( position ), tags="light_point,light", components=[
             K.component( ids, "Sandbox.PointLight", f"light/{name}/light", Attenuation=1, FogMode="Enabled", FogStrength=1,

@@ -1,0 +1,8 @@
+var model=Model.Load("models/maps/orion/orion_props.vmdl");
+if(model.IsError)throw new InvalidOperationException("Public props model failed");
+var paths=model.Materials.Select(m=>m.ResourcePath).ToArray();
+foreach(var mat in new[]{"coat","seal","alloy"})if(!paths.Contains("materials/orion/yard-lamp-v1/"+mat+".vmat"))throw new InvalidOperationException("Missing lamp material: "+mat);
+var oldPath=System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(),"Assets/models/maps/orion/yard-lamp-v1/before.vmdl");
+if(System.IO.File.Exists(oldPath))throw new InvalidOperationException("Old alternate still present");
+var report=new{Model=model.ResourcePath,Error=model.IsError,LampMaterials=3,OldAlternateRemoved=true};
+System.IO.File.WriteAllText(System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(),"Sources/Orion/yard-lamp-v1/retirement/public-resource.json"),System.Text.Json.JsonSerializer.Serialize(report));return report;

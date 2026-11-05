@@ -106,6 +106,7 @@ public partial class DroppedEquipment : Component, IUse, Component.ICollisionLis
 		}
 
 		droppedWeapon.Rigidbody = go.Components.Create<Rigidbody>();
+		droppedWeapon.Rigidbody.Velocity = InheritedVelocity( heldWeapon );
 
 		go.Components.Create<DestroyBetweenRounds>();
 

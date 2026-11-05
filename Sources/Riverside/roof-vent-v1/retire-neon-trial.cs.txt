@@ -1,0 +1,28 @@
+var project=Sandbox.Project.Current.GetRootPath();
+var roots=new[]{"models/props/riverside/neon_sign_v1","materials/riverside/neon_sign_v1"};
+foreach(var session in Editor.SceneEditorSession.All)
+    foreach(var prefix in roots)
+        if(session.Scene.Serialize().ToJsonString().Contains(prefix,StringComparison.OrdinalIgnoreCase))throw new Exception("Trial referenced in an open scene");
+var archive=System.IO.Path.Combine(project,"output/riverside/neon-cabinet-trial-retired");
+var count=0;
+foreach(var prefix in roots)
+{
+    var folder=System.IO.Path.GetFullPath(System.IO.Path.Combine(project,"Assets",prefix));
+    var expected=System.IO.Path.GetFullPath(System.IO.Path.Combine(project,"Assets",prefix));
+    if(!folder.Equals(expected,StringComparison.OrdinalIgnoreCase)||!System.IO.Directory.Exists(folder))continue;
+    var files=System.IO.Directory.GetFiles(folder,"*",System.IO.SearchOption.AllDirectories);
+    foreach(var file in files)
+    {
+        var relative=System.IO.Path.GetRelativePath(System.IO.Path.Combine(project,"Assets"),file);
+        var target=System.IO.Path.Combine(archive,relative);System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target));
+        System.IO.File.Copy(file,target,true);
+    }
+    foreach(var file in files.Where(f=>f.EndsWith(".vmdl")||f.EndsWith(".vmat")))
+    {
+        var path=System.IO.Path.GetRelativePath(System.IO.Path.Combine(project,"Assets"),file).Replace('\\','/');
+        var asset=Editor.AssetSystem.FindByPath(path);if(asset is not null)asset.Delete();
+    }
+    foreach(var file in files)if(System.IO.File.Exists(file)){System.IO.File.Delete(file);count++;}
+    // Only task-owned trial files are deleted; the other edit uses models/maps/... and hyphenated materials.
+}
+return new{RetiredTrialFiles=count,Archive=archive,OtherNeonEditUntouched=true};

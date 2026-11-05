@@ -49,5 +49,9 @@
   Repaired UVs are the default; `--scan-uvs` is only for comparing with the original. `--meshes-only` preserves the
   existing ModelDoc/material resources while replacing their generated mesh inputs.
 - Raw/repaired work arrays and review renders are in `D:/tmp/hc1-mw22-tools/zombie_female_01_work`; the original
-  installed inputs/textures were backed up to its `before_face_fix` folder. Editor was closed during final atlas
-  work; final rendering checks use Eevee. A live-match check remains outstanding.
+  installed inputs/textures were backed up to its `before_face_fix` folder.
+- Final native verification (2026-11-04, engine 26.11.03a): full model compile succeeded; fixed-LOD lit and albedo
+  captures were made in an isolated temporary SceneWorld, which was deleted afterwards. LOD0's eye/cheek patches
+  are removed. The model was reopened in ModelDoc, leaving the active Railhead scene unmodified. Native before/after
+  captures and finite-normal/skin-weight checks are saved in `output/zombie-female-face-fix-20261104/`.
+  The distant 8k LOD remains coarse when examined at close range. A live-match check remains outstanding.

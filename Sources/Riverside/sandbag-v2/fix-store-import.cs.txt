@@ -1,0 +1,44 @@
+var project = Sandbox.Project.Current.GetRootPath();
+var session = Editor.SceneEditorSession.Active;
+if (session.IsPlaying || session.HasUnsavedChanges) throw new Exception("Need clean edit mode for the public store import check");
+var publicFile = System.IO.Path.Combine(project,"Assets/models/maps/riverside/riverside_store.vmdl");
+var path = System.Text.RegularExpressions.Regex.Match(System.IO.File.ReadAllText(publicFile),"filename\\s*=\\s*\"([^\"]+\\.obj)\"").Groups[1].Value;
+if (!new[] { "models/maps/riverside/ice-cabinet-v1/store_without_ice.obj", "models/maps/riverside/register-v1/store_without_register.obj" }.Contains(path)) throw new Exception("Unrecognized public store background: " + path);
+var full = System.IO.Path.Combine(project,"Assets",path);
+var folder = System.IO.Path.Combine(project,"output/asset-improvement-20261030/riverside-sandbags/installed/store-import-reconciliation",System.IO.Path.GetFileName(System.IO.Path.GetDirectoryName(path)));
+System.IO.Directory.CreateDirectory(folder);
+var original = System.IO.File.ReadAllBytes(full);
+var text = System.Text.Encoding.UTF8.GetString(original);
+var lines = System.Text.RegularExpressions.Regex.Matches(text,@"[^\n]*\n|[^\n]+$").Cast<System.Text.RegularExpressions.Match>().Select(m=>m.Value).ToArray();
+var kept = new System.Text.StringBuilder();
+var material = "";var removed=0;
+foreach (var line in lines)
+{
+    if (line.StartsWith("usemtl ")) material = line.Substring(7).Trim();
+    if (material == "rs_sandbag" && line.StartsWith("f ")) { removed++;continue; }
+    if (line.Trim() == "usemtl rs_sandbag") continue;
+    kept.Append(line);
+}
+var modelPath = System.IO.Path.Combine(project,"Assets/models/maps/riverside/riverside_store.vmdl");
+var scenePath = System.IO.Path.Combine(project,"Assets/scenes/maps/Riverside/riverside.scene");
+string Hash(byte[] b)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(b));
+var modelHash=Hash(System.IO.File.ReadAllBytes(modelPath));var sceneHash=Hash(System.IO.File.ReadAllBytes(scenePath));
+if (removed != 0 && removed != 1728) throw new Exception("Unexpected old store bag count: " + removed);
+if (removed > 0)
+{
+    System.IO.File.WriteAllBytes(System.IO.Path.Combine(folder,"before-store_without_ice.obj"),original);
+    if (!System.IO.File.ReadAllBytes(full).SequenceEqual(original)) throw new Exception("Store import changed during preparation");
+    System.IO.File.WriteAllText(full,kept.ToString(),new System.Text.UTF8Encoding(false));
+}
+var after=System.IO.File.ReadAllText(full);
+var originalOtherFaces=lines.Where(l=>l.StartsWith("f ")).ToArray();
+if (originalOtherFaces.Length-System.Text.RegularExpressions.Regex.Matches(after,@"(?m)^f ").Count!=removed) throw new Exception("Unexpected face count change");
+var asset = Editor.AssetSystem.FindByPath("models/maps/riverside/riverside_store.vmdl");
+if (asset is null) throw new Exception("Public store model missing");
+await asset.CompileIfNeededAsync();
+var model=Model.Load("models/maps/riverside/riverside_store.vmdl");
+if (model.IsError) throw new Exception("Store compilation failed");
+if (Hash(System.IO.File.ReadAllBytes(modelPath))!=modelHash || Hash(System.IO.File.ReadAllBytes(scenePath))!=sceneHash) throw new Exception("Unexpected public resource/scene change");
+var report=new { ImportedStoreSource=path,RemovedOldBagFaces=removed,Before=Hash(original),After=Hash(System.IO.File.ReadAllBytes(full)),PublicModelAndPhysicsUnchanged=true,SavedSceneUnchanged=true,ModelValid=!model.IsError };
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"receipt.json"),System.Text.Json.JsonSerializer.Serialize(report,new System.Text.Json.JsonSerializerOptions{WriteIndented=true}));
+return report;

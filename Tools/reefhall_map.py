@@ -46,6 +46,7 @@ import building_textures as BT
 import map_kit as K
 import reefhall_materials as RM
 import reefhall_consoles as RC
+import reefhall_display_pedestal as DP
 from map_kit import Model, normalise
 
 TITLE = "Reef Hall"
@@ -840,7 +841,8 @@ def display_case( model, centre, size=( 40, 40 ), z=0.0, tank_name="display", rn
     """ A small glass display tank on a plinth: a precast concrete base, a glass box with sand, coral and rock in it. """
     e, n = centre[:2]
     sx, sy = size
-    model.box( ( e - sx / 2, n - sy / 2, z ), ( e + sx / 2, n + sy / 2, z + 30 ), { "default": "rh_smooth", "+z": "rh_black" }, METAL )
+    upgraded = DP.matches(centre, size, z)
+    model.box( ( e - sx / 2, n - sy / 2, z ), ( e + sx / 2, n + sy / 2, z + 30 ), { "default": None } if upgraded else { "default": "rh_smooth", "+z": "rh_black" }, METAL )
     top = z + 30
     h = 34
     paint = tank_paint( tank_name )
@@ -848,7 +850,8 @@ def display_case( model, centre, size=( 40, 40 ), z=0.0, tank_name="display", rn
         model.box( ( e - sx / 2 + 1, n - sy / 2 + 1, top ), ( e + sx / 2 - 1, n + sy / 2 - 1, top + h ), { face: paint, "default": None } )
     model.collision_box( ( e - sx / 2 + 1, n - sy / 2 + 1, top ), ( e + sx / 2 - 1, n + sy / 2 - 1, top + h ), GLASS )
     target = inside if inside is not None else model
-    model.box( ( e - sx / 2 + 1, n - sy / 2 + 1, top + h - 0.3 ), ( e + sx / 2 - 1, n + sy / 2 - 1, top + h + 1.2 ), { "+z": "rh_gunmetal", "default": "rh_gunmetal" } )
+    if not upgraded:
+        model.box( ( e - sx / 2 + 1, n - sy / 2 + 1, top + h - 0.3 ), ( e + sx / 2 - 1, n + sy / 2 - 1, top + h + 1.2 ), { "+z": "rh_gunmetal", "default": "rh_gunmetal" } )
     facing( target, "rh_sand", [ ( e - sx / 2 + 2, n - sy / 2 + 2, top + 4 ), ( e + sx / 2 - 2, n - sy / 2 + 2, top + 4 ),
                                  ( e + sx / 2 - 2, n + sy / 2 - 2, top + 4 ), ( e - sx / 2 + 2, n + sy / 2 - 2, top + 4 ) ], ( 0, 0, 1 ) )
     if rng is not None:
@@ -1304,7 +1307,11 @@ _sconces = []                   # the wall lights the room being built has place
 def sconce( model, fr, u, z, w=0.0 ):
     """ A wall light: a small gunmetal box with a warm glowing face, on a frame wall's front, and a small unshadowed
     light just off it, so it washes the wall above and below as the references' do. """
-    fbox( model, fr, u - 3.5, u + 3.5, w, w + 3.0, z, z + 16, { "default": "rh_gunmetal", "front": "rh_led_warm" } )
+    if np.allclose(fr.p(u,w,z),(760.,1100.,110.)) and np.allclose(fr.vec(0,1,0),(0,1,0)):
+        from reefhall_wall_light import append_to as append_approved_wall_light
+        append_approved_wall_light(model)
+    else:
+        fbox( model, fr, u - 3.5, u + 3.5, w, w + 3.0, z, z + 16, { "default": "rh_gunmetal", "front": "rh_led_warm" } )
     _sconces.append( light( "Wall light", fr.p( u, w + 8.0, z + 8 ), SCONCE, 130.0 ) )
 
 
@@ -1518,18 +1525,10 @@ def bronze_planter( model, centre, z=0.0, width=17.5 * DOOR_S, height=37.0 * DOO
     t, b, z1 = width / 2, width / 2 * foot, z + height
     corners = lambda r, zz: [ ( e - r, n - r, zz ), ( e + r, n - r, zz ), ( e + r, n + r, zz ), ( e - r, n + r, zz ) ]
     low, high = corners( b, z ), corners( t, z1 - 1.2 )
-    for k in range( 4 ):
-        quad = [ low[k], low[( k + 1 ) % 4], high[( k + 1 ) % 4], high[k] ]
-        mid = np.mean( quad, axis=0 )
-        facing( model, "rh_bronze", quad, ( mid[0] - e, mid[1] - n, 0 ) )
-    model.box( ( e - t - 0.35, n - t - 0.35, z1 - 1.2 ), ( e + t + 0.35, n + t + 0.35, z1 ), { "default": "rh_bronze", "-z": None } )
+    from reefhall_bronze_planter import shell as draw_planter_shell
+    draw_planter_shell(model, centre, z, width, height, foot)
     soil = z1 - 1.8
     model.box( ( e - t + 0.6, n - t + 0.6, soil - 1 ), ( e + t - 0.6, n + t - 0.6, soil ), { "+z": "rh_soil", "default": None } )
-    for k in range( 4 ):
-        inner = corners( t - 0.6, soil ) + corners( t - 0.6, z1 + 0.01 )
-        quad = [ inner[k], inner[( k + 1 ) % 4], inner[4 + ( k + 1 ) % 4], inner[4 + k] ]
-        mid = np.mean( quad, axis=0 )
-        facing( model, "rh_bronze", quad, ( e - mid[0], n - mid[1], 0 ) )
     model.hull( low + corners( t + 0.35, z1 ), METAL )
     return soil
 
@@ -1974,13 +1973,19 @@ def partition( model, p0, p1, z0, z1, gaps=() ):
 def desk( model, centre, yaw, z=0.0 ):
     """ An office desk: a laminate top on gunmetal legs, two screens and a chair. """
     fr = Frame( centre[:2], ( math.cos( math.radians( yaw ) ), math.sin( math.radians( yaw ) ) ) )
-    fbox( model, fr, -36, 36, -16, 16, z + 28, z + 30, "rh_laminate", WOOD )
-    for u in ( -33, 33 ):
-        fbox( model, fr, u - 2, u + 2, -14, 14, z, z + 28, "rh_gunmetal" )
-    fbox( model, fr, -31, 31, 10, 12, z + 6, z + 28, "rh_gunmetal" )
-    for u in ( -13, 13 ):
-        fbox( model, fr, u - 1.5, u + 1.5, 8, 10, z + 30, z + 36, "rh_gunmetal" )
-        fbox( model, fr, u - 12, u + 12, 8, 9.5, z + 36, z + 51, { "default": "rh_black", "back": "rh_screen_data" } )
+    if np.allclose(centre[:2], (1960,780)) and abs(yaw-180.0)<.001 and abs(z-208.0)<.001:
+        from reefhall_office_desk import build as draw_office_workstation
+        draw_office_workstation(model,centre,yaw,z)
+        # Retain the original desktop collision; chairs below stay untouched.
+        fbox(model,fr,-36,36,-16,16,z+28,z+30,{"default":None},WOOD)
+    else:
+        fbox( model, fr, -36, 36, -16, 16, z + 28, z + 30, "rh_laminate", WOOD )
+        for u in ( -33, 33 ):
+            fbox( model, fr, u - 2, u + 2, -14, 14, z, z + 28, "rh_gunmetal" )
+        fbox( model, fr, -31, 31, 10, 12, z + 6, z + 28, "rh_gunmetal" )
+        for u in ( -13, 13 ):
+            fbox( model, fr, u - 1.5, u + 1.5, 8, 10, z + 30, z + 36, "rh_gunmetal" )
+            fbox( model, fr, u - 12, u + 12, 8, 9.5, z + 36, z + 51, { "default": "rh_black", "back": "rh_screen_data" } )
     fbox( model, fr, -9, 9, -34, -18, z + 16, z + 19, "rh_pad_dark" )
     fbox( model, fr, -9, 9, -36, -33, z + 19, z + 36, "rh_pad_dark" )
     fbox( model, fr, -1.5, 1.5, -27.5, -24.5, z, z + 16, "rh_gunmetal" )
@@ -2234,6 +2239,10 @@ def lamp_lid( inside, centre, r, z, ring=False ):
 
 def pump( model, centre, yaw=0.0 ):
     """ A circulation pump on a plinth: a blue motor, the volute and its pipe stubs. """
+    if tuple(centre[:2]) == (-380,1610) and abs(yaw % 360.0) < 1e-8:
+        from reefhall_circulation_pump import append_to as append_approved_pump
+        append_approved_pump(model)
+        return
     fr = Frame( centre[:2], ( math.cos( math.radians( yaw ) ), math.sin( math.radians( yaw ) ) ) )
     fbox( model, fr, -34, 34, -18, 18, 0, 8, "rh_gunmetal", METAL )
     tube( model, fr.p( -30, 0, 26 ), fr.p( 8, 0, 26 ), 16, "rh_steel_blue", sides=16, cap=True )
@@ -3213,6 +3222,7 @@ def write_scene( rooms, lights ):
             *( placed_model_object( f"{name.title()} {kind} {k + 1}", f"aquarium/{name}/{kind.lower()}/{k}", prop )
                for kind in ( "Bench", "Stand" )
                for k, prop in enumerate( p for p in model.props if p.get( "kind" ) == kind ) ) ) ] )
+    building['Children'].append(DP.scene_object(ids))
     light_objects = [
         K.game_object( ids, name, f"light/{name}", K.to_world( position ), tags="light_point,light", components=[
             K.component( ids, "Sandbox.PointLight", f"light/{name}/light", Attenuation=1, FogMode="Enabled", FogStrength=1,

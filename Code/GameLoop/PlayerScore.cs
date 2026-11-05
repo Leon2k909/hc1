@@ -175,15 +175,19 @@ public sealed class PlayerScore : Component,
 		}
 	}
 
-	[Rpc.Owner]
+	[Rpc.Host]
 	public void CallInUAV()
 	{
-		if ( BankedUAVs > 0 )
-		{
-			BankedUAVs--;
-			ScorestreakManager.Instance?.ActivateUAV( Client.Team );
-			AddScore( 50, "UAV Deployed", countsTowardStreak: false );
-		}
+		if ( !Networking.IsHost || !Client.IsValid() || BankedUAVs <= 0 ) return;
+		if ( Rpc.Caller is not null && Rpc.Caller != Connection.Host && Rpc.Caller != Client.Connection ) return;
+
+		var manager = ScorestreakManager.Instance;
+		if ( !manager.IsValid() || Client.Team is not (Team.Terrorist or Team.CounterTerrorist) ) return;
+
+		// Spend the reward on the same host that activates the team's shared UAV.
+		BankedUAVs--;
+		manager.ActivateUAV( Client.Team );
+		AddScore( 50, "UAV Deployed", countsTowardStreak: false );
 	}
 
 	[Rpc.Broadcast( NetFlags.HostOnly )]

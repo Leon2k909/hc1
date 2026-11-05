@@ -1,0 +1,6 @@
+var session=Editor.SceneEditorSession.All.SingleOrDefault(x=>x.Scene.Name=="sewage");
+if(session is null)return new{Open=false,Removed=0};
+var objects=session.Scene.GetAllObjects(true).Where(x=>x.Name=="REVIEW VENT - OLD (left)"||x.Name=="REVIEW VENT - NEW (right)").ToArray();
+foreach(var item in objects)item.Destroy();
+if(objects.Length>0)session.HasUnsavedChanges=true;
+return new{Open=true,Removed=objects.Length};

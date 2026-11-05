@@ -268,7 +268,7 @@ class Model:
             out.hulls.append( ( [ tuple( np.asarray( p, float ) * flip ) for p in points ], surface ) )
         for prop in self.props:
             out.props.append( { **prop, "position": tuple( np.asarray( prop["position"] ) * flip ),
-                                "yaw": -prop["yaw"] } )
+                                "yaw": prop.get( "mirror_yaw_offset", 0.0 ) - prop["yaw"] } )
         return out
 
     def bounds( self ):

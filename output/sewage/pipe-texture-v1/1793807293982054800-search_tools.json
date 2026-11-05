@@ -1,0 +1,1520 @@
+{
+  "tools": [
+    {
+      "name": "add_component_with_properties",
+      "title": "Add Component With Properties",
+      "toolset": "bridge_component",
+      "description": "Add a component to a GameObject and configure its properties in one call (properties PERSIST through save+reload). Use list_available_components to find valid types. Returns appliedProperties + failedProperties so you can see exactly what stuck.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of the GameObject."
+          },
+          "component": {
+            "type": "string",
+            "description": "Component type name (e.g. 'ModelRenderer', 'Rigidbody', 'BoxCollider')."
+          },
+          "properties": {
+            "description": "Key-value map of property names to values, each auto-converted to the property's real type. Primitives '5'/true; Color/Vector3 as comma strings '1,0,0,1'; enum member names; ASSET refs as a path ('Model':'models/dev/box.vmdl', 'MaterialOverride':'materials/x.vmat'); GameObject/Component refs as a target GUID. Best-effort per key â€” failures are reported in failedProperties, not silently dropped. JSON value."
+          }
+        },
+        "required": [
+          "id",
+          "component"
+        ]
+      }
+    },
+    {
+      "name": "add_render_target_camera",
+      "title": "Add Render Target Camera",
+      "toolset": "bridge_visuals",
+      "description": "CCTV / security monitor / mirror / simple portal: creates a secondary camera (IsMainCamera=false, Priority param) positioned/rotated or aimed at a target object, a display surface (scaled box with a ModelRenderer), and GENERATES a sealed wiring component that at runtime creates the render-target Texture (Texture.CreateRenderTarget builder), assigns camera.RenderTarget and sets the texture onto an anonymous complex-shader material on the display (attribute 'Color' = albedo; the screen is scene-lit, not emissive/unlit). Returns {created, camera{id,...}, display{id,...}|null, className, path, generatedCode, attachedAndWired, resolution, nextSteps[]}. FIRST call generates the .cs â†’ follow nextSteps: trigger_hotload, then add_component_with_properties on the display with properties {SourceCamera: &lt;camera GUID&gt;}; a REPEAT call reusing the same `name` after the hotload attaches AND wires everything automatically (attachedAndWired=true). The feed only renders in play mode â€” verify with start_play + capture_view. If `name`'s .cs file exists but isn't compiled yet, the call errors â€” hotload first. Scene/file-mutating â€” refused during play mode.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class name for the generated wiring component. Defaults to 'RenderTargetDisplay'. Reuse the same name for extra cameras â€” after a hotload the class is reused and wired in one shot."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory for the generated .cs file. Defaults to 'Code'."
+          },
+          "cameraName": {
+            "type": "string",
+            "description": "GameObject name for the camera. Defaults to 'RT Camera'."
+          },
+          "position": {
+            "type": "string",
+            "description": "World position of the camera. As \"x,y,z\" (or JSON {x,y,z})."
+          },
+          "rotation": {
+            "type": "string",
+            "description": "World rotation of the camera. As \"pitch,yaw,roll\" degrees."
+          },
+          "lookAtId": {
+            "type": "string",
+            "description": "GUID of a GameObject to aim the camera at (overrides rotation; from get_scene_hierarchy / find_objects)."
+          },
+          "priority": {
+            "type": "number",
+            "description": "CameraComponent.Priority (integer). Defaults to 1."
+          },
+          "fieldOfView": {
+            "type": "number",
+            "description": "Camera field of view in degrees (clamped 5-170). Engine default when omitted."
+          },
+          "resolution": {
+            "type": "string",
+            "description": "Render-target size as 'width,height' pixels (min 16). Defaults to '512,512'."
+          },
+          "backgroundColor": {
+            "type": "string",
+            "description": "Camera background colour. Engine default when omitted. As \"r,g,b[,a]\" (0-1 floats)."
+          },
+          "createDisplay": {
+            "type": "boolean",
+            "description": "Create the display surface GameObject. Defaults to true. Pass false to wire your own surface later."
+          },
+          "displayPosition": {
+            "type": "string",
+            "description": "World position of the display surface. As \"x,y,z\" (or JSON {x,y,z})."
+          },
+          "displayRotation": {
+            "type": "string",
+            "description": "World rotation of the display surface. As \"pitch,yaw,roll\" degrees."
+          },
+          "displaySize": {
+            "type": "string",
+            "description": "Display box extents as 'x,y,z' world units (thin x = a wall screen facing Â±x). Defaults to '4,128,72'."
+          },
+          "attribute": {
+            "type": "string",
+            "description": "Material attribute that receives the texture. Defaults to 'Color' (albedo on the complex shader). Sanitized to [A-Za-z0-9_]."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "add_water_body",
+      "title": "Add Water Body",
+      "toolset": "bridge_world",
+      "description": "Create a swimmable/buoyant water region: a GameObject with a WaterVolume (s&box's buoyancy + drag physics volume, region defined by a trigger BoxCollider sized to `size`) plus, by default, a simple flat translucent-blue surface box at the water line so it's visible. HONEST LIMIT: the visual is a tinted dev-box stand-in, NOT a Gerstner/water shader â€” the dev material may render the tint opaque; swap in a real water material later. Only the WaterVolume properties you pass are set (engine defaults otherwise). Returns {created, gameObject{id,...}, size, appliedProperties[], surface{id,...}|null, note, nextSteps[]}. Next: start_play and drop a physics prop in to verify buoyancy; tune FluidDensity/LinearDrag/WaveAmplitude etc. with set_property on the WaterVolume. Scene-mutating â€” refused during play mode.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "GameObject name. Defaults to 'Water'."
+          },
+          "position": {
+            "type": "string",
+            "description": "World position of the volume's CENTRE (the surface sits at z + size.z/2 + surfaceOffset). As \"x,y,z\" (or JSON {x,y,z})."
+          },
+          "size": {
+            "type": "string",
+            "description": "Full extents of the volume as 'x,y,z' world units. Defaults to '512,512,128'."
+          },
+          "density": {
+            "type": "number",
+            "description": "WaterVolume.FluidDensity â€” higher = more buoyant. Engine default when omitted."
+          },
+          "linearDrag": {
+            "type": "number",
+            "description": "WaterVolume.LinearDrag on submerged bodies. Engine default when omitted."
+          },
+          "angularDrag": {
+            "type": "number",
+            "description": "WaterVolume.AngularDrag on submerged bodies. Engine default when omitted."
+          },
+          "waveAmplitude": {
+            "type": "number",
+            "description": "WaterVolume.WaveAmplitude â€” physics wave height (does NOT animate the visual surface)."
+          },
+          "waveFrequency": {
+            "type": "number",
+            "description": "WaterVolume.WaveFrequency â€” physics wave frequency."
+          },
+          "fluidVelocity": {
+            "type": "string",
+            "description": "WaterVolume.FluidVelocity â€” current/flow direction and speed, world units/s. As \"x,y,z\" (or JSON {x,y,z})."
+          },
+          "surfaceOffset": {
+            "type": "number",
+            "description": "WaterVolume.SurfaceOffset â€” shifts the water line relative to the top of the box."
+          },
+          "visualSurface": {
+            "type": "boolean",
+            "description": "Create the tinted surface box child. Defaults to true."
+          },
+          "surfaceColor": {
+            "type": "string",
+            "description": "Tint of the visual surface. Defaults to translucent blue (0.15,0.35,0.55,0.6). As \"r,g,b[,a]\" (0-1 floats)."
+          },
+          "parentId": {
+            "type": "string",
+            "description": "GUID of a parent GameObject."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "asset_dependencies",
+      "title": "Asset Dependencies",
+      "toolset": "asset",
+      "description": "Walk an asset's relationships - the assets it references (uses), the assets that depend on it, or the assets it was generated from. Deep recurses the whole chain, e.g. a model's materials and their textures.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Asset path, as returned by asset_search."
+          },
+          "relation": {
+            "type": "string",
+            "enum": [
+              "References",
+              "Dependants",
+              "Parents"
+            ],
+            "description": "Which direction to walk.",
+            "default": "References"
+          },
+          "deep": {
+            "type": "boolean",
+            "description": "Recurse instead of returning only direct relationships.",
+            "default": false
+          },
+          "type": {
+            "type": "string",
+            "description": "Filter results to one asset type - a file extension or friendly name. See asset_types."
+          },
+          "limit": {
+            "type": "integer",
+            "description": "How many results to return.",
+            "minimum": 1,
+            "maximum": 500,
+            "default": 100
+          }
+        },
+        "required": [
+          "path"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "Path": {
+            "type": "string"
+          },
+          "Relation": {
+            "type": "string"
+          },
+          "Total": {
+            "type": "integer",
+            "description": "How many related assets exist, beyond what's shown."
+          },
+          "Assets": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "Path": {
+                  "type": "string"
+                },
+                "Type": {
+                  "type": "string"
+                }
+              },
+              "required": []
+            }
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "asset_search",
+      "title": "Asset Search",
+      "toolset": "asset",
+      "description": "Search the asset system by keywords and type. An empty query lists every asset, so use limit and offset to page through. Returns relative asset paths - pass one to asset_info, asset_compile, asset_read or asset_dependencies.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Space separated keywords. Every keyword must match the asset's path or one of its tags. Empty matches everything."
+          },
+          "type": {
+            "type": "string",
+            "description": "Filter to one asset type - a file extension (vmdl, vmat, prefab) or friendly name (Model, Material). See asset_types."
+          },
+          "projectOnly": {
+            "type": "boolean",
+            "description": "Only assets belonging to the currently open project, excluding engine content and cloud downloads.",
+            "default": false
+          },
+          "unreferencedOnly": {
+            "type": "boolean",
+            "description": "Only assets nothing else references - useful for finding unused assets. Note map files and code can use an asset without the asset system knowing.",
+            "default": false
+          },
+          "compileFailedOnly": {
+            "type": "boolean",
+            "description": "Only assets whose last compile failed.",
+            "default": false
+          },
+          "uncompiledOnly": {
+            "type": "boolean",
+            "description": "Only assets with no compiled version at all.",
+            "default": false
+          },
+          "limit": {
+            "type": "integer",
+            "description": "How many results to return.",
+            "minimum": 1,
+            "maximum": 500,
+            "default": 50
+          },
+          "offset": {
+            "type": "integer",
+            "description": "How many results to skip, for paging.",
+            "default": 0
+          }
+        },
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "Total": {
+            "type": "integer",
+            "description": "How many assets matched in total, beyond this page."
+          },
+          "Showing": {
+            "type": "integer"
+          },
+          "Offset": {
+            "type": "integer"
+          },
+          "Assets": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "Path": {
+                  "type": "string"
+                },
+                "Type": {
+                  "type": "string"
+                }
+              },
+              "required": []
+            }
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "asset_thumbnail",
+      "title": "Asset Thumbnail",
+      "toolset": "asset",
+      "description": "Render an asset's preview thumbnail and return it as an image - see what a model, material or texture actually looks like.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Asset path, as returned by asset_search."
+          }
+        },
+        "required": [
+          "path"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "assign_material",
+      "title": "Assign Material",
+      "toolset": "bridge_material",
+      "description": "Apply a material to a GameObject by setting its ModelRenderer's MaterialOverride (overrides the whole model's material). Requires an existing ModelRenderer (assign_model first) and errors if the material path can't be loaded. Returns { assigned, id, material } â€” tweak values afterwards with set_material_property.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of the GameObject."
+          },
+          "material": {
+            "type": "string",
+            "description": "Material path (e.g. 'materials/walls/brick.vmat')."
+          },
+          "slot": {
+            "type": "number",
+            "description": "Material slot index. Defaults to 0 (first slot)."
+          }
+        },
+        "required": [
+          "id",
+          "material"
+        ]
+      }
+    },
+    {
+      "name": "assign_model",
+      "title": "Assign Model",
+      "toolset": "bridge_material",
+      "description": "Set a 3D model on a GameObject's ModelRenderer. Creates the renderer component if it doesn't exist; errors if the model path can't be loaded. Returns { assigned, id, model } â€” follow with assign_material / set_material_property to style it, or take a screenshot to verify.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of the GameObject."
+          },
+          "model": {
+            "type": "string",
+            "description": "Model path (e.g. 'models/citizen/citizen.vmdl', 'models/dev/box.vmdl')."
+          }
+        },
+        "required": [
+          "id",
+          "model"
+        ]
+      }
+    },
+    {
+      "name": "build_terrain_mesh",
+      "title": "Build Terrain Mesh",
+      "toolset": "bridge_world",
+      "description": "Build a standalone heightmap terrain mesh (a MeshComponent) from a hills/clearings JSON spec â€” independent of MapBuilder. Use when you don't have a MapBuilder component in the scene and want one-shot terrain. Returns `built`, `id` (the new GameObject's GUID), `name`, `vertices`, and `faces`; pass `id` to assign_material, set_transform, or delete_gameobject. Note: raycast_terrain cannot sample this mesh (it requires MapBuilder).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "size": {
+            "type": "number",
+            "description": "Total terrain size (world units, square).",
+            "default": 9600
+          },
+          "resolution": {
+            "type": "integer",
+            "description": "Grid resolution per side.",
+            "default": 64
+          },
+          "name": {
+            "type": "string",
+            "description": "Name for the created terrain GameObject. Default 'Generated Terrain'. Default: \"Generated Terrain\".",
+            "default": "Generated Terrain"
+          },
+          "hills": {
+            "description": "Hill bumps: array of {x, y, radius (default 500), height (default 100; negative = depression)}. Default: none. JSON array. Default: []."
+          },
+          "clearings": {
+            "description": "Zones flattened back toward height 0: array of {x, y, radius (default 300)}. Default: none. JSON array. Default: []."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "copy_asset_with_dependencies",
+      "title": "Copy Asset With Dependencies",
+      "toolset": "bridge_asset",
+      "description": "Copy a project asset and its full dependency closure (via Asset.GetReferences(deep:true)) into a target directory, preserving relative path structure so material references to textures keep resolving. SHADOW GUARD: refuses to write under core engine trees (models/citizen, models/dev, materials/dev, materials/default) -- copying there triggers an infinite asset-recompile loop (BRIDGE_GOTCHAS #5). Cloud/procedural/transient assets are skipped with a reason. Returns { copied:[{from,to}], skipped:[{path,reason}], count, note }.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "sourcePath": {
+            "type": "string",
+            "description": "Absolute path OR project-relative path of the source asset (e.g. 'models/props/crate.vmdl'). Use search_assets to find the exact path."
+          },
+          "targetDir": {
+            "type": "string",
+            "description": "Project-relative destination directory (e.g. 'Assets/library'). Defaults to 'Assets/library'."
+          },
+          "overwrite": {
+            "type": "boolean",
+            "description": "Overwrite existing files at the destination. Defaults to false."
+          }
+        },
+        "required": [
+          "sourcePath"
+        ]
+      }
+    },
+    {
+      "name": "create_material",
+      "title": "Create Material",
+      "toolset": "bridge_material",
+      "description": "Create a new material file (.vmat, KV1 format) with a shader and properties like color, roughness, metallic, texture. Errors if the file already exists; when no properties are given it writes sensible PBR defaults (g_flMetalness 0, g_flRoughness 1). Returns { created, path, shader, propertiesWritten } â€” pass the returned path to recompile_asset (so the editor compiles it) and then assign_material.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Relative path for the material (e.g. 'materials/walls/brick.vmat')."
+          },
+          "shader": {
+            "type": "string",
+            "description": "Shader to use. Defaults to 'shaders/complex.shader' (PBR)."
+          },
+          "properties": {
+            "description": "Material properties as key-value pairs (e.g. { \"Color\": \"#ff0000\", \"Roughness\": 0.8 }). JSON value."
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
+    },
+    {
+      "name": "hammer_asset_usage",
+      "title": "Asset Usage",
+      "toolset": "hammer",
+      "description": "Which assets the map uses and how heavily - mesh materials with how many faces, triangles and square units of surface they cover, models and other assets in entity keyvalues, and resources on game object components. Counts the map as placed: everything inside a prefab counts once per placement, nested prefabs included, so Nodes, Faces and Triangles track what gets drawn. With no asset, lists every asset sorted by 'sortBy'; give an asset to list where it's placed - inside a prefab, that's the prefab node placed in the map.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "asset": {
+            "type": "string",
+            "description": "An asset path to find users of. Empty summarises everything."
+          },
+          "sortBy": {
+            "type": "string",
+            "description": "Sort the summary by Nodes, Faces, Triangles or Area.",
+            "default": "Nodes"
+          },
+          "includePrefabs": {
+            "type": "boolean",
+            "description": "Count what's inside prefabs placed in the map, not just the map's own nodes.",
+            "default": true
+          },
+          "limit": {
+            "type": "integer",
+            "description": "How many entries to return.",
+            "minimum": 1,
+            "maximum": 1000,
+            "default": 200
+          }
+        },
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "hammer_assign_asset",
+      "title": "Assign Asset",
+      "toolset": "hammer",
+      "description": "Apply an asset to nodes the way dropping it onto them in Hammer does - a material paints every face of the meshes (or just the selected faces, in Faces mode), a model swaps a prop's model. Give node ids, or nothing to apply to the current selection. Selects the nodes it applied to. The user can undo this.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "asset": {
+            "type": "string",
+            "description": "The material or model asset path."
+          },
+          "ids": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "Node ids to apply to. Empty applies to the current selection."
+          }
+        },
+        "required": [
+          "asset"
+        ]
+      }
+    },
+    {
+      "name": "hammer_create_mesh",
+      "title": "Create Mesh",
+      "toolset": "hammer",
+      "description": "Build brush geometry from raw polygons - for shapes the primitives don't cover, like ramps, arches or custom trim. Faces index into the vertex list and are wound counter-clockwise seen from the side they face (the right-hand rule gives the outward normal). Vertices shared by faces get welded. The user can undo this. Returns the new mesh node.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "vertices": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "World space vertex positions, each 'x,y,z'."
+          },
+          "faces": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "Indices": {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  },
+                  "description": "Indices into the vertex list, counter-clockwise seen from the side the face points."
+                },
+                "Material": {
+                  "type": "string",
+                  "description": "This face's material. Empty uses the mesh's material."
+                }
+              },
+              "required": [
+                "Indices"
+              ]
+            },
+            "description": "The polygons, each at least 3 vertex indices."
+          },
+          "material": {
+            "type": "string",
+            "description": "Material for faces that don't set their own. Empty uses the material active in Hammer's material browser."
+          }
+        },
+        "required": [
+          "vertices",
+          "faces"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "Id": {
+            "type": "integer"
+          },
+          "Kind": {
+            "type": "string"
+          },
+          "Name": {
+            "type": "string"
+          },
+          "ClassName": {
+            "type": "string"
+          },
+          "Description": {
+            "type": "string"
+          },
+          "Position": {
+            "type": "string"
+          },
+          "Parent": {
+            "type": "integer"
+          },
+          "GameObject": {
+            "type": "string"
+          },
+          "Selected": {
+            "type": "boolean"
+          },
+          "Visible": {
+            "type": "boolean"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "hammer_create_primitive",
+      "title": "Create Primitive",
+      "toolset": "hammer",
+      "description": "Build brush geometry fitted to a box, like dragging out Hammer's block tool - a box by default, or any shape hammer_list_primitives lists (stairs, cylinder, sphere...). Rooms are boxes: floor, walls and ceiling, or a 'Hollow' box. The user can undo this. Returns the new mesh node.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "mins": {
+            "type": "string",
+            "description": "One corner of the bounds, as 'x,y,z'."
+          },
+          "maxs": {
+            "type": "string",
+            "description": "The opposite corner of the bounds, as 'x,y,z'."
+          },
+          "type": {
+            "type": "string",
+            "description": "The shape, by name from hammer_list_primitives - 'Box', 'Stairs', 'Cylinder'...",
+            "default": "Box"
+          },
+          "material": {
+            "type": "string",
+            "description": "Material for every face. Empty uses the material active in Hammer's material browser."
+          },
+          "options": {
+            "type": "object",
+            "description": "The shape's options as a json object, e.g. {\"NumberOfSteps\": 8} for stairs or {\"Options\": \"Hollow\"} for a room. hammer_list_primitives lists them."
+          }
+        },
+        "required": [
+          "mins",
+          "maxs"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "Id": {
+            "type": "integer"
+          },
+          "Kind": {
+            "type": "string"
+          },
+          "Name": {
+            "type": "string"
+          },
+          "ClassName": {
+            "type": "string"
+          },
+          "Description": {
+            "type": "string"
+          },
+          "Position": {
+            "type": "string"
+          },
+          "Parent": {
+            "type": "integer"
+          },
+          "GameObject": {
+            "type": "string"
+          },
+          "Selected": {
+            "type": "boolean"
+          },
+          "Visible": {
+            "type": "boolean"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "hammer_find_hidden_faces",
+      "title": "Find Hidden Faces",
+      "toolset": "hammer",
+      "description": "Find mesh faces nobody can see because they're buried inside or pressed flat against other geometry - the underside of a crate sitting on a floor, wall ends tucked into other walls. They still cost rendering and lightmap space. By default this only reports; set apply to paint them nodraw (or another material) in one undo step. A face counts as hidden only if every sample point on it is enclosed by opaque, non-tools mesh geometry, so partly covered faces are left alone. Meshes that aren't closed can fool it - check the result with hammer_focus_nodes and hammer_screenshot before applying on a map you care about.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "ids": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "Mesh node ids to check. Empty checks every mesh."
+          },
+          "apply": {
+            "type": "boolean",
+            "description": "Paint the hidden faces with 'material'. False only reports them.",
+            "default": false
+          },
+          "material": {
+            "type": "string",
+            "description": "The material to paint hidden faces with.",
+            "default": "materials/tools/toolsnodraw.vmat"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "How many meshes to list in the report.",
+            "minimum": 1,
+            "maximum": 1000,
+            "default": 100
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "hammer_get_node",
+      "title": "Get Node",
+      "toolset": "hammer",
+      "description": "Everything about one map node - transform, parent and children, and depending on its kind: an entity's class and every keyvalue, a mesh's face materials, a game object's id and components, or an instance's target.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The node id, from hammer_find_nodes or hammer_get_selection."
+          },
+          "includeComponentProperties": {
+            "type": "boolean",
+            "description": "Include the full serialized properties of a game object's components, not just their types.",
+            "default": false
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "Angles": {
+            "type": "string"
+          },
+          "Scale": {
+            "type": "string"
+          },
+          "ChildCount": {
+            "type": "integer"
+          },
+          "Children": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "Id": {
+                  "type": "integer"
+                },
+                "Kind": {
+                  "type": "string"
+                },
+                "Name": {
+                  "type": "string"
+                },
+                "ClassName": {
+                  "type": "string"
+                },
+                "Description": {
+                  "type": "string"
+                },
+                "Position": {
+                  "type": "string"
+                },
+                "Parent": {
+                  "type": "integer"
+                },
+                "GameObject": {
+                  "type": "string"
+                },
+                "Selected": {
+                  "type": "boolean"
+                },
+                "Visible": {
+                  "type": "boolean"
+                }
+              },
+              "required": []
+            }
+          },
+          "EntityClassTitle": {
+            "type": "string"
+          },
+          "KeyValues": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "Materials": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "Components": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "Type": {
+                  "type": "string"
+                },
+                "Id": {
+                  "type": "string"
+                },
+                "Enabled": {
+                  "type": "boolean"
+                },
+                "Properties": {}
+              },
+              "required": []
+            }
+          },
+          "Tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "InstanceTarget": {
+            "type": "integer"
+          },
+          "Id": {
+            "type": "integer"
+          },
+          "Kind": {
+            "type": "string"
+          },
+          "Name": {
+            "type": "string"
+          },
+          "ClassName": {
+            "type": "string"
+          },
+          "Description": {
+            "type": "string"
+          },
+          "Position": {
+            "type": "string"
+          },
+          "Parent": {
+            "type": "integer"
+          },
+          "GameObject": {
+            "type": "string"
+          },
+          "Selected": {
+            "type": "boolean"
+          },
+          "Visible": {
+            "type": "boolean"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "hammer_mesh_faces",
+      "title": "Mesh Faces",
+      "toolset": "hammer",
+      "description": "A mesh's individual faces - each one's index, material, normal, center, area and triangle count. Face indices are what hammer_set_face_material takes.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The mesh node id."
+          },
+          "includeVertices": {
+            "type": "boolean",
+            "description": "Include each face's corner positions.",
+            "default": false
+          },
+          "limit": {
+            "type": "integer",
+            "description": "How many faces to return.",
+            "minimum": 1,
+            "maximum": 5000,
+            "default": 500
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "hammer_mesh_stats",
+      "title": "Mesh Stats",
+      "toolset": "hammer",
+      "description": "Geometry cost of the map's meshes - per mesh its face and triangle count, size, and faces per material, heaviest first, plus map totals. Use it to find the meshes worth simplifying.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "ids": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "Mesh node ids to measure. Empty measures every mesh."
+          },
+          "sortBy": {
+            "type": "string",
+            "description": "Sort by Triangles, Faces or Size (bounding box volume).",
+            "default": "Triangles"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "How many meshes to list.",
+            "minimum": 1,
+            "maximum": 1000,
+            "default": 50
+          }
+        },
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "hammer_overlays_to_decals",
+      "title": "Overlays To Decals",
+      "toolset": "hammer",
+      "description": "Replace overlays with Decal game objects - both static overlays (kind Overlay) and info_overlay entities. Each overlay's material becomes a .decal asset (made once per material from its color, normal and roughness textures, reused if one already exists in the folder), and a game object with a Decal component goes on the surface the overlay covered, the same size and facing the same way. One undo step covers the whole swap. Set dryRun to see what would happen first.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "ids": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "Overlay node ids to convert. Empty converts every overlay in the map."
+          },
+          "decalFolder": {
+            "type": "string",
+            "description": "Folder in the project's assets for the generated .decal files.",
+            "default": "decals/overlays"
+          },
+          "keepOverlays": {
+            "type": "boolean",
+            "description": "Keep the overlays after creating the decals, instead of deleting them.",
+            "default": false
+          },
+          "dryRun": {
+            "type": "boolean",
+            "description": "Only report what would be converted - create and delete nothing.",
+            "default": false
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "hammer_replace_material",
+      "title": "Replace Material",
+      "toolset": "hammer",
+      "description": "Replace one material with another on every face in the map that uses it - retexture a whole map in one call. Leaves those faces selected in Faces mode so the user sees what changed. The user can undo this.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": "string",
+            "description": "The material to replace, e.g. 'materials/dev/reflectivity_30.vmat'. hammer_asset_usage lists the map's materials."
+          },
+          "to": {
+            "type": "string",
+            "description": "The material to use instead."
+          }
+        },
+        "required": [
+          "from",
+          "to"
+        ]
+      }
+    },
+    {
+      "name": "hammer_select",
+      "title": "Select",
+      "toolset": "hammer",
+      "description": "Change Hammer's selection - select nodes by id and/or everything using an asset, optionally switching selection mode first. Selecting is how you show the user what you mean, and some tools (hammer_run_command, hammer_assign_asset) act on the selection. Returns the new selection.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "ids": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "Node ids to select. Empty selects nothing by id."
+          },
+          "usingAsset": {
+            "type": "string",
+            "description": "Also select every node using this asset - a model or material path."
+          },
+          "add": {
+            "type": "boolean",
+            "description": "Add to the current selection instead of replacing it.",
+            "default": false
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "Groups",
+              "Objects",
+              "Meshes",
+              "Verticies",
+              "Edges",
+              "Faces",
+              "Nav",
+              "Tiles"
+            ],
+            "description": "Switch selection mode first - Groups, Objects or Meshes. Empty keeps the current mode."
+          }
+        },
+        "required": []
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "Mode": {
+            "type": "string"
+          },
+          "Pivot": {
+            "type": "string"
+          },
+          "Count": {
+            "type": "integer"
+          },
+          "Nodes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "Id": {
+                  "type": "integer"
+                },
+                "Kind": {
+                  "type": "string"
+                },
+                "Name": {
+                  "type": "string"
+                },
+                "ClassName": {
+                  "type": "string"
+                },
+                "Description": {
+                  "type": "string"
+                },
+                "Position": {
+                  "type": "string"
+                },
+                "Parent": {
+                  "type": "integer"
+                },
+                "GameObject": {
+                  "type": "string"
+                },
+                "Selected": {
+                  "type": "boolean"
+                },
+                "Visible": {
+                  "type": "boolean"
+                }
+              },
+              "required": []
+            }
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "hammer_set_face_material",
+      "title": "Set Face Material",
+      "toolset": "hammer",
+      "description": "Paint individual faces of a mesh with a material, by face index from hammer_mesh_faces. The user can undo this.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The mesh node id."
+          },
+          "faces": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "Face indices from hammer_mesh_faces."
+          },
+          "material": {
+            "type": "string",
+            "description": "The material to paint them with."
+          }
+        },
+        "required": [
+          "id",
+          "faces",
+          "material"
+        ]
+      }
+    },
+    {
+      "name": "hammer_status",
+      "title": "Status",
+      "toolset": "hammer",
+      "description": "Whether Hammer is open and what map it's editing - the map's asset path, unsaved changes, how many nodes of each kind it has, the selection mode and count, and the material active in Hammer's material browser. Start here before any other hammer_ tool. If Hammer isn't open, hammer_open_map opens a map in it.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "Open": {
+            "type": "boolean"
+          },
+          "MapOpen": {
+            "type": "boolean"
+          },
+          "Map": {
+            "type": "string"
+          },
+          "File": {
+            "type": "string"
+          },
+          "HasUnsavedChanges": {
+            "type": "boolean"
+          },
+          "NodeCounts": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer"
+            }
+          },
+          "SelectionMode": {
+            "type": "string"
+          },
+          "SelectedCount": {
+            "type": "integer"
+          },
+          "CurrentMaterial": {
+            "type": "string"
+          },
+          "ViewCount": {
+            "type": "integer"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "hammer_trace",
+      "title": "Trace Ray",
+      "toolset": "hammer",
+      "description": "Trace a ray through the open map and report the first node it hits, where, and the surface normal - find the floor under a point, check what's in front of the camera, or probe where to place something. Traces Hammer's own geometry, so it works before the map is compiled.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "type": "string",
+            "description": "Ray start as 'x,y,z'."
+          },
+          "to": {
+            "type": "string",
+            "description": "Ray end as 'x,y,z'."
+          },
+          "meshesOnly": {
+            "type": "boolean",
+            "description": "Only hit mesh geometry, ignoring entities and game objects.",
+            "default": false
+          },
+          "skipToolsMaterials": {
+            "type": "boolean",
+            "description": "Don't hit tools materials like clip or trigger.",
+            "default": false
+          },
+          "hitBackfaces": {
+            "type": "boolean",
+            "description": "Hit faces from behind too. A back face hit (the normal points along the ray) means the ray started inside something.",
+            "default": false
+          }
+        },
+        "required": [
+          "from",
+          "to"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "Hit": {
+            "type": "boolean"
+          },
+          "Position": {
+            "type": "string"
+          },
+          "Normal": {
+            "type": "string"
+          },
+          "Node": {
+            "type": "object",
+            "properties": {
+              "Id": {
+                "type": "integer"
+              },
+              "Kind": {
+                "type": "string"
+              },
+              "Name": {
+                "type": "string"
+              },
+              "ClassName": {
+                "type": "string"
+              },
+              "Description": {
+                "type": "string"
+              },
+              "Position": {
+                "type": "string"
+              },
+              "Parent": {
+                "type": "integer"
+              },
+              "GameObject": {
+                "type": "string"
+              },
+              "Selected": {
+                "type": "boolean"
+              },
+              "Visible": {
+                "type": "boolean"
+              }
+            },
+            "required": []
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "list_asset_library",
+      "title": "List Asset Library",
+      "toolset": "bridge_asset",
+      "description": "List assets visible to the editor's AssetSystem â€” project assets plus mounted engine/installed-package content (it does NOT query the remote sbox.game library; use install_asset to pull in new packages). Returns { count, assets:[{ name, path, relativePath, assetType }] } â€” pass a returned path to spawn_model, assign_model, or get_asset_info.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Search term, case-insensitive substring match against asset NAMES."
+          },
+          "type": {
+            "type": "string",
+            "description": "Asset type filter, substring-matched against the asset's type (e.g. 'model', 'material', 'sound')."
+          },
+          "maxResults": {
+            "type": "number",
+            "description": "Maximum results. Defaults to 200."
+          }
+        },
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "perf_rendering",
+      "title": "Rendering",
+      "toolset": "perf",
+      "description": "Rendering detail for the last frame: which renderer drew it, resolution and AA, the rendering issues the dev tools flags (draw calls, batching, texture pool), every scene system counter (draws, triangles, batches, material changes, culling, lights and shadows, texture pool, device report), the managed renderer's phases and draws when it rendered, and the active camera's post-processing layers.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "recompile_asset",
+      "title": "Recompile Asset",
+      "toolset": "bridge_asset",
+      "description": "Compile a project asset by path â€” registers it with the editor's AssetSystem then compiles it (e.g. .vmat â†’ .vmat_c). Use after writing/editing an asset with write_file so the change takes effect without a manual editor step. Verified on materials. NOTE: the engine exposes no reachable particle (.vpcf) compiler, so this can't compile particles â€” author those in s&box's particle editor, then spawn_vpcf plays them.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Asset path â€” project-relative (e.g. 'materials/foo.vmat') or absolute."
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
+    },
+    {
+      "name": "search_assets",
+      "title": "Search Assets",
+      "toolset": "bridge_asset",
+      "description": "Search for assets in the project by name, type, or keyword. Returns models, materials, sounds, textures, prefabs, etc.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Search term to match against asset name or path."
+          },
+          "type": {
+            "type": "string",
+            "description": "Asset type filter (e.g. 'model', 'material', 'sound', 'texture', 'prefab')."
+          },
+          "maxResults": {
+            "type": "number",
+            "description": "Maximum results to return. Defaults to 50."
+          }
+        },
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "set_material_property",
+      "title": "Set Material Property",
+      "toolset": "bridge_material",
+      "description": "Change a property on the material assigned to a GameObject â€” color, roughness, metallic, texture, etc. Operates on the ModelRenderer's MaterialOverride; if none is assigned it auto-creates one from the default complex shader (no separate assign_material step needed). Returns { set, id, property, autoCreatedMaterial } â€” screenshot to verify the visual change.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of the GameObject."
+          },
+          "property": {
+            "type": "string",
+            "description": "Material property name (e.g. 'Color', 'Roughness', 'Metalness', 'Normal')."
+          },
+          "value": {
+            "description": "Property value â€” number for floats, string for texture paths/colors, {r,g,b,a} for colors. JSON value."
+          }
+        },
+        "required": [
+          "id",
+          "property",
+          "value"
+        ]
+      }
+    },
+    {
+      "name": "set_property",
+      "title": "Set Property",
+      "toolset": "bridge_component",
+      "description": "Set a property value on a component (editor mode), and PERSIST it (survives save+reload). Handles primitives, enums, value types (Color/Vector3 as comma strings), AND references: pass an asset PATH for Model/Material/Texture/SoundEvent props, or a GameObject GUID for GameObject/Component-typed props (resolved like set_component_reference). Returns success=false with a clear error if a path/GUID can't be resolved (no more silent null). For wiring object refs prefer set_component_reference; for prefab refs use set_prefab_ref.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of the GameObject."
+          },
+          "component": {
+            "type": "string",
+            "description": "Component type name."
+          },
+          "property": {
+            "type": "string",
+            "description": "Property name to set."
+          },
+          "value": {
+            "description": "New value. Primitive: '5', 'true'. Color/Vector3: a comma string ('1,0,0,1' / '0,0,200'), an array ([0,0,200]), or an object ({r,g,b,a} / {x,y,z}). Enum: the member name. Asset ref (Model/Material/...): the asset path e.g. 'models/dev/box.vmdl'. GameObject/Component ref: the target GameObject's GUID. Empty/'null' clears the property. JSON value."
+          }
+        },
+        "required": [
+          "id",
+          "component",
+          "property",
+          "value"
+        ]
+      }
+    },
+    {
+      "name": "set_skybox",
+      "title": "Set Skybox",
+      "toolset": "bridge_visuals",
+      "description": "Set the scene's 2D skybox tint / indirect lighting (re-uses an existing SkyBox2D or creates one). Darken the tint for night/dusk. Optionally point it at a .vmat sky material (silently kept as-is if the material fails to load). Returns { created, gameObject } â€” gameObject.id is the sky object; screenshot to verify the change.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "tint": {
+            "type": "string",
+            "description": "Sky tint colour. As \"r,g,b[,a]\" (0-1 floats)."
+          },
+          "indirectLighting": {
+            "type": "boolean",
+            "description": "Whether the sky contributes indirect/ambient light."
+          },
+          "material": {
+            "type": "string",
+            "description": "Path to a .vmat sky material (optional)."
+          },
+          "name": {
+            "type": "string",
+            "description": "Name for the sky GameObject if one is created."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "spawn_model",
+      "title": "Spawn Model",
+      "toolset": "scene",
+      "description": "Create a game object with a ModelRenderer in one call - the fastest way to put a model in the scene. Optionally tint it, override its material, scale it and parent it. The user can undo this. Returns the new object's id.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "model": {
+            "type": "string",
+            "description": "Model asset path, e.g. 'models/dev/box.vmdl'."
+          },
+          "name": {
+            "type": "string",
+            "description": "The new object's name. Empty uses the model filename."
+          },
+          "position": {
+            "type": "string",
+            "description": "World position as 'x,y,z'."
+          },
+          "angles": {
+            "type": "string",
+            "description": "Rotation as 'pitch,yaw,roll'."
+          },
+          "scale": {
+            "type": "string",
+            "description": "Scale as 'x,y,z', or a single number for uniform."
+          },
+          "tint": {
+            "type": "string",
+            "description": "Tint color as 'r,g,b,a' (0-1 floats) or '#rrggbb'."
+          },
+          "material": {
+            "type": "string",
+            "description": "Material asset path to override every surface with."
+          },
+          "parent": {
+            "type": "string",
+            "description": "Parent game object id. Empty parents to the scene root."
+          }
+        },
+        "required": [
+          "model"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "Id": {
+            "type": "string"
+          },
+          "Name": {
+            "type": "string"
+          }
+        },
+        "required": []
+      }
+    }
+  ],
+  "total": 402
+}

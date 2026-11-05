@@ -19,9 +19,9 @@
   docstring has the reasoning, and `Walk` every figure:
   - One stride of 26 frames on the citizen's own upright posture: 70 u/s at ~138 steps a minute, 0.77 m steps, a
     person's brisk walk. A Walker plays it at 1x.
-  - The upper body: the pelvis turns, lists and tilts, the chest turns against it and leans 4 degrees, and the head
-    holds its gaze. The arms hang just clear of the sides and swing 15 degrees each way opposite the legs, the elbows
-    bent 18 degrees and more as the arm comes forward, with relaxed hands.
+  - The upper body: the pelvis turns, lists and tilts, the chest turns against it, and the head holds its gaze.
+    The arms hang just clear of the sides, opposite the legs, with relaxed hands. The upper-body tuning was
+    revised on 2026-11-04 (below).
   - The legs follow a person's gait curves at a brisk pace (Winter's and Perry's knee, thigh and heel-rise angles:
     `STANCE_KNEE`, `HEEL_RISE`, `SWING_KNEE`, `SWING_THIGH`). Each foot lands heel first with the toes 15 degrees up,
     rolls flat, lifts its heel about the ball and leaves over the toes' tips, pitched ~70 degrees. The feet are 6"
@@ -93,4 +93,25 @@
 - The attacks start part-way in, so the swing's furthest reach (`ZombieClip.Hit`) lands at `AttackWindup`.
   `SwingCount` is synced, so every client picks the same attack.
 - Headshots go by the driver's head bone height (bullets stop on the capsule), not the renderer bounds.
+
+### Zombie shamble (2026-11-04)
+- The intended character is explicitly zombie-like. `Tools/zombie_walk.py` replaces the even human gait with
+  54/46 step timing and a lower right-foot recovery (48-degree knee curve, 0.2-unit clearance target, versus
+  60 degrees and 0.4 for the left). The 26-frame loop and authored 70 u/s ground speed stay the same.
+- The torso slumps forward (measured pelvis-to-neck lean averages 13.36 degrees), one shoulder drops, and the head
+  bows. The left arm reaches weakly while the right hangs, with different elbow bends and little rhythmic pumping.
+  Relaxed hands and the narrow stance avoid the old raised claws and wide crouched waddle.
+- `ZombieAI` follows its actual path direction outside attack range instead of facing the player while moving
+  sideways around corners. Within attack range and during swings it still faces the player.
+- Playback follows separately smoothed ground speed, so turning does not cancel velocity vectors and slow the feet.
+  Removing the minimum playback rate lets a blocked or slowing zombie stop stepping. Spawn/teleport samples cannot
+  create phantom motion, smoothing is consistent across frame rates, and idle/attack interruptions preserve stride phase.
+- Rebuild only the walk: `rtk python Tools/zombie_walk.py --citizen-data Sources/Zombies/zombie_male_02/work/citizen_data.txt --write`.
+  This preserves the other clips and the existing ModelDoc. Full native compile of `zombie_driver.vmdl` succeeded.
+- Native isolated-scene captures cover all three zombie bodies. Seventeen engine behavior checks cover start/stop,
+  corners, slow movement, vertical movement, teleport reset, run cadence, stride resumption, attack timing, and
+  30/60/144 fps. Loop closure, finite transforms, valid rotations, asymmetric arm reach and deterministic DMX
+  generation passed. The lowest swinging sole stays 0.22 units above the floor on the left and 0.10 on the right.
+  Front/side captures, an animated comparison, and results are in `output/zombie-walk-20261104/`. The open Riverside scene and
+  play state were preserved. A live-match check is still outstanding.
 

@@ -88,6 +88,7 @@ public sealed class TeamSpawnAssigner : Component,
 		}
 
 		var bestScore = float.NegativeInfinity;
+		var bestOccupied = true;
 		SpawnPointInfo bestSpawn = default;
 		var found = false;
 		foreach ( var spawn in spawns )
@@ -106,15 +107,19 @@ public sealed class TeamSpawnAssigner : Component,
 					.Run().Hit;
 			} );
 
-			// Prefer distance and cover. A crowded spawn is the last resort.
+			// Occupancy is a strict priority: a distant occupied spawn must never
+			// outscore a free one just because the free spawn is close to an enemy.
+			var occupied = nearestOccupant < 96f;
 			var score = MathF.Min( nearestEnemy, 6000f )
 				- (nearestEnemy < 1200f ? 6000f : 0f)
-				- (visibleToEnemy ? 3000f : 0f)
-				- (nearestOccupant < 96f ? 10000f : 0f);
-			if ( score <= bestScore )
+				- (visibleToEnemy ? 3000f : 0f);
+			if ( found && occupied && !bestOccupied )
+				continue;
+			if ( found && occupied == bestOccupied && score <= bestScore )
 				continue;
 
 			bestScore = score;
+			bestOccupied = occupied;
 			bestSpawn = spawn;
 			found = true;
 		}

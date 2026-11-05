@@ -10,9 +10,69 @@ This file is kept short on purpose. The full notes that used to live here (~900 
 - No lambdas inside explicit `IGameEventHandler<T>` methods.
 - Editor tools can't use a type that is new to game code in the same hotload.
 - Graphics upgrade work: one change at a time on a branch, shown to the user and approved before it is kept.
+- Model upgrade priority: choose props visible at player eye level on main routes or frequently used interaction points. Avoid spending upgrades on hidden rooftop/background details unless requested (user preference, 2026-11-04).
+- Model upgrades: check existing approved models and pending review candidates before building a replacement and reuse suitable ones. Prioritize substantial rebuilds of crude assets; small detail passes were insufficient. Orion uses the existing dark Collider chair, not a pale duplicate (2026-11-04).
+- Prioritize model upgrades players can see up close during normal play; avoid inaccessible roofs and similar details (user request, 2026-11-04).
+- Always show both before and after images for model and graphics improvements, with matching camera, framing and lighting. Include both images directly in the review response.
 - Keep this file small. Add new long notes as a new file in `docs/notes/` and a line in the index below.
 
 ## Index of docs/notes
+
+- [Sprays and personal loading screens (code only, 2026-11-05)](docs/notes/sprays-and-loading-screens-20261105.md)
+
+- [Grenade release clearance (code only, 2026-11-04)](docs/notes/grenade-release-clearance-20261104.md)
+
+- [Radial blast impulse falloff (code only, 2026-11-04)](docs/notes/radial-blast-impulse-20261104.md)
+
+- [Riverside west-yard privacy fence (close-range rebuild in review, 2026-11-04)](docs/notes/riverside-yard-fence-v1-20261104.md)
+- [Riverside Lucky Stop timber entrance steps (approved installation, 2026-11-04)](docs/notes/riverside-store-timber-steps-v1-20261104.md)
+
+- [Riverdale sand bin v3 (structural realism rebuild; staged review, 2026-11-04)](docs/notes/riverdale-sand-bin-v3-20261104.md)
+
+- [Riverdale sand bin v2 (realism revision; staged, 2026-11-04)](docs/notes/riverdale-sand-bin-v2-20261104.md)
+
+- [Belltower market cross installed; well frame review (2026-11-04)](docs/notes/belltower-cross-installed-well-frame-review-20261104.md)
+
+- [Riverside interior drinks fridges (three installed; originals deleted, 2026-11-04)](docs/notes/riverside-interior-fridges-v1-review-20261104.md)
+- [Riverside guard-tower corrugated roof v1 (installed; original removed, 2026-11-04)](docs/notes/riverside-tower-roof-v1-review-20261104.md)
+- [Riverside STILL HERE plank board v1 (installed; old board removed, 2026-11-04)](docs/notes/riverside-still-here-board-v1-review-20261104.md)
+
+- [Riverdale sand bin (new model after existing-upgrade audit; staged review, 2026-11-04)](docs/notes/riverdale-sand-bin-v1-20261104.md)
+
+- [Reef Hall close-range display pedestal (installed; old geometry deleted, 2026-11-04)](docs/notes/reefhall-display-pedestal-v1-20261104.md)
+- [Reef Hall display coral (rejected; original retained, 2026-11-04)](docs/notes/reefhall-display-coral-v1-20261104.md)
+- [Riverside close-range T2 sliding-window frame (review candidate, 2026-11-04)](docs/notes/riverside-sliding-window-v1-20261104.md)
+
+- [Riverdale shared cone (existing approved asset reused; review) and reel installation, 2026-11-04](docs/notes/riverdale-shared-cone-v1-20261104.md)
+
+- [Riverdale shared cable reel (existing approved model reused; staged review, 2026-11-04)](docs/notes/riverdale-shared-reel-v1-20261104.md)
+
+- [Belltower suspended lamps installed; bakery sack review (2026-11-04)](docs/notes/belltower-suspended-lamps-and-sacks-20261104.md)
+
+- [Sewage maintenance tunnel gates v1 (new model review, 2026-11-04)](docs/notes/sewage-tunnel-gates-v1-20261104.md)
+
+- [Belltower wall lantern v2 (24 installed; original asset retained, 2026-11-04)](docs/notes/belltower-wall-lantern-v2-review-20261104.md)
+
+- [Sewage caged work lamps v1 (existing staged model reused, 2026-11-04)](docs/notes/sewage-work-lamps-v1-reuse-20261104.md)
+
+- [Belltower cafe table v2 (all seven installed, 2026-11-04)](docs/notes/belltower-bistro-table-v2-review-20261104.md)
+
+- [Belltower bistro chairs v2 (all 21 installed, 2026-11-04)](docs/notes/belltower-bistro-chairs-v2-20261104.md)
+
+- [Sewage main stair treads v1 (model review, 2026-11-04)](docs/notes/sewage-stair-treads-v1-20261104.md)
+
+- [Belltower menu boards v2 (six installed; old geometry deleted, 2026-11-04)](docs/notes/belltower-menu-boards-v2-20261104.md)
+
+- [Sewage warning sign v1 (model review, 2026-11-04)](docs/notes/sewage-warning-sign-v1-20261104.md)
+
+- [Ares storage lockers v1 (all fourteen installed, 2026-11-04)](docs/notes/ares-lockers-v1-20261104.md)
+- [Railhead brick pallet v1 (east-yard replacement installed, 2026-11-04)](docs/notes/railhead-brick-pallet-v1-review-20261104.md)
+- [ReefHall circulation pump v1 (filter-room replacement installed, 2026-11-04)](docs/notes/reefhall-circulation-pump-v1-review-20261104.md)
+- [Railhead smoking-area ashtrays v1 (all four installed; old geometry and preview removed, 2026-11-04)](docs/notes/railhead-ashtray-v1-review-20261104.md)
+- [ReefHall sealed wall light v1 (installed; old mesh and preview removed, 2026-11-04)](docs/notes/reefhall-wall-light-v1-review-20261104.md)
+- [Railhead taxi-rank sign v1 (review candidate; existing upgrades audited first, 2026-11-04)](docs/notes/railhead-taxi-post-v1-review-20261104.md)
+
+- [Belltower terracotta pots v2 (all twelve installed, 2026-11-04)](docs/notes/belltower-terracotta-pots-v2-20261104.md)
 - [Preamble](docs/notes/00-preamble.md) (0 KB)
 - [Editor connection](docs/notes/001-editor-connection.md) (0 KB)
 - [Shared camera look (2026-10-17)](docs/notes/002-shared-camera-look-2026-10-17.md) (2 KB)
@@ -219,3 +279,59 @@ This file is kept short on purpose. The full notes that used to live here (~900 
 - [Riverside lawn chairs v2 (all 4, 2026-11-03)](docs/notes/196-riverside-lawn-chairs-v2.md) (1 KB)
 - [Zombie in the open shirt (`zombie_male_02`, a third zombie body, random body per zombie, 2026-11-03)](docs/notes/197-zombie-male-02-meshy-scan-on-the-citizen-skeleton-tools-zombie-male-02-py.md) (4 KB)
 - [Crosshair settings preview (`CrosshairPreview`, 2026-10-27)](docs/notes/151-crosshair-settings-preview-crosshairpreview-2026-10-27.md) (1 KB)
+- [Spillway's yard hose v2 (`hose_coil_v2`, 2026-11-03)](docs/notes/197-spillway-yard-hose-v2.md) (2 KB)
+- [Spillway's turbine wall vent v2 (`wall_vent_v2`, installed 2026-11-04)](docs/notes/198-spillway-wall-vent-v2.md) (2 KB)
+
+- [Riverside supply crates v2 (all 12, 2026-11-04)](docs/notes/riverside-supply-crates-v2-20261104.md) (2 KB)
+
+- [Riverside sandbags v2 (54 installed, 2026-11-04)](docs/notes/riverside-sandbags-v2-review-20261104.md) (1 KB)
+- [Riverside speed-limit sign v2 (installed, 2026-11-04)](docs/notes/riverside-speed-sign-v2-review-20261104.md) (1 KB)
+- [Riverside porch bulkhead lamp v2 (26 installed; old material deleted, 2026-11-04)](docs/notes/riverside-porch-light-v2-review-20261104.md) (2 KB)
+- [Riverside cobra-head streetlight v2 (all four installed, 2026-11-04)](docs/notes/riverside-street-lamp-v2-review-20261104.md) (1 KB)
+- [Riverside glazed pole insulator v2 (48 installed; old cylinders removed, 2026-11-04)](docs/notes/riverside-pole-insulator-v2-review-20261104.md) (2 KB)
+- [Riverside porch drinks fridge v1 (installed, 2026-11-04)](docs/notes/riverside-drinks-fridge-v1-20261104.md) (2 KB)
+- [Railhead east-yard cable reel v1 (installed, original wood finish, 2026-11-04)](docs/notes/railhead-cable-drum-v1-20261104.md) (2 KB)
+- [Belltower beer-garden picnic tables v1 (all ten installed, old geometry removed, 2026-11-04)](docs/notes/belltower-picnic-tables-v1-20261104.md) (2 KB)
+- [Riverside ice cabinet v1 (installed, 2026-11-04)](docs/notes/riverside-ice-cabinet-v1-20261104.md)
+- [Riverside discarded tyres v1 (12 installed, 2026-11-04)](docs/notes/riverside-discarded-tyres-v1-20261104.md)
+- [Spillway trench grates v1 (5 installed, 2026-11-04)](docs/notes/spillway-trench-grates-v1-20261104.md)
+- [Spillway rooftop extractor fans v1 (7 installed, old assets retained by request, 2026-11-04)](docs/notes/spillway-roof-fans-v1-review-20261104.md)
+- [Boxyard pipe stacks v1 (both installed, 2026-11-04)](docs/notes/boxyard-pipe-stacks-v1-20261104.md)
+- [Boxyard gantry crane rebuild (all three installed; old geometry deleted, 2026-11-04)](docs/notes/boxyard-gantry-crane-v1-review-20261104.md)
+- [Sewage crane blocks v1 (both installed, 2026-11-04)](docs/notes/sewage-crane-blocks-v1-20261104.md)
+- [Sewage salvage drums v1 (all six installed, 2026-11-04)](docs/notes/sewage-salvage-drums-v1-20261104.md)
+- [Orion yard lamp v1 (installed, 2026-11-04)](docs/notes/orion-yard-lamp-v1-20261104.md)
+- [Orion shared dark operator chairs (all six installed; duplicate deleted, 2026-11-04)](docs/notes/orion-shared-operator-chairs-20261104.md)
+- [Orion launch vehicle rebuild (installed, old version removed, 2026-11-04)](docs/notes/orion-launch-vehicle-v1-review-20261104.md)
+- [Orion radome (keep original in use; retain rebuild as unused alternative, 2026-11-04)](docs/notes/orion-radome-v1-review-20261104.md)
+- [Orion close-range yard case (keep both; original active, upgraded alternative retained, 2026-11-04)](docs/notes/orion-yard-case-reuse-v1-20261104.md)
+- [Reef Hall bronze entrance planter v1 (2 installed, 2026-11-04)](docs/notes/reefhall-bronze-planter-v1-20261104.md)
+- [Reef Hall upper-office workstation v1 (installed, old asset retained by request, 2026-11-04)](docs/notes/reefhall-office-desk-v1-review-20261104.md)
+- [Boxyard southwest pallet stack (rejected; keep original texture active, 2026-11-04)](docs/notes/boxyard-pallet-stack-v1-review-20261104.md)
+- [Orion launch-platform cage lights (review candidate, original materials retained, 2026-11-04)](docs/notes/orion-mount-lamps-v1-review-20261104.md)
+- [Riverside cash register v1 (installed, 2026-11-04)](docs/notes/riverside-register-v1-20261104.md)
+- [Riverside camper rebuild (installed; old version deleted, 2026-11-04)](docs/notes/riverside-camper-v2-review-20261104.md)
+- [Riverside office rooftop AC v1 (installed, 2026-11-04)](docs/notes/riverside-roof-ac-v1-review-20261104.md)
+- [Lucky Stop fluorescent fixture v1 (both installed; old fixtures deleted, 2026-11-04)](docs/notes/riverside-fluorescent-v1-review-20261104.md)
+- [Riverside T2 rooftop TV aerial v1 (installed; old aerial deleted, 2026-11-04)](docs/notes/riverside-tv-aerial-v1-review-20261104.md)
+- [Riverside T2 trailer hitch v1 (installed; old hitch deleted, 2026-11-04)](docs/notes/riverside-trailer-hitch-v1-review-20261104.md)
+- [Riverside water-tower tank A (installed; rejected B entirely deleted, 2026-11-04)](docs/notes/riverside-water-tank-v1-review-20261104.md)
+- [Riverside guard-tower ladder v1 (installed; old wood/steel variants preserved for reuse, 2026-11-04)](docs/notes/riverside-tower-ladder-v1-review-20261104.md)
+- [Riverside checkout counter v1 (installed; old version deleted, 2026-11-04)](docs/notes/riverside-counter-v1-20261104.md)
+- [Riverside grocery shelving v1 (installed; old version deleted, 2026-11-04)](docs/notes/riverside-shelving-v1-20261104.md)
+
+- [Riverside entrance gate v1 (rejected; original retained, 2026-11-04)](docs/notes/riverside-entrance-gate-v1-review-20261104.md)
+
+- [Riverside trailer entry door v1 (T2 installed; old panel removed, 2026-11-04)](docs/notes/riverside-trailer-door-v1-review-20261104.md)
+- [Lucky Stop roof sign v1 (installed; lighting toned down; old sign deleted, 2026-11-04)](docs/notes/riverside-shop-sign-v1-20261104.md)
+
+- [Riverside passive roof vent v1 (T2 installed; old box deleted, 2026-11-04)](docs/notes/riverside-roof-vent-v1-review-20261104.md)
+
+- [Riverside T2 precast entry unit v1 (weathered version installed; old boxes deleted, 2026-11-04)](docs/notes/riverside-t2-precast-entry-v1-review-20261104.md)
+
+- [Riverside L1 roof ladder v1 (installed; original retained for reuse, 2026-11-04)](docs/notes/riverside-roof-ladder-v1-review-20261104.md)
+
+- [Riverside shed downlight (approved bulkhead reused; installed, 2026-11-04)](docs/notes/riverside-shed-downlight-reuse-v1-20261104.md)
+
+- [Riverside folded blue tarp v1 (installed; original retained, 2026-11-04)](docs/notes/riverside-folded-tarp-v1-review-20261104.md)
+

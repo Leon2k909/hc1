@@ -1,4 +1,13 @@
 ## Bullet traces (`Shootable.DoTraceBullet`)
+- Close-cover bore clearance (2026-11-04, file-only implementation): `Shootable.Clearance.cs` probes a line
+  `SightHeight` inches below the sight ray for the first 48 units (or weapon range if shorter). Solid cover there
+  moves that shot's origin to the bore; its direction stays unchanged and the full trace still uses ordinary
+  penetration, damage and impact handling. Bodies do not count as cover. Open shots retain sight alignment.
+  This is a close-cover approximation, not a simulation of the animated barrel or full mechanical offset at all
+  distances. `BulletDrop` modes skip it because their ballistic path already starts below the sights. Zero or
+  invalid sight heights skip it. All 32 current firearm prefabs have positive sight heights.
+  `rtk dotnet run --project Tools/MuzzleClearanceChecks/MuzzleClearanceChecks.csproj` passed 18 checks using
+  the production clearance method and engine seams. No editor connection or in-game verification was performed.
 - A bullet is a line through the world: walls, floors and props stop it only where its line meets them. Bodies
   (players' and bots' hitboxes, zombies' capsules: `IsBody`) are found with a box of `max(BulletSize*1.75, 14)` units
   (±7 in; the M700's is ±28 in), so near misses still hit them. The box counts only where it touches a body in the open:

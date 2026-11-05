@@ -1,0 +1,23 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var folder=System.IO.Path.Combine(root,"output/riverside/searchlight-v1");
+var source=System.IO.Path.GetFullPath(System.IO.Path.Combine(root,"Assets/models/maps/riverside/searchlight-v1"));
+var archive=System.IO.Path.Combine(folder,"retired-before");
+var expected=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"preview-plan.json")))["files"].AsObject();
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+var files=System.IO.Directory.GetFiles(source,"before.*");
+if(files.Length==0)throw new InvalidOperationException("Already retired; inspect retirement receipt");
+foreach(var path in files) {
+ var rel=System.IO.Path.GetRelativePath(root,path).Replace('\\','/');
+ if(expected.TryGetPropertyValue(rel,out var sha)&&Hash(path)!=sha.GetValue<string>())throw new InvalidOperationException("Comparison changed: "+rel);
+ if(System.IO.File.Exists(System.IO.Path.Combine(archive,System.IO.Path.GetFileName(path))))throw new InvalidOperationException("Archive already exists");
+}
+System.IO.Directory.CreateDirectory(archive);
+var receipt=new System.Collections.Generic.Dictionary<string,object>();
+foreach(var path in files) {
+ var rel=System.IO.Path.GetRelativePath(root,path).Replace('\\','/');
+ var target=System.IO.Path.Combine(archive,System.IO.Path.GetFileName(path));
+ var hash=Hash(path);System.IO.File.Move(path,target);
+ receipt[rel]=new{Archive=System.IO.Path.GetRelativePath(root,target).Replace('\\','/'),Sha256=hash};
+}
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"retirement.json"),System.Text.Json.JsonSerializer.Serialize(receipt,new System.Text.Json.JsonSerializerOptions{WriteIndented=true}));
+return new{Retired=receipt.Keys,NewSearchlightKept=true,PublicMapChanged=false};

@@ -104,21 +104,26 @@ for k in range(5):
         knot_rings = np.where(here & (dk < kr * 1.3), 0.5 + 0.5 * np.sin(dk * 34.0), knot_rings)
 
 # Grain runs along Y. Each plank is cut from a different part of the tree.
-gp = np.stack((X * 3.6 + index * 17.3, Y * 0.06 + index * 31.7, zw * 1.7 + index * 53.1), -1)[cover]
+gp = np.stack((X * 3.6 + index * 17.3, Y * 0.13 + index * 31.7, zw * 2.1 + index * 53.1), -1)[cover]
 grain = field(noise(gp, 1.0, 31, 4))
 # About five texels a line: any finer and it aliases into stripes.
 lines = 0.5 + 0.5 * np.sin(grain * 30.0)
 tight = 0.5 + 0.5 * np.sin(field(noise(gp * np.array((1, 1, 2.2), np.float32), 1.0, 33, 3)) * 44.0)
 saw = field(noise(np.stack((X * 2, Y * 1.9, Z * 0.2), -1)[cover], 1.0, 34, 2))
+fibres = field(noise(np.stack((X * 2.0 + index * 13.1, Y * 0.72, zw * 5.8), -1)[cover], 1.0, 46, 3))
+pores = smooth(0.63, 0.78, fibres) * smooth(0.28, 0.7, fine + (mid - 0.5) * 0.3)
 
-heart = mix(flat((116, 92, 68)), flat((56, 42, 30)), np.clip(lines * 0.6 + tight * 0.14 + (mid - 0.5) * 0.4 + (big - 0.5) * 0.3, 0, 1))
+heart = mix(flat((112, 86, 60)), flat((64, 46, 30)), np.clip(lines * 0.36 + tight * 0.20 + mid * 0.24 + big * 0.16, 0, 1))
 tone = np.array([1.0, 0.8, 1.12, 0.9, 1.04], np.float32)[index]
 heart = heart * tone[..., None]
 heart = mix(heart, flat((30, 21, 15)), np.clip(knot_dark * (0.72 + 0.28 * knot_rings), 0, 1))
 
 # The stain has gone, and the wood gone grey, wherever weather reached it. It's deepest low on each plank's sun side.
 fade = smooth(0.22, 0.66, big * 0.5 + mid * 0.5 + (lines - 0.5) * 0.16 + (Z / 40.0) * 0.14)
-wood = mix(heart, flat((128, 120, 106)) * (0.7 + 0.4 * lines[..., None]), fade * 0.72)
+wood = mix(heart, flat((128, 120, 106)) * (0.84 + 0.18 * mid[..., None]), fade * 0.60)
+# Short pores and torn fibres add scale without the old long, blurry bands. They follow the knot-warped grain.
+wood = mix(wood, flat((48, 34, 23)), pores * 0.42)
+wood *= 0.97 + 0.06 * saw[..., None]
 # Wet patches from the rails above, and a darker skirt round each plank's end grain.
 ends = smooth(24.5, 27.9, np.abs(Y))
 wood = wood * (1 - ends[..., None] * 0.34)
@@ -131,8 +136,9 @@ crack = smooth(0.016, 0.0, np.abs(split - 0.5)) * smooth(0.46, 0.66, big + ends 
 crack = ndi.gaussian_filter(crack, 0.6)
 wood = wood * (1 - crack[..., None] * 0.78)
 
-t_rough = 0.72 + 0.1 * lines + 0.08 * fade - 0.1 * knot_dark
-t_height = 0.02 * (grain - 0.5) + 0.012 * (lines - 0.5) + 0.004 * (saw - 0.5) + 0.0012 * (micro - 0.5) - crack * 0.03 + knot_dark * 0.008
+t_rough = 0.73 + 0.06 * lines + 0.08 * fade + 0.08 * pores - 0.1 * knot_dark
+t_height = (0.008 * (grain - 0.5) + 0.005 * (lines - 0.5) + 0.006 * (saw - 0.5)
+            + 0.004 * (fibres - 0.5) - pores * 0.009 + 0.0012 * (micro - 0.5) - crack * 0.03 + knot_dark * 0.008)
 
 # Rust weeps down from every bolt and standoff plate.
 front = timber & (nor[..., 0] > 0.6)
@@ -162,8 +168,8 @@ wood = mix(wood, flat((150, 130, 104)), (rub * scrape * 0.42)[..., None] * front
 t_rough = t_rough - rub * scrape * 0.16
 
 # Stencils, sprayed in one pass across the top and bottom planks. +Y is a player's right, so they read left to right.
-art_top = ndi.gaussian_filter(stencil_image(["ARMS ISSUE"], (1100, 170), bridge=True), 1.3)
-art_low = ndi.gaussian_filter(stencil_image(["CLEAR BEFORE RACKING"], (1400, 110), bridge=True), 1.0)
+art_top = ndi.gaussian_filter(stencil_image(["ARMS ISSUE"], (1100, 170), bridge=False), 0.55)
+art_low = ndi.gaussian_filter(stencil_image(["CLEAR BEFORE RACKING"], (1400, 110), bridge=False), 0.45)
 top_mask = sample_image(art_top, np.clip((Y + 15.5) / 31.0, -1, 2), np.clip((Z - 11.95) / 4.8, -1, 2))
 low_mask = sample_image(art_low, np.clip((Y + 15.5) / 31.0, -1, 2), np.clip((Z + 16.05) / 2.45, -1, 2))
 top_mask = top_mask * (index == 4)

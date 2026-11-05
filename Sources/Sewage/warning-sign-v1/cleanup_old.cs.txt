@@ -1,0 +1,23 @@
+var project=Sandbox.Project.Current.GetRootPath();
+var assets=System.IO.Path.GetFullPath(System.IO.Path.Combine(project,"Assets"))+System.IO.Path.DirectorySeparatorChar;
+var material=System.IO.File.ReadAllText(System.IO.Path.Combine(assets,"materials/sewage/warning.vmat"));
+if(!material.Contains("materials/sewage/warning-sign-v1/warning_color_v2.png"))throw new Exception("Approved texture is not active");
+var removed=new System.Collections.Generic.List<string>();
+foreach(var relative in new[]{"materials/sewage/warning_color.png","models/maps/sewage/warning-sign-v1/before.vmdl","models/maps/sewage/warning-sign-v1/after.vmdl"}) {
+ var path=System.IO.Path.GetFullPath(System.IO.Path.Combine(assets,relative));
+ if(!path.StartsWith(assets,StringComparison.OrdinalIgnoreCase))throw new Exception("Path outside Assets");
+ var asset=Editor.AssetSystem.FindByPath(relative);if(asset!=null)asset.Delete();
+ if(System.IO.File.Exists(path))System.IO.File.Delete(path);
+ if(System.IO.File.Exists(path+".meta"))System.IO.File.Delete(path+".meta");
+ removed.Add(relative);
+}
+foreach(var variant in new[]{"before","after"})foreach(var suffix in new[]{".obj",".obj.meta",".mtl"}) {
+ var relative="models/maps/sewage/warning-sign-v1/"+variant+suffix;
+ var path=System.IO.Path.GetFullPath(System.IO.Path.Combine(assets,relative));
+ if(!path.StartsWith(assets,StringComparison.OrdinalIgnoreCase))throw new Exception("Path outside Assets");
+ if(System.IO.File.Exists(path)){System.IO.File.Delete(path);removed.Add(relative);}
+}
+var folder=System.IO.Path.Combine(assets,"models/maps/sewage/warning-sign-v1");
+if(System.IO.Directory.Exists(folder)&&!System.IO.Directory.EnumerateFileSystemEntries(folder).Any())System.IO.Directory.Delete(folder);
+var result=new{Deleted=removed,ApprovedTexturePresent=System.IO.File.Exists(System.IO.Path.Combine(assets,"materials/sewage/warning-sign-v1/warning_color_v2.png")),SceneChanged=false};
+System.IO.File.WriteAllText(System.IO.Path.Combine(project,"output/sewage/warning-sign-v1/cleanup.json"),System.Text.Json.JsonSerializer.Serialize(result,new System.Text.Json.JsonSerializerOptions{WriteIndented=true}));return result;

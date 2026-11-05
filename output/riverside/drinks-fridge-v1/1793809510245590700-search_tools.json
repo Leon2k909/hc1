@@ -1,0 +1,747 @@
+{
+  "tools": [
+    {
+      "name": "add_joint",
+      "title": "Add Joint",
+      "toolset": "bridge_physics",
+      "description": "Add a physics joint/constraint component to a GameObject, optionally connected to a target body (targetId). Returns { added, id, joint, targetId } — joint is the component type added (FixedJoint/SpringJoint/SliderJoint). If targetId is omitted the joint is added unconnected; wire it later via set_property. Both objects need physics (add_physics) for the constraint to simulate in play mode.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of the GameObject to add the joint to."
+          },
+          "type": {
+            "type": "string",
+            "description": "Type of joint to create. One of: fixed | spring | slider."
+          },
+          "targetId": {
+            "type": "string",
+            "description": "GUID of the target GameObject to connect to."
+          },
+          "frequency": {
+            "type": "number",
+            "description": "Spring frequency (spring joints only)."
+          },
+          "damping": {
+            "type": "number",
+            "description": "Damping ratio (spring joints only). 0 = no damping, 1 = critical."
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      }
+    },
+    {
+      "name": "add_network_helper",
+      "title": "Add Network Helper",
+      "toolset": "bridge_networking",
+      "description": "Add a NetworkHelper component (with StartServer=true) to an existing GameObject for quick multiplayer setup — at runtime it creates the lobby and spawns the player prefab per connection. Returns { added, id, component:'NetworkHelper' }. NOTE: the current handler requires id (create a holder with create_gameobject first) and does not apply maxPlayers/playerPrefab — wire PlayerPrefab afterward with set_prefab_ref/set_property.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of the GameObject to attach to. Required in practice — the current handler errors when omitted (create a holder with create_gameobject first)."
+          },
+          "name": {
+            "type": "string",
+            "description": "Rename the target GameObject to this. Omit to keep its current name."
+          },
+          "maxPlayers": {
+            "type": "number",
+            "description": "Maximum number of players in the lobby (currently not applied by the handler)."
+          },
+          "playerPrefab": {
+            "type": "string",
+            "description": "Path to the player prefab to spawn for each connection (currently not applied by the handler — set the NetworkHelper's PlayerPrefab afterward with set_prefab_ref)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "add_water_body",
+      "title": "Add Water Body",
+      "toolset": "bridge_world",
+      "description": "Create a swimmable/buoyant water region: a GameObject with a WaterVolume (s&box's buoyancy + drag physics volume, region defined by a trigger BoxCollider sized to `size`) plus, by default, a simple flat translucent-blue surface box at the water line so it's visible. HONEST LIMIT: the visual is a tinted dev-box stand-in, NOT a Gerstner/water shader — the dev material may render the tint opaque; swap in a real water material later. Only the WaterVolume properties you pass are set (engine defaults otherwise). Returns {created, gameObject{id,...}, size, appliedProperties[], surface{id,...}|null, note, nextSteps[]}. Next: start_play and drop a physics prop in to verify buoyancy; tune FluidDensity/LinearDrag/WaveAmplitude etc. with set_property on the WaterVolume. Scene-mutating — refused during play mode.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "GameObject name. Defaults to 'Water'."
+          },
+          "position": {
+            "type": "string",
+            "description": "World position of the volume's CENTRE (the surface sits at z + size.z/2 + surfaceOffset). As \"x,y,z\" (or JSON {x,y,z})."
+          },
+          "size": {
+            "type": "string",
+            "description": "Full extents of the volume as 'x,y,z' world units. Defaults to '512,512,128'."
+          },
+          "density": {
+            "type": "number",
+            "description": "WaterVolume.FluidDensity — higher = more buoyant. Engine default when omitted."
+          },
+          "linearDrag": {
+            "type": "number",
+            "description": "WaterVolume.LinearDrag on submerged bodies. Engine default when omitted."
+          },
+          "angularDrag": {
+            "type": "number",
+            "description": "WaterVolume.AngularDrag on submerged bodies. Engine default when omitted."
+          },
+          "waveAmplitude": {
+            "type": "number",
+            "description": "WaterVolume.WaveAmplitude — physics wave height (does NOT animate the visual surface)."
+          },
+          "waveFrequency": {
+            "type": "number",
+            "description": "WaterVolume.WaveFrequency — physics wave frequency."
+          },
+          "fluidVelocity": {
+            "type": "string",
+            "description": "WaterVolume.FluidVelocity — current/flow direction and speed, world units/s. As \"x,y,z\" (or JSON {x,y,z})."
+          },
+          "surfaceOffset": {
+            "type": "number",
+            "description": "WaterVolume.SurfaceOffset — shifts the water line relative to the top of the box."
+          },
+          "visualSurface": {
+            "type": "boolean",
+            "description": "Create the tinted surface box child. Defaults to true."
+          },
+          "surfaceColor": {
+            "type": "string",
+            "description": "Tint of the visual surface. Defaults to translucent blue (0.15,0.35,0.55,0.6). As \"r,g,b[,a]\" (0-1 floats)."
+          },
+          "parentId": {
+            "type": "string",
+            "description": "GUID of a parent GameObject."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "assign_patrol_route",
+      "title": "Assign Patrol Route",
+      "toolset": "bridge_npc",
+      "description": "Wire a placed route (or an arbitrary ordered GUID list) into an NpcBrain's Waypoints list on a target NPC. This is the list-of-GameObject-references case that plain set_property can't express. Pass either waypointIds (explicit order) or routeId (a route parent whose children become the waypoints in hierarchy order). The list count is returned; List&lt;GameObject&gt; refs may read back as handles/GUIDs via get_property, so trust the count or confirm patrol in play mode.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "npcId": {
+            "type": "string",
+            "description": "GUID of the GameObject holding the NpcBrain (or any component with a List&lt;GameObject&gt; waypoint property)."
+          },
+          "waypointIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Ordered waypoint GameObject GUIDs (e.g. from place_patrol_route). Takes precedence over routeId."
+          },
+          "routeId": {
+            "type": "string",
+            "description": "A route parent GUID whose children (in hierarchy order) become the waypoints."
+          },
+          "property": {
+            "type": "string",
+            "description": "The List&lt;GameObject&gt; property name to set. Defaults to 'Waypoints'. (Use 'SpawnPoints' to wire spawn points on a spawner.)."
+          }
+        },
+        "required": [
+          "npcId"
+        ]
+      }
+    },
+    {
+      "name": "batch_add_component",
+      "title": "Batch Add Component",
+      "toolset": "bridge_batch",
+      "description": "Add one component type to MANY GameObjects in one call (e.g. BoxCollider on every crate). Skips objects that already have the component unless skipExisting:false. dryRun:true validates the type and reports per-object alreadyHas WITHOUT adding. Returns { total, succeeded, failed, skipped, dryRun, results }. Follow with batch_set_property to configure the new components. Scene-mutating: refused during play mode.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "GUIDs of the target GameObjects (from find_objects or get_selected_objects)."
+          },
+          "component": {
+            "type": "string",
+            "description": "Component type name to add, e.g. 'BoxCollider', 'PointLight' (search with list_available_components)."
+          },
+          "skipExisting": {
+            "type": "boolean",
+            "description": "Skip objects that already have this component type. Default true."
+          },
+          "dryRun": {
+            "type": "boolean",
+            "description": "true = validate and report without adding anything. Default false."
+          }
+        },
+        "required": [
+          "ids",
+          "component"
+        ]
+      }
+    },
+    {
+      "name": "batch_set_property",
+      "title": "Batch Set Property",
+      "toolset": "bridge_batch",
+      "description": "Set ONE component property to the same value across MANY GameObjects in a single call. Pass dryRun:true first: it performs the same type coercion and reference resolution as apply, reports current/proposed values, and sets wouldChange:false when they already match. Apply skips no-op setters. Returns { total, succeeded, failed, dryRun, changed, unchanged, results }. Scene-mutating: refused during play mode. Value coercion matches set_property.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "GUIDs of the GameObjects to modify (from find_objects, get_scene_hierarchy, or get_selected_objects)."
+          },
+          "component": {
+            "type": "string",
+            "description": "Component type name present on each object, e.g. 'ModelRenderer', 'PointLight'."
+          },
+          "property": {
+            "type": "string",
+            "description": "Property name to set, e.g. 'Tint', 'Enabled', 'LightColor' (see get_all_properties)."
+          },
+          "value": {
+            "description": "New value — number, bool, string, enum name, 'x,y,z' vector, color, or asset path. JSON value."
+          },
+          "dryRun": {
+            "type": "boolean",
+            "description": "true = validate and report current values without changing anything. Default false."
+          }
+        },
+        "required": [
+          "ids",
+          "component",
+          "property",
+          "value"
+        ]
+      }
+    },
+    {
+      "name": "create_idle_economy",
+      "title": "Create Idle Economy",
+      "toolset": "bridge_scaffold_gameplay",
+      "description": "Generate a geometric idle-economy component (sealed): generators on the classic BaseCost * Growth^Owned cost curve with Buy 1 / Buy N / Buy Max — CostOf(index, count), MaxAffordable(index), TryBuy(index, count) and BuyMax(index) all use the CLOSED-FORM geometric series (cost = c0*(g^n-1)/(g-1), buyMax = floor(log_g(funds*(g-1)/c0+1))) — no per-copy loops, Buy 1000 is the same math as Buy 1. Wallet wiring is TypeLibrary reflection with NO compile-time wallet dependency (the shipped create_idle_income pattern): each income tick invokes AddMoney(long|int) on the first sibling component that has one, purchases invoke TrySpend(long|int), Buy Max reads the sibling's Money (or Balance) property — works out of the box next to create_economy_wallet or create_currency_account; with NO wallet sibling, purchases are refused with a Log.Warning (never silent) while TotalEarned still accumulates. Host-authoritative: mutations IsProxy-guarded; owned counts are HOST-SIDE state (not replicated); TotalEarned is [Sync(FromHost)]. Static events OnPurchased(index, count, cost) and OnIncomeTick(amount, total). BuyMax steps down once past a whole-currency rounding edge rather than failing. Returns { created, path, className, generators, tickSeconds, placedOn, note, nextSteps }. Next: trigger_hotload, place it NEXT TO a wallet on the same GameObject, tune the parallel GeneratorNames/BaseCosts/Growths/IncomesPerSecond lists with set_property. Refused during play mode. Pair with create_offline_progress for away-time earnings; use create_idle_income for a bare income ticker with no purchasing.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class name for the generated component. Defaults to 'IdleEconomy'."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory for the generated .cs file. Defaults to 'Code'."
+          },
+          "tickSeconds": {
+            "type": "number",
+            "description": "Seconds between income grants (floored at 0.1). Defaults to 1."
+          },
+          "generators": {
+            "description": "Baked-in generator defaults (inspector-tunable after generation). Omit for a starter trio: Cursor 15/1.15/0.5, Farm 200/1.15/4, Factory 3000/1.12/30. JSON array."
+          },
+          "targetId": {
+            "type": "string",
+            "description": "GUID of the GameObject to attach to — put it on the SAME GameObject as the wallet so the reflection wiring finds it (only attaches if the type is already loaded — hotload first)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_lobby_manager",
+      "title": "Create Lobby Manager",
+      "toolset": "bridge_networking",
+      "description": "Generate a lobby manager Component implementing Component.INetworkListener: a static Instance singleton, a [Sync] PlayerCount maintained in OnActive/OnDisconnected, and a LobbyState [Property] that flips to 'playing' when the lobby fills. Writes &lt;name&gt;.cs and returns { created, path, className }. Follow with trigger_hotload, then get_compile_errors, then place via add_component_to_new_object.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class name. Defaults to 'LobbyManager'."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory under code/."
+          },
+          "maxPlayers": {
+            "type": "number",
+            "description": "Currently not applied by the handler — the generated MaxPlayers [Property] defaults to 16; tune it per-instance with set_property."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_loot_table_resource",
+      "title": "Create Loot Table Resource",
+      "toolset": "bridge_scaffold_gameplay",
+      "description": "Generate GameResource-based loot tables — the data-asset sibling of create_weighted_loot_table. One .cs file containing THREE types: an entry POCO { Name, Weight, optional NestedTable reference }, a [AssetType]-registered GameResource loot-table class (designers author '.loot' files in the editor asset browser — New &gt; Loot Table — after the hotload; NOTE: [AssetType(Name=..., Extension=..., Category=...)] is used because GameResourceAttribute is [Obsolete] on this SDK), and a '&lt;name&gt;Resolver' Component that rolls an assigned table by cumulative weight. Nested tables: an entry with a NestedTable rolls INTO that table instead of dropping its Name, capped at maxDepth (default 4) with a self-reference guard so cycles terminate (at the cap the deepest entry's Name is returned). Resolver.Roll() returns the item name (null + warning when no Table is assigned or the table is empty; entries with weight &lt;= 0 never win; all-zero weights fall back to the first entry) and fires the static OnLoot(GameObject, item) event; roll HOST-SIDE and replicate the result yourself. targetId attaches the RESOLVER (the resource is an asset type, not a component). SURPRISING: pick an extension that is NOT a suffix of a built-in one (e.g. avoid 'cfg') or ResourceLibrary picks up engine files as phantom instances. Returns { created, path, className, resolverClass, extension, maxDepth, placedOn, note, nextSteps }. Next: trigger_hotload -&gt; author .loot assets in the editor -&gt; assign the resolver's Table (set_property with the asset path). Refused during play mode. Use create_weighted_loot_table for a single inline component with no asset files; create_gacha_drop_table for pity + duplicate mechanics.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class name for the generated GameResource (the resolver becomes '&lt;name&gt;Resolver'). Defaults to 'LootTableResource'."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory for the generated .cs file. Defaults to 'Code'."
+          },
+          "extension": {
+            "type": "string",
+            "description": "Asset file extension (lowercase alphanumerics; avoid suffixes of built-in extensions like 'cfg'). Defaults to 'loot'."
+          },
+          "title": {
+            "type": "string",
+            "description": "Display name of the asset type in the editor's New-asset menu. Defaults to 'Loot Table'."
+          },
+          "maxDepth": {
+            "type": "integer",
+            "description": "Default nested-table resolve depth cap baked into the resolver (clamped 0..16; also a [Property]). Defaults to 4."
+          },
+          "targetId": {
+            "type": "string",
+            "description": "GUID of a GameObject to attach the RESOLVER component to (only attaches if the type is already loaded — hotload first)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_npc_brain",
+      "title": "Create Npc Brain",
+      "toolset": "bridge_npc",
+      "description": "Generate an NpcBrain Component: a behavior state machine (Idle/Patrol/Wander/Chase/Search/Flee/Ambush) driven by occlusion-aware perception — FOV cone + sight range + a line-of-sight trace (respects walls/trees) + proximity hearing — with last-known-position memory (lose-LOS -&gt; search -&gt; give up -&gt; resume). This is the decision layer on top of bake_navmesh / NavMeshAgent movement. Pick a behavior preset, then tune via the generated [Property] fields with set_property. After generating: trigger_hotload + get_compile_errors, place a route with place_patrol_route + assign_patrol_route, bake_navmesh, and verify perception in EDIT mode with simulate_npc_perception (chase/search behavior needs play mode). The component is added to a GameObject like any other; it auto-adds a NavMeshAgent in OnStart.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class/file name. Defaults to 'NpcBrain'. Sanitized to a valid C# identifier."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory under the project root for the .cs file. Defaults to 'Code'."
+          },
+          "behavior": {
+            "type": "string",
+            "description": "Preset (sets StartState + flee toggle): 'patrol' (walk waypoints), 'guard' (Ambush near spawn until a target enters range), 'hunter' (patrol-&gt;chase-&gt;search, the Sasquatch), 'swarm' (wander/idle-&gt;chase nearest, RUN mobs), 'skittish' (chase but flee on low health). The generated file is the same shape; the preset just changes defaults. Defaults to 'hunter'. One of: patrol | guard | hunter | swarm | skittish."
+          },
+          "targetTag": {
+            "type": "string",
+            "description": "Tag the NPC hunts (its candidates are GameObjects with this tag). Defaults to 'player'."
+          },
+          "moveSpeed": {
+            "type": "number",
+            "description": "Patrol/wander speed (NavMeshAgent MaxSpeed). Default 130."
+          },
+          "chaseSpeed": {
+            "type": "number",
+            "description": "Chase/flee speed. Default 200."
+          },
+          "sightRange": {
+            "type": "number",
+            "description": "Max sight distance. Default 1500."
+          },
+          "fovDegrees": {
+            "type": "number",
+            "description": "Full field-of-view cone angle in degrees. Default 110. (Baked into a cosine threshold for cheap, trig-free checks.)."
+          },
+          "eyeHeight": {
+            "type": "number",
+            "description": "Trace origin height above the NPC's feet. Default 64."
+          },
+          "hearingRadius": {
+            "type": "number",
+            "description": "Proximity-hearing radius — a target within it is investigated (sets last-known-pos) but NOT instantly aggroed. Default 600."
+          },
+          "giveUpTime": {
+            "type": "number",
+            "description": "Seconds to search after losing line-of-sight before giving up and resuming the start state. Default 6."
+          },
+          "searchRadius": {
+            "type": "number",
+            "description": "Wander radius around the last-known position while searching. Default 400."
+          },
+          "waypointStopDistance": {
+            "type": "number",
+            "description": "How close the NPC must get to a waypoint/target before it counts as reached. Default 80."
+          },
+          "canFlee": {
+            "type": "boolean",
+            "description": "Enable the Flee state (else the NPC never flees). Defaults from the preset."
+          },
+          "fleeHealthFrac": {
+            "type": "number",
+            "description": "Flee when CurrentHealthFrac drops to/below this (the game sets CurrentHealthFrac 0..1). Default 0.25."
+          },
+          "networked": {
+            "type": "boolean",
+            "description": "When true (default), emit a host-authoritative brain: 'if (IsProxy) return;' + [Sync] CurrentState. NOTE: a no-session solo playtest makes everything a proxy, so a networked brain won't think until a host session exists — pass false to iterate solo in the edit scene."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_trigger_zone",
+      "title": "Create Trigger Zone",
+      "toolset": "bridge_scaffold_gameplay",
+      "description": "Generate a trigger-zone Component (Component.ITriggerListener): auto-adds a trigger BoxCollider on start, filters entrants by a TriggerTag [Property] (default 'player'), and logs enter/exit via private OnPlayerEnter/OnPlayerExit extension points you fill in. Writes &lt;name&gt;.cs and returns { created, path, className }. NOTE: the action/filterTag params are not currently applied at generation time — the zone always logs; implement teleport/damage/spawn in the generated methods (edit_script). Follow with trigger_hotload, then get_compile_errors.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class name. Defaults to 'TriggerZone'."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory under code/ for the file."
+          },
+          "action": {
+            "type": "string",
+            "description": "What happens on trigger (currently not applied by the handler — the generated zone always logs; implement the effect in OnPlayerEnter yourself). One of: log | teleport | damage | spawn."
+          },
+          "filterTag": {
+            "type": "string",
+            "description": "Only trigger for objects with this tag (currently not applied at generation — the generated TriggerTag [Property] defaults to 'player'; change it per-instance with set_property)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "find_broken_references",
+      "title": "Find Broken References",
+      "toolset": "bridge_validation",
+      "description": "Scan the project for broken references, two layers in one call: (1) every GameObject in the open scene — renderers with no Model (missing_model), component properties pointing at DESTROYED GameObjects/Components (dead_gameobject_ref / dead_component_ref), null component entries whose type no longer exists (missing_component); (2) every .scene/.prefab FILE — prefab references to deleted/renamed files (missing_prefab_file). Returns { total, showing, truncated, objectsScanned, filesScanned, issues } — each issue has { id, name, component, kind, detail } (file-level issues carry the file path in name). Fix missing models with assign_model, dead refs with set_property/set_component_reference, missing prefab files by fixing the path or recreating via create_prefab. Read-only; safe any time. Results cap at `limit` (default 100, max 500).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "Max issues to return (default 100, max 500). total still counts everything."
+          },
+          "scanFiles": {
+            "type": "boolean",
+            "description": "Include the .scene/.prefab file scan for missing prefab references. Default true."
+          }
+        },
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "get_all_properties",
+      "title": "Get All Properties",
+      "toolset": "bridge_component",
+      "description": "Dump all public properties of every component on a GameObject. Returns { id, components } where each entry is { component, properties: [{ name, type, value }] } — values are stringified (unreadable ones show '&lt;error&gt;'). Use the exact component/property names it reports with set_property or get_property; can be large on component-heavy objects.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of the GameObject."
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "instantiate_prefab",
+      "title": "Instantiate Prefab",
+      "toolset": "bridge_prefab",
+      "description": "Spawn a FULL prefab instance into the active scene — components and children recreated. Uses the engine's GameObject.Clone for registered prefabs, with a guid-remapped deserialize fallback for freshly-written files (repeat instantiations never collide). Returns { instantiated, prefab, method, gameObject, components, childCount } — gameObject.id is the new GUID for set_transform/set_property follow-ups. Optional name/position/rotation override the spawned root.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Path to the .prefab file (e.g. 'prefabs/enemies/grunt.prefab')."
+          },
+          "name": {
+            "type": "string",
+            "description": "Rename the spawned root (defaults to the prefab's root name)."
+          },
+          "position": {
+            "type": "string",
+            "description": "World position to spawn at — object {x,y,z} or comma string \"x,y,z\". Defaults to origin. As \"x,y,z\" (or JSON {x,y,z})."
+          },
+          "rotation": {
+            "type": "string",
+            "description": "Rotation as euler angles. Defaults to identity. As \"pitch,yaw,roll\" degrees."
+          },
+          "scale": {
+            "type": "number",
+            "description": "Uniform scale multiplier. Defaults to 1.0."
+          },
+          "parent": {
+            "type": "string",
+            "description": "GUID of parent GameObject to attach to."
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
+    },
+    {
+      "name": "set_component_reference",
+      "title": "Set Component Reference",
+      "toolset": "bridge_component",
+      "description": "Wire a component's GameObject/Component-typed property to ANOTHER live object in the scene by GUID (e.g. ObjectiveManager.Player = the player, a camera's follow target, a door's hinge). Preferred for object/component refs (can pick a specific component type off the target via targetComponent, and validates). set_property also accepts a GUID for ref props; set_prefab_ref is for prefab assets. Set clear:true to null the reference.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of the GameObject that HOLDS the component you're writing into."
+          },
+          "component": {
+            "type": "string",
+            "description": "Component type name on that object (e.g. 'ObjectiveManager', 'CameraComponent')."
+          },
+          "property": {
+            "type": "string",
+            "description": "The property to set (must be a GameObject- or Component-typed property)."
+          },
+          "targetId": {
+            "type": "string",
+            "description": "GUID of the GameObject to reference. Required unless clear:true."
+          },
+          "targetComponent": {
+            "type": "string",
+            "description": "If the property is a Component subtype, the specific component type to pull off the target object. Omit to auto-match by the property's type."
+          },
+          "clear": {
+            "type": "boolean",
+            "description": "If true, set the reference to null instead of assigning a target."
+          }
+        },
+        "required": [
+          "id",
+          "component",
+          "property"
+        ]
+      }
+    },
+    {
+      "name": "set_fog",
+      "title": "Set Fog",
+      "toolset": "bridge_visuals",
+      "description": "Add or update fog in the active scene. Types: 'gradient' (distance haze — great for mood/horror), 'cubemap' (sky-tinted distance fog), 'volumetric' (a localized fog volume). Re-running with the same targetId updates it rather than duplicating; without targetId each call creates a new fog object. Returns { created, type, gameObject } — gameObject.id addresses the fog object for later set_property/delete_gameobject; screenshot to verify the look.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Fog type (default gradient). One of: gradient | cubemap | volumetric."
+          },
+          "name": {
+            "type": "string",
+            "description": "GameObject name when creating a new fog object."
+          },
+          "targetId": {
+            "type": "string",
+            "description": "GUID of an existing GameObject to host the fog (else a new fog object is created)."
+          },
+          "color": {
+            "type": "string",
+            "description": "Fog colour (gradient/volumetric Color, cubemap Tint). As \"r,g,b[,a]\" (0-1 floats)."
+          },
+          "startDistance": {
+            "type": "number",
+            "description": "gradient/cubemap: distance (units) where fog begins."
+          },
+          "endDistance": {
+            "type": "number",
+            "description": "gradient/cubemap: distance (units) where fog reaches full density."
+          },
+          "height": {
+            "type": "number",
+            "description": "gradient: world height the fog settles around."
+          },
+          "falloff": {
+            "type": "number",
+            "description": "Distance/density falloff exponent (higher = sharper onset)."
+          },
+          "blur": {
+            "type": "number",
+            "description": "cubemap: sky blur amount."
+          },
+          "heightStart": {
+            "type": "number",
+            "description": "cubemap: world height where height-fog starts."
+          },
+          "heightWidth": {
+            "type": "number",
+            "description": "cubemap: height-fog band width."
+          },
+          "heightExponent": {
+            "type": "number",
+            "description": "cubemap: height-fog falloff exponent."
+          },
+          "strength": {
+            "type": "number",
+            "description": "volumetric: fog density/strength."
+          },
+          "size": {
+            "type": "string",
+            "description": "volumetric: bounds size (units) centred on the object — object {x,y,z} or comma string \"x,y,z\". As \"x,y,z\" (or JSON {x,y,z})."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "set_prefab_ref",
+      "title": "Set Prefab Ref",
+      "toolset": "bridge_prefab",
+      "description": "Set a GameObject-typed property on a component to a loaded prefab. Use this when set_property can't handle prefab references (which it can't, because prefabs are GameObjects not primitives).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of the GameObject holding the component."
+          },
+          "component": {
+            "type": "string",
+            "description": "Component type name."
+          },
+          "property": {
+            "type": "string",
+            "description": "Property name to set (must be GameObject-typed)."
+          },
+          "prefabPath": {
+            "type": "string",
+            "description": "Prefab asset path (e.g. 'prefabs/player.prefab')."
+          }
+        },
+        "required": [
+          "id",
+          "component",
+          "property",
+          "prefabPath"
+        ]
+      }
+    },
+    {
+      "name": "set_property",
+      "title": "Set Property",
+      "toolset": "bridge_component",
+      "description": "Set a property value on a component (editor mode), and PERSIST it (survives save+reload). Handles primitives, enums, value types (Color/Vector3 as comma strings), AND references: pass an asset PATH for Model/Material/Texture/SoundEvent props, or a GameObject GUID for GameObject/Component-typed props (resolved like set_component_reference). Returns success=false with a clear error if a path/GUID can't be resolved (no more silent null). For wiring object refs prefer set_component_reference; for prefab refs use set_prefab_ref.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of the GameObject."
+          },
+          "component": {
+            "type": "string",
+            "description": "Component type name."
+          },
+          "property": {
+            "type": "string",
+            "description": "Property name to set."
+          },
+          "value": {
+            "description": "New value. Primitive: '5', 'true'. Color/Vector3: a comma string ('1,0,0,1' / '0,0,200'), an array ([0,0,200]), or an object ({r,g,b,a} / {x,y,z}). Enum: the member name. Asset ref (Model/Material/...): the asset path e.g. 'models/dev/box.vmdl'. GameObject/Component ref: the target GameObject's GUID. Empty/'null' clears the property. JSON value."
+          }
+        },
+        "required": [
+          "id",
+          "component",
+          "property",
+          "value"
+        ]
+      }
+    },
+    {
+      "name": "set_runtime_property",
+      "title": "Set Runtime Property",
+      "toolset": "bridge_playmode",
+      "description": "Set a component property value during play mode — tweak values live while the game runs. Errors if the game is not playing (start_play first). Returns { set, id, component, property, value } like set_property; read it back with get_runtime_property. Runtime changes are DISCARDED when play mode stops — use set_property in edit mode to persist.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of the GameObject."
+          },
+          "component": {
+            "type": "string",
+            "description": "Component type name."
+          },
+          "property": {
+            "type": "string",
+            "description": "Property name to set."
+          },
+          "value": {
+            "description": "New value. JSON value."
+          }
+        },
+        "required": [
+          "id",
+          "component",
+          "property",
+          "value"
+        ]
+      }
+    },
+    {
+      "name": "tune_vehicle",
+      "title": "Tune Vehicle",
+      "toolset": "bridge_vehicle",
+      "description": "Apply a handling preset to a vehicle component on a GameObject: arcade (forgiving), drift (low grip, sharp steering), offroad (soft long-travel suspension), or race (fast, planted). Sets EngineForce/MaxSpeed/SteerStrength/GripFactor/SuspensionStrength/SuspensionDamping by name via reflection — targets create_vehicle_controller scaffolds out of the box, partially tunes anything exposing those property names. Returns { tuned, preset, component, applied, missing } — missing lists properties the component lacks. Auto-finds the first component with 'Vehicle' in its type name; pass component to target explicitly. Scene-mutating: refused during play mode (use set_property on runtime objects while playing).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of the GameObject carrying the vehicle component (from find_objects)."
+          },
+          "preset": {
+            "type": "string",
+            "description": "Handling preset to apply. One of: arcade | drift | offroad | race."
+          },
+          "component": {
+            "type": "string",
+            "description": "Component type name to tune. Default: first component with 'Vehicle' in its name."
+          }
+        },
+        "required": [
+          "id",
+          "preset"
+        ]
+      }
+    }
+  ],
+  "total": 402
+}

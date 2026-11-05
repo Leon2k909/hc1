@@ -1,0 +1,15 @@
+// Fine brass finish for the sewer padlock case.
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    TextureColor "materials/sewage/gate-lock-v2/brass_color.png"
+    TextureNormal "materials/default/default_normal.tga"
+    TextureRoughness "materials/belltower/fountain_bronze_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[1 1 1 1]"
+    g_vTexCoordScale "[8 8]"
+    g_flMetalness ".55"
+    g_flRoughnessScaleFactor ".65"
+    g_flModelTintAmount "1"
+}

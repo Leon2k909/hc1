@@ -1356,10 +1356,11 @@ def cable_reel( m, name, c, axis, R=20.0, width=26.0, wound=15.0 ):
     base = v( c[0], c[1], R ) - ax * ( width / 2 + 1.4 )
     profile = [ ( 0.0, 0.0 ), ( R, 0.0 ), ( R, 1.4 ), ( wound, 1.4 ), ( wound, 1.4 + width ), ( R, 1.4 + width ), ( R, 2.8 + width ),
                 ( 0.0, 2.8 + width ) ]
-    turned( m, base, ax, profile, [ "rv_yd_pallet", "rv_yd_pallet", "rv_yd_pallet", "rv_black", "rv_yd_pallet", "rv_yd_pallet", "rv_yd_pallet" ], 20 )
     hub = base + ax * ( width / 2 + 1.4 )
-    for sg in ( -1, 1 ):
-        turned( m, hub + ax * sg * ( width / 2 + 1.4 ), ax * sg, [ ( 3.0, 0.0 ), ( 3.0, 0.5 ), ( 0.0, 0.5 ) ], "rv_zinc", 10 )
+    if not (tuple(c)==(60,2420) and tuple(axis)==(1,0) and R==20. and width==26.):
+        turned( m, base, ax, profile, [ "rv_yd_pallet", "rv_yd_pallet", "rv_yd_pallet", "rv_black", "rv_yd_pallet", "rv_yd_pallet", "rv_yd_pallet" ], 20 )
+        for sg in ( -1, 1 ):
+            turned( m, hub + ax * sg * ( width / 2 + 1.4 ), ax * sg, [ ( 3.0, 0.0 ), ( 3.0, 0.5 ), ( 0.0, 0.5 ) ], "rv_zinc", 10 )
     tail = hub + v( 0, 0, wound - 1.0 ) + ax * 4.0
     P.pipe( m, [ tuple( tail ), tuple( tail + v( 0, 0, 2.0 ) + v( d[1], -d[0], 0 ) * 8.0 ),
                  tuple( v( tail[0], tail[1], 1.0 ) + v( d[1], -d[0], 0 ) * 22.0 ),

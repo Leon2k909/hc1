@@ -1,0 +1,87 @@
+{
+  "tools": [
+    {
+      "name": "spawn_models",
+      "title": "Spawn Models",
+      "toolset": "scene",
+      "description": "Create many model game objects in one call - each item takes the same fields spawn_model does. Use this to build big arrangements without a round trip per object. One undo step covers the whole batch. Returns the created ids.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "Model": {
+                  "type": "string",
+                  "description": "Model asset path, e.g. 'models/dev/box.vmdl'."
+                },
+                "Name": {
+                  "type": "string",
+                  "description": "The new object's name. Empty uses the model filename."
+                },
+                "Position": {
+                  "type": "string",
+                  "description": "World position as 'x,y,z'."
+                },
+                "Angles": {
+                  "type": "string",
+                  "description": "Rotation as 'pitch,yaw,roll'."
+                },
+                "Scale": {
+                  "type": "string",
+                  "description": "Scale as 'x,y,z', or a single number for uniform."
+                },
+                "Tint": {
+                  "type": "string",
+                  "description": "Tint color as 'r,g,b,a' (0-1 floats) or '#rrggbb'."
+                },
+                "Material": {
+                  "type": "string",
+                  "description": "Material asset path to override every surface with."
+                },
+                "Parent": {
+                  "type": "string",
+                  "description": "Parent game object id. Empty parents to the scene root."
+                }
+              },
+              "required": [
+                "Model"
+              ]
+            },
+            "description": "The models to spawn."
+          }
+        },
+        "required": [
+          "items"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "Count": {
+            "type": "integer"
+          },
+          "Created": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "Id": {
+                  "type": "string"
+                },
+                "Name": {
+                  "type": "string"
+                }
+              },
+              "required": []
+            }
+          }
+        },
+        "required": []
+      }
+    }
+  ],
+  "total": 402
+}

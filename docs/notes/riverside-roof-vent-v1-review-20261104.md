@@ -1,0 +1,6 @@
+## Riverside passive roof vent v1 — T2 installed, 2026-11-04
+
+- User-approved first T2 vent installed: one renderer under `Passive Roof Vents`, engine `1033.911476,765.044280,122`, yaw zero. Exactly 12 old box faces removed; all other lowland lines, existing scene objects/properties, complete ModelDoc/physics and lighting retained.
+- Mushroom hood, rolled rim/inner skin, open screened intake, support straps, cap fasteners, curb/sealant and bolted flashing fitted to relative roof plane `z=-.538902254+.095652174*x`. Hood top Z=4.34.
+- `models/props/riverside/roof_vent_v1/vent.vmdl`: 3,148 / 1,732 / 976 triangles; one procedural 1k PBR atlas plus screen material/512px mask. No external assets, new collision/lights or runtime component. No gameplay/LOD test.
+- Native guarded install/save/compile, exact source/scene readback and actual saved-group screenshot passed. Nine comparison files archived outside Assets/deleted through editor. Shared materials retained. Generator hook targets first T2 vent only and preserves random calls. Recipe: `Sources/Riverside/roof-vent-v1/README.md`; receipts: `output/riverside/roof-vent-v1/installed/`. Historical comparison scripts are archival. Do not regenerate the map.

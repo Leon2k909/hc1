@@ -1,0 +1,10 @@
+var report=new System.Collections.Generic.List<object>();
+foreach(var name in new[]{"pad","dressing"}) {
+ var model=Model.Load("models/maps/riverside/riverside_"+name+".vmdl");
+ if(model.IsError)throw new InvalidOperationException("Public model failed: "+name);
+ var paths=model.Materials.Select(m=>m.ResourcePath).ToArray();
+ foreach(var mat in new[]{"rubber","sidewall"})if(!paths.Contains("materials/riverside/discarded-tyres-v1/"+mat+".vmat"))throw new InvalidOperationException("Missing tyre material: "+mat);
+ report.Add(new{Model=model.ResourcePath,Error=model.IsError,TyreMaterials=2});
+}
+System.IO.File.WriteAllText(System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(),"output/riverside/discarded-tyres-v1/public-resources.json"),System.Text.Json.JsonSerializer.Serialize(report));
+return report;

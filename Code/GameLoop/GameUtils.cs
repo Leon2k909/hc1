@@ -625,6 +625,7 @@ public static partial class GameUtils
 	public static void LoadMap( SceneFile map )
 	{
 		if ( map is null ) return;
+		CosmeticPreferences.ApplyLoadingScreen();
 
 		if ( Networking.IsActive && Networking.IsHost )
 		{

@@ -1,0 +1,50 @@
+if(!Game.IsPlaying || Game.ActiveScene?.Source?.ResourcePath!="scenes/maps/riverside/riverside.scene" || Networking.IsActive)
+ throw new Exception("Requires offline Riverside play");
+var scene=Game.ActiveScene;
+var editor=Editor.SceneEditorSession.Active;
+var dirty=editor.HasUnsavedChanges;
+var store=scene.GetAllComponents<ModelRenderer>().Single(r=>r.Model?.ResourcePath=="models/maps/riverside/riverside_store.vmdl");
+var original=store.Model;
+var without=Model.Load("models/maps/riverside/shop-sign-v1/store_without_shop_sign.vmdl");
+var candidate=Model.Load("models/maps/riverside/shop-sign-v1/shop_sign.vmdl");
+if(without.IsError || candidate.IsError)throw new Exception("Preview models failed to load");
+var gameplay=scene.GetAllComponents<CameraComponent>().First(c=>c.IsMainCamera);
+var mains=scene.GetAllComponents<CameraComponent>().Select(c=>(Camera:c,Main:c.IsMainCamera)).ToArray();
+GameObject holder=null,item=null;
+var paths=new System.Collections.Generic.List<string>();
+var output="C:/sbox-projects/hc1/shop-sign-review/output/riverside/shop-sign-v1";
+try
+{
+ using(scene.Push())
+ {
+  holder=new GameObject(true,"Register review camera");
+  var camera=holder.Components.Create<CameraComponent>();
+  void Copy<T>() where T:Component,new(){var source=gameplay.GameObject.GetComponent<T>(true);if(source!=null)Facepunch.GameObjectExtensions.CopyPropertiesTo(source,holder.Components.Create<T>());}
+  Copy<Bloom>();Copy<Tonemapping>();Copy<Sharpen>();Copy<AmbientOcclusion>();Copy<Vignette>();Copy<Facepunch.PhotographicResponse>();Copy<ColorAdjustments>();
+  foreach(var old in mains)old.Camera.IsMainCamera=false;
+  camera.IsMainCamera=true;camera.ZNear=.5f;camera.ZFar=50000;camera.BackgroundColor=gameplay.BackgroundColor;camera.CustomSize=new Vector2(1200,900);
+  camera.WorldPosition=new Vector3(310,-320,85);camera.WorldRotation=Rotation.LookAt(new Vector3(514,-220,200)-camera.WorldPosition);camera.FieldOfView=55;
+  item=new GameObject(false,"Temporary Lucky Stop register review");item.WorldPosition=new Vector3(514,-220,150);
+  var renderer=item.Components.Create<ModelRenderer>();renderer.Model=candidate;
+  foreach(var variant in new[]{"before","after"})
+  {
+   store.Model=variant=="after"?without:original;item.Enabled=variant=="after";
+   using var bitmap=new Bitmap(1200,900);
+   for(int frame=0;frame<80;frame++)
+   {
+    if(!Game.IsPlaying||Game.ActiveScene!=scene)throw new Exception("Runtime scene changed");
+    cancellationToken.ThrowIfCancellationRequested();camera.RenderToBitmap(bitmap,false);await Task.Delay(20,cancellationToken);
+   }
+   var path=System.IO.Path.Combine(output,"in-game-"+variant+".png");System.IO.File.WriteAllBytes(path,bitmap.ToPng());paths.Add(path);
+  }
+ }
+ var errors=scene.GetAllComponents<ModelRenderer>().Where(r=>r.Model?.IsError==true).Select(r=>r.GameObject.Name).ToArray();
+ var report=new{PreviewOnly=true,ActualPlayMode=Game.IsPlaying,Map=scene.Source.ResourcePath,PlayerCount=scene.GetAllComponents<Facepunch.PlayerPawn>().Count(),ErrorModels=errors,NoExtraLights=true,Paths=paths,Candidate=candidate.MeshInfo,StoreWithout=without.MeshInfo,PublicStore=original.MeshInfo};
+ System.IO.File.WriteAllText(System.IO.Path.Combine(output,"runtime-review.json"),Json.Serialize(report));
+ return new{report.PreviewOnly,report.ActualPlayMode,report.Map,report.PlayerCount,report.ErrorModels,report.Paths};
+}
+finally
+{
+ store.Model=original;item?.Destroy();holder?.Destroy();foreach(var old in mains)if(old.Camera.IsValid())old.Camera.IsMainCamera=old.Main;
+ if(editor.HasUnsavedChanges!=dirty)throw new Exception("Review changed editor dirty state");
+}

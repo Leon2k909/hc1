@@ -1,0 +1,8 @@
+var toned=Model.Load("models/maps/riverside/shop-sign-v1/shop_sign.vmdl");var bright=Model.Load("models/maps/riverside/shop-sign-v1/bright_reference.vmdl");
+if(toned.IsError || bright.IsError || toned.Materials.Concat(bright.Materials).Any(m=>m==null || m.IsError))throw new Exception("A sign material did not load");
+var face=toned.Materials.First(m=>m.ResourcePath=="materials/riverside/shop-sign-v1/face_toned.vmat");
+var bulb=toned.Materials.First(m=>m.ResourcePath=="materials/riverside/shop-sign-v1/bulb.vmat");
+if(face.GetFeature("F_SELF_ILLUM")!=0 || bulb.GetFeature("F_SELF_ILLUM")!=1)throw new Exception("Revised sign emission features are wrong");
+var color=face.GetTexture("g_tColor");if(color==null || color.Width!=2048 || color.Height!=512)throw new Exception("Sign artwork texture failed to load");
+var result=new{AllMaterialsLoaded=true,PrintedFaceHasNoEmission=true,LampsRemainLit=true,Geometry=toned.MeshInfo,Reference=bright.MeshInfo,Materials=toned.Materials.Select(m=>new{m.ResourcePath,m.IsError,Emission=m.GetFeature("F_SELF_ILLUM")}).ToArray()};
+System.IO.File.WriteAllText("C:/sbox-projects/hc1/shop-sign-review/output/riverside/shop-sign-v1/lighting-materials.json",Json.Serialize(result));return new{result.AllMaterialsLoaded,result.PrintedFaceHasNoEmission,result.LampsRemainLit};

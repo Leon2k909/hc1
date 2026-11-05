@@ -1,0 +1,66 @@
+// User approved the reviewed flowerpot. Publish its twelve existing placements.
+var root=Sandbox.Project.Current.GetRootPath();
+var directory=System.IO.Path.Combine(System.IO.Path.GetTempPath(),"belltower-terracotta-pot-v2/install-stage");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(directory,"manifest.json")));
+if(manifest["revision"].GetValue<string>()!="belltower-pot-v2-install" || manifest["pots"].GetValue<int>()!=12)throw new InvalidOperationException("Wrong installation plan.");
+string Hash(string path) {using var s=System.IO.File.OpenRead(path);return Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(s)).ToLowerInvariant();}
+var session=Editor.SceneEditorSession.All.Single(s=>s.Scene.IsEditor && s.Scene.Source?.ResourcePath?.Equals("scenes/maps/belltower/belltower.scene",StringComparison.OrdinalIgnoreCase)==true);
+if(session.HasUnsavedChanges || session.IsPlaying)throw new InvalidOperationException("Requires the saved, stopped Belltower editor scene.");
+var previous=Editor.SceneEditorSession.Active;var game=Game.ActiveScene?.Id;var playing=Game.IsPlaying;
+var scene=session.Scene;var scenePath=System.IO.Path.Combine(root,"Assets/scenes/maps/Belltower/belltower.scene");
+if(Hash(scenePath)!=manifest["scene_before"].GetValue<string>())throw new InvalidOperationException("Scene changed since staging.");
+foreach(var p in manifest["protected"].AsObject())if(Hash(System.IO.Path.Combine(root,p.Key))!=p.Value.GetValue<string>())throw new InvalidOperationException("Protected source changed: "+p.Key);
+var groupPath=System.IO.Path.Combine(directory,"pots.json");
+if(Hash(groupPath)!=manifest["group_sha256"].GetValue<string>())throw new InvalidOperationException("Pot placements changed.");
+var data=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(groupPath)).AsObject();
+var id=Guid.Parse(data["__guid"].GetValue<string>());
+if(scene.GetAllObjects(true).Any(o=>o.Id==id || o.Name=="Doorway flowerpots"))throw new InvalidOperationException("Pot group already present; inspect before repeating.");
+var pot=Model.Load("models/maps/belltower/terracotta-pot-v2/terracotta_pot.vmdl");
+if(pot is null || pot.IsError)throw new InvalidOperationException("Approved model did not load.");
+var plan=new System.Collections.Generic.List<(string Target,string Source,string Backup,string Before,string After)>();
+foreach(var p in manifest["files"].AsObject())
+{
+ if(!System.Text.RegularExpressions.Regex.IsMatch(p.Key,@"^Assets/models/maps/belltower/belltower_(west|east)\.(obj|vmdl)$"))throw new InvalidOperationException("Unexpected target.");
+ var r=p.Value;var target=System.IO.Path.Combine(root,p.Key);var source=r["source"].GetValue<string>();var backup=r["backup"].GetValue<string>();var before=r["before"].GetValue<string>();var after=r["after"].GetValue<string>();
+ var current=Hash(target);
+ if(Hash(source)!=after || Hash(backup)!=before || (current!=before && current!=after))throw new InvalidOperationException("Publication input changed: "+p.Key);
+ if(current!=after)plan.Add((target,source,backup,before,after));
+}
+System.IO.File.Copy(scenePath,System.IO.Path.Combine(directory,"belltower-before.scene"),true);
+var originalObjects=scene.GetAllObjects(true).ToArray();
+var oldIds=originalObjects.Select(o=>o.Id).ToHashSet();
+var oldPhysics=scene.GetAllComponents<ModelCollider>().Select(c=>c.Serialize().ToJsonString()).ToArray();
+foreach(var item in plan)
+{
+ cancellationToken.ThrowIfCancellationRequested();
+ var incoming=item.Target+".pot-v2-incoming";
+ System.IO.File.Copy(item.Source,incoming,true);
+ if(Hash(incoming)!=item.After)throw new InvalidOperationException("Incoming asset differs.");
+ try {System.IO.File.Move(incoming,item.Target,true);}
+ catch(Exception error) when(error is System.IO.IOException || error is UnauthorizedAccessException)
+ {
+  var retained=item.Target+".pot-v2-retained";
+  if(System.IO.File.Exists(retained))throw new InvalidOperationException("Inspect retained original: "+item.Target,error);
+  System.IO.File.Move(item.Target,retained);
+  try {System.IO.File.Move(incoming,item.Target);}
+  catch {System.IO.File.Move(retained,item.Target);throw;}
+ }
+ if(Hash(item.Target)!=item.After)throw new InvalidOperationException("Published source differs.");
+ Editor.AssetSystem.RegisterFile(item.Target);
+}
+GameObject added=null;
+try
+{
+ using(scene.Push()) {added=scene.CreateObject(false);added.Deserialize(data.DeepClone().AsObject());}
+ if(added.Children.Count!=12 || added.Children.Any(o=>o.Components.Get<ModelRenderer>()?.Model?.ResourcePath!=pot.ResourcePath))throw new InvalidOperationException("Not all twelve pots were created.");
+ if(!oldPhysics.SequenceEqual(scene.GetAllComponents<ModelCollider>().Select(c=>c.Serialize().ToJsonString())))throw new InvalidOperationException("Physics changed.");
+ session.HasUnsavedChanges=true;
+ session.Save(false);
+ if(session.HasUnsavedChanges)throw new InvalidOperationException("Belltower did not save.");
+ var preserved=ReferenceEquals(previous,Editor.SceneEditorSession.Active)&&Game.ActiveScene?.Id==game&&Game.IsPlaying==playing;
+ if(!preserved)throw new InvalidOperationException("Previous editor/play state changed; inspect completed save.");
+ var result=new{PotsInstalled=12,OldTrianglesRemoved=1680,SourceSceneSha256=Hash(scenePath),SceneSaved=true,ExistingObjectIdsPreserved=oldIds.IsSubsetOf(scene.GetAllObjects(true).Select(o=>o.Id).ToHashSet()),PhysicsPreserved=true,PreviousEditorAndGamePreserved=preserved};
+ System.IO.File.WriteAllText(System.IO.Path.Combine(directory,"installed.json"),System.Text.Json.JsonSerializer.Serialize(result));
+ return result;
+}
+catch {if(added.IsValid())session.HasUnsavedChanges=true;throw;}

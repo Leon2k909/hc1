@@ -1,0 +1,101 @@
+var project=Sandbox.Project.Current.GetRootPath();
+var output=System.IO.Path.Combine(project,"output/riverside/t2-precast-entry-v1");
+var plan=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(output,"review.json")));
+var paths=new[]{"models/props/riverside/t2_precast_entry_v1/entry_steps.vmdl","models/maps/riverside/riverside_low.vmdl"};
+foreach(var path in paths)
+{
+    var asset=Editor.AssetSystem.FindByPath(path) ?? throw new Exception("Missing asset: "+path);
+    await asset.CompileIfNeededAsync();
+}
+var models=paths.Select(Model.Load).ToArray();
+if(models.Any(m=>m is null || m.IsError))throw new Exception("Review model failed to load");
+var root=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(project,"Assets/scenes/maps/Riverside/riverside.scene"))).AsObject();
+var roots=new System.Text.Json.Nodes.JsonArray();
+foreach(var item in root["GameObjects"].AsArray())
+{
+    var name=item["Name"]?.GetValue<string>() ?? "";
+    if(!new[]{"Moon","Sky","Fog","Look","Riverside","Lights","Porch Lights","Roof TV Aerials","Trailer Entry Doors","Trailer Hitches","Passive Roof Vents","Precast Entry Steps"}.Contains(name))continue;
+    var clone=item.DeepClone();
+    if(name=="Riverside")
+    {
+        var children=new System.Text.Json.Nodes.JsonArray();
+        foreach(var child in clone["Children"].AsArray())
+        {
+            if(!new[]{"Ground","Lowland Trailers"}.Contains(child["Name"]?.GetValue<string>()))continue;
+            var piece=child.DeepClone();var comps=new System.Text.Json.Nodes.JsonArray();
+            foreach(var c in piece["Components"].AsArray())if(c["__type"]?.GetValue<string>()=="Sandbox.ModelRenderer")comps.Add(c.DeepClone());
+            piece["Components"]=comps;children.Add(piece);
+        }
+        clone["Children"]=children;
+    }
+    roots.Add(clone);
+}
+root["GameObjects"]=roots;root["SceneProperties"]["NavMesh"]["Enabled"]=false;root["SceneProperties"]["WantsSystemScene"]=false;
+var scene=Scene.CreateEditorScene();
+var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic;
+var preRender=typeof(Scene).GetMethod("PreRender",flags,null,Type.EmptyTypes,null);
+var preCamera=typeof(Scene).GetMethod("PreCameraRender",flags,null,Type.EmptyTypes,null);
+try
+{
+    CameraComponent camera;GameObject replacement,lightHolder;ModelRenderer pad;
+    var origin=new Vector3((float)plan["position"][0].GetValue<double>(),(float)plan["position"][1].GetValue<double>(),(float)plan["position"][2].GetValue<double>());
+    var frame=Rotation.FromYaw((float)plan["yaw"].GetValue<double>());
+    using(scene.Push())
+    {
+        scene.Deserialize(root);
+        pad=scene.GetAllComponents<ModelRenderer>().Single(r=>r.Model?.ResourcePath=="models/maps/riverside/riverside_low.vmdl");
+        replacement=new GameObject(false,"T2 precast entry review");replacement.WorldPosition=origin;replacement.WorldRotation=frame;
+        replacement.Components.Create<ModelRenderer>().Model=models[0];
+        foreach(var t in scene.GetAllComponents<Tonemapping>())
+        {
+            var e=(t.MinimumExposure+t.MaximumExposure)/2f;t.AutoExposureEnabled=true;t.MinimumExposure=t.MaximumExposure=e;t.Rate=1000;
+        }
+        camera=new GameObject(true,"Precast entry camera").Components.Create<CameraComponent>();
+        camera.ZNear=.3f;camera.ZFar=30000;camera.FieldOfView=50;
+        lightHolder=new GameObject(true,"Temporary matched inspection light");
+        var light=lightHolder.Components.Create<PointLight>();light.Radius=950;light.LightColor=new Color(0,0,0);light.Shadows=true;
+    }
+    var original=pad.Model;
+    var textures=scene.GetAllComponents<ModelRenderer>().Where(r=>r.Model is not null).SelectMany(r=>r.Model.Materials).Concat(models.SelectMany(m=>m.Materials)).Distinct()
+        .SelectMany(m=>new[]{"g_tColor","g_tNormal","g_tRoughness","SkyTexture"}.Select(m.GetTexture)).Where(t=>t is not null).Distinct().ToArray();
+    foreach(var t in textures)t.MarkUsed(512);
+    foreach(var mat in models[0].Materials)
+        foreach(var t in new[]{"g_tColor","g_tNormal","g_tRoughness","g_tTranslucency"}.Select(mat.GetTexture).Where(t=>t is not null))t.MarkUsed(1024);
+    for(var f=0;f<40;f++)
+    {
+        using(scene.Push()){scene.EditorTick(.016f,.016f);preRender.Invoke(scene,null);}
+        await Task.Delay(25,cancellationToken);
+    }
+    var shots=new (string name,Vector3 eye,Vector3 target,float radius)[]{
+        ("whole",new Vector3(-46,-50,40),new Vector3(18,0,13),140),
+        ("detail",new Vector3(-15,-33,23),new Vector3(11,-14,13.5f),100),
+        ("context",new Vector3(-90,-110,76),new Vector3(20,0,38),250)
+    };
+    var files=new System.Collections.Generic.List<string>();
+    foreach(var variant in new[]{"new"})foreach(var shot in shots)
+    {
+        using(scene.Push())
+        {
+            replacement.Enabled=false;pad.Model=replacement.Enabled?models[1]:original;
+            lightHolder.Components.Get<PointLight>().Radius=shot.radius;
+            lightHolder.WorldPosition=origin+frame*(shot.target+(shot.name=="whole"?new Vector3(-45,-35,60):new Vector3(-28,-22,35)));
+        }
+        using var bitmap=new Bitmap(1600,1000);
+        for(var f=0;f<12;f++)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            using(scene.Push())
+            {
+                camera.WorldPosition=origin+frame*shot.eye;camera.WorldRotation=Rotation.LookAt(frame*(shot.target-shot.eye));
+                scene.EditorTick(.016f,.016f);preRender.Invoke(scene,null);preCamera.Invoke(scene,null);
+                ((SceneCamera)typeof(CameraComponent).GetProperty("SceneCamera",flags).GetValue(camera)).AntiAliasing=true;
+                camera.RenderToBitmap(bitmap,false);
+            }
+            await Task.Delay(16,cancellationToken);
+        }
+        if(variant=="settling")continue;
+        var path=System.IO.Path.Combine(output,"installed_maplight_"+shot.name+".png");System.IO.File.WriteAllBytes(path,bitmap.ToPng());files.Add(path);
+    }
+    return new{Models=models.Select(m=>new{m.ResourcePath,m.IsError,Bounds=m.Bounds.ToString()}).ToArray(),Screenshots=files,Installed=true,InspectionLight=false};
+}
+finally{scene.Destroy();}

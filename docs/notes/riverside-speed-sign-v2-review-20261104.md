@@ -1,0 +1,7 @@
+## Riverside speed-limit sign v2 — installed, 2026-11-04
+
+- User approved after 54 sandbags were installed. One speed sign is installed and saved in the public Riverside scene; original post collision retained.
+- `models/props/riverside/speed_sign_v2/speed_sign.vmdl`: rounded formed sheet, matching rear outline, perforated U-channel post, fixing bolts/washers and rear mounting plates. Keeps existing SPEED LIMIT 15 artwork. Shared 1k PBR atlas; 3,504 / 596 / 324 triangles in three LODs.
+- Original has 16 faces and a rear image wider than the front. Private comparison preserves its exact published geometry/UVs/normals. Native front/full map views and isolated rear views use matched cameras/exposure with a temporary inspection light. All models load without errors; geometry/UV/normal and public hash checks passed. No gameplay/LOD playtest.
+- Recipe: `Sources/Riverside/speed-sign-v2/README.md`. Evidence: `output/asset-improvement-20261030/riverside-speed-sign/before-after.png`. Preserve original post collision and avoid full-map regeneration if later approved.
+- Installation removes exactly 16 original pad faces and preserves every unrelated line and the complete ModelDoc/physics byte-for-byte. Saved transform/model checks pass, and all 54 sandbags remain. Native pad compilation succeeded. Generator records `SPEED_SIGNS` and emits the scene group; no full regeneration. Receipts/backups: `output/asset-improvement-20261030/riverside-speed-sign/installed/`.

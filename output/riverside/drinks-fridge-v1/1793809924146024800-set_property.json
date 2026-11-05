@@ -1,0 +1,5 @@
+InvalidOperationException: The requested operation requires an element of type 'String', but the target element has type 'Number'.
+at System.Text.Json.ThrowHelper.ThrowJsonElementWrongTypeException(JsonTokenType expectedType, JsonTokenType actualType)
+at System.Text.Json.JsonElement.GetString()
+at SetPropertyHandler.Execute(JsonElement p) in C:\sbox-projects\hc1\forked-shooter-main\Libraries\sboxskinsgg.claudebridge\Editor\MyEditorMenu.cs:line 1768
+at McpGate.Run(String command, JsonObject args) in C:\sbox-projects\hc1\forked-shooter-main\Libraries\sboxskinsgg.claudebridge\Editor\Mcp\McpGate.cs:line 58

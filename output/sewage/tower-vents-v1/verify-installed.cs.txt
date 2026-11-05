@@ -1,0 +1,6 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var disk=System.IO.File.ReadAllText(System.IO.Path.Combine(root,"Assets/scenes/maps/sewage/sewage.scene"));
+var data=System.Text.Json.Nodes.JsonNode.Parse(disk);
+var old=Model.Load("models/maps/sewage/sewage_tower.vmdl");
+var current=Model.Load("models/maps/sewage/tower-vents-v1/vents.vmdl");
+return new{NewModelLoads=current is not null&&!current.IsError,OldModelLoads=old is not null&&!old.IsError,NewGroups=data["GameObjects"].AsArray().Count(x=>x["Name"]?.GetValue<string>()=="Waterworks louvred vent housings"),ComparisonObjectsRemain=disk.Contains("REVIEW VENT"),SavedNewBase=disk.Contains("models/maps/sewage/tower-vents-v1/base_tower.vmdl"),OldSourceRetained=System.IO.File.Exists(System.IO.Path.Combine(root,"Assets/models/maps/sewage/sewage_tower.obj"))};

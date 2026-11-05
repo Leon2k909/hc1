@@ -53,15 +53,16 @@ def geometry():
     # Separate folded body panels leave an actual cavity behind the louvres.
     box(PAINT, (-50, -21.5, 0), (-48.7, 0, 93), name='left cheek')
     box(PAINT, (48.7, -21.5, 0), (50, 0, 93), name='right cheek')
-    box(PAINT, (-50, -21.5, 0), (50, 0, 1.3), name='bottom pan')
-    box(PAINT, (-50, -21.5, 91.7), (50, 0, 93), name='top panel')
+    box(PAINT, (-48.7, -21.5, 0), (48.7, 0, 1.3), name='bottom pan')
+    box(PAINT, (-48.7, -21.5, 91.7), (48.7, 0, 93), name='top panel')
     box(BLACK, (-48.7, -5.1, 1.3), (48.7, -4.9, 91.7), bevel=.01, name='dark plenum')
     # Plain access panels below and above the removable louvre cassette.
     box(PAINT, (-48.7, -21.5, 1.3), (48.7, -20.7, 14.6), name='lower access panel')
     box(PAINT, (-48.7, -21.5, 83.9), (48.7, -20.7, 91.7), name='top panel face')
     # Four channel rails and a central mullion; front return lips catch the light.
-    for x0, x1 in [(-48.7, -43.5), (43.5, 48.7), (-1.4, 1.4)]:
+    for x0, x1 in [(-48.7, -43.5), (43.5, 48.7)]:
         box(PAINT, (x0, -23.6, 14.4), (x1, -20.2, 84.1), bevel=.09, name='cassette upright')
+    box(PAINT, (-1.4, -23.6, 18), (1.4, -20.2, 81), bevel=.09, name='centre mullion')
     for z0, z1 in [(14.4, 18), (81, 84.1)]:
         box(PAINT, (-43.5, -23.6, z0), (43.5, -20.2, z1), bevel=.09, name='cassette horizontal')
     # Eight slightly overlapping blades per bank, seated into the channels.
@@ -71,7 +72,7 @@ def geometry():
         blade(1.45, 43.5, z)
     # A projecting rain cap with a small turned-down front edge.
     box(PAINT, (-50.5, -24, 92.9), (50.5, .5, 93.6), bevel=.08, name='rain cap')
-    box(PAINT, (-50.5, -24, 91.8), (50.5, -23.3, 93.6), bevel=.06, name='cap drip')
+    box(PAINT, (-50.5, -24, 91.8), (50.5, -23.3, 92.9), bevel=.06, name='cap drip')
     # Backing mesh has geometry only at close range; the black plenum persists at every LOD.
     for z in range(20, 81, 4):
         kit.tube(part(STEEL, 1, bevel=0, name='screen horizontal'), [(-43.5, -7, z), (43.5, -7, z)], .055, 4)

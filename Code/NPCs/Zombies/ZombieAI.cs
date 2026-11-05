@@ -63,6 +63,8 @@ public sealed class ZombieAI : Component, Component.IDamageable
 	private TimeUntil _nextGroan;
 	/// <summary>Hits a moment apart (a burst, a shotgun's pellets) get one grunt.</summary>
 	private TimeSince _timeSincePain = 10f;
+	private TimeSince _timeSinceHitReaction = 10f;
+	private ZombieHitReactionPose _hitReaction;
 
 	public float MoveSpeed => Speed switch
 	{
@@ -149,11 +151,16 @@ public sealed class ZombieAI : Component, Component.IDamageable
 			return;
 
 		var toTarget = (_target.WorldPosition - WorldPosition).WithZ( 0 );
-		if ( toTarget.LengthSquared > 0.1f )
-			WorldRotation = Rotation.Lerp( WorldRotation, Rotation.LookAt( toTarget.Normal, Vector3.Up ), Time.Delta * 10f );
-
 		var dist = WorldPosition.Distance( _target.WorldPosition );
 		var attacking = _timeSinceAttackStart < AttackAnimHold;
+		// Follow the path around corners instead of walking sideways while staring through the wall at the target.
+		// In striking range, turn towards the player so the attack still faces them.
+		var facing = toTarget;
+		if ( !attacking && dist > AttackRange && Agent.IsValid() && Agent.Enabled
+			&& Agent.Velocity.WithZ( 0 ).LengthSquared > 100f )
+			facing = Agent.Velocity.WithZ( 0 );
+		if ( facing.LengthSquared > 0.1f )
+			WorldRotation = Rotation.Lerp( WorldRotation, Rotation.LookAt( facing.Normal, Vector3.Up ), 1f - MathF.Exp( -Time.Delta * 10f ) );
 
 		if ( Agent.IsValid() && Agent.Enabled )
 		{
@@ -443,16 +450,28 @@ public sealed class ZombieAI : Component, Component.IDamageable
 
 	private Vector3 _lastPos;
 	private Vector3 _smoothVel;
+	private float _smoothSpeed;
+	private bool _hasAnimationPosition;
+	private float? _moveCycle;
 
 	private void UpdateAnimation()
 	{
 		if ( !Renderer.IsValid() || Anim == AnimState.Dead ) return;
 
 		// Velocity from position deltas, so proxies animate too.
-		var vel = Time.Delta > 0f ? (WorldPosition - _lastPos) / Time.Delta : Vector3.Zero;
+		var vel = _hasAnimationPosition && Time.Delta > 0f ? (WorldPosition - _lastPos) / Time.Delta : Vector3.Zero;
 		_lastPos = WorldPosition;
-		if ( vel.Length > 600f ) vel = Vector3.Zero; // teleports / spawn
-		_smoothVel = _smoothVel.LerpTo( vel.WithZ( 0 ), Time.Delta * 10f );
+		_hasAnimationPosition = true;
+		if ( vel.Length > 600f ) // Teleports aren't footsteps; discard the old movement too.
+		{
+			vel = Vector3.Zero;
+			_smoothVel = Vector3.Zero;
+			_smoothSpeed = 0f;
+		}
+		var blend = 1f - MathF.Exp( -Time.Delta * 12f );
+		_smoothVel = _smoothVel.LerpTo( vel.WithZ( 0 ), blend );
+		// Smooth the speed separately: averaging direction vectors made the feet slow down during turns.
+		_smoothSpeed += (vel.WithZ( 0 ).Length - _smoothSpeed) * blend;
 
 		if ( Renderer.UseAnimGraph ) UpdateAnimGraph();
 		else UpdateSequence();
@@ -479,19 +498,21 @@ public sealed class ZombieAI : Component, Component.IDamageable
 	private void UpdateSequence()
 	{
 		var seq = Renderer.Sequence;
+		if ( _playingSeq == MoveClip.Name ) _moveCycle = seq.TimeNormalized;
 		switch ( Anim )
 		{
 			case AnimState.Move:
 			{
 				var clip = MoveClip;
-				if ( _playingSeq != clip.Name ) Play( clip, true, Quirk * clip.Duration );
+				if ( _playingSeq != clip.Name ) Play( clip, true, (_moveCycle ?? Quirk) * clip.Duration );
 
 				// Feet keep pace with the ground: Walkers (70) play the walk (made for 70) at 1x. Past 1.4x its cadence
 				// turns frantic, so faster feet slide a little instead. Jogs are the run slowed down. Each zombie starts
 				// at its own point in the cycle (Quirk), so a crowd doesn't march in step; a rate of its own would make
 				// its feet slide.
-				var (min, max) = Speed == ZombieSpeed.Walk ? (0.6f, 1.4f) : (0.55f, 1.3f);
-				seq.PlaybackRate = (_smoothVel.Length / clip.Speed).Clamp( min, max );
+				// No minimum cadence: a slowing or blocked zombie must not keep marching in place.
+				var max = Speed == ZombieSpeed.Walk ? 1.4f : 1.3f;
+				seq.PlaybackRate = (_smoothSpeed / clip.Speed).Clamp( 0f, max );
 				break;
 			}
 
@@ -635,15 +656,40 @@ public sealed class ZombieAI : Component, Component.IDamageable
 			eco?.AddKill();
 			Kill( attacker?.GameObject );
 		}
-		else if ( !burn )
+		else if ( damage > 0f && !burn )
 		{
 			eco?.AddPoints( 10 );
+			// Coalesce shotgun pellets, but keep a burst's separate impacts visible.
+			if ( _timeSinceHitReaction >= .09f )
+			{
+				_timeSinceHitReaction = 0;
+				var push = info.Origin == default ? Vector3.Zero : (info.Position == default ? WorldPosition : info.Position) - info.Origin;
+				if ( push.IsNearZeroLength && attacker.IsValid() ) push = WorldPosition - attacker.WorldPosition;
+				if ( push.IsNearZeroLength ) push = -WorldRotation.Forward;
+				var side = info.Position == default ? 0f : WorldTransform.PointToLocal( info.Position ).y / 14f;
+				ReactToHit( push.Normal, (damage / 40f).Clamp( .55f, 1.2f ), headshot, side );
+			}
 			if ( _timeSincePain > 0.35f )
 			{
 				_timeSincePain = 0;
 				PlayVoice( ZombieVoice.Pain );
 			}
 		}
+	}
+
+	[Rpc.Broadcast( NetFlags.HostOnly )]
+	private void ReactToHit( Vector3 push, float strength, bool headshot, float side )
+	{
+		if ( IsDead || _ragdolled || Application.IsDedicatedServer ) return;
+		_hitReaction ??= new ZombieHitReactionPose();
+		_hitReaction.Trigger( WorldRotation.Inverse * push, strength, headshot, side );
+	}
+
+	/// <summary>Apply after the driver animates, then merge that pose onto every visible zombie body.</summary>
+	internal void FinishHitReaction()
+	{
+		if ( IsDead || _ragdolled || !Enabled || Application.IsDedicatedServer ) return;
+		_hitReaction?.Apply( Renderer, Time.Delta );
 	}
 
 	/// <summary>Host: kill this zombie (from damage, or a Clean Sweep with no attacker).</summary>

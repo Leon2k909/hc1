@@ -13,6 +13,22 @@
 						_class = "DefaultMaterialGroup"
 						remaps =
 						[
+							{ from = "rh_wl_rh_black.vmat" to = "materials/reefhall/rh_black.vmat" },
+							{ from = "rh_wl_rh_frosted_lit.vmat" to = "materials/reefhall/rh_frosted_lit.vmat" },
+							{ from = "rh_wl_rh_gunmetal.vmat" to = "materials/reefhall/rh_gunmetal.vmat" },
+							{ from = "rh_wl_rh_rubber.vmat" to = "materials/reefhall/rh_rubber.vmat" },
+							{ from = "rh_wl_rh_stainless.vmat" to = "materials/reefhall/rh_stainless.vmat" },
+							{ from = "rh_wl_rh_steel.vmat" to = "materials/reefhall/rh_steel.vmat" },
+							{ from = "rh_cp_rh_black.vmat" to = "materials/reefhall/rh_black.vmat" },
+							{ from = "rh_cp_rh_brass.vmat" to = "materials/reefhall/rh_brass.vmat" },
+							{ from = "rh_cp_rh_coral_white.vmat" to = "materials/reefhall/rh_coral_white.vmat" },
+							{ from = "rh_cp_rh_gunmetal.vmat" to = "materials/reefhall/rh_gunmetal.vmat" },
+							{ from = "rh_cp_rh_pipe.vmat" to = "materials/reefhall/rh_pipe.vmat" },
+							{ from = "rh_cp_rh_pipe_dark.vmat" to = "materials/reefhall/rh_pipe_dark.vmat" },
+							{ from = "rh_cp_rh_rubber.vmat" to = "materials/reefhall/rh_rubber.vmat" },
+							{ from = "rh_cp_rh_stainless.vmat" to = "materials/reefhall/rh_stainless.vmat" },
+							{ from = "rh_cp_rh_steel.vmat" to = "materials/reefhall/rh_steel.vmat" },
+							{ from = "rh_cp_rh_steel_blue.vmat" to = "materials/reefhall/rh_steel_blue.vmat" },
 							{ from = "rh_ceiling.vmat" to = "materials/reefhall/rh_ceiling.vmat" },
 							{ from = "rh_floor.vmat" to = "materials/reefhall/rh_floor.vmat" },
 							{ from = "rh_grate.vmat" to = "materials/reefhall/rh_grate.vmat" },
@@ -42,6 +58,32 @@
 						_class = "RenderMeshFile"
 						name = "reefhall_filter"
 						filename = "models/maps/reefhall/reefhall_filter.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "wall_light"
+						filename = "models/maps/reefhall/wall-light-v1/installed_wall_light.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "circulation_pump"
+						filename = "models/maps/reefhall/circulation-pump-v1/installed_circulation_pump.obj"
 						import_translation = [ 0.0, 0.0, 0.0 ]
 						import_rotation = [ 0.0, 0.0, 0.0 ]
 						import_scale = 1.0

@@ -1,0 +1,26 @@
+var session = Editor.SceneEditorSession.Active;
+if (session?.Scene is null || !session.Scene.Name.Equals("riverside", StringComparison.OrdinalIgnoreCase) || session.IsPlaying)
+    throw new Exception("Riverside must be active and out of play mode");
+if (session.HasUnsavedChanges) throw new Exception("The editor has unsaved changes; inspect them before installation");
+var project = Sandbox.Project.Current.GetRootPath();
+var plan = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(project, "output/asset-improvement-20261030/riverside-sandbags/installed/placements.json")));
+foreach (var name in new[] { "riverside_pad", "riverside_store", "riverside_dressing" })
+{
+    var asset = Editor.AssetSystem.FindByPath("models/maps/riverside/" + name + ".vmdl");
+    if (asset is null) throw new Exception("Missing model " + name);
+    await asset.CompileIfNeededAsync();
+    cancellationToken.ThrowIfCancellationRequested();
+}
+using (session.Scene.Push())
+{
+    var group = session.Scene.GetAllObjects(true).FirstOrDefault(g => g.Name == "Sandbags");
+    if (group is null)
+    {
+        group = new GameObject(false, "Sandbags");
+        group.Deserialize(plan["group"].AsObject());
+    }
+    var renderers = group.GetComponentsInChildren<ModelRenderer>().ToArray();
+    if (renderers.Length != 54 || renderers.Any(r => r.Model is null || r.Model.IsError)) throw new Exception("Expected 54 valid sandbag models");
+    session.HasUnsavedChanges = true;
+    return new { Installed = renderers.Length, InvalidModels = renderers.Count(r => r.Model.IsError), CollidersAdded = group.GetComponentsInChildren<Collider>().Count(), NeedsSave = true };
+}

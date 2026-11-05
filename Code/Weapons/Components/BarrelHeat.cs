@@ -8,7 +8,7 @@ namespace Facepunch;
 /// A closed-bolt gun left with a round chambered in a barrel past <see cref="CookOffTemperature"/> fires it by itself.
 /// </summary>
 [Title( "Barrel Heat" ), Group( "Weapon Components" )]
-public sealed class BarrelHeat : EquipmentComponent
+public sealed class BarrelHeat : EquipmentComponent, IDroppedWeaponState
 {
 	/// <summary>
 	/// Barrel temperature rise per shot, in °C: the heat one round leaves in the barrel over the barrel's heat capacity
@@ -59,7 +59,27 @@ public sealed class BarrelHeat : EquipmentComponent
 	}
 
 	/// <summary>When the round now in the chamber would cook off, in seconds after the last shot.</summary>
-	private float _cookOffAfter;
+	[Sync] private float _cookOffAfter { get; set; }
+
+	void IDroppedWeaponState.CopyToDroppedWeapon( DroppedEquipment dropped )
+	{
+		var state = dropped.GetOrAddComponent<BarrelHeat>();
+		// Store the current temperature with a fresh clock, so floor time cools it exactly once.
+		state.CoolingTime = CoolingTime;
+		state.ShotTemperature = Temperature;
+		state.TimeSinceShot = 0;
+		state._cookOffAfter = MathF.Max( 0f, _cookOffAfter - TimeSinceShot );
+		// This component is only thermal storage on the dropped object, not a firing action.
+		state.CookOffTemperature = 0f;
+	}
+
+	void IDroppedWeaponState.CopyFromDroppedWeapon( DroppedEquipment dropped )
+	{
+		if ( dropped.GetComponent<BarrelHeat>() is not { } state ) return;
+		ShotTemperature = state.Temperature;
+		TimeSinceShot = 0;
+		_cookOffAfter = MathF.Max( 0f, state._cookOffAfter - state.TimeSinceShot );
+	}
 
 	internal void Shoot()
 	{

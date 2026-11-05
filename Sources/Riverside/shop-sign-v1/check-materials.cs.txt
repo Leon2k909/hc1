@@ -1,0 +1,11 @@
+var candidate=Model.Load("models/maps/riverside/shop-sign-v1/shop_sign.vmdl");
+var original=Model.Load("models/maps/riverside/riverside_store.vmdl");
+var without=Model.Load("models/maps/riverside/shop-sign-v1/store_without_shop_sign.vmdl");
+if(candidate.IsError || without.IsError || candidate.Materials.Any(m=>m==null || m.IsError))throw new Exception("Sign resource/material failed to load");
+var face=candidate.Materials.First(m=>m.ResourcePath=="materials/riverside/shop-sign-v1/face.vmat");
+var color=face.GetTexture("g_tColor");if(color==null || color.Width!=2048 || color.Height!=512)throw new Exception("Face texture dimensions are wrong");
+if(candidate.Materials.Any(m=>m.ResourcePath!="materials/riverside/shop-sign-v1/face.vmat" && m.ResourcePath!="materials/riverside/rs_lamp_warm.vmat" && m.GetFeature("F_SELF_ILLUM")!=0))throw new Exception("Unexpected emissive cabinet material");
+var session=Editor.SceneEditorSession.Active;
+var report=new{AllMaterialsLoaded=true,Face=new{color.Width,color.Height,color.Mips,Emission=face.GetFeature("F_SELF_ILLUM")},Materials=candidate.Materials.Select(m=>new{m.ResourcePath,m.IsError,Emission=m.GetFeature("F_SELF_ILLUM")}).ToArray(),Candidate=candidate.MeshInfo,Original=original.MeshInfo,Without=without.MeshInfo,Editor=new{Scene=session.Scene.Id,Dirty=session.HasUnsavedChanges,Playing=Game.IsPlaying}};
+System.IO.File.WriteAllText("C:/sbox-projects/hc1/shop-sign-review/output/riverside/shop-sign-v1/materials-verified.json",Json.Serialize(report));
+return new{report.AllMaterialsLoaded,MaterialCount=report.Materials.Length,report.Face,RemovedTriangles=original.MeshInfo.TotalTriangles-without.MeshInfo.TotalTriangles,report.Editor};

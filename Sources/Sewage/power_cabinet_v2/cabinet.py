@@ -46,6 +46,7 @@ SKIN = 18.5  # The doors' outer face.
 LEAF_LOW, LEAF_HIGH = 8.0, 107.5
 GAUGES = [(-25.0, 94.2), (-12.0, 94.2)]
 GAUGE_R = 4.1
+GAUGE_NEEDLES = [172.0, 238.0]
 LAMP_AT = (18.5, -24.0, 110.8)
 
 
@@ -211,12 +212,26 @@ def instruments():
         for z in (z0 + 1.0, z1 - 1.0):
             button_head(y, z, SKIN + 0.5, 0.3, ZINC)
     x = SKIN + 0.5
-    for y, z in GAUGES:
+    # Folded rain hood: pitched top, downturned drip edge and two cheek brackets.
+    along_y([(x, 103.0), (x+4.6, 102.35), (x+4.6, 101.6),
+             (x+4.35, 101.6), (x+4.35, 102.13), (x, 102.78)],
+            -32.4, -4.6, part(PAINT, 3, bevel=0.025, segs=2, name="instrument rain hood"))
+    for yy in (-32.4, -4.8):
+        along_y([(x+0.03, 102.75), (x+4.32, 102.12), (x+0.03, 98.9)], yy, yy+0.2,
+                part(PAINT, 2, bevel=0.025, name="hood cheek"))
+    box(part(OXIDE, 2, bevel=0.025, name="hood mounting strip"), (x, -32.4, 101.2), (x+0.16, -4.6, 102.75))
+    for yy in (-31.2, -5.8):
+        button_head(yy, 101.8, x+0.16, 0.25, ZINC)
+    for index, (y, z) in enumerate(GAUGES):
         m = face_frame(y, z, x)
         lathe(part(OXIDE, 2, bevel=0.0, name="meter bezel", dense=1.5), [(GAUGE_R + 0.75, 0.0), (GAUGE_R + 0.75, 0.55), (GAUGE_R + 0.5, 0.86), (GAUGE_R + 0.04, 0.86), (GAUGE_R + 0.04, 0.3)], 28, m)
         p = part(DIAL, 2, name="meter dial", dense=2.2)
         lathe(p, [(0.0, 0.32), (GAUGE_R + 0.06, 0.32)][::-1], 28, m)
         drop(p, (-1, 0, 0))
+        # A raised, tapered pointer sits above the dial and beneath its central boss.
+        pointer = m @ Matrix.Rotation(math.radians(225-GAUGE_NEEDLES[index]), 4, "Z")
+        prism(part(RUBBER, 2, name="meter pointer", dense=2.2),
+              [(-0.8,-0.12),(2.9,-0.07),(3.42,0.0),(2.9,0.07),(-0.8,0.12)], 0.43, 0.51, pointer)
         lathe(part(RUBBER, 1, name="meter boss", dense=1.5), [(0.34, 0.3), (0.34, 0.5), (0.0, 0.58)], 8, m)
         for a in (45, 135, 225, 315):
             r = math.radians(a)
@@ -561,7 +576,7 @@ def build_stage():
     lod("cabinet_lod2", 2, 0.4)
     lod("cabinet_lod3", 3, 0.3)
     with open(os.path.join(WORK, "cabinet.json"), "w") as h:
-        json.dump(dict(density=density, gauges=GAUGES, gauge_r=GAUGE_R, skin=SKIN, lamp=LAMP_AT), h)
+        json.dump(dict(density=density, gauges=GAUGES, gauge_r=GAUGE_R, gauge_needles=GAUGE_NEEDLES, skin=SKIN, lamp=LAMP_AT), h)
     bpy.ops.wm.save_as_mainfile(filepath=BLEND)
     print("saved build", flush=True)
 
@@ -578,7 +593,7 @@ def bake_stage():
     scene.render.engine = "CYCLES"
     scene.cycles.device = "CPU"
     scene.render.threads_mode = "FIXED"
-    scene.render.threads = 4
+    scene.render.threads = 2
     scene.cycles.use_denoising = False
     scene.cycles.use_adaptive_sampling = False
     scene.cycles.max_bounces = 2
@@ -643,7 +658,7 @@ def bake_stage():
     bake_one(RES // 2, "AO", None, 24, "bake_cabinet_ao")
 
 
-def export_stage():
+def export_stage(write_resources=True):
     bpy.ops.wm.open_mainfile(filepath=BLEND)
     out = os.path.join(ROOT, "Assets", MODEL)
     mats = os.path.join(ROOT, "Assets", MATS)
@@ -707,6 +722,9 @@ def export_stage():
             h.writelines(faces)
         counts[lod] = n_tris
         print("lod", lod, "tris", n_tris, flush=True)
+    if not write_resources:
+        print("exported meshes", counts, flush=True)
+        return
     with open(os.path.join(out, f"{NAME}.mtl"), "w", newline="\n") as h:
         h.write(f"newmtl {NAME}\nKd 1 1 1\nd 1\n")
     meshes = ",\n".join(
@@ -830,4 +848,6 @@ if "bake" in STAGES:
     bake_stage()
 if "export" in STAGES:
     export_stage()
+if "export-meshes" in STAGES:
+    export_stage(write_resources=False)
 print("cabinet stages done", flush=True)

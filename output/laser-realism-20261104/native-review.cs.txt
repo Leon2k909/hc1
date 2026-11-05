@@ -1,0 +1,35 @@
+var scene = new Scene();
+try
+{
+    using var scope = scene.Push();
+    var wall = new GameObject(true,"Laser review target");
+    wall.WorldPosition = new Vector3(300,0,64);
+    var collider = wall.Components.Create<BoxCollider>(); collider.Scale=new Vector3(4,240,128);
+    var mesh = wall.Components.Create<ModelRenderer>(); mesh.Model=Model.Load("models/dev/box.vmdl");
+    mesh.WorldScale=new Vector3(.08f,4.8f,2.56f); mesh.Tint=new Color(.14f,.16f,.18f);
+    collider.Scale=new Vector3(50,50,50);
+    var ground = new GameObject(true,"Ground").Components.Create<ModelRenderer>();
+    ground.Model=Model.Load("models/dev/box.vmdl"); ground.WorldPosition=new Vector3(140,0,-2);
+    ground.WorldScale=new Vector3(6,5,.08f);ground.Tint=new Color(.16f,.15f,.13f);
+    var moon = new GameObject(true,"Moon").Components.Create<DirectionalLight>();
+    moon.WorldRotation=Rotation.From(new Angles(45,20,0));moon.LightColor=Color.White*.15f;moon.SkyColor=Color.White*.07f;
+    var sky = new GameObject(true,"Night sky").Components.Create<SkyBox2D>();
+    sky.SkyMaterial=Material.Load("materials/riverside/sky/riverside_sky.vmat");
+    sky.Tint=Color.White*.05f;
+    var fog = new GameObject(true,"Night haze").Components.Create<VolumetricFogVolume>();
+    fog.Bounds=new BBox(new Vector3(-500,-500,-100),new Vector3(1000,500,300));fog.Strength=.2f;
+    var camera=new GameObject(true,"Review camera").Components.Create<CameraComponent>();
+    camera.WorldPosition=new Vector3(-20,0,60);camera.WorldRotation=Rotation.Identity;
+    camera.FieldOfView=70;camera.ZNear=.1f;camera.BackgroundColor=new Color(.015f,.02f,.03f);
+    var beam=new GameObject(true,"Review laser").Components.Create<Facepunch.Gunsmith.GunsmithLaserBeam>();
+    scene.EditorTick(.02f,.02f);
+    beam.TraceBeam(new Vector3(0,-8,50),Vector3.Forward,null,camera);
+    using var bitmap=new Bitmap(1000,600);
+    camera.RenderToBitmap(bitmap);
+    var path=System.IO.Path.Combine(exchangeDirectory,"laser-after.png");
+    System.IO.File.WriteAllBytes(path,bitmap.ToPng());
+    var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic;
+    var points=typeof(Facepunch.Gunsmith.GunsmithLaserBeam).GetField("points",flags).GetValue(beam);
+    return new {path,beam.HasHit,beam.IsVisible,beam.Start,beam.End,Adaptation=Facepunch.Gunsmith.LaserOptics.Adapted(camera),Points=((ValueTuple<Vector3,float,float>[])points).Select(x=>new {Position=x.Item1,Level=x.Item2,Radius=x.Item3}).ToArray()};
+}
+finally { scene.Destroy(); }

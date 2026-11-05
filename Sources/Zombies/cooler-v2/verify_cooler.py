@@ -31,7 +31,8 @@ def bounds(path):
     return v.min(0), v.max(0)
 
 
-old_lo, old_hi = bounds(os.path.join(WORK, "old_cooler.obj"))
+# Recorded bounds of the retired box-built cooler; validation doesn't need to retain its obsolete mesh.
+old_lo, old_hi = np.array((-16.3, -15.22, 0.0)), np.array((16.3, 8.8, 32.42))
 report["old"] = dict(min=old_lo.round(2).tolist(), max=old_hi.round(2).tolist())
 for lod in range(3):
     path = os.path.join(NEW, f"{NAME}_lod{lod}.obj")
@@ -53,12 +54,35 @@ for tex in re.findall(r'"(materials/[^"]+\.png)"', vmat):
     check(os.path.exists(os.path.join(ASSETS, tex)), f"missing {tex}")
 scene = json.loads(open(os.path.join(ASSETS, "scenes/maps/Riverside/riverside.scene"), encoding="utf-8").read())
 placed = [o for o in scene["GameObjects"] if o.get("Name") == "Cooler"]
-check(len(placed) == 1 and placed[0]["Components"][0]["Model"] == "models/zombies/cooler_v2/cooler.vmdl", "the scene doesn't place one new cooler")
+def model_path(component):
+    model = component.get("Model")
+    return model.get("Path") if isinstance(model, dict) else model
+
+check(len(placed) == 1 and any(model_path(c) == "models/zombies/cooler_v2/cooler.vmdl"
+                             for c in placed[0].get("Components", [])), "the scene doesn't place one new cooler")
 report["placed"] = placed[0]["Position"] if placed else None
 pad = open(os.path.join(ASSETS, "models/maps/riverside/riverside_pad.obj"), encoding="utf-8").read()
 check("usemtl rs_cooler" not in pad, "the old cooler's faces are still in the pad's model")
-collision = subprocess.run(["git", "status", "--porcelain", "--", "Assets/models/maps/riverside/riverside_pad.vmdl", "Assets/models/maps/riverside/*hulls*"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
+collision = subprocess.run(["git", "status", "--porcelain", "--", "Assets/models/maps/riverside/*hulls*"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
 check(collision == "", f"the pad's collision files changed: {collision}")
+# Material remaps can change in another prop task; compare the actual physics blocks, not the whole ModelDoc's status.
+def physics_blocks(text):
+    blocks = []
+    for match in re.finditer(r'_class\s*=\s*"(Physics[^\"]*)"', text):
+        start = text.rfind("{", 0, match.start())
+        depth = 0
+        for end in range(start, len(text)):
+            depth += (text[end] == "{") - (text[end] == "}")
+            if depth == 0:
+                blocks.append(re.sub(r"\s+", "", text[start:end + 1]))
+                break
+    return blocks
+
+pad_path = "Assets/models/maps/riverside/riverside_pad.vmdl"
+baseline = subprocess.run(["git", "show", "HEAD:" + pad_path], cwd=ROOT, capture_output=True, text=True)
+check(baseline.returncode == 0, "could not read the pad's committed collision definition")
+current = open(os.path.join(ROOT, pad_path), encoding="utf-8").read()
+check(physics_blocks(current) == physics_blocks(baseline.stdout), "the pad's physics definition changed")
 report["compiled files"] = [n for n in os.listdir(NEW) + os.listdir(MATS) if n.endswith("_c")]
 report["failures"] = failures
 print(json.dumps(report, indent=1))

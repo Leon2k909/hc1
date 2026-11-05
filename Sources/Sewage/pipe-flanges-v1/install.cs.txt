@@ -1,0 +1,15 @@
+if(Game.IsPlaying) throw new Exception("Stop for a quiet edit before installing flange details.");
+var session=Editor.SceneEditorSession.All.Single(x=>x.Scene.Name=="sewage");
+if(session.Scene.GetAllObjects(true).Any(x=>x.Name=="Waterworks bolted flanges")) throw new Exception("Flange details are already present; inspect before retrying.");
+var model=Model.Load("models/maps/sewage/pipe-flanges-v1/flanges.vmdl");
+if(model is null || model.IsError) throw new Exception("Flange model is unavailable.");
+using(session.Scene.Push())
+{
+    var holder=new GameObject(false,"Waterworks bolted flanges");
+    holder.Tags.Add("sewage");
+    holder.Components.Create<ModelRenderer>().Model=model;
+    holder.Enabled=true;
+}
+session.HasUnsavedChanges=true;
+session.Save(false);
+return new {Saved=!session.HasUnsavedChanges,Scene=session.Scene.Name,ActiveScene=Editor.SceneEditorSession.Active.Scene.Name};

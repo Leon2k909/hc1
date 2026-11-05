@@ -73,7 +73,29 @@ Input.CancelPressed = true;
 cancel.Update();
 Check( cancel.ThrowState == Throwable.State.Idle && cancel.Projectiles == 0, "Secondary-attack cancellation must remain supported." );
 
-Console.WriteLine( $"PASS: {checks} throwable checks against production input and throw components." );
+var actual = new TestThrowable { Prefab = new() };
+actual.Owner.AimRay = new( new( 0, 0, 64 ), new( 1, 0, 0 ) );
+actual.Owner.CharacterController.Velocity = new( 100, 20, 0 );
+actual.SpawnActual();
+Check( GameObject.LastClone.Position == new Vector3( 32, -10, 64 ), "An unobstructed throw must retain its existing release position." );
+Check( actual.Scene.Trace.Start == actual.Owner.AimRay.Position && actual.Scene.Trace.End == new Vector3( 32, -10, 64 ),
+	"Clearance must sweep the entire forward and sideways offset." );
+Check( actual.Scene.Trace.Radius == 2f, "Clearance must account for projectile width rather than using a zero-width line." );
+Check( actual.Scene.Trace.Ignored == actual.GameObject.Root, "The clearance probe must ignore the thrower's own hierarchy." );
+Check( actual.Scene.Trace.Excluded.SequenceEqual( new[] { "trigger", "playerclip", "movement" } ),
+	"Invisible movement/trigger volumes must not obstruct a grenade's release." );
+var launched = GameObject.LastClone.GetComponentInChildren<Rigidbody>();
+Check( launched.Velocity == new Vector3( 100 + actual.ThrowPower, 20, 100 ), "Throw velocity must retain both inherited movement and authored throw power." );
+
+foreach ( var contact in new[] { new Vector3( 18, -5.625f, 64 ), new Vector3( 5, -1.5625f, 64 ), new Vector3( 0, 0, 64 ) } )
+{
+	actual.Scene.Trace.Result = new() { Hit = true, EndPosition = contact, HitPosition = new( 99, 99, 99 ), Normal = new( -1, 0, 0 ) };
+	actual.SpawnActual();
+	Check( GameObject.LastClone.Position == contact, "Obstructed throws must use the swept centre, with no unchecked sideways offset or oversized normal push." );
+	Check( GameObject.LastClone.GetComponent<BaseGrenade>().Player == actual.Owner, "Obstruction must preserve grenade attribution." );
+}
+
+Console.WriteLine( $"PASS: {checks} throwable checks against production input, release and clearance code." );
 
 // Input and engine services are isolated; production code owns preparation, cancellation and release timing.
 namespace Sandbox
@@ -137,12 +159,19 @@ namespace Sandbox
 	public class Rigidbody : Component { public Vector3 Velocity, AngularVelocity; }
 	public class GameObject
 	{
+		public static GameObject LastClone;
+		public Vector3 Position;
+		private readonly Dictionary<Type, object> components = new();
 		public GameObject Root => this;
 		public NetworkState Network { get; } = new();
 		public Tags Tags { get; } = new();
-		public GameObject Clone( Vector3 position, Rotation rotation ) => new();
-		public T GetComponent<T>() where T : new() => new();
-		public T GetComponentInChildren<T>() where T : new() => new();
+		public GameObject Clone( Vector3 position, Rotation rotation ) => LastClone = new() { Position = position };
+		public T GetComponent<T>() where T : new()
+		{
+			if ( !components.TryGetValue( typeof(T), out var component ) ) components[typeof(T)] = component = new T();
+			return (T)component;
+		}
+		public T GetComponentInChildren<T>() where T : new() => GetComponent<T>();
 		public void NetworkSpawn() { }
 		public Team GetTeam() => default;
 	}
@@ -150,12 +179,18 @@ namespace Sandbox
 	public class Scene { public TraceStub Trace { get; } = new(); }
 	public class TraceStub
 	{
+		public Vector3 Start, End;
+		public float Radius;
+		public GameObject Ignored;
+		public string[] Excluded;
+		public TraceResult? Result;
 		public TraceStub Ray( Ray ray, float distance ) => this;
-		public TraceStub IgnoreGameObjectHierarchy( GameObject obj ) => this;
-		public TraceStub WithoutTags( params string[] tags ) => this;
-		public TraceResult Run() => default;
+		public TraceStub Sphere( float radius, Vector3 from, Vector3 to ) { Radius = radius; Start = from; End = to; return this; }
+		public TraceStub IgnoreGameObjectHierarchy( GameObject obj ) { Ignored = obj; return this; }
+		public TraceStub WithoutTags( params string[] tags ) { Excluded = tags; return this; }
+		public TraceResult Run() => Result ?? new TraceResult { EndPosition = End };
 	}
-	public struct TraceResult { public bool Hit; public Vector3 HitPosition, Normal; }
+	public struct TraceResult { public bool Hit; public Vector3 HitPosition, EndPosition, Normal; }
 }
 namespace Sandbox.Events { public interface IGameEventHandler<T> { void OnGameEvent( T args ); } }
 namespace Facepunch
@@ -173,7 +208,7 @@ namespace Facepunch
 		public PlayerInventory Inventory { get; } = new();
 		public Renderer BodyRenderer { get; } = new();
 		public Rigidbody CharacterController { get; } = new();
-		public Ray AimRay => default;
+		public Ray AimRay { get; set; }
 		public Angles EyeAngles => default;
 	}
 	public class EquipmentResource { public Model WorldModel { get; } = new(); }
@@ -194,6 +229,7 @@ namespace Facepunch
 		public Equipment Weapon => Equipment;
 		public void Fixed() => base.OnFixedUpdate();
 		public void Update() => base.OnUpdate();
+		public void SpawnActual() => base.SpawnProjectile( Owner );
 		protected override void SpawnProjectile( PlayerPawn player ) => Projectiles++;
 	}
 }

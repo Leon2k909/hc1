@@ -1,0 +1,2 @@
+var m=Model.Load("models/maps/ares/ares_hall.vmdl");
+return new {m.IsError,Materials=m.Materials.Select(x=>x.ResourcePath).ToArray()};

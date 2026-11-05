@@ -1,0 +1,4 @@
+return new[]{"west","east"}.Select(side=> {
+ var model=Model.Load("models/maps/belltower/belltower_"+side+".vmdl");
+ return new {Side=side,model.IsError,Materials=model.Materials.Select(m=>m.ResourcePath).ToArray()};
+}).ToArray();

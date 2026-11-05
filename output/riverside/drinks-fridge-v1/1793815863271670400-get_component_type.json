@@ -1,0 +1,187 @@
+{
+  "ClassName": "CameraComponent",
+  "Namespace": "Sandbox",
+  "Title": "Camera",
+  "Description": "Every scene should have at least one Camera.",
+  "Group": "Rendering",
+  "Icon": "videocam",
+  "BaseType": "Component",
+  "Properties": [
+    {
+      "Name": "ClearFlags",
+      "Title": "Clear Flags",
+      "Description": "The clear flags for this camera.",
+      "Type": "ClearFlags",
+      "Group": null,
+      "ReadOnly": false
+    },
+    {
+      "Name": "BackgroundColor",
+      "Title": "Background Color",
+      "Description": "The background color of this camera's view if there's no 2D Sky in the scene.",
+      "Type": "Color",
+      "Group": null,
+      "ReadOnly": false
+    },
+    {
+      "Name": "EnablePostProcessing",
+      "Title": "Enable Post Processing",
+      "Description": "Enable or disable post processing for this camera.",
+      "Type": "Boolean",
+      "Group": null,
+      "ReadOnly": false
+    },
+    {
+      "Name": "PostProcessAnchor",
+      "Title": "Post Process Anchor",
+      "Description": "If set then we'll trigger post process volumes from this position, instead of the camera's position.",
+      "Type": "GameObject",
+      "Group": null,
+      "ReadOnly": false
+    },
+    {
+      "Name": "IsMainCamera",
+      "Title": "Is Main Camera",
+      "Description": "Returns true if this is the main game camera.",
+      "Type": "Boolean",
+      "Group": null,
+      "ReadOnly": false
+    },
+    {
+      "Name": "FovAxis",
+      "Title": "FOV Axis",
+      "Description": "The axis to use for the field of view.",
+      "Type": "Axis",
+      "Group": null,
+      "ReadOnly": false
+    },
+    {
+      "Name": "FieldOfView",
+      "Title": "Field Of View",
+      "Description": "The field of view of this camera.",
+      "Type": "Single",
+      "Group": null,
+      "ReadOnly": false
+    },
+    {
+      "Name": "ZNear",
+      "Title": "Znear",
+      "Description": "The camera's near clip plane distance. This is the closest distance this camera will be able to render. A good value for this is about 5. Below 5 and particularly below 1 you're going to start to see a lot of artifacts like z-fighting.",
+      "Type": "Single",
+      "Group": null,
+      "ReadOnly": false
+    },
+    {
+      "Name": "ZFar",
+      "Title": "Zfar",
+      "Description": "The camera's far clip plane distance. This is the furthest distance this camera will be able to render. This value totally depends on the game you're making. Shorter the better, sensible ranges would be between about 1000 and 30000, but if you want it to be further out you can balance that out by making ZNear larger.",
+      "Type": "Single",
+      "Group": null,
+      "ReadOnly": false
+    },
+    {
+      "Name": "Priority",
+      "Title": "Priority",
+      "Description": "The priority of this camera. Dictates which camera gets rendered on top of another. Higher means it'll be rendered on top.",
+      "Type": "Int32",
+      "Group": null,
+      "ReadOnly": false
+    },
+    {
+      "Name": "Orthographic",
+      "Title": "Orthographic",
+      "Description": "Whether or not to use orthographic projection instead of perspective.",
+      "Type": "Boolean",
+      "Group": null,
+      "ReadOnly": false
+    },
+    {
+      "Name": "OrthographicHeight",
+      "Title": "Orthographic Height",
+      "Description": "The orthographic size for this camera while <span style=\"color: #4EC9B0;\">CameraComponent</span>.<span style=\"color: #DCDCDC;\">Orthographic</span> is set to true.",
+      "Type": "Single",
+      "Group": null,
+      "ReadOnly": false
+    },
+    {
+      "Name": "TargetEye",
+      "Title": "Target Eye",
+      "Description": "The HMD eye that this camera is targeting. Use <span style=\"color: #86C691;\">StereoTargetEye</span>.<span style=\"color: #DCDCDC;\">None</span> for the user's monitor (i.e. the companion window).",
+      "Type": "StereoTargetEye",
+      "Group": null,
+      "ReadOnly": false
+    },
+    {
+      "Name": "RenderTags",
+      "Title": "Render Tags",
+      "Description": "A list of tags that will be checked to include specific game objects when rendering this camera. If none are set, it will include everything.",
+      "Type": "TagSet",
+      "Group": null,
+      "ReadOnly": false
+    },
+    {
+      "Name": "RenderExcludeTags",
+      "Title": "Render Exclude Tags",
+      "Description": "A list of tags that will be checked to exclude specific game objects when rendering this camera.",
+      "Type": "TagSet",
+      "Group": null,
+      "ReadOnly": false
+    },
+    {
+      "Name": "Viewport",
+      "Title": "Viewport",
+      "Description": "The size of the camera represented on the screen. Normalized between 0 and 1.",
+      "Type": "Vector4",
+      "Group": null,
+      "ReadOnly": false
+    },
+    {
+      "Name": "OnComponentEnabled",
+      "Title": "On Component Enabled",
+      "Description": null,
+      "Type": "Action",
+      "Group": "Component",
+      "ReadOnly": false
+    },
+    {
+      "Name": "OnComponentStart",
+      "Title": "On Component Start",
+      "Description": null,
+      "Type": "Action",
+      "Group": "Component",
+      "ReadOnly": false
+    },
+    {
+      "Name": "OnComponentUpdate",
+      "Title": "On Component Update",
+      "Description": null,
+      "Type": "Action",
+      "Group": "Component",
+      "ReadOnly": false
+    },
+    {
+      "Name": "OnComponentFixedUpdate",
+      "Title": "On Component Fixed Update",
+      "Description": null,
+      "Type": "Action",
+      "Group": "Component",
+      "ReadOnly": false
+    },
+    {
+      "Name": "OnComponentDisabled",
+      "Title": "On Component Disabled",
+      "Description": null,
+      "Type": "Action",
+      "Group": "Component",
+      "ReadOnly": false
+    },
+    {
+      "Name": "OnComponentDestroy",
+      "Title": "On Component Destroy",
+      "Description": null,
+      "Type": "Action",
+      "Group": "Component",
+      "ReadOnly": false
+    }
+  ]
+}

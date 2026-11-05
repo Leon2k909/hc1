@@ -1,0 +1,19 @@
+Layer0
+{
+ shader "shaders/complex.shader"
+ F_SPECULAR 1
+ F_METALNESS_TEXTURE 1
+ F_SELF_ILLUM 1
+ TextureColor "materials/riverside/porch_light_v2/lamp_color.png"
+ TextureNormal "materials/riverside/porch_light_v2/lamp_normal.png"
+ TextureRoughness "materials/riverside/porch_light_v2/lamp_rough.png"
+ TextureMetalness "materials/riverside/porch_light_v2/lamp_metal.png"
+ TextureSelfIllumMask "materials/riverside/porch_light_v2/lamp_glow.png"
+ g_flSelfIllumBrightness "1.2"
+ g_flSelfIllumAlbedoFactor "1"
+ g_vSelfIllumTint "[1 0.84 0.60 0]"
+ g_flRoughnessScaleFactor "1"
+ g_flModelTintAmount "1"
+ g_vColorTint "[1 1 1 0]"
+ g_bFogEnabled "1"
+}

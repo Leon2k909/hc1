@@ -1,0 +1,163 @@
+var project = Sandbox.Project.Current.GetRootPath();
+var output = System.IO.Path.Combine(project, "output/asset-improvement-20261030/riverside-sandbags");
+var plan = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(output, "review.json")));
+var bagPaths = Enumerable.Range(0, 3).Select(i => "models/props/riverside/sandbag_v2/sandbag_" + i + ".vmdl").ToArray();
+var names = new[] { "riverside_pad", "riverside_store", "riverside_dressing" };
+var backgroundPaths = names.Select(n => plan["backgrounds"][n]["model"].GetValue<string>()).ToArray();
+foreach (var path in bagPaths.Concat(backgroundPaths))
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    var asset = Editor.AssetSystem.FindByPath(path);
+    if (asset is null) throw new Exception("Asset not registered: " + path);
+    await asset.CompileIfNeededAsync();
+}
+var models = bagPaths.Select(Model.Load).ToArray();
+var backgrounds = backgroundPaths.Select(Model.Load).ToArray();
+if (models.Concat(backgrounds).Any(m => m is null || m.IsError)) throw new Exception("A review model failed to load");
+var root = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(project, "Assets/scenes/maps/Riverside/riverside.scene"))).AsObject();
+var keep = new System.Collections.Generic.HashSet<string>(new[] { "Moon", "Sky", "Fog", "Look", "Riverside", "Lights", "Supply Crates" });
+var roots = new System.Text.Json.Nodes.JsonArray();
+foreach (var item in root["GameObjects"].AsArray())
+{
+    var name = item["Name"]?.GetValue<string>() ?? "";
+    if (!keep.Contains(name)) continue;
+    var clone = item.DeepClone();
+    if (name == "Riverside")
+    {
+        var children = new System.Text.Json.Nodes.JsonArray();
+        foreach (var child in clone["Children"].AsArray())
+        {
+            if (!new[] { "Ground", "Pad", "Lucky Stop", "Dressing" }.Contains(child["Name"]?.GetValue<string>())) continue;
+            var piece = child.DeepClone();
+            var comps = new System.Text.Json.Nodes.JsonArray();
+            foreach (var c in piece["Components"].AsArray()) if (c["__type"]?.GetValue<string>() == "Sandbox.ModelRenderer") comps.Add(c.DeepClone());
+            piece["Components"] = comps;
+            children.Add(piece);
+        }
+        clone["Children"] = children;
+    }
+    roots.Add(clone);
+}
+root["GameObjects"] = roots;
+root["SceneProperties"]["NavMesh"]["Enabled"] = false;
+root["SceneProperties"]["WantsSystemScene"] = false;
+var scene = Scene.CreateEditorScene();
+var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
+var preRender = typeof(Scene).GetMethod("PreRender", flags, null, Type.EmptyTypes, null);
+var preCamera = typeof(Scene).GetMethod("PreCameraRender", flags, null, Type.EmptyTypes, null);
+try
+{
+    GameObject replacement, lightHolder, hero, detailFill;
+    CameraComponent camera;
+    ModelRenderer[] zones;
+    using (scene.Push())
+    {
+        scene.Deserialize(root);
+        zones = names.Select(n => scene.GetAllComponents<ModelRenderer>().Single(r => r.Model?.ResourcePath == "models/maps/riverside/" + n + ".vmdl")).ToArray();
+        replacement = new GameObject(false, "Sandbag v2 review");
+        var k = 0;
+        foreach (var bag in plan["bags"].AsArray())
+        {
+            var pos = bag["position"].AsArray().Select(n => (float)n.GetValue<double>()).ToArray();
+            var piece = new GameObject(replacement, true, "Sandbag " + k++);
+            piece.WorldPosition = new Vector3(pos[0], pos[1], pos[2]);
+            piece.WorldRotation = Rotation.FromYaw((float)bag["yaw"].GetValue<double>() + (bag["variant"].GetValue<int>() == 1 ? 180 : 0));
+            piece.WorldScale = new Vector3((float)bag["size"][0].GetValue<double>() / 25f, 1, 1);
+            var renderer = piece.Components.Create<ModelRenderer>();
+            renderer.Model = models[bag["variant"].GetValue<int>()];
+            renderer.Tint = new Color((float)bag["tint"][0].GetValue<double>(), (float)bag["tint"][1].GetValue<double>(), (float)bag["tint"][2].GetValue<double>());
+        }
+        hero = new GameObject(false, "Single bag detail review");
+        hero.WorldPosition = new Vector3(3070,-440,2.6f);
+        hero.WorldRotation = Rotation.FromYaw(-74.0546f);
+        hero.Components.Create<ModelRenderer>().Model = models[0];
+        foreach (var t in scene.GetAllComponents<Tonemapping>())
+        {
+            var exposure = (t.MinimumExposure + t.MaximumExposure) / 2f;
+            t.AutoExposureEnabled = true;
+            t.MinimumExposure = t.MaximumExposure = exposure;
+            t.Rate = 10;
+        }
+        var holder = new GameObject(true, "Review camera");
+        camera = holder.Components.Create<CameraComponent>();
+        camera.ZNear = .3f;
+        camera.ZFar = 30000;
+        camera.FieldOfView = 65;
+        lightHolder = new GameObject(true, "Temporary inspection light");
+        var light = lightHolder.Components.Create<PointLight>();
+        light.Radius = 350;
+        light.LightColor = new Color(2, 1.9f, 1.7f);
+        light.Shadows = true;
+        detailFill = new GameObject(false, "Temporary close detail fill");
+        var fill = detailFill.Components.Create<PointLight>();
+        fill.LightColor = new Color(.85f, .88f, .9f);
+        fill.Radius = 150;
+        fill.Shadows = false;
+        scene.EditorTick(.016f, .016f);
+        preRender.Invoke(scene, null);
+        preCamera.Invoke(scene, null);
+    }
+    var originals = zones.Select(r => r.Model).ToArray();
+    var textures = scene.GetAllComponents<ModelRenderer>().Where(r => r.Model is not null).SelectMany(r => r.Model.Materials).Distinct()
+        .SelectMany(m => new[] { "g_tColor", "g_tNormal", "g_tRoughness", "SkyTexture" }.Select(m.GetTexture)).Where(t => t is not null).Distinct().ToArray();
+    foreach (var texture in textures) texture.MarkUsed(512);
+    var clothTextures = models.SelectMany(m => m.Materials).Distinct().SelectMany(m => new[] { "g_tColor", "g_tNormal", "g_tRoughness" }.Select(m.GetTexture)).Where(t => t is not null).ToArray();
+    foreach (var texture in clothTextures) texture.MarkUsed(2048);
+    for (var f = 0; f < 100; f++)
+    {
+        using (scene.Push()) { scene.EditorTick(.016f, .016f); preRender.Invoke(scene, null); }
+        await Task.Delay(25, cancellationToken);
+    }
+    var first = plan["bags"][34]["position"].AsArray().Select(n => (float)n.GetValue<double>()).ToArray();
+    var detailOrigin = new Vector3(first[0], first[1], first[2]);
+    var storeWall = plan["walls"][1];
+    var endA = storeWall["a"].AsArray().Select(n => (float)n.GetValue<double>()).ToArray();
+    var endB = storeWall["b"].AsArray().Select(n => (float)n.GetValue<double>()).ToArray();
+    var storeOrigin = (new Vector3(endA[0], endA[1], endA[2]) + new Vector3(endB[0], endB[1], endB[2])) * .5f;
+    var shots = new (string name, Vector3 origin, float yaw, Vector3 eye, Vector3 target)[] {
+        ("wall", new Vector3(3070,-190,0), -74.0546f, new Vector3(0,-135,65), new Vector3(0,0,10)),
+        ("detail", detailOrigin, -74.0546f, new Vector3(23,-30,19), new Vector3(1,0,1)),
+        ("store", storeOrigin, -90, new Vector3(28,-100,55), new Vector3(0,0,13)),
+        ("single", new Vector3(3070,-440,2.6f), -74.0546f, new Vector3(26,-26,14), new Vector3(5,0,0))
+    };
+    var files = new System.Collections.Generic.List<string>();
+    foreach (var variant in new[] { "settling", "old", "new" })
+    {
+        using (scene.Push())
+        {
+            replacement.Enabled = variant == "new";
+            for (var k = 0; k < zones.Length; k++) zones[k].Model = variant == "new" ? backgrounds[k] : originals[k];
+        }
+        foreach (var shot in shots)
+        {
+            if (shot.name == "single" && variant != "new") continue;
+            var frame = Rotation.FromYaw(shot.yaw);
+            using var bitmap = new Bitmap(1500, 950);
+            for (var f = 0; f < 20; f++)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                using (scene.Push())
+                {
+                    hero.Enabled = shot.name == "single" && variant == "new";
+                    detailFill.Enabled = hero.Enabled;
+                    camera.WorldPosition = shot.origin + frame * shot.eye;
+                    camera.WorldRotation = Rotation.LookAt(frame * (shot.target - shot.eye));
+                    detailFill.WorldPosition = camera.WorldPosition + Vector3.Up * 10;
+                    lightHolder.WorldPosition = shot.origin + frame * new Vector3(30,-50,85);
+                    scene.EditorTick(.016f, .016f);
+                    preRender.Invoke(scene, null);
+                    preCamera.Invoke(scene, null);
+                    camera.RenderToBitmap(bitmap);
+                }
+                foreach (var texture in clothTextures) texture.MarkUsed(2048);
+                await Task.Delay(16, cancellationToken);
+            }
+            if (variant == "settling") continue;
+            var path = System.IO.Path.Combine(output, variant + "_" + shot.name + ".png");
+            System.IO.File.WriteAllBytes(path, bitmap.ToPng());
+            files.Add(path);
+        }
+    }
+    return new { Bags = replacement.GetComponentsInChildren<ModelRenderer>().Count(), Models = models.Select(m => new { m.ResourcePath, m.IsError, Bounds = m.Bounds.ToString() }).ToArray(), Screenshots = files, InspectionLight = true, Installed = false };
+}
+finally { scene.Destroy(); }

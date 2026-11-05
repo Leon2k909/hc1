@@ -1,0 +1,99 @@
+var project = Sandbox.Project.Current.GetRootPath();
+var output = System.IO.Path.Combine(project, "output/asset-improvement-20261030/riverside-crate/installed");
+var root = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(project, "Assets/scenes/maps/Riverside/riverside.scene"))).AsObject();
+var keep = new System.Collections.Generic.HashSet<string>(new[] { "Moon", "Sky", "Fog", "Look", "Riverside", "Lights", "Supply Crates" });
+var roots = new System.Text.Json.Nodes.JsonArray();
+foreach (var item in root["GameObjects"].AsArray())
+{
+    var name = item["Name"]?.GetValue<string>() ?? "";
+    if (!keep.Contains(name)) continue;
+    var clone = item.DeepClone();
+    if (name == "Riverside")
+    {
+        var children = new System.Text.Json.Nodes.JsonArray();
+        foreach (var child in clone["Children"].AsArray())
+        {
+            if (!new[] { "Ground", "Pad", "Lucky Stop", "Dressing" }.Contains(child["Name"]?.GetValue<string>())) continue;
+            var piece = child.DeepClone();
+            var comps = new System.Text.Json.Nodes.JsonArray();
+            foreach (var c in piece["Components"].AsArray()) if (c["__type"]?.GetValue<string>() == "Sandbox.ModelRenderer") comps.Add(c.DeepClone());
+            piece["Components"] = comps;
+            children.Add(piece);
+        }
+        clone["Children"] = children;
+    }
+    roots.Add(clone);
+}
+root["GameObjects"] = roots;
+root["SceneProperties"]["NavMesh"]["Enabled"] = false;
+root["SceneProperties"]["WantsSystemScene"] = false;
+var scene = Scene.CreateEditorScene();
+var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
+var preRender = typeof(Scene).GetMethod("PreRender", flags, null, Type.EmptyTypes, null);
+var preCamera = typeof(Scene).GetMethod("PreCameraRender", flags, null, Type.EmptyTypes, null);
+try
+{
+    CameraComponent camera;
+    GameObject lightObject;
+    ModelRenderer[] crates;
+    using (scene.Push())
+    {
+        scene.Deserialize(root);
+        crates = scene.GetAllComponents<ModelRenderer>().Where(r => r.Model?.ResourcePath == "models/props/riverside/crate_v2/crate.vmdl").ToArray();
+        if (crates.Length != 12 || crates.Any(r => r.Model.IsError)) throw new Exception("Installed crate verification failed");
+        foreach (var t in scene.GetAllComponents<Tonemapping>())
+        {
+            var exposure = (t.MinimumExposure + t.MaximumExposure) / 2f;
+            t.AutoExposureEnabled = true;
+            t.MinimumExposure = t.MaximumExposure = exposure;
+            t.Rate = 10;
+        }
+        var holder = new GameObject(true, "Installed capture camera");
+        camera = holder.Components.Create<CameraComponent>();
+        camera.ZNear = 1;
+        camera.ZFar = 30000;
+        camera.FieldOfView = 65;
+        lightObject = new GameObject(true, "Temporary inspection light");
+        var light = lightObject.Components.Create<PointLight>();
+        light.LightColor = new Color(2, 1.9f, 1.7f);
+        light.Radius = 350;
+        light.Shadows = true;
+        scene.EditorTick(.016f, .016f);
+        preRender.Invoke(scene, null);
+        preCamera.Invoke(scene, null);
+    }
+    foreach (var texture in crates.SelectMany(r => r.Model.Materials).Distinct().SelectMany(m => new[] { "g_tColor", "g_tNormal", "g_tRoughness" }.Select(m.GetTexture)).Where(t => t is not null).Distinct()) texture.MarkUsed(2048);
+    await Task.Delay(2000, cancellationToken);
+    var views = new (string name, Vector3 origin, float yaw, Vector3 eye, Vector3 target)[] {
+        ("pad", new Vector3(-80,-140,96), -73.300756f, new Vector3(53,-60,47), new Vector3(0,0,11)),
+        ("store-stack", new Vector3(490,-30,0), -78.69f, new Vector3(65,-70,62), new Vector3(0,0,18)),
+        ("north-row", new Vector3(3240,329,0), -90, new Vector3(20,-140,80), new Vector3(0,0,10)),
+        ("next-sandbags", new Vector3(3070,-190,0), -74.0546f, new Vector3(0,-135,65), new Vector3(0,0,10))
+    };
+    var files = new System.Collections.Generic.List<string>();
+    foreach (var view in views)
+    {
+        var frame = Rotation.FromYaw(view.yaw);
+        using var bitmap = new Bitmap(1400, 900);
+        for (var f = 0; f < 24; f++)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            using (scene.Push())
+            {
+                camera.WorldPosition = view.origin + frame * view.eye;
+                camera.WorldRotation = Rotation.LookAt(frame * (view.target - view.eye));
+                lightObject.WorldPosition = view.origin + frame * new Vector3(30,-50,85);
+                scene.EditorTick(.016f, .016f);
+                preRender.Invoke(scene, null);
+                preCamera.Invoke(scene, null);
+                camera.RenderToBitmap(bitmap);
+            }
+            await Task.Delay(16, cancellationToken);
+        }
+        var path = System.IO.Path.Combine(output, view.name + ".png");
+        System.IO.File.WriteAllBytes(path, bitmap.ToPng());
+        files.Add(path);
+    }
+    return new { Crates = crates.Length, InvalidModels = crates.Count(r => r.Model.IsError), Screenshots = files, InspectionLight = true };
+}
+finally { scene.Destroy(); }

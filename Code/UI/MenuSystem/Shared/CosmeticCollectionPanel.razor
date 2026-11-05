@@ -1,0 +1,102 @@
+@using Sandbox
+@using Sandbox.UI
+@namespace Facepunch.UI
+@inherits Panel
+@attribute [StyleSheet]
+
+<root class="cosmetic-collection">
+    <div class="cosmetic-intro">
+        <label class="cosmetic-heading">@Tr( IsLoadingScreen ? "LOADING SCREENS" : "SPRAYS" )</label>
+        <label class="cosmetic-description">@Tr( IsLoadingScreen
+            ? "Choose artwork for your loading screen, or use your own image."
+            : "Choose a spray to leave on walls and floors during a match." )</label>
+        @if ( !IsLoadingScreen )
+        {
+            <label class="cosmetic-note">@Tr( "Bind Spray in Settings → Controls. One active spray, with a 10-second cooldown." )</label>
+        }
+    </div>
+
+    <div class="cosmetic-body">
+        <div class="cosmetic-preview-panel">
+            <div class="cosmetic-preview @(IsLoadingScreen ? "landscape" : "spray")">
+                @if ( !string.IsNullOrEmpty( SelectedImage ) )
+                {
+                    <img src=@SelectedImage />
+                }
+                else
+                {
+                    <i>landscape</i>
+                }
+            </div>
+            <label class="cosmetic-selected-name">@Tr( SelectedName )</label>
+            <label class="cosmetic-equipped">@Tr( "EQUIPPED" )</label>
+        </div>
+
+        <div class="cosmetic-options">
+            <div class="cosmetic-grid">
+                @foreach ( var art in Collection )
+                {
+                    <button class="cosmetic-option @(SelectedId == art.Id ? "selected" : "") @(IsLoadingScreen ? "landscape" : "spray")"
+                            @onclick=@(() => Select( art.Id ))>
+                        @if ( !string.IsNullOrEmpty( art.Image ) )
+                        {
+                            <img src=@art.Image />
+                        }
+                        else
+                        {
+                            <i>landscape</i>
+                        }
+                        <label>@Tr( art.Name )</label>
+                        @if ( SelectedId == art.Id ) { <i class="cosmetic-check">check_circle</i> }
+                    </button>
+                }
+            </div>
+
+            @if ( IsLoadingScreen )
+            {
+                <div class="cosmetic-custom">
+                    <label class="cosmetic-custom-title">@Tr( "YOUR IMAGE" )</label>
+                    <label class="cosmetic-description">@Tr( "Paste a direct HTTPS link to a PNG, JPG or WebP image. This image is only shown to you." )</label>
+                    <TextEntry class="cosmetic-url" Text=@UrlDraft Placeholder="https://example.com/image.png" OnTextEdited=@EditUrl />
+                    <div class="cosmetic-custom-actions">
+                        <button class="cosmetic-use" @onclick=@UseCustomImage>@Tr( "USE IMAGE" )</button>
+                        <button @onclick=@UseDefault>@Tr( "RESTORE DEFAULT" )</button>
+                    </div>
+                    @if ( !string.IsNullOrEmpty( Message ) ) { <label class="cosmetic-message">@Tr( Message )</label> }
+                    <label class="cosmetic-note">@Tr( "Use a direct image link, not a page link. If the host is unavailable, try another image or restore the default." )</label>
+                </div>
+            }
+        </div>
+    </div>
+</root>
+
+@code
+{
+    public bool IsLoadingScreen { get; set; }
+    private string _urlDraft = CosmeticPreferences.CustomImage ?? "";
+    private string UrlDraft { get => _urlDraft; set => _urlDraft = value; }
+    private string Message { get; set; }
+    private IReadOnlyList<CosmeticArt> Collection => IsLoadingScreen ? CosmeticCatalog.LoadingScreens : CosmeticCatalog.Sprays;
+    private string SelectedId => IsLoadingScreen ? CosmeticPreferences.LoadingId : CosmeticPreferences.SprayId;
+    private string SelectedImage => IsLoadingScreen ? CosmeticPreferences.LoadingImage : CosmeticCatalog.FindSpray( SelectedId )?.Image;
+    private string SelectedName => SelectedId == "custom" ? "Your image" : Collection.FirstOrDefault( item => item.Id == SelectedId )?.Name ?? "Game default";
+
+    private void EditUrl( string text ) { UrlDraft = text; Message = null; }
+    private void Select( string id )
+    {
+        if ( IsLoadingScreen ) CosmeticPreferences.SelectLoadingScreen( id );
+        else CosmeticPreferences.SelectSpray( id );
+        Message = null;
+        Sound.Play( "ui_button_press" );
+        StateHasChanged();
+    }
+    private void UseCustomImage()
+    {
+        Message = CosmeticPreferences.SelectCustomImage( UrlDraft )
+            ? "Image selected." : "Enter a direct HTTPS image link ending in .png, .jpg, .jpeg or .webp.";
+        Sound.Play( "ui_button_press" );
+        StateHasChanged();
+    }
+    private void UseDefault() => Select( "default" );
+    protected override int BuildHash() => HashCode.Combine( IsLoadingScreen, CosmeticPreferences.Version, SelectedId, UrlDraft, Message, GameText.Current );
+}

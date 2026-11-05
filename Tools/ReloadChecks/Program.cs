@@ -87,6 +87,27 @@ gun = Gun( loaded: 5, reserve: 30 );
 gun.ManualReload();
 Advance( gun, 1.01f );
 Check( gun.AmmoComponent.Ammo == 31 && gun.AmmoComponent.ReserveAmmo == 4, "Manual tactical reloads must retain their chambered extra round." );
+gun.AmmoComponent.RefillAll();
+Check( gun.AmmoComponent.Ammo == 31 && gun.AmmoComponent.ReserveAmmo == 120,
+	"Resupplying after a tactical reload must preserve the chambered extra round and refill reserves." );
+
+foreach ( var fittedCapacity in new[] { 0, 15, 45 } )
+foreach ( var chamber in new[] { false, true } )
+{
+	var capacity = fittedCapacity > 0 ? fittedCapacity : 30;
+	foreach ( var (loaded, expected) in new[] { (0, capacity), (7, capacity), (capacity, capacity),
+		(capacity + 1, capacity + (chamber ? 1 : 0)), (capacity + 7, capacity + (chamber ? 1 : 0)) } )
+	{
+		var ammo = new WeaponAmmo { MaxAmmo = 30, HasChamber = chamber, Ammo = loaded, ReserveAmmo = 1, SpareMagazines = 3 };
+		ammo.Components.Parent = new Equipment { Resource = new(), AttachmentMagazineCapacity = fittedCapacity };
+		ammo.RefillAll();
+		Check( ammo.Ammo == expected && ammo.ReserveAmmo == capacity * 3,
+			$"Resupplying {loaded} rounds with capacity {capacity}, chamber {chamber} must fill ammo within its legal capacity." );
+		ammo.RefillAll();
+		Check( ammo.Ammo == expected && ammo.ReserveAmmo == capacity * 3,
+			"Repeated resupplies must neither manufacture nor remove chambered rounds." );
+	}
+}
 
 Console.WriteLine( $"PASS: {checks} checks against production reload and ammunition code." );
 
@@ -101,7 +122,11 @@ namespace Sandbox
 		public ComponentLookup Components { get; } = new();
 	}
 	public class GameObject { public void PlaySound( SoundEvent sound ) { } }
-	public class ComponentLookup { public T Get<T>( FindMode mode ) where T : class => null; }
+	public class ComponentLookup
+	{
+		public object Parent { get; set; }
+		public T Get<T>( FindMode mode ) where T : class => Parent as T;
+	}
 	public enum FindMode { InParent }
 	public static class Validity { public static bool IsValid( this object item ) => item is Component component ? component.Valid : item is not null; }
 	public sealed class PropertyAttribute : Attribute;

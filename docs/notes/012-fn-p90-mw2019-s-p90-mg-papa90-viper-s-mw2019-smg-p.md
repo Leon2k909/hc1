@@ -11,8 +11,14 @@
     recoil scale (0.29,1.73) is the Vityaz's (0.5,3) scaled by free recoil (~0.64 against ~1.1 m/s).
   - Reload times are when the left hand is back on the grip (the clips' grip-pose events, 2.53 and 2.93 s) and the
     last foley has played: 2.55 s, 3.05 s empty.
-  - The real gun throws its cases down through a chute behind the grip (`tag_brass` faces down there), but
-    `SpentCasing.Launch` ignores the port's rotation, so that isn't modelled.
+  - Downward case ejection added in code (2026-11-04): `CasingEjectionRules` recognises the P90's exact resource
+    path and launches cases along the weapon's downward axis with small fore/aft and lateral variation.
+    Gameplay and Theater both pass the equipment resource to `WeaponModel.EjectCasing`. Conventional weapons
+    retain their existing ejection ranges. Speeds are cosmetic estimates, not measurements. The current shared
+    9 mm casing model/sound remain unchanged; this corrects motion, not the case's dimensions.
+    Local cases inherit current controller velocity; remote cases inherit synced velocity. No prefab/scene edits
+    or editor connection. 82 production-rule checks passed; offline game build: 0 errors, 108 warnings.
+    Live ejection, collision and appearance still need an in-game check.
 - Materials and sounds are from `Tools/p90_assets.py`: the P90's own receiver, rails, barrel and flash hider, iron
   sights and magazine. The magazine's shell is see-through, like the real one's (its vmt's `$translucent`: the colour
   map's alpha is opacity, not a metal mask). A 5.7 mm shot is louder than a 9 mm SMG's and quieter than a 5.45 mm

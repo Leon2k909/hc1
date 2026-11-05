@@ -1,0 +1,85 @@
+{
+  "Scene": "sewage",
+  "Name": "Waterworks pipework",
+  "Id": "2a628f77-20cc-59ba-9a1d-db7628c9c7ba",
+  "Enabled": true,
+  "ActiveInHierarchy": true,
+  "Tags": [
+    "sewage"
+  ],
+  "Parent": null,
+  "WorldPosition": "0,0,0",
+  "WorldRotation": "-0,0,0",
+  "WorldScale": "1,1,1",
+  "Components": [
+    {
+      "Type": "ModelRenderer",
+      "Id": "8d185f8a-93c0-5489-b36d-4f4bd63f2361",
+      "Enabled": true,
+      "Properties": {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "8d185f8a-93c0-5489-b36d-4f4bd63f2361",
+        "__enabled": true,
+        "Flags": 0,
+        "BodyGroups": 18446744073709551615,
+        "CreateAttachments": false,
+        "LodOverride": null,
+        "MaterialGroup": null,
+        "MaterialOverride": null,
+        "Materials": null,
+        "Model": {
+          "Id": "2e5d5bb3-d252-4be6-8550-bcfc26881e15",
+          "Path": "models/maps/sewage/sewage_pipework.vmdl"
+        },
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "RenderOptions": {
+          "GameLayer": true,
+          "OverlayLayer": false,
+          "BloomLayer": false,
+          "AfterUILayer": false
+        },
+        "RenderType": "On",
+        "Tint": "1,1,1,1"
+      }
+    },
+    {
+      "Type": "ModelCollider",
+      "Id": "4ebec0c8-b4a6-5331-8e06-35343f868bf2",
+      "Enabled": true,
+      "Properties": {
+        "__type": "Sandbox.ModelCollider",
+        "__guid": "4ebec0c8-b4a6-5331-8e06-35343f868bf2",
+        "__enabled": true,
+        "Flags": 0,
+        "ColliderFlags": 0,
+        "Elasticity": null,
+        "Friction": null,
+        "IsTrigger": false,
+        "Model": {
+          "Id": "2e5d5bb3-d252-4be6-8550-bcfc26881e15",
+          "Path": "models/maps/sewage/sewage_pipework.vmdl"
+        },
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "OnObjectTriggerEnter": null,
+        "OnObjectTriggerExit": null,
+        "OnTriggerEnter": null,
+        "OnTriggerExit": null,
+        "RollingResistance": null,
+        "Static": true,
+        "Surface": null,
+        "SurfaceVelocity": "0,0,0"
+      }
+    }
+  ],
+  "Children": []
+}

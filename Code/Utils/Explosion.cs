@@ -4,6 +4,7 @@ public static class Explosion
 {
 	public static void AtPoint( Vector3 point, float radius, float baseDamage, Component attacker = null, Component inflictor = null, Curve falloff = default )
 	{
+		if ( !float.IsFinite( radius ) || radius <= 0f ) return;
 		if ( falloff.Frames.IsEmpty )
 		{
 			falloff = new Curve( new Curve.Frame( 1.0f, 1.0f ), new Curve.Frame( 0.0f, 0.0f ) );
@@ -58,7 +59,7 @@ public static class Explosion
 			var distance = obj.WorldPosition.Distance( point );
 			var damage = baseDamage * falloff.Evaluate( distance / radius );
 			var direction = (obj.WorldPosition - point).Normal;
-			var force = direction * distance * 50f;
+			var force = direction * BlastImpulseRules.Magnitude( distance, radius );
 
 			DamageInfo damageInfo =
 				new DamageInfo( attacker, damage, inflictor, point, force, Flags: DamageFlags.Explosion )
@@ -92,7 +93,7 @@ public static class Explosion
 		if ( damage <= 0f ) return;
 
 		var info = Tec.Utils.CreateDamageInfo( new DamageInfo( attacker, damage, inflictor, centre,
-			(centre - point).Normal * distance * 50f, Flags: DamageFlags.Explosion ) );
+			(centre - point).Normal * BlastImpulseRules.Magnitude( distance, radius ), Flags: DamageFlags.Explosion ) );
 		foreach ( var receiver in receivers )
 			receiver.OnDamage( info );
 	}

@@ -1,0 +1,46 @@
+@import "/UI/Styles/MenuPage.scss";
+
+CosmeticCollectionPanel {
+    flex-grow: 1; min-width: 0; min-height: 0; flex-direction: column;
+    gap: 24px; padding: 28px 40px; overflow-y: scroll;
+    .cosmetic-intro { flex-direction: column; gap: 10px; flex-shrink: 0; }
+    .cosmetic-heading { font-size: 28px; font-weight: 700; letter-spacing: 3px; }
+    .cosmetic-description { font-size: 15px; color: $menu-muted; }
+    .cosmetic-note { font-size: 13px; color: $menu-muted; }
+    .cosmetic-body { flex-direction: row; align-items: flex-start; gap: 28px; flex-shrink: 0; }
+    .cosmetic-preview-panel { @include menu-panel; width: 360px; flex-shrink: 0; flex-direction: column; padding: 20px; gap: 14px; }
+    .cosmetic-preview {
+        width: 100%; height: 260px; background-color: #08090b; justify-content: center; align-items: center;
+        border: 1px solid $menu-border;
+        img { width: 90%; height: 90%; object-fit: contain; }
+        &.landscape { height: 180px; img { width: 100%; height: 100%; object-fit: cover; } }
+        > i { font-size: 64px; color: $menu-muted; }
+    }
+    .cosmetic-selected-name { font-size: 22px; font-weight: 700; }
+    .cosmetic-equipped { font-size: 12px; letter-spacing: 2px; color: $menu-accent; }
+    .cosmetic-options { flex-grow: 1; min-width: 0; flex-direction: column; gap: 24px; }
+    .cosmetic-grid { flex-direction: row; flex-wrap: wrap; gap: 12px; }
+    .cosmetic-option {
+        width: 180px; height: 170px; position: relative; flex-shrink: 0; flex-direction: column;
+        align-items: center; justify-content: center; gap: 10px; padding: 12px;
+        background-color: #0d0f12; border: 2px solid $menu-border; cursor: pointer;
+        img { width: 108px; height: 108px; object-fit: contain; }
+        > i { font-size: 60px; color: $menu-muted; }
+        label { font-size: 13px; font-weight: 600; }
+        &.landscape { width: 224px; height: 152px; padding: 8px; img { width: 204px; height: 108px; object-fit: cover; } }
+        &:hover { border-color: rgba(white, 0.5); sound-in: ui_button_hover; }
+        &.selected { border-color: $menu-accent; }
+        .cosmetic-check { position: absolute; right: 8px; top: 8px; font-size: 20px; color: $menu-accent; }
+    }
+    .cosmetic-custom { @include menu-panel; flex-direction: column; gap: 14px; padding: 22px; }
+    .cosmetic-custom-title { @include menu-section-title; }
+    .cosmetic-url { width: 100%; min-height: 42px; padding: 10px; font-size: 15px; background-color: #08090b; border: 1px solid $menu-border; color: white; }
+    .cosmetic-custom-actions { flex-direction: row; flex-wrap: wrap; gap: 12px; button { @include menu-action; padding: 12px 18px; font-size: 12px; } }
+    .cosmetic-use { background-color: $menu-accent; color: #08090b; }
+    .cosmetic-message { font-size: 14px; color: $menu-accent; }
+}
+.main-menu-root.narrow CosmeticCollectionPanel {
+    padding: 20px 24px;
+    .cosmetic-body { flex-direction: column; }
+    .cosmetic-preview-panel, .cosmetic-options { width: 100%; }
+}

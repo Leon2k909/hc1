@@ -49,8 +49,10 @@ other dark faces are put back unchanged; only the 930 hose faces disappear. Keep
 
 Installed by guarded `install.py` while the editor was closed: exactly 930 faces removed, all other OBJ lines unchanged, one `Yard Hose`
 renderer added under `Spillway` at the placement above, and the generator updated without rebuilding the map. Static checks confirm the
-saved scene differs only by that object and no collider was added. Native installed checks and comparison archive are pending editor
-startup. Pre-install backups of the mesh, scene and generator are in `output/asset-improvement-20261030/spillway-hose/retired/`.
+saved scene differs only by that object and no collider was added. Native installed validation completed 2026-11-04: one valid hose,
+no added collider or error models, three rays still hit the ground at z 0, and two installed captures checked. The cargo model compiled
+successfully on engine 26.11.03a. Twelve hose-specific comparison sources, metadata and compiled caches were archived; the shared hidden
+material was retained. Pre-install backups of the mesh, scene and generator are in `output/asset-improvement-20261030/spillway-hose/retired/`.
 
 `check_installed.py --static` rechecks those exact changes; without the switch it also renders the saved installation and checks three
 floor rays in an isolated s&box scene. `archive_review.py` archives just the hose-specific comparison resources through the editor.

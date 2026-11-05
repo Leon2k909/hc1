@@ -30,12 +30,13 @@
     /// How long the list stays up after the last switch.
     private const float ShowSeconds = 2.2f;
 
-    public PlayerPawn Player => Client.Viewer.PlayerPawn;
+    public PlayerPawn Player => Client.Viewer?.PlayerPawn;
     public PlayerInventory Inventory => Player.Inventory;
     public Equipment CurrentEquipment => Player?.CurrentEquipment;
 
     private Equipment _lastEquipment;
     private int _lastCount = -1;
+    private int _lastInventoryHash;
     private RealTimeSince _sinceSwitch = 999f;
 
     public string SlotClass( EquipmentSlot slot )
@@ -71,11 +72,12 @@
 
         var current = CurrentEquipment;
         var count = EquipmentCount();
-        if ( current != _lastEquipment || count != _lastCount || SwitchPressed() )
+        if ( current != _lastEquipment || count != _lastCount || _inventoryHash != _lastInventoryHash || SwitchPressed() )
             _sinceSwitch = 0f;
 
         _lastEquipment = current;
         _lastCount = count;
+        _lastInventoryHash = _inventoryHash;
         SetClass( "shown", _sinceSwitch < ShowSeconds );
     }
 
@@ -107,15 +109,30 @@
         .ToArray();
 
     private double _countedAt = double.NaN;
+    private PlayerPawn _countedPlayer;
     private int _count;
+    private int _inventoryHash;
 
-    /// How many pieces of equipment are carried, counted once a frame for Tick and BuildHash (it walks the pawn's objects).
+    /// Snapshot the count and displayed equipment once per frame and viewed pawn for Tick and BuildHash.
     private int EquipmentCount()
     {
-        if ( _countedAt != RealTime.NowDouble )
+        var player = Player;
+        if ( _countedAt != RealTime.NowDouble || _countedPlayer != player )
         {
             _countedAt = RealTime.NowDouble;
-            _count = Inventory?.Equipment.Count() ?? 0;
+            _countedPlayer = player;
+            _count = 0;
+            var hash = new HashCode();
+            foreach ( var equipment in Inventory?.Equipment ?? Enumerable.Empty<Equipment>() )
+            {
+                _count++;
+                hash.Add( equipment );
+                hash.Add( equipment.Resource );
+                hash.Add( equipment.Resource?.Slot );
+                hash.Add( equipment.Resource?.Name );
+                hash.Add( equipment.Resource?.Icon );
+            }
+            _inventoryHash = hash.ToHashCode();
         }
 
         return _count;
@@ -123,6 +140,9 @@
 
     protected override int BuildHash()
     {
-        return !Player.IsValid() ? 0 : HashCode.Combine( EquipmentCount(), CurrentEquipment );
+        if ( !Player.IsValid() ) return 0;
+
+        EquipmentCount();
+        return HashCode.Combine( Player, _inventoryHash, CurrentEquipment );
     }
 }

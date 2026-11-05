@@ -149,7 +149,7 @@ def materials():
     label("03", (480, 1090, 700, 1380), ["03"], fontsize=230)
     label("outfall", (740, 1090, 1500, 1220), ["SPILLWAY / OUTFALL 3"], fontsize=70)
     label("pumps", (740, 1280, 1500, 1410), ["PUMP HOUSE"], fontsize=86)
-    label("service", (0, 1580, 1480, 1750), ["RIVERDALE    •    GENERATING STATION"], colors=(212, 212, 200, 255), fontsize=75)
+    label("service", (0, 1580, 1480, 1750), ["RIVERDALE    ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â¢    GENERATING STATION"], colors=(212, 212, 200, 255), fontsize=75)
     atlas.convert("RGB").save(MAT / "graphics_color.png")
     atlas.getchannel("A").save(MAT / "graphics_alpha.png")
     texture_material("sw_graphics", "materials/spillway/graphics_color.png", alpha="materials/spillway/graphics_alpha.png")
@@ -221,20 +221,8 @@ def case(m,c,size,along=(1,0),paint="rv_olive",z0=0,**kwargs):
 
 
 def roof_fan(m,centre,radius=40):
-    e,n,z=centre
-    P.lathe(m,(e,n),[(radius+4,z),(radius+4,z+3),(radius,z+6),(radius-2,z+6)],"rv_steel",32)
-    P.cylinder(m,(e,n),radius-2,z+.2,z+1,"rv_dark",32)
-    for j in range(5):
-        a=j*2*math.pi/5
-        points=[v(e+math.cos(a+off)*r,n+math.sin(a+off)*r,z+2+dz) for r,off,dz in ((7,-.12,0),(radius-4,.15,1),(radius-5,.52,1),(10,.24,0))]
-        card(m,"rv_steel",points,UP)
-    P.cylinder(m,(e,n),8,z+1,z+6,"rv_steel",24)
-    for rr in (radius*.35,radius*.65,radius*.90):
-        points=[v(e+math.cos(a)*rr,n+math.sin(a)*rr,z+7) for a in np.linspace(0,2*math.pi,33)]
-        for p,q in zip(points[:-1],points[1:]):P.rod(m,p,q,.45,"rv_frame",5)
-    for j in range(8):
-        a=j*math.pi/4
-        P.rod(m,(e,n,z+7),(e+math.cos(a)*(radius-2),n+math.sin(a)*(radius-2),z+7),.5,"rv_frame",5)
+    from spillway_roof_fans import build as draw_roof_fan
+    draw_roof_fan(m,centre,radius)
 
 
 def equipment_cover(m, bounds):
@@ -379,9 +367,10 @@ def west_works():
         P.wall_light(m,f"Turbine east {n}",(-1327,n,185),(1,0,0),radius=220)
     for z in (320,500):
         window(m,(-1328,690,z),(0,1,0),930,84)
+    # The first wall vent is a separate visual model; retain both original collision boxes.
     for n in (220,1150):
-        box(m,-1328,-1310,n-50,n+50,25,118,"rv_steel",METAL)
-        P.louvre(m,(-1308,n,75),(0,1,0),86,64)
+        box(m,-1328,-1310,n-50,n+50,25,118,{"default":None} if n==220 else "rv_steel",METAL)
+        if n!=220:P.louvre(m,(-1308,n,75),(0,1,0),86,64)
     # A narrow maintenance gallery across the facade, behind the main circulation.
     box(m,-2390,-1325,78,130,228,237,"rv_steel")
     rail(m,[(-2380,80),(-1330,80)],237,clip=False)
@@ -512,8 +501,10 @@ def cargo_yard():
         if H>75:case(m,(e+4,n),(L*.76,W*.9,48),(1,0),z0=H)
     # Pallets, hose loops and cabinets make the shipping yard read at player scale. The pallets by container 02 are a model of their
     # own, placed by scene(): Sources/Spillway/cargo-props-v2.
+    from spillway_service_cabinet import cabinet as service_cabinet
     for e in (-325,-280):
-        box(m,e-18,e+18,332,358,0,79,"rv_steel",METAL)
+        service_cabinet(m,(e,345,0))
+        box(m,e-18,e+18,332,358,0,79,{"default":None},METAL)
     # The continuous yard hose is a separate visual model, placed by scene(): Sources/Spillway/hose-coil-v2.
     P.jersey(m,(300,-120),(0,1),160)
     P.jersey(m,(-310,-100),(1,0),160)
@@ -532,7 +523,8 @@ def cargo_yard():
     pipe(m,[(715,855,350),(1705,855,350)],9,"rv_pipe",sides=10)
     # Damp grates and cable trenches, useful reference-scale detail.
     for e,n,w,h in ((330,-460,150,55),(-50,-930,190,60),(980,-470,90,140),(-1130,50,140,60),(1730,-960,140,65)):
-        P.quad(m,"rv_grating",(e,n,.35),(1,0,0),(0,1,0),w,h)
+        from spillway_trench_grates import grate as draw_trench_grate
+        draw_trench_grate(m,(e,n,0),w,h)
     # Big pipe wraps around the island retaining wall, with visible elbows and discharge spouts.
     pipe(m,[(-480,-1090,-125),(680,-1090,-125),(680,-900,-125)],23,"rv_pipe",sides=16)
     for e in (-380,570):
@@ -717,7 +709,7 @@ DM=[(-1130,-730,0),(-1130,400,0),(-1760,490,0),(-1760,1390,0),(-970,1800,0),(50,
     (540,-460,0),(-320,20,0),(100,480,0),(200,1030,0),(100,1000,236)]
 DOM=[("A",(-1100,600,0)),("B",(100,-160,0)),("C",(1320,850,0))]
 HOT=[("Cargo",(80,-890,0)),("Control",(100,1050,236)),("Turbine",(-1750,720,0)),("Tailrace",(1240,-1000,0)),("Service",(30,1770,0))]
-SITES=[("bombsite_a","A · Control",-90,450,850,1200,0),("bombsite_b","B · Cargo",-360,530,-1000,-350,0)]
+SITES=[("bombsite_a","A Ãƒâ€šÃ‚Â· Control",-90,450,850,1200,0),("bombsite_b","B Ãƒâ€šÃ‚Â· Cargo",-360,530,-1000,-350,0)]
 
 
 def minimap():
@@ -806,6 +798,9 @@ def scene(written):
                 root["Children"].append(K.game_object(IDS,f"Yard Pallet {k}",f"yard/pallet{k}",K.to_world(p),K.yaw_rotation(yaw),components=[
                     K.component(IDS,"Sandbox.ModelRenderer",f"yard/pallet{k}/renderer",Model=pallet,RenderType="On",Tint="1,1,1,1"),
                     K.component(IDS,"Sandbox.ModelCollider",f"yard/pallet{k}/collider",Model=pallet,Static=True,IsTrigger=False)]))
+            vent="models/maps/spillway/wall_vent_v2/wall_vent.vmdl"
+            root["Children"].append(K.game_object(IDS,"Turbine Wall Vent 1","west/vent1",K.to_world((-1328,220,25)),"0,0,0,1",components=[
+                K.component(IDS,"Sandbox.ModelRenderer","west/vent1/renderer",Model=vent,RenderType="On",Tint="1,1,1,1")]))
             hose="models/maps/spillway/hose_coil_v2/hose_coil.vmdl"
             root["Children"].append(K.game_object(IDS,"Yard Hose","cargo/hose",K.to_world((90,-1080,0)),"0,0,0,1",components=[
                 K.component(IDS,"Sandbox.ModelRenderer","cargo/hose/renderer",Model=hose,RenderType="On",Tint="1,1,1,1")]))

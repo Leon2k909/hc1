@@ -1,0 +1,12 @@
+"Layer0"
+{
+ shader "shaders/complex.shader"
+ F_SPECULAR "1"
+ TextureColor "materials/spillway/trench-grates-v1/steel_color.png"
+ TextureNormal "materials/spillway/trench-grates-v1/steel_normal.png"
+ TextureRoughness "materials/spillway/trench-grates-v1/steel_rough.png"
+ TextureAmbientOcclusion "materials/default/default_ao.tga"
+ g_vColorTint "[0.48 0.55 0.54 1]"
+ g_flMetalness "0.65"
+ g_flRoughnessScaleFactor "1.1"
+}

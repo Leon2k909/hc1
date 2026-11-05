@@ -42,3 +42,6 @@ during this work; verification explicitly records those two external changes
 and still requires the public lantern source, glow material, scene, all geometry
 and physics files to match the original guard. Native imports are restricted to
 this proposal's private directories. No frame-time benchmark is claimed.
+
+
+The unused comparison background for this earlier review was archived/deleted during the approved porch-lamp retirement (2026-11-04) because it retained a cached dependency on the old lamp material. See Sources/Riverside/porch-light-v2/README.md and its installed/legacy-cleanup/ backups. Keep historical PNGs; do not rerun the original review script without rebuilding its background from current assets. The approved public model is unaffected.

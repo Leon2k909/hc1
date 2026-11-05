@@ -1,0 +1,7 @@
+var session=Editor.SceneEditorSession.All.Single(x=>x.Scene.Name=="sewage");
+var holder=session.Scene.GetAllObjects(true).Single(x=>x.Name=="Waterworks bolted flanges");
+if(holder.Components.Get<ModelRenderer>()?.Model?.ResourcePath!="models/maps/sewage/pipe-flanges-v1/flanges.vmdl") throw new Exception("Unexpected flange renderer.");
+session.HasUnsavedChanges=true;
+session.Save(false);
+var disk=System.IO.File.ReadAllText(System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(),"Assets/scenes/maps/sewage/sewage.scene"));
+return new {Saved=!session.HasUnsavedChanges,OnDisk=disk.Contains("Waterworks bolted flanges")&&disk.Contains("models/maps/sewage/pipe-flanges-v1/flanges.vmdl"),ActiveScene=Editor.SceneEditorSession.Active.Scene.Name};

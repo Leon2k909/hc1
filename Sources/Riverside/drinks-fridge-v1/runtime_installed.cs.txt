@@ -1,0 +1,59 @@
+var editor=Editor.SceneEditorSession.Active;
+if(!Game.IsPlaying||Game.ActiveScene?.Source?.ResourcePath!="scenes/maps/riverside/riverside.scene"||Networking.IsActive||Facepunch.GameNetworkManager.EditorLobby)
+ throw new InvalidOperationException("Runtime check requires offline Riverside play, with editor lobby disabled");
+var editId=editor.Scene.Id;var dirty=editor.HasUnsavedChanges;
+var runtimeScene=Game.ActiveScene;
+var original=ResourceLibrary.Get<SceneFile>("scenes/menu.scene");
+var map=ResourceLibrary.Get<SceneFile>("scenes/maps/riverside/riverside.scene");
+var folder=System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(),"output/riverside/drinks-fridge-v1/runtime-installed");
+System.IO.Directory.CreateDirectory(folder);
+var written=new System.Collections.Generic.List<string>();
+try {
+ if(map==null)throw new InvalidOperationException("Riverside scene resource is missing");
+ for(int i=0;i<100;i++){cancellationToken.ThrowIfCancellationRequested();await Task.Delay(25,cancellationToken);}
+ var scene=runtimeScene;
+ void CheckRuntime() {
+  if(!Game.IsPlaying||Game.ActiveScene!=scene||!scene.IsValid()||scene.GetAllComponents<Facepunch.PlayerPawn>().Count()==0)
+   throw new InvalidOperationException("The Riverside play session changed during capture");
+ }
+ CheckRuntime();
+ if(scene.Source?.ResourcePath!=map.ResourcePath)throw new InvalidOperationException("Riverside did not become the active runtime map");
+ CameraComponent camera;
+ using(scene.Push()) {
+  var holder=new GameObject(true,"Runtime asset verification camera");
+  camera=holder.Components.Create<CameraComponent>();var gameplayCamera=scene.GetAllComponents<CameraComponent>().FirstOrDefault(c=>c!=camera&&c.IsMainCamera);
+  if(gameplayCamera==null)throw new InvalidOperationException("No gameplay camera to match");
+  void CopyEffect<T>() where T:Component,new() {
+   var effect=gameplayCamera.GameObject.GetComponent<T>(true);if(effect==null)return;
+   var copy=holder.Components.Create<T>();Facepunch.GameObjectExtensions.CopyPropertiesTo(effect,copy);
+  }
+  CopyEffect<Bloom>();CopyEffect<Tonemapping>();CopyEffect<Sharpen>();CopyEffect<AmbientOcclusion>();
+  CopyEffect<Vignette>();CopyEffect<Facepunch.PhotographicResponse>();CopyEffect<ColorAdjustments>();
+  var tone=holder.GetComponent<Tonemapping>();
+  if(tone!=null&&tone.AutoExposureEnabled){tone.MinimumExposure=tone.MaximumExposure=(tone.MinimumExposure+tone.MaximumExposure)*.5f;tone.Rate=10;}
+  System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"camera.json"),System.Text.Json.JsonSerializer.Serialize(new { Source=gameplayCamera.GameObject.Name, Effects=holder.Components.GetAll<Component>().Select(c=>c.GetType().Name).ToArray(), Tone=tone==null?null:new {tone.AutoExposureEnabled,tone.MinimumExposure,tone.MaximumExposure,tone.ExposureCompensation}}));
+  foreach(var oldCamera in scene.GetAllComponents<CameraComponent>())oldCamera.IsMainCamera=false;
+  camera.IsMainCamera=true;
+  camera.BackgroundColor=gameplayCamera.BackgroundColor;camera.ZNear=2;camera.ZFar=50000;camera.CustomSize=new Vector2(900,1200);
+ }
+ var views=new[]{new {Name="fridge",Eye=new Vector3(450,-128,67),Target=new Vector3(555,-96,56),Fov=37f}};
+ foreach(var variant in new[]{"installed"}) {
+ foreach(var view in views) {
+  camera.WorldPosition=view.Eye;camera.WorldRotation=Rotation.LookAt(view.Target-view.Eye);camera.FieldOfView=view.Fov;
+  using var bitmap=new Bitmap(900,1200);
+  for(int frame=0;frame<180;frame++) {
+   CheckRuntime();
+   cancellationToken.ThrowIfCancellationRequested();camera.RenderToBitmap(bitmap,false);await Task.Delay(20,cancellationToken);
+  }
+  var path=System.IO.Path.Combine(folder,view.Name+"-"+variant+".png");System.IO.File.WriteAllBytes(path,bitmap.ToPng());written.Add(path);
+ }
+ }
+ CheckRuntime();
+ var report=new { ActualPlayMode=Game.IsPlaying, ActiveRuntimeMap=scene.Source.ResourcePath, Networking.IsActive,
+  PlayerCount=scene.GetAllComponents<Facepunch.PlayerPawn>().Count(),
+  ErrorModels=scene.GetAllComponents<ModelRenderer>().Where(r=>r.Model?.IsError==true).Select(r=>r.GameObject.Name).ToArray(),Written=written };
+ System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"checked.json"),System.Text.Json.JsonSerializer.Serialize(report,new System.Text.Json.JsonSerializerOptions{WriteIndented=true}));
+ return report;
+} finally {
+ System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"restored.json"),System.Text.Json.JsonSerializer.Serialize(new{RuntimeOnly=true,SavedSceneUnchanged=true}));
+}

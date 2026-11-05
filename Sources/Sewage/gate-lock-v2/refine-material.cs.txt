@@ -1,0 +1,9 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var path=System.IO.Path.Combine(root,"Assets/materials/sewage/gate-lock-v2/brass.vmat");
+var texture=System.IO.Path.Combine(root,"Assets/materials/sewage/gate-lock-v2/brass_color.png");
+if(!System.IO.File.Exists(texture)) {
+ System.IO.File.Copy("C:/Users/leon2/.codex/generated_images/01a1a73a-ac05-7220-9dac-461a6cce09ed/exec-75632065-b989-4de8-bb45-4e8ddc558bc6.png",texture);
+ Editor.AssetSystem.RegisterFile(texture);
+}
+System.IO.File.Copy(System.IO.Path.Combine(root,"Sources/sewage/gate-lock-v2/brass.vmat.txt"),path,true);
+Editor.AssetSystem.RegisterFile(path);return new{Updated=true};

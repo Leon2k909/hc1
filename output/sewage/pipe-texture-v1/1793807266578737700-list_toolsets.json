@@ -1,0 +1,664 @@
+{
+  "toolsets": [
+    {
+      "name": "asset",
+      "description": "The asset system - search, inspect, compile, edit and preview the project's assets",
+      "tools": [
+        "asset_compile",
+        "asset_dependencies",
+        "asset_files",
+        "asset_find_by_file",
+        "asset_info",
+        "asset_read",
+        "asset_search",
+        "asset_thumbnail",
+        "asset_types",
+        "asset_write",
+        "create_asset"
+      ]
+    },
+    {
+      "name": "bridge_asset",
+      "description": "Search the local asset library and sbox.game cloud assets, install packages, inspect asset metadata, copy assets with their dependency closure, and recompile assets.",
+      "tools": [
+        "copy_asset_with_dependencies",
+        "get_asset_info",
+        "inspect_model_geometry",
+        "install_asset",
+        "list_asset_library",
+        "recompile_asset",
+        "search_assets"
+      ]
+    },
+    {
+      "name": "bridge_audio",
+      "description": "List sounds, author .sound events, attach sound components, and preview audio in the editor.",
+      "tools": [
+        "add_tts_voice",
+        "assign_sound",
+        "create_sound_event",
+        "list_sounds",
+        "play_sound_preview"
+      ]
+    },
+    {
+      "name": "bridge_batch",
+      "description": "Bulk operations across many GameObjects in one call, with dry-run validation before applying. Get target ids from find_objects or get_selected_objects.",
+      "tools": [
+        "batch_add_component",
+        "batch_delete",
+        "batch_reparent",
+        "batch_set_property"
+      ]
+    },
+    {
+      "name": "bridge_character",
+      "description": "Spawn and outfit citizen characters, pose and animate them, play animations, set animgraph parameters, ragdolls, lipsync, and attachments.",
+      "tools": [
+        "add_lipsync",
+        "add_ragdoll",
+        "dress_citizen",
+        "equip_model",
+        "list_animations",
+        "play_animation",
+        "pose_citizen",
+        "set_animgraph_param",
+        "set_bodygroup",
+        "set_expression",
+        "set_look_at",
+        "spawn_citizen"
+      ]
+    },
+    {
+      "name": "bridge_component",
+      "description": "Add, configure, inspect and invoke components on GameObjects: set/get properties, wire cross-component references, call methods and editor buttons.",
+      "tools": [
+        "add_component_to_new_object",
+        "add_component_with_properties",
+        "get_all_properties",
+        "get_property",
+        "invoke_button",
+        "invoke_method",
+        "list_available_components",
+        "list_component_buttons",
+        "set_component_reference",
+        "set_property"
+      ]
+    },
+    {
+      "name": "bridge_debug",
+      "description": "Bridge health, editor restart, console commands, profiler stats, time scale, debug draw primitives (lines, boxes, spheres), and editor camera framing.",
+      "tools": [
+        "console_run",
+        "debug_clear",
+        "debug_draw_box",
+        "debug_draw_line",
+        "debug_draw_ray",
+        "debug_draw_sphere",
+        "frame_camera",
+        "get_bridge_status",
+        "get_profiler_stats",
+        "restart_editor",
+        "set_time_scale"
+      ]
+    },
+    {
+      "name": "bridge_discovery",
+      "description": "Reflect over the s&box API: describe types, search types, get method signatures, list installed libraries, and search project files. Use before writing C# against unfamiliar SDK types.",
+      "tools": [
+        "describe_type",
+        "find_in_project",
+        "get_method_signature",
+        "list_libraries",
+        "search_types"
+      ]
+    },
+    {
+      "name": "bridge_gameobject",
+      "description": "GameObject lifecycle, hierarchy, transforms, tags, selection, and bulk layout (align, distribute, scatter, snap-to-ground, grid duplicate) in the open scene. Objects are referenced by GUID from get_scene_hierarchy or find_objects.",
+      "tools": [
+        "align_objects",
+        "commit_placement_plan",
+        "create_gameobject",
+        "delete_gameobject",
+        "distribute_objects",
+        "duplicate_gameobject",
+        "find_objects",
+        "find_objects_near",
+        "focus_object",
+        "get_bounds",
+        "get_scene_hierarchy",
+        "get_selected_objects",
+        "get_tags",
+        "grid_duplicate",
+        "group_objects",
+        "measure_distance",
+        "randomize_transforms",
+        "rename_gameobject",
+        "replace_model",
+        "scatter_props",
+        "select_object",
+        "set_enabled",
+        "set_parent",
+        "set_tags",
+        "set_tint",
+        "set_transform",
+        "snap_to_ground"
+      ]
+    },
+    {
+      "name": "bridge_helpers",
+      "description": "Claude Bridge convenience helpers over native MCP. Prefer the engine's scene, asset, Hammer and UI tools for ordinary editor work.",
+      "tools": [
+        "bridge_call",
+        "bridge_describe_handler",
+        "bridge_list_handlers",
+        "bridge_read",
+        "bridge_scatter_props",
+        "bridge_simulate_input"
+      ]
+    },
+    {
+      "name": "bridge_material",
+      "description": "Assign models and materials to renderers, author .vmat materials, and set material properties.",
+      "tools": [
+        "assign_material",
+        "assign_model",
+        "create_material",
+        "set_material_property"
+      ]
+    },
+    {
+      "name": "bridge_moviemaker",
+      "description": "Wire and control Sandbox.MovieMaker cutscene playback: list .movie clips, add MoviePlayer components, play and stop clips.",
+      "tools": [
+        "add_movie_player",
+        "author_movie_clip",
+        "create_killcam",
+        "gameplay_recording_status",
+        "list_movies",
+        "play_movie",
+        "record_gameplay_clip",
+        "record_playtest",
+        "stop_gameplay_recording",
+        "stop_movie"
+      ]
+    },
+    {
+      "name": "bridge_navigation",
+      "description": "Bake the navmesh and query walkable paths.",
+      "tools": [
+        "bake_navmesh",
+        "get_navmesh_path"
+      ]
+    },
+    {
+      "name": "bridge_networking",
+      "description": "Multiplayer setup, local multi-instance testing, and codegen: network helpers, lobby managers, networked players, [Sync] properties, RPCs (broadcast/host/targeted), ownership, spawning, and host-migration recovery.",
+      "tools": [
+        "add_host_migration_recovery",
+        "add_network_helper",
+        "add_rpc_method",
+        "add_sync_property",
+        "add_targeted_rpc",
+        "configure_network",
+        "create_host_rpc_action",
+        "create_lobby_manager",
+        "create_local_player_resolver",
+        "create_network_events",
+        "create_networked_player",
+        "get_network_status",
+        "multiplayer_test_status",
+        "network_spawn",
+        "set_ownership",
+        "start_multiplayer_test",
+        "stop_multiplayer_test"
+      ]
+    },
+    {
+      "name": "bridge_npc",
+      "description": "NPC brains (state machines), spawners, patrol routes, and perception simulation.",
+      "tools": [
+        "assign_patrol_route",
+        "create_npc_brain",
+        "create_npc_schedule_brain",
+        "create_npc_spawner",
+        "create_utility_ai",
+        "place_patrol_route",
+        "simulate_npc_perception"
+      ]
+    },
+    {
+      "name": "bridge_physics",
+      "description": "Rigidbodies, colliders, joints, raycasts and overlap queries in the open scene.",
+      "tools": [
+        "add_collider",
+        "add_joint",
+        "add_physics",
+        "physics_overlap",
+        "raycast"
+      ]
+    },
+    {
+      "name": "bridge_playmode",
+      "description": "Enter/exit play mode, check play state, and read/write component properties on live runtime objects while playing.",
+      "tools": [
+        "get_runtime_property",
+        "is_playing",
+        "set_runtime_property",
+        "start_play",
+        "stop_play"
+      ]
+    },
+    {
+      "name": "bridge_playtest",
+      "description": "Scripted gameplay verification in play mode: run step lists with in-frame assertions (playtest), drive the player controller, and simulate input actions.",
+      "tools": [
+        "drive_player",
+        "drive_player_status",
+        "playtest",
+        "playtest_abort",
+        "playtest_status",
+        "simulate_input"
+      ]
+    },
+    {
+      "name": "bridge_prefab",
+      "description": "Create prefabs from scene objects, instantiate them, list and inspect them, and wire prefab references into component properties.",
+      "tools": [
+        "create_prefab",
+        "get_prefab_info",
+        "instantiate_prefab",
+        "list_prefabs",
+        "set_prefab_ref"
+      ]
+    },
+    {
+      "name": "bridge_project",
+      "description": "Project info and config (.sbproj), file read/write, C# script create/edit/delete, hotload, input actions, and publishing metadata.",
+      "tools": [
+        "create_script",
+        "delete_script",
+        "describe_project",
+        "edit_script",
+        "ensure_input_action",
+        "get_package_details",
+        "get_project_config",
+        "get_project_info",
+        "list_project_files",
+        "read_file",
+        "set_project_config",
+        "set_project_thumbnail",
+        "trigger_hotload",
+        "write_file"
+      ]
+    },
+    {
+      "name": "bridge_scaffold_gameplay",
+      "description": "Generate complete, compile-verified gameplay C# components: player/NPC controllers, game managers, health, pickups, inventory, save systems, economy, loot tables, round/phase machines, interaction systems, placement mode, and more. Each tool writes a .cs file into the project; follow with trigger_hotload + compile_status.",
+      "tools": [
+        "add_achievement_trigger",
+        "add_interaction_prompt",
+        "add_interaction_station",
+        "add_leaderboard_stat",
+        "add_steam_stat_currency",
+        "create_achievement_set",
+        "create_carry_system",
+        "create_currency_account",
+        "create_currency_pickup",
+        "create_day_night_clock",
+        "create_economy_wallet",
+        "create_elo_rating_system",
+        "create_event_bus",
+        "create_event_director",
+        "create_gacha_drop_table",
+        "create_game_manager",
+        "create_health_system",
+        "create_hold_to_confirm",
+        "create_idle_economy",
+        "create_idle_income",
+        "create_interactable",
+        "create_inventory",
+        "create_leaderboard_panel",
+        "create_loot_table_resource",
+        "create_meta_progression",
+        "create_needs_system",
+        "create_npc_controller",
+        "create_objective_system",
+        "create_offline_progress",
+        "create_pickup",
+        "create_placement_mode",
+        "create_player_controller",
+        "create_round_phase_machine",
+        "create_round_state_machine",
+        "create_save_slots",
+        "create_save_system",
+        "create_signed_save",
+        "create_speedrun_leaderboard",
+        "create_stat_modifier_system",
+        "create_team_assigner",
+        "create_trigger_zone",
+        "create_weighted_loot_table",
+        "scaffold_map_vote_flow"
+      ]
+    },
+    {
+      "name": "bridge_scaffold_polish",
+      "description": "Generate game-feel and presentation components: camera shake, flickering lights, floating combat text, combo meters, nametags, world-panel UIs, cutscene directors, and dialogue systems.",
+      "tools": [
+        "add_flicker_light",
+        "create_camera_effects",
+        "create_camera_shake",
+        "create_combo_meter",
+        "create_cutscene_director",
+        "create_dialogue_system",
+        "create_floating_combat_text",
+        "create_proxy_nametag",
+        "create_round_timer_hud",
+        "create_worldpanel_ui",
+        "generate_lipsync_dialogue"
+      ]
+    },
+    {
+      "name": "bridge_scene",
+      "description": "Create and load scene files in the s&box editor. For saving/listing scenes use the built-in scene toolset (save_scene, list_scenes).",
+      "tools": [
+        "create_scene",
+        "describe_scene",
+        "load_scene"
+      ]
+    },
+    {
+      "name": "bridge_screenshot",
+      "description": "Capture inline PNG images from the main camera, framed/free viewpoints, object orbits, saved session camera bookmarks, ordered comparison sets, or a deterministic orthographic top-down view. Works in edit and play mode; temporary cameras are removed after every capture.",
+      "tools": [
+        "capture_camera_set",
+        "capture_topdown",
+        "capture_view",
+        "delete_camera_bookmark",
+        "list_camera_bookmarks",
+        "save_camera_bookmark",
+        "screenshot_from",
+        "screenshot_orbit",
+        "take_screenshot"
+      ]
+    },
+    {
+      "name": "bridge_ui",
+      "description": "Generate Razor UI panels: screen-space HUDs, world-space panels, and custom PanelComponent scaffolds.",
+      "tools": [
+        "add_panel_buildhash",
+        "add_screen_panel",
+        "add_world_panel",
+        "create_razor_ui"
+      ]
+    },
+    {
+      "name": "bridge_validation",
+      "description": "Lint and validate the project: networking footguns, sandbox whitelist violations, Razor transpiler footguns, scene setup issues, publishing readiness, save-file inspection, and networked-object state dumps.",
+      "tools": [
+        "find_broken_references",
+        "inspect_networked_object",
+        "networking_lint",
+        "razor_lint",
+        "sandbox_lint",
+        "save_inspect",
+        "scene_validate",
+        "services_query",
+        "validate_project"
+      ]
+    },
+    {
+      "name": "bridge_vehicle",
+      "description": "Make things drivable: generate raycast-car controllers with built-in driver seats, standalone enter/exit seats, and physgun-style grab tools; apply arcade/drift/offroad/race handling presets to any vehicle component. Attach the generated components with batch_add_component; verify by driving in play mode.",
+      "tools": [
+        "create_physics_grab_tool",
+        "create_seat_system",
+        "create_vehicle_controller",
+        "tune_vehicle"
+      ]
+    },
+    {
+      "name": "bridge_visuals",
+      "description": "Lighting, fog, post-processing, skyboxes, envmap probes, particles (.vpcf), and one-call atmosphere/look presets.",
+      "tools": [
+        "add_beam",
+        "add_daynight_sun",
+        "add_envmap_probe",
+        "add_light",
+        "add_post_process",
+        "add_render_target_camera",
+        "add_trail",
+        "apply_atmosphere",
+        "apply_post_fx_look",
+        "bake_reflections",
+        "create_particle_effect",
+        "set_fog",
+        "set_skybox",
+        "spawn_particle",
+        "spawn_vpcf"
+      ]
+    },
+    {
+      "name": "bridge_workflow",
+      "description": "Agent workflow safety net: snapshot the whole scene to temp storage before risky changes (checkpoint_scene), browse snapshots (list_checkpoints), and roll the scene back (restore_checkpoint). The undo story for bridge mutations while the engine's snapshot API stays addon-inaccessible.",
+      "tools": [
+        "checkpoint_scene",
+        "list_checkpoints",
+        "restore_checkpoint"
+      ]
+    },
+    {
+      "name": "bridge_world",
+      "description": "Terrain sculpting, hills, trails and clearings; forest painting and POIs; cave paths; and path-based object placement. Requires MapBuilder/ForestGenerator-style components in the project (invoke_button works anywhere).",
+      "tools": [
+        "add_cave_waypoint",
+        "add_forest_poi",
+        "add_forest_trail",
+        "add_terrain_clearing",
+        "add_terrain_hill",
+        "add_terrain_trail",
+        "add_water_body",
+        "build_terrain_mesh",
+        "clear_cave_path",
+        "clear_forest_pois",
+        "clear_terrain_features",
+        "paint_forest_density",
+        "place_along_path",
+        "raycast_terrain",
+        "sculpt_terrain",
+        "set_forest_seed"
+      ]
+    },
+    {
+      "name": "component",
+      "description": "Component type documentation - what components exist and what properties they expose",
+      "tools": [
+        "get_component_type"
+      ]
+    },
+    {
+      "name": "editor",
+      "description": null,
+      "tools": [
+        "compile_status",
+        "console_command",
+        "editor_status"
+      ]
+    },
+    {
+      "name": "hammer",
+      "description": "Hammer, the map editor - find and inspect map nodes, place entities, game objects and brush geometry, assign materials, run Hammer commands, move the camera and screenshot the map",
+      "tools": [
+        "hammer_asset_usage",
+        "hammer_assign_asset",
+        "hammer_build_map",
+        "hammer_build_status",
+        "hammer_compiled_map_stats",
+        "hammer_create_entities",
+        "hammer_create_entity",
+        "hammer_create_game_object",
+        "hammer_create_mesh",
+        "hammer_create_primitive",
+        "hammer_delete_nodes",
+        "hammer_duplicate_nodes",
+        "hammer_entity_classes",
+        "hammer_find_hidden_faces",
+        "hammer_find_nodes",
+        "hammer_focus_nodes",
+        "hammer_get_node",
+        "hammer_get_selection",
+        "hammer_list_commands",
+        "hammer_list_primitives",
+        "hammer_mesh_faces",
+        "hammer_mesh_stats",
+        "hammer_move_nodes",
+        "hammer_open_map",
+        "hammer_overlays_to_decals",
+        "hammer_prefab_placements",
+        "hammer_redo",
+        "hammer_replace_material",
+        "hammer_run_command",
+        "hammer_save",
+        "hammer_screenshot",
+        "hammer_select",
+        "hammer_set_camera",
+        "hammer_set_components",
+        "hammer_set_face_material",
+        "hammer_set_node",
+        "hammer_status",
+        "hammer_trace",
+        "hammer_undo",
+        "hammer_views"
+      ]
+    },
+    {
+      "name": "instance",
+      "description": "Tool discovery and recent console output",
+      "tools": [
+        "call_tool",
+        "call_tools",
+        "describe_toolset",
+        "instance_console_command",
+        "instance_status",
+        "list_toolsets",
+        "read_console",
+        "run_csharp",
+        "search_tools"
+      ]
+    },
+    {
+      "name": "log",
+      "description": "Write messages to the editor console",
+      "tools": [
+        "log_error",
+        "log_info",
+        "log_warning"
+      ]
+    },
+    {
+      "name": "network",
+      "description": "Multiplayer from the editor - host a lobby, spawn local client instances, watch connections and trigger a host handoff",
+      "tools": [
+        "network_disconnect",
+        "network_migrate_to_new_instance",
+        "network_spawn_instance",
+        "network_start_hosting",
+        "network_status"
+      ]
+    },
+    {
+      "name": "package",
+      "description": "Published packages on the sbox.game backend - search and fetch details",
+      "tools": [
+        "find_packages",
+        "get_package",
+        "install_package"
+      ]
+    },
+    {
+      "name": "perf",
+      "description": "Performance numbers from the dev tools (devtools): frame times, what limits the frame rate, CPU scopes, GPU passes, memory and GC, rendering counters, network and UI costs",
+      "tools": [
+        "perf_cpu",
+        "perf_frames",
+        "perf_gpu",
+        "perf_memory",
+        "perf_network",
+        "perf_overview",
+        "perf_rendering",
+        "perf_ui"
+      ]
+    },
+    {
+      "name": "play",
+      "description": "Play mode - start, stop and pause the game",
+      "tools": [
+        "play_pause",
+        "play_start",
+        "play_stop"
+      ]
+    },
+    {
+      "name": "publishing",
+      "description": "Preview publishing rules, runtime-content warnings and dependency costs without saving project settings.",
+      "tools": [
+        "publishing_preview"
+      ]
+    },
+    {
+      "name": "scene",
+      "description": "Open scenes - the game object hierarchy, creating and editing game objects and components, the editor camera and viewport screenshots",
+      "tools": [
+        "add_component",
+        "camera_screenshot",
+        "create_game_object",
+        "delete_game_object",
+        "editor_camera_screenshot",
+        "find_game_objects",
+        "get_editor_camera",
+        "get_game_object",
+        "get_selection",
+        "list_scenes",
+        "redo",
+        "remove_component",
+        "save_scene",
+        "scene_trace",
+        "scene_tree",
+        "set_component",
+        "set_editor_camera",
+        "set_game_object",
+        "set_selection",
+        "spawn_model",
+        "spawn_models",
+        "undo"
+      ]
+    },
+    {
+      "name": "scenefile",
+      "description": "Opening, switching and closing scene tabs",
+      "tools": [
+        "close_scene",
+        "open_scene",
+        "switch_scene"
+      ]
+    },
+    {
+      "name": "ui",
+      "description": "Live UI - panel tree, computed styles, matched rules, screenshots, hit testing, text metrics, and probing css without editing a file",
+      "tools": [
+        "text_measure",
+        "ui_batch_stats",
+        "ui_hit_test",
+        "ui_matched_rules",
+        "ui_panel_dump",
+        "ui_pixels",
+        "ui_probe",
+        "ui_probe_batch",
+        "ui_screenshot",
+        "ui_set_pseudo",
+        "ui_set_style"
+      ]
+    }
+  ]
+}

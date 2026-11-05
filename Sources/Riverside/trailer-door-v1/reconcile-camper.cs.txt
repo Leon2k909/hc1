@@ -1,0 +1,17 @@
+var session=Editor.SceneEditorSession.All.Single(s=>s.Scene?.Name.Equals("riverside",StringComparison.OrdinalIgnoreCase)==true&&!s.IsPlaying);
+if(session.HasUnsavedChanges)throw new Exception("Riverside has unsaved work");
+var project=Sandbox.Project.Current.GetRootPath();
+var before=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(project,"output/riverside/trailer-door-v1/installed/before-install/riverside.scene")));
+var camper=before["GameObjects"].AsArray().Single(g=>g["Name"]?.GetValue<string>()=="Boarded Camper");
+var id=Guid.Parse(camper["__guid"].GetValue<string>());
+using(session.Scene.Push())
+{
+    var existing=session.Scene.GetAllObjects(true).SingleOrDefault(g=>g.Id==id);
+    if(existing is null)
+    {
+        existing=new GameObject(false,"Boarded Camper");existing.Deserialize(camper.AsObject());
+        if(existing.GetComponentsInChildren<ModelRenderer>().Any(r=>r.Model is null||r.Model.IsError))throw new Exception("Invalid restored camper model");
+        session.HasUnsavedChanges=true;session.Save(false);
+    }
+    return new {RestoredCamper=existing.Name,NeedsSave=session.HasUnsavedChanges,ActiveScene=Editor.SceneEditorSession.Active?.Scene?.Name};
+}

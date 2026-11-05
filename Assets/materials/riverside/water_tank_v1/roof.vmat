@@ -1,0 +1,11 @@
+Layer0
+{
+ shader "shaders/complex.shader"
+ F_SPECULAR 1
+ TextureColor "materials/riverside/water_tank_v1/roof_color.png"
+ TextureNormal "materials/riverside/water_tank_v1/shell_normal.png"
+ TextureRoughness "materials/riverside/water_tank_v1/roof_rough.png"
+ g_flRoughnessScaleFactor "1"
+ g_flMetalness "0.35"
+ g_vColorTint "[1 1 1 1]"
+}

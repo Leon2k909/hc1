@@ -1,0 +1,12 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var folder=System.IO.Path.Combine(root,"output/railhead/ashtray-v1");
+var plan=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"retire-plan.json")));
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+foreach(var item in plan["files"].AsArray()) {
+ var rel=item["path"].GetValue<string>();
+ if(!rel.StartsWith("Assets/models/maps/railhead/ashtray-v1/east_without_ashtray.")||rel.Contains(".."))throw new InvalidOperationException("Unexpected deletion target");
+ if(Hash(System.IO.Path.Combine(root,rel))!=item["sha256"].GetValue<string>()||Hash(System.IO.Path.Combine(root,item["archive"].GetValue<string>()))!=item["sha256"].GetValue<string>())throw new InvalidOperationException("Preview or archive changed");
+}
+var removed=new System.Collections.Generic.List<string>();
+foreach(var item in plan["files"].AsArray()) {var rel=item["path"].GetValue<string>();System.IO.File.Delete(System.IO.Path.Combine(root,rel));removed.Add(rel);}
+return new {Removed=removed,Archived=true};

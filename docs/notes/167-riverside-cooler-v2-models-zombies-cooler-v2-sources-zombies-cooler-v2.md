@@ -5,3 +5,9 @@
 - Installed by `install_cooler.py`, which cuts its 136 triangles from `riverside_pad.obj`: `riverside_map.py` can't be safely rerun (note 163).
 - Seen in s&box in an isolated editor scene under the map's own light, exposure held at 3.5: it reads well there, and needed no brightening, where the old body
   nearly vanished. Collision tested with rays. **Not yet seen in a live match.** See the folder's README.
+- Detail pass (2026-11-04): real raised pull tabs and anchors on the five tilted cans, scored lid surfaces, and moulded
+  handle grips. Closer LODs are 4,328 / 2,582 triangles; the far LOD remains 624. All maps were rebaked at the same
+  paths. Native model/material compilation and offline geometry, scene-reference and collision checks passed.
+  Matched native captures are in `output/cooler-detail-20261104/`; no map scene edits were needed.
+- The detail pass was approved and replaces the prior version in place. The obsolete comparison model, its inputs,
+  OLD gallery group and superseded work/preview files were removed; the current build and approved shots remain.

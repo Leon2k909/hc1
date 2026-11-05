@@ -1,4 +1,10 @@
 ## Ordnance and handling sounds (`Tools/ordnance_sounds.py`, `Tools/handling_sounds.py`)
+- Empty-trigger behavior corrected in code (2026-11-04, no editor): `Shootable` now allows one dry-fire click per
+  fresh empty trigger pull. Holding fire on an empty automatic weapon no longer repeats clicks every 0.15 s.
+  A pending press bridges the automatic-fire dispatcher's one-tick held-input delay; release, input suppression,
+  holstering, successful firing or automatic reload clears it. Running a magazine dry while holding the trigger
+  does not invent another trigger pull. The existing empty-gun auto-reload path and dry-click rate limit remain.
+  The 56 existing production input-dispatcher checks pass; live sound/trigger behavior is unverified.
 - The user asked for some of the default s&box and CoD sounds to be changed "so we're unique", "ultra realistic"
   (2026-10-01). Both scripts synthesise from the physics of each event, with no samples, the way `world_sounds.py` does
   (and on its helpers). Each docstring has every layer, its source figures and why. A re-run rewrites the WAVs (seeded,

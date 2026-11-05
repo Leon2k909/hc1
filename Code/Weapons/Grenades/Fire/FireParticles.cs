@@ -86,6 +86,11 @@ public sealed class FlameParticles : ParticleController
 	/// <summary> The wind (units/s), which leans the flames and carries them. Set from the main thread. </summary>
 	public Vector3 Wind { get; set; }
 
+	/// <summary> Optional opening limits for a contained map fire. Radius 0 keeps the normal open-fire behaviour. </summary>
+	public Vector3 OpeningOrigin { get; set; }
+	public float OpeningRadius { get; set; }
+	public float OpeningHeight { get; set; }
+
 	/// <summary> The flame sheet plays at this many frames a second, of its 64. </summary>
 	private const float FramesPerSecond = 30f;
 
@@ -99,6 +104,7 @@ public sealed class FlameParticles : ParticleController
 		p.StartScale = life;
 		p.HitNormal = new Vector3( width, height, groundAt.z );
 		p.Color = tint;
+		p.HitPos = new Vector3( tint.r, tint.g, tint.b );
 		p.Alpha = 0f;
 		p.Size = new Vector3( width * 0.5f, height * 0.5f, 1f );
 		p.SequenceTime = new Vector3( 0f, 0f, Random.Shared.Float() );
@@ -127,6 +133,29 @@ public sealed class FlameParticles : ParticleController
 		var rise = t < 0.5f ? 0f : full.y * 0.9f * (t - 0.5f);
 		p.Position.z = full.z + p.Size.y * 0.45f + rise;
 		p.Velocity = Wind.WithZ( 0f ) * 0.5f;
+		if ( OpeningRadius > 0f )
+		{
+			// Let each tongue sway and narrow as it cools, while retaining its original tint rather than compounding it.
+			var tail = Math.Clamp( (t - 0.4f) / 0.6f, 0f, 1f );
+			p.Size.x *= 1f - 0.5f * tail;
+			p.Alpha *= 0.72f;
+			p.Color = new Color( p.HitPos.x, p.HitPos.y * (1f - 0.3f * t), p.HitPos.z * (1f - 0.6f * t), 1f );
+			var roll = MathF.Sin( p.Age * 7f + p.SequenceTime.z * MathF.PI * 2f ) * 4f;
+			p.Angles = new Angles( 0f, 0f, roll );
+			var angle = roll * MathF.PI / 180f;
+			var sine = MathF.Abs( MathF.Sin( angle ) );
+			var cosine = MathF.Abs( MathF.Cos( angle ) );
+			var halfWidth = (p.Size.x * cosine + p.Size.y * sine) * 0.5f;
+			var halfHeight = (p.Size.y * cosine + p.Size.x * sine) * 0.5f;
+			// The barrel shields flame bases from crosswind. Only a tongue that clears the rim can drift outwards.
+			var bottom = p.Position.z - halfHeight;
+			var free = Math.Clamp( (bottom - OpeningOrigin.z - OpeningHeight) / MathF.Max( OpeningRadius, 1f ), 0f, 1f );
+			var offset = (p.Position - OpeningOrigin).WithZ( 0f );
+			var radius = MathF.Max( 0f, OpeningRadius - halfWidth - 0.5f ) + free * OpeningRadius * 0.5f;
+			if ( offset.Length > radius ) offset = offset.Normal * radius;
+			p.Position = OpeningOrigin.WithZ( p.Position.z ) + offset;
+			p.Velocity *= free;
+		}
 	}
 }
 

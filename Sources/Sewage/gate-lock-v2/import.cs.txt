@@ -1,0 +1,10 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var source=System.IO.Path.Combine(root,"output/sewage/gate-lock-v2/preview");
+var target=System.IO.Path.Combine(root,"Assets/models/maps/sewage/gate-lock-v2");
+System.IO.Directory.CreateDirectory(target);
+foreach(var path in System.IO.Directory.GetFiles(source)) {
+ var destination=System.IO.Path.Combine(target,System.IO.Path.GetFileName(path));
+ if(System.IO.File.Exists(destination))throw new Exception("Preview already exists: "+destination);
+ System.IO.File.Copy(path,destination);Editor.AssetSystem.RegisterFile(destination);
+}
+return new{Imported=true};

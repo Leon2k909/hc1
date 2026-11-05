@@ -1,0 +1,30 @@
+var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic;
+var preRender=typeof(Scene).GetMethod("PreRender",flags,null,Type.EmptyTypes,null);
+var preCamera=typeof(Scene).GetMethod("PreCameraRender",flags,null,Type.EmptyTypes,null);
+var scene=Scene.CreateEditorScene();var checks=new System.Collections.Generic.List<object>();
+void Check(string name,bool pass,object detail=null)=>checks.Add(new{Name=name,Pass=pass,Detail=detail});
+Transform Bone(SkinnedModelRenderer r,string name){if(!r.TryGetBoneTransform(name,out var pose))throw new InvalidOperationException(name);return pose;}
+try {
+ SkinnedModelRenderer driver;CameraComponent camera;
+ using(scene.Push()) {
+  var go=new GameObject(true,"Sequence preservation probe");driver=go.Components.Create<SkinnedModelRenderer>();driver.Model=Model.Load(Facepunch.ZombieAI.DriverModel);driver.UseAnimGraph=false;
+  var view=new GameObject(true,"Probe view");view.WorldPosition=new Vector3(150,0,60);view.WorldRotation=Rotation.LookAt(new Vector3(0,0,35)-view.WorldPosition);camera=view.Components.Create<CameraComponent>();camera.ZFar=1000;
+ }
+ float elapsed=0;
+ foreach(var name in new[]{"walk_a","run","attack_a"}) {
+  using(scene.Push()){driver.Sequence.Blending=false;driver.Sequence.Name=name;driver.Sequence.Looping=name!="attack_a";driver.Sequence.Time=.3f;driver.Sequence.PlaybackRate=0;}
+  for(var i=0;i<3;i++)using(scene.Push()){scene.EditorTick(elapsed+=1f/60f,1f/60f);preRender.Invoke(scene,null);preCamera.Invoke(scene,null);using var bmp=new Bitmap(64,64);camera.RenderToBitmap(bmp,false);}
+  var left=Bone(driver,"ankle_L");var right=Bone(driver,"ankle_R");var time=driver.Sequence.Time;
+  var pose=new Facepunch.ZombieHitReactionPose();pose.Trigger(Vector3.Backward,1,true,0);
+  using(scene.Push())pose.Apply(driver,.1f);
+  var single=Bone(driver,"head").Position;
+  Check(name+" keeps sequence time and playback",driver.Sequence.Name==name&&MathF.Abs(driver.Sequence.Time-time)<.0001f&&driver.Sequence.PlaybackRate==0);
+  Check(name+" keeps animated feet",Bone(driver,"ankle_L").Position.Distance(left.Position)<.001f&&Bone(driver,"ankle_R").Position.Distance(right.Position)<.001f);
+  var repeated=new Facepunch.ZombieHitReactionPose();repeated.Trigger(Vector3.Backward,1,true,0);
+  for(var i=0;i<6;i++)using(scene.Push())repeated.Apply(driver,1f/60f);
+  var error=Bone(driver,"head").Position.Distance(single);
+  Check(name+" reused animation pose does not accumulate",error<.002f,error);
+ }
+}finally{scene.Destroy();}
+var path=System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(),"output/zombie-hit-reactions-20261104/locomotion-checks.json");
+System.IO.File.WriteAllText(path,System.Text.Json.JsonSerializer.Serialize(checks,new System.Text.Json.JsonSerializerOptions{WriteIndented=true}));return checks;

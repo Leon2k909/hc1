@@ -186,6 +186,20 @@ for can in facts["cans"]:
     c_col = np.where((here & printed)[..., None], ink_c, c_col)
     c_metal = np.where(here & printed, scuff * 0.9 + 0.1, c_metal)
     c_rough = np.where(here & printed, 0.34 + 0.1 * fine, c_rough)
+    # Recessed score lines make the lids read as drinks cans rather than blank shiny caps.
+    ref = np.array((1, 0, 0) if abs(axis[0]) < 0.9 else (0, 1, 0), np.float32)
+    across = np.cross(axis, ref)
+    across /= np.linalg.norm(across)
+    forward = np.cross(across, axis)
+    rel = pos - np.array(can["at"], np.float32)
+    u, v = (rel * forward).sum(-1), (rel * across).sum(-1)
+    lid = here & (along > 4.60) & (along < 4.76) & ((nor * axis).sum(-1) > 0.65)
+    oval = np.sqrt(((u - 0.34) / 0.38) ** 2 + (v / 0.27) ** 2)
+    scored = np.exp(-0.5 * ((oval - 1) / 0.07) ** 2) * lid
+    c_col = np.where(lid[..., None], flat((122, 124, 122)) * (0.85 + 0.2 * fine[..., None]), c_col)
+    c_col = mix(c_col, flat((32, 34, 32)), scored * 0.75)
+    c_rough = np.where(lid, 0.45 + 0.12 * fine, c_rough)
+    height -= scored * 0.015
 color = np.where(is_can[..., None], c_col, color)
 rough = np.where(is_can, c_rough, rough)
 metal = np.where(is_can, c_metal, metal)
@@ -194,6 +208,8 @@ metal = np.where(is_can, c_metal, metal)
 is_rubber = finish == RUBBER
 color = np.where(is_rubber[..., None], flat((30, 30, 29)) * (0.75 + 0.5 * fine[..., None]), color)
 rough = np.where(is_rubber, 0.72 + 0.16 * fine, rough)
+grip = is_rubber & (np.abs(X) > 15.9) & (Z > 9.65) & (Z < 10.65) & (np.abs(Y) < 2.1)
+height += grip * (0.5 + 0.5 * np.cos(Y * 2 * math.pi / 0.34)) * 0.012
 is_steel = finish == STEEL
 rust = smooth(0.46, 0.7, mid * 0.6 + fine * 0.4)
 color = np.where(is_steel[..., None], mix(flat((142, 142, 138)), flat((84, 50, 30)), rust), color)

@@ -57,7 +57,9 @@ public partial class Lowerable : EquipmentComponent, IGameEventHandler<Equipment
 		if ( Equipment.HasTag( "aiming" ) || Equipment.HasTag( "reloading" ) )
 			return;
 
-		if ( Input.Down( "Use" ) && Input.Down( "Reload" ) )
+		// Complete the chord in either order, once per press rather than repeating while held.
+		if ( Input.Down( "Use" ) && Input.Down( "Reload" )
+			&& (Input.Pressed( "Use" ) || Input.Pressed( "Reload" )) )
 		{
 			ToggleLower();
 		}

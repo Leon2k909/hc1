@@ -1,0 +1,15 @@
+Layer0
+{
+ shader "shaders/complex.shader"
+ F_SPECULAR 1
+ TextureColor "materials/riverside/register-v1/display_color.png"
+ TextureNormal "materials/default/default_normal.tga"
+ TextureRoughness "[0.24 0.24 0.24 0]"
+ F_SELF_ILLUM 1
+ TextureSelfIllumMask "[1 1 1 0]"
+ g_flSelfIllumBrightness "0.32"
+ g_vSelfIllumTint "[1 1 1 1]"
+ g_flMetalness "0"
+ g_flRoughnessScaleFactor "1"
+ g_vColorTint "[1 1 1 1]"
+}

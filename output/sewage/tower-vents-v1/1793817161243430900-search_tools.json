@@ -1,0 +1,54 @@
+{
+  "tools": [
+    {
+      "name": "editor_camera_screenshot",
+      "title": "Editor Camera Screenshot",
+      "toolset": "scene",
+      "description": "Render what the editor scene camera sees and return it as an image - see the scene the way the viewport does. Move the view first with set_editor_camera.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "width": {
+            "type": "integer",
+            "description": "Image width in pixels.",
+            "minimum": 16,
+            "maximum": 4096,
+            "default": 1280
+          },
+          "height": {
+            "type": "integer",
+            "description": "Image height in pixels.",
+            "minimum": 16,
+            "maximum": 4096,
+            "default": 720
+          }
+        },
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "set_editor_camera",
+      "title": "Set Editor Camera",
+      "toolset": "scene",
+      "description": "Move the editor scene camera. Give a position and/or angles - anything left empty keeps its current value. Returns the resulting transform.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "position": {
+            "type": "string",
+            "description": "World position as 'x,y,z'."
+          },
+          "angles": {
+            "type": "string",
+            "description": "View angles as 'pitch,yaw,roll'."
+          }
+        },
+        "required": []
+      }
+    }
+  ],
+  "total": 402
+}

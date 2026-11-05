@@ -2,18 +2,28 @@ namespace Facepunch;
 
 public partial class Shootable
 {
+	private float _penetrationDamageScale = 1f;
+
+	private void SetPenetrationDamageScale( float scale ) => _penetrationDamageScale = scale;
+
 	/// <summary>
 	/// Impacts in shot order. Solid masonry and unspecified surfaces stop rounds. Only explicitly supported light
 	/// materials can be crossed, after finding an exit on the exact shape hit within its permitted thickness.
 	/// Limits are conservative gameplay rules in map units, not a ballistic simulation.
 	/// </summary>
 	public static IEnumerable<SceneTraceResult> ResolvePenetration( Scene scene, IEnumerable<SceneTraceResult> traces, float budget )
+		=> ResolvePenetrationWithDamage( scene, traces, budget, null );
+
+	internal static IEnumerable<SceneTraceResult> ResolvePenetrationWithDamage( Scene scene,
+		IEnumerable<SceneTraceResult> traces, float budget, Action<float> onDamageScale )
 	{
 		var remaining = budget.Clamp( 0f, 8f );
+		var damageScale = 1f;
 		foreach ( var entry in traces.OrderBy( x => x.Distance ) )
 		{
 			if ( !entry.Hit ) continue;
 			// The stopping surface still receives its impact, even when no round emerges from it.
+			onDamageScale?.Invoke( damageScale );
 			yield return entry;
 			if ( entry.StartedSolid || IsBody( entry ) || remaining <= 0f ) yield break;
 			var limit = MathF.Min( remaining, PenetrableDepth( entry.Surface ) );
@@ -28,7 +38,18 @@ public partial class Shootable
 			var thickness = (exit.EndPosition - entry.EndPosition).Dot( direction );
 			if ( thickness <= 0f || thickness > limit ) yield break;
 			remaining -= thickness;
+			damageScale *= RetainedDamage( entry.Surface, thickness );
 		}
+	}
+
+	private static float RetainedDamage( Surface surface, float thickness )
+	{
+		for ( var depth = 0; surface is not null && depth < 8; depth++, surface = surface.GetBaseSurface() )
+		{
+			var loss = PenetrationDamageRules.LossPerUnit( surface.ResourceName );
+			if ( loss > 0f ) return PenetrationDamageRules.RetainedFraction( loss, thickness );
+		}
+		return 1f;
 	}
 
 	private static float PenetrableDepth( Surface surface )

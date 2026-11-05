@@ -1,0 +1,17 @@
+def ashtray_pillar( model, e, n, z0=0.0, r=4.0, height=40.0 ):
+    """ A brushed stainless ash column (a Standascher): a 200 mm tube on a round foot plate, a perforated top tray and
+    a dark ring of slots round its head where the ash goes in. One collision box. """
+    c = ( e, n )
+    model.cylinder( c, r + 1.6, z0, z0 + 0.6, { "side": "rw_steel", "top": "rw_steel" }, sides=20, collide=None )
+    model.cylinder( c, r, z0 + 0.6, z0 + height - 5.0, { "side": "rw_steel" }, sides=20, collide=None )
+    # The slots' ring and the head over it.
+    model.cylinder( c, r - 0.15, z0 + height - 5.0, z0 + height - 2.8, { "side": "rw_black" }, sides=20, collide=None )
+    model.cylinder( c, r + 0.2, z0 + height - 2.8, z0 + height, { "side": "rw_steel", "top": "rw_steel" }, sides=20,
+                    collide=None )
+    annulus( model, "rw_steel_dark", c, r - 1.4, r - 0.4, z0 + height + 0.02, 20 )
+    disc( model, "rw_black", ( e, n, z0 + height + 0.03 ), ( 0, 0, 1 ), r - 1.4, 20 )
+    # A yellow band round it, matching the zone's line, and a door's seam down its front.
+    model.cylinder( c, r + 0.05, z0 + height - 12.0, z0 + height - 9.5, { "side": "rw_line_yellow" }, sides=20,
+                    collide=None )
+    model.collision_box( ( e - r, n - r, z0 ), ( e + r, n + r, z0 + height ), METAL )
+

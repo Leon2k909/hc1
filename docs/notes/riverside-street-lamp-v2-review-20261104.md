@@ -1,0 +1,7 @@
+## Riverside cobra-head streetlight v2 — installed, 2026-11-04
+
+- All four sodium heads installed and saved after approval. Removed exactly 56 old dressing faces while preserving all unrelated mesh lines, the entire ModelDoc/physics and all existing lights. All 26 porch fittings retained.
+- `models/props/riverside/street_lamp_v2/street_lamp.vmdl`: shaped casting, hollow collar, bolts, service rim/gasket, hinges/latches, domed amber refractor and photocell. One procedural 1k PBR/glow atlas/material; three LODs, 2,268 / 1,548 / 732 triangles.
+- Lane-lamp-2 comparison hides only 14 old faces in a private dressing background, preserving transformer/searchlight work. Engine position `1061.570555,262.862964,368`, yaw `-81.469234`; arm fits collar. Lens/photocell extend slightly beyond the old vertical bounds.
+- Matched native underside/top/context captures, fixed exposure and temporary inspection light. Models valid; geometry/UV/normal and public hash checks passed. No gameplay/LOD test. Recipe: `Sources/Riverside/street-lamp-v2/README.md`; evidence: `output/asset-improvement-20261030/riverside-street-lamp/before-after.png`.
+- Canonical generator records `STREET_LIGHTS` and emits the saved group, preserving actual arms and light anchors. Native save succeeded after a temporary editor stall; saved-placement/source/collision/light checks passed. Receipts: `riverside-street-lamp/installed/`. Historical review scripts should not be rerun against installed sources.

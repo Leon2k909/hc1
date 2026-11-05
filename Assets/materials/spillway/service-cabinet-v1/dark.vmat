@@ -1,0 +1,13 @@
+"Layer0"
+{
+ shader "shaders/complex.shader"
+ F_SPECULAR "1"
+ g_flMetalness "0.15"
+ g_flRoughnessScaleFactor "1.05"
+ TextureColor "materials/spillway/service-cabinet-v1/coat_color.png"
+ TextureNormal "materials/spillway/service-cabinet-v1/coat_normal.png"
+ TextureRoughness "materials/spillway/service-cabinet-v1/coat_rough.png"
+ TextureAmbientOcclusion "materials/default/default_ao.tga"
+ g_vColorTint "[0.1 0.12 0.115 1]"
+ g_flModelTintAmount "1"
+}

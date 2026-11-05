@@ -1,0 +1,38 @@
+if(!Game.IsPlaying || Game.ActiveScene?.Source?.ResourcePath!="scenes/maps/riverside/riverside.scene" || Networking.IsActive)
+ throw new Exception("Requires offline Riverside play");
+var scene=Game.ActiveScene;
+var store=scene.GetAllComponents<ModelRenderer>().Single(r=>r.Model?.ResourcePath=="models/maps/riverside/riverside_store.vmdl");
+if(store.Model.IsError || store.Model.MeshInfo.LodCount!=3)throw new Exception("Installed cabinet model did not load");
+var gameplay=scene.GetAllComponents<CameraComponent>().First(c=>c.IsMainCamera);
+var mains=scene.GetAllComponents<CameraComponent>().Select(c=>(Camera:c,Main:c.IsMainCamera)).ToArray();
+GameObject holder=null;
+var paths=new System.Collections.Generic.List<string>();
+var output="C:/sbox-projects/hc1/ice-cabinet-review/output/riverside/ice-cabinet-v1";
+try
+{
+ using(scene.Push())
+ {
+  holder=new GameObject(true,"Installed ice cabinet verification camera");
+  var camera=holder.Components.Create<CameraComponent>();
+  void Copy<T>() where T:Component,new(){var source=gameplay.GameObject.GetComponent<T>(true);if(source!=null)Facepunch.GameObjectExtensions.CopyPropertiesTo(source,holder.Components.Create<T>());}
+  Copy<Bloom>();Copy<Tonemapping>();Copy<Sharpen>();Copy<AmbientOcclusion>();Copy<Vignette>();Copy<Facepunch.PhotographicResponse>();Copy<ColorAdjustments>();
+  foreach(var old in mains)old.Camera.IsMainCamera=false;
+  camera.IsMainCamera=true;camera.ZNear=2;camera.ZFar=50000;camera.BackgroundColor=gameplay.BackgroundColor;camera.CustomSize=new Vector2(1280,960);
+  foreach(var view in new[]{(Name:"installed-in-game",Eye:new Vector3(470,-232,76),Target:new Vector3(622,-160,50),Fov:39f),(Name:"installed-porch",Eye:new Vector3(440,-205,80),Target:new Vector3(598,-142,57),Fov:59f)})
+  {
+   camera.WorldPosition=view.Eye;camera.WorldRotation=Rotation.LookAt(view.Target-view.Eye);camera.FieldOfView=view.Fov;
+   using var bitmap=new Bitmap(1280,960);
+   for(int frame=0;frame<100;frame++)
+   {
+    if(!Game.IsPlaying||Game.ActiveScene!=scene)throw new Exception("Runtime scene changed");
+    cancellationToken.ThrowIfCancellationRequested();camera.RenderToBitmap(bitmap,false);await Task.Delay(20,cancellationToken);
+   }
+   var path=System.IO.Path.Combine(output,view.Name+".png");System.IO.File.WriteAllBytes(path,bitmap.ToPng());paths.Add(path);
+  }
+ }
+ var errors=scene.GetAllComponents<ModelRenderer>().Where(r=>r.Model?.IsError==true).Select(r=>r.GameObject.Name).ToArray();
+ var report=new{Installed=true,ActualPlayMode=Game.IsPlaying,Map=scene.Source.ResourcePath,PlayerCount=scene.GetAllComponents<Facepunch.PlayerPawn>().Count(),ErrorModels=errors,NoRuntimeModelSubstitution=true,NoExtraLights=true,Paths=paths,StoreMesh=store.Model.MeshInfo};
+ System.IO.File.WriteAllText(System.IO.Path.Combine(output,"installed-runtime.json"),Json.Serialize(report));
+ return new{report.Installed,report.ActualPlayMode,report.Map,report.PlayerCount,report.ErrorModels,report.Paths};
+}
+finally{holder?.Destroy();foreach(var old in mains)if(old.Camera.IsValid())old.Camera.IsMainCamera=old.Main;}

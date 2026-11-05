@@ -1,0 +1,9 @@
+var root=Sandbox.Project.Current.GetRootPath();
+foreach(var relative in new[]{"Assets/models/maps/sewage/tower-deck-v1/deck.vmdl","output/sewage/tower-deck-v1/stage/Assets/models/maps/sewage/tower-deck-v1/deck.vmdl"})
+{
+    var path=System.IO.Path.Combine(root,relative);
+    var text=System.IO.File.ReadAllText(path).Replace("materials/sewage/crane-blocks-v1/steel.vmat","materials/sewage/tower-deck-v1/coated_steel.vmat");
+    System.IO.File.WriteAllText(path,text);
+    if(relative.StartsWith("Assets/"))Editor.AssetSystem.RegisterFile(path);
+}
+return new{Updated=true};

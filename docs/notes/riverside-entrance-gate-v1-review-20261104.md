@@ -1,0 +1,6 @@
+## Riverside entrance gate v1 — review candidate, 2026-11-04
+
+- Next candidate after the 48 approved pole insulators were installed. User rejected this candidate: keep the original gate. Never installed; published pad/scene/physics unchanged. Static locked gate at engine `-1290,0,96`; original NO TRESPASSING sign and neighbouring fences retained.
+- Two framed leaves, tension rods/turnbuckles, hinges, tension clips/bolts, drop bolt, a chain wrapped around both meeting rails, brass padlock and barbed top wires. Original 82 gate faces hidden only in a private pad copy, matched by exact material/triangle positions.
+- `models/props/riverside/entrance_gate_v1/gate.vmdl`: 20,652 / 13,632 / 3,464 triangles; one procedural 1k PBR atlas/new metal material plus shared `rs_chainlink`. No external assets, gameplay logic, added collision or persistent lights.
+- Matched native whole/hardware/hinge comparisons with fixed exposure and temporary inspection light; disposable scene destroyed afterward. Native models valid and geometry/UV/normal/protected-file checks passed. No gameplay/LOD test. Recipe: `Sources/Riverside/entrance-gate-v1/README.md`; evidence: `output/riverside/entrance-gate-v1/`. Do not regenerate the map for installation.

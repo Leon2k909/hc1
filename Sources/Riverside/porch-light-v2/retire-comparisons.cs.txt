@@ -1,0 +1,25 @@
+var project=Sandbox.Project.Current.GetRootPath();
+var folder=System.IO.Path.Combine(project,"output/asset-improvement-20261030/riverside-porch-light/installed/legacy-cleanup/retired-comparisons");
+var retired=new System.Collections.Generic.List<string>();
+foreach (var path in new[] {
+"models/props/riverside/speed_sign_v2/review/pad_without_sign.vmdl",
+"models/props/riverside/sandbag_v2/review/riverside_pad_without_bags.vmdl",
+"models/props/riverside/crate_v2/review/pad_without_crate.vmdl",
+"models/maps/riverside/lantern-v1/pad_without_lantern.vmdl",
+"models/props/riverside/sandbag_v2/review/riverside_store_without_bags.vmdl" })
+{
+    var source=System.IO.Path.Combine(project,"Assets",path);
+    if (!System.IO.File.Exists(source)) continue;
+    foreach (var suffix in new[] { "", ".meta", "_c" })
+    {
+        var file=source+suffix;
+        if (!System.IO.File.Exists(file)) continue;
+        var backup=System.IO.Path.Combine(folder,path+suffix);
+        System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(backup));
+        System.IO.File.Copy(file,backup,true);
+    }
+    var asset=Editor.AssetSystem.FindByPath(path) ?? throw new Exception("Comparison not registered: "+path);
+    if (!asset.Delete()) throw new Exception("Failed to retire comparison: "+path);
+    retired.Add(path);
+}
+return new { RetiredUnusedComparisons=retired,BackupsRetained=true };

@@ -1,0 +1,1803 @@
+Sandbox.ParticleEffect::get_OnPostStep
+0000: ldarg.0 
+0001: ldfld System.Action`1[System.Single] <OnPostStep>k__BackingField
+0006: ret 
+Sandbox.ParticleEffect::set_OnPostStep
+0000: ldarg.0 
+0001: ldarg.1 
+0002: stfld System.Action`1[System.Single] <OnPostStep>k__BackingField
+0007: ret 
+Sandbox.ParticleEffect::UpdateParticle
+0000: ldarg.0 
+0001: call System.Collections.Generic.List`1[Sandbox.Particle] get_Particles()
+0006: ldarg.1 
+0007: callvirt Sandbox.Particle get_Item(Int32)
+000C: stloc.0 
+000D: ldloc.0 
+000E: ldloc.0 
+000F: ldfld Single BornTime
+0014: ldarg.0 
+0015: call Sandbox.ParticleFloat get_Lifetime()
+001A: stloc.s 12
+001C: ldloca.s 12
+001E: ldloc.0 
+001F: ldc.i4 155
+0024: ldc.i4.s 100
+0026: callvirt Single Rand(Int32, Int32)
+002B: stloc.s 13
+002D: ldloca.s 13
+002F: ldloc.0 
+0030: ldc.i4 145
+0035: ldc.i4.s 100
+0037: callvirt Single Rand(Int32, Int32)
+003C: stloc.s 14
+003E: ldloca.s 14
+0040: call Single Evaluate(Single ByRef, Single ByRef)
+0045: add 
+0046: stfld Single DeathTime
+004B: ldloc.0 
+004C: ldfld Single BornTime
+0051: ldloc.0 
+0052: ldfld Single Age
+0057: add 
+0058: ldloc.0 
+0059: ldfld Single BornTime
+005E: ldloc.0 
+005F: ldfld Single DeathTime
+0064: ldc.r4 0
+0069: ldc.r4 1
+006E: call Single Remap(Single, Single, Single, Single, Single)
+0073: stloc.1 
+0074: ldloc.0 
+0075: ldloc.1 
+0076: stfld Single LifeDelta
+007B: ldarg.0 
+007C: call Sandbox.ParticleFloat get_PerParticleTimeScale()
+0081: stloc.s 12
+0083: ldloca.s 12
+0085: ldloc.0 
+0086: ldc.i4 3355
+008B: ldc.i4 551
+0090: call Single Evaluate(Sandbox.IDynamicFloatContext, Int32, Int32)
+0095: ldarg.0 
+0096: ldfld Single _timeDelta
+009B: mul 
+009C: ldloc.0 
+009D: ldfld Single TimeScale
+00A2: mul 
+00A3: stloc.2 
+00A4: ldloc.0 
+00A5: ldfld Int32 Frame
+00AA: stloc.3 
+00AB: ldloc.0 
+00AC: dup 
+00AD: ldfld Single Age
+00B2: ldloc.2 
+00B3: add 
+00B4: stfld Single Age
+00B9: ldloc.0 
+00BA: dup 
+00BB: ldfld Int32 Frame
+00C0: ldc.i4.1 
+00C1: add 
+00C2: stfld Int32 Frame
+00C7: ldloc.0 
+00C8: ldfld Single LifeDelta
+00CD: ldc.r4 0
+00D2: bge.un.s 1
+00D4: ret 
+00D5: ldarg.0 
+00D6: call Sandbox.ParticleFloat get_Damping()
+00DB: stloc.s 12
+00DD: ldloca.s 12
+00DF: ldloc.0 
+00E0: ldc.i4 8234
+00E5: ldc.i4 561
+00EA: call Single Evaluate(Sandbox.IDynamicFloatContext, Int32, Int32)
+00EF: stloc.s 4
+00F1: ldarg.0 
+00F2: call Sandbox.ParticleFloat get_ForceScale()
+00F7: stloc.s 12
+00F9: ldloca.s 12
+00FB: ldloc.0 
+00FC: ldc.i4 7723
+0101: ldc.i4 562
+0106: call Single Evaluate(Sandbox.IDynamicFloatContext, Int32, Int32)
+010B: stloc.s 5
+010D: ldarg.0 
+010E: call Sandbox.ParticleFloat get_LocalSpace()
+0113: stloc.s 12
+0115: ldloca.s 12
+0117: ldloc.0 
+0118: ldc.i4 254
+011D: ldc.i4 563
+0122: call Single Evaluate(Sandbox.IDynamicFloatContext, Int32, Int32)
+0127: ldc.r4 0
+012C: ldc.r4 1
+0131: call Single Clamp(Single, Single, Single)
+0136: stloc.s 6
+0138: ldc.i4.0 
+0139: stloc.s 7
+013B: ldloc.0 
+013C: ldfld Sandbox.SkinnedModelRenderer AttachTarget
+0141: call Boolean IsValid(Sandbox.IValid)
+0146: brfalse.s 71
+0148: ldloc.0 
+0149: ldfld Int32 AttachBoneIndex
+014E: ldc.i4.0 
+014F: blt.s 62
+0151: ldloc.3 
+0152: ldc.i4.0 
+0153: ble.s 58
+0155: ldloc.s 6
+0157: ldc.r4 0
+015C: ldc.r4 0.0001
+0161: call Boolean AlmostEqual(Single, Single, Single)
+0166: brtrue.s 39
+0168: ldloc.0 
+0169: ldfld Sandbox.SkinnedModelRenderer AttachTarget
+016E: ldloc.0 
+016F: ldfld Int32 AttachBoneIndex
+0174: ldloca.s 8
+0176: ldloca.s 9
+0178: callvirt Boolean TryGetSnapshotBone(Int32, Transform ByRef, Transform ByRef)
+017D: brfalse.s 16
+017F: ldloca.s 0
+0181: ldloc.s 6
+0183: ldloca.s 8
+0185: ldloca.s 9
+0187: call Void ApplyLocalSpaceMovement(Sandbox.Particle ByRef, Single, Transform ByRef, Transform ByRef)
+018C: ldc.i4.1 
+018D: stloc.s 7
+018F: ldloc.s 7
+0191: brtrue.s 52
+0193: ldarg.0 
+0194: ldfld Boolean _parentMoved
+0199: brfalse.s 44
+019B: ldloc.3 
+019C: ldc.i4.0 
+019D: ble.s 40
+019F: ldloc.s 6
+01A1: ldc.r4 0
+01A6: ldc.r4 0.0001
+01AB: call Boolean AlmostEqual(Single, Single, Single)
+01B0: brtrue.s 21
+01B2: ldloca.s 0
+01B4: ldloc.s 6
+01B6: ldarg.0 
+01B7: ldflda Transform lastTransform
+01BC: ldarg.0 
+01BD: ldflda Transform _worldTx
+01C2: call Void ApplyLocalSpaceMovement(Sandbox.Particle ByRef, Single, Transform ByRef, Transform ByRef)
+01C7: ldloc.0 
+01C8: ldloc.s 4
+01CA: ldloc.2 
+01CB: mul 
+01CC: stloc.s 13
+01CE: ldloca.s 13
+01D0: callvirt Void ApplyDamping(Single ByRef)
+01D5: ldarg.0 
+01D6: call System.Action`2[Sandbox.Particle,System.Single] get_OnStep()
+01DB: dup 
+01DC: brtrue.s 3
+01DE: pop 
+01DF: br.s 12
+01E1: ldloc.0 
+01E2: ldloc.0 
+01E3: ldfld Single LifeDelta
+01E8: callvirt Void Invoke(Sandbox.Particle, Single)
+01ED: ldarg.0 
+01EE: call Boolean get_Force()
+01F3: brfalse 417
+01F8: ldloc.s 5
+01FA: ldc.r4 0
+01FF: beq 405
+0204: ldarg.0 
+0205: call Vector3 get_ForceDirection()
+020A: stloc.s 15
+020C: ldloca.s 15
+020E: ldc.r4 0.0001
+0213: call Boolean IsNearlyZero(Single)
+0218: brtrue.s 53
+021A: ldloc.0 
+021B: dup 
+021C: ldfld Vector3 Velocity
+0221: ldloc.s 5
+0223: ldarg.0 
+0224: call SimulationSpace get_ForceSpace()
+0229: ldc.i4.1 
+022A: beq.s 8
+022C: ldarg.0 
+022D: call Vector3 get_ForceDirection()
+0232: br.s 6
+0234: ldarg.0 
+0235: ldfld Vector3 _worldForce
+023A: call Vector3 op_Multiply(Single, Vector3)
+023F: ldloc.2 
+0240: call Vector3 op_Multiply(Vector3, Single)
+0245: call Vector3 op_Addition(Vector3, Vector3)
+024A: stfld Vector3 Velocity
+024F: ldarg.0 
+0250: call Sandbox.ParticleVector3 get_OrbitalForce()
+0255: stloc.s 16
+0257: ldloca.s 16
+0259: call Boolean IsNearlyZero()
+025E: brtrue 185
+0263: ldarg.0 
+0264: call Sandbox.ParticleVector3 get_OrbitalForce()
+0269: stloc.s 16
+026B: ldloca.s 16
+026D: ldloc.1 
+026E: ldloc.0 
+026F: ldc.i4 8363
+0274: ldc.i4 598
+0279: callvirt Single Rand(Int32, Int32)
+027E: ldloc.0 
+027F: ldc.i4 5216
+0284: ldc.i4 598
+0289: callvirt Single Rand(Int32, Int32)
+028E: ldloc.0 
+028F: ldc.i4 2323
+0294: ldc.i4 598
+0299: callvirt Single Rand(Int32, Int32)
+029E: call Vector3 Evaluate(Single, Single, Single, Single)
+02A3: stloc.s 17
+02A5: ldarg.0 
+02A6: ldflda Transform _worldTx
+02AB: ldfld Vector3 Position
+02B0: ldloc.0 
+02B1: ldfld Vector3 Position
+02B6: call Vector3 op_Subtraction(Vector3, Vector3)
+02BB: stloc.s 15
+02BD: ldloca.s 15
+02BF: call Vector3 get_Normal()
+02C4: stloc.s 18
+02C6: ldloca.s 18
+02C8: ldc.r4 0
+02CD: call Vector3 op_Implicit(Single)
+02D2: stloc.s 15
+02D4: ldloca.s 15
+02D6: ldloc.s 17
+02D8: newobj Void .ctor(Vector3)
+02DD: stloc.s 21
+02DF: ldloca.s 21
+02E1: call Rotation op_Implicit(Angles ByRef)
+02E6: stloc.s 22
+02E8: ldloca.s 22
+02EA: call Vector3 RotateAround(Vector3 ByRef, Rotation ByRef)
+02EF: stloc.s 19
+02F1: ldloc.s 18
+02F3: ldloc.s 19
+02F5: call Vector3 op_Subtraction(Vector3, Vector3)
+02FA: stloc.s 20
+02FC: ldloc.0 
+02FD: dup 
+02FE: ldfld Vector3 Velocity
+0303: ldloc.s 5
+0305: ldloc.s 20
+0307: call Vector3 op_Multiply(Single, Vector3)
+030C: ldloc.2 
+030D: call Vector3 op_Multiply(Vector3, Single)
+0312: call Vector3 op_Addition(Vector3, Vector3)
+0317: stfld Vector3 Velocity
+031C: ldarg.0 
+031D: call Sandbox.ParticleFloat get_OrbitalPull()
+0322: stloc.s 12
+0324: ldloca.s 12
+0326: call Boolean IsNearlyZero()
+032B: brtrue.s 108
+032D: ldarg.0 
+032E: ldflda Transform _worldTx
+0333: ldfld Vector3 Position
+0338: ldloc.0 
+0339: ldfld Vector3 Position
+033E: call Vector3 op_Subtraction(Vector3, Vector3)
+0343: ldc.r4 100
+0348: call Vector3 op_Division(Vector3, Single)
+034D: stloc.s 23
+034F: ldloc.0 
+0350: dup 
+0351: ldfld Vector3 Velocity
+0356: ldloc.s 5
+0358: ldloc.s 23
+035A: call Vector3 op_Multiply(Single, Vector3)
+035F: ldloc.2 
+0360: call Vector3 op_Multiply(Vector3, Single)
+0365: ldarg.0 
+0366: call Sandbox.ParticleFloat get_OrbitalPull()
+036B: stloc.s 12
+036D: ldloca.s 12
+036F: ldloca.s 1
+0371: ldloc.0 
+0372: ldc.i4 4333
+0377: ldc.i4 609
+037C: callvirt Single Rand(Int32, Int32)
+0381: stloc.s 13
+0383: ldloca.s 13
+0385: call Single Evaluate(Single ByRef, Single ByRef)
+038A: call Vector3 op_Multiply(Vector3, Single)
+038F: call Vector3 op_Addition(Vector3, Vector3)
+0394: stfld Vector3 Velocity
+0399: ldarg.0 
+039A: call Sandbox.ParticleVector3 get_ConstantMovement()
+039F: stloc.s 16
+03A1: ldloca.s 16
+03A3: call Boolean IsNearlyZero()
+03A8: brtrue.s 95
+03AA: ldarg.0 
+03AB: call Sandbox.ParticleVector3 get_ConstantMovement()
+03B0: stloc.s 16
+03B2: ldloca.s 16
+03B4: ldloc.0 
+03B5: ldc.i4 4395
+03BA: ldc.i4 616
+03BF: call Vector3 Evaluate(Sandbox.Particle, Int32, Int32)
+03C4: ldarg.0 
+03C5: ldfld Single _timeDelta
+03CA: call Vector3 op_Multiply(Vector3, Single)
+03CF: stloc.s 24
+03D1: ldloc.0 
+03D2: dup 
+03D3: ldfld Vector3 Position
+03D8: ldloca.s 24
+03DA: ldarg.0 
+03DB: ldflda Transform _worldTx
+03E0: ldloca.s 24
+03E2: call Vector3 NormalToWorld(Vector3 ByRef)
+03E7: ldloca.s 24
+03E9: call Single get_Length()
+03EE: call Vector3 op_Multiply(Vector3, Single)
+03F3: stloc.s 15
+03F5: ldloca.s 15
+03F7: ldloc.s 6
+03F9: ldc.i4.1 
+03FA: call Vector3 LerpTo(Vector3 ByRef, Single, Boolean)
+03FF: call Vector3 op_Addition(Vector3, Vector3)
+0404: stfld Vector3 Position
+0409: ldarg.0 
+040A: call Boolean get_Collision()
+040F: brfalse 528
+0414: ldarg.0 
+0415: call Sandbox.ParticleFloat get_Bounce()
+041A: stloc.s 12
+041C: ldloca.s 12
+041E: ldloc.0 
+041F: ldc.i4 3478
+0424: ldc.i4 622
+0429: call Single Evaluate(Sandbox.IDynamicFloatContext, Int32, Int32)
+042E: stloc.s 25
+0430: ldarg.0 
+0431: call Sandbox.ParticleFloat get_Friction()
+0436: stloc.s 12
+0438: ldloca.s 12
+043A: ldloc.0 
+043B: ldc.i4 7579
+0440: ldc.i4 623
+0445: call Single Evaluate(Sandbox.IDynamicFloatContext, Int32, Int32)
+044A: stloc.s 26
+044C: ldarg.0 
+044D: call Sandbox.ParticleFloat get_Bumpiness()
+0452: stloc.s 12
+0454: ldloca.s 12
+0456: ldloc.0 
+0457: ldc.i4 2380
+045C: ldc.i4 624
+0461: call Single Evaluate(Sandbox.IDynamicFloatContext, Int32, Int32)
+0466: stloc.s 27
+0468: ldarg.0 
+0469: call Sandbox.ParticleFloat get_PushStrength()
+046E: stloc.s 12
+0470: ldloca.s 12
+0472: ldloc.0 
+0473: ldc.i4 5281
+0478: ldc.i4 625
+047D: call Single Evaluate(Sandbox.IDynamicFloatContext, Int32, Int32)
+0482: stloc.s 28
+0484: ldarg.0 
+0485: call Sandbox.ParticleFloat get_DieOnCollisionChance()
+048A: stloc.s 12
+048C: ldloca.s 12
+048E: ldloc.0 
+048F: ldc.i4 4582
+0494: ldc.i4 626
+0499: call Single Evaluate(Sandbox.IDynamicFloatContext, Int32, Int32)
+049E: call System.Random get_Shared()
+04A3: ldc.r4 0
+04A8: ldc.r4 1
+04AD: call Single Float(System.Random, Single, Single)
+04B2: cgt 
+04B4: stloc.s 29
+04B6: ldc.r4 0.01
+04BB: ldarg.0 
+04BC: call Single get_CollisionRadius()
+04C1: call Single Max(Single, Single)
+04C6: stloc.s 30
+04C8: ldarg.0 
+04C9: call Sandbox.Scene get_Scene()
+04CE: callvirt Boolean get_IsEditor()
+04D3: brfalse.s 7
+04D5: ldc.r4 0
+04DA: stloc.s 28
+04DC: call Single get_Now()
+04E1: ldloc.0 
+04E2: ldfld Single HitTime
+04E7: sub 
+04E8: stloc.s 31
+04EA: ldloc.0 
+04EB: ldloca.s 25
+04ED: ldloca.s 26
+04EF: ldloca.s 27
+04F1: ldloca.s 28
+04F3: ldloca.s 29
+04F5: ldloca.s 2
+04F7: ldloc.s 30
+04F9: ldarg.0 
+04FA: ldflda Sandbox.SceneTrace _trace
+04FF: ldloc.s 28
+0501: ldc.r4 0
+0506: bne.un.s 3
+0508: ldnull 
+0509: br.s 11
+050B: ldarg.0 
+050C: ldflda System.Collections.Concurrent.ConcurrentBag`1[Sandbox.ParticleEffect+DeferredParticleForce] _deferredForces
+0511: call System.Collections.Concurrent.ConcurrentBag`1[Sandbox.ParticleEffect+DeferredParticleForce] EnsureInitialized[ConcurrentBag`1](System.Collections.Concurrent.ConcurrentBag`1[Sandbox.ParticleEffect+DeferredParticleForce] ByRef)
+0516: callvirt Boolean MoveWithCollision(Single ByRef, Single ByRef, Single ByRef, Single ByRef, Boolean ByRef, Single ByRef, Single, Sandbox.SceneTrace ByRef, System.Collections.Concurrent.ConcurrentBag`1[Sandbox.ParticleEffect+DeferredParticleForce])
+051B: brfalse 289
+0520: ldloc.s 31
+0522: ldc.r4 0.3
+0527: ble.un 277
+052C: ldarg.0 
+052D: call Boolean get_UsePrefabFeature()
+0532: brfalse 266
+0537: ldarg.0 
+0538: call Sandbox.ParticleFloat get_CollisionPrefabChance()
+053D: stloc.s 12
+053F: ldloca.s 12
+0541: ldloca.s 1
+0543: call System.Random get_Shared()
+0548: ldc.r4 0
+054D: ldc.r4 1
+0552: call Single Float(System.Random, Single, Single)
+0557: stloc.s 13
+0559: ldloca.s 13
+055B: call Single Evaluate(Single ByRef, Single ByRef)
+0560: call System.Random get_Shared()
+0565: ldc.r4 0
+056A: ldc.r4 1
+056F: call Single Float(System.Random, Single, Single)
+0574: ble.un 200
+0579: call System.Random get_Shared()
+057E: ldarg.0 
+057F: call System.Collections.Generic.List`1[Sandbox.GameObject] get_CollisionPrefab()
+0584: ldnull 
+0585: call Sandbox.GameObject FromList[GameObject](System.Random, System.Collections.Generic.List`1[Sandbox.GameObject], Sandbox.GameObject)
+058A: stloc.s 32
+058C: ldloc.s 32
+058E: brfalse 174
+0593: ldloc.0 
+0594: ldflda Angles Angles
+0599: call Rotation op_Implicit(Angles ByRef)
+059E: stloc.s 33
+05A0: ldloc.0 
+05A1: ldfld Vector3 Position
+05A6: stloc.s 34
+05A8: ldarg.0 
+05A9: call Boolean get_CollisionPrefabAlign()
+05AE: brfalse.s 87
+05B0: ldloc.0 
+05B1: ldfld Vector3 HitNormal
+05B6: ldloc.0 
+05B7: ldflda Angles Angles
+05BC: call Vector3 get_Forward()
+05C1: call Rotation LookAt(Vector3, Vector3)
+05C6: stloc.s 33
+05C8: ldarg.0 
+05C9: call Sandbox.ParticleFloat get_CollisionPrefabRotation()
+05CE: stloc.s 12
+05D0: ldloca.s 12
+05D2: ldloca.s 1
+05D4: call System.Random get_Shared()
+05D9: ldc.r4 0
+05DE: ldc.r4 1
+05E3: call Single Float(System.Random, Single, Single)
+05E8: stloc.s 13
+05EA: ldloca.s 13
+05EC: call Single Evaluate(Single ByRef, Single ByRef)
+05F1: call Rotation FromYaw(Single)
+05F6: ldloc.s 33
+05F8: call Rotation op_Multiply(Rotation, Rotation)
+05FD: stloc.s 33
+05FF: ldloc.0 
+0600: ldfld Vector3 HitPos
+0605: stloc.s 34
+0607: ldarg.0 
+0608: ldflda System.Collections.Concurrent.ConcurrentBag`1[Sandbox.ParticleEffect+ParticleCollisionPrefab] _collisionPrefabs
+060D: call System.Collections.Concurrent.ConcurrentBag`1[Sandbox.ParticleEffect+ParticleCollisionPrefab] EnsureInitialized[ConcurrentBag`1](System.Collections.Concurrent.ConcurrentBag`1[Sandbox.ParticleEffect+ParticleCollisionPrefab] ByRef)
+0612: ldloc.s 32
+0614: ldloc.s 34
+0616: ldloc.s 33
+0618: newobj Void .ctor(Sandbox.GameObject, Vector3, Rotation)
+061D: callvirt Void Add(ParticleCollisionPrefab)
+0622: br.s 29
+0624: ldloc.0 
+0625: dup 
+0626: ldfld Vector3 Position
+062B: ldloc.0 
+062C: ldfld Vector3 Velocity
+0631: ldloc.2 
+0632: call Vector3 op_Multiply(Vector3, Single)
+0637: call Vector3 op_Addition(Vector3, Vector3)
+063C: stfld Vector3 Position
+0641: ldarg.0 
+0642: call Boolean get_ApplyColor()
+0647: brfalse.s 116
+0649: ldarg.0 
+064A: call Sandbox.ParticleFloat get_Brightness()
+064F: stloc.s 12
+0651: ldloca.s 12
+0653: ldloc.0 
+0654: ldc.i4 4626
+0659: ldc.i4 665
+065E: call Single Evaluate(Sandbox.IDynamicFloatContext, Int32, Int32)
+0663: stloc.s 35
+0665: ldloc.0 
+0666: ldarg.0 
+0667: call Color get_Tint()
+066C: stloc.s 36
+066E: ldloca.s 36
+0670: ldarg.0 
+0671: call Sandbox.ParticleGradient get_Gradient()
+0676: stloc.s 37
+0678: ldloca.s 37
+067A: ldloc.0 
+067B: ldc.i4 8752
+0680: ldc.i4 667
+0685: call Color Evaluate(Sandbox.Particle, Int32, Int32)
+068A: stloc.s 38
+068C: ldloca.s 38
+068E: call Color op_Multiply(Color ByRef, Color ByRef)
+0693: stfld Color Color
+0698: ldloc.0 
+0699: dup 
+069A: ldflda Color Color
+069F: ldloca.s 35
+06A1: ldc.r4 1
+06A6: stloc.s 13
+06A8: ldloca.s 13
+06AA: newobj Void .ctor(Single ByRef, Single ByRef)
+06AF: stloc.s 36
+06B1: ldloca.s 36
+06B3: call Color op_Multiply(Color ByRef, Color ByRef)
+06B8: stfld Color Color
+06BD: ldarg.0 
+06BE: call Boolean get_ApplyAlpha()
+06C3: brfalse.s 32
+06C5: ldloc.0 
+06C6: ldarg.0 
+06C7: call Sandbox.ParticleFloat get_Alpha()
+06CC: stloc.s 12
+06CE: ldloca.s 12
+06D0: ldloc.0 
+06D1: ldc.i4 8525
+06D6: ldc.i4 673
+06DB: call Single Evaluate(Sandbox.IDynamicFloatContext, Int32, Int32)
+06E0: stfld Single Alpha
+06E5: ldarg.0 
+06E6: call Boolean get_ApplyShape()
+06EB: brfalse 184
+06F0: ldloc.0 
+06F1: ldloc.0 
+06F2: ldfld Single StartScale
+06F7: ldarg.0 
+06F8: call Sandbox.ParticleFloat get_Scale()
+06FD: stloc.s 12
+06FF: ldloca.s 12
+0701: ldloc.0 
+0702: ldc.i4 6211
+0707: ldc.i4 678
+070C: call Single Evaluate(Sandbox.IDynamicFloatContext, Int32, Int32)
+0711: mul 
+0712: call Vector3 op_Implicit(Single)
+0717: stfld Vector3 Size
+071C: ldarg.0 
+071D: call Sandbox.ParticleFloat get_Stretch()
+0722: stloc.s 12
+0724: ldloca.s 12
+0726: ldloc.0 
+0727: ldc.i4 62415
+072C: ldc.i4 680
+0731: call Single Evaluate(Sandbox.IDynamicFloatContext, Int32, Int32)
+0736: stloc.s 39
+0738: ldloc.s 39
+073A: ldc.r4 0
+073F: bge.un.s 48
+0741: ldloc.0 
+0742: ldflda Vector3 Size
+0747: dup 
+0748: call Single get_x()
+074D: ldloc.s 39
+074F: ldc.r4 0
+0754: ldc.r4 -1
+0759: ldc.r4 1
+075E: ldc.r4 2
+0763: ldc.i4.0 
+0764: call Single Remap(Single, Single, Single, Single, Single, Boolean)
+0769: mul 
+076A: call Void set_x(Single)
+076F: br.s 55
+0771: ldloc.s 39
+0773: ldc.r4 0
+0778: ble.un.s 46
+077A: ldloc.0 
+077B: ldflda Vector3 Size
+0780: dup 
+0781: call Single get_y()
+0786: ldloc.s 39
+0788: ldc.r4 0
+078D: ldc.r4 1
+0792: ldc.r4 1
+0797: ldc.r4 2
+079C: ldc.i4.0 
+079D: call Single Remap(Single, Single, Single, Single, Single, Boolean)
+07A2: mul 
+07A3: call Void set_y(Single)
+07A8: ldarg.0 
+07A9: call Boolean get_ApplyRotation()
+07AE: brfalse 147
+07B3: ldloc.0 
+07B4: ldflda Angles Angles
+07B9: ldloc.0 
+07BA: ldflda Angles StartAngles
+07BF: ldfld Single pitch
+07C4: ldarg.0 
+07C5: call Sandbox.ParticleFloat get_Pitch()
+07CA: stloc.s 12
+07CC: ldloca.s 12
+07CE: ldloc.0 
+07CF: ldc.i4 2363
+07D4: ldc.i4 693
+07D9: call Single Evaluate(Sandbox.IDynamicFloatContext, Int32, Int32)
+07DE: add 
+07DF: stfld Single pitch
+07E4: ldloc.0 
+07E5: ldflda Angles Angles
+07EA: ldloc.0 
+07EB: ldflda Angles StartAngles
+07F0: ldfld Single yaw
+07F5: ldarg.0 
+07F6: call Sandbox.ParticleFloat get_Yaw()
+07FB: stloc.s 12
+07FD: ldloca.s 12
+07FF: ldloc.0 
+0800: ldc.i4 8762
+0805: ldc.i4 694
+080A: call Single Evaluate(Sandbox.IDynamicFloatContext, Int32, Int32)
+080F: add 
+0810: stfld Single yaw
+0815: ldloc.0 
+0816: ldflda Angles Angles
+081B: ldloc.0 
+081C: ldflda Angles StartAngles
+0821: ldfld Single roll
+0826: ldarg.0 
+0827: call Sandbox.ParticleFloat get_Roll()
+082C: stloc.s 12
+082E: ldloca.s 12
+0830: ldloc.0 
+0831: ldc.i4 3675
+0836: ldc.i4 695
+083B: call Single Evaluate(Sandbox.IDynamicFloatContext, Int32, Int32)
+0840: add 
+0841: stfld Single roll
+0846: ldarg.0 
+0847: call Boolean get_SheetSequence()
+084C: brfalse 152
+0851: ldloc.0 
+0852: ldflda Vector3 SequenceTime
+0857: ldarg.0 
+0858: call Sandbox.ParticleFloat get_SequenceTime()
+085D: stloc.s 12
+085F: ldloca.s 12
+0861: ldloc.0 
+0862: ldc.i4 7234
+0867: ldc.i4 700
+086C: call Single Evaluate(Sandbox.IDynamicFloatContext, Int32, Int32)
+0871: call Void set_x(Single)
+0876: ldarg.0 
+0877: call Sandbox.ParticleFloat get_SequenceSpeed()
+087C: stloc.s 12
+087E: ldloca.s 12
+0880: ldloc.0 
+0881: ldc.i4 1351
+0886: ldc.i4 702
+088B: call Single Evaluate(Sandbox.IDynamicFloatContext, Int32, Int32)
+0890: ldloc.2 
+0891: mul 
+0892: stloc.s 40
+0894: ldarg.0 
+0895: call Boolean get_SequenceFitToLifetime()
+089A: brfalse.s 24
+089C: ldloc.0 
+089D: callvirt Single get_LifeTimeRemaining()
+08A2: ldc.r4 0
+08A7: ble.un.s 11
+08A9: ldloc.s 40
+08AB: ldloc.0 
+08AC: callvirt Single get_LifeTimeRemaining()
+08B1: div 
+08B2: stloc.s 40
+08B4: ldloc.0 
+08B5: ldflda Vector3 SequenceTime
+08BA: dup 
+08BB: call Single get_y()
+08C0: ldloc.s 40
+08C2: add 
+08C3: call Void set_y(Single)
+08C8: ldloc.0 
+08C9: ldarg.0 
+08CA: call Sandbox.ParticleFloat get_SequenceId()
+08CF: stloc.s 12
+08D1: ldloca.s 12
+08D3: ldloc.0 
+08D4: ldc.i4 1051
+08D9: ldc.i4 709
+08DE: call Single Evaluate(Sandbox.IDynamicFloatContext, Int32, Int32)
+08E3: conv.i4 
+08E4: stfld Int32 Sequence
+08E9: ldloc.1 
+08EA: ldc.r4 1
+08EF: blt.un.s 29
+08F1: ldloc.0 
+08F2: ldc.i4.1 
+08F3: stfld Boolean IsDead
+08F8: ldloc.0 
+08F9: ldfld Boolean hasUpdated
+08FE: brfalse.s 13
+0900: ldloc.0 
+0901: ldc.i4.0 
+0902: stfld Boolean hasUpdated
+0907: ldloc.0 
+0908: callvirt Void OnDisabled()
+090D: ret 
+090E: ldloc.0 
+090F: ldfld Boolean hasUpdated
+0914: brtrue.s 13
+0916: ldloc.0 
+0917: ldc.i4.1 
+0918: stfld Boolean hasUpdated
+091D: ldloc.0 
+091E: callvirt Void OnEnabled()
+0923: ldloc.0 
+0924: ldloc.1 
+0925: callvirt Void OnUpdate(Single)
+092A: ldloc.0 
+092B: ldfld Sandbox.GameObject Follower
+0930: call Boolean IsValid(Sandbox.IValid)
+0935: brfalse.s 44
+0937: ldloc.0 
+0938: ldfld Sandbox.GameObject Follower
+093D: ldloc.0 
+093E: ldfld Vector3 Position
+0943: ldloc.0 
+0944: ldflda Angles Angles
+0949: call Rotation op_Implicit(Angles ByRef)
+094E: ldloc.0 
+094F: ldfld Sandbox.GameObject Follower
+0954: callvirt Vector3 get_WorldScale()
+0959: newobj Void .ctor(Vector3, Rotation, Vector3)
+095E: callvirt Void set_WorldTransform(Transform)
+0963: ldarg.0 
+0964: ldflda Transform _worldTx
+0969: ldflda Vector3 Position
+096E: ldloc.0 
+096F: ldflda Vector3 Position
+0974: call Single DistanceBetween(Vector3 ByRef, Vector3 ByRef)
+0979: conv.i8 
+097A: stloc.s 10
+097C: ldarg.0 
+097D: ldflda Int64 _maxDistance
+0982: call Int64 Read(Int64 ByRef)
+0987: ldloc.s 10
+0989: bgt.s 14
+098B: ldarg.0 
+098C: ldflda Int64 _maxDistance
+0991: ldloc.s 10
+0993: call Int64 Exchange(Int64 ByRef, Int64)
+0998: pop 
+0999: ldloc.0 
+099A: ldflda Vector3 Size
+099F: call Single get_x()
+09A4: ldloc.0 
+09A5: ldflda Vector3 Size
+09AA: call Single get_y()
+09AF: call Single Max(Single, Single)
+09B4: conv.i8 
+09B5: stloc.s 11
+09B7: ldarg.0 
+09B8: ldflda Int64 _maxSize
+09BD: call Int64 Read(Int64 ByRef)
+09C2: ldloc.s 11
+09C4: bgt.s 14
+09C6: ldarg.0 
+09C7: ldflda Int64 _maxSize
+09CC: ldloc.s 11
+09CE: call Int64 Exchange(Int64 ByRef, Int64)
+09D3: pop 
+09D4: ret 
+Sandbox.ParticleEffect::PostStep
+0000: ldarg.0 
+0001: call System.Action`1[Sandbox.Particle] get_OnParticleDestroyed()
+0006: ldnull 
+0007: ceq 
+0009: ldc.i4.0 
+000A: ceq 
+000C: stloc.0 
+000D: ldarg.0 
+000E: call System.Collections.Generic.List`1[Sandbox.Particle] get_Particles()
+0013: callvirt Enumerator GetEnumerator()
+0018: stloc.2 
+0019: br.s 84
+001B: ldloca.s 2
+001D: call Sandbox.Particle get_Current()
+0022: stloc.3 
+0023: ldloc.3 
+0024: ldfld Boolean IsDead
+0029: brfalse.s 68
+002B: ldarg.0 
+002C: ldfld System.Collections.Generic.List`1[System.ValueTuple`2[Sandbox.Particle,System.UInt32]] _deadParticles
+0031: dup 
+0032: brtrue.s 17
+0034: pop 
+0035: ldarg.0 
+0036: newobj Void .ctor()
+003B: dup 
+003C: stloc.s 4
+003E: stfld System.Collections.Generic.List`1[System.ValueTuple`2[Sandbox.Particle,System.UInt32]] _deadParticles
+0043: ldloc.s 4
+0045: ldloc.3 
+0046: ldloc.3 
+0047: ldfld UInt32 Generation
+004C: newobj Void .ctor(Sandbox.Particle, UInt32)
+0051: callvirt Void Add(System.ValueTuple`2[Sandbox.Particle,System.UInt32])
+0056: ldloc.0 
+0057: ldloc.3 
+0058: ldfld Boolean hasUpdated
+005D: brtrue.s 13
+005F: ldloc.3 
+0060: ldfld Sandbox.GameObject Follower
+0065: call Boolean IsValid(Sandbox.IValid)
+006A: br.s 1
+006C: ldc.i4.1 
+006D: or 
+006E: stloc.0 
+006F: ldloca.s 2
+0071: call Boolean MoveNext()
+0076: brtrue.s 163
+0078: leave.s 14
+007A: ldloca.s 2
+007C: constrained. System.Collections.Generic.List`1+Enumerator[Sandbox.Particle]
+0082: callvirt Void Dispose()
+0087: endfinally 
+0088: ldarg.0 
+0089: ldfld System.Collections.Generic.List`1[System.ValueTuple`2[Sandbox.Particle,System.UInt32]] _deadParticles
+008E: stloc.1 
+008F: ldloc.1 
+0090: brfalse 299
+0095: ldloc.1 
+0096: callvirt Int32 get_Count()
+009B: ldc.i4.0 
+009C: ble 287
+00A1: ldarg.0 
+00A2: ldnull 
+00A3: stfld System.Collections.Generic.List`1[System.ValueTuple`2[Sandbox.Particle,System.UInt32]] _deadParticles
+00A8: ldloc.0 
+00A9: brfalse.s 97
+00AB: ldloc.1 
+00AC: callvirt Enumerator GetEnumerator()
+00B1: stloc.s 5
+00B3: br.s 59
+00B5: ldloca.s 5
+00B7: call System.ValueTuple`2[Sandbox.Particle,System.UInt32] get_Current()
+00BC: dup 
+00BD: ldfld Sandbox.Particle Item1
+00C2: stloc.s 6
+00C4: ldfld UInt32 Item2
+00C9: stloc.s 7
+00CB: ldloc.s 6
+00CD: ldfld UInt32 Generation
+00D2: ldloc.s 7
+00D4: bne.un.s 26
+00D6: ldloc.s 6
+00D8: ldfld Boolean IsDead
+00DD: brfalse.s 17
+00DF: ldloc.s 6
+00E1: ldfld Boolean IsReleased
+00E6: brtrue.s 8
+00E8: ldarg.0 
+00E9: ldloc.s 6
+00EB: call Void Terminate(Sandbox.Particle)
+00F0: ldloca.s 5
+00F2: call Boolean MoveNext()
+00F7: brtrue.s 188
+00F9: leave 194
+00FE: ldloca.s 5
+0100: constrained. System.Collections.Generic.List`1+Enumerator[System.ValueTuple`2[Sandbox.Particle,System.UInt32]]
+0106: callvirt Void Dispose()
+010B: endfinally 
+010C: ldc.i4.0 
+010D: stloc.s 8
+010F: ldc.i4.0 
+0110: stloc.s 9
+0112: br.s 50
+0114: ldarg.0 
+0115: call System.Collections.Generic.List`1[Sandbox.Particle] get_Particles()
+011A: ldloc.s 9
+011C: callvirt Sandbox.Particle get_Item(Int32)
+0121: stloc.s 10
+0123: ldloc.s 10
+0125: ldfld Boolean IsDead
+012A: brtrue.s 20
+012C: ldarg.0 
+012D: call System.Collections.Generic.List`1[Sandbox.Particle] get_Particles()
+0132: ldloc.s 8
+0134: dup 
+0135: ldc.i4.1 
+0136: add 
+0137: stloc.s 8
+0139: ldloc.s 10
+013B: callvirt Void set_Item(Int32, Sandbox.Particle)
+0140: ldloc.s 9
+0142: ldc.i4.1 
+0143: add 
+0144: stloc.s 9
+0146: ldloc.s 9
+0148: ldarg.0 
+0149: call System.Collections.Generic.List`1[Sandbox.Particle] get_Particles()
+014E: callvirt Int32 get_Count()
+0153: blt.s 191
+0155: ldarg.0 
+0156: call System.Collections.Generic.List`1[Sandbox.Particle] get_Particles()
+015B: ldloc.s 8
+015D: ldarg.0 
+015E: call System.Collections.Generic.List`1[Sandbox.Particle] get_Particles()
+0163: callvirt Int32 get_Count()
+0168: ldloc.s 8
+016A: sub 
+016B: callvirt Void RemoveRange(Int32, Int32)
+0170: ldloc.1 
+0171: callvirt Enumerator GetEnumerator()
+0176: stloc.s 5
+0178: br.s 23
+017A: ldloca.s 5
+017C: call System.ValueTuple`2[Sandbox.Particle,System.UInt32] get_Current()
+0181: ldfld Sandbox.Particle Item1
+0186: stloc.s 11
+0188: ldarg.0 
+0189: ldloc.s 11
+018B: call Boolean ReleaseParticle(Sandbox.Particle)
+0190: pop 
+0191: ldloca.s 5
+0193: call Boolean MoveNext()
+0198: brtrue.s 224
+019A: leave.s 36
+019C: ldloca.s 5
+019E: constrained. System.Collections.Generic.List`1+Enumerator[System.ValueTuple`2[Sandbox.Particle,System.UInt32]]
+01A4: callvirt Void Dispose()
+01A9: endfinally 
+01AA: ldloc.1 
+01AB: callvirt Void Clear()
+01B0: ldarg.0 
+01B1: ldfld System.Collections.Generic.List`1[System.ValueTuple`2[Sandbox.Particle,System.UInt32]] _deadParticles
+01B6: brtrue.s 7
+01B8: ldarg.0 
+01B9: ldloc.1 
+01BA: stfld System.Collections.Generic.List`1[System.ValueTuple`2[Sandbox.Particle,System.UInt32]] _deadParticles
+01BF: endfinally 
+01C0: ldarg.0 
+01C1: ldarg.0 
+01C2: ldflda Transform _worldTx
+01C7: ldflda Vector3 Position
+01CC: ldarg.0 
+01CD: ldfld Int64 _maxDistance
+01D2: conv.r4 
+01D3: ldc.r4 2
+01D8: mul 
+01D9: call BBox FromPositionAndSize(Vector3 ByRef, Single)
+01DE: call Void set_ParticleBounds(BBox)
+01E3: ldarg.0 
+01E4: ldarg.0 
+01E5: ldfld Int64 _maxSize
+01EA: conv.r4 
+01EB: call Void set_MaxParticleSize(Single)
+01F0: ldarg.0 
+01F1: call System.Action`1[System.Single] get_OnPostStep()
+01F6: dup 
+01F7: brtrue.s 3
+01F9: pop 
+01FA: br.s 11
+01FC: ldarg.0 
+01FD: ldfld Single _timeDelta
+0202: callvirt Void Invoke(Single)
+0207: ldarg.0 
+0208: ldarg.0 
+0209: call Transform get_WorldTransform()
+020E: stfld Transform lastTransform
+0213: ret 
+Sandbox.ParticleRenderer::OnPostStepInternal
+0000: ldarg.0 
+0001: ldarg.1 
+0002: callvirt Void OnPostStep(Single)
+0007: leave.s 14
+0009: stloc.0 
+000A: call Sandbox.Diagnostics.Logger get_Log()
+000F: ldloc.0 
+0010: callvirt Void Warning(System.Object)
+0015: leave.s 0
+0017: ret 
+Sandbox.ParticleRenderer::OnPostStep
+0000: ret 
+Sandbox.ParticleRenderer::GetLocalBounds
+0000: ldarg.0 
+0001: call Sandbox.ParticleEffect get_ParticleEffect()
+0006: call Boolean IsValid(Sandbox.IValid)
+000B: brfalse.s 124
+000D: ldc.r4 0
+0012: call Vector3 op_Implicit(Single)
+0017: stloc.1 
+0018: ldloca.s 1
+001A: ldc.r4 16
+001F: call BBox FromPositionAndSize(Vector3 ByRef, Single)
+0024: stloc.0 
+0025: ldarg.0 
+0026: call Sandbox.ParticleEffect get_ParticleEffect()
+002B: callvirt System.Collections.Generic.List`1[Sandbox.Particle] get_Particles()
+0030: callvirt Enumerator GetEnumerator()
+0035: stloc.2 
+0036: br.s 54
+0038: ldloca.s 2
+003A: call Sandbox.Particle get_Current()
+003F: stloc.3 
+0040: ldloca.s 0
+0042: ldarg.0 
+0043: call Transform get_WorldTransform()
+0048: stloc.s 4
+004A: ldloca.s 4
+004C: ldloc.3 
+004D: ldflda Vector3 Position
+0052: call Vector3 PointToLocal(Vector3 ByRef)
+0057: stloc.1 
+0058: ldloca.s 1
+005A: ldc.r4 4
+005F: call BBox FromPositionAndSize(Vector3 ByRef, Single)
+0064: stloc.s 5
+0066: ldloca.s 5
+0068: call BBox AddBBox(BBox ByRef)
+006D: stloc.0 
+006E: ldloca.s 2
+0070: call Boolean MoveNext()
+0075: brtrue.s 193
+0077: leave.s 14
+0079: ldloca.s 2
+007B: constrained. System.Collections.Generic.List`1+Enumerator[Sandbox.Particle]
+0081: callvirt Void Dispose()
+0086: endfinally 
+0087: ldloc.0 
+0088: ret 
+0089: ldc.r4 0
+008E: call Vector3 op_Implicit(Single)
+0093: stloc.1 
+0094: ldloca.s 1
+0096: ldc.r4 16
+009B: call BBox FromPositionAndSize(Vector3 ByRef, Single)
+00A0: ret 
+Sandbox.IBatchedParticleSpriteRenderer::ProcessParticlesDirectly
+0000: ldloca.s 37
+0002: call Void .ctor()
+0007: ldloca.s 37
+0009: ldc.i4.2 
+000A: call Void set_AddressModeU(Sandbox.Rendering.TextureAddressMode)
+000F: ldloca.s 37
+0011: ldc.i4.2 
+0012: call Void set_AddressModeV(Sandbox.Rendering.TextureAddressMode)
+0017: ldloc.s 37
+0019: stloc.0 
+001A: ldarg.0 
+001B: callvirt Sandbox.ParticleEffect get_ParticleEffect()
+0020: callvirt System.Collections.Generic.List`1[Sandbox.Particle] get_Particles()
+0025: call System.Span`1[Sandbox.Particle] AsSpan[Particle](System.Collections.Generic.List`1[Sandbox.Particle])
+002A: stloc.1 
+002B: ldloca.s 1
+002D: call Int32 get_Length()
+0032: stloc.2 
+0033: ldloc.2 
+0034: brfalse.s 10
+0036: ldarga.s 1
+0038: call Int32 get_Length()
+003D: ldloc.2 
+003E: bge.s 18
+0040: ldc.i4.0 
+0041: ldc.i4.0 
+0042: ldloca.s 38
+0044: initobj BBox
+004A: ldloc.s 38
+004C: newobj Void .ctor(Int32, Int32, BBox)
+0051: ret 
+0052: ldarg.0 
+0053: callvirt Sandbox.Texture get_RenderTexture()
+0058: dup 
+0059: brtrue.s 6
+005B: pop 
+005C: call Sandbox.Texture get_White()
+0061: stloc.3 
+0062: ldarg.0 
+0063: callvirt Placement get_TextSprite()
+0068: stloc.s 4
+006A: ldarg.0 
+006B: callvirt ParticleType get_Type()
+0070: ldc.i4.1 
+0071: ceq 
+0073: stloc.s 5
+0075: ldloc.s 5
+0077: brfalse.s 27
+0079: ldloca.s 4
+007B: call Int32 get_Width()
+0080: brtrue.s 18
+0082: ldc.i4.0 
+0083: ldc.i4.0 
+0084: ldloca.s 38
+0086: initobj BBox
+008C: ldloc.s 38
+008E: newobj Void .ctor(Int32, Int32, BBox)
+0093: ret 
+0094: ldarg.0 
+0095: callvirt Single get_Scale()
+009A: ldc.r4 2
+009F: div 
+00A0: ldarg.0 
+00A1: callvirt Vector3 get_WorldScale()
+00A6: stloc.s 39
+00A8: ldloca.s 39
+00AA: call Single get_x()
+00AF: mul 
+00B0: call Single Abs(Single)
+00B5: stloc.s 6
+00B7: ldarg.0 
+00B8: callvirt Rotation get_WorldRotation()
+00BD: stloc.s 7
+00BF: ldarg.0 
+00C0: callvirt BillboardAlignment get_Alignment()
+00C5: stloc.s 8
+00C7: ldarg.0 
+00C8: callvirt BillboardAlignment get_Alignment()
+00CD: ldc.i4.3 
+00CE: ceq 
+00D0: stloc.s 9
+00D2: ldarg.0 
+00D3: callvirt BillboardAlignment get_Alignment()
+00D8: brfalse.s 11
+00DA: ldarg.0 
+00DB: callvirt BillboardAlignment get_Alignment()
+00E0: ldc.i4.1 
+00E1: ceq 
+00E3: br.s 1
+00E5: ldc.i4.1 
+00E6: stloc.s 10
+00E8: ldarg.0 
+00E9: callvirt Single get_BlurAmount()
+00EE: ldc.r4 0
+00F3: ldc.r4 1
+00F8: ldc.r4 0
+00FD: ldc.r4 6
+0102: ldc.i4.0 
+0103: call Single Remap(Single, Single, Single, Single, Single, Boolean)
+0108: stloc.s 11
+010A: ldarg.0 
+010B: callvirt Single get_BlurSpacing()
+0110: ldc.r4 0
+0115: ldc.r4 1
+011A: ldc.r4 0
+011F: ldc.r4 1
+0124: ldc.i4.0 
+0125: call Single Remap(Single, Single, Single, Single, Single, Boolean)
+012A: stloc.s 12
+012C: ldarg.0 
+012D: callvirt Boolean get_LeadingTrail()
+0132: brtrue.s 7
+0134: ldc.r4 1
+0139: br.s 5
+013B: ldc.r4 2
+0140: stloc.s 13
+0142: ldarg.0 
+0143: callvirt Boolean get_FaceVelocity()
+0148: brtrue.s 7
+014A: ldc.r4 -1
+014F: br.s 6
+0151: ldarg.0 
+0152: callvirt Single get_RotationOffset()
+0157: stloc.s 14
+0159: ldloc.0 
+015A: stloc.s 37
+015C: ldloca.s 37
+015E: ldarg.0 
+015F: callvirt Sandbox.Rendering.FilterMode get_TextureFilter()
+0164: call Void set_Filter(Sandbox.Rendering.FilterMode)
+0169: ldloc.s 37
+016B: call Int32 GetBindlessIndex(Sandbox.Rendering.SamplerState)
+0170: stloc.s 15
+0172: ldloc.3 
+0173: callvirt Vector4 get_SequenceData()
+0178: stloc.s 16
+017A: ldarg.0 
+017B: callvirt Boolean get_Lighting()
+0180: ldc.i4.0 
+0181: cgt.un 
+0183: stloc.s 17
+0185: ldloc.3 
+0186: brtrue.s 12
+0188: call Sandbox.Texture get_Invalid()
+018D: callvirt Int32 get_Index()
+0192: br.s 6
+0194: ldloc.3 
+0195: call Int32 get_Index()
+019A: stloc.s 18
+019C: ldarg.0 
+019D: callvirt Sandbox.Texture get_RefractionNormalTexture()
+01A2: dup 
+01A3: brtrue.s 4
+01A5: pop 
+01A6: ldc.i4.0 
+01A7: br.s 5
+01A9: call Int32 get_Index()
+01AE: stloc.s 19
+01B0: ldarg.0 
+01B1: callvirt Sandbox.ParticleFloat get_RefractionStrength()
+01B6: stloc.s 20
+01B8: ldarg.0 
+01B9: callvirt Boolean get_MotionBlur()
+01BE: stloc.s 21
+01C0: ldarg.0 
+01C1: callvirt Single get_FogStrength()
+01C6: ldc.r4 0.001
+01CB: call UInt32 PackFogAndAlphaCutout(Single, Single)
+01D0: stloc.s 22
+01D2: ldarg.0 
+01D3: callvirt Single get_DepthFeather()
+01D8: stloc.s 23
+01DA: ldarg.0 
+01DB: callvirt Single get_CameraFadeNear()
+01E0: ldarg.0 
+01E1: callvirt Single get_CameraFadeFar()
+01E6: call UInt32 PackCameraFade(Single, Single)
+01EB: stloc.s 24
+01ED: ldarg.0 
+01EE: callvirt Single get_BlurOpacity()
+01F3: stloc.s 25
+01F5: ldarg.0 
+01F6: callvirt Vector2 get_Pivot()
+01FB: stloc.s 26
+01FD: ldc.i4.0 
+01FE: stloc.s 27
+0200: ldarg.0 
+0201: callvirt Sandbox.ParticleEffect get_ParticleEffect()
+0206: callvirt Boolean get_SnapToFrame()
+020B: brfalse.s 6
+020D: ldloc.s 27
+020F: ldc.i4.8 
+0210: or 
+0211: stloc.s 27
+0213: ldloc.s 5
+0215: brfalse.s 7
+0217: ldloc.s 27
+0219: ldc.i4.s 16
+021B: or 
+021C: stloc.s 27
+021E: ldloc.s 5
+0220: brtrue.s 8
+0222: ldloc.3 
+0223: callvirt Vector2 get_Size()
+0228: br.s 21
+022A: ldloca.s 4
+022C: call Int32 get_Width()
+0231: conv.r4 
+0232: ldloca.s 4
+0234: call Int32 get_Height()
+0239: conv.r4 
+023A: newobj Void .ctor(Single, Single)
+023F: stloc.s 28
+0241: ldloca.s 28
+0243: call Single get_x()
+0248: ldloca.s 28
+024A: call Single get_y()
+024F: div 
+0250: stloc.s 29
+0252: ldloc.s 5
+0254: brfalse.s 18
+0256: ldloca.s 4
+0258: call Int32 get_InstanceOffset()
+025D: stloc.s 18
+025F: ldloca.s 4
+0261: call Int32 get_TileOffset()
+0266: stloc.s 15
+0268: ldloca.s 28
+026A: call Single get_x()
+026F: conv.i4 
+0270: ldloca.s 28
+0272: call Single get_y()
+0277: conv.i4 
+0278: ldc.i4.s 16
+027A: shl 
+027B: or 
+027C: call Single Int32BitsToSingle(Int32)
+0281: stloc.s 30
+0283: ldc.i4.0 
+0284: stloc.s 31
+0286: ldc.i4.0 
+0287: stloc.s 32
+0289: ldloca.s 33
+028B: ldc.r4 3.4028235E+38
+0290: ldc.r4 3.4028235E+38
+0295: ldc.r4 3.4028235E+38
+029A: call Void .ctor(Single, Single, Single)
+029F: ldloca.s 34
+02A1: ldc.r4 -3.4028235E+38
+02A6: ldc.r4 -3.4028235E+38
+02AB: ldc.r4 -3.4028235E+38
+02B0: call Void .ctor(Single, Single, Single)
+02B5: ldloca.s 26
+02B7: call Single get_x()
+02BC: ldc.r4 1
+02C1: ldloca.s 26
+02C3: call Single get_x()
+02C8: sub 
+02C9: call Single Max(Single, Single)
+02CE: stloc.s 35
+02D0: ldloca.s 26
+02D2: call Single get_y()
+02D7: ldc.r4 1
+02DC: ldloca.s 26
+02DE: call Single get_y()
+02E3: sub 
+02E4: call Single Max(Single, Single)
+02E9: stloc.s 36
+02EB: ldarga.s 1
+02ED: call SpriteData& GetPinnableReference()
+02F2: stloc.s 41
+02F4: ldloc.s 41
+02F6: conv.u 
+02F7: stloc.s 40
+02F9: ldc.i4.0 
+02FA: stloc.s 42
+02FC: br 990
+0301: ldloca.s 1
+0303: ldloc.s 42
+0305: call Sandbox.Particle& get_Item(Int32)
+030A: stloc.s 43
+030C: ldloc.s 43
+030E: ldind.ref 
+030F: ldflda Vector3 Position
+0314: stloc.s 44
+0316: ldloc.s 43
+0318: ldind.ref 
+0319: ldflda Vector3 Velocity
+031E: stloc.s 45
+0320: ldloc.s 43
+0322: ldind.ref 
+0323: ldfld Angles Angles
+0328: stloc.s 46
+032A: ldloc.s 9
+032C: brfalse.s 67
+032E: ldloc.s 7
+0330: ldloca.s 46
+0332: call Rotation ToRotation()
+0337: call Rotation op_Multiply(Rotation, Rotation)
+033C: stloc.s 63
+033E: ldloca.s 63
+0340: call Angles Angles()
+0345: stloc.s 62
+0347: ldloca.s 46
+0349: ldloc.s 62
+034B: ldfld Single pitch
+0350: stfld Single pitch
+0355: ldloca.s 46
+0357: ldloc.s 62
+0359: ldfld Single yaw
+035E: stfld Single yaw
+0363: ldloca.s 46
+0365: ldloc.s 62
+0367: ldfld Single roll
+036C: stfld Single roll
+0371: ldloc.s 43
+0373: ldind.ref 
+0374: ldflda Vector3 SequenceTime
+0379: call Single get_y()
+037E: ldloc.s 43
+0380: ldind.ref 
+0381: ldflda Vector3 SequenceTime
+0386: call Single get_z()
+038B: add 
+038C: stloc.s 47
+038E: ldloc.s 43
+0390: ldind.ref 
+0391: ldflda Vector3 SequenceTime
+0396: call Single get_x()
+039B: ldc.r4 0
+03A0: ble.un.s 18
+03A2: ldloc.s 47
+03A4: ldloc.s 43
+03A6: ldind.ref 
+03A7: ldflda Vector3 SequenceTime
+03AC: call Single get_x()
+03B1: add 
+03B2: stloc.s 47
+03B4: ldc.i4.0 
+03B5: stloc.s 48
+03B7: ldloc.s 21
+03B9: brfalse.s 26
+03BB: ldloc.s 45
+03BD: call Single get_Length()
+03C2: ldloc.s 11
+03C4: mul 
+03C5: ldc.r4 0.02
+03CA: mul 
+03CB: conv.i4 
+03CC: ldc.i4.0 
+03CD: ldc.i4.8 
+03CE: call Int32 Clamp(Int32, Int32, Int32)
+03D3: stloc.s 48
+03D5: ldloc.s 32
+03D7: ldloc.s 48
+03D9: ldloc.s 13
+03DB: conv.i4 
+03DC: mul 
+03DD: add 
+03DE: stloc.s 32
+03E0: ldloc.s 43
+03E2: ldind.ref 
+03E3: ldflda Vector3 Size
+03E8: call Single get_x()
+03ED: ldloc.s 6
+03EF: mul 
+03F0: stloc.s 49
+03F2: ldloc.s 43
+03F4: ldind.ref 
+03F5: ldflda Vector3 Size
+03FA: call Single get_y()
+03FF: ldloc.s 6
+0401: mul 
+0402: stloc.s 50
+0404: ldloc.s 5
+0406: brtrue.s 23
+0408: ldloc.s 16
+040A: ldsfld Vector4 Zero
+040F: call Boolean op_Equality(Vector4, Vector4)
+0414: brfalse.s 16
+0416: ldloc.s 29
+0418: ldc.r4 1
+041D: beq.s 7
+041F: ldloc.s 49
+0421: ldloc.s 29
+0423: mul 
+0424: stloc.s 49
+0426: ldloc.s 35
+0428: ldc.r4 2
+042D: mul 
+042E: ldloc.s 49
+0430: mul 
+0431: ldloc.s 36
+0433: ldc.r4 2
+0438: mul 
+0439: ldloc.s 50
+043B: mul 
+043C: call Single Max(Single, Single)
+0441: stloc.s 51
+0443: ldloca.s 52
+0445: ldloc.s 51
+0447: ldloc.s 51
+0449: ldloc.s 51
+044B: call Void .ctor(Single, Single, Single)
+0450: ldloca.s 53
+0452: ldloc.s 44
+0454: call Single get_x()
+0459: ldloc.s 44
+045B: call Single get_y()
+0460: ldloc.s 44
+0462: call Single get_z()
+0467: call Void .ctor(Single, Single, Single)
+046C: ldloca.s 33
+046E: ldloc.s 53
+0470: ldloc.s 52
+0472: call Vector3 op_Subtraction(Vector3, Vector3)
+0477: stloc.s 39
+0479: ldloca.s 39
+047B: call Vector3 Min(Vector3 ByRef, Vector3 ByRef)
+0480: stloc.s 33
+0482: ldloca.s 34
+0484: ldloc.s 53
+0486: ldloc.s 52
+0488: call Vector3 op_Addition(Vector3, Vector3)
+048D: stloc.s 39
+048F: ldloca.s 39
+0491: call Vector3 Max(Vector3 ByRef, Vector3 ByRef)
+0496: stloc.s 34
+0498: ldloc.s 43
+049A: ldind.ref 
+049B: ldflda Color Color
+04A0: call Color32 ToRgbe()
+04A5: stloc.s 54
+04A7: ldloc.s 43
+04A9: ldind.ref 
+04AA: ldflda Color Color
+04AF: ldfld Single a
+04B4: ldloc.s 43
+04B6: ldind.ref 
+04B7: ldfld Single Alpha
+04BC: mul 
+04BD: ldc.r4 0
+04C2: ldc.r4 1
+04C7: call Single Clamp(Single, Single, Single)
+04CC: ldc.r4 255
+04D1: mul 
+04D2: conv.u1 
+04D3: stloc.s 55
+04D5: ldloca.s 56
+04D7: ldloc.s 54
+04D9: ldfld Byte r
+04DE: ldloc.s 54
+04E0: ldfld Byte g
+04E5: ldloc.s 54
+04E7: ldfld Byte b
+04EC: ldloc.s 55
+04EE: call Void .ctor(Byte, Byte, Byte, Byte)
+04F3: ldloc.s 43
+04F5: ldind.ref 
+04F6: ldflda Color OverlayColor
+04FB: call Color32 ToRgbe()
+0500: stloc.s 57
+0502: ldloc.s 43
+0504: ldind.ref 
+0505: ldflda Color OverlayColor
+050A: ldfld Single a
+050F: ldc.r4 0
+0514: ldc.r4 1
+0519: call Single Clamp(Single, Single, Single)
+051E: ldc.r4 255
+0523: mul 
+0524: conv.u1 
+0525: stloc.s 58
+0527: ldloca.s 59
+0529: ldloc.s 57
+052B: ldfld Byte r
+0530: ldloc.s 57
+0532: ldfld Byte g
+0537: ldloc.s 57
+0539: ldfld Byte b
+053E: ldloc.s 58
+0540: call Void .ctor(Byte, Byte, Byte, Byte)
+0545: ldloc.s 17
+0547: conv.u1 
+0548: ldloc.s 54
+054A: ldfld Byte a
+054F: ldc.i4.s 16
+0551: shl 
+0552: or 
+0553: stloc.s 60
+0555: ldloc.s 45
+0557: ldobj Vector3
+055C: stloc.s 61
+055E: ldloc.s 10
+0560: brfalse.s 36
+0562: ldloca.s 61
+0564: call Single get_LengthSquared()
+0569: ldc.r4 0.001
+056E: ble.un.s 12
+0570: ldloc.s 43
+0572: ldind.ref 
+0573: ldloc.s 61
+0575: stfld Vector3 LastVelocity
+057A: br.s 10
+057C: ldloc.s 43
+057E: ldind.ref 
+057F: ldfld Vector3 LastVelocity
+0584: stloc.s 61
+0586: ldloc.s 40
+0588: ldloc.s 31
+058A: conv.i 
+058B: sizeof Sandbox.Rendering.SpriteBatchSceneObject+SpriteData
+0591: mul 
+0592: add 
+0593: dup 
+0594: ldloc.s 44
+0596: call Single get_x()
+059B: ldloc.s 44
+059D: call Single get_y()
+05A2: ldloc.s 44
+05A4: call Single get_z()
+05A9: newobj Void .ctor(Single, Single, Single)
+05AE: stfld Vector3 Position
+05B3: dup 
+05B4: ldloc.s 46
+05B6: ldfld Single pitch
+05BB: ldloc.s 46
+05BD: ldfld Single yaw
+05C2: ldloc.s 46
+05C4: ldfld Single roll
+05C9: newobj Void .ctor(Single, Single, Single)
+05CE: stfld Vector3 Rotation
+05D3: dup 
+05D4: ldloc.s 49
+05D6: ldloc.s 50
+05D8: newobj Void .ctor(Single, Single)
+05DD: stfld Vector2 Scale
+05E2: dup 
+05E3: ldloc.s 61
+05E5: stfld Vector3 Velocity
+05EA: dup 
+05EB: ldloc.s 13
+05ED: ldloc.s 11
+05EF: ldloc.s 12
+05F1: ldloc.s 25
+05F3: newobj Void .ctor(Single, Single, Single, Single)
+05F8: stfld Vector4 MotionBlur
+05FD: dup 
+05FE: ldloc.s 18
+0600: stfld Int32 TextureHandle
+0605: dup 
+0606: ldloca.s 56
+0608: call UInt32 get_RawInt()
+060D: stfld UInt32 TintColor
+0612: dup 
+0613: ldloca.s 59
+0615: call UInt32 get_RawInt()
+061A: stfld UInt32 OverlayColor
+061F: dup 
+0620: ldloc.s 27
+0622: stfld Int32 RenderFlags
+0627: dup 
+0628: ldloc.s 8
+062A: stfld UInt32 BillboardMode
+062F: dup 
+0630: ldloc.s 22
+0632: stfld UInt32 FogStrengthCutout
+0637: dup 
+0638: ldloc.s 60
+063A: stfld UInt32 Lighting
+063F: dup 
+0640: ldloc.s 23
+0642: stfld Single DepthFeather
+0647: dup 
+0648: ldloc.s 24
+064A: stfld UInt32 CameraFade
+064F: dup 
+0650: ldloc.s 19
+0652: stfld Int32 NormalTextureHandle
+0657: dup 
+0658: ldloca.s 20
+065A: ldloc.s 43
+065C: ldind.ref 
+065D: ldc.i4 6271
+0662: ldc.i4 217
+0667: call Single Evaluate(Sandbox.IDynamicFloatContext, Int32, Int32)
+066C: ldc.r4 0
+0671: call Single Max(Single, Single)
+0676: stfld Single RefractionStrength
+067B: dup 
+067C: ldloc.s 15
+067E: stfld Int32 SamplerIndex
+0683: dup 
+0684: ldloc.s 48
+0686: stfld Int32 Splots
+068B: dup 
+068C: ldloc.s 14
+068E: stfld Single RotationOffset
+0693: dup 
+0694: ldloc.s 5
+0696: brtrue.s 16
+0698: ldloc.s 43
+069A: ldind.ref 
+069B: ldfld Int32 Sequence
+06A0: ldc.i4 255
+06A5: and 
+06A6: br.s 7
+06A8: ldloca.s 4
+06AA: call Int32 get_TilesX()
+06AF: stfld Int32 Sequence
+06B4: dup 
+06B5: ldloc.s 5
+06B7: brtrue.s 4
+06B9: ldloc.s 47
+06BB: br.s 2
+06BD: ldloc.s 30
+06BF: stfld Single SequenceTime
+06C4: dup 
+06C5: ldloc.s 16
+06C7: stfld Vector4 BlendSheetUV
+06CC: ldloc.s 26
+06CE: stfld Vector2 Offset
+06D3: ldloc.s 31
+06D5: ldc.i4.1 
+06D6: add 
+06D7: stloc.s 31
+06D9: ldloc.s 42
+06DB: ldc.i4.1 
+06DC: add 
+06DD: stloc.s 42
+06DF: ldloc.s 42
+06E1: ldloc.2 
+06E2: blt -998
+06E7: ldc.i4.0 
+06E8: conv.u 
+06E9: stloc.s 41
+06EB: ldloc.s 31
+06ED: ldloc.s 32
+06EF: ldloc.s 33
+06F1: ldloc.s 34
+06F3: newobj Void .ctor(Vector3, Vector3)
+06F8: newobj Void .ctor(Int32, Int32, BBox)
+06FD: ret 
+Sandbox.Texture::UpdateSheetInfo
+0000: ldarg.0 
+0001: ldc.i4.0 
+0002: call Void set_HasAnimatedSequences(Boolean)
+0007: ldarg.0 
+0008: ldarg.0 
+0009: ldfld NativeEngine.ITexture native
+000E: call Int32 GetSequenceCount(NativeEngine.ITexture)
+0013: call Void set_SequenceCount(Int32)
+0018: ldarg.0 
+0019: call Int32 get_SequenceCount()
+001E: ldc.i4.0 
+001F: bgt.s 1
+0021: ret 
+0022: newobj Void .ctor()
+0027: stloc.0 
+0028: ldc.i4.0 
+0029: stloc.1 
+002A: br.s 98
+002C: newobj Void .ctor()
+0031: stloc.2 
+0032: ldloc.0 
+0033: ldloc.2 
+0034: callvirt Void Add(SequenceInfo)
+0039: ldarg.0 
+003A: ldfld NativeEngine.ITexture native
+003F: ldloc.1 
+0040: call SheetSequence_t GetSequence(NativeEngine.ITexture, Int32)
+0045: stloc.3 
+0046: ldloc.2 
+0047: ldloca.s 3
+0049: call Single get_m_flTotalTime()
+004E: callvirt Void set_Length(Single)
+0053: ldloc.2 
+0054: ldloca.s 3
+0056: call Int32 FrameCount()
+005B: callvirt Void set_FrameCount(Int32)
+0060: ldloc.2 
+0061: ldloca.s 3
+0063: call Boolean get_m_bClamp()
+0068: ldc.i4.0 
+0069: ceq 
+006B: callvirt Void set_Looped(Boolean)
+0070: ldarg.0 
+0071: ldarg.0 
+0072: call Boolean get_HasAnimatedSequences()
+0077: brtrue.s 11
+0079: ldloc.2 
+007A: callvirt Int32 get_FrameCount()
+007F: ldc.i4.1 
+0080: cgt 
+0082: br.s 1
+0084: ldc.i4.1 
+0085: call Void set_HasAnimatedSequences(Boolean)
+008A: ldloc.1 
+008B: ldc.i4.1 
+008C: add 
+008D: stloc.1 
+008E: ldloc.1 
+008F: ldarg.0 
+0090: call Int32 get_SequenceCount()
+0095: blt.s 149
+0097: ldarg.0 
+0098: ldloc.0 
+0099: callvirt SequenceInfo[] ToArray()
+009E: stfld SequenceInfo[] sequences
+00A3: ret 

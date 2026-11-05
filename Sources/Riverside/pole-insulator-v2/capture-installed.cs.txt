@@ -1,0 +1,93 @@
+var project = Sandbox.Project.Current.GetRootPath();
+var output = System.IO.Path.Combine(project,"output/asset-improvement-20261030/riverside-pole-insulator/installed");
+var plan = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(output,"plan.json")));
+var root = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(project,"Assets/scenes/maps/Riverside/riverside.scene"))).AsObject();
+var roots = new System.Text.Json.Nodes.JsonArray();
+foreach (var item in root["GameObjects"].AsArray())
+{
+    var name=item["Name"]?.GetValue<string>() ?? "";
+    if (!new[] {"Moon","Sky","Fog","Look","Riverside","Lights","Pole Insulators","Streetlight Heads","Porch Lights"}.Contains(name)) continue;
+    var clone=item.DeepClone();
+    if (name=="Riverside")
+    {
+        var children=new System.Text.Json.Nodes.JsonArray();
+        foreach(var child in clone["Children"].AsArray())
+        {
+            if (!new[] {"Ground","Pad","Lucky Stop","Dressing"}.Contains(child["Name"]?.GetValue<string>())) continue;
+            var piece=child.DeepClone();
+            var comps=new System.Text.Json.Nodes.JsonArray();
+            foreach(var c in piece["Components"].AsArray()) if(c["__type"]?.GetValue<string>()=="Sandbox.ModelRenderer") comps.Add(c.DeepClone());
+            piece["Components"]=comps;children.Add(piece);
+        }
+        clone["Children"]=children;
+    }
+    roots.Add(clone);
+}
+root["GameObjects"]=roots;
+root["SceneProperties"]["NavMesh"]["Enabled"]=false;
+root["SceneProperties"]["WantsSystemScene"]=false;
+var scene=Scene.CreateEditorScene();
+var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic;
+var preRender=typeof(Scene).GetMethod("PreRender",flags,null,Type.EmptyTypes,null);
+var preCamera=typeof(Scene).GetMethod("PreCameraRender",flags,null,Type.EmptyTypes,null);
+try
+{
+    CameraComponent camera; GameObject lightHolder;
+    Vector3 Origin(int index)
+    {
+        var b=plan["placements"][index]["base"];
+        return new Vector3((float)b[0].GetValue<double>(),(float)b[1].GetValue<double>(),(float)b[2].GetValue<double>());
+    }
+    using(scene.Push())
+    {
+        scene.Deserialize(root);
+        var insulators=scene.GetAllComponents<ModelRenderer>().Where(r=>r.Model?.ResourcePath.Contains("/pole_insulator_v2/")==true).ToArray();
+        if(insulators.Length!=48 || insulators.Any(r=>r.Model.IsError)) throw new Exception("Saved installed model failure");
+        foreach(var t in scene.GetAllComponents<Tonemapping>())
+        {
+            var exposure=(t.MinimumExposure+t.MaximumExposure)/2f;
+            t.AutoExposureEnabled=true;t.MinimumExposure=t.MaximumExposure=exposure;t.Rate=10;
+        }
+        camera=new GameObject(true,"Installed verification camera").Components.Create<CameraComponent>();
+        camera.ZNear=.3f;camera.ZFar=30000;camera.FieldOfView=50;
+        lightHolder=new GameObject(true,"Temporary inspection light");
+        var light=lightHolder.Components.Create<PointLight>();
+        light.Radius=200;light.LightColor=new Color(1.3f,1.4f,1.5f);light.Shadows=true;
+    }
+    var textures=scene.GetAllComponents<ModelRenderer>().Where(r=>r.Model is not null).SelectMany(r=>r.Model.Materials).Distinct()
+        .SelectMany(m=>new[]{"g_tColor","g_tNormal","g_tRoughness","SkyTexture"}.Select(m.GetTexture)).Where(t=>t is not null).Distinct().ToArray();
+    foreach(var t in textures)t.MarkUsed(2048);
+    for(var f=0;f<80;f++)
+    {
+        using(scene.Push()){scene.EditorTick(.016f,.016f);preRender.Invoke(scene,null);}
+        await Task.Delay(25,cancellationToken);
+    }
+    var shots=new (string name,Vector3 origin,Vector3 eye,Vector3 target)[]{
+        ("wired",Origin(12),new Vector3(9,-7,5),new Vector3(0,0,2.5f)),
+        ("spare",Origin(16),new Vector3(9,-7,5),new Vector3(0,0,2.5f)),
+        ("crossarms",new Vector3(1050,340,400),new Vector3(95,-95,60),new Vector3(0,0,10))
+    };
+    var files=new System.Collections.Generic.List<string>();
+    foreach(var shot in shots)
+    {
+        using var bitmap=new Bitmap(1500,1100);
+        for(var f=0;f<24;f++)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            using(scene.Push())
+            {
+                camera.WorldPosition=shot.origin+shot.eye;
+                camera.WorldRotation=Rotation.LookAt(shot.target-shot.eye);
+                lightHolder.WorldPosition=shot.origin+new Vector3(8,-12,12);
+                scene.EditorTick(.016f,.016f);preRender.Invoke(scene,null);preCamera.Invoke(scene,null);
+                ((SceneCamera)typeof(CameraComponent).GetProperty("SceneCamera",flags).GetValue(camera)).AntiAliasing=true;
+                camera.RenderToBitmap(bitmap,false);
+            }
+            await Task.Delay(16,cancellationToken);
+        }
+        var path=System.IO.Path.Combine(output,shot.name+".png");
+        System.IO.File.WriteAllBytes(path,bitmap.ToPng());files.Add(path);
+    }
+    return new {Installed=48,Wired=36,Bare=12,Screenshots=files,InspectionLight=true};
+}
+finally{scene.Destroy();}

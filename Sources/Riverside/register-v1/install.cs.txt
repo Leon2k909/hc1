@@ -1,0 +1,23 @@
+var folder="C:/sbox-projects/hc1/register-review/output/riverside/register-v1";
+var project=Sandbox.Project.Current.GetRootPath();
+var plan=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"install-plan.json")));
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+foreach(var item in plan["before"].AsObject())
+ if(Hash(System.IO.Path.Combine(project,item.Key))!=item.Value.GetValue<string>())throw new Exception("Public model changed since install preparation");
+foreach(var item in plan["files"].AsObject())
+{
+ if(item.Key.Contains("..") || !(item.Key=="Assets/models/maps/riverside/riverside_store.vmdl" || item.Key.StartsWith("Assets/models/maps/riverside/register-v1/")))throw new Exception("Unexpected install target");
+ if(Hash(System.IO.Path.Combine(folder,"install-stage",item.Key))!=item.Value.GetValue<string>())throw new Exception("Staged file changed");
+}
+var session=Editor.SceneEditorSession.Active;
+var before=new{Scene=session.Scene.Id,Runtime=Game.ActiveScene?.Id,Playing=Game.IsPlaying,Dirty=session.HasUnsavedChanges};
+foreach(var item in plan["files"].AsObject().OrderBy(p=>p.Key.EndsWith(".vmdl")?1:0))
+{
+ var target=System.IO.Path.Combine(project,item.Key);
+ System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target));
+ System.IO.File.Copy(System.IO.Path.Combine(folder,"install-stage",item.Key),target,true);
+ Editor.AssetSystem.RegisterFile(target);
+}
+var result=new{Installed=true,Registers=1,Files=plan["files"].AsObject().Count,UserStatePreserved=session.Scene.Id==before.Scene && Game.ActiveScene?.Id==before.Runtime && Game.IsPlaying==before.Playing && session.HasUnsavedChanges==before.Dirty};
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"installed-source.json"),Json.Serialize(result));
+return result;

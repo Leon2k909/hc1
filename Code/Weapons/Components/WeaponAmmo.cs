@@ -59,7 +59,9 @@ public partial class WeaponAmmo : Component, IDroppedWeaponState<WeaponAmmo>
 	/// </summary>
 	public void RefillAll()
 	{
-		Ammo = GetEffectiveMaxAmmo();
+		var capacity = GetEffectiveMaxAmmo();
+		// Preserve an already loaded chambered round without granting one to an empty or partial gun.
+		Ammo = Math.Clamp( Ammo, capacity, capacity + (HasChamber ? 1 : 0) );
 		ReserveAmmo = GetMaxReserve();
 	}
 

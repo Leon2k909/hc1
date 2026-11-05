@@ -127,25 +127,6 @@ public partial class Shootable : WeaponInputAction,
 	public IReadOnlyList<FireMode> FireModes =>
 		Equipment.IsValid() && Equipment.TriggerFireModes is { Count: > 0 } modes ? modes : SupportedFireModes;
 
-	/// <summary>
-	/// After the fire control group changes: a fire mode the new selector lacks becomes its counterpart (burst for
-	/// automatic and back, as the M4's group and the M4A1's differ), else the selector's first.
-	/// </summary>
-	internal void KeepFireModeFitted()
-	{
-		var modes = FireModes;
-		if ( modes.Count == 0 || modes.Contains( CurrentFireMode ) ) return;
-		var counterpart = CurrentFireMode switch
-		{
-			FireMode.Automatic => FireMode.Burst,
-			FireMode.Burst => FireMode.Automatic,
-			_ => FireMode.Semi
-		};
-		CurrentFireMode = modes.Contains( counterpart ) ? counterpart : modes[0];
-		ClearBurst();
-		Equipment.ViewModel?.OnFireMode( CurrentFireMode );
-	}
-
 	[Sync] public TimeSince TimeSinceFireModeSwitch { get; set; }
 	[Sync] public TimeSince TimeSinceBurstFinished { get; set; }
 	[Sync] public bool IsBurstFiring { get; set; }
@@ -180,6 +161,7 @@ public partial class Shootable : WeaponInputAction,
 	/// number of ticks (on the 50 Hz tick, 680 and 740 rpm both used to fire at 600).
 	/// </summary>
 	private float _nextShotTime;
+	private bool _dryFirePullPending;
 
 	/// <summary>
 	/// Fetches the desired model renderer that we'll focus effects on like trail effects, muzzle flashes, etc.
@@ -273,7 +255,7 @@ public partial class Shootable : WeaponInputAction,
 			CreateDischargeParticle( MuzzleSmokePrefab, effector.DischargeMuzzle, smokeScale, "Muzzle smoke" );
 
 		// One spent case per discharge, independent of flash/smoke chance and pellet count.
-		effector.EjectCasing( EjectionPrefab, Equipment.Owner );
+		effector.EjectCasing( EjectionPrefab, Equipment.Owner, Equipment.Resource );
 
 		// Falls off with distance as a real blast does, muffled through walls (GunshotAudio).
 		var shootSound = GetShootSound( suppressed );
@@ -326,6 +308,7 @@ public partial class Shootable : WeaponInputAction,
 	/// </summary>
 	public void Shoot()
 	{
+		_dryFirePullPending = false;
 		// Held fire goes off on the first tick after the shot is due, so carry that lateness into the next shot and the
 		// average rate is exact. A later shot (trigger released, or semi-auto) starts a fresh schedule, so clicking can
 		// never beat the cyclic rate.
@@ -362,6 +345,7 @@ public partial class Shootable : WeaponInputAction,
 		for ( int i = 0; i < BulletCount; i++ )
 		{
 			int count = 0;
+			_penetrationDamageScale = 1f;
 			var struck = new HashSet<GameObject>();
 
 			foreach ( var trace in GetShootTrace() )
@@ -397,7 +381,7 @@ public partial class Shootable : WeaponInputAction,
 					continue;
 				}
 
-				var damage = CalculateDamageFalloff( GetEffectiveDamage(), trace.Distance + _pathTravelled );
+				var damage = CalculateDamageFalloff( GetEffectiveDamage(), trace.Distance + _pathTravelled ) * _penetrationDamageScale;
 				damage = damage.CeilToInt();
 
 				// Inflict damage on whatever we find.
@@ -542,13 +526,14 @@ public partial class Shootable : WeaponInputAction,
 	{
 		var start = WeaponRay.Position;
 		var rot = Rotation.LookAt( WeaponRay.Forward );
-		_flybyOrigin = start;
 
 		var forward = rot.Forward;
 		forward += (Vector3.Random + Vector3.Random + Vector3.Random + Vector3.Random) * (BulletSpread + Equipment.Owner.Spread) * 0.25f;
 		if ( Equipment.GetComponentInChildren<BarrelHeat>() is { } heat )
 			forward += heat.Deviation( rot );
 		forward = forward.Normal;
+		ApplyCloseCoverClearance( ref start, forward, rot );
+		_flybyOrigin = start;
 		ApplyBallistics( ref start, ref forward, rot );
 
 		var end = start + forward * (MaxRange - _pathTravelled);
@@ -558,7 +543,7 @@ public partial class Shootable : WeaponInputAction,
 		var firstHit = original.FirstOrDefault( trace => trace.Hit );
 		PlayTracer( firstHit.Hit ? firstHit.EndPosition : end, start );
 
-		return ResolvePenetration( Scene, original, PenetrationThickness );
+		return ResolvePenetrationWithDamage( Scene, original, PenetrationThickness, SetPenetrationDamageScale );
 	}
 
 	/// <summary>
@@ -668,12 +653,20 @@ public partial class Shootable : WeaponInputAction,
 
 	protected override void OnInputSuppressed()
 	{
+		_dryFirePullPending = false;
 		if ( IsBurstFiring )
 			ClearBurst();
 	}
 
 	protected override void OnInputUpdate()
 	{
+		// Automatic fire reads held input from the previous dispatcher tick. Remember an empty
+		// trigger press until that tick arrives, but never manufacture a new pull while held down.
+		if ( !Input.Down( "attack1" ) )
+			_dryFirePullPending = false;
+		else if ( Input.Pressed( "attack1" ) )
+			_dryFirePullPending = AmmoComponent.IsValid() && !AmmoComponent.HasAmmo;
+
 		if ( Input.Pressed( "FireMode" ) )
 		{
 			CycleFireMode();
@@ -724,9 +717,16 @@ public partial class Shootable : WeaponInputAction,
 
 					if ( Time.Now >= _nextShotTime && Equipment.GetComponentInChildren<Reloadable>() is { } reloadable
 						&& reloadable.AmmoComponent == AmmoComponent && reloadable.TryReloadEmpty() )
+					{
+						_dryFirePullPending = false;
 						return;
+					}
 
-					DryShoot();
+					if ( _dryFirePullPending )
+					{
+						_dryFirePullPending = false;
+						DryShoot();
+					}
 				}
 			}
 			else
@@ -776,6 +776,7 @@ public partial class Shootable : WeaponInputAction,
 
 	void IGameEventHandler<EquipmentHolsteredEvent>.OnGameEvent( EquipmentHolsteredEvent eventArgs )
 	{
+		_dryFirePullPending = false;
 		ClearBurst();
 	}
 }

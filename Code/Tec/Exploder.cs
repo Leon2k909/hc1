@@ -17,11 +17,10 @@ public class Exploder : Component
 		// Log.Info("EXPLODEEEEEEEEEEEEEEEEEEEEEE");
 
 		var screenShaker = ScreenShaker.Main;
-		var viewer = Client.Viewer;
 		
-		if ( screenShaker.IsValid() && viewer.IsValid() )
+		if ( screenShaker.IsValid() )
 		{
-			var distance = viewer.GameObject.WorldPosition.Distance( WorldPosition );
+			var distance = screenShaker.WorldPosition.Distance( point );
 			var falloff = damageFalloff;
 			
 			if ( falloff.Frames.IsEmpty )
@@ -31,7 +30,7 @@ public class Exploder : Component
 
 			var radiusWithPadding = damageRadius * 1.2f;
 			
-			if ( distance <= radiusWithPadding )
+			if ( radiusWithPadding > 0f && distance <= radiusWithPadding )
 			{
 				var scalar = falloff.Evaluate( distance / radiusWithPadding );
 				var shake = new ScreenShake.Random( ScreenShakeIntensity * scalar, ScreenShakeLifeTime );

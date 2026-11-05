@@ -1,4 +1,43 @@
 ## Aiming lasers and reflex sight glass (`GunsmithLaserBeam`, `LaserOptics`, `m4_optic_lens.shader`)
+- Strict visibility pass (2026-11-04, user requested ultra realism):
+  - Clear air no longer draws an airborne strand. A per-sample visibility floor suppresses ordinary environmental
+    haze when viewed from behind the emitter; denser particles progressively reveal the strand. Side views retain
+    haze scattering. The existing wavelength/phase/attenuation model still controls the resulting light.
+  - `ScatteringVisibility` smoothly changes its display thresholds with scattering angle. These thresholds compensate
+    for approximate map fog/exposure; they are appearance tuning, not calibrated measurements of real aerosol density.
+    The basic scattered-light visibility principle is described by the University of Illinois Physics Van:
+    https://van.physics.illinois.edu/ask/listing/21586 .
+  - Increased beam sampling from 16 to 48 and resize the arrays safely on hotload. Localized dense particles now
+    reveal local sections instead of lighting the whole clear-air ray. Surface footprint, emitter tracing and the
+    learned 25 m zero are untouched.
+  - `output/laser-strict-realism-20261104/` contains native before/after PNGs, the review script and JSON checks.
+    All six after cases pass: clear night/shooter hidden, ordinary haze/shooter hidden, dense mist/shooter visible,
+    haze/side visible, clear day/shooter hidden, localized dense mist visible only locally (9/48 nonzero samples).
+    Hit dots remain present. Production game/editor compiles and all three attachment/direction/hide/disable checks pass.
+- Endpoint revision (2026-11-04, user highlighted the hard green ring):
+  - Supersedes the layered spot/halo below. The hit now uses one 64×64 radial Gaussian alpha texture on an uncapped
+    quad aligned to the hit surface, instead of three additive solid discs. Its footprint follows incidence and
+    divergence, with pixel-area compensation for a small antialiased core at distance.
+  - Removed the camera-facing glare discs entirely; camera bloom supplies optical glow. Old live spot/glare objects
+    are deleted during hotload so an earlier hard ring cannot remain behind. The spot's depth offset is bounded to
+    0.15 units, rather than increasing indefinitely with distance.
+  - Native 1920×1080 before/after captures and a 6× nearest-neighbour detail comparison are in
+    `output/laser-endpoint-20261104/`. A separate shallow floor hit lands at z=0 and renders as a small surface spot.
+    Compilation and `Hc1Mw22EffectsQa.LaserCheck()` pass (three attachment variants, directions, hit/no-hit and cleanup).
+- Display revision (2026-11-04, user reported the laser looked unrealistic on Riverside):
+  - The old flat white line profile and night/fog estimates could drive the beam far above white, creating a solid
+    luminous cord. The beam now uses a small runtime Gaussian alpha texture, a one-pixel minimum width and logarithmic
+    contrast compression (`BeamContrastScale = 0.04`). Scattering, extinction, colour, direction and distance still
+    drive its response; the airborne strand no longer shares the surface dot's intense core.
+  - The dot's additional halo is limited to 0.05 and 0.12 degrees. The old 0.5/1.2/3-degree discs produced a large
+    green patch and compounded camera bloom. Old glare objects are deleted when hotload changes the array size, and
+    the beam texture is released on disable/destroy.
+  - Native before/after renders under identical night/haze conditions are in `output/laser-realism-20261104/`.
+    The beam remains faintly green and the hit stays a compact bright dot. This is a display tuning pass, not a claim
+    that the game's exposure/fog estimates provide calibrated real-world photometry.
+  - `Hc1Mw22EffectsQa.LaserCheck()` passed for all three attachment variants, hit dots, pitched directions, no-hit
+    range, hiding and disable cleanup. No map or play-state changes were needed. Live-match appearance remains to be
+    judged in the user's lighting and exposure.
 - The user aimed a Kastov-74u with the Box Collimator and a green laser (2026-10-18). The beam was drawn as a bright line
   across the view, and the glass looked strongly blue. They asked whether you'd see the beam at all when aiming, and for
   1:1 realism.

@@ -1,0 +1,5 @@
+var model=Model.Load("models/maps/reefhall/reefhall_control.vmdl");
+var old=Model.Load("models/maps/reefhall/office-desk-v1/legacy_workstation.vmdl");
+if(model.IsError||old.IsError)throw new InvalidOperationException("Workstation resource failed to load");
+var report=new{PublicModel=model.ResourcePath,PublicError=model.IsError,OldModel=old.ResourcePath,OldError=old.IsError};
+System.IO.File.WriteAllText(System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(),"Sources/ReefHall/office-desk-v1/review/public-resource.json"),System.Text.Json.JsonSerializer.Serialize(report));return report;

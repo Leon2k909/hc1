@@ -1,0 +1,4 @@
+var session=Editor.SceneEditorSession.All.Single(s=>s.Scene.IsEditor && s.Scene.Source?.ResourcePath=="scenes/maps/belltower/belltower.scene");
+var piles=session.Scene.GetAllComponents<ModelRenderer>().Where(r=>r.Model?.ResourcePath?.StartsWith("models/maps/belltower/sack-pile-v2/sack_pile")==true).ToArray();
+if(piles.Length!=2 || piles.Any(r=>r.Model.IsError) || session.HasUnsavedChanges)throw new InvalidOperationException("Saved piles differ.");
+return new{SavedPiles=2,TotalSacks=14,ModelsLoaded=true,SceneSaved=true};

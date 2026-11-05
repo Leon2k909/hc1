@@ -1,0 +1,36 @@
+var session=Editor.SceneEditorSession.Active;
+var scene=session.Scene;
+var before=new {Scene=scene.Id,Dirty=session.HasUnsavedChanges,Playing=Game.IsPlaying,Runtime=Game.ActiveScene,Objects=scene.GetAllObjects(true).Count()};
+var output="C:/sbox-projects/hc1/shelving-review/output/riverside/shelving-v1";
+var images=new System.Collections.Generic.List<string>();
+var checks=new System.Collections.Generic.List<object>();
+foreach(var variant in new[]{"before","after"})
+{
+    var resource="models/maps/riverside/shelving-v1/"+(variant=="before"?"legacy_shelving.vmdl":"gondola.vmdl");
+    var model=Model.Load(resource);
+    if(model.IsError)throw new Exception("Could not load "+resource);
+    var world=new SceneWorld();
+    try
+    {
+        var item=new SceneObject(world,model,Transform.Zero);
+        var key=new SceneLight(world,new Vector3(-90,-90,110),330,Color.White*1.25f);
+        var fill=new SceneLight(world,new Vector3(90,85,90),300,new Color(.70f,.79f,1f)*.4f);
+        var camera=new SceneCamera("Isolated cabinet review") {
+            World=world,Position=new Vector3(-90,-105,78),
+            Rotation=Rotation.LookAt(new Vector3(0,0,27)-new Vector3(-90,-105,78)),
+            FieldOfView=47,ZNear=.1f,ZFar=500,Size=new Vector2(1000,1000),
+            AmbientLightColor=Color.White*.08f,BackgroundColor=new Color(.07f,.08f,.09f),
+            AntiAliasing=true,EnablePostProcessing=true
+        };
+        var pixmap=new Editor.Pixmap(1000,1000);
+        Sandbox.SandboxToolExtensions.RenderToPixmap(camera,pixmap,false);
+        var path=System.IO.Path.Combine(output,"isolated-"+variant+".png");
+        pixmap.SavePng(path);images.Add(path);
+        checks.Add(new {Variant=variant,Resource=resource,model.IsError,Mesh=model.MeshInfo});
+    }
+    finally{world.Delete();}
+}
+var preserved=scene.Id==before.Scene && session.HasUnsavedChanges==before.Dirty && Game.IsPlaying==before.Playing && Game.ActiveScene==before.Runtime && scene.GetAllObjects(true).Count()==before.Objects;
+if(!preserved)throw new Exception("Editor state changed during isolated capture");
+System.IO.File.WriteAllText(System.IO.Path.Combine(output,"isolated-native-review.json"),Json.Serialize(new{PreviewOnly=true,UserStatePreserved=preserved,Images=images,Models=checks}));
+return new {PreviewOnly=true,UserStatePreserved=preserved,Images=images};

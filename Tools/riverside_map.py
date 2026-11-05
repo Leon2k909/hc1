@@ -319,7 +319,7 @@ RAISED = 96.0           # the raised trailer's stilts
 
 
 def build_trailer( name, L, W, tint, side, seed, extra ):
-    part, info = P.trailer( L, W, tint, seed=seed, door_side=side, lit_share=0.6, boarded_share=0.15 )
+    part, info = P.trailer( L, W, tint, seed=seed, door_side=side, lit_share=0.6, boarded_share=0.15, aerial_model=( name == "T2" ), entry_door_model=( name == "T2" ), hitch_model=( name == "T2" ), roof_vent_model=( name == "T2" ), entry_steps_model=( name == "T2" ) )
     if extra in ( "porch", "porch_small" ):
         y0 = side * W / 2
         depth = 100 if extra == "porch" else 70
@@ -335,7 +335,9 @@ def build_trailer( name, L, W, tint, side, seed, extra ):
         # Raised on timber stilts against floods: 6x6 posts X-braced along each side, a landing on posts and a stair up to
         # its door. SAFE / HIGHER / STRONGER and an arrow sprayed on its hitch end, a ladder from the ground to its roof.
         lift = RAISED
+        before_lift = part
         part = P.place( part, ( 0, 0, lift ), 0.0 )
+        P.carry( part, before_lift, ( 0, 0, lift ), 0.0 )
         for key in ( "porch_light", "door" ):
             if key in info:
                 info[key] = info[key] + UP * lift
@@ -364,16 +366,13 @@ def build_trailer( name, L, W, tint, side, seed, extra ):
         P.paint( part, "safe_higher", v( -hx, -12, lift + P.FLOOR + 50 ), v( 0, -1, 0 ), 76, tone="white", off=0.6 )
         foot = v( -hx - 40, 40, 0 )
         topp = v( -hx - 2, 40, lift + P.FLOOR + P.WALL + 6 )
-        for dy in ( -9, 9 ):
-            rod( part, foot + v( 0, dy, 0 ), topp + v( 0, dy, 0 ), 0.8, "rs_alu", 6 )
-        rungs = int( ( topp[2] - foot[2] ) / 12 )
-        for k in range( 1, rungs + 1 ):
-            p = foot + ( topp - foot ) * ( k / ( rungs + 1 ) )
-            rod( part, p + v( 0, -9, 0 ), p + v( 0, 9, 0 ), 0.55, "rs_alu", 5 )
+        from riverside_roof_ladder import append_to as append_approved_roof_ladder
+        append_approved_roof_ladder( part, foot )
         # Junk up on its roof: a tarp and a lawn chair, someone's lookout.
         roof = lift + P.FLOOR + P.WALL
         P.lawn_chair( part, ( -hx + 80, 0 ), ( -1, 0 ), roof + 5 )
-        box( part, -hx + 120, -hx + 200, -40, 40, roof + 4, roof + 7, "rs_tarp_blue" )
+        from riverside_folded_tarp import append_to as append_approved_folded_tarp
+        append_approved_folded_tarp( part, v( -hx + 160, 0, roof + 4 ) )
     return part, info
 
 
@@ -449,26 +448,15 @@ def store( m ):
     card( m, "rs_roof", pr, v( 0, -0.15, 1 ) )
     card( m, "rs_roof", pr, -UP )
     box( m, e0 - 14, e1 + 14, PORCH_N0 - 10, PORCH_N0 - 4, eave - 6, eave + 1, "rs_wood" )
-    P.steps( m, ( ( d0 + d1 ) / 2, PORCH_N0 - 30 ), ( 0, 1 ), 90, F - 0.5, "rs_wood", "wood", rise=7 )
-    # The LUCKY STOP sign standing on the porch roof's front edge, backlit, with gooseneck lamps over it.
+    P.steps( m, ( ( d0 + d1 ) / 2, PORCH_N0 - 30 ), ( 0, 1 ), 90, F - 0.5, "rs_wood", "wood", rise=7, model=True )
+    # Approved formed lightbox with open gooseneck reflectors; keep the existing sign floodlight subdued.
     r = P.right_for( ( 0, -1 ) )
     sw = 160.0
     sh = sw / RM.aspect( RM.LIT, "lucky_stop" )
     sc = v( ( e0 + e1 ) / 2, PORCH_N0 - 6, eave + 30 + sh / 2 )
-    obox( m, sc, ( 1, 0, 0 ), ( sw + 8, 8, sh + 8 ), "rs_dark", "metal" )
-    P.lit( m, "lucky_stop", sc + v( 0, -4, 0 ), r, sh, off=0.4, w=sw )
-    P.sign( m, "sign_back", sc + v( 0, 4, 0 ), -r, sh, off=0.4, w=sw )
-    for k in range( 3 ):
-        lp = sc + v( -sw * 0.35 + k * sw * 0.35, -14, sh / 2 + 6 )
-        obox( m, lp, ( 1, 0, 0 ), ( 8, 6, 3 ), "rs_dark" )
-        card( m, "rs_lamp_warm", [ lp + v( -3.5, -2.5, -1.6 ), lp + v( 3.5, -2.5, -1.6 ), lp + v( 3.5, 2.5, -1.6 ), lp + v( -3.5, 2.5, -1.6 ) ], -UP )
-        rod( m, lp + v( 0, 3, 0 ), lp + v( 0, 12, -2 ), 0.6, "rs_steel", 5 )
-    for sx in ( -1, 1 ):
-        # Steel legs from the porch roof up to the sign, braced back.
-        foot = v( sc[0] + sx * sw * 0.4, PORCH_N0 - 6, eave )
-        m.beam( foot, foot + UP * ( sc[2] - sh / 2 - eave ), ( 2.0, 2.0 ), "rs_steel" )
-        m.beam( foot + UP * ( sc[2] - sh / 2 - eave - 4 ), v( foot[0], PORCH_N0 + 30, eave + 4 ), ( 1.5, 1.5 ), "rs_steel" )
-    P.light( "store sign", sc + v( 0, -60, 10 ), P.WARM, 420, shadows=True, scale=2.2 )
+    from riverside_shop_sign import append_to as append_approved_shop_sign
+    append_approved_shop_sign( m, v( ( e0 + e1 ) / 2, PORCH_N0 - 6, eave ) )
+    P.light( "store sign", sc + v( 0, -60, 10 ), P.WARM, 420, shadows=True, scale=0.44 )
     # The front: windows lit from inside, the OPEN and COLD BEER neon, posters, the door's frame.
     front = n0 - 0.2
     for cx, ww in ( ( ( d1 + e1 ) / 2, min( 70.0, e1 - d1 - 24 ) ), ( ( e0 + d0 ) / 2, min( 90.0, d0 - e0 - 30 ) ) ):
@@ -487,24 +475,24 @@ def store( m ):
     for row_e in ( 140, 270 ):
         for k in range( 2 ):
             sn = n0 + 90 + k * 110
-            box( m, row_e - 18, row_e + 18, sn, sn + 70, F, F + 56, { "default": "rs_wood" }, "wood" )
-            for zz in ( F + 18, F + 38, F + 56 ):
-                P.lit( m, "window", v( row_e - 18.3, sn + 35, zz - 7 ), P.right_for( ( -1, 0 ) ), 12, off=0.0, w=68 )
-                P.lit( m, "window", v( row_e + 18.3, sn + 35, zz - 7 ), P.right_for( ( 1, 0 ) ), 12, off=0.0, w=68 )
-    box( m, e0 + 10, e0 + 120, n1 - 80, n1 - 50, F, F + 40, { "default": "rs_wood", "+z": "rs_concrete" }, "wood" )
-    obox( m, v( e0 + 50, n1 - 65, F + 46 ), ( 1, 0, 0 ), ( 16, 12, 12 ), "rs_dark" )
+            from riverside_shelving import append_to as append_approved_shelving
+            append_approved_shelving( m, v( row_e, sn + 35, F ) )
+    from riverside_counter import append_to as append_approved_counter
+    append_approved_counter( m, v( e0 + 65, n1 - 65, F ) )
+    from riverside_register import append_to as append_approved_register
+    append_approved_register( m, v( e0 + 50, n1 - 65, F + 40 ) )
     for k in range( 3 ):
-        P.fridge( m, ( e1 - wt - 16, n0 + 120 + k * 34 ), ( -1, 0 ), F )
+        P.fridge( m, ( e1 - wt - 16, n0 + 120 + k * 34 ), ( -1, 0 ), F, model=True )
     for k, ( fx, fn ) in enumerate( ( ( 150, n0 + 120 ), ( 280, n0 + 250 ) ) ):
-        obox( m, v( fx, fn, T - 3 ), ( 0, 1, 0 ), ( 48, 8, 3 ), "rs_dark" )
-        card( m, "rs_lamp_cool", [ v( fx - 3, fn - 23, T - 4.6 ), v( fx + 3, fn - 23, T - 4.6 ), v( fx + 3, fn + 23, T - 4.6 ), v( fx - 3, fn + 23, T - 4.6 ) ], -UP )
+        P.FLUORESCENTS.append( [ m, ( float( fx ), float( fn ), T - 4.6 ), 0.0 ] )
         P.light( f"store inside {k}", ( fx, fn, T - 30 ), P.COOL, 300, shadows=k == 0, scale=1.4 )
     # On the porch: the ice machine, a drinks fridge, sandbags at the east end, crates, a burning drum by the steps.
     ice_c = v( d0 - 40, n0 - 18, F )
-    obox( m, ice_c + UP * 30, ( 1, 0, 0 ), ( 38, 30, 60 ), "rs_fridge", "metal" )
-    P.lit( m, "vending", ice_c + v( 0, -15.2, 30 ), r, 52, off=0.0, w=36 )
+    from riverside_ice_cabinet import append_to as append_approved_ice_cabinet
+    append_approved_ice_cabinet( m, ice_c )
     P.light( "ice machine", ice_c + v( 0, -40, 40 ), P.COOL, 140, scale=0.9 )
-    P.fridge( m, ( e0 + 26, PORCH_N0 + 40 ), ( 0, -1 ), F )
+    from riverside_drinks_fridge import append_to as append_approved_porch_fridge
+    append_approved_porch_fridge( m )
     P.sandbag_wall( m, ( e1 - 70, PORCH_N0 + 10 ), ( e1 + 8, PORCH_N0 + 10 ), rows=5, z0=F, seed=3 )
     P.sandbag_wall( m, ( e1 + 30, PORCH_N0 - 30 ), ( e1 + 30, PORCH_N0 + 70 ), rows=4, z0=0, seed=4 )
     P.crate( m, ( e0 - 40, PORCH_N0 - 30 ), ( 30, 22, 20 ), ( 1, 0.2 ), 0 )
@@ -512,7 +500,7 @@ def store( m ):
     P.crate( m, ( d1 + 40, PORCH_N0 + 30 ), ( 30, 22, 20 ), ( 1, 0 ), F )
     P.drum( m, ( d0 - 30, PORCH_N0 - 60 ), "rs_rust", name="store drum" )
     P.light( "store porch", ( ( e0 + e1 ) / 2, PORCH_N0 + 40, F + 96 ), P.PORCH, 340, shadows=True, scale=1.8 )
-    obox( m, v( d1 + 20, n0 - 3, F + 96 ), ( 1, 0, 0 ), ( 8, 6, 5 ), "rs_porch_light" )
+    P.porch_light_fixture( m, v( d1 + 20, n0 - 3, F + 96 ), ( 0, -1 ), ( 8, 6, 5 ) )
     # The shed: plywood walls, a lean-to roof, its front sprayed FUEL FOOD GUNS A BETTER TOMORROW?
     se0, se1, sn0, sn1 = SHED
     box( m, se0, se1, sn0, sn1, 0, SHED_TOP, { "default": "rs_plywood", "+z": None }, "wood" )
@@ -521,8 +509,7 @@ def store( m ):
     P.paint( m, "fuel_food", v( ( se0 + se1 ) / 2 + 6, sn0 - 0.2, 70 ), P.right_for( ( 0, -1 ) ), 124, tone="white", off=0.4 )
     P.paint( m, "x_mark", v( se1 - 30, sn0 - 0.2, 100 ), P.right_for( ( 0, -1 ) ), 26, tone="red", off=0.5 )
     P.light( "shed lamp", ( se0 + 40, sn0 - 40, 120 ), P.SODIUM, 300, scale=1.6 )
-    obox( m, v( se0 + 40, sn0 - 3, 124 ), ( 1, 0, 0 ), ( 12, 6, 5 ), "rs_dark" )
-    card( m, "rs_lamp_sodium", [ v( se0 + 34, sn0 - 6, 121.4 ), v( se0 + 46, sn0 - 6, 121.4 ), v( se0 + 46, sn0, 121.4 ), v( se0 + 34, sn0, 121.4 ) ], -UP )
+    # Approved downward bulkhead is emitted by shed_light_objects(); sodium point light above is retained.
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -576,7 +563,7 @@ DOG_GATE = ( 1, 5, 50 )
 def pad( m ):
     gz = HIGH
     name, c, yaw, L, W = OFFICE
-    part, info = P.trailer( L, W, "rs_siding_white", seed=51, door_side=1, lit_share=0.8, boarded_share=0.0, door_lit=True )
+    part, info = P.trailer( L, W, "rs_siding_white", seed=51, door_side=1, lit_share=0.8, boarded_share=0.0, door_lit=True, roof_ac_model=True )
     door_x = info["door"][0]
     P.lit( part, "office", v( door_x, W / 2 + 0.5, P.FLOOR + 92 ), P.right_for( ( 0, 1 ) ), 14, off=0.5 )
     P.sign( part, "office_rules", v( door_x + 70, W / 2, P.FLOOR + 50 ), P.right_for( ( 0, 1 ) ), 30, off=0.6 )
@@ -656,7 +643,7 @@ def write_beam_material():
 
 def dressing( m ):
     # The park's sign on the terrace behind the porch trailer, facing the entrance; the neon on its pole down the lane.
-    P.park_sign( m, SIGN[0], SIGN[1], scale=0.7, height=370 )
+    P.park_sign( m, SIGN[0], SIGN[1], scale=0.7, height=370, board_model=True )
     P.neon_sign( m, NO_PLACE[0], NO_PLACE[1] )
     for k, ( c, paint_name ) in enumerate( DRUMS ):
         P.drum( m, c[:2], paint_name, z0=c[2], name=f"drum {k}" )
@@ -689,7 +676,7 @@ def dressing( m ):
     P.wire( m, taps_w[3][1], ( -620, 1480, 115 ) )
     P.wire( m, taps_e[1][1], ( 60, 1320, 115 ) )
     # The guard tower's searchlight, aimed down the lane towards the entrance.
-    head = P.guard_tower( m, TOWER[0], TOWER[1], aim=SEARCH_TARGET )
+    head = P.guard_tower( m, TOWER[0], TOWER[1], aim=SEARCH_TARGET, ladder_model=True, roof_model=True )
     P.light( "guard tower cab", ( TOWER[0][0], TOWER[0][1], 520 + 70 ), P.WARM, 200, scale=1.4 )
     SEARCH_HEAD[:] = [ float( x ) for x in head ]
     # No SpotLight for it: one as narrow as the beam lights nothing in s&box (a 3.5 degree cone lit nothing even 200
@@ -812,7 +799,7 @@ def trees( near, far ):
 
 
 def backdrop( m ):
-    P.water_tower( m, WATER_TOWER[0], WATER_TOWER[1] )
+    P.water_tower( m, WATER_TOWER[0], WATER_TOWER[1], tank_model=True )
     # A far-off fire across the river: a glow and smoke above the trees.
     P.FIRES.append( ( "far fire", ( LEVEE[1] + 3200, 2600, 80 ), "far" ) )
 
@@ -920,7 +907,7 @@ def model_object( name, key, model_name, collide=True, shadows=True ):
 # MapFire settings per kind: width, flame height, flames a second, smoke a second, smoke size, smoke life, shade, embers,
 # light radius, brightness, shadows.
 FIRE_KINDS = {
-    "drum": ( 18, 44, 22, 1.2, 70, 6, 0.24, 6, 380, 2.8, False ),
+    "drum": ( 12, 30, 24, 2, 48, 4.5, 0.24, 2, 380, 2.2, False ),
     "big": ( 160, 120, 40, 6, 640, 18, 0.34, 14, 1100, 4.0, True ),
     "medium": ( 80, 60, 24, 2.5, 300, 12, 0.3, 8, 520, 2.6, False ),
     "far": ( 600, 260, 20, 3, 1400, 18, 0.12, 0, 2400, 5.0, False ),
@@ -929,10 +916,11 @@ FIRE_KINDS = {
 
 def fire_object( name, key, position, kind ):
     w, h, fps, sps, size, life, shade, eps, radius, bright, shadows = FIRE_KINDS[kind]
+    opening = { "OpeningRadius": 9.5, "OpeningHeight": 7.59 } if kind == "drum" else {}
     return K.game_object( ids, name, key, K.to_world( position ), components=[
         K.component( ids, "Facepunch.MapFire", f"{key}/fire", Width=w, FlameHeight=h, FlamesPerSecond=fps, SmokePerSecond=sps,
                      SmokeSize=size, SmokeLife=life, SmokeShade=shade, EmbersPerSecond=eps, LightRadius=radius, LightBrightness=bright,
-                     LightShadows=shadows, DetailDistance=2500 ) ] )
+                     LightShadows=shadows, DetailDistance=2500, **opening ) ] )
 
 
 def look_object():
@@ -1029,6 +1017,14 @@ def teddy_objects():
     return out
 
 
+def camper_objects():
+    """Approved camper, with collision retained in the original pad model."""
+    return [K.game_object(ids, "Boarded Camper", f"camper/{k}", K.to_world(position), K.yaw_rotation(yaw), components=[
+        K.component(ids, "Sandbox.ModelRenderer", f"camper/{k}/renderer", BodyGroups=18446744073709551615,
+                    Model="models/props/riverside/camper_v2/camper.vmdl", RenderType="On", Tint="1,1,1,1")])
+        for k, (owner, position, yaw) in enumerate(P.CAMPERS)]
+
+
 def propane_objects():
     """ The propane cylinders' models: the pad's row, the camper's pair and the porch's. P.propane keeps the big ones' collision in the zone models. """
     out = []
@@ -1050,6 +1046,219 @@ def lawn_chair_objects():
         out.append( K.game_object( ids, "Lawn Chair", key, K.to_world( position ), K.yaw_rotation( K.plan_yaw( heading ) % 360.0 ), components=[
             K.component( ids, "Sandbox.ModelRenderer", f"{key}/renderer", BodyGroups=18446744073709551615,
                          Model=f"models/props/riverside/lawn_chair_v2/lawn_chair_{colour}.vmdl", RenderType="On", Tint="1,1,1,1" ) ] ) )
+    return out
+
+
+def crate_objects():
+    """ Supply crates at the authored positions, scaled to their original three sizes. """
+    out = []
+    for k, ( owner, position, yaw, size ) in enumerate( P.CRATES ):
+        key = f"supply_crate/{k}"
+        heading = ( math.cos( math.radians( yaw ) ), math.sin( math.radians( yaw ) ) )
+        out.append( K.game_object( ids, "Supply Crate", key, K.to_world( position ), K.yaw_rotation( K.plan_yaw( heading ) % 360.0 ),
+            scale=tuple( s / base for s, base in zip( size, ( 30, 24, 22 ) ) ), components=[
+            K.component( ids, "Sandbox.ModelRenderer", f"{key}/renderer", BodyGroups=18446744073709551615,
+                         Model="models/props/riverside/crate_v2/crate.vmdl", RenderType="On", Tint="1,1,1,1" ) ] ) )
+    return out
+
+
+def sandbag_objects():
+    """ Sewn sandbag variants at the authored bag centres, with damp lower courses. """
+    out = []
+    for k, ( owner, position, yaw, size, variant, tint ) in enumerate( P.SANDBAGS ):
+        key = f"sandbag/{k}"
+        heading = ( math.cos( math.radians( yaw ) ), math.sin( math.radians( yaw ) ) )
+        out.append( K.game_object( ids, "Sandbag", key, K.to_world( position ), K.yaw_rotation( K.plan_yaw( heading ) % 360.0 ),
+            scale=( size[0] / 25, 1, 1 ), components=[
+            K.component( ids, "Sandbox.ModelRenderer", f"{key}/renderer", BodyGroups=18446744073709551615,
+                         Model=f"models/props/riverside/sandbag_v2/sandbag_{variant}.vmdl", RenderType="On",
+                         Tint=",".join( str( c ) for c in ( *tint, 1 ) ) ) ] ) )
+        out[-1]["Position"] = ",".join( f"{v:.5f}" for v in K.to_world( position ) )
+    return out
+
+
+def speed_sign_objects():
+    """ Approved speed-limit signs; their simple metal post collision remains in the zone. """
+    out = []
+    for k, ( owner, position, yaw ) in enumerate( P.SPEED_SIGNS ):
+        key = f"speed_sign/{k}"
+        heading = ( math.cos( math.radians( yaw ) ), math.sin( math.radians( yaw ) ) )
+        out.append( K.game_object( ids, "Speed-Limit Sign", key, K.to_world( position ), K.yaw_rotation( K.plan_yaw( heading ) ), components=[
+            K.component( ids, "Sandbox.ModelRenderer", f"{key}/renderer", BodyGroups=18446744073709551615,
+                         Model="models/props/riverside/speed_sign_v2/speed_sign.vmdl", RenderType="On", Tint="1,1,1,1" ) ] ) )
+        out[-1]["Position"] = ",".join( f"{v:.5f}" for v in K.to_world( position ) )
+    return out
+
+
+def shed_light_objects():
+    se0, se1, sn0, sn1 = SHED
+    return [ K.game_object( ids, "Shed Downlight", "shed_downlight/0", K.to_world(v(se0 + 40, sn0 - 3, 124)), K.angles_rotation(90, 0, 0), scale=(1.3, 2.4, 1.05), components=[
+        K.component(ids, "Sandbox.ModelRenderer", "shed_downlight/0/renderer", Model="models/props/riverside/porch_light_v2/porch_light.vmdl", RenderType="On", Tint="1,1,1,1") ] ) ]
+
+
+def porch_light_objects():
+    """ Caged bulkhead fixtures; preserve the authored point lights and fixture envelopes. """
+    out = []
+    # Keep the larger storefront fixture last, matching the approved saved group.
+    fixtures = sorted( P.PORCH_FIXTURES, key=lambda item: tuple( item[3] ) != ( 5, 4, 6 ) )
+    for k, ( owner, position, yaw, size ) in enumerate( fixtures ):
+        key = f"porch_light/{k}"
+        heading = ( math.cos( math.radians( yaw ) ), math.sin( math.radians( yaw ) ) )
+        width, depth, height = size
+        out.append( K.game_object( ids, "Porch Light", key, K.to_world( position ), K.yaw_rotation( K.plan_yaw( heading ) ),
+            scale=( depth / 4, width / 5, height / 6 ), components=[
+            K.component( ids, "Sandbox.ModelRenderer", f"{key}/renderer", BodyGroups=18446744073709551615,
+                         Model="models/props/riverside/porch_light_v2/porch_light.vmdl", RenderType="On", Tint="1,1,1,1" ) ] ) )
+        out[-1]["Position"] = ",".join( f"{v:.6f}" for v in K.to_world( position ) )
+    return out
+
+
+def roof_ac_objects():
+    """The approved office rooftop AC; the other trailers keep their original dressing."""
+    out = []
+    for k, ( owner, position, yaw ) in enumerate( P.ROOF_ACS ):
+        key = f"roof_ac/{k}"
+        out.append( K.game_object( ids, "Office Rooftop AC", key, K.to_world( position ), K.yaw_rotation( yaw ), components=[
+            K.component( ids, "Sandbox.ModelRenderer", f"{key}/renderer", Model="models/props/riverside/roof_ac_v1/roof_ac.vmdl",
+                         RenderType="On", Tint="1,1,1,1" ) ] ) )
+    return out
+
+
+def street_light_objects():
+    """ Approved cobra-head housings at the original arm anchors; no new lights or collision. """
+    out = []
+    for k, ( owner, position, yaw ) in enumerate( P.STREET_LIGHTS ):
+        key = f"street_light/{k}"
+        heading = ( math.cos( math.radians( yaw ) ), math.sin( math.radians( yaw ) ) )
+        out.append( K.game_object( ids, "Streetlight Head", key, K.to_world( position ), K.yaw_rotation( K.plan_yaw( heading ) ), components=[
+            K.component( ids, "Sandbox.ModelRenderer", f"{key}/renderer", BodyGroups=18446744073709551615,
+                         Model="models/props/riverside/street_lamp_v2/street_lamp.vmdl", RenderType="On", Tint="1,1,1,1" ) ] ) )
+        out[-1]["Position"] = ",".join( f"{v:.6f}" for v in K.to_world( position ) )
+    return out
+
+
+def tower_ladder_objects():
+    return [ K.game_object( ids, "Guard Tower Ladder", f"tower_ladder/{k}", K.to_world( pos ), K.yaw_rotation( yaw ), components=[
+        K.component( ids, "Sandbox.ModelRenderer", f"tower_ladder/{k}/renderer", Model="models/props/riverside/tower_ladder_v1/ladder.vmdl", RenderType="On", Tint="1,1,1,1" ) ] )
+        for k, ( owner, pos, yaw ) in enumerate( P.TOWER_LADDERS ) ]
+
+
+def graffiti_board_objects():
+    return [ K.game_object( ids, "STILL HERE Board", f"graffiti_board/{k}", K.to_world( pos ), K.yaw_rotation( yaw ), components=[
+        K.component( ids, "Sandbox.ModelRenderer", f"graffiti_board/{k}/renderer", Model="models/props/riverside/still_here_board_v1/board.vmdl", RenderType="On", Tint="1,1,1,1" ) ] )
+        for k, ( owner, pos, yaw ) in enumerate( P.GRAFFITI_BOARDS ) ]
+
+
+def tower_roof_objects():
+    return [ K.game_object( ids, "Guard Tower Roof", f"tower_roof/{k}", K.to_world( pos ), K.yaw_rotation( yaw ), components=[
+        K.component( ids, "Sandbox.ModelRenderer", f"tower_roof/{k}/renderer", Model="models/props/riverside/tower_roof_v1/roof.vmdl", RenderType="On", Tint="1,1,1,1" ) ] )
+        for k, ( owner, pos, yaw ) in enumerate( P.TOWER_ROOFS ) ]
+
+
+def interior_fridge_objects():
+    return [ K.game_object( ids, f"Interior Drinks Fridge {k+1}", f"interior_fridge/{k}", K.to_world( pos ), K.yaw_rotation( yaw ), components=[
+        K.component( ids, "Sandbox.ModelRenderer", f"interior_fridge/{k}/renderer", Model="models/props/riverside/interior_fridges_v1/fridge.vmdl", RenderType="On", Tint="1,1,1,1" ) ] )
+        for k, ( owner, pos, yaw ) in enumerate( P.INTERIOR_FRIDGES ) ]
+
+
+def store_step_objects():
+    return [ K.game_object( ids, "Lucky Stop Timber Steps", f"store_steps/{k}", K.to_world( pos ), K.yaw_rotation( yaw ), components=[
+        K.component( ids, "Sandbox.ModelRenderer", f"store_steps/{k}/renderer", Model="models/props/riverside/store_timber_steps_v1/steps.vmdl", RenderType="On", Tint="1,1,1,1" ) ] )
+        for k, ( owner, pos, yaw ) in enumerate( P.STORE_STEPS ) ]
+
+
+def water_tank_objects():
+    """Approved A vessel; original support structure and lights remain in the backdrop."""
+    out = []
+    for k, ( owner, position, yaw ) in enumerate( P.WATER_TANKS ):
+        key = f"water_tank/{k}"
+        out.append( K.game_object( ids, "Riverside Water Tank", key, K.to_world( position ), K.yaw_rotation( yaw ), components=[
+            K.component( ids, "Sandbox.ModelRenderer", f"{key}/renderer", Model="models/props/riverside/water_tank_v1/tank.vmdl",
+                         RenderType="On", Tint="1,1,1,1" ) ] ) )
+    return out
+
+
+def hitch_objects():
+    """The approved T2 hitch; original body collision remains in the zone."""
+    out = []
+    for k, ( owner, position, yaw ) in enumerate( P.HITCHES ):
+        key = f"hitch/{k}"
+        out.append( K.game_object( ids, "T2 Trailer Hitch", key, K.to_world( position ), K.yaw_rotation( yaw ), components=[
+            K.component( ids, "Sandbox.ModelRenderer", f"{key}/renderer", Model="models/props/riverside/trailer_hitch_v1/hitch.vmdl",
+                         RenderType="On", Tint="1,1,1,1" ) ] ) )
+    return out
+
+
+def aerial_objects():
+    """The approved T2 rooftop aerial; other trailers retain their original arrays."""
+    out = []
+    for k, ( owner, position, yaw ) in enumerate( P.AERIALS ):
+        key = f"aerial/{k}"
+        out.append( K.game_object( ids, "T2 Rooftop TV Aerial", key, K.to_world( position ), K.yaw_rotation( yaw ), components=[
+            K.component( ids, "Sandbox.ModelRenderer", f"{key}/renderer", Model="models/props/riverside/tv_aerial_v1/aerial.vmdl",
+                         RenderType="On", Tint="1,1,1,1" ) ] ) )
+    return out
+
+
+def fluorescent_objects():
+    """The approved store fittings, retaining their authored light sources."""
+    out = []
+    for k, ( owner, position, yaw ) in enumerate( P.FLUORESCENTS ):
+        key = f"fluorescent/{k}"
+        out.append( K.game_object( ids, f"Store Fluorescent {k + 1}", key, K.to_world( position ), K.yaw_rotation( yaw ), components=[
+            K.component( ids, "Sandbox.ModelRenderer", f"{key}/renderer", Model="models/props/riverside/fluorescent_v1/fixture.vmdl",
+                         RenderType="On", Tint="1,1,1,1" ) ] ) )
+    return out
+
+
+def pole_insulator_objects():
+    """ Glazed crossarm pins; ties appear only on wired pins and follow the first span. """
+    out = []
+    for k, ( owner, position, yaw, wired ) in enumerate( P.PIN_INSULATORS ):
+        key = f"pole_insulator/{k}"
+        heading = ( math.cos( math.radians( yaw ) ), math.sin( math.radians( yaw ) ) )
+        model = "pole_insulator" if wired else "pole_insulator_bare"
+        out.append( K.game_object( ids, "Pole Insulator", key, K.to_world( position ), K.yaw_rotation( K.plan_yaw( heading ) ), components=[
+            K.component( ids, "Sandbox.ModelRenderer", f"{key}/renderer", BodyGroups=18446744073709551615,
+                         Model=f"models/props/riverside/pole_insulator_v2/{model}.vmdl", RenderType="On", Tint="1,1,1,1" ) ] ) )
+        out[-1]["Position"] = ",".join( f"{v:.6f}" for v in K.to_world( position ) )
+    return out
+
+
+def trailer_door_objects():
+    """The approved T2 entry door; window cards remain in the lowland mesh."""
+    out = []
+    for k, ( owner, position, yaw ) in enumerate( P.TRAILER_DOORS ):
+        key = f"trailer_door/{k}"
+        heading = ( math.cos( math.radians( yaw ) ), math.sin( math.radians( yaw ) ) )
+        out.append( K.game_object( ids, "T2 Entry Door", key, K.to_world( position ), K.yaw_rotation( K.plan_yaw( heading ) ), components=[
+            K.component( ids, "Sandbox.ModelRenderer", f"{key}/renderer", Model="models/props/riverside/trailer_door_v1/door.vmdl",
+                         RenderType="On", Tint="1,1,1,1" ) ] ) )
+        out[-1]["Position"] = ",".join( f"{v:.6f}" for v in K.to_world( position ) )
+    return out
+
+
+def roof_vent_objects():
+    """Approved first T2 passive vent; its flashing is fitted to that roof plane."""
+    out = []
+    for k, ( owner, position, yaw ) in enumerate( P.ROOF_VENTS ):
+        key = f"roof_vent/{k}"
+        heading = ( math.cos( math.radians( yaw ) ), math.sin( math.radians( yaw ) ) )
+        out.append( K.game_object( ids, "T2 Passive Roof Vent", key, K.to_world( position ), K.yaw_rotation( K.plan_yaw( heading ) ), components=[
+            K.component( ids, "Sandbox.ModelRenderer", f"{key}/renderer", Model="models/props/riverside/roof_vent_v1/vent.vmdl", RenderType="On", Tint="1,1,1,1" ) ] ) )
+        out[-1]["Position"] = ",".join( f"{v:.6f}" for v in K.to_world( position ) )
+    return out
+
+
+def entry_step_objects():
+    """Approved first T2 passive vent; its flashing is fitted to that roof plane."""
+    out = []
+    for k, ( owner, position, yaw ) in enumerate( P.ENTRY_STEPS ):
+        key = f"entry_steps/{k}"
+        heading = ( math.cos( math.radians( yaw ) ), math.sin( math.radians( yaw ) ) )
+        out.append( K.game_object( ids, "T2 Precast Entry Steps", key, K.to_world( position ), K.yaw_rotation( K.plan_yaw( heading ) ), components=[
+            K.component( ids, "Sandbox.ModelRenderer", f"{key}/renderer", Model="models/props/riverside/t2_precast_entry_v1/entry_steps.vmdl", RenderType="On", Tint="1,1,1,1" ) ] ) )
+        out[-1]["Position"] = ",".join( f"{v:.6f}" for v in K.to_world( position ) )
     return out
 
 
@@ -1127,8 +1336,29 @@ def write_scene( written ):
         K.game_object( ids, "Burn Drums", "drums", children=burn_drum_objects() ),
         *cooler_objects(),
         *teddy_objects(),
+        *camper_objects(),
         K.game_object( ids, "Propane Cylinders", "propane", children=propane_objects() ),
         K.game_object( ids, "Lawn Chairs", "lawn_chairs", children=lawn_chair_objects() ),
+        K.game_object( ids, "Supply Crates", "supply_crates", children=crate_objects() ),
+        K.game_object( ids, "Sandbags", "sandbags", children=sandbag_objects() ),
+        K.game_object( ids, "Speed-Limit Signs", "speed_signs", children=speed_sign_objects() ),
+        K.game_object( ids, "Porch Lights", "porch_lights", children=porch_light_objects() ),
+        K.game_object( ids, "Shed Downlights", "shed_downlights", children=shed_light_objects() ),
+        K.game_object( ids, "Streetlight Heads", "street_lights", children=street_light_objects() ),
+        K.game_object( ids, "Pole Insulators", "pole_insulators", children=pole_insulator_objects() ),
+        K.game_object( ids, "Roof Air Conditioners", "roof_acs", children=roof_ac_objects() ),
+        K.game_object( ids, "Store Ceiling Lights", "fluorescents", children=fluorescent_objects() ),
+        K.game_object( ids, "Roof TV Aerials", "roof_aerials", children=aerial_objects() ),
+        K.game_object( ids, "Trailer Hitches", "trailer_hitches", children=hitch_objects() ),
+        K.game_object( ids, "Water Tower Tanks", "water_tanks", children=water_tank_objects() ),
+        K.game_object( ids, "Park Graffiti Boards", "graffiti_boards", children=graffiti_board_objects() ),
+        K.game_object( ids, "Guard Tower Ladders", "tower_ladders", children=tower_ladder_objects() ),
+        K.game_object( ids, "Guard Tower Roofs", "tower_roofs", children=tower_roof_objects() ),
+        K.game_object( ids, "Interior Drinks Fridges", "interior_fridges", children=interior_fridge_objects() ),
+        K.game_object( ids, "Store Timber Steps", "store_steps", children=store_step_objects() ),
+        K.game_object( ids, "Trailer Entry Doors", "trailer_doors", children=trailer_door_objects() ),
+        K.game_object( ids, "Passive Roof Vents", "roof_vents", children=roof_vent_objects() ),
+        K.game_object( ids, "Precast Entry Steps", "precast_entry_steps", children=entry_step_objects() ),
         K.game_object( ids, "Reflection Probes", "probes", children=[ probe_object( *p ) for p in PROBES ] ),
         K.game_object( ids, "Volumetric Fog", "haze", children=[ haze_object( *h ) for h in HAZE ] ),
         K.game_object( ids, "Player Spawns", "spawns", children=spawns ),

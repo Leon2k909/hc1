@@ -83,6 +83,7 @@ namespace Sandbox
 	}
 	public class Scene { public void Dispatch<T>( T args ) { } }
 	public class NetworkState { public object Owner => null; }
+	public class Connection { public static Connection Host { get; } = new(); }
 	public static class Validity { public static bool IsValid( this Component component ) => component is not null; public static int Clamp( this int value, int min, int max ) => Math.Clamp( value, min, max ); }
 	public static class Networking { public static bool IsHost => true; }
 	public class NetList<T> : List<T>;
@@ -94,6 +95,8 @@ namespace Sandbox
 	public sealed class SyncAttribute( SyncFlags flags = default ) : Attribute { public SyncFlags Flags => flags; }
 	public static class Rpc
 	{
+		public static Connection Caller { get; set; }
+		public sealed class HostAttribute : Attribute;
 		public sealed class OwnerAttribute : Attribute;
 		public sealed class BroadcastAttribute( NetFlags flags ) : Attribute { public NetFlags Flags => flags; }
 		public static IDisposable FilterInclude( object owner ) => new Filter();
@@ -122,6 +125,7 @@ namespace Facepunch
 	{
 		public static Client Local { get; } = new();
 		public bool IsBot { get; set; }
+		public Connection Connection { get; set; } = new();
 		public Team Team { get; set; }
 		public PlayerPawn PlayerPawn { get; set; }
 		public bool IsFriendly( Client other ) => Team != Team.Unassigned && Team == other.Team;
@@ -146,5 +150,5 @@ namespace Facepunch
 	}
 	public class GameSettings { public bool UseScorestreaks { get; set; } }
 	public static class GameSettingsSystem { public static GameSettings Current { get; } = new(); }
-	public class ScorestreakManager { public static ScorestreakManager Instance => null; public void ActivateUAV( Team team ) { } }
+	public class ScorestreakManager : Component { public static ScorestreakManager Instance => null; public void ActivateUAV( Team team ) { } }
 }

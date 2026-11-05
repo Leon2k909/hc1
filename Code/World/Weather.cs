@@ -75,6 +75,7 @@ public sealed class Weather : Component
 	private bool _rolled;
 	private TimeSince _sinceStart;
 	private RainView _view;
+	private AmbientBirds _birds;
 
 	/// <summary> The rain on the grass (mm), drying with fine grass's one-hour timelag. </summary>
 	private float _wetMm;
@@ -92,11 +93,20 @@ public sealed class Weather : Component
 	protected override void OnDestroy()
 	{
 		if ( _view.IsValid() ) _view.GameObject.Destroy();
+		if ( _birds.IsValid() ) _birds.GameObject.Destroy();
 		if ( !IsProxy ) FuelWetting = 0f;
 	}
 
 	protected override void OnUpdate()
 	{
+		if ( !Application.IsDedicatedServer && !_birds.IsValid() && MapsLoaded() && SkyFound() )
+		{
+			var birds = new GameObject( Scene, true, "Outdoor birds" );
+			birds.Flags |= GameObjectFlags.NotSaved | GameObjectFlags.NotNetworked;
+			birds.NetworkMode = NetworkMode.Never;
+			_birds = birds.AddComponent<AmbientBirds>();
+		}
+
 		if ( !IsProxy && !_rolled && ((_sinceStart > 1f && MapsLoaded()) || _sinceStart > MapLoadTimeout) )
 			Roll();
 

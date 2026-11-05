@@ -1,0 +1,8 @@
+var model=Model.Load("models/maps/riverside/counter-v1/counter.vmdl");
+if(model.IsError || model.Materials.Any(m=>m==null || m.IsError))throw new Exception("Counter contains a missing material");
+var laminate=model.Materials.First(m=>m.ResourcePath=="materials/riverside/counter-v1/laminate.vmat");
+var color=laminate.GetTexture("g_tColor");var normal=laminate.GetTexture("g_tNormal");
+if(color==null || normal==null || color.Width!=2048 || color.Height!=512 || normal.Width!=2048 || normal.Height!=512)throw new Exception("Laminate texture dimensions do not match compiled sources");
+var result=new{AllMaterialsLoaded=true,Materials=model.Materials.Select(m=>new{m.ResourcePath,m.IsError,m.ShaderName}).ToArray(),LaminateColor=new{color.Width,color.Height,color.Mips},LaminateNormal=new{normal.Width,normal.Height,normal.Mips}};
+System.IO.File.WriteAllText("C:/sbox-projects/hc1/counter-review/output/riverside/counter-v1/materials-verified.json",Json.Serialize(result));
+return result;

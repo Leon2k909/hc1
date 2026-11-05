@@ -1,0 +1,318 @@
+{
+  "name": "bridge_project",
+  "description": "Project info and config (.sbproj), file read/write, C# script create/edit/delete, hotload, input actions, and publishing metadata.",
+  "tools": [
+    {
+      "name": "create_script",
+      "title": "Create Script",
+      "toolset": "bridge_project",
+      "description": "Create a new C# component script in the project â€” a minimal s&box Component class (name is sanitized to a valid identifier), or your exact code when content is provided. Errors if the file already exists. Returns { path, created, className } â€” the new type is NOT live until a recompile, so call trigger_hotload, then attach it with add_component_with_properties (component=className).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class name for the component (e.g. 'PlayerController'). Will also be the filename."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory under code/ to place the script (e.g. 'Components'). Defaults to 'code/'."
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of what this component does â€” used to generate appropriate code."
+          },
+          "properties": {
+            "description": "List of [Property] fields to include in the component. JSON array."
+          },
+          "content": {
+            "type": "string",
+            "description": "Full C# file content. If provided, ignores name/properties and writes this directly."
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "delete_script",
+      "title": "Delete Script",
+      "toolset": "bridge_project",
+      "description": "Permanently delete a file from the project by its project-relative path (built for C# scripts, but removes any file; no recycle bin, and editor undo cannot restore it). Errors if the file doesn't exist. Returns a confirmation with the path â€” follow with trigger_hotload so the removed class actually leaves the compiled assembly.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Relative path to the script file to delete."
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
+    },
+    {
+      "name": "describe_project",
+      "title": "Describe Project",
+      "toolset": "bridge_project",
+      "description": "One-call project orientation: identity (name/ident/org/type), the open scene with object count, scene and prefab file lists (capped at 50 each, Libraries/.sbox excluded), code footprint (.cs/.razor counts), custom Component types (up to 100, engine types excluded), and installed libraries. Returns a structured summary â€” orient here first, then get_scene_hierarchy for the scene, describe_type for components, find_broken_references for project health. Read-only.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "edit_script",
+      "title": "Edit Script",
+      "toolset": "bridge_project",
+      "description": "Edit an existing C# script in place via exact-text find/replace or a full-content overwrite. Errors if the file or the find text isn't found (find/replace replaces ALL occurrences). Returns { path, edited, operation } where operation is 'find_replace' or 'overwrite' â€” follow with trigger_hotload so the change compiles, then get_compile_errors if in doubt.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Relative path to the script file (e.g. 'code/PlayerController.cs')."
+          },
+          "operations": {
+            "description": "List of edit operations to apply in order. JSON array."
+          }
+        },
+        "required": [
+          "path",
+          "operations"
+        ]
+      }
+    },
+    {
+      "name": "ensure_input_action",
+      "title": "Ensure Input Action",
+      "toolset": "bridge_project",
+      "description": "Register a custom named INPUT ACTION in the project so a generated game's custom verbs work in play mode. Writes to &lt;project&gt;.sbproj â†’ Metadata.InputSettings.Actions[]. Idempotent: if the action already exists it is left alone (pass update=true to rebind its key). If the project has no InputSettings yet, the full DEFAULT action set (Forward/Back/Left/Right/Jump/Use/attack1/...) is seeded first so player movement/use are preserved â€” the engine only auto-injects defaults when a game defines NONE. After adding, call it from game code with Input.Pressed(\"name\") / Input.Down(\"name\") / Input.Released(\"name\"). Note: input config is read at project load, so restart_editor (or reload the project) for a new action to take effect in play mode.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The action verb game code will call, e.g. \"interact\", \"sprint\", \"drop\". Matches Input.Pressed(\"interact\")."
+          },
+          "keyboardKey": {
+            "type": "string",
+            "description": "Default keyboard binding, e.g. \"e\", \"f\", \"space\", \"mouse1\", \"shift\". Omit to add the action with no default key (player can bind it)."
+          },
+          "group": {
+            "type": "string",
+            "description": "UI group the action is listed under in the bindings menu (e.g. \"Actions\", \"Movement\", \"Other\"). Defaults to \"Actions\"."
+          },
+          "update": {
+            "type": "boolean",
+            "description": "If the action already exists, rebind its keyboardKey to the provided value instead of leaving it untouched. Default false (idempotent no-op when present)."
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "get_package_details",
+      "title": "Get Package Details",
+      "toolset": "bridge_project",
+      "description": "Fetch package information from the s&box package backend (Package.FetchAsync) by ident. Returns { fullIdent, title, summary, description, org } â€” no download/rating/dependency data is included. Use it to confirm a package exists and what it is before install_asset.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "ident": {
+            "type": "string",
+            "description": "Package identifier (e.g. 'facepunch.flatgrass', 'myorg.mygame')."
+          }
+        },
+        "required": [
+          "ident"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "get_project_config",
+      "title": "Get Project Config",
+      "toolset": "bridge_project",
+      "description": "Read the full project configuration from the .sbproj file including title, description, version, type, package references, metadata, and raw JSON.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "get_project_info",
+      "title": "Get Project Info",
+      "toolset": "bridge_project",
+      "description": "Get information about the current s&box project â€” path, name, game type, dependencies, and configuration.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "list_project_files",
+      "title": "List Project Files",
+      "toolset": "bridge_project",
+      "description": "Browse the project file tree. Optionally filter by directory path and/or file extension (e.g. '.cs', '.scene'). Returns { path, count, files } as project-root-relative paths â€” CAPPED AT 500 files (count reflects the truncated list, with no marker that more exist), so on large projects narrow with path/extension or use find_in_project. Recursive by default.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Relative directory path to list (e.g. 'code/Components'). Defaults to project root."
+          },
+          "extension": {
+            "type": "string",
+            "description": "Filter by file extension, including the dot (e.g. '.cs', '.scene')."
+          },
+          "recursive": {
+            "type": "boolean",
+            "description": "Whether to list files recursively. Defaults to true."
+          }
+        },
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "read_file",
+      "title": "Read File",
+      "toolset": "bridge_project",
+      "description": "Read the contents of a file in the s&box project (scripts, scenes, configs, etc.).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Relative path to the file within the project (e.g. 'code/PlayerController.cs')."
+          }
+        },
+        "required": [
+          "path"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "set_project_config",
+      "title": "Set Project Config",
+      "toolset": "bridge_project",
+      "description": "Update project configuration fields for publishing: title, description, version, type, package ident, summary, visibility. Only provided fields are changed â€” edits string values in the .sbproj file in place. Returns { updated, path } (the .sbproj path); read the result back with get_project_config to confirm what actually changed.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Project display title."
+          },
+          "description": {
+            "type": "string",
+            "description": "Project description for publishing."
+          },
+          "version": {
+            "type": "string",
+            "description": "Version string (e.g. '1.0.0', '2.1.3')."
+          },
+          "type": {
+            "type": "string",
+            "description": "Project type: 'game', 'addon', 'library', or 'template'."
+          },
+          "packageIdent": {
+            "type": "string",
+            "description": "Package identifier (e.g. 'myorg.mygame')."
+          },
+          "summary": {
+            "type": "string",
+            "description": "Short summary for asset.party listing."
+          },
+          "isPublic": {
+            "type": "boolean",
+            "description": "Whether the project is publicly visible."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "set_project_thumbnail",
+      "title": "Set Project Thumbnail",
+      "toolset": "bridge_project",
+      "description": "Set or update the project thumbnail image (thumb.png) used for publishing. Provide either a source path or base64 image data.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "sourcePath": {
+            "type": "string",
+            "description": "Relative path to an image file within the project to use as thumbnail."
+          },
+          "base64": {
+            "type": "string",
+            "description": "Base64-encoded image data to write as thumbnail."
+          },
+          "format": {
+            "type": "string",
+            "description": "Image format when using base64 mode. Defaults to 'png'. One of: png | jpg."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "trigger_hotload",
+      "title": "Trigger Hotload",
+      "toolset": "bridge_project",
+      "description": "Nudge s&box to recompile and hotload the project's C# (bumps the .csproj timestamps the file-watcher keys on). NOT synchronous: the compile lands on a later frame, and editing an EXISTING .cs can leave the OLD assembly running silently. Returns { triggered, touched, assemblyBefore, note } â€” assemblyBefore is the current game-assembly fingerprint; poll get_bridge_status.gameAssembly until it differs (or verify with an explicit marker such as a version string in a Log.Info) BEFORE trusting invoke_button / describe_type output. Falls back to restart_editor for new package dependencies.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
+    },
+    {
+      "name": "write_file",
+      "title": "Write File",
+      "toolset": "bridge_project",
+      "description": "Write or overwrite a file in the s&box project (SILENTLY replaces existing content â€” read_file first if you need to preserve it). Creates parent directories as needed; paths are confined to the project root (traversal outside it is denied). Returns a confirmation with the path â€” for C# follow with trigger_hotload so it compiles; for assets (.vmat etc.) follow with recompile_asset.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Relative path for the file (e.g. 'code/Components/Health.cs')."
+          },
+          "content": {
+            "type": "string",
+            "description": "The full file content to write."
+          }
+        },
+        "required": [
+          "path",
+          "content"
+        ]
+      }
+    }
+  ]
+}

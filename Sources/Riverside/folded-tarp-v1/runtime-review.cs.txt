@@ -1,0 +1,46 @@
+if(!Game.IsPlaying || Game.ActiveScene?.Source?.ResourcePath!="scenes/maps/riverside/riverside.scene" || Networking.IsActive)throw new Exception("Requires offline Riverside play");
+var scene=Game.ActiveScene;var editor=Editor.SceneEditorSession.Active;var dirty=editor.HasUnsavedChanges;
+for(int attempt=0;attempt<300;attempt++)
+{
+ if(scene.GetAllComponents<ModelRenderer>().Any(r=>r.Model?.ResourcePath=="models/maps/riverside/riverside_levee.vmdl") && scene.GetAllComponents<CameraComponent>().Any(c=>c.IsMainCamera) && scene.GetAllComponents<Facepunch.PlayerPawn>().Any())break;
+ if(!Game.IsPlaying||Game.ActiveScene!=scene)throw new Exception("Play changed while waiting for the map");cancellationToken.ThrowIfCancellationRequested();await Task.Delay(50,cancellationToken);
+}
+var dressing=scene.GetAllComponents<ModelRenderer>().Single(r=>r.Model?.ResourcePath=="models/maps/riverside/riverside_levee.vmdl");var original=dressing.Model;
+var without=Model.Load("models/maps/riverside/folded-tarp-v1/levee_without_tarp.vmdl");var candidate=Model.Load("models/maps/riverside/folded-tarp-v1/tarp.vmdl");
+if(without.IsError || candidate.IsError)throw new Exception("Preview model failed");
+var gameplay=scene.GetAllComponents<CameraComponent>().First(c=>c.IsMainCamera);var mains=scene.GetAllComponents<CameraComponent>().Select(c=>(Camera:c,Main:c.IsMainCamera)).ToArray();
+GameObject holder=null,item=null;var paths=new System.Collections.Generic.List<string>();var output="C:/sbox-projects/hc1/folded-tarp-review/output/riverside/folded-tarp-v1";
+try
+{
+ using(scene.Push())
+ {
+  holder=new GameObject(true,"Temporary neon review camera");var camera=holder.Components.Create<CameraComponent>();
+  void Copy<T>() where T:Component,new(){var source=gameplay.GameObject.GetComponent<T>(true);if(source!=null)Facepunch.GameObjectExtensions.CopyPropertiesTo(source,holder.Components.Create<T>());}
+  Copy<Bloom>();Copy<Tonemapping>();Copy<Sharpen>();Copy<AmbientOcclusion>();Copy<Vignette>();Copy<Facepunch.PhotographicResponse>();Copy<ColorAdjustments>();
+  camera.IsMainCamera=false;camera.EnablePostProcessing=gameplay.EnablePostProcessing;camera.PostProcessAnchor=gameplay.PostProcessAnchor??gameplay.GameObject;camera.ZNear=5f;camera.ZFar=50000;camera.BackgroundColor=gameplay.BackgroundColor;camera.CustomSize=new Vector2(1200,1200);
+  item=new GameObject(true,"Temporary real neon sign");item.WorldPosition=new Vector3(607,-737,314);item.WorldRotation=Rotation.FromYaw(90f);var renderer=item.Components.Create<ModelRenderer>();renderer.Model=candidate;
+  foreach(var view in new[]{"whole"})
+  {
+   camera.WorldPosition=new Vector3(700,-850,425);
+   camera.WorldRotation=Rotation.LookAt(new Vector3(607,-737,317)-camera.WorldPosition);camera.FieldOfView=46;
+   foreach(var variant in new[]{"before","after"})
+   {
+    dressing.Model=variant=="before"?original:without;renderer.Enabled=variant=="after";
+    using var bitmap=new Bitmap(1200,1200);
+    for(int frame=0;frame<12;frame++)
+    {
+     if(!Game.IsPlaying||Game.ActiveScene!=scene)throw new Exception("Runtime scene changed");cancellationToken.ThrowIfCancellationRequested();camera.RenderToBitmap(bitmap,false);await Task.Delay(20,cancellationToken);
+    }
+    var path=System.IO.Path.Combine(output,"in-game-"+view+"-"+variant+".png");System.IO.File.WriteAllBytes(path,bitmap.ToPng());paths.Add(path);
+   }
+  }
+ }
+ var errors=scene.GetAllComponents<ModelRenderer>().Where(r=>r.Model?.IsError==true).Select(r=>r.GameObject.Name).ToArray();
+ var report=new{PreviewOnly=true,ActualPlayMode=Game.IsPlaying,PlayerCount=scene.GetAllComponents<Facepunch.PlayerPawn>().Count(),ErrorModels=errors,NoExtraLights=true,CameraEffectsCopied=true,GameplayPostProcessing=gameplay.EnablePostProcessing,Paths=paths,Candidate=candidate.MeshInfo};
+ System.IO.File.WriteAllText(System.IO.Path.Combine(output,"runtime-review.json"),Json.Serialize(report));return new{report.PreviewOnly,report.ActualPlayMode,report.PlayerCount,report.ErrorModels,report.Paths};
+}
+finally
+{
+ if(dressing.IsValid())dressing.Model=original;item?.Destroy();holder?.Destroy();
+ if(editor.HasUnsavedChanges!=dirty)throw new Exception("Neon review changed editor dirty state");
+}

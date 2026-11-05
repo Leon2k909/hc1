@@ -1,12 +1,12 @@
 # Lowtide's mooring bollard v2
 
-Created 2026-10-30, installed 2026-10-31 at the user's word ("mooring new better"). All 12 of Lowtide's quay bollards draw this model. Notes: `docs/notes/174-*`. Nothing is committed.
+Created 2026-10-30, installed 2026-10-31 at the user's word ("mooring new better"). All 12 of Lowtide's quay bollards draw this model. Notes: `docs/notes/174-*`.
 
 The old one is three stacked 12-sided cylinders in the shared `iron_black`. This is a cast-iron bollard with a flanged foot on six bolts, a waisted neck,
 and a flared, domed head. Black bitumen flakes to rust, with rust running down the paint. The harbour side of the neck is rope-worn, there's salt at the
 foot, and it has a made-up foundry mark.
 
-- Triangles, LOD 0-2: 3,574 / 1,786 / 464, against 84 or so. One 1024 atlas at about 16 px/in, shared by all twelve.
+- Triangles after the 2026-11-04 rope pass, LOD 0-2: 6,836 / 3,256 / 1,110, previously 3,574 / 1,786 / 464. One 2048 atlas, shared by all twelve.
 - It fits the old collision box (9 in round, 25 high), on the same origin at the ground. It's round, so its yaw only turns the wear: -X looks at the harbour.
 - `bollard.py` builds, bakes and exports through `prop_stages.py`, `paint_bollard.py` paints, `render_bollard.py` renders, `verify_bollard.py` checks,
   `make.ps1` runs them. `install_bollards.py` installed it. The engine check is `Sources/ReefHall/bench_v2/check_config.py` and `capture_installed.cs.txt`.
@@ -19,3 +19,19 @@ Checked in s&box on 2026-10-31, in an isolated editor scene loaded from `lowtide
 - 36 rays: every one stopped on the collision box at the expected distance, on metal, or passed over the top.
 
 **Not checked:** a real match, because the editor is shared and play wasn't to be started. So walking into them, bullets and marks, bots' paths round the two moved ones, and the player camera's own look (Lowtide's scene look was on, with exposure held at 2.4). Frame time. The LOD thresholds (estimates, 30 and 80): the shots at 12, 25 and 40 m show nothing wrong, but I haven't watched one switch.
+
+## Approved rope details (2026-11-04)
+
+- A short discarded mooring line wraps three and a half times round the waist. Its hanging end follows the flared base, with seven small loose fibres at the cut.
+- The rope's three-strand grooves follow distance along its actual path, including the hanging end. It has a faded tan surface and a darker, damp lower end.
+- The atlas is now 2048, improving the iron's rust edges, cast lettering and salt detail along with the rope. The casting shape, installed ModelDoc/material resource,
+  map placements and existing collision were retained. `export-meshes` only writes the three OBJ inputs, leaving resources to the native editor.
+- `run.ps1` rebuilds at idle priority in a hidden Blender process using two threads, with current work in `output/bollard-rope-20261104/work`.
+  Run `paint_bollard.py` with that work folder and the installed asset folder after baking. Compile the installed material and model through the editor.
+- `verify_bollard.py` passed: all LODs fit the existing footprint and height, 15 solid pieces with no inward-facing pieces, all texture references present,
+  12 placements, old merged faces absent and original map collision boxes present. Native full model/material compilation passed.
+- Approved engine views and forced LOD 0-2 captures are in `output/bollard-rope-20261104/after` and `lods`, with current build files in `work`. All LODs retain the rope; the tiny cut fibres drop out
+  beyond LOD 0. The far LOD is visibly faceted when enlarged to the close-up camera, so its distance thresholds still need a live-match check.
+  Captures used isolated scenes and preserved the user's active scene and play state. Live gameplay and performance remain untested.
+- The user approved the rope pass and requested replacement and cleanup. It remains installed at the existing model path for all twelve bollards. The OLD gallery
+  group and label, local `compare_old/old_bollard` model and mesh inputs, superseded original build folder, and current before/comparison files were removed.

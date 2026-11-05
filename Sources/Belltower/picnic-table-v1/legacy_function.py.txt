@@ -1,0 +1,7 @@
+def picnic_table( model, centre, yaw, z=0.0 ):
+    p = Place( ( centre[0], centre[1], z ), yaw )
+    p.box( model, ( -42, -16, 27 ), ( 42, 16, 30 ), "planks" )
+    for s in ( -1, 1 ):
+        p.box( model, ( -42, s * 30 - 6, 15 ), ( 42, s * 30 + 6, 18 ), "planks" )
+        p.box( model, ( s * 32 - 2, -34, 0 ), ( s * 32 + 2, 34, 27 ), "planks_dark" )
+    p.box( model, ( -42, -36, 0 ), ( 42, 36, 30 ), None, WOOD )

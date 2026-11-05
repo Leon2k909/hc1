@@ -1,0 +1,32 @@
+var project=Sandbox.Project.Current.GetRootPath();
+var review="C:/sbox-projects/hc1/register-review";
+var folder=System.IO.Path.Combine(review,"output/riverside/register-v1");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"manifest.json")));
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+var source=System.IO.Path.Combine(project,manifest["source_model"].GetValue<string>());
+if(Hash(source)!=manifest["source_sha256"].GetValue<string>() || Hash(System.IO.Path.Combine(project,manifest["source_vmdl"].GetValue<string>()))!=manifest["source_vmdl_sha256"].GetValue<string>())
+    throw new Exception("Original store changed since preparation; regenerate the review before importing.");
+var session=Editor.SceneEditorSession.Active;
+var before=new {Id=session.Scene.Id,Dirty=session.HasUnsavedChanges,Playing=Game.IsPlaying};
+var files=manifest["files"].AsObject();
+int Priority(string p)=>p.EndsWith(".png")?0:p.EndsWith(".vmat")?1:p.EndsWith(".mtl")?2:p.EndsWith(".obj")?3:4;
+foreach(var pair in files)
+{
+    if(pair.Key.Contains("..") || !(pair.Key.StartsWith("Assets/models/maps/riverside/register-v1/") || pair.Key.StartsWith("Assets/materials/riverside/register-v1/")))
+        throw new Exception("Unexpected preview target");
+    if(Hash(System.IO.Path.Combine(review,pair.Key))!=pair.Value.GetValue<string>())throw new Exception("Staged input changed: "+pair.Key);
+}
+foreach(var pair in files.OrderBy(p=>Priority(p.Key)))
+{
+    var target=System.IO.Path.Combine(project,pair.Key);
+    if(System.IO.File.Exists(target) && Hash(target)==pair.Value.GetValue<string>())continue;
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target));
+    var temporary=target+".ice-review-writing";
+    System.IO.File.Copy(System.IO.Path.Combine(review,pair.Key),temporary,true);
+    System.IO.File.Move(temporary,target,true);
+    Editor.AssetSystem.RegisterFile(target);
+}
+var report=new {PreviewOnly=true,Files=files.Count,UnchangedSource=Hash(source)==manifest["source_sha256"].GetValue<string>(),
+    UserStatePreserved=session.Scene.Id==before.Id && session.HasUnsavedChanges==before.Dirty && Game.IsPlaying==before.Playing};
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"native-import.json"),Json.Serialize(report));
+return report;

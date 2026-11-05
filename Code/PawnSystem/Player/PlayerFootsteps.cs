@@ -24,23 +24,25 @@ public sealed class PlayerFootsteps : Component
 
 	private void Footstep()
 	{
-		// Corpses (ZombieAI) are silent underfoot: step on the floor beneath them.
-		var tr = Scene.Trace
-			.Ray( Player.WorldPosition + Vector3.Up * 20, Player.WorldPosition + Vector3.Up * -20 )
-			.IgnoreGameObjectHierarchy( Player.GameObject )
-			.WithoutTags( "corpse" )
-			.Run();
-
-		if ( !tr.Hit )
-			return;
-
-		var surface = WorldSounds.SurfaceAt( tr );
+		var nextLeft = !flipFlop;
+		// Approximate boot spacing in body space. At a material boundary, each foot can land on
+		// a different floor instead of both sampling the point beneath the player's centre.
+		var foot = Player.WorldPosition + Player.WorldRotation.Left * (nextLeft ? 6f : -6f);
+		var tr = TraceFloor( foot );
+		var surface = tr.Hit ? WorldSounds.SurfaceAt( tr ) : null;
+		if ( surface is null )
+		{
+			// A boot can extend over a stair/ledge while the controller remains supported. Preserve
+			// the ordinary supported step rather than losing its timing or inventing a surface.
+			tr = TraceFloor( Player.WorldPosition );
+			surface = tr.Hit ? WorldSounds.SurfaceAt( tr ) : null;
+		}
 		if ( surface is null )
 			return;
 
 		TimeSinceStep = 0;
 
-		flipFlop = !flipFlop;
+		flipFlop = nextLeft;
 
 		// Don't make footsteps sometimes, but keep the step info
 		if ( Player.IsCrouching || Player.IsSlowWalking )
@@ -62,6 +64,12 @@ public sealed class PlayerFootsteps : Component
 		handle.OcclusionEnabled = !Player.IsViewer && handle.OcclusionEnabled;
 		handle.SpacialBlend = Player.IsViewer ? 0 : handle.SpacialBlend;
 	}
+
+	private SceneTraceResult TraceFloor( Vector3 at ) => Scene.Trace
+		.Ray( at + Vector3.Up * 20f, at + Vector3.Up * -20f )
+		.IgnoreGameObjectHierarchy( Player.GameObject )
+		.WithoutTags( "corpse" )
+		.Run();
 
 	protected override void OnFixedUpdate()
 	{

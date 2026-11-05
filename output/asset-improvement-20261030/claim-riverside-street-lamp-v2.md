@@ -1,0 +1,1 @@
+Riverside utility-pole cobra-head streetlights claimed in Install new chairs, 2026-11-04. Sources/Riverside/street-lamp-v2/. Review candidate only. Preserve the actual poles, transformer/searchlight work, lamp arms and point-light positions. Roof AC belongs to Continue from Claude; counter/grocery shelving to Show project in the editor.

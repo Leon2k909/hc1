@@ -1,0 +1,17 @@
+var session=Editor.SceneEditorSession.Active;var before=new{Id=session.Scene.Id,Dirty=session.HasUnsavedChanges,Playing=Game.IsPlaying};var output="C:/sbox-projects/hc1/roof-ladder-review/output/riverside/roof-ladder-v1";
+var models=new System.Collections.Generic.List<object>();
+foreach(var variant in new[]{"before","after"})
+{
+ var model=Model.Load("models/maps/riverside/roof-ladder-v1/"+(variant=="before"?"legacy_ladder.vmdl":"ladder.vmdl"));if(model.IsError||model.Materials.Any(m=>m.IsError))throw new Exception("Ladder resource failed");models.Add(new{variant,Mesh=model.MeshInfo,Materials=model.Materials.Select(m=>new{m.ResourcePath,m.IsError,Emission=m.GetFeature("F_SELF_ILLUM")}).ToArray()});
+ var world=new SceneWorld();try
+ {
+  new SceneObject(world,model,Transform.Zero);new SceneLight(world,new Vector3(-80,130,270),900,Color.White*18);new SceneLight(world,new Vector3(200,-200,100),900,new Color(.7f,.8f,1f)*12);
+  foreach(var view in new[]{"whole","detail"})
+  {
+   var eye=view=="whole"?new Vector3(120,240,130):new Vector3(40,45,218);var target=view=="whole"?new Vector3(0,-20,120):new Vector3(0,-36,218);
+   var camera=new SceneCamera("Ladder studio") {World=world,Position=eye,Rotation=Rotation.LookAt(target-eye),FieldOfView=view=="whole"?50:48,ZNear=3,ZFar=2000,Size=new Vector2(1000,1200),AmbientLightColor=new Color(.20f,.23f,.27f),BackgroundColor=new Color(.04f,.05f,.065f),AntiAliasing=true,EnablePostProcessing=true};
+   var pix=new Editor.Pixmap(1000,1200);Sandbox.SandboxToolExtensions.RenderToPixmap(camera,pix,false);pix.SavePng(System.IO.Path.Combine(output,"studio-"+view+"-"+variant+".png"));
+  }
+ }finally{world.Delete();}
+}
+var preserved=session.Scene.Id==before.Id && session.HasUnsavedChanges==before.Dirty && Game.IsPlaying==before.Playing;var report=new{UserStatePreserved=preserved,Models=models};System.IO.File.WriteAllText(System.IO.Path.Combine(output,"studio.json"),Json.Serialize(report));return report;

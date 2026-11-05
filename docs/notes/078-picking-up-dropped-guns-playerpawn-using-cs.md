@@ -1,4 +1,15 @@
 ## Picking up dropped guns (`PlayerPawn.Using.cs`)
+- Drop momentum (2026-11-04, code only): `DroppedEquipment.Create` now initializes its rigidbody with the holder's
+  current linear velocity. `DroppedWeapon.Motion.cs` selects the live controller for a local holder and synced
+  velocity for remote holders or a missing local controller. Nonfinite values become zero. Drops with no held
+  source retain zero initial movement. This covers held-weapon swaps/disconnects and other shared creation paths;
+  lightweight bots creating drops without a held Equipment source do not acquire velocity through this helper.
+  `PlayerInventory.DropHost` adds its existing forward/up toss to the inherited velocity instead of overwriting
+  it with the host's possibly inactive controller. Drops stopped by its existing cover trace retain inherited
+  movement without the deliberate toss. No angular momentum transfer is simulated.
+  `Tools/DroppedMomentumChecks` passed 14 production-helper checks covering local/remote selection, absent
+  controllers, lateral/vertical/falling movement and invalid values. No editor used; live physics/network behavior
+  remains unverified.
 - Use targeting stops at the nearest solid trace hit (2026-11-03). `RunAll` includes objects behind walls, so
   `GetUsables` now walks hits in distance order, returning the first valid usable or stopping at a solid obstruction.
   Non-interactive trigger colliders remain transparent to interaction; interactive triggers can still be used.

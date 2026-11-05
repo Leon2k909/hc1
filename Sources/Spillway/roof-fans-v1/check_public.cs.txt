@@ -1,0 +1,12 @@
+var output=new System.Collections.Generic.List<object>();
+foreach(var name in new[]{"spillway_west","spillway_east"}) {
+ var model=Model.Load("models/maps/spillway/"+name+".vmdl");
+ if(model.IsError)throw new InvalidOperationException(name+" failed to load");
+ foreach(var mat in new[]{"shell","blade","guard","dark"})
+  if(!model.Materials.Any(m=>m.ResourcePath=="materials/spillway/roof-fans-v1/"+mat+".vmat"))throw new InvalidOperationException("Missing fan material "+mat);
+ output.Add(new{Model=model.ResourcePath,Error=model.IsError});
+}
+var old=Model.Load("models/maps/spillway/roof-fans-v1/legacy_fan.vmdl");
+if(old.IsError)throw new InvalidOperationException("Retained old fan failed to load");
+var report=new{PublicModels=output,OldModel=old.ResourcePath,OldError=old.IsError};
+System.IO.File.WriteAllText(System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(),"Sources/Spillway/roof-fans-v1/review/public-resource.json"),System.Text.Json.JsonSerializer.Serialize(report));return report;

@@ -1,0 +1,580 @@
+{
+  "PreviewOnly": true,
+  "UserStatePreserved": true,
+  "Images": [
+    "C:/sbox-projects/hc1/shelving-review/output/riverside/shelving-v1\\isolated-before.png",
+    "C:/sbox-projects/hc1/shelving-review/output/riverside/shelving-v1\\isolated-after.png"
+  ],
+  "Models": [
+    {
+      "Variant": "before",
+      "Resource": "models/maps/riverside/shelving-v1/legacy_shelving.vmdl",
+      "IsError": false,
+      "Mesh": {
+        "TotalVertices": 48,
+        "TotalTriangles": 24,
+        "TotalDrawCalls": 2,
+        "LodCount": 0,
+        "LodSwitchDistances": [],
+        "Meshes": [
+          {
+            "Name": "legacy_shelving",
+            "Vertices": 48,
+            "Triangles": 24,
+            "LodMask": 255,
+            "MeshGroupMask": 18446744073709551615,
+            "TranslucencyType": 0,
+            "BoundsMin": "-18.2999992,-35,0",
+            "BoundsMax": "18.2999992,35,56",
+            "DrawCalls": [
+              {
+                "Vertices": 48,
+                "Indices": 36,
+                "PrimitiveType": 5,
+                "UvDensity": 131.93938,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 0,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "94489c8b-ebc4-4b6b-b1b2-5a801d1b53e3",
+                  "Path": "materials/riverside/rs_lit.vmat"
+                }
+              },
+              {
+                "Vertices": 48,
+                "Indices": 36,
+                "PrimitiveType": 5,
+                "UvDensity": 131.93938,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 36,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "80a9ffae-85d9-4652-b553-5bb5b082c671",
+                  "Path": "materials/riverside/rs_wood.vmat"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "Variant": "after",
+      "Resource": "models/maps/riverside/shelving-v1/gondola.vmdl",
+      "IsError": false,
+      "Mesh": {
+        "TotalVertices": 49430,
+        "TotalTriangles": 36780,
+        "TotalDrawCalls": 33,
+        "LodCount": 3,
+        "LodSwitchDistances": [
+          0,
+          10,
+          25
+        ],
+        "Meshes": [
+          {
+            "Name": "lod0",
+            "Vertices": 25200,
+            "Triangles": 19300,
+            "LodMask": 1,
+            "MeshGroupMask": 18446744073709551615,
+            "TranslucencyType": 0,
+            "BoundsMin": "-17.75,-34.5,0",
+            "BoundsMax": "17.75,34.5,56",
+            "DrawCalls": [
+              {
+                "Vertices": 25200,
+                "Indices": 270,
+                "PrimitiveType": 5,
+                "UvDensity": 6.0596843,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 0,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "a995cc86-2a74-4f3f-808a-02d17ac74f41",
+                  "Path": "materials/riverside/shelving-v1/box0.vmat"
+                }
+              },
+              {
+                "Vertices": 25200,
+                "Indices": 330,
+                "PrimitiveType": 5,
+                "UvDensity": 6.0596843,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 270,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "d41e9942-4e54-4616-a30a-0bd534c4e4b6",
+                  "Path": "materials/riverside/shelving-v1/box1.vmat"
+                }
+              },
+              {
+                "Vertices": 25200,
+                "Indices": 2040,
+                "PrimitiveType": 5,
+                "UvDensity": 7.2062144,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 600,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "0cb4becf-fa7b-4f07-9bf8-37ad3ad053c6",
+                  "Path": "materials/riverside/shelving-v1/cardboard.vmat"
+                }
+              },
+              {
+                "Vertices": 25200,
+                "Indices": 1584,
+                "PrimitiveType": 5,
+                "UvDensity": 6.7955136,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 2640,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "b04e6d5c-041d-4313-8dd9-3887d1f40422",
+                  "Path": "materials/riverside/shelving-v1/label0.vmat"
+                }
+              },
+              {
+                "Vertices": 25200,
+                "Indices": 1440,
+                "PrimitiveType": 5,
+                "UvDensity": 6.795467,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 4224,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "64772878-e586-4bff-9701-35f665f60877",
+                  "Path": "materials/riverside/shelving-v1/label1.vmat"
+                }
+              },
+              {
+                "Vertices": 25200,
+                "Indices": 936,
+                "PrimitiveType": 5,
+                "UvDensity": 6.794064,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 5664,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "81923aea-1bca-4f52-9178-fc445e0f2a74",
+                  "Path": "materials/riverside/shelving-v1/label2.vmat"
+                }
+              },
+              {
+                "Vertices": 25200,
+                "Indices": 1080,
+                "PrimitiveType": 5,
+                "UvDensity": 6.7940693,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 6600,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "8cb38f62-661d-40b2-bf05-a63032edd2ba",
+                  "Path": "materials/riverside/shelving-v1/label3.vmat"
+                }
+              },
+              {
+                "Vertices": 25200,
+                "Indices": 4752,
+                "PrimitiveType": 5,
+                "UvDensity": 5.576744,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 7680,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "1ad6f43e-e5c5-459a-8bfe-3e5b261f10c5",
+                  "Path": "materials/riverside/shelving-v1/paint.vmat"
+                }
+              },
+              {
+                "Vertices": 25200,
+                "Indices": 48,
+                "PrimitiveType": 5,
+                "UvDensity": 7.206185,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 12432,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "5e3e0cdd-ba47-4a49-95dd-53eb2d5c344c",
+                  "Path": "materials/riverside/shelving-v1/prices.vmat"
+                }
+              },
+              {
+                "Vertices": 25200,
+                "Indices": 5940,
+                "PrimitiveType": 5,
+                "UvDensity": 5.576743,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 12480,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "13eb3046-2cf2-4080-a377-e2a4e2fc8e2b",
+                  "Path": "materials/riverside/shelving-v1/rubber.vmat"
+                }
+              },
+              {
+                "Vertices": 25200,
+                "Indices": 39480,
+                "PrimitiveType": 5,
+                "UvDensity": 45.677616,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 18420,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "ca9a7ec0-785e-4fd5-9a73-f956bdf7fba0",
+                  "Path": "materials/riverside/shelving-v1/steel.vmat"
+                }
+              }
+            ]
+          },
+          {
+            "Name": "lod1",
+            "Vertices": 16816,
+            "Triangles": 12300,
+            "LodMask": 2,
+            "MeshGroupMask": 18446744073709551615,
+            "TranslucencyType": 0,
+            "BoundsMin": "-17.75,-34.5,0",
+            "BoundsMax": "17.75,34.5,56",
+            "DrawCalls": [
+              {
+                "Vertices": 16816,
+                "Indices": 270,
+                "PrimitiveType": 5,
+                "UvDensity": 6.0596843,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 0,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "a995cc86-2a74-4f3f-808a-02d17ac74f41",
+                  "Path": "materials/riverside/shelving-v1/box0.vmat"
+                }
+              },
+              {
+                "Vertices": 16816,
+                "Indices": 330,
+                "PrimitiveType": 5,
+                "UvDensity": 6.0596843,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 270,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "d41e9942-4e54-4616-a30a-0bd534c4e4b6",
+                  "Path": "materials/riverside/shelving-v1/box1.vmat"
+                }
+              },
+              {
+                "Vertices": 16816,
+                "Indices": 2040,
+                "PrimitiveType": 5,
+                "UvDensity": 7.2062144,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 600,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "0cb4becf-fa7b-4f07-9bf8-37ad3ad053c6",
+                  "Path": "materials/riverside/shelving-v1/cardboard.vmat"
+                }
+              },
+              {
+                "Vertices": 16816,
+                "Indices": 1056,
+                "PrimitiveType": 5,
+                "UvDensity": 6.7940693,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 2640,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "b04e6d5c-041d-4313-8dd9-3887d1f40422",
+                  "Path": "materials/riverside/shelving-v1/label0.vmat"
+                }
+              },
+              {
+                "Vertices": 16816,
+                "Indices": 960,
+                "PrimitiveType": 5,
+                "UvDensity": 6.794064,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 3696,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "64772878-e586-4bff-9701-35f665f60877",
+                  "Path": "materials/riverside/shelving-v1/label1.vmat"
+                }
+              },
+              {
+                "Vertices": 16816,
+                "Indices": 624,
+                "PrimitiveType": 5,
+                "UvDensity": 6.7940555,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 4656,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "81923aea-1bca-4f52-9178-fc445e0f2a74",
+                  "Path": "materials/riverside/shelving-v1/label2.vmat"
+                }
+              },
+              {
+                "Vertices": 16816,
+                "Indices": 720,
+                "PrimitiveType": 5,
+                "UvDensity": 6.7940555,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 5280,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "8cb38f62-661d-40b2-bf05-a63032edd2ba",
+                  "Path": "materials/riverside/shelving-v1/label3.vmat"
+                }
+              },
+              {
+                "Vertices": 16816,
+                "Indices": 4752,
+                "PrimitiveType": 5,
+                "UvDensity": 5.5368385,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 6000,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "1ad6f43e-e5c5-459a-8bfe-3e5b261f10c5",
+                  "Path": "materials/riverside/shelving-v1/paint.vmat"
+                }
+              },
+              {
+                "Vertices": 16816,
+                "Indices": 48,
+                "PrimitiveType": 5,
+                "UvDensity": 7.206185,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 10752,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "5e3e0cdd-ba47-4a49-95dd-53eb2d5c344c",
+                  "Path": "materials/riverside/shelving-v1/prices.vmat"
+                }
+              },
+              {
+                "Vertices": 16816,
+                "Indices": 5940,
+                "PrimitiveType": 5,
+                "UvDensity": 5.536838,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 10800,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "13eb3046-2cf2-4080-a377-e2a4e2fc8e2b",
+                  "Path": "materials/riverside/shelving-v1/rubber.vmat"
+                }
+              },
+              {
+                "Vertices": 16816,
+                "Indices": 20160,
+                "PrimitiveType": 5,
+                "UvDensity": 7.520437,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 16740,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "ca9a7ec0-785e-4fd5-9a73-f956bdf7fba0",
+                  "Path": "materials/riverside/shelving-v1/steel.vmat"
+                }
+              }
+            ]
+          },
+          {
+            "Name": "lod2",
+            "Vertices": 7414,
+            "Triangles": 5180,
+            "LodMask": 4,
+            "MeshGroupMask": 18446744073709551615,
+            "TranslucencyType": 0,
+            "BoundsMin": "-17.75,-34.5,0",
+            "BoundsMax": "17.75,34.5,56",
+            "DrawCalls": [
+              {
+                "Vertices": 7414,
+                "Indices": 270,
+                "PrimitiveType": 5,
+                "UvDensity": 6.0597095,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 0,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "a995cc86-2a74-4f3f-808a-02d17ac74f41",
+                  "Path": "materials/riverside/shelving-v1/box0.vmat"
+                }
+              },
+              {
+                "Vertices": 7414,
+                "Indices": 330,
+                "PrimitiveType": 5,
+                "UvDensity": 6.0597095,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 270,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "d41e9942-4e54-4616-a30a-0bd534c4e4b6",
+                  "Path": "materials/riverside/shelving-v1/box1.vmat"
+                }
+              },
+              {
+                "Vertices": 7414,
+                "Indices": 2040,
+                "PrimitiveType": 5,
+                "UvDensity": 7.175612,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 600,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "0cb4becf-fa7b-4f07-9bf8-37ad3ad053c6",
+                  "Path": "materials/riverside/shelving-v1/cardboard.vmat"
+                }
+              },
+              {
+                "Vertices": 7414,
+                "Indices": 504,
+                "PrimitiveType": 5,
+                "UvDensity": 6.059709,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 2640,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "b04e6d5c-041d-4313-8dd9-3887d1f40422",
+                  "Path": "materials/riverside/shelving-v1/label0.vmat"
+                }
+              },
+              {
+                "Vertices": 7414,
+                "Indices": 432,
+                "PrimitiveType": 5,
+                "UvDensity": 6.059709,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 3144,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "64772878-e586-4bff-9701-35f665f60877",
+                  "Path": "materials/riverside/shelving-v1/label1.vmat"
+                }
+              },
+              {
+                "Vertices": 7414,
+                "Indices": 252,
+                "PrimitiveType": 5,
+                "UvDensity": 6.0597095,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 3576,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "81923aea-1bca-4f52-9178-fc445e0f2a74",
+                  "Path": "materials/riverside/shelving-v1/label2.vmat"
+                }
+              },
+              {
+                "Vertices": 7414,
+                "Indices": 252,
+                "PrimitiveType": 5,
+                "UvDensity": 6.0597095,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 3828,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "8cb38f62-661d-40b2-bf05-a63032edd2ba",
+                  "Path": "materials/riverside/shelving-v1/label3.vmat"
+                }
+              },
+              {
+                "Vertices": 7414,
+                "Indices": 2640,
+                "PrimitiveType": 5,
+                "UvDensity": 7.2263846,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 4080,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "1ad6f43e-e5c5-459a-8bfe-3e5b261f10c5",
+                  "Path": "materials/riverside/shelving-v1/paint.vmat"
+                }
+              },
+              {
+                "Vertices": 7414,
+                "Indices": 48,
+                "PrimitiveType": 5,
+                "UvDensity": 6.0597095,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 6720,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "5e3e0cdd-ba47-4a49-95dd-53eb2d5c344c",
+                  "Path": "materials/riverside/shelving-v1/prices.vmat"
+                }
+              },
+              {
+                "Vertices": 7414,
+                "Indices": 132,
+                "PrimitiveType": 5,
+                "UvDensity": 6.0597095,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 6768,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "13eb3046-2cf2-4080-a377-e2a4e2fc8e2b",
+                  "Path": "materials/riverside/shelving-v1/rubber.vmat"
+                }
+              },
+              {
+                "Vertices": 7414,
+                "Indices": 8640,
+                "PrimitiveType": 5,
+                "UvDensity": 6.724777,
+                "InstanceCount": 0,
+                "AlphaBlended": false,
+                "StartIndex": 6900,
+                "BaseVertex": 0,
+                "Material": {
+                  "Id": "ca9a7ec0-785e-4fd5-9a73-f956bdf7fba0",
+                  "Path": "materials/riverside/shelving-v1/steel.vmat"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

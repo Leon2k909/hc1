@@ -1,0 +1,66 @@
+var session = Editor.SceneEditorSession.Active;
+if (session?.IsPlaying == true) throw new Exception("Stop play before installing scene objects.");
+if (session?.Scene is null || !session.Scene.Name.Equals("riverside", StringComparison.OrdinalIgnoreCase))
+    throw new Exception("Riverside must be the active scene.");
+var project = Sandbox.Project.Current.GetRootPath();
+var output = System.IO.Path.Combine(project, "output/asset-improvement-20261030/riverside-crate/installed");
+var data = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(output, "placements.json")));
+var assets = new[] {
+    "models/maps/riverside/riverside_pad.vmdl",
+    "models/maps/riverside/riverside_store.vmdl",
+    "models/maps/riverside/riverside_dressing.vmdl",
+    "models/props/riverside/crate_v2/review/pad_without_crate.vmdl",
+    "models/maps/riverside/lantern-v1/pad_without_lantern.vmdl"
+};
+foreach (var path in assets)
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    var full = System.IO.Path.Combine(project, "Assets", path);
+    var original = System.IO.File.ReadAllText(full);
+    var updated = System.Text.RegularExpressions.Regex.Replace(original, @"(?m)^[^\r\n]*from = ""rs_crate\.vmat""[^\r\n]*\r?\n", "");
+    if (original != updated)
+    {
+        var backup = System.IO.Path.Combine(output, "before-install/assets", path);
+        System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(backup));
+        if (!System.IO.File.Exists(backup)) System.IO.File.Copy(full, backup);
+        System.IO.File.WriteAllText(full, updated);
+    }
+    var mtl = System.IO.Path.ChangeExtension(full, ".mtl");
+    // The crate review shares a copy named riverside_pad.mtl.
+    if (path.Contains("crate_v2/review/")) mtl = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(full), "riverside_pad.mtl");
+    if (System.IO.File.Exists(mtl))
+    {
+        var text = System.IO.File.ReadAllText(mtl);
+        var clean = System.Text.RegularExpressions.Regex.Replace(text, @"(?ms)^newmtl rs_crate\r?\n.*?(?=^newmtl |\z)", "");
+        if (text != clean)
+        {
+            var backup = System.IO.Path.Combine(output, "before-install/assets", System.IO.Path.GetRelativePath(System.IO.Path.Combine(project, "Assets"), mtl));
+            System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(backup));
+            if (!System.IO.File.Exists(backup)) System.IO.File.Copy(mtl, backup);
+            System.IO.File.WriteAllText(mtl, clean);
+        }
+    }
+    var asset = Editor.AssetSystem.FindByPath(path);
+    if (asset is null) throw new Exception("Missing asset: " + path);
+    await asset.CompileIfNeededAsync();
+}
+var scene = session.Scene;
+using (scene.Push())
+{
+    var group = scene.GetAllObjects(true).FirstOrDefault(g => g.Name == "Supply Crates");
+    if (group is null)
+    {
+        group = new GameObject(false, "Supply Crates");
+        group.Deserialize(data["group"].AsObject());
+    }
+    var models = group.GetComponentsInChildren<ModelRenderer>().ToArray();
+    if (models.Length != 12 || models.Any(r => r.Model is null || r.Model.IsError))
+        throw new Exception("Expected twelve valid crate models.");
+    session.HasUnsavedChanges = true;
+    return new {
+        Installed = models.Length,
+        Objects = models.Select(r => new { r.GameObject.Id, Position = r.WorldPosition.ToString(), Scale = r.WorldScale.ToString(), r.Model.ResourcePath }).ToArray(),
+        ColliderCount = group.GetComponentsInChildren<Collider>().Count(),
+        NeedsSceneSave = true
+    };
+}

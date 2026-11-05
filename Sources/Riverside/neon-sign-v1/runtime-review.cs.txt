@@ -1,0 +1,51 @@
+if(!Game.IsPlaying || Game.ActiveScene?.Source?.ResourcePath!="scenes/maps/riverside/riverside.scene" || Networking.IsActive)throw new Exception("Requires offline Riverside play");
+var scene=Game.ActiveScene;var editor=Editor.SceneEditorSession.Active;var dirty=editor.HasUnsavedChanges;
+for(int attempt=0;attempt<300;attempt++)
+{
+ if(scene.GetAllComponents<ModelRenderer>().Any(r=>r.Model?.ResourcePath=="models/maps/riverside/riverside_dressing.vmdl") && scene.GetAllComponents<CameraComponent>().Any(c=>c.IsMainCamera) && scene.GetAllComponents<Facepunch.PlayerPawn>().Any())break;
+ if(!Game.IsPlaying||Game.ActiveScene!=scene)throw new Exception("Play changed while waiting for the map");cancellationToken.ThrowIfCancellationRequested();await Task.Delay(50,cancellationToken);
+}
+var dressing=scene.GetAllComponents<ModelRenderer>().Single(r=>r.Model?.ResourcePath=="models/maps/riverside/riverside_dressing.vmdl");var original=dressing.Model;
+var without=Model.Load("models/maps/riverside/neon-sign-v1/dressing_without_neon.vmdl");var candidate=Model.Load("models/maps/riverside/neon-sign-v1/neon_sign.vmdl");
+if(without.IsError || candidate.IsError)throw new Exception("Preview model failed");
+var lightSettings=scene.GetAllComponents<PointLight>().Where(l=>l.GameObject.Name.StartsWith("no_place glow")).Select(l=>new{Name=l.GameObject.Name,Intensity=l.Intensity,Color=l.LightColor,Radius=l.Radius,Position=l.WorldPosition}).ToArray();
+if(lightSettings.Length!=2)throw new Exception("Expected the original two neon scene lights");
+var gameplay=scene.GetAllComponents<CameraComponent>().First(c=>c.IsMainCamera);var mains=scene.GetAllComponents<CameraComponent>().Select(c=>(Camera:c,Main:c.IsMainCamera)).ToArray();
+GameObject holder=null,item=null;var paths=new System.Collections.Generic.List<string>();var output="C:/sbox-projects/hc1/neon-sign-review/output/riverside/neon-sign-v1";
+try
+{
+ using(scene.Push())
+ {
+  holder=new GameObject(true,"Temporary neon review camera");var camera=holder.Components.Create<CameraComponent>();
+  void Copy<T>() where T:Component,new(){var source=gameplay.GameObject.GetComponent<T>(true);if(source!=null)Facepunch.GameObjectExtensions.CopyPropertiesTo(source,holder.Components.Create<T>());}
+  Copy<Bloom>();Copy<Tonemapping>();Copy<Sharpen>();Copy<AmbientOcclusion>();Copy<Vignette>();Copy<Facepunch.PhotographicResponse>();Copy<ColorAdjustments>();
+  camera.IsMainCamera=false;camera.EnablePostProcessing=gameplay.EnablePostProcessing;camera.PostProcessAnchor=gameplay.PostProcessAnchor??gameplay.GameObject;camera.ZNear=5f;camera.ZFar=50000;camera.BackgroundColor=gameplay.BackgroundColor;camera.CustomSize=new Vector2(1200,1200);
+  item=new GameObject(true,"Temporary real neon sign");item.WorldPosition=new Vector3(1150,60,0);item.WorldRotation=Rotation.FromYaw(2.8624052f);var renderer=item.Components.Create<ModelRenderer>();renderer.Model=candidate;
+  foreach(var view in new[]{"front"})
+  {
+   camera.WorldPosition=view=="front"?new Vector3(975,-39,420):view=="side"?new Vector3(1040,-90,410):new Vector3(730,-150,240);
+   var target=view=="whole"?new Vector3(1150,60,250):new Vector3(1150,60,410);
+   camera.WorldRotation=Rotation.LookAt(target-camera.WorldPosition);camera.FieldOfView=view=="whole"?60:45;
+   foreach(var variant in new[]{"before","after"})
+   {
+    dressing.Model=variant=="before"?original:without;renderer.Enabled=variant=="after";
+    using var bitmap=new Bitmap(1200,1200);
+    for(int frame=0;frame<12;frame++)
+    {
+     if(!Game.IsPlaying||Game.ActiveScene!=scene)throw new Exception("Runtime scene changed");cancellationToken.ThrowIfCancellationRequested();camera.RenderToBitmap(bitmap,false);await Task.Delay(20,cancellationToken);
+    }
+    var path=System.IO.Path.Combine(output,"in-game-"+view+"-"+variant+".png");System.IO.File.WriteAllBytes(path,bitmap.ToPng());paths.Add(path);
+   }
+  }
+ }
+ var afterLights=scene.GetAllComponents<PointLight>().Where(l=>l.GameObject.Name.StartsWith("no_place glow")).Select(l=>new{Name=l.GameObject.Name,Intensity=l.Intensity,Color=l.LightColor,Radius=l.Radius,Position=l.WorldPosition}).ToArray();
+ if(Json.Serialize(lightSettings)!=Json.Serialize(afterLights))throw new Exception("The original neon lights changed during review");
+ var errors=scene.GetAllComponents<ModelRenderer>().Where(r=>r.Model?.IsError==true).Select(r=>r.GameObject.Name).ToArray();
+ var report=new{PreviewOnly=true,ActualPlayMode=Game.IsPlaying,PlayerCount=scene.GetAllComponents<Facepunch.PlayerPawn>().Count(),ErrorModels=errors,NoExtraLights=true,ExistingNeonLightsUnchanged=true,CameraEffectsCopied=true,GameplayPostProcessing=gameplay.EnablePostProcessing,Paths=paths,Candidate=candidate.MeshInfo,Lights=lightSettings};
+ System.IO.File.WriteAllText(System.IO.Path.Combine(output,"runtime-review.json"),Json.Serialize(report));return new{report.PreviewOnly,report.ActualPlayMode,report.PlayerCount,report.ErrorModels,report.Paths};
+}
+finally
+{
+ if(dressing.IsValid())dressing.Model=original;item?.Destroy();holder?.Destroy();
+ if(editor.HasUnsavedChanges!=dirty)throw new Exception("Neon review changed editor dirty state");
+}

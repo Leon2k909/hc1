@@ -1,0 +1,100 @@
+var project=Sandbox.Project.Current.GetRootPath();
+var output=System.IO.Path.Combine(project,"output/riverside/neon-sign-v1");
+var plan=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(output,"review.json")));
+var paths=new[]{"models/props/riverside/neon_sign_v1/neon_sign.vmdl",plan["background"].GetValue<string>()};
+foreach(var path in paths)
+{
+    var asset=Editor.AssetSystem.FindByPath(path) ?? throw new Exception("Missing asset: "+path);
+    await asset.CompileIfNeededAsync();
+}
+var models=paths.Select(Model.Load).ToArray();
+var emission=Material.Load("materials/riverside/neon_sign_v1/neon.vmat");
+if(models.Any(m=>m is null || m.IsError))throw new Exception("Review model failed to load");
+var root=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(project,"Assets/scenes/maps/Riverside/riverside.scene"))).AsObject();
+var roots=new System.Text.Json.Nodes.JsonArray();
+foreach(var item in root["GameObjects"].AsArray())
+{
+    var name=item["Name"]?.GetValue<string>() ?? "";
+    if(!new[]{"Moon","Sky","Fog","Look","Riverside","Lights","Porch Lights","Roof TV Aerials","Trailer Entry Doors","Trailer Hitches","Passive Roof Vents","Pole Insulators","Streetlight Heads"}.Contains(name))continue;
+    var clone=item.DeepClone();
+    if(name=="Riverside")
+    {
+        var children=new System.Text.Json.Nodes.JsonArray();
+        foreach(var child in clone["Children"].AsArray())
+        {
+            if(!new[]{"Ground","Lowland Trailers","Dressing"}.Contains(child["Name"]?.GetValue<string>()))continue;
+            var piece=child.DeepClone();var comps=new System.Text.Json.Nodes.JsonArray();
+            foreach(var c in piece["Components"].AsArray())if(c["__type"]?.GetValue<string>()=="Sandbox.ModelRenderer")comps.Add(c.DeepClone());
+            piece["Components"]=comps;children.Add(piece);
+        }
+        clone["Children"]=children;
+    }
+    roots.Add(clone);
+}
+root["GameObjects"]=roots;root["SceneProperties"]["NavMesh"]["Enabled"]=false;root["SceneProperties"]["WantsSystemScene"]=false;
+var scene=Scene.CreateEditorScene();
+var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic;
+var preRender=typeof(Scene).GetMethod("PreRender",flags,null,Type.EmptyTypes,null);
+var preCamera=typeof(Scene).GetMethod("PreCameraRender",flags,null,Type.EmptyTypes,null);
+try
+{
+    CameraComponent camera;GameObject replacement,lightHolder;ModelRenderer pad;
+    var origin=new Vector3((float)plan["position"][0].GetValue<double>(),(float)plan["position"][1].GetValue<double>(),(float)plan["position"][2].GetValue<double>());
+    var frame=Rotation.FromYaw((float)plan["yaw"].GetValue<double>());
+    using(scene.Push())
+    {
+        scene.Deserialize(root);
+        pad=scene.GetAllComponents<ModelRenderer>().Single(r=>r.Model?.ResourcePath=="models/maps/riverside/riverside_dressing.vmdl");
+        replacement=new GameObject(false,"Neon sign v1 review");replacement.WorldPosition=origin;replacement.WorldRotation=frame;
+        replacement.Components.Create<ModelRenderer>().Model=models[0];
+        foreach(var t in scene.GetAllComponents<Tonemapping>())
+        {
+            var e=(t.MinimumExposure+t.MaximumExposure)/2f;t.AutoExposureEnabled=true;t.MinimumExposure=t.MaximumExposure=e;t.Rate=1000;
+        }
+        camera=new GameObject(true,"Neon comparison camera").Components.Create<CameraComponent>();
+        camera.ZNear=.3f;camera.ZFar=30000;camera.FieldOfView=50;
+        lightHolder=new GameObject(true,"Temporary matched inspection light");
+        var light=lightHolder.Components.Create<PointLight>();light.Radius=950;light.LightColor=new Color(1.2f,1.3f,1.5f);light.Shadows=true;
+    }
+    var original=pad.Model;
+    var textures=scene.GetAllComponents<ModelRenderer>().Where(r=>r.Model is not null).SelectMany(r=>r.Model.Materials).Concat(models.SelectMany(m=>m.Materials)).Distinct()
+        .SelectMany(m=>new[]{"g_tColor","g_tNormal","g_tRoughness","SkyTexture"}.Select(m.GetTexture)).Where(t=>t is not null).Distinct().ToArray();
+    foreach(var t in textures)t.MarkUsed(512);
+    foreach(var mat in models[0].Materials)
+        foreach(var t in new[]{"g_tColor","g_tNormal","g_tRoughness","g_tTranslucency"}.Select(mat.GetTexture).Where(t=>t is not null))t.MarkUsed(1024);
+    for(var f=0;f<40;f++)
+    {
+        using(scene.Push()){scene.EditorTick(.016f,.016f);preRender.Invoke(scene,null);}
+        await Task.Delay(25,cancellationToken);
+    }
+    var shots=new (string name,Vector3 eye,Vector3 target,float radius)[]{
+        ("whole",new Vector3(235,-130,60),new Vector3(0,0,0),400)
+    };
+    var files=new System.Collections.Generic.List<string>();
+    foreach(var variant in new[]{"red12","red15","red18"})foreach(var shot in shots)
+    {
+        using(scene.Push())
+        {
+            replacement.Enabled=true;pad.Model=models[1];emission.Set("g_flSelfIllumBrightness",float.Parse(variant.Replace("red","")));emission.Set("g_vSelfIllumTint",new Vector4(1,.1f,.04f,0));
+            lightHolder.Components.Get<PointLight>().Radius=shot.radius;
+            lightHolder.WorldPosition=origin+frame*(shot.target+(shot.name=="whole"?new Vector3(70,-60,95):new Vector3(18,-12,18)));
+        }
+        using var bitmap=new Bitmap(1600,1000);
+        for(var f=0;f<12;f++)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            using(scene.Push())
+            {
+                camera.WorldPosition=origin+frame*shot.eye;camera.WorldRotation=Rotation.LookAt(frame*(shot.target-shot.eye));
+                scene.EditorTick(.016f,.016f);preRender.Invoke(scene,null);preCamera.Invoke(scene,null);
+                ((SceneCamera)typeof(CameraComponent).GetProperty("SceneCamera",flags).GetValue(camera)).AntiAliasing=true;
+                camera.RenderToBitmap(bitmap,false);
+            }
+            await Task.Delay(16,cancellationToken);
+        }
+        if(variant=="settling")continue;
+        var path=System.IO.Path.Combine(output,variant+"_"+shot.name+".png");System.IO.File.WriteAllBytes(path,bitmap.ToPng());files.Add(path);
+    }
+    return new{Models=models.Select(m=>new{m.ResourcePath,m.IsError,Bounds=m.Bounds.ToString()}).ToArray(),Screenshots=files,Installed=false,InspectionLight=true};
+}
+finally{emission.Set("g_flSelfIllumBrightness",6f);emission.Set("g_vSelfIllumTint",new Vector4(1,1,1,0));scene.Destroy();}

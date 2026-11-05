@@ -1,0 +1,117 @@
+var project = Sandbox.Project.Current.GetRootPath();
+var output = System.IO.Path.Combine(project, "output/asset-improvement-20261030/riverside-pole-insulator");
+var plan = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(output, "review.json")));
+var paths = new[] { "models/props/riverside/pole_insulator_v2/pole_insulator.vmdl", plan["background"].GetValue<string>() };
+foreach (var path in paths)
+{
+    var asset = Editor.AssetSystem.FindByPath(path);
+    if (asset is null) throw new Exception("Asset not registered: " + path);
+    await asset.CompileIfNeededAsync();
+}
+var models = paths.Select(Model.Load).ToArray();
+if (models.Any(m => m is null || m.IsError)) throw new Exception("A review model failed to load");
+var root = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(project, "Assets/scenes/maps/Riverside/riverside.scene"))).AsObject();
+var roots = new System.Text.Json.Nodes.JsonArray();
+foreach (var item in root["GameObjects"].AsArray())
+{
+    var name = item["Name"]?.GetValue<string>() ?? "";
+    if (!new[] { "Moon", "Sky", "Fog", "Look", "Riverside", "Lights", "Supply Crates", "Sandbags", "Lawn Chairs", "Speed-Limit Signs", "Porch Lights", "Streetlight Heads" }.Contains(name)) continue;
+    var clone = item.DeepClone();
+    if (name == "Riverside")
+    {
+        var children = new System.Text.Json.Nodes.JsonArray();
+        foreach (var child in clone["Children"].AsArray())
+        {
+            if (!new[] { "Ground", "Pad", "Lucky Stop", "Dressing" }.Contains(child["Name"]?.GetValue<string>())) continue;
+            var piece = child.DeepClone();
+            var comps = new System.Text.Json.Nodes.JsonArray();
+            foreach (var c in piece["Components"].AsArray()) if (c["__type"]?.GetValue<string>() == "Sandbox.ModelRenderer") comps.Add(c.DeepClone());
+            piece["Components"] = comps;
+            children.Add(piece);
+        }
+        clone["Children"] = children;
+    }
+    roots.Add(clone);
+}
+root["GameObjects"] = roots;
+root["SceneProperties"]["NavMesh"]["Enabled"] = false;
+root["SceneProperties"]["WantsSystemScene"] = false;
+var scene = Scene.CreateEditorScene();
+var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
+var preRender = typeof(Scene).GetMethod("PreRender", flags, null, Type.EmptyTypes, null);
+var preCamera = typeof(Scene).GetMethod("PreCameraRender", flags, null, Type.EmptyTypes, null);
+try
+{
+    GameObject replacement, lightHolder;
+    CameraComponent camera;
+    ModelRenderer store;
+    var origin = new Vector3((float)plan["position"][0].GetValue<double>(), (float)plan["position"][1].GetValue<double>(), (float)plan["position"][2].GetValue<double>());
+    using (scene.Push())
+    {
+        scene.Deserialize(root);
+        store = scene.GetAllComponents<ModelRenderer>().Single(r => r.Model?.ResourcePath == "models/maps/riverside/riverside_dressing.vmdl");
+        replacement = new GameObject(false, "Pole insulator v2 review");
+        replacement.WorldPosition = origin;
+        replacement.WorldRotation = Rotation.FromYaw((float)plan["yaw"].GetValue<double>());
+        replacement.Components.Create<ModelRenderer>().Model = models[0];
+        foreach (var t in scene.GetAllComponents<Tonemapping>())
+        {
+            var exposure = (t.MinimumExposure + t.MaximumExposure) / 2f;
+            t.AutoExposureEnabled = true;
+            t.MinimumExposure = t.MaximumExposure = exposure;
+            t.Rate = 10;
+        }
+        camera = new GameObject(true, "Review camera").Components.Create<CameraComponent>();
+        camera.ZNear = .3f; camera.ZFar = 30000; camera.FieldOfView = 50;
+        lightHolder = new GameObject(true, "Temporary inspection light");
+        var light = lightHolder.Components.Create<PointLight>();
+        light.Radius = 200; light.LightColor = new Color(1.3f,1.4f,1.5f); light.Shadows = true;
+        scene.EditorTick(.016f,.016f); preRender.Invoke(scene,null); preCamera.Invoke(scene,null);
+    }
+    var original = store.Model;
+    var textures = scene.GetAllComponents<ModelRenderer>().Where(r => r.Model is not null).SelectMany(r => r.Model.Materials).Distinct()
+        .SelectMany(m => new[] { "g_tColor", "g_tNormal", "g_tRoughness", "SkyTexture" }.Select(m.GetTexture)).Where(t => t is not null).Distinct().ToArray();
+    foreach (var t in textures) t.MarkUsed(512);
+    var detailTextures = models[0].Materials.SelectMany(m => new[] { "g_tColor", "g_tNormal", "g_tRoughness", "g_tSelfIllumMask" }.Select(m.GetTexture)).Where(t => t is not null).ToArray();
+    foreach (var t in detailTextures) t.MarkUsed(2048);
+    for (var f=0; f<100; f++)
+    {
+        using (scene.Push()) { scene.EditorTick(.016f,.016f); preRender.Invoke(scene,null); }
+        await Task.Delay(25,cancellationToken);
+    }
+    var shots = new (string name, Vector3 origin, float yaw, Vector3 eye, Vector3 target)[] {
+        ("angle",origin,0,new Vector3(9,-7,5),new Vector3(0,0,2.5f)),
+        ("detail",origin,0,new Vector3(5,-4,5.5f),new Vector3(0,0,4.5f)),
+        ("context",origin,0,new Vector3(38,-28,18),new Vector3(8,0,-2)),
+        ("installed_street",new Vector3(1061.570555f,262.862964f,368),-81.469234f,new Vector3(28,-22,-17),new Vector3(0,0,0))
+    };
+    var files = new System.Collections.Generic.List<string>();
+    foreach (var variant in new[] { "settling", "old", "new" })
+    foreach (var shot in shots)
+    {
+        if (shot.name == "installed_street" && variant != "new") continue;
+        using (scene.Push()) { replacement.Enabled = variant == "new" && shot.name != "installed_street"; store.Model = replacement.Enabled ? models[1] : original; }
+        var frame = Rotation.FromYaw(shot.yaw);
+        using var bitmap = new Bitmap(1500,1100);
+        for (var f=0; f<20; f++)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            using (scene.Push())
+            {
+                camera.WorldPosition = shot.origin + frame * shot.eye;
+                camera.WorldRotation = Rotation.LookAt(frame * (shot.target-shot.eye));
+                lightHolder.WorldPosition = shot.origin + frame * (shot.name == "installed_street" ? new Vector3(15,-25,25) : new Vector3(8,-12,12));
+                scene.EditorTick(.016f,.016f); preRender.Invoke(scene,null); preCamera.Invoke(scene,null);
+                ((SceneCamera)typeof(CameraComponent).GetProperty("SceneCamera",flags).GetValue(camera)).AntiAliasing=true;
+                camera.RenderToBitmap(bitmap,false);
+            }
+            foreach (var t in detailTextures) t.MarkUsed(2048);
+            await Task.Delay(16,cancellationToken);
+        }
+        if (variant == "settling") continue;
+        var path = System.IO.Path.Combine(output, variant + "_" + shot.name + ".png");
+        System.IO.File.WriteAllBytes(path,bitmap.ToPng()); files.Add(path);
+    }
+    return new { Models = models.Select(m => new { m.ResourcePath,m.IsError,Bounds=m.Bounds.ToString() }).ToArray(), SavedBagRenderers = scene.GetAllComponents<ModelRenderer>().Count(r => r.Model?.ResourcePath.Contains("sandbag_v2/sandbag_") == true), Screenshots=files, InspectionLight=true, Installed=false };
+}
+finally { scene.Destroy(); }

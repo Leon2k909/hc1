@@ -1,4 +1,26 @@
 ## Soldier training (`SoldierTrainingRules`, `SoldierTraining`, `Client.Training`, `PlayerPawn.Training`)
+- Breath control (2026-11-04, code only): after fully aiming while stationary on the ground, hold the dedicated
+  `BreathControl` action to steady the added breathing sway to 30% of its usual amplitude. Per user request it is
+  unbound on both keyboard and controller by default; assign it under Keybinds → Weapon Handling → Hold Breath.
+  It no longer shares the Run action. `BreathControlRules` allows four
+  seconds from a full reserve and refills it over eight seconds when not holding; these are gameplay values.
+  At least 35% sprint stamina is required. Moving, sprinting, sliding, getting up, leaving ADS, reloading or
+  opening an input-blocking menu cancels the hold. A forced stop requires releasing the action and recovering at least
+  75% of the reserve before another hold; simply keeping the action down never restarts it. Brief voluntary holds can
+  reuse their remaining reserve. The effect eases in/out, retains residual sway, and does not change recoil,
+  spread or mouse input. It scales the existing shared camera/sight/firing-ray breathing offset. Camera-mode
+  changes preserve the reserve; death resets it. No movement bindings or sprint behavior were changed.
+  Validation: `Tools/BreathControlChecks` passed 56 checks across 30/60/120/144 Hz; the existing training/breathing
+  harness passed all 17 scenarios. Offline `Code/razedtest.csproj` build succeeded with 0 errors and 108 warnings.
+  No editor connection or live gameplay verification was performed.
+- Stance recoil support (2026-11-04, code only): `ShootRecoil.GetSupportScale` uses 0.85 for grounded crouch,
+  0.70 for grounded prone and the existing 0.55 for mounting. The strongest support wins; they do not stack.
+  Airborne crouch, slides and getting up receive no stance reduction. These are gameplay approximations, not
+  measured firearm data. Wounds, training and separate vertical/horizontal attachment effects still multiply
+  the result. Both patterned and random recoil use a fixed 0.02 impulse calibration (the original 50 Hz tick)
+  instead of multiplying each shot by the current tick duration. Normal 50 Hz standing/mounted magnitudes stay
+  the same. `Tools/RecoilSupportChecks` passed 123 checks against the production recoil component, including both
+  recoil modes, three tick lengths, modifiers, support exclusions and unbound breath-control configuration.
 - Players improve the skills they use (2026-10-18). The existing career level stays 1–55; Endurance and Weapon Handling
   each run from 1–50. Earned skill XP also adds to career XP. Skills survive deaths, map changes and prestige.
 - Endurance earns 1 XP per 10 metres of actual ground sprinting. The host samples movement every 0.25 s and rejects

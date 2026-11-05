@@ -1,0 +1,13 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var directory="models/maps/sewage/tower-vents-v1";
+foreach(var name in new[]{"compare_old","compare_new"})
+foreach(var ext in new[]{".obj",".mtl",".vmdl"})
+{
+    var relative=directory+"/"+name+ext;
+    var source=System.IO.Path.Combine(root,"output/sewage/tower-vents-v1/stage/Assets",relative);
+    var target=System.IO.Path.Combine(root,"Assets",relative);
+    if(System.IO.File.Exists(target))throw new Exception("Comparison asset already exists: "+target);
+    System.IO.File.Copy(source,target);
+    Editor.AssetSystem.RegisterFile(target);
+}
+return new{Imported=true,SceneChanged=false};

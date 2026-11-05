@@ -1,4 +1,10 @@
 ## Weapon fire rates and bots
+- Dropping and picking up a firearm preserves its selector setting (`Shootable.FireSelector.cs`,
+  `DroppedFireSelector`). The existing `IDroppedWeaponState` path carries a passive host-synced snapshot,
+  never a firing action. Pickup clears pending dry-trigger input and unfinished bursts. Missing or invalid
+  snapshots retain the prefab default; an incompatible fitted fire control group uses the existing
+  automatic/burst counterpart or first supported position. `Tools/FireSelectorChecks` passes 33 offline
+  checks; full game compilation passed. Multiplayer pickup and selector visuals still need an in-game check.
 - The SCAR-H's BaseDamage 36 is the M4's 20 scaled by muzzle energy: M80 at its prefab's 792 m/s is 2,989 J, and the
   M4's M855 at 905 m/s is 1,646 J. So in hardcore a body hit at full damage always kills (see Hardcore hit locations).
   The FAL's 41 is the same sum for M80 from its longer barrel (840 m/s, 3,362 J).

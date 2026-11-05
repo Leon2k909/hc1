@@ -1,0 +1,7 @@
+var model=Model.Load("models/maps/spillway/spillway_cargo.vmdl");
+if(model.IsError)throw new InvalidOperationException("Public cargo model failed");
+var paths=model.Materials.Select(m=>m.ResourcePath).ToArray();
+foreach(var mat in new[]{"steel","frame","dark","bolt"})if(!paths.Contains("materials/spillway/trench-grates-v1/"+mat+".vmat"))throw new InvalidOperationException("Missing grate material: "+mat);
+var report=new{Model=model.ResourcePath,Error=model.IsError,GrateMaterials=4};
+System.IO.File.WriteAllText(System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(),"output/spillway/trench-grates-v1/public-resource.json"),System.Text.Json.JsonSerializer.Serialize(report));
+return report;

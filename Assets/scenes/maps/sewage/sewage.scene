@@ -173,8 +173,8 @@
           "MaterialOverride": null,
           "Materials": null,
           "Model": {
-            "Id": "a112e772-6cb2-4372-9683-abba5959f981",
-            "Path": "models/maps/sewage/sewage_tower.vmdl"
+            "Id": "cd5ca233-1b7a-43cb-98bf-d5ec3d08d82a",
+            "Path": "models/maps/sewage/tower-rails-v1/base_tower.vmdl"
           },
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
@@ -324,11 +324,14 @@
           "CreateAttachments": false,
           "LodOverride": null,
           "MaterialGroup": null,
-          "MaterialOverride": null,
+          "MaterialOverride": {
+            "Id": "db209792-4c41-4247-ac9c-afd7abbf456a",
+            "Path": "materials/sewage/pipe-texture-v1/pipe.vmat"
+          },
           "Materials": null,
           "Model": {
-            "Id": "2e5d5bb3-d252-4be6-8550-bcfc26881e15",
-            "Path": "models/maps/sewage/sewage_pipework.vmdl"
+            "Id": "11accb4f-a4fb-4095-88a7-e96b000fb3b6",
+            "Path": "models/maps/sewage/valve-wheels-v1/base_pipework.vmdl"
           },
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
@@ -404,8 +407,8 @@
           "MaterialOverride": null,
           "Materials": null,
           "Model": {
-            "Id": "f685a1ee-6d62-4bde-a705-83bbac7d4f3d",
-            "Path": "models/maps/sewage/sewage_details.vmdl"
+            "Id": "4648ea22-c561-4d55-b63a-8bc1a1fc7d87",
+            "Path": "models/maps/sewage/work-lamps-v1/base_details.vmdl"
           },
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
@@ -459,7 +462,7 @@
       "Flags": 0,
       "Name": "Power cabinet 1",
       "Position": "470,958,0",
-      "Rotation": "0.0000000,0.0000000,-0.7071068,0.7071068",
+      "Rotation": "0,0,-0.707106829,0.707106829",
       "Scale": "1,1,1",
       "Tags": "sewage",
       "Enabled": true,
@@ -536,7 +539,7 @@
       "Flags": 0,
       "Name": "Power cabinet 2",
       "Position": "600,-946,0",
-      "Rotation": "0.0000000,0.0000000,0.7071068,0.7071068",
+      "Rotation": "0,0,0.707106829,0.707106829",
       "Scale": "1,1,1",
       "Tags": "sewage",
       "Enabled": true,
@@ -613,7 +616,7 @@
       "Flags": 0,
       "Name": "Power cabinet 3",
       "Position": "830,870,352",
-      "Rotation": "0.0000000,0.0000000,-0.7071068,0.7071068",
+      "Rotation": "0,0,-0.707106829,0.707106829",
       "Scale": "1,1,1",
       "Tags": "sewage",
       "Enabled": true,
@@ -869,11 +872,55 @@
               "__guid": "a9f98156-a596-5f18-8d48-059dbc66afa8",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 0.5,
+              "Intensity": 1,
               "LightColor": "0.304,1.292,0.627,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -883,7 +930,8 @@
               "Radius": 260,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -909,11 +957,55 @@
               "__guid": "61ffc1ca-9785-571c-ba9b-2cf148759c96",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 0.5,
+              "Intensity": 1,
               "LightColor": "0.304,1.292,0.627,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -923,7 +1015,8 @@
               "Radius": 260,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -949,11 +1042,55 @@
               "__guid": "bc1f87c1-219b-5da1-8511-2fa27411b77c",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 0.5,
+              "Intensity": 1,
               "LightColor": "1.9,0.1045,0.0342,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -963,7 +1100,8 @@
               "Radius": 260,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -989,11 +1127,55 @@
               "__guid": "1bc10e3f-47b9-5544-af6b-8da4ad0896ba",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 0.5,
+              "Intensity": 1,
               "LightColor": "1.9,0.1045,0.0342,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -1003,7 +1185,8 @@
               "Radius": 260,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -1029,11 +1212,55 @@
               "__guid": "42b17706-05fb-5bf7-9d6b-9535165ec5d2",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 0.5,
+              "Intensity": 1,
               "LightColor": "0.45,0.65,0.78,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -1043,7 +1270,8 @@
               "Radius": 1100,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": true
+              "Shadows": true,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -1069,11 +1297,55 @@
               "__guid": "1872d757-905d-54b6-810e-60829f9c873f",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 0.5,
+              "Intensity": 1,
               "LightColor": "0.45,0.65,0.78,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -1083,7 +1355,8 @@
               "Radius": 1100,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": true
+              "Shadows": true,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -1109,11 +1382,55 @@
               "__guid": "eb4c41ce-6d7a-55e8-8cef-2dc659bb6df3",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 0.5,
+              "Intensity": 1,
               "LightColor": "0.45,0.65,0.78,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -1123,7 +1440,8 @@
               "Radius": 1100,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": true
+              "Shadows": true,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -1149,11 +1467,55 @@
               "__guid": "b65656b4-c963-5919-959a-4bc132cae8b3",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 0.5,
+              "Intensity": 1,
               "LightColor": "0.14,0.6,0.32,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -1163,7 +1525,8 @@
               "Radius": 410,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -1189,11 +1552,55 @@
               "__guid": "2e698c9b-4129-5217-8b2e-2b2668b7b8cc",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 0.5,
+              "Intensity": 1,
               "LightColor": "0.14,0.6,0.32,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -1203,7 +1610,8 @@
               "Radius": 410,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -1229,11 +1637,55 @@
               "__guid": "59aa4888-9ca7-5bf8-a91b-3d31610406d7",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 0.5,
+              "Intensity": 1,
               "LightColor": "1.6,1.024,0.416,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -1243,7 +1695,8 @@
               "Radius": 360,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -1269,11 +1722,55 @@
               "__guid": "cd5357c4-484b-5320-9421-601eb7be110e",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 0.5,
+              "Intensity": 1,
               "LightColor": "1.6,1.024,0.416,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -1283,7 +1780,8 @@
               "Radius": 360,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -1309,11 +1807,55 @@
               "__guid": "7db46143-6509-5cad-ab25-cae5bddae8c2",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 0.5,
+              "Intensity": 1,
               "LightColor": "1.6,1.024,0.416,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -1323,7 +1865,8 @@
               "Radius": 360,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -1349,11 +1892,55 @@
               "__guid": "d5e7760b-bf78-5242-a6e9-6f850566c015",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 0.5,
+              "Intensity": 1,
               "LightColor": "1.6,1.024,0.416,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -1363,7 +1950,8 @@
               "Radius": 360,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -1389,11 +1977,55 @@
               "__guid": "ef5429b2-491e-5a36-8585-42ee9567c55e",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 0.5,
+              "Intensity": 1,
               "LightColor": "1.6,1.024,0.416,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -1403,7 +2035,8 @@
               "Radius": 360,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -1429,11 +2062,55 @@
               "__guid": "3db81658-7ea8-593f-a8ce-1e9ff995af1a",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 0.5,
+              "Intensity": 1,
               "LightColor": "1.6,1.024,0.416,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -1443,7 +2120,8 @@
               "Radius": 360,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -1469,11 +2147,55 @@
               "__guid": "4a035a57-fd13-58f3-9b49-d0f7562362df",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 0.5,
+              "Intensity": 1,
               "LightColor": "1.6,1.024,0.416,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -1483,7 +2205,8 @@
               "Radius": 360,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -1509,11 +2232,55 @@
               "__guid": "caa085dd-da0f-57e7-a717-784db4292c10",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 0.5,
+              "Intensity": 1,
               "LightColor": "1.6,1.024,0.416,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -1523,7 +2290,8 @@
               "Radius": 360,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -1549,11 +2317,55 @@
               "__guid": "d9b175ba-f17f-5587-b736-e33681c01dfa",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 0.5,
+              "Intensity": 1,
               "LightColor": "1.6,1.024,0.416,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -1563,7 +2375,8 @@
               "Radius": 360,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -1589,11 +2402,55 @@
               "__guid": "e430c9ea-7d2a-55f9-8b62-fc5db616699c",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 0.5,
+              "Intensity": 1,
               "LightColor": "1.6,1.024,0.416,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -1603,7 +2460,8 @@
               "Radius": 360,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -1629,11 +2487,55 @@
               "__guid": "aa51b244-7b18-5640-83a3-ebc0c3a2793d",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 0.5,
+              "Intensity": 1,
               "LightColor": "1.6,1.024,0.416,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -1643,7 +2545,8 @@
               "Radius": 360,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -1669,11 +2572,55 @@
               "__guid": "37c2563f-0880-5073-a994-ba3e9e626523",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 0.5,
+              "Intensity": 1,
               "LightColor": "1.6,1.024,0.416,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -1683,7 +2630,8 @@
               "Radius": 360,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -1709,11 +2657,55 @@
               "__guid": "54413428-c01a-5f96-b97a-47ad0a812991",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 0.5,
+              "Intensity": 1,
               "LightColor": "1.6,1.024,0.416,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -1723,7 +2715,8 @@
               "Radius": 360,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -1749,11 +2742,55 @@
               "__guid": "1aa81314-84ac-57d8-91fa-73554412ca1d",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 0.5,
+              "Intensity": 1,
               "LightColor": "1.2,0.768,0.312,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -1763,7 +2800,8 @@
               "Radius": 330,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -1789,11 +2827,55 @@
               "__guid": "d1c09f1d-1d16-5f3c-8e6b-041ca99c44fe",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 0.5,
+              "Intensity": 1,
               "LightColor": "1.2,0.768,0.312,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -1803,7 +2885,8 @@
               "Radius": 330,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -1829,11 +2912,55 @@
               "__guid": "c5c30f68-de0f-5603-8d5d-7d5def294b67",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 0.5,
+              "Intensity": 1,
               "LightColor": "1.2,0.768,0.312,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -1843,7 +2970,8 @@
               "Radius": 330,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -1869,11 +2997,55 @@
               "__guid": "2bf90503-345e-513b-918c-5e7c8615222d",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 0.5,
+              "Intensity": 1,
               "LightColor": "0.272,1.156,0.561,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -1883,7 +3055,8 @@
               "Radius": 205,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -1909,11 +3082,55 @@
               "__guid": "7b45fe09-2034-5f14-a1ff-f531c1431266",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 0.5,
+              "Intensity": 1,
               "LightColor": "1.7,0.0935,0.0306,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -1923,7 +3140,8 @@
               "Radius": 205,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -1949,11 +3167,55 @@
               "__guid": "0bbc5b6c-c9c9-5fe5-ade6-860524a844e6",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 0.5,
+              "Intensity": 1,
               "LightColor": "1.7,0.0935,0.0306,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -1963,7 +3225,8 @@
               "Radius": 205,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -1989,11 +3252,55 @@
               "__guid": "4dfa47ff-30d5-59da-8e29-2f22b8e9d0b9",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 0.5,
+              "Intensity": 1,
               "LightColor": "1.7,0.0935,0.0306,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -2003,7 +3310,8 @@
               "Radius": 205,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -2029,11 +3337,55 @@
               "__guid": "1986ba01-f46b-536c-92fe-a3f3dea09cbe",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 0.5,
+              "Intensity": 1,
               "LightColor": "0.672,1.05,1.134,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -2043,7 +3395,8 @@
               "Radius": 390,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -2069,11 +3422,55 @@
               "__guid": "8d78cf5f-27e5-5efb-a21d-ddc5a9e67933",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 0.5,
+              "Intensity": 1,
               "LightColor": "0.672,1.05,1.134,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -2083,7 +3480,8 @@
               "Radius": 390,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -2109,11 +3507,55 @@
               "__guid": "7e437a2b-3a42-5e82-a682-78cb66e0d122",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 0.5,
+              "Intensity": 1,
               "LightColor": "0.672,1.05,1.134,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -2123,7 +3565,8 @@
               "Radius": 390,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -2149,11 +3592,55 @@
               "__guid": "6405a268-f3e7-5fbf-a6ba-6bf01f4cb962",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 0.5,
+              "Intensity": 1,
               "LightColor": "0.672,1.05,1.134,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -2163,7 +3650,8 @@
               "Radius": 390,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -2189,11 +3677,55 @@
               "__guid": "96366185-4e62-59bf-ad1e-3d6c620aa34a",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 0.5,
+              "Intensity": 1,
               "LightColor": "0.065,0.13,0.11,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -2203,7 +3735,8 @@
               "Radius": 1100,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -2229,11 +3762,55 @@
               "__guid": "ebf4c655-92b6-500a-8b69-54146fc53ba4",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 0.5,
+              "Intensity": 1,
               "LightColor": "0.065,0.13,0.11,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -2243,7 +3820,8 @@
               "Radius": 1100,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -2269,11 +3847,55 @@
               "__guid": "b2514cb7-4002-52ae-a517-323b120f3d12",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 0.5,
+              "Intensity": 1,
               "LightColor": "0.065,0.13,0.11,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -2283,7 +3905,8 @@
               "Radius": 1100,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -2309,11 +3932,55 @@
               "__guid": "3d0f1284-c1d9-5406-8394-a7febac96a26",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 0.5,
+              "Intensity": 1,
               "LightColor": "0.08,0.34,0.165,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -2323,7 +3990,8 @@
               "Radius": 100,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -2349,11 +4017,55 @@
               "__guid": "9edc3585-a284-5127-9875-a657d299b104",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 0.5,
+              "Intensity": 1,
               "LightColor": "0.08,0.34,0.165,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -2363,7 +4075,8 @@
               "Radius": 100,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -2389,11 +4102,55 @@
               "__guid": "daa58f03-c2c2-5d6a-a403-4925858809d1",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 0.5,
+              "Intensity": 1,
               "LightColor": "0.08,0.34,0.165,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -2403,7 +4160,8 @@
               "Radius": 100,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -2875,7 +4633,7 @@
         "100d9f09-2c5b-41ea-a4d6-e73e2e7a7474": "334009ae-bddd-5b8f-925a-553277e02c31",
         "eb59db6f-2e1b-4290-8ea3-98f00b7ad4bc": "34d07c89-8f35-5745-b67e-f79909de4b4a",
         "6f8c1e1b-00f3-4ad6-a2d3-f73657da9d04": "cc46cfbc-2b4a-551b-88a1-3e71adf0cbba",
-        "13f4f6f5-6c96-4dfa-87ab-bffb93e9708e": "4dd971eb-b597-878a-a0ab-b743bd38f0e0"
+        "504cffff-8d79-4211-a71c-c9f62cdd84c0": "d70d5bd8-b867-8cbe-9698-6c18d749cc58"
       }
     },
     {
@@ -2921,7 +4679,9 @@
         "277c324d-4d24-4dcf-9d9c-5f7dc9051932": "6ca76771-deae-5317-9b38-68e6ad0a1285",
         "a0ca5a0f-4af9-416f-8308-bb7fa5dfb8f7": "4a23ddb0-8aae-5060-bc08-ecce6c69ec1b",
         "62e7124f-7d96-4d4a-b3ba-4c0ef58f6b4a": "bce52874-b843-543b-9ae7-4beba0b6e22c",
+        "37b4fba5-67ef-81bb-866f-c8cfc5b5a492": "3c201bce-ad40-8419-a430-7010d8d06a2b",
         "932f5e2c-242a-8101-95e4-a2a78a7da717": "fb2b29cc-c1f6-8753-a7d9-b1ce17ac1250",
+        "0501fc7f-ec2f-8532-90d2-5f88bb898cdb": "6aa1964d-1527-8450-ad26-226439be3dae",
         "91d5d71c-7576-48cb-8996-eb3c468aaf59": "d18e4a5e-892a-588a-bf3b-8ef58e3ef2de",
         "b4ca6d36-f647-49b3-9151-8ef4c63aeddd": "ac9f528e-9467-5709-9c2b-e3f6c933520c",
         "4dc414cd-ed6d-4fcd-bd26-0c4c340b5301": "0eb3f172-34bf-5bea-83db-7ff50d91842e"
@@ -2996,14 +4756,56 @@
           "__guid": "5e753c58-34be-49cc-af8d-bfa3b8685c70",
           "__enabled": true,
           "Flags": 0,
+          "__version": 1,
+          "AnimationCurve": [
+            {
+              "x": 0,
+              "y": 0,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 0.5,
+              "y": 1,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            }
+          ],
+          "AnimationDuration": 2,
+          "AnimationEnabled": false,
+          "AnimationGradient": {
+            "blend": "Linear",
+            "color": [
+              {
+                "t": 0.5,
+                "c": "1,1,1,1"
+              }
+            ],
+            "alpha": []
+          },
+          "AnimationPattern": "Flicker",
+          "AnimationSpeed": 1,
+          "AnimationTimeOffset": 0,
           "Attenuation": 0.6,
+          "BakeLightIndex": -1,
           "ConeInner": 9,
           "ConeOuter": 22,
           "Contribution": "Diffuse, Specular, Transmissive",
           "Cookie": null,
           "FogMode": "Enabled",
           "FogStrength": 1.5,
+          "Intensity": 1,
           "LightColor": "2.6,3.8,4.3,1",
+          "MixedShadows": false,
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
@@ -3013,7 +4815,8 @@
           "Radius": 1400,
           "ShadowBias": 0,
           "ShadowHardness": 0,
-          "Shadows": true
+          "Shadows": true,
+          "Temperature": 6500
         }
       ],
       "Children": []
@@ -3039,14 +4842,56 @@
           "__guid": "70bb60f1-3866-47e8-a9d5-2385e7330325",
           "__enabled": true,
           "Flags": 0,
+          "__version": 1,
+          "AnimationCurve": [
+            {
+              "x": 0,
+              "y": 0,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 0.5,
+              "y": 1,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            }
+          ],
+          "AnimationDuration": 2,
+          "AnimationEnabled": false,
+          "AnimationGradient": {
+            "blend": "Linear",
+            "color": [
+              {
+                "t": 0.5,
+                "c": "1,1,1,1"
+              }
+            ],
+            "alpha": []
+          },
+          "AnimationPattern": "Flicker",
+          "AnimationSpeed": 1,
+          "AnimationTimeOffset": 0,
           "Attenuation": 0.6,
+          "BakeLightIndex": -1,
           "ConeInner": 9,
           "ConeOuter": 22,
           "Contribution": "Diffuse, Specular, Transmissive",
           "Cookie": null,
           "FogMode": "Enabled",
           "FogStrength": 1.5,
+          "Intensity": 1,
           "LightColor": "2.6,3.8,4.3,1",
+          "MixedShadows": false,
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
@@ -3056,7 +4901,8 @@
           "Radius": 1400,
           "ShadowBias": 0,
           "ShadowHardness": 0,
-          "Shadows": true
+          "Shadows": true,
+          "Temperature": 6500
         }
       ],
       "Children": []
@@ -3082,14 +4928,56 @@
           "__guid": "6c590cdd-d461-42f2-92c4-1a7096ff52cd",
           "__enabled": true,
           "Flags": 0,
+          "__version": 1,
+          "AnimationCurve": [
+            {
+              "x": 0,
+              "y": 0,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 0.5,
+              "y": 1,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            }
+          ],
+          "AnimationDuration": 2,
+          "AnimationEnabled": false,
+          "AnimationGradient": {
+            "blend": "Linear",
+            "color": [
+              {
+                "t": 0.5,
+                "c": "1,1,1,1"
+              }
+            ],
+            "alpha": []
+          },
+          "AnimationPattern": "Flicker",
+          "AnimationSpeed": 1,
+          "AnimationTimeOffset": 0,
           "Attenuation": 0.6,
+          "BakeLightIndex": -1,
           "ConeInner": 9,
           "ConeOuter": 22,
           "Contribution": "Diffuse, Specular, Transmissive",
           "Cookie": null,
           "FogMode": "Enabled",
           "FogStrength": 1.5,
+          "Intensity": 1,
           "LightColor": "2.6,3.8,4.3,1",
+          "MixedShadows": false,
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
@@ -3099,7 +4987,8 @@
           "Radius": 1400,
           "ShadowBias": 0,
           "ShadowHardness": 0,
-          "Shadows": true
+          "Shadows": true,
+          "Temperature": 6500
         }
       ],
       "Children": []
@@ -3138,6 +5027,251 @@
           "OnComponentStart": null,
           "OnComponentUpdate": null,
           "Strength": 0.009
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "ce056f58-7167-4aad-a349-3273413146d3",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Waterworks bolted flanges",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "sewage",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.ModelRenderer",
+          "__guid": "e9a78a1a-d298-478f-a439-987adb2ac287",
+          "__enabled": true,
+          "Flags": 0,
+          "BodyGroups": 18446744073709551615,
+          "CreateAttachments": false,
+          "LodOverride": null,
+          "MaterialGroup": null,
+          "MaterialOverride": null,
+          "Materials": null,
+          "Model": {
+            "Id": "6ee8c329-f026-4e10-af73-5064a07c45c7",
+            "Path": "models/maps/sewage/pipe-flanges-v1/flanges.vmdl"
+          },
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "RenderOptions": {
+            "GameLayer": true,
+            "OverlayLayer": false,
+            "BloomLayer": false,
+            "AfterUILayer": false
+          },
+          "RenderType": "On",
+          "Tint": "1,1,1,1"
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "626931e9-0a6b-46f1-90cb-496de18a7a93",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Waterworks valve wheels",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "sewage",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.ModelRenderer",
+          "__guid": "0c0a6084-2fb2-43bf-8dbf-65adc3088c6e",
+          "__enabled": true,
+          "Flags": 0,
+          "BodyGroups": 18446744073709551615,
+          "CreateAttachments": false,
+          "LodOverride": null,
+          "MaterialGroup": null,
+          "MaterialOverride": null,
+          "Materials": null,
+          "Model": {
+            "Id": "6d261107-750e-461b-a871-e1476283daaf",
+            "Path": "models/maps/sewage/valve-wheels-v1/wheels.vmdl"
+          },
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "RenderOptions": {
+            "GameLayer": true,
+            "OverlayLayer": false,
+            "BloomLayer": false,
+            "AfterUILayer": false
+          },
+          "RenderType": "On",
+          "Tint": "1,1,1,1"
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "34545ade-9033-4031-b3a3-70e14742fa53",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Waterworks caged work lamps",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "sewage",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.ModelRenderer",
+          "__guid": "dc014de2-2078-48ee-ac2d-ded9a3ccce86",
+          "__enabled": true,
+          "Flags": 0,
+          "BodyGroups": 18446744073709551615,
+          "CreateAttachments": false,
+          "LodOverride": null,
+          "MaterialGroup": null,
+          "MaterialOverride": null,
+          "Materials": null,
+          "Model": {
+            "Id": "de13de13-5383-41d3-bb32-03e8f222c7b8",
+            "Path": "models/maps/sewage/work-lamps-v1/lamps.vmdl"
+          },
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "RenderOptions": {
+            "GameLayer": true,
+            "OverlayLayer": false,
+            "BloomLayer": false,
+            "AfterUILayer": false
+          },
+          "RenderType": "On",
+          "Tint": "1,1,1,1"
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "825be41b-c9d8-4935-9ebe-c3bb7a37311c",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Waterworks louvred vent housings",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "sewage",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.ModelRenderer",
+          "__guid": "50b73135-bac0-437c-b1b3-a9a70c52c8ec",
+          "__enabled": true,
+          "Flags": 0,
+          "BodyGroups": 18446744073709551615,
+          "CreateAttachments": false,
+          "LodOverride": null,
+          "MaterialGroup": null,
+          "MaterialOverride": null,
+          "Materials": null,
+          "Model": {
+            "Id": "142eaa01-8159-4917-ab09-ccfb50a67716",
+            "Path": "models/maps/sewage/tower-vents-v1/vents.vmdl"
+          },
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "RenderOptions": {
+            "GameLayer": true,
+            "OverlayLayer": false,
+            "BloomLayer": false,
+            "AfterUILayer": false
+          },
+          "RenderType": "On",
+          "Tint": "1,1,1,1"
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "93655672-7b22-4529-8762-dcdb114593f8",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Waterworks tower safety railing",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "sewage",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.ModelRenderer",
+          "__guid": "db885be0-1803-41f1-8da9-1882ff649cf4",
+          "__enabled": true,
+          "Flags": 0,
+          "BodyGroups": 18446744073709551615,
+          "CreateAttachments": false,
+          "LodOverride": null,
+          "MaterialGroup": null,
+          "MaterialOverride": null,
+          "Materials": null,
+          "Model": {
+            "Id": "593b1758-a7f6-46ab-9000-9dd679e6e255",
+            "Path": "models/maps/sewage/tower-rails-v1/rails.vmdl"
+          },
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "RenderOptions": {
+            "GameLayer": true,
+            "OverlayLayer": false,
+            "BloomLayer": false,
+            "AfterUILayer": false
+          },
+          "RenderType": "On",
+          "Tint": "1,1,1,1"
         }
       ],
       "Children": []

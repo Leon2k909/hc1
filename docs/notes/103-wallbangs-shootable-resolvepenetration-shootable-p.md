@@ -1,4 +1,16 @@
 ## Wallbangs (`Shootable.ResolvePenetration`, `Shootable.Penetration.cs`)
+- Damage loss added in code (2026-11-04, no editor): `ResolvePenetrationWithDamage` tracks a cumulative damage
+  multiplier while finding the same exits as the original resolver. Each entry receives its incoming damage;
+  only a successful crossing reduces the damage of later hits. `Shootable.Shoot` multiplies normal range falloff
+  by this value before rounding. Each pellet/shot starts at 1. Bodies and solid/unknown cover still stop rounds.
+  Per-unit loss in `PenetrationDamageRules` is a gameplay approximation: wood 0.125, plastic 0.175, sheet metal 3.2,
+  glass 0.05, and fabric/paper/cardboard 0.1. At their existing maximum supported thicknesses, these retain 50%,
+  65%, 60%, 85% and 90% respectively. Multiple crossings multiply their retained fractions. Glass loss is modest
+  because map window collision is thicker than the real pane. Custom surfaces inherit their base material's loss.
+  This does not simulate cartridge-specific residual velocity, fragmentation, deflection or penetration depth.
+  The original three-argument `ResolvePenetration` API remains available and returns the same hit sequence.
+  Offline tests link the production penetration iterator with deterministic trace seams. Gameplay feel and map
+  balance still need in-game verification.
 - The user (2026-09-29): no wallbangs through brick or thick walls, where a real round couldn't go. Codex rewrote the
   penetration pass that day. Rounds used to go through anything up to 32 units thick (`PenetrationThickness`), any
   wall in the game included.

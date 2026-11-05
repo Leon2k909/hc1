@@ -1,0 +1,3 @@
+# Riverside shed downlight - installed, 2026-11-04
+
+Approved bulkhead reused unchanged, aimed down and scaled to the original mount. Exactly14 old box/lens triangles deleted, one saved renderer under Shed Downlights. All other store OBJ lines, complete ModelDoc/physics, existing lights and all prior scene roots retained. Concurrent Interior Drinks Fridges group preserved. Generator narrow hook passes light/collision equality checks. No new models/materials/textures/lights/colliders. Recipe `Sources/Riverside/shed-downlight-reuse-v1/README.md`; evidence `output/riverside/shed-downlight-reuse-v1/installed/`. No gameplay/LOD test.

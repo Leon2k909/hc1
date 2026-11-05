@@ -1,0 +1,1 @@
+Riverside trailer porch bulkhead lamps claimed in Install new chairs, 2026-11-04. Private candidate: Sources/Riverside/porch-light-v2/. Preserve existing point lights; do not touch guard searchlight, store counter or the speed-sign installation.

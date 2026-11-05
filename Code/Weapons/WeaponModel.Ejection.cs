@@ -3,7 +3,7 @@ namespace Facepunch;
 public abstract partial class WeaponModel
 {
 	/// <summary>Launch solid brass in weapon space; retain authored transforms for legacy particle effects.</summary>
-	public GameObject EjectCasing( GameObject prefab, PlayerPawn owner = null )
+	public GameObject EjectCasing( GameObject prefab, PlayerPawn owner = null, EquipmentResource resource = null )
 	{
 		if ( Application.IsDedicatedServer || !prefab.IsValid() || !EjectionPort.IsValid() ) return null;
 
@@ -20,8 +20,12 @@ public abstract partial class WeaponModel
 				StartEnabled = false,
 				Name = "Spent casing"
 			} );
-			casing.GetComponent<SpentCasing>( true ).Launch( WorldRotation, owner.IsValid() ? owner.SyncedVelocity : Vector3.Zero,
-				owner.IsValid() ? owner.GameObject : GameObject );
+			var inheritedVelocity = Vector3.Zero;
+			if ( owner.IsValid() )
+				inheritedVelocity = owner.IsLocallyControlled && owner.CharacterController.IsValid()
+					? owner.CharacterController.Velocity : owner.SyncedVelocity;
+			casing.GetComponent<SpentCasing>( true ).Launch( WorldRotation, inheritedVelocity,
+				owner.IsValid() ? owner.GameObject : GameObject, resource?.ResourcePath );
 			casing.Enabled = true;
 			return casing;
 		}

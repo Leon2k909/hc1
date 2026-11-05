@@ -79,6 +79,10 @@ public partial class PlayerPawn : IGameEventHandler<DamageGivenEvent>, IGameEven
 	{
 		var damageInfo = eventArgs.DamageInfo;
 
+		// Recovery waits after every damaging hit, including blasts or hazards with no valid attacker.
+		if ( damageInfo.Damage > 0f )
+			_timeSinceLastDamage = 0f;
+
 		var attacker = GameUtils.GetPlayerFromComponent( eventArgs.DamageInfo.Attacker );
 		var victim = GameUtils.GetPlayerFromComponent( eventArgs.DamageInfo.Victim );
 		var attackerIsViewer = attacker.IsValid() && attacker.IsViewer;
@@ -95,7 +99,6 @@ public partial class PlayerPawn : IGameEventHandler<DamageGivenEvent>, IGameEven
 		// indicator shows where the heat comes from.
 		if ( damageInfo.Flags.HasFlag( DamageFlags.Burn ) )
 		{
-			_timeSinceLastDamage = 0f;
 			if ( IsViewer && IndicatorSource( damageInfo ) is { } heat )
 				DamageIndicator.Current?.OnHit( heat );
 			return;
@@ -111,10 +114,6 @@ public partial class PlayerPawn : IGameEventHandler<DamageGivenEvent>, IGameEven
 			}
 		}
 
-		// The zone has no attacker, but standing in it mustn't let health come back.
-		if ( damageInfo.Flags.HasFlag( DamageFlags.Zone ) )
-			_timeSinceLastDamage = 0f;
-
 		if ( !damageInfo.Attacker.IsValid() )
 			return;
 
@@ -123,8 +122,6 @@ public partial class PlayerPawn : IGameEventHandler<DamageGivenEvent>, IGameEven
 		{
 			DamageIndicator.Current?.OnHit( source );
 		}
-
-		_timeSinceLastDamage = 0f;
 
 		TimeUntilAccelerationRecovered = Global.TakeDamageAccelerationDampenTime;
 		AccelerationAddedScale = Global.TakeDamageAccelerationOffset;

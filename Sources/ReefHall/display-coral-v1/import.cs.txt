@@ -1,0 +1,7 @@
+var root=Sandbox.Project.Current.GetRootPath();var output=System.IO.Path.Combine(root,"output/reefhall/display-coral-v1");var plan=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(output,"manifest.json")));
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+foreach(var p in plan["protected"].AsObject())if(Hash(System.IO.Path.Combine(root,p.Key))!=p.Value.GetValue<string>())throw new Exception("Public source changed: "+p.Key);
+foreach(var p in plan["files"].AsObject())if(!(p.Key.StartsWith("models/props/reefhall/display_coral_v1/")||p.Key.StartsWith("materials/reefhall/display_coral_v1/"))||p.Key.Contains("..")||Hash(System.IO.Path.Combine(output,"stage/Assets",p.Key))!=p.Value.GetValue<string>())throw new Exception("Invalid stage input");
+foreach(var p in plan["files"].AsObject().OrderBy(x=>x.Key.EndsWith(".vmdl")?1:0)){
+ var target=System.IO.Path.Combine(root,"Assets",p.Key);System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target));System.IO.File.Copy(System.IO.Path.Combine(output,"stage/Assets",p.Key),target,true);Editor.AssetSystem.RegisterFile(target);
+}return new{PreviewOnly=true,Imported=plan["files"].AsObject().Count};

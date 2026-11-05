@@ -1,0 +1,6 @@
+var model=Model.Load("models/maps/riverside/shelving-v1/gondola.vmdl");
+if(model.IsError || model.Materials.Any(m=>m==null || m.IsError))throw new Exception("A shelving material is missing");
+if(model.Materials.Any(m=>m.GetFeature("F_SELF_ILLUM")!=0))throw new Exception("The shelf candidate must have no luminous product labels");
+var report=new{AllMaterialsLoaded=true,NoEmission=true,Materials=model.Materials.Select(m=>new{m.ResourcePath,m.IsError,m.ShaderName,Emission=m.GetFeature("F_SELF_ILLUM")}).ToArray(),Mesh=model.MeshInfo};
+System.IO.File.WriteAllText("C:/sbox-projects/hc1/shelving-review/output/riverside/shelving-v1/materials-verified.json",Json.Serialize(report));
+return new{report.AllMaterialsLoaded,report.NoEmission,MaterialCount=report.Materials.Length,Triangles=report.Mesh.Meshes.Select(m=>m.Triangles).ToArray()};

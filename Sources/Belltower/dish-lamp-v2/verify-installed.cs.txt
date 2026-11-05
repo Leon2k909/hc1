@@ -1,0 +1,5 @@
+var session=Editor.SceneEditorSession.All.Single(s=>s.Scene.IsEditor && s.Scene.Source?.ResourcePath=="scenes/maps/belltower/belltower.scene");
+var lamps=session.Scene.GetAllComponents<ModelRenderer>().Where(r=>r.Model?.ResourcePath=="models/maps/belltower/dish-lamp-v2/wall_lantern.vmdl").ToArray();
+var original=Model.Load("models/maps/belltower/wall-lantern-original/wall_lantern_original.vmdl");
+if(lamps.Length!=10 || lamps.Any(r=>r.Model.IsError) || session.HasUnsavedChanges || original is null || original.IsError)throw new InvalidOperationException("Lamp installation differs.");
+return new{InstalledLamps=10,Saved=true,AllModelsLoaded=true,OriginalWallLanternPreserved=true};

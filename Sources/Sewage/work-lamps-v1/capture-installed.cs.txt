@@ -1,0 +1,37 @@
+var project=Sandbox.Project.Current.GetRootPath();
+var output=System.IO.Path.Combine(project,"output/sewage/work-lamps-v1/current-review");
+var editor=Editor.SceneEditorSession.Active;
+var before=new{Scene=editor.Scene.Id,Runtime=Game.ActiveScene?.Id,Game.IsPlaying,Dirty=editor.HasUnsavedChanges};
+var data=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(project,"Assets/scenes/maps/sewage/sewage.scene"))).AsObject();
+var objects=data["GameObjects"].AsArray();
+foreach(var go in objects.ToArray()) {
+ var name=go["Name"]?.GetValue<string>()??"";
+ if(name=="zombies"||name=="game_setup"||name.Contains("spawn",StringComparison.OrdinalIgnoreCase))objects.Remove(go);
+}
+data["SceneProperties"]["WantsSystemScene"]=false;data["SceneProperties"]["NavMesh"]["Enabled"]=false;
+var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic;
+var preRender=typeof(Scene).GetMethod("PreRender",flags,null,Type.EmptyTypes,null);
+var preCamera=typeof(Scene).GetMethod("PreCameraRender",flags,null,Type.EmptyTypes,null);
+var scene=Scene.CreateEditorScene();
+try {
+ CameraComponent camera;
+ using(scene.Push()) {
+  scene.Deserialize(data);
+  var fixtureObjects=scene.GetAllObjects(true).Where(g=>g.Name=="Waterworks caged work lamps").ToArray();
+  if(fixtureObjects.Length!=1)throw new Exception("Expected exactly one saved lamp group");
+  var renderer=fixtureObjects[0].Components.Get<ModelRenderer>();
+  if(renderer.Model==null||renderer.Model.IsError||renderer.Model.ResourcePath!="models/maps/sewage/work-lamps-v1/lamps.vmdl")throw new Exception("Installed lamp model invalid");
+  var holder=new GameObject(false,"Installed work lamp review camera");camera=holder.Components.Create<CameraComponent>();
+  camera.IsMainCamera=false;camera.ZNear=1;camera.ZFar=20000;
+  camera.WorldPosition=new Vector3(-200,620,225);camera.WorldRotation=Rotation.LookAt(new Vector3(-110,680,205)-camera.WorldPosition);camera.FieldOfView=42;holder.Enabled=true;
+ }
+ using var bitmap=new Bitmap(1280,720);
+ for(var frame=0;frame<24;frame++) {
+  cancellationToken.ThrowIfCancellationRequested();
+  using(scene.Push()){scene.EditorTick(.016f,.016f);preRender.Invoke(scene,null);preCamera.Invoke(scene,null);camera.RenderToBitmap(bitmap,false);}
+  await Task.Delay(16,cancellationToken);
+ }
+ System.IO.File.WriteAllBytes(System.IO.Path.Combine(output,"after.png"),bitmap.ToPng());
+ var result=new{SavedSceneRendered=true,AddedPreviewFixtures=false,UserStatePreserved=editor.Scene.Id==before.Scene&&Game.ActiveScene?.Id==before.Runtime&&Game.IsPlaying==before.IsPlaying&&editor.HasUnsavedChanges==before.Dirty};
+ System.IO.File.WriteAllText(System.IO.Path.Combine(output,"installed-capture.json"),System.Text.Json.JsonSerializer.Serialize(result));return result;
+}finally{scene.Destroy();}

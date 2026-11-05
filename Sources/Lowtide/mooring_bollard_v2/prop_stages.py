@@ -109,7 +109,7 @@ def bake_stage(name, work, res, pos_range, ao_distance):
     scene.render.engine = "CYCLES"
     scene.cycles.device = "CPU"
     scene.render.threads_mode = "FIXED"
-    scene.render.threads = 4
+    scene.render.threads = 2
     scene.cycles.use_denoising = False
     scene.cycles.use_adaptive_sampling = False
     scene.cycles.max_bounces = 2
@@ -174,7 +174,7 @@ def bake_stage(name, work, res, pos_range, ao_distance):
     bake_one(max(512, res // 2), "AO", None, 64, f"bake_{name}_ao")
 
 
-def export_stage(name, work, out, folder, colours, thresholds, generated_by):
+def export_stage(name, work, out, folder, colours, thresholds, generated_by, write_resources=True):
     bpy.ops.wm.open_mainfile(filepath=os.path.join(work, f"{name}_build.blend"))
     os.makedirs(out, exist_ok=True)
     if uv_hash(bpy.data.objects[f"{name}_lod0"]) != open(os.path.join(work, f"{name}_baked_uv_hash.txt")).read().strip():
@@ -235,6 +235,9 @@ def export_stage(name, work, out, folder, colours, thresholds, generated_by):
         counts[number] = n_tris
         print("lod", number, "tris", n_tris, flush=True)
         number += 1
+    if not write_resources:
+        print("exported meshes", counts, flush=True)
+        return
     with open(os.path.join(out, f"{name}.mtl"), "w", newline="\n") as h:
         h.write(f"newmtl {name}\nKd 1 1 1\nd 1\n")
     meshes = ",\n".join(

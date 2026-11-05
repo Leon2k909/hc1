@@ -1,4 +1,12 @@
 ## RPK (MWII's RPK, mg_iw9_rkilo, addon 3499492742)
+- Heat transfer added in code (2026-11-04, no editor): `BarrelHeat` implements `IDroppedWeaponState`. Dropping a
+  heat-enabled gun stores its current temperature, cooling constant and remaining cook-off deadline on the dropped
+  object. Picking it up restores the cooled temperature with a fresh clock, so floor time is counted exactly once.
+  Repeated transfers do not reset temperature, and the receiving prefab retains its heating/dispersion/cook-off
+  settings. The cook-off deadline is now synced so owner-to-host drops can preserve it. Storage on the floor does
+  not fire the weapon; an overdue cook-off can occur once it is held again, only if it is still hot and loaded.
+  Existing drops with no heat snapshot retain default initialization. Offline checks link the actual component
+  with clock/drop/weapon seams; live multiplayer handoff and gameplay feel remain unverified.
 - The real 7.62x39 RPK LMG (category LMG, 3 spare mags): 600 rpm and the Kastov 762's shot sounds
   (`kastov_prefabs.gameplay_rpk`). The factory magazine is MWII's 75-round drum; its parts (`PARTS_RPK`,
   `Assets/gunsmith/rpk/`) are the RPK's own 40-round box mag, the AKM's 30, and the AK-platform stocks and grips.

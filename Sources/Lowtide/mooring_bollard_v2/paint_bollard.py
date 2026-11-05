@@ -19,7 +19,7 @@ from paint import OUT, WORK, fill_from, load, mix, noise as lattice_noise, sampl
 from scipy import ndimage as ndi  # noqa: E402
 from scipy.spatial import cKDTree  # noqa: E402
 
-PAINT, ZINC = 0, 3
+PAINT, ZINC, ROPE = 0, 3, 9
 NAME = "mooring_bollard"
 facts = json.load(open(os.path.join(WORK, f"{NAME}.json")))
 density, RANGE, FLANGE = facts["density"], facts["range"], facts["flange"]
@@ -146,6 +146,31 @@ metal = metal * (1 - np.maximum(salt, guano))
 grime = np.clip(smooth(0.42, 0.9, crevice + (mid - 0.5) * 0.4) * 0.6, 0, 0.8)
 color = mix(color, rgb(46, 40, 32) * (0.75 + 0.45 * fine[..., None]), grime)
 rough = rough * (1 - grime * 0.6) + 0.88 * grime * 0.6
+
+# Three-strand laid rope: its grooves follow distance along the actual coiled line.
+# World-axis stripes would cut across the turns and fail at the hanging end.
+rope = finish == ROPE
+path = np.load(os.path.join(WORK, f"{NAME}_rope.npy"))
+dense = np.concatenate([a+(b-a)*np.linspace(0, 1, 6, endpoint=False)[:, None] for a, b in zip(path, path[1:])]+[path[-1:]])
+distance = np.r_[0, np.linalg.norm(np.diff(dense, axis=0), axis=1).cumsum()]
+tangent = np.gradient(dense, axis=0)
+tangent /= np.maximum(np.linalg.norm(tangent, axis=1, keepdims=True), 1e-6)
+radial_axis = dense * np.array((1, 1, 0), np.float32)
+radial_axis -= (radial_axis*tangent).sum(-1, keepdims=True)*tangent
+radial_axis /= np.maximum(np.linalg.norm(radial_axis, axis=1, keepdims=True), 1e-6)
+cross_axis = np.cross(tangent, radial_axis)
+q = pos[rope]
+_, idx = cKDTree(dense).query(q, workers=2)
+offset = q-dense[idx]
+angle = np.arctan2((offset*cross_axis[idx]).sum(-1), (offset*radial_axis[idx]).sum(-1))
+lay = 0.5+0.5*np.cos(3*angle-2*math.pi*distance[idx]/0.9)
+rope_color = mix(srgb_to_linear((99, 88, 61)), srgb_to_linear((161, 146, 110)), smooth(0.08, 0.85, lay)[:, None])
+rope_color *= (0.87+0.22*fine[rope, None])
+wet = smooth(5.0, 1.0, Z[rope])
+color[rope] = rope_color*(1-0.38*wet[:, None])
+rough[rope] = 0.92-0.16*wet
+metal[rope] = 0.0
+height[rope] = 0.024*lay+0.002*(micro[rope]-0.5)
 color = color * (0.64 + 0.36 * ao[..., None])
 
 normal = to_normal(ndi.gaussian_filter(fill_from(cover, height)[0], 0.5), density, 1.0)

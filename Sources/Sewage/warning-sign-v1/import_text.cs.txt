@@ -1,0 +1,17 @@
+var project=Sandbox.Project.Current.GetRootPath();
+var folder=System.IO.Path.Combine(project,"output/sewage/warning-sign-v1/text-fit");
+var materialPath=System.IO.Path.Combine(project,"Assets/materials/sewage/warning.vmat");
+var material=System.IO.File.ReadAllText(materialPath);
+var oldReference="materials/sewage/warning_color.png";
+var newReference="materials/sewage/warning-sign-v1/warning_color_v2.png";
+if(!material.Contains(oldReference)&&!material.Contains(newReference))throw new Exception("Warning material changed unexpectedly");
+var backup=System.IO.Path.Combine(folder,"warning-before.vmat.txt");
+if(!System.IO.File.Exists(backup))System.IO.File.WriteAllText(backup,material);
+var target=System.IO.Path.Combine(project,"Assets",newReference);
+System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target));
+System.IO.File.Copy(System.IO.Path.Combine(folder,"stage/warning_color.png"),target,true);
+Editor.AssetSystem.RegisterFile(target);
+System.IO.File.WriteAllText(materialPath,material.Replace(oldReference,newReference));
+Editor.AssetSystem.RegisterFile(materialPath);
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"phase.txt"),"after");
+return new{Imported=newReference,Material="materials/sewage/warning.vmat",Text="WATCH / YOUR STEP",MinimumHorizontalMargin="10%",SceneChanged=false,ModelChanged=false};

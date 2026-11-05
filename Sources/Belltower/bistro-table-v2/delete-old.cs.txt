@@ -1,0 +1,37 @@
+// Delete only verified retired assets. Keep comparison PNGs and shared materials.
+var root=Sandbox.Project.Current.GetRootPath();
+var directory=System.IO.Path.Combine(System.IO.Path.GetTempPath(),"belltower-bistro-table-v2/install-stage");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(directory,"manifest.json")));
+string Hash(string p) {using var s=System.IO.File.OpenRead(p);return Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(s)).ToLowerInvariant();}
+var retired=Array.Empty<string>();
+var delete=manifest["deleted"].AsObject().Select(p=>p.Key).ToHashSet();
+foreach(var file in System.IO.Directory.EnumerateFiles(System.IO.Path.Combine(root,"Assets/models"),"*.vmdl",System.IO.SearchOption.AllDirectories))
+{
+ var relative=System.IO.Path.GetRelativePath(root,file).Replace('\\','/');
+ if(delete.Contains(relative))continue;
+ var text=System.IO.File.ReadAllText(file);
+ if(retired.Any(r=>text.Contains("\""+r+"\"")))throw new InvalidOperationException("A model still references a retired menu mesh: "+relative);
+}
+var count=0;
+foreach(var p in manifest["deleted"].AsObject())
+{
+ var target=System.IO.Path.GetFullPath(System.IO.Path.Combine(root,p.Key));
+ var allowedRoot=System.IO.Path.GetFullPath(System.IO.Path.Combine(root,"Assets/models/maps/belltower")).TrimEnd('\\','/')+System.IO.Path.DirectorySeparatorChar;
+ if(!target.StartsWith(allowedRoot,StringComparison.OrdinalIgnoreCase))throw new InvalidOperationException("Deletion is outside Belltower models: "+target);
+ var before=p.Value["before"].GetValue<string>();
+ if(Hash(p.Value["backup"].GetValue<string>())!=before)throw new InvalidOperationException("Verified backup differs.");
+ if(!System.IO.File.Exists(target))continue;
+ if(Hash(target)!=before)throw new InvalidOperationException("Retired source changed: "+p.Key);
+ System.IO.File.Delete(target);count++;
+}
+var temporary=0;
+foreach(var p in manifest["files"].AsObject())
+{
+ var path=System.IO.Path.Combine(root,p.Key)+".bistro-table-v2-incoming";
+ if(!System.IO.File.Exists(path))continue;
+ if(Hash(path)!=p.Value["after"].GetValue<string>())throw new InvalidOperationException("Inspect incomplete publication file: "+path);
+ System.IO.File.Delete(path);temporary++;
+}
+var result=new {DeletedRetiredFiles=count,RetiredTableReviewWrappers=2,RemovedOwnTemporaryFiles=temporary,SharedMaterialsPreserved=true};
+System.IO.File.WriteAllText(System.IO.Path.Combine(directory,"deleted.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

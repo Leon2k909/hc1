@@ -43,6 +43,8 @@ from PIL import Image
 
 import map_kit as K
 import orion_parts as OP
+import orion_task_chairs as OTC
+import orion_launch_vehicle as OLV
 import orion_cable_reel as OCR
 import orion_generator as OG
 import orion_textures as OT
@@ -334,8 +336,8 @@ def launch_control( m, glass ):
     OP.plate( m, "chart", ( r0 + 1.2, 100, OVER_Z + 100 ), ( 0, 1, 0 ), 40, off=0.0 )
     for k, e in enumerate( ( r0 + 70, r0 + 180 ) ):
         OP.desk( m, ( e, 110 ), ( 1, 0 ), 90, 30, 30, 3, ( "telemetry", "cctv", "status" ) )
-        OP.chair( m, ( e - 20, 80 ), ( 0, 1 ) )
-        OP.chair( m, ( e + 22, 78 ), ( 0, 1 ) )
+        OP.chair( m, ( e - 20, 80, OVER_Z + .2 ), ( 0, 1 ) )
+        OP.chair( m, ( e + 22, 78, OVER_Z + .2 ), ( 0, 1 ) )
     P.ceiling_light( m, "LC control lamp", ( ( r0 + r1 ) / 2, 60, 512 ), ( 1, 0 ), "warm", 700 )
     for k, e in enumerate( ( r0 + 50, r0 + 170 ) ):
         OP.tube_light( m, f"LC control tube {k}", ( e, n1 - 25, 470 ), ( 0, -1 ), 48, "warm", 300, light=( k == 0 ) )
@@ -730,7 +732,7 @@ def fuel( m, glass ):
     OP.screen( m, "orbit", ( o1 - 17.5, 782, G + 130 ), v( 0, -1, 0 ), 26, off=0.0 )
     for k, e in enumerate( ( 800, 900 ) ):
         OP.desk( m, ( e, 796 ), ( 1, 0 ), 84, 30, 30, 2, ( "telemetry", "status" ) )
-        OP.chair( m, ( e, 768 ), ( 0, 1 ) )
+        OP.chair( m, ( e, 768, G + .2 ), ( 0, 1 ) )
     P.ceiling_light( m, "OPS lamp 1", ( 820, 790, OPS_TOP - 20 ), ( 1, 0 ), "warm", 560 )
     P.ceiling_light( m, "OPS lamp 2", ( 900, 770, OPS_TOP - 20 ), ( 1, 0 ), "warm", 480 )
     for e in np.arange( 820, 970, 37 ):
@@ -771,8 +773,8 @@ def yard_props( m ):
     LF.build( m, 240, 230, "-e" )
     OP.tarp_pile( m, ( 195, 0 ), 110, 80, 78, ( 1, 0.2 ) )
     P.cylinder( m, ( 181, 171 ), 2.4, 0, 96, "oa_steel", 8 )
-    box( m, 176, 186, 160, 172, 92, 100, "oa_dark" )
-    card( m, "oa_lamp_warm", [ v( 177, 161, 91.9 ), v( 185, 161, 91.9 ), v( 185, 171, 91.9 ), v( 177, 171, 91.9 ) ], -UP )
+    from orion_yard_lamp import head as draw_yard_lamp
+    draw_yard_lamp(m)
     P.LIGHTS.append( ( "Yard post lamp", ( 181, 166, 84 ), OP.WARM, 420, False ) )
     # Floor markings: bay lines, lanes, arrows.
     for a, b in ( ( ( -230, -100 ), ( -230, 640 ) ), ( ( 470, -60 ), ( 470, 660 ) ), ( ( -230, 640 ), ( 470, 640 ) ), ( ( -60, 120 ), ( 300, 120 ) ),
@@ -1359,7 +1361,9 @@ def whiteboard_object( at, out ):
 def write_scene( written, light_list, path ):
     world = K.game_object( ids, "Orion", "world", children=[
         model_object( title, f"world/{name}", name, collide, shadows )
-        for name, title, collide, shadows in SCENE_MODELS if name in written ]
+          for name, title, collide, shadows in SCENE_MODELS if name in written ]
+        + OTC.objects(ids, OP.CHAIRS)
+        + OLV.objects(ids, OP.LAUNCH_VEHICLES)
         + ( [ OCR.scene_object(), OG.scene_object() ] if "orion_launch_deck" in written else [] )
         + [ red_crate_object( *placed ) for placed in OP.RED_CRATES ]
         + [ tarp_pile_object( *placed ) for placed in OP.TARP_PILES ]

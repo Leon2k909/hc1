@@ -1,0 +1,16 @@
+Layer0
+{
+ shader "shaders/complex.shader"
+ F_SPECULAR 1
+ TextureColor "materials/riverside/fluorescent_v1/tube_color.png"
+ TextureNormal "materials/default/default_normal.tga"
+ TextureRoughness "[0.3 0.3 0.3 0]"
+ F_SELF_ILLUM 1
+ TextureSelfIllumMask "materials/riverside/fluorescent_v1/tube_glow.png"
+ g_flSelfIllumBrightness "4"
+ g_flSelfIllumAlbedoFactor "1"
+ g_vSelfIllumTint "[1 1 1 1]"
+ g_flRoughnessScaleFactor "1"
+ g_flMetalness "0"
+ g_vColorTint "[1 1 1 1]"
+}

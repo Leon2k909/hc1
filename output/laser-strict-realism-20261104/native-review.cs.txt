@@ -1,0 +1,59 @@
+var original = Game.ActiveScene;
+var results = new System.Collections.Generic.List<object>();
+var output = "C:/sbox-projects/hc1/forked-shooter-main/output/laser-strict-realism-20261104";
+System.IO.Directory.CreateDirectory(output);
+var phase = "after";
+var assertStrict = true;
+var flags = System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic;
+foreach(var setup in new[]{
+    (Name:"clear-night-own",Density:0f,Side:false,Day:false,Local:false,Expected:false),
+    (Name:"haze-night-own",Density:.2f,Side:false,Day:false,Local:false,Expected:false),
+    (Name:"dense-mist-own",Density:1f,Side:false,Day:false,Local:false,Expected:true),
+    (Name:"haze-side",Density:.2f,Side:true,Day:false,Local:false,Expected:true),
+    (Name:"clear-day-own",Density:0f,Side:false,Day:true,Local:false,Expected:false),
+    (Name:"local-dense-mist",Density:1f,Side:false,Day:false,Local:true,Expected:true)})
+{
+    cancellationToken.ThrowIfCancellationRequested();
+    var scene = new Scene();
+    try
+    {
+        using var scope = scene.Push();
+        var wall = new GameObject(true,"Target"); wall.WorldPosition=new Vector3(300,0,64);
+        var mesh=wall.Components.Create<ModelRenderer>();mesh.Model=Model.Load("models/dev/box.vmdl");
+        mesh.WorldScale=new Vector3(.08f,4.8f,2.56f);mesh.Tint=new Color(.14f,.16f,.18f);
+        wall.Components.Create<BoxCollider>().Scale=new Vector3(50,50,50);
+        var floor=new GameObject(true,"Floor").Components.Create<ModelRenderer>();floor.Model=mesh.Model;
+        floor.WorldPosition=new Vector3(140,0,-2);floor.WorldScale=new Vector3(6,5,.08f);floor.Tint=new Color(.16f,.15f,.13f);
+        var moon=new GameObject(true,"Directional light").Components.Create<DirectionalLight>();
+        moon.WorldRotation=Rotation.From(new Angles(45,20,0));moon.LightColor=Color.White*(setup.Day?2f:.15f);moon.SkyColor=Color.White*(setup.Day?.5f:.07f);
+        var sky=new GameObject(true,"Sky").Components.Create<SkyBox2D>();
+        sky.SkyMaterial=Material.Load("materials/riverside/sky/riverside_sky.vmat");sky.Tint=Color.White*.05f;
+        var fog=new GameObject(true,"Particles").Components.Create<VolumetricFogVolume>();
+        fog.Bounds=setup.Local?new BBox(new Vector3(100,-150,0),new Vector3(180,150,150)):
+            new BBox(new Vector3(-500,-500,-100),new Vector3(1000,500,300));
+        fog.Strength=setup.Density;
+        var camera=new GameObject(true,"Review camera").Components.Create<CameraComponent>();
+        camera.WorldPosition=setup.Side?new Vector3(150,-180,80):new Vector3(-20,0,60);
+        camera.WorldRotation=Rotation.LookAt((setup.Side?new Vector3(150,-8,50):new Vector3(298,-8,50))-camera.WorldPosition);
+        camera.FieldOfView=70;camera.ZNear=.1f;camera.BackgroundColor=new Color(.015f,.02f,.03f);
+        var beam=new GameObject(true,"Laser").Components.Create<Facepunch.Gunsmith.GunsmithLaserBeam>();
+        scene.EditorTick(.02f,.02f);
+        beam.TraceBeam(new Vector3(0,-8,50),Vector3.Forward,null,camera);
+        var line=(SceneLineObject)typeof(Facepunch.Gunsmith.GunsmithLaserBeam).GetField("beam",flags).GetValue(beam);
+        var points=((ValueTuple<Vector3,float,float>[])typeof(Facepunch.Gunsmith.GunsmithLaserBeam).GetField("points",flags).GetValue(beam));
+        if(!beam.HasHit || beam.End.Distance(new Vector3(298,-8,50))>.01f) throw new Exception(setup.Name+": incorrect surface hit");
+        if(assertStrict && line.RenderingEnabled!=setup.Expected) throw new Exception(setup.Name+": incorrect beam visibility");
+        if(assertStrict && setup.Local && points.All(p=>p.Item2>0)) throw new Exception("Local mist lights the entire ray");
+        var path=System.IO.Path.Combine(output,$"{phase}-{setup.Name}.png");
+        using(var bitmap=new Bitmap(1280,720)) {camera.RenderToBitmap(bitmap);System.IO.File.WriteAllBytes(path,bitmap.ToPng());}
+        results.Add(new {setup.Name,BeamVisible=line.RenderingEnabled,SurfaceDotVisible=beam.IsVisible,
+            SampleCount=points.Length,LitSamples=points.Count(p=>p.Item2>0),Peak=points.Max(p=>p.Item2),Path=path});
+        beam.Hide();if(beam.IsVisible || beam.HasHit) throw new Exception("Hide failed");
+        beam.Enabled=false;if(beam.IsVisible) throw new Exception("Disable failed");
+    }
+    finally {scene.Destroy();}
+}
+if(Game.ActiveScene!=original) throw new Exception("Changed active scene");
+var report = new {Passed=true,Phase=phase,Cases=results};
+System.IO.File.WriteAllText(System.IO.Path.Combine(output,$"{phase}-checks.json"),Json.Serialize(report));
+return report;

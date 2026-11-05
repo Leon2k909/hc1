@@ -1,0 +1,12 @@
+var session=Editor.SceneEditorSession.Active;
+var group=session.Scene.GetAllObjects(true).Single(g=>g.Name=="Porch Lights");
+var renderers=group.GetComponentsInChildren<ModelRenderer>().ToArray();
+if (renderers.Length!=26 || renderers.Any(r=>r.Model is null || r.Model.IsError)) throw new Exception("Invalid installed porch fixtures");
+var project=Sandbox.Project.Current.GetRootPath();
+var legacy=System.IO.Path.Combine(project,"Assets/materials/riverside/rs_porch_light.vmat");
+if (System.IO.File.Exists(legacy) || System.IO.File.Exists(legacy+"_c") || System.IO.File.Exists(legacy+".meta")) throw new Exception("Legacy lamp material remains");
+var publicModels=new[] { "riverside_low", "riverside_terrace", "riverside_levee", "riverside_pad", "riverside_store" }.Select(n=>Model.Load("models/maps/riverside/"+n+".vmdl")).ToArray();
+if (publicModels.Any(m=>m is null || m.IsError)) throw new Exception("Invalid public zone");
+var report=new { InstalledFixtures=renderers.Length,AllFixturesValid=true,PublicZonesValid=publicModels.Length,OldMaterialSourceCompiledAndMetaAbsent=true,AddedLights=group.GetComponentsInChildren<Light>().Count(),AddedColliders=group.GetComponentsInChildren<Collider>().Count(),session.HasUnsavedChanges,session.IsPlaying };
+System.IO.File.WriteAllText(System.IO.Path.Combine(project,"output/asset-improvement-20261030/riverside-porch-light/installed/native-final-check.json"),System.Text.Json.JsonSerializer.Serialize(report,new System.Text.Json.JsonSerializerOptions{WriteIndented=true}));
+return report;

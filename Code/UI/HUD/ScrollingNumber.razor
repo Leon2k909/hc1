@@ -13,11 +13,14 @@
 
     public override void Tick()
     {
-        SmoothValue = SmoothValue.Approach( (float)Value, Speed * Time.Delta );
+        // Large awards must catch up before the score feed expires. Clearing the feed
+        // also clears the animation, so a new streak starts from its own score.
+        var rate = MathF.Max( Speed, MathF.Abs( Value - SmoothValue ) * 12f );
+        SmoothValue = Value == 0 ? 0f : SmoothValue.Approach( (float)Value, rate * Time.Delta );
     }
 
     protected override int BuildHash()
     {
-        return HashCode.Combine( SmoothValue );
+        return HashCode.Combine( SmoothValue.CeilToInt() );
     }
 }

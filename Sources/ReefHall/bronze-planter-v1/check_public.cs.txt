@@ -1,0 +1,6 @@
+var model=Model.Load("models/maps/reefhall/reefhall_lobby.vmdl");
+if(model.IsError)throw new InvalidOperationException("Public lobby model failed");
+foreach(var mat in new[]{"bronze","edge","toe"})
+ if(!model.Materials.Any(m=>m.ResourcePath=="materials/reefhall/bronze-planter-v1/"+mat+".vmat"))throw new InvalidOperationException("Missing planter material "+mat);
+var report=new{Model=model.ResourcePath,Error=model.IsError,PlanterMaterials=3};
+System.IO.File.WriteAllText(System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(),"Sources/ReefHall/bronze-planter-v1/review/public-resource.json"),System.Text.Json.JsonSerializer.Serialize(report));return report;

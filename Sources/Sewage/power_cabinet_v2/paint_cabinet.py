@@ -15,7 +15,7 @@ import numpy as np
 sys.dont_write_bytecode = True
 ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", ".."))
 sys.path.insert(0, os.path.join(ROOT, "Sources", "Gameplay", "capture-flag-v2"))
-from paint import FONT, OUT, WORK, fill_from, load, mix, noise, save_gray, save_normal, save_rgb, smooth, srgb_to_linear, stencil_image, to_normal  # noqa: E402
+from paint import FONT, OUT, WORK, fill_from, load, mix, noise, sample_image, save_gray, save_normal, save_rgb, smooth, srgb_to_linear, stencil_image, to_normal  # noqa: E402
 
 from PIL import Image, ImageDraw, ImageFont  # noqa: E402
 from scipy import ndimage as ndi  # noqa: E402
@@ -350,7 +350,7 @@ rough = np.where(plate, 0.5 + 0.2 * mid + 0.24 * p_chip, rough)
 metal = np.where(plate, 0.0, metal)
 height = np.where(plate, 0.002 * (micro - 0.5) + p_chip * 0.006, height)
 
-# Meter dials: cream, a scale of ticks with a red end, and a needle.
+# Meter dials: cream, a numbered scale and units. The needles are raised mesh parts.
 dial = finish == DIAL
 d_color = rgb(214, 204, 170).copy()
 d_glow = np.zeros((H, W), np.float32)
@@ -366,13 +366,20 @@ for index, (gy, gz) in enumerate(facts["gauges"]):
     tick_major = (np.abs(((sweep + 22.5) % 45.0) - 22.5) < 1.7) & (r > 0.68) & (r < 0.86)
     arc = (r > 0.86) & (r < 0.9)
     ink = (tick_minor | tick_major | arc) & inside
-    red_zone = (sweep > 205.0) & inside & (r > 0.74) & (r < 0.9)
-    needle_at = [172.0, 96.0][index]
-    off = (sweep - needle_at + 180.0) % 360.0 - 180.0
-    needle = (np.abs(off) * np.pi / 180.0 * np.maximum(r, 0.06) * R < 0.055 + 0.04 * (1 - r)) & (r < 0.86)
+    red_zone = (sweep > (205.0 if index == 0 else 250.0)) & inside & (r > 0.74) & (r < 0.9)
     picture = np.where(ink[..., None], np.array((0.012, 0.012, 0.012), np.float32), d_color)
     picture = np.where(red_zone[..., None], np.array((0.5, 0.025, 0.015), np.float32), picture)
-    picture = np.where(needle[..., None], np.array((0.01, 0.01, 0.01), np.float32), picture)
+    labels = np.zeros((H, W), np.float32)
+    values = (0, 25, 50, 75, 100) if index == 0 else (0, 125, 250, 375, 500)
+    for step, value in enumerate(values):
+        angle = math.radians(225-step*67.5)
+        cy, cz = gy+R*0.54*math.cos(angle), gz+R*0.54*math.sin(angle)
+        art = stencil_image([str(value)], (256, 128), bridge=False)
+        width = 0.37*len(str(value))+0.16
+        labels = np.maximum(labels, sample_image(art, (Y-cy)/width+0.5, (Z-cz)/0.62+0.5))
+    unit = stencil_image(["A" if index == 0 else "V"], (128, 128), bridge=False)
+    labels = np.maximum(labels, sample_image(unit, (Y-gy)/0.95+0.5, (Z-gz+1.55)/0.95+0.5))
+    picture = mix(picture, np.array((0.012,0.012,0.012),np.float32), labels)
     d_color = np.where(here[..., None], picture, d_color)
 d_color = mix(d_color, rgb(120, 92, 54), smooth(0.35, 0.75, mid * 0.6 + big * 0.4) * 0.55)
 color = np.where(dial[..., None], d_color, color)

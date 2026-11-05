@@ -1,0 +1,24 @@
+if(Game.IsPlaying) throw new Exception("Wait for edit mode before installing work lamps.");
+var root=Sandbox.Project.Current.GetRootPath();
+var plan=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/sewage/work-lamps-v1/plan.json")));
+var hash=Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(System.IO.Path.Combine(root,"Assets/models/maps/sewage/sewage_details.obj")))).ToLowerInvariant();
+if(hash!=plan["original_sha256"].GetValue<string>()) throw new Exception("Details changed; rebuild the targeted lamp splice before installing.");
+var session=Editor.SceneEditorSession.All.Single(x=>x.Scene.Name=="sewage");
+var details=session.Scene.GetAllObjects(true).Single(x=>x.Name=="Waterworks details").Components.Get<ModelRenderer>();
+if(details.Model?.ResourcePath!="models/maps/sewage/sewage_details.vmdl") throw new Exception("Unexpected details renderer model.");
+if(session.Scene.GetAllObjects(true).Any(x=>x.Name=="Waterworks caged work lamps")) throw new Exception("Caged lamps are already present; inspect before retrying.");
+var body=Model.Load("models/maps/sewage/work-lamps-v1/base_details.vmdl");
+var lamps=Model.Load("models/maps/sewage/work-lamps-v1/lamps.vmdl");
+if(body is null || body.IsError || lamps is null || lamps.IsError) throw new Exception("Lamp preview models failed to load.");
+using(session.Scene.Push())
+{
+    var holder=new GameObject(false,"Waterworks caged work lamps");
+    holder.Tags.Add("sewage");
+    holder.Components.Create<ModelRenderer>().Model=lamps;
+    details.Model=body;
+    holder.Enabled=true;
+}
+session.HasUnsavedChanges=true;
+session.Save(false);
+var disk=System.IO.File.ReadAllText(System.IO.Path.Combine(root,"Assets/scenes/maps/sewage/sewage.scene"));
+return new {Saved=!session.HasUnsavedChanges,OnDisk=disk.Contains("Waterworks caged work lamps")&&disk.Contains("models/maps/sewage/work-lamps-v1/base_details.vmdl"),ActiveScene=Editor.SceneEditorSession.Active.Scene.Name};

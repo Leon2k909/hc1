@@ -1,0 +1,17 @@
+if(Game.IsPlaying)throw new Exception("Comparison needs edit mode.");
+var session=Editor.SceneEditorSession.All.Single(x=>x.Scene.Name=="sewage");
+session.MakeActive(false);
+var items=new[]{(Name:"REVIEW VENT - OLD (left)",Path:"models/maps/sewage/tower-vents-v1/compare_old.vmdl",Position:new Vector3(470,-100,792)),(Name:"REVIEW VENT - NEW (right)",Path:"models/maps/sewage/tower-vents-v1/compare_new.vmdl",Position:new Vector3(470,-180,792))};
+using(session.Scene.Push())
+foreach(var item in items)
+{
+    var holder=session.Scene.GetAllObjects(true).FirstOrDefault(x=>x.Name==item.Name);
+    if(holder is null)holder=new GameObject(false,item.Name);
+    var model=Model.Load(item.Path);
+    if(model is null||model.IsError)throw new Exception("Comparison model did not load: "+item.Path);
+    holder.WorldPosition=item.Position;
+    holder.Components.GetOrCreate<ModelRenderer>().Model=model;
+    holder.Enabled=true;
+}
+session.HasUnsavedChanges=true;
+return session.Scene.GetAllObjects(true).Where(x=>x.Name.StartsWith("REVIEW VENT")).Select(x=>new{x.Id,x.Name,x.WorldPosition,Bounds=x.Components.Get<ModelRenderer>().Model.Bounds}).ToArray();

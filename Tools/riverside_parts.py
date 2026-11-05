@@ -31,6 +31,26 @@ COOLERS = []            # ( position, yaw ): cooler_v2 models the scene places
 TEDDIES = []            # ( position, yaw ): teddy_v2 models the scene places
 PROPANE = []            # [ owner, position, yaw, size ]: propane_v2 cylinders the scene places, in owner's frame until carry() moves them into a zone model
 LAWN_CHAIRS = []        # [ owner, position, yaw, colour ]: lawn_chair_v2 instances, carried into the zone's frame
+CRATES = []             # [ owner, position, yaw, size ]: supply crate v2 instances; original collision stays in the zone
+SANDBAGS = []           # [ owner, centre, yaw, size, variant, tint ]: reviewed cloth sacks; walls retain collision
+SPEED_SIGNS = []        # [ owner, ground centre, plan yaw ]: approved formed sign; original post collision retained
+PORCH_FIXTURES = []     # [ owner, centre, plan yaw, size (width, depth, height) ]: approved bulkhead lamps
+ROOF_ACS = []           # [ owner, base, plan yaw ]: approved office rooftop AC, visual only
+TOWER_LADDERS = []      # [owner, ladder foot, plan yaw]: approved fitted Lowtide design
+GRAFFITI_BOARDS = []    # approved STILL HERE plank board
+TOWER_ROOFS = []        # approved formed corrugated guard-tower canopy
+INTERIOR_FRIDGES = []   # approved stocked cabinet instances; original collision and lights retained
+STORE_STEPS = []        # approved Lucky Stop timber stair, original collision wedge retained
+WATER_TANKS = []        # [ owner, vessel base, plan yaw ]: approved A water-tower vessel
+HITCHES = []            # [ owner, body-end centre, plan yaw ]: approved T2 trailer hitch
+AERIALS = []            # [ owner, mast base, plan yaw ]: approved T2 rooftop aerial
+FLUORESCENTS = []       # [ owner, base, plan yaw ]: approved store ceiling fixtures; existing point lights stay
+STREET_LIGHTS = []      # [ owner, head centre, plan yaw ]: approved sodium cobra-heads, existing arms/lights retained
+CAMPERS = []            # [ owner, ground origin, plan yaw ]: approved separate boarded camper
+TRAILER_DOORS = []      # [ owner, sill centre, plan outward yaw ]: approved T2 door; original window retained
+ENTRY_STEPS = []        # [owner, foot, plan heading]: approved weathered T2 precast entry
+ROOF_VENTS = []         # [ owner, base, plan heading ]: approved first T2 vent, with roof-specific flashing
+PIN_INSULATORS = []     # [ owner, base, plan wire yaw, wired ]: glazed pins, original wire contacts retained
 
 WARM = "1.00,0.72,0.42,1"
 PORCH = "1.00,0.78,0.50,1"
@@ -50,6 +70,26 @@ def reset():
     PROPANE.clear()
     TEDDIES.clear()
     LAWN_CHAIRS.clear()
+    CRATES.clear()
+    SANDBAGS.clear()
+    SPEED_SIGNS.clear()
+    PORCH_FIXTURES.clear()
+    ROOF_ACS.clear()
+    TOWER_LADDERS.clear()
+    GRAFFITI_BOARDS.clear()
+    TOWER_ROOFS.clear()
+    INTERIOR_FRIDGES.clear()
+    STORE_STEPS.clear()
+    WATER_TANKS.clear()
+    HITCHES.clear()
+    AERIALS.clear()
+    FLUORESCENTS.clear()
+    STREET_LIGHTS.clear()
+    PIN_INSULATORS.clear()
+    CAMPERS.clear()
+    TRAILER_DOORS.clear()
+    ENTRY_STEPS.clear()
+    ROOF_VENTS.clear()
 
 
 def light( name, pos, colour, radius, shadows=False, scale=1.0 ):
@@ -167,21 +207,28 @@ def window( m, centre, right, w, h, style, seed=0 ):
     obox( m, c - UP * ( h / 2 + 2.5 ) + out * 1.2, right, ( w + 5, 2.4, 1.2 ), "rs_alu" )
 
 
-def door( m, centre_foot, right, w=32.0, h=76.0, paint_name="rs_alu", lit_window=False, open_=False ):
+def door( m, centre_foot, right, w=32.0, h=76.0, paint_name="rs_alu", lit_window=False, open_=False, model=False ):
     right = unit( right )
     out = np.cross( right, UP )
     c = v( *centre_foot )
-    RP.quad( m, "rs_dark", c + UP * ( h / 2 ), right, UP, w + 3, h + 2, off=0.3 )
+    if model:
+        if open_ or w != 32.0 or h != 76.0:
+            raise ValueError( "The approved entry door uses the closed 32 by 76 inch opening" )
+        TRAILER_DOORS.append( [ m, tuple( float( q ) for q in c ), math.degrees( math.atan2( out[1], out[0] ) ) ] )
+    else:
+        RP.quad( m, "rs_dark", c + UP * ( h / 2 ), right, UP, w + 3, h + 2, off=0.3 )
     if not open_:
-        RP.quad( m, paint_name, c + UP * ( h / 2 ), right, UP, w, h, off=0.5 )
+        if not model:
+            RP.quad( m, paint_name, c + UP * ( h / 2 ), right, UP, w, h, off=0.5 )
         if lit_window:
             lit( m, "trailer_window", c + UP * ( h * 0.72 ), right, h * 0.22, off=0.7, w=w * 0.5 )
         else:
             RP.quad( m, "rs_window_dark", c + UP * ( h * 0.72 ), right, UP, w * 0.5, h * 0.22, off=0.7 )
-        obox( m, c + UP * ( h * 0.47 ) + right * ( w * 0.36 ) + out * 1.4, right, ( 1.0, 1.5, 3.5 ), "rs_steel" )
+        if not model:
+            obox( m, c + UP * ( h * 0.47 ) + right * ( w * 0.36 ) + out * 1.4, right, ( 1.0, 1.5, 3.5 ), "rs_steel" )
 
 
-def steps( m, foot, along, width, z_top, paint_name="rs_concrete", surface=STONE, rise=7.5 ):
+def steps( m, foot, along, width, z_top, paint_name="rs_concrete", surface=STONE, rise=7.5, model=False ):
     """ Steps from the ground up to z_top, their foot's front edge at foot, climbing along. """
     along = unit( ( along[0], along[1], 0 ) )
     side = np.cross( UP, along )
@@ -189,7 +236,9 @@ def steps( m, foot, along, width, z_top, paint_name="rs_concrete", surface=STONE
     rise = z_top / n
     going = 10.0
     f = v( foot[0], foot[1], 0 )
-    for i in range( n ):
+    if model:
+        STORE_STEPS.append( [ m, tuple( float( q ) for q in f ), math.degrees( math.atan2( along[1], along[0] ) ) - 90 ] )
+    for i in range( 0 if model else n ):
         p0 = f + along * ( going * i )
         z = rise * ( i + 1 )
         depth = going * ( n - i )
@@ -203,7 +252,7 @@ def steps( m, foot, along, width, z_top, paint_name="rs_concrete", surface=STONE
 
 def trailer( length=560.0, width=120.0, tint="rs_siding_white", seed=0, door_x=None, door_side=1, porch_light=True,
              lit_share=0.45, boarded_share=0.2, hitch=True, antenna=None, ac=True, end_window=True, styles=None,
-             skirt=True, door_lit=None ):
+             skirt=True, door_lit=None, roof_ac_model=False, aerial_model=False, entry_door_model=False, hitch_model=False, roof_vent_model=False, entry_steps_model=False ):
     """ A single-wide in its own frame: x along its length (hitch at -x), y across, z up from the ground. Returns
     ( model, info ) where info has the door's outside point and the porch light's place. """
     rng = np.random.default_rng( seed )
@@ -259,12 +308,21 @@ def trailer( length=560.0, width=120.0, tint="rs_siding_white", seed=0, door_x=N
         if sy == door_side:
             right_d = v( -sy, 0, 0 )
             dl = door_lit if door_lit is not None else rng.random() < 0.5
-            door( m, v( door_x, sy * hy, F ), right_d, lit_window=dl, paint_name=( "rs_alu" if rng.random() < 0.5 else "rs_siding_cream" ) )
-            steps( m, v( door_x, sy * ( hy + 10 * max( 1, int( round( F / 7.5 ) ) ) ), 0 ), v( 0, -sy, 0 ), 36, F - 1, "rs_concrete" )
+            door( m, v( door_x, sy * hy, F ), right_d, lit_window=dl, paint_name=( "rs_alu" if rng.random() < 0.5 else "rs_siding_cream" ), model=entry_door_model )
+            step_foot = v( door_x, sy * ( hy + 10 * max( 1, int( round( F / 7.5 ) ) ) ), 0 )
+            if entry_steps_model:
+                # Retain the exact original wedge collision; suppress only the render boxes.
+                collision_steps = K.Model()
+                steps( collision_steps, step_foot, v( 0, -sy, 0 ), 36, F - 1, "rs_concrete" )
+                m.boxes.extend( collision_steps.boxes )
+                m.hulls.extend( collision_steps.hulls )
+                ENTRY_STEPS.append( [ m, tuple(step_foot), -90.0 * sy ] )
+            else:
+                steps( m, step_foot, v( 0, -sy, 0 ), 36, F - 1, "rs_concrete" )
             info["door"] = v( door_x, sy * ( hy + 60 ), 0 )
             if porch_light:
                 pl = v( door_x + 22, sy * ( hy + 2 ), F + 82 )
-                obox( m, pl, ( 1, 0, 0 ), ( 5, 4, 6 ), "rs_porch_light" )
+                porch_light_fixture( m, pl, ( 0, sy ) )
                 info["porch_light"] = pl + v( 0, sy * 14, -6 )
     # An end window at +x.
     if end_window:
@@ -272,25 +330,38 @@ def trailer( length=560.0, width=120.0, tint="rs_siding_white", seed=0, door_x=N
         window( m, v( hx, 0, F + 48 ), v( 0, 1, 0 ), 50, 26, style, seed=seed * 7 )
     # Hitch tongue at -x.
     if hitch:
-        for sy in ( -1, 1 ):
-            m.beam( v( -hx, sy * 30, 18 ), v( -hx - 46, 0, 14 ), ( 3, 4 ), "rs_rust" )
-        cylinder( m, ( -hx - 44, 0 ), 1.6, 0, 18, "rs_rust", 6 )
-        obox( m, v( -hx - 44, 0, 1 ), ( 1, 0, 0 ), ( 8, 8, 2 ), "rs_concrete" )
+        if hitch_model:
+            HITCHES.append( [ m, ( -float( hx ), 0.0, 0.0 ), 0.0 ] )
+        else:
+            for sy in ( -1, 1 ):
+                m.beam( v( -hx, sy * 30, 18 ), v( -hx - 46, 0, 14 ), ( 3, 4 ), "rs_rust" )
+            cylinder( m, ( -hx - 44, 0 ), 1.6, 0, 18, "rs_rust", 6 )
+            obox( m, v( -hx - 44, 0, 1 ), ( 1, 0, 0 ), ( 8, 8, 2 ), "rs_concrete" )
     # Roof furniture: vents, an AC unit, maybe an antenna.
-    for x in rng.uniform( -hx + 40, hx - 40, int( rng.integers( 1, 4 ) ) ):
-        obox( m, v( x, rng.uniform( -hy * 0.4, hy * 0.4 ), T + crown + 1 ), ( 1, 0, 0 ), ( 14, 14, 4 ), "rs_alu" )
+    for vent_index, x in enumerate( rng.uniform( -hx + 40, hx - 40, int( rng.integers( 1, 4 ) ) ) ):
+        vent_y = rng.uniform( -hy * 0.4, hy * 0.4 )
+        if roof_vent_model and vent_index == 0:
+            ROOF_VENTS.append( [ m, ( float( x ), float( vent_y ), T + crown - 1 ), 90.0 ] )
+        else:
+            obox( m, v( x, vent_y, T + crown + 1 ), ( 1, 0, 0 ), ( 14, 14, 4 ), "rs_alu" )
     if ac and rng.random() < 0.6:
         x = rng.uniform( -hx * 0.5, hx * 0.5 )
-        obox( m, v( x, 0, T + crown + 7 ), ( 1, 0, 0 ), ( 34, 30, 13 ), "rs_alu" )
-        obox( m, v( x, 0, T + crown + 13.7 ), ( 1, 0, 0 ), ( 26, 22, 0.6 ), "rs_dark" )
+        if roof_ac_model:
+            ROOF_ACS.append( [ m, ( float( x ), 0.0, T + crown + 0.5 ), 0.0 ] )
+        else:
+            obox( m, v( x, 0, T + crown + 7 ), ( 1, 0, 0 ), ( 34, 30, 13 ), "rs_alu" )
+            obox( m, v( x, 0, T + crown + 13.7 ), ( 1, 0, 0 ), ( 26, 22, 0.6 ), "rs_dark" )
     if antenna if antenna is not None else rng.random() < 0.35:
         x = rng.uniform( -hx * 0.6, hx * 0.6 )
         base = v( x, -hy * 0.3, T + crown )
-        rod( m, base, base + UP * 70, 0.8, "rs_steel", 6 )
-        for k in range( 5 ):
-            zz = 50 + k * 4
-            L2 = 30 - k * 4
-            rod( m, base + UP * zz - v( 0, L2 / 2, 0 ), base + UP * zz + v( 0, L2 / 2, 0 ), 0.4, "rs_steel", 4 )
+        if aerial_model:
+            AERIALS.append( [ m, tuple( float( q ) for q in base ), 0.0 ] )
+        else:
+            rod( m, base, base + UP * 70, 0.8, "rs_steel", 6 )
+            for k in range( 5 ):
+                zz = 50 + k * 4
+                L2 = 30 - k * 4
+                rod( m, base + UP * zz - v( 0, L2 / 2, 0 ), base + UP * zz + v( 0, L2 / 2, 0 ), 0.4, "rs_steel", 4 )
     # Collision: the body on its blocks, one box.
     m.collision_box( v( -hx, -hy, 0 ), v( hx, hy, T + crown ), SHEET )
     return m, info
@@ -353,6 +424,17 @@ def string( m, pts, sag=8.0, spacing=12.0, seed=0, dead=0.08, lights_every=None 
 
 def wire( m, a, b, sag=None, r=0.35, paint_name="rs_wire", segs=10 ):
     a, b = v( *a ), v( *b )
+    # The first span sets a tie's heading; branches do not rotate an established tie.
+    for item in PIN_INSULATORS:
+        if item[0] is not m or item[3]:
+            continue
+        contact = v( *item[1] ) + UP * 5
+        for end, other in ( ( a, b ), ( b, a ) ):
+            if np.linalg.norm( contact - end ) < 0.0001:
+                direction = other - end
+                item[2] = math.degrees( math.atan2( direction[1], direction[0] ) )
+                item[3] = True
+                break
     L = float( np.linalg.norm( ( b - a )[:2] ) )
     sag = sag if sag is not None else L * 0.035
     prev = a
@@ -388,14 +470,15 @@ def pole( m, base, height=420.0, facing=( 1, 0 ), arms=2, transformer=False, lam
         obox( m, c + f * 5, side, ( L, 4, 4.5 ), "rs_pole" )
         for s in ( -0.45, -0.15, 0.15, 0.45 ) if k == 0 else ( -0.4, 0.4 ):
             p = c + f * 5 + side * ( L * s ) + UP * 2.3
-            cylinder( m, p, 1.4, p[2], p[2] + 5, "rs_glass", 6, top="rs_glass" )
+            PIN_INSULATORS.append( [ m, tuple( float( q ) for q in p ), 0.0, False ] )
             taps.append( p + UP * 5 )
         # Braces.
         m.beam( c + f * 5 + side * ( L * 0.3 ), b + tilt * ( z - 22 ) + f * 5, ( 1.4, 1.4 ), "rs_steel" )
         m.beam( c + f * 5 - side * ( L * 0.3 ), b + tilt * ( z - 22 ) + f * 5, ( 1.4, 1.4 ), "rs_steel" )
     if transformer:
         c = b + tilt * ( height - 80 ) - f * 12
-        cylinder( m, c, 9, c[2] - 16, c[2] + 16, "rs_steel", 12, top="rs_steel", bottom="rs_steel" )
+        from riverside_pole_transformer import transformer as draw_transformer
+        draw_transformer( m, c, f, taps[0] )
     head = None
     if lamp:
         kind, direction = lamp
@@ -404,10 +487,12 @@ def pole( m, base, height=420.0, facing=( 1, 0 ), arms=2, transformer=False, lam
         a1 = a0 + d * 70 + UP * 8
         pipe_arm( m, a0, a1 )
         head = a1 + d * 8
-        obox( m, head + UP * 1, d, ( 22, 10, 5 ), "rs_alu" )
-        lens = "rs_lamp_sodium" if kind == "sodium" else "rs_lamp_cool"
-        card( m, lens, [ head - d * 8 - np.cross( UP, d ) * 4 - UP * 1.6, head + d * 9 - np.cross( UP, d ) * 4 - UP * 1.6,
-                         head + d * 9 + np.cross( UP, d ) * 4 - UP * 1.6, head - d * 8 + np.cross( UP, d ) * 4 - UP * 1.6 ], -UP )
+        if kind == "sodium":
+            STREET_LIGHTS.append( [ m, tuple( float( q ) for q in head ), math.degrees( math.atan2( d[1], d[0] ) ) ] )
+        else:
+            obox( m, head + UP * 1, d, ( 22, 10, 5 ), "rs_alu" )
+            card( m, "rs_lamp_cool", [ head - d * 8 - np.cross( UP, d ) * 4 - UP * 1.6, head + d * 9 - np.cross( UP, d ) * 4 - UP * 1.6,
+                                      head + d * 9 + np.cross( UP, d ) * 4 - UP * 1.6, head - d * 8 + np.cross( UP, d ) * 4 - UP * 1.6 ], -UP )
     return taps, head
 
 
@@ -515,19 +600,14 @@ def drum( m, c, paint_name="rs_drum_blue", z0=0.0, burning=True, dented=0.0, nam
         FIRES.append( ( name, ( c[0], c[1], z0 + h * 0.78 ), "drum" ) )
 
 
-def crate( m, c, size=( 30, 22, 20 ), along=( 1, 0 ), z0=0.0, paint_name="rs_crate", label=True, surface=WOOD ):
+def crate( m, c, size=( 30, 22, 20 ), along=( 1, 0 ), z0=0.0, paint_name=None, label=True, surface=WOOD ):
+    """ The separate supply crate model; retain the original solid box for collision. """
     along = unit( ( along[0], along[1], 0 ) )
-    side = np.cross( UP, along )
     L, W, H = size
     centre = v( c[0], c[1], z0 + H / 2 )
-    obox( m, centre, along, ( L, W, H ), paint_name, surface )
-    # Slats and corner boards.
-    for s in ( -1, 1 ):
-        for k in ( -0.48, 0.48 ):
-            obox( m, centre + side * ( W / 2 + 0.3 ) * s + along * ( L * k ), along, ( 2.5, 0.8, H ), "rs_wood" )
-        obox( m, centre + side * ( W / 2 + 0.3 ) * s, along, ( L, 0.8, 2.2 ), "rs_wood" )
-    if label:
-        sign( m, "crate_label", centre + side * ( W / 2 + 0.75 ), right_for( side ), H * 0.45, off=0.0 )
+    obox( m, centre, along, ( L, W, H ), None, surface )
+    CRATES.append( [ m, ( float( c[0] ), float( c[1] ), float( z0 ) ),
+                    math.degrees( math.atan2( along[1], along[0] ) ), tuple( float( s ) for s in size ) ] )
 
 
 def sandbag_wall( m, a, b, rows=4, z0=0.0, seed=0 ):
@@ -547,29 +627,18 @@ def sandbag_wall( m, a, b, rows=4, z0=0.0, seed=0 ):
             p = a + dn * t + side * rng.normal( 0, 0.8 ) + UP * ( z0 + r * 5.2 + 2.6 )
             yaw = rng.normal( 0, 0.06 )
             al = dn * math.cos( yaw ) + side * math.sin( yaw )
-            bag( m, p, al, ( 25 + rng.normal( 0, 1 ), 13.5, 5.6 ) )
+            bag( m, p, al, ( 25 + rng.normal( 0, 1 ), 13.5, 5.6 ), course=r )
     c = ( a + b ) / 2 + UP * ( z0 + rows * 2.6 )
     m.oriented_box( c, ( dn, side, UP ), ( L, 14, rows * 5.2 ), None, FABRIC )
 
 
-def bag( m, p, along, size ):
-    """ A filled sack: a rounded box made from a squashed lathe-like loft. """
+def bag( m, p, along, size, course=0 ):
+    """ Record a compressed sewn sandbag model. sandbag_wall keeps the simple collision wall. """
     along = unit( along )
-    side = np.cross( UP, along )
-    L, W, H = size
-    rings = []
-    for t in np.linspace( -1, 1, 5 ):
-        k = math.sqrt( max( 0.0, 1 - ( abs( t ) ** 3 ) ) ) * 0.9 + 0.1
-        ring = []
-        for j in range( 8 ):
-            a = 2 * math.pi * j / 8
-            ring.append( p + along * ( t * L / 2 ) + side * ( math.cos( a ) * W / 2 * k ) + UP * ( math.sin( a ) * H / 2 * k ) )
-        rings.append( ring )
-    for r0, r1 in zip( rings, rings[1:] ):
-        for j in range( 8 ):
-            j1 = ( j + 1 ) % 8
-            q = [ r0[j], r0[j1], r1[j1], r1[j] ]
-            card( m, "rs_sandbag", q, sum( q ) / 4 - p )
+    variant = len( SANDBAGS ) % 3
+    tint = ( .74, .72, .65 ) if course == 0 else ( .86, .84, .78 ) if course == 1 else ( .96, .95, .91 )
+    yaw = math.degrees( math.atan2( along[1], along[0] ) ) + ( 180 if variant == 1 else 0 )
+    SANDBAGS.append( [ m, tuple( float( q ) for q in p ), yaw, tuple( float( s ) for s in size ), variant, tint ] )
 
 
 def cooler( m, c, along=( 1, 0 ), z0=0.0 ):
@@ -588,6 +657,10 @@ def teddy( c, facing=( 0, -1 ), z0=0.0 ):
 
 def tire( m, c, axis=( 1, 0, 0 ), r=13.0, w=8.0, paint_name="rs_rubber" ):
     a = unit( axis )
+    if abs( a[2] ) > 0.99:
+        from riverside_discarded_tyres import tire as draw_loose_tyre
+        draw_loose_tyre( m, c, a, r, w, paint_name )
+        return
     p = v( *c )
     rod( m, p - a * ( w / 2 ), p + a * ( w / 2 ), r, paint_name, 12, caps=False )
     u, wv = RP.perp( a )
@@ -596,15 +669,19 @@ def tire( m, c, axis=( 1, 0, 0 ), r=13.0, w=8.0, paint_name="rs_rubber" ):
                               for k in range( 12 ) ], a * sg )
 
 
-def fridge( m, c, facing=( 0, -1 ), z0=0.0, lit_front=True ):
+def fridge( m, c, facing=( 0, -1 ), z0=0.0, lit_front=True, model=False ):
     """ A glass-door drinks fridge, lit from inside. """
     f = unit( ( facing[0], facing[1], 0 ) )
     side = np.cross( UP, f )
     W, D, H = 30.0, 28.0, 72.0
     base = v( c[0], c[1], z0 )
-    obox( m, base + UP * ( H / 2 ), side, ( W, D, H ), "rs_fridge", METAL )
+    obox( m, base + UP * ( H / 2 ), side, ( W, D, H ), {"default":None} if model else "rs_fridge", METAL )
+    if model:
+        yaw = ( math.degrees( math.atan2( f[1], f[0] ) ) + 270 ) % 360 - 180
+        INTERIOR_FRIDGES.append( [ m, tuple( float( q ) for q in base ), yaw ] )
     if lit_front:
-        lit( m, "fridge", base + f * ( D / 2 ) + UP * ( H * 0.5 ), right_for( f ), H * 0.86, off=0.2, w=W * 0.86 )
+        if not model:
+            lit( m, "fridge", base + f * ( D / 2 ) + UP * ( H * 0.5 ), right_for( f ), H * 0.86, off=0.2, w=W * 0.86 )
         light( "fridge", base + f * ( D / 2 + 12 ) + UP * ( H * 0.6 ), COOL, 90, scale=0.9 )
 
 
@@ -633,7 +710,7 @@ def propane( m, c, z0=0.0, size="100" ):
 def carry( dst, part, origin, yaw ):
     """ Moves the model instances in part into dst's frame, as place() does its geometry. """
     c, s = math.cos( math.radians( yaw ) ), math.sin( math.radians( yaw ) )
-    for item in PROPANE + LAWN_CHAIRS:
+    for item in PROPANE + LAWN_CHAIRS + CRATES + SANDBAGS + SPEED_SIGNS + PORCH_FIXTURES + ROOF_ACS + STREET_LIGHTS + FLUORESCENTS + PIN_INSULATORS + AERIALS + CAMPERS + TRAILER_DOORS + HITCHES + WATER_TANKS + GRAFFITI_BOARDS + TOWER_LADDERS + TOWER_ROOFS + INTERIOR_FRIDGES + STORE_STEPS + ROOF_VENTS + ENTRY_STEPS:
         if item[0] is part:
             x, y, z = item[1]
             item[0] = dst
@@ -726,101 +803,19 @@ def pickup( seed=3, wrecked=True ):
 
 
 def rv( seed=5 ):
-    """ A 1970s travel trailer in its own frame (x along, front at +x): white fibreglass, rounded front, a red stripe,
-    windows boarded, a bloody handprint by the door, a ladder up the back. 320 long, 96 wide, 118 tall. """
+    """Approved camper instance; retain its original sheet-metal box and separate propane pair."""
     m = K.Model()
-    rng = np.random.default_rng( seed )
-    L, W = 320.0, 96.0
-    hx, hy = L / 2, W / 2
-    F, T = 26.0, 118.0
-    # Body with rounded vertical corners at the front: a loft of sections along x.
-    prof = []
-    for k in range( 9 ):
-        a = math.pi / 2 * k / 8
-        prof.append( ( math.sin( a ), math.cos( a ) ) )
-    # Sides.
     for sy in ( -1, 1 ):
-        anchored_wall( m, "rs_siding_white", ( -hx, sy * hy ), ( hx - 18, sy * hy ), F, T - 8, v( 0, sy, 0 ), base_z=F - 4 )
-        # The roof's rounded edge.
-        for k in range( 4 ):
-            a0, a1 = math.pi / 2 * k / 4, math.pi / 2 * ( k + 1 ) / 4
-            p0 = ( sy * ( hy - 8 + 8 * math.cos( a0 ) ), T - 8 + 8 * math.sin( a0 ) )
-            p1 = ( sy * ( hy - 8 + 8 * math.cos( a1 ) ), T - 8 + 8 * math.sin( a1 ) )
-            card( m, "rs_siding_white", [ v( -hx, p0[0], p0[1] ), v( hx - 18, p0[0], p0[1] ), v( hx - 18, p1[0], p1[1] ), v( -hx, p1[0], p1[1] ) ],
-                  v( 0, sy * math.cos( ( a0 + a1 ) / 2 ), math.sin( ( a0 + a1 ) / 2 ) ),
-                  uv=[ ( 0, 0.9 + k * 0.02 ), ( 3.2, 0.9 + k * 0.02 ), ( 3.2, 0.92 + k * 0.02 ), ( 0, 0.92 + k * 0.02 ) ] )
-    box( m, -hx, hx - 18, -hy + 8, hy - 8, T - 1, T, "rs_siding_white" )
-    # The rounded front: a quarter-round in plan each side, raked back.
-    for sy in ( -1, 1 ):
-        for k in range( 6 ):
-            a0, a1 = math.pi / 2 * k / 6, math.pi / 2 * ( k + 1 ) / 6
-            q = [ v( hx - 18 + 18 * math.sin( a0 ), sy * ( hy - 18 + 18 * math.cos( a0 ) ), F ), v( hx - 18 + 18 * math.sin( a1 ), sy * ( hy - 18 + 18 * math.cos( a1 ) ), F ),
-                  v( hx - 26 + 18 * math.sin( a1 ), sy * ( hy - 18 + 18 * math.cos( a1 ) ), T - 4 ), v( hx - 26 + 18 * math.sin( a0 ), sy * ( hy - 18 + 18 * math.cos( a0 ) ), T - 4 ) ]
-            mid = ( a0 + a1 ) / 2
-            card( m, "rs_siding_white", q, v( math.sin( mid ), sy * math.cos( mid ), 0.2 ), uv=[ ( k * 0.1, 0.0 ), ( k * 0.1 + 0.1, 0.0 ), ( k * 0.1 + 0.1, 0.95 ), ( k * 0.1, 0.95 ) ] )
-    card( m, "rs_siding_white", [ v( hx, -hy + 18, F ), v( hx, hy - 18, F ), v( hx - 8, hy - 18, T - 4 ), v( hx - 8, -hy + 18, T - 4 ) ], v( 1, 0, 0.15 ),
-          uv=[ ( 0, 0 ), ( 0.6, 0 ), ( 0.6, 0.95 ), ( 0, 0.95 ) ] )
-    card( m, "rs_siding_white", [ v( hx - 8, -hy + 18, T - 4 ), v( hx - 8, hy - 18, T - 4 ), v( hx - 18, hy - 18, T ), v( hx - 18, -hy + 18, T ) ], v( 0.5, 0, 1 ) )
-    for sy in ( -1, 1 ):
-        card( m, "rs_siding_white", [ v( hx - 18, sy * ( hy - 18 ), T - 4 ), v( hx - 8, sy * ( hy - 18 ), T - 4 ), v( hx - 18, sy * ( hy - 18 ), T ) ], v( 0.3, sy, 0.8 ) )
-    fc = v( hx - 4, 0, F + 52 )
-    RP.quad( m, "rs_alu", fc, v( 0, 1, 0 ), unit( v( -0.15, 0, 1 ) ), 50, 30, off=0.3 )
-    RP.quad( m, "rs_window_dark", fc, v( 0, 1, 0 ), unit( v( -0.15, 0, 1 ) ), 46, 26, off=0.45 )
-    for k in range( 3 ):
-        ang = rng.normal( 0, 0.1 )
-        r2 = v( 0, math.cos( ang ), math.sin( ang ) )
-        RP.quad( m, "rs_plywood", fc + UP * ( ( k - 1 ) * 9 ), r2, unit( np.cross( v( 1, 0, 0.15 ), r2 ) ), 60, 9, off=0.7 + 0.1 * k )
-    # Back wall.
-    anchored_wall( m, "rs_siding_white", ( -hx, hy ), ( -hx, -hy ), F, T, v( -1, 0, 0 ), base_z=F - 4 )
-    # Under the floor: dark, with the axle.
-    box( m, -hx + 4, hx - 10, -hy + 4, hy - 4, 10, F, "rs_dark" )
-    for sy in ( -1, 1 ):
-        tire( m, v( -20, sy * ( hy - 4 ), 13 ), ( 0, 1, 0 ), r=13, w=8 )
-        box( m, -42, 2, sy * hy - 1 if sy > 0 else -hy, sy * hy if sy > 0 else -hy + 1, 22, 30, "rs_alu" )
-    # The stripe: a red band with a thin second line, on both sides and round the front.
-    for sy in ( -1, 1 ):
-        right = v( -1, 0, 0 ) if sy > 0 else v( 1, 0, 0 )
-        RP.quad( m, "rs_red_stripe", v( -18, sy * hy, F + 34 ), right, UP, L - 36, 4.5, off=0.3 )
-        RP.quad( m, "rs_red_stripe", v( -18, sy * hy, F + 29 ), right, UP, L - 36, 1.4, off=0.3 )
-    # Windows boarded with plywood, one with a broken pane; the door; the handprint and smears.
-    for sy in ( -1, 1 ):
-        right = v( -1, 0, 0 ) if sy > 0 else v( 1, 0, 0 )
-        for x, wv, hv in ( ( 100, 46, 28 ), ( 20, 30, 26 ), ( -90, 48, 28 ) ):
-            c = v( x, sy * hy, F + 58 )
-            RP.quad( m, "rs_alu", c, right, UP, wv + 3, hv + 3, off=0.35 )
-            RP.quad( m, "rs_window_dark", c, right, UP, wv, hv, off=0.5 )
-            for k in range( 3 ):
-                ang = rng.normal( 0, 0.1 )
-                r2 = right * math.cos( ang ) + UP * math.sin( ang )
-                u2 = unit( np.cross( np.cross( right, UP ), r2 ) )
-                RP.quad( m, "rs_plywood", c + UP * ( ( k - 1 ) * hv * 0.34 ), r2, u2, wv + 14, hv * 0.32, off=0.7 + 0.1 * k )
-    door( m, v( -40, -hy, F ), v( 1, 0, 0 ), w=26, h=72, paint_name="rs_siding_white" )
-    blood( m, "hand", v( 60, -hy, F + 50 ), v( 1, 0, 0 ), 22, off=0.9 )
-    blood( m, "smear", v( 30, -hy, F + 40 ), v( 1, 0, 0 ), 18, off=0.85 )
-    blood( m, "hand", v( 120, hy, F + 48 ), v( -1, 0, 0 ), 20, off=0.9 )
-    blood( m, "hand", v( -110, hy, F + 54 ), v( -1, 0, 0 ), 26, off=0.95 )
-    blood( m, "smear", v( -70, hy, F + 40 ), v( -1, 0, 0 ), 22, off=0.9 )
-    blood( m, "splatter", v( -130, hy, F + 30 ), v( -1, 0, 0 ), 30, off=0.85 )
-    # A ladder up the back to the roof, a spare wheel, the tongue at the front.
-    for sy in ( -1, 1 ):
-        rod( m, v( -hx - 3, sy * 9, F ), v( -hx - 3, sy * 9, T + 4 ), 0.6, "rs_alu", 6 )
-    for zz in np.arange( F + 10, T, 11 ):
-        rod( m, v( -hx - 3, -9, zz ), v( -hx - 3, 9, zz ), 0.45, "rs_alu", 5 )
-    tire( m, v( -hx - 6, 30, 50 ), ( 1, 0, 0 ), r=13, w=7 )
-    for sy in ( -1, 1 ):
-        m.beam( v( hx - 6, sy * 26, 16 ), v( hx + 40, 0, 14 ), ( 3, 4 ), "rs_rust" )
-    cylinder( m, ( hx + 38, 0 ), 1.6, 0, 16, "rs_rust", 6 )
-    # A propane pair on the tongue: 20 lb cylinders.
-    for sy in ( -1, 1 ):
-        propane( m, ( hx + 12, sy * 9 ), 18.0, size="20" )
-    m.collision_box( v( -hx, -hy, 0 ), v( hx, hy, T ), SHEET )
+        propane( m, ( 172, sy * 9 ), 18.0, size="20" )
+    m.collision_box( v( -160, -48, 0 ), v( 160, 48, 118 ), SHEET )
+    CAMPERS.append( [ m, ( 0.0, 0.0, 0.0 ), 0.0 ] )
     return m
 
 
 # ---------------------------------------------------------------------------------------------------------------------
 # Signs and towers
 
-def park_sign( m, base, facing, scale=1.0, height=None ):
+def park_sign( m, base, facing, scale=1.0, height=None, board_model=False ):
     """ RIVERSIDE TRAILER PARK: a roadside sign on two steel posts: the top board with its red neon script and bulb
     letters, the GOOD TIMES / BIGGER TOMORROW marquee under it, and a plywood board between the posts with STILL HERE
     sprayed on it. Faces facing (plan). """
@@ -862,8 +857,12 @@ def park_sign( m, base, facing, scale=1.0, height=None ):
     # The plywood board between the posts, and the graffiti on it.
     pw, ph = W * 0.62, 70 * s
     pc = b + UP * ( z_mq - 26 * s - ph / 2 ) + f * 4
-    obox( m, pc, right, ( pw, 1.5, ph ), "rs_plywood", WOOD )
-    paint( m, "still_here", pc + f * 0.8, right, ph * 0.86, tone="red", off=0.0 )
+    if board_model:
+        GRAFFITI_BOARDS.append( [ m, tuple( float( q ) for q in pc ), math.degrees( math.atan2( right[1], right[0] ) ) ] )
+        obox( m, pc, right, ( pw, 1.5, ph ), { "default": None }, WOOD )
+    else:
+        obox( m, pc, right, ( pw, 1.5, ph ), "rs_plywood", WOOD )
+        paint( m, "still_here", pc + f * 0.8, right, ph * 0.86, tone="red", off=0.0 )
     # Its lights: the neon's red glow and the bulbs' warm one, shining on the trailers below.
     light( "sign neon", centre + f * 50, RED, 420, scale=2.2 )
     light( "sign bulbs", centre + f * 60 - UP * ( top_h * 0.25 ), WARM, 520, shadows=True, scale=2.4 )
@@ -887,17 +886,24 @@ def neon_sign( m, base, facing, height=360.0, name="no_place" ):
     light( f"{name} glow back", centre - f * 40, RED, 300, scale=1.4 )
 
 
+def porch_light_fixture( m, centre, facing, size=( 5, 4, 6 ) ):
+    """ Record the approved fixture; existing point lights and wall collision stay as authored. """
+    PORCH_FIXTURES.append( [ m, tuple( float( q ) for q in centre ),
+                            math.degrees( math.atan2( facing[1], facing[0] ) ), tuple( size ) ] )
+
+
 def speed_sign( m, base, facing, z_bottom=78.0 ):
+    """ Record the approved formed sign while preserving the original post collision. """
+    if z_bottom != 78.0:
+        raise ValueError( "The approved speed-sign model uses the original 78-inch board bottom" )
     f = unit( ( facing[0], facing[1], 0 ) )
     right = right_for( f )
     b = v( base[0], base[1], base[2] if len( base ) > 2 else 0.0 )
-    obox( m, b + UP * ( z_bottom / 2 + 16 ), right, ( 2.5, 2.5, z_bottom + 32 ), "rs_steel", METAL )
-    c = b + UP * ( z_bottom + 15 ) + f * 1.5
-    sign( m, "speed", c, right, 30, off=0.2 )
-    sign( m, "sign_back", c - f * 0.2, -right, 30, off=0.0 )
+    obox( m, b + UP * ( z_bottom / 2 + 16 ), right, ( 2.5, 2.5, z_bottom + 32 ), None, METAL )
+    SPEED_SIGNS.append( [ m, tuple( float( q ) for q in b ), math.degrees( math.atan2( f[1], f[0] ) ) ] )
 
 
-def water_tower( m, base, facing=( -1, -1 ) ):
+def water_tower( m, base, facing=( -1, -1 ), tank_model=False ):
     """ A steel water tower: four splayed legs braced in tiers, a riser, a cylindrical tank with a conical roof and a
     finial, a catwalk with a railing, and RIVERSIDE STICKS TOGETHER painted across the tank. """
     b = v( base[0], base[1], base[2] if len( base ) > 2 else 0.0 )
@@ -919,8 +925,11 @@ def water_tower( m, base, facing=( -1, -1 ) ):
             rod( m, pts[k], nxt[( k + 1 ) % 4], 0.8, "rs_tank", 4 )
     bz = b[2]
     cylinder( m, b, 18, bz, bz + z0, "rs_tank", 10 )
-    cylinder( m, b, r_tank, bz + z0, bz + z1, "rs_tank", 28, bottom="rs_tank" )
-    lathe( m, b, [ ( r_tank + 2, bz + z1 ), ( r_tank * 0.55, bz + z1 + 70 ), ( 18, bz + z1 + 110 ), ( 0, bz + z1 + 112 ) ], "rs_tank", 28 )
+    if tank_model:
+        WATER_TANKS.append( [ m, tuple( float( q ) for q in b + UP * z0 ), 0.0 ] )
+    else:
+        cylinder( m, b, r_tank, bz + z0, bz + z1, "rs_tank", 28, bottom="rs_tank" )
+        lathe( m, b, [ ( r_tank + 2, bz + z1 ), ( r_tank * 0.55, bz + z1 + 70 ), ( 18, bz + z1 + 110 ), ( 0, bz + z1 + 112 ) ], "rs_tank", 28 )
     cylinder( m, b, 6, bz + z1 + 110, bz + z1 + 140, "rs_tank", 8, top="rs_tank" )
     # The catwalk round the tank's foot.
     zc = bz + z0 + 4
@@ -935,7 +944,8 @@ def water_tower( m, base, facing=( -1, -1 ) ):
     # Rust streaks down the tank (dark quads), the lettering facing the park.
     right = right_for( f )
     c = b + f * ( r_tank + 0.6 ) + UP * ( ( z0 + z1 ) / 2 )
-    paint( m, "sticks", c, right, ( z1 - z0 ) * 0.8, tone="white", off=0.0 )
+    if not tank_model:
+        paint( m, "sticks", c, right, ( z1 - z0 ) * 0.8, tone="white", off=0.0 )
     # Floodlights on the catwalk lighting the lettering, and the aviation beacon on its finial.
     for sx in ( -1, 1 ):
         lamp = v( b[0], b[1], zc ) + f * ( r_tank + 26 ) + right * ( sx * r_tank * 0.45 ) + UP * 6
@@ -952,7 +962,7 @@ def water_tower( m, base, facing=( -1, -1 ) ):
 LAMP_LENS = ( 10.2, 8.0 )      # the searchlight's lens: how far along its aim from the head, its radius
 
 
-def guard_tower( m, base, facing=( 0, -1 ), deck=520.0, aim=None ):
+def guard_tower( m, base, facing=( 0, -1 ), deck=520.0, aim=None, ladder_model=False, roof_model=False ):
     """ A timber watchtower somebody put up after it started: four poles, X bracing, a plywood cab with a corrugated
     roof, a ladder, and a searchlight sweeping the park, pointed at aim (else straight out along facing). Returns the lamp
     head's centre; its lens is LAMP_LENS[0] along the aim from there, LAMP_LENS[1] in radius. """
@@ -989,23 +999,28 @@ def guard_tower( m, base, facing=( 0, -1 ), deck=520.0, aim=None ):
     roof_c = deck_c + UP * 104
     pts = [ roof_c + side * ( -hw - 10 ) + f * ( -hw - 10 ) + UP * 8, roof_c + side * ( hw + 10 ) + f * ( -hw - 10 ) + UP * 8,
             roof_c + side * ( hw + 10 ) + f * ( hw + 10 ), roof_c + side * ( -hw - 10 ) + f * ( hw + 10 ) ]
-    card( m, "rs_roof", pts, UP + f * 0.1 )
-    card( m, "rs_roof", pts, -UP )
+    if roof_model:
+        TOWER_ROOFS.append( [ m, tuple( float( q ) for q in roof_c + UP * 4 ), math.degrees( math.atan2( -side[1], -side[0] ) ) ] )
+    else:
+        card( m, "rs_roof", pts, UP + f * 0.1 )
+        card( m, "rs_roof", pts, -UP )
     # The ladder up one side.
     lb = b - f * ( half_foot + 18 )
-    for sx in ( -1, 1 ):
-        rod( m, lb + side * ( sx * 9 ), lb + side * ( sx * 9 ) + UP * deck - f * -20 + f * 0, 1.2, "rs_wood", 5 )
-    for zz in np.arange( 12, deck, 12 ):
-        p = lb + UP * zz + f * ( 20 * zz / deck )
-        rod( m, p - side * 9, p + side * 9, 0.9, "rs_wood", 5 )
+    if ladder_model:
+        TOWER_LADDERS.append( [ m, tuple( float( q ) for q in lb ), math.degrees( math.atan2( -side[1], -side[0] ) ) ] )
+    else:
+        for sx in ( -1, 1 ):
+            rod( m, lb + side * ( sx * 9 ), lb + side * ( sx * 9 ) + UP * deck - f * -20 + f * 0, 1.2, "rs_wood", 5 )
+        for zz in np.arange( 12, deck, 12 ):
+            p = lb + UP * zz + f * ( 20 * zz / deck )
+            rod( m, p - side * 9, p + side * 9, 0.9, "rs_wood", 5 )
     # The searchlight on the rail, aimed down the park.
     sl = deck_c + f * ( hw - 6 ) + UP * 52
-    cylinder( m, sl, 2.5, sl[2] - 10, sl[2], "rs_steel", 8 )
     head = sl + UP * 6
     a = unit( v( *aim ) - head ) if aim is not None else f
+    from riverside_searchlight import searchlight as draw_searchlight
+    draw_searchlight( m, sl, head, a )
     a_side, a_up = RP.perp( a )
-    rod( m, sl + UP * 2, head, 1.5, "rs_steel", 6 )
-    rod( m, head - a * 8, head + a * 10, 9, "rs_dark", 12, caps=True )
     card( m, "rs_lamp_search", [ head + a * LAMP_LENS[0] + ( a_side * math.cos( 2 * math.pi * k / 12 ) + a_up * math.sin( 2 * math.pi * k / 12 ) ) * LAMP_LENS[1]
                                  for k in range( 12 ) ], a )
     m.collision_box( b - v( half_foot, half_foot, 0 ), b + v( half_foot, half_foot, 40 ), WOOD )

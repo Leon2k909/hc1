@@ -1,0 +1,9 @@
+var session=Editor.SceneEditorSession.All.Single(x=>x.Scene.Name=="sewage");
+var wanted=new[]{"Waterworks pipework","Waterworks valve wheels","Waterworks bolted flanges"};
+return new {
+    Applied=session.Scene.GetAllObjects(true).Where(x=>wanted.Contains(x.Name)).Select(x=>new{x.Name,Model=x.Components.Get<ModelRenderer>()?.Model?.ResourcePath,Error=x.Components.Get<ModelRenderer>()?.Model?.IsError}).ToArray(),
+    LampPreviewInstalled=session.Scene.GetAllObjects(true).Any(x=>x.Name=="Waterworks caged work lamps"),
+    session.HasUnsavedChanges,
+    ActiveScene=Editor.SceneEditorSession.Active.Scene.Name,
+    Game.IsPlaying
+};

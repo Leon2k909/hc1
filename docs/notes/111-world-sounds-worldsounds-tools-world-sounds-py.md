@@ -1,4 +1,12 @@
 ## World sounds (`WorldSounds`, `Tools/world_sounds.py`)
+- Per-foot floor sampling added in code (2026-11-05, no editor): `PlayerFootsteps` now probes six units to either
+  side of the body centre, alternating left/right with its existing footstep state. Material selection and world
+  sound position use that foot's contact, so boots straddling metal and concrete can play different materials.
+  The offset rotates with the body. If the foot probe misses or yields no surface at a stair/ledge, a centre-floor
+  probe preserves the supported step; no valid floor means no sound or consumed alternation. This is approximate
+  boot spacing, not skeletal foot-animation/IK contact tracking. Existing cadence, quiet crouch/walk, remote movement
+  state, Ninja reduction and sound occlusion remain in place. `Tools/FootstepSurfaceChecks` passed 27 checks linked
+  to the production component. No editor or live listening check was performed.
 - The user asked which of s&box's default sounds the game used, then for them to be replaced with sounds as close to
   the real thing as possible, and for every sound to be made that way from now on (2026-09-29): "ultra real 1:1 or
   close enough". Replaced so far: bullet impacts, knife strikes and the knife's swing, grenade bounces, footsteps,

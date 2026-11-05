@@ -1,0 +1,13 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var stage=System.IO.Path.Combine(root,"output/sewage/valve-wheels-v1/stage/Assets/models/maps/sewage/valve-wheels-v1");
+var target=System.IO.Path.Combine(root,"Assets/models/maps/sewage/valve-wheels-v1");
+System.IO.Directory.CreateDirectory(target);
+var written=new System.Collections.Generic.List<string>();
+foreach(var source in System.IO.Directory.GetFiles(stage))
+{
+    var path=System.IO.Path.Combine(target,System.IO.Path.GetFileName(source));
+    System.IO.File.Copy(source,path,true);
+    Editor.AssetSystem.RegisterFile(path);
+    written.Add(path);
+}
+return new { Imported=written, SceneChanged=false };

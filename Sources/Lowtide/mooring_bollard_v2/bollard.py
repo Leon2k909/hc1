@@ -9,6 +9,9 @@ import math
 import os
 import sys
 
+import numpy as np
+from mathutils import Vector
+
 sys.dont_write_bytecode = True
 
 argv = sys.argv[sys.argv.index("--") + 1 :]
@@ -20,15 +23,48 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import build as kit  # noqa: E402
 import prop_stages as stages  # noqa: E402
 
-from build import Part, add, frame, lathe  # noqa: E402
+from build import Part, add, frame, lathe, spline, tube  # noqa: E402
 
 PAINT, ZINC = kit.PAINT, kit.ZINC
+ROPE = 9
 NAME = "mooring_bollard"
 FOLDER = "models/maps/lowtide/mooring_bollard_v2"
 OUT = os.path.join(ROOT, "Assets", "models", "maps", "lowtide", "mooring_bollard_v2")
-RES, RANGE = 1024, 64.0
+RES, RANGE = 2048, 64.0
 BOLTS = 6
 FLANGE_TOP = 1.35
+
+
+def rope_wrap():
+    # A short discarded line, with its upper end tucked beneath the first turn.
+    # Follow the casting's waist so the line rests against it instead of floating.
+    waist = [(3.5, 6.72), (5.4, 6.42), (8.0, 6.2), (11.0, 6.08), (14.0, 6.06)]
+    path = []
+    for t in np.linspace(0, 1, 169):
+        z = 12.4 - 3.3 * t
+        a = 0.7 + 7 * math.pi * t
+        radius = float(np.interp(z, *zip(*waist))) + 0.27
+        path.append(Vector((radius * math.cos(a), radius * math.sin(a), z)))
+    end_angle = 0.7 + 7 * math.pi
+    tail = [path[-1]]
+    for radius, z, turn in ((6.58, 8.1, 0.03), (6.7, 6.4, 0.10), (6.96, 4.5, 0.17),
+                            (7.35, 2.8, 0.24), (8.15, 1.8, 0.31)):
+        tail.append(Vector((radius*math.cos(end_angle+turn), radius*math.sin(end_angle+turn), z)))
+    path.extend(spline(tail, 3)[1:])
+    tube(add(Part(ROPE, 3, name="laid mooring line")), path, 0.31, 8)
+    # Loose fibres at the cut end, inside the existing flange's footprint.
+    end = path[-1]
+    along = (path[-1] - path[-2]).normalized()
+    across = along.cross(Vector((0, 0, 1))).normalized()
+    up = across.cross(along).normalized()
+    for k in range(7):
+        a = k * 2 * math.pi / 7
+        spread = across * math.cos(a) + up * math.sin(a)
+        start = end + spread * 0.13
+        fibre = spline([start, start+along*0.2+spread*0.05,
+                        start+along*(0.35+0.03*k)+spread*0.14+Vector((0, 0, -0.08))], 2)
+        tube(add(Part(ROPE, 0, name="cut rope fibres")), fibre, [0.04, 0.035, 0.03, 0.02, 0.008], 5)
+    np.save(os.path.join(WORK, f"{NAME}_rope.npy"), np.array(path, np.float32))
 
 
 def geometry():
@@ -38,6 +74,7 @@ def geometry():
     for k in range(BOLTS):
         a = 2 * math.pi * (k + 0.5) / BOLTS
         kit.hex_bolt((7.95 * math.cos(a), 7.95 * math.sin(a), FLANGE_TOP - 0.06), (0, 0, 1), size=0.82, lod=1, washer=True, finish=ZINC)
+    rope_wrap()
 
 
 if "build" in STAGES:
@@ -46,4 +83,6 @@ if "bake" in STAGES:
     stages.bake_stage(NAME, WORK, RES, RANGE, 5.0)
 if "export" in STAGES:
     stages.export_stage(NAME, WORK, OUT, FOLDER, ("",), (0.0, 30.0, 80.0), "Sources/Lowtide/mooring_bollard_v2/bollard.py")
+if "export-meshes" in STAGES:
+    stages.export_stage(NAME, WORK, OUT, FOLDER, ("",), (0.0, 30.0, 80.0), "Sources/Lowtide/mooring_bollard_v2/bollard.py", write_resources=False)
 print("bollard stages done", flush=True)

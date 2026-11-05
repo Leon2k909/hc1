@@ -99,6 +99,9 @@ def body():
             lathe(add(Part(RUBBER, 2, name="handle boss")), [(0, 0.0), (0.62, 0.0), (0.62, 0.3), (0.42, 0.42), (0, 0.42)], 8, frame((s * 15.96, y, 13.0), (s, 0, 0)))
         path = spline([(s * 16.12, -3.6, 13.0), (s * 16.26, -3.5, 11.4), (s * 16.28, -2.4, 10.2), (s * 16.28, 2.4, 10.2), (s * 16.26, 3.5, 11.4), (s * 16.12, 3.6, 13.0)], 3)
         tube(add(Part(RUBBER, 2, name="handle")), path, 0.26, 8)
+        lathe(add(Part(RUBBER, 1, name="handle grip")),
+              [(0, -2.05), (0.28, -2.05), (0.37, -1.9), (0.37, 1.9), (0.28, 2.05), (0, 2.05)],
+              10, frame((s * 16.28, 0, 10.2), (0, 1, 0)))
     # The drain plug, low on one end.
     lathe(add(Part(RUBBER, 1, name="drain boss")), [(0, 0.0), (0.88, 0.0), (0.88, 0.2), (0.62, 0.3), (0, 0.3)], 12, frame((15.72, 4.6, 1.5), (1, 0, 0)))
     lathe(add(Part(RUBBER, 0, name="drain plug")), [(0, 0.0), (0.5, 0.0), (0.5, 0.26), (0, 0.32)], 6, frame((16.0, 4.6, 1.5), (1, 0, 0)))
@@ -142,7 +145,14 @@ def contents():
     )
     for at, axis, kind in placed:
         part = add(Part(CAN, 1, name=f"can {kind}"))
-        lathe(part, profile, 12, frame(at, axis))
+        m = frame(at, axis)
+        lathe(part, profile, 16, m)
+        # A lifted aluminium ring tab and its anchor, built in the can's own frame so tilted cans keep them.
+        tab = [m @ Vector((-0.18 + 0.35 * math.cos(a), 0.21 * math.sin(a), 4.83 + 0.04 * math.cos(a)))
+               for a in np.linspace(0, 2 * math.pi, 12, endpoint=False)]
+        tube(part, tab, 0.055, 6, closed=True)
+        lathe(part, [(0, 0), (0.13, 0), (0.13, 0.09), (0.07, 0.13), (0, 0.13)],
+              8, m @ Matrix.Translation((0.12, 0, 4.71)))
         cans.append((part, at, axis, kind))
     return cans
 
@@ -308,7 +318,7 @@ def bake_stage():
     bake_one(1024, "AO", None, 32, "bake_cooler_ao")
 
 
-def export_stage():
+def export_stage(write_resources=True):
     bpy.ops.wm.open_mainfile(filepath=BLEND)
     out = os.path.join(ROOT, "Assets", MODEL)
     mats = os.path.join(ROOT, "Assets", MATS)
@@ -371,6 +381,9 @@ def export_stage():
             h.writelines(faces)
         counts[lod] = n_tris
         print("lod", lod, "tris", n_tris, flush=True)
+    if not write_resources:
+        print("exported meshes", counts, flush=True)
+        return
     with open(os.path.join(out, f"{NAME}.mtl"), "w", newline="\n") as h:
         h.write(f"newmtl {NAME}\nKd 1 1 1\nd 1\n")
     meshes = ",\n".join(
@@ -472,4 +485,6 @@ if "bake" in STAGES:
     bake_stage()
 if "export" in STAGES:
     export_stage()
+if "export-meshes" in STAGES:
+    export_stage(write_resources=False)
 print("cooler stages done", flush=True)

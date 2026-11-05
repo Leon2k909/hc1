@@ -1,0 +1,13 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var directory=System.IO.Path.Combine(System.IO.Path.GetTempPath(),"belltower-menu-board-v2/install-stage");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(directory,"manifest.json")));
+string Hash(string p) {using var s=System.IO.File.OpenRead(p);return Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(s)).ToLowerInvariant();}
+foreach(var p in manifest["new_files"].AsObject())
+{
+ if(p.Key!="Assets/models/maps/belltower/menu-board-v2/menu_board_b.vmdl")throw new InvalidOperationException("Unexpected new asset.");
+ var source=p.Value["source"].GetValue<string>();var target=System.IO.Path.Combine(root,p.Key);var after=p.Value["after"].GetValue<string>();
+ if(Hash(source)!=after || (System.IO.File.Exists(target)&&Hash(target)!=after))throw new InvalidOperationException("Variant changed.");
+ if(!System.IO.File.Exists(target))System.IO.File.Copy(source,target);
+ Editor.AssetSystem.RegisterFile(target);
+}
+return new {MenuPictureVariantsPreserved=true};

@@ -65,7 +65,7 @@ for x in (-16.7,16.7):
  rings=[[P(x+a,b,z) for a,b in outline(w,h,r)] for z,w,h,r in profiles]
  loft(rings,'yellow',lambda j,k,pts:np.mean(pts,axis=0)-P(x,0,profiles[j][0]),caps=((0,-Z),(-1,Z)))
  for sy in (-1,1):
-  box((x,sy*3.92,1.25),(6.8,.13,.73),'rubber',.16)
+  box((x,sy*4.015,1.25),(6.8,.035,.73),'rubber',.012)
   box((x,sy*3.99,1.70),(7.2,.22,.23),'yellow',.09)
   for dx in (-2.8,2.8):box((x+dx,sy*3.995,1.23),(.20,.22,.74),'yellow',.07)
  box((x,0,2.56),(2.6,2.6,.70),'rubber',.2)
@@ -79,8 +79,9 @@ for x in (-16.7,16.7):
  for dx in (-.28,.28):box((x+dx,2.12,2.6),(.18,.26,.44),'rubber',.07)
 # Rounded hollow-board exterior and its inset laminated faces.
 board_profiles=[(-.55,39.0,9.5,.55),(-.37,39.4,9.9,.75),(.37,39.4,9.9,.75),(.55,39.0,9.5,.55)]
-board_rings=[[P(x,d,34.45+u) for x,u in outline(w,h,r)] for d,w,h,r in board_profiles]
-loft(board_rings,'white',lambda j,k,pts:np.mean(pts,axis=0)-P(0,board_profiles[j][0],34.45),caps=((0,-Y),(-1,Y)))
+board_offset=1.4
+board_rings=[[P(x,d+board_offset,34.45+u) for x,u in outline(w,h,r)] for d,w,h,r in board_profiles]
+loft(board_rings,'white',lambda j,k,pts:np.mean(pts,axis=0)-P(0,board_profiles[j][0]+board_offset,34.45),caps=((0,-Y),(-1,Y)))
 def clip(poly,axis,bound,greater):
  result=[]
  for a,b in zip(poly,poly[1:]+poly[:1]):
@@ -96,18 +97,20 @@ for s in (-1,1):
   poly=[(-18.7,-4.),(18.7,-4.),(18.7,4.),(-18.7,4.)]
   poly=clip(poly,lambda p:p[0]+p[1],k*9.5,True)
   if poly:poly=clip(poly,lambda p:p[0]+p[1],k*9.5+4.6,False)
-  if len(poly)>=3:face('red',[P(x,s*.565,34.45+u) for x,u in poly],Y*s)
+  if len(poly)>=3:face('red',[P(x,board_offset+s*.565,34.45+u) for x,u in poly],Y*s)
  for x in (-18.3,18.3):
   for z in (30.8,38.1):
-   cylinder((x,s*.57,z),Y*s,.045,.13,'rubber',16)
-   cylinder((x,s*.617,z),Y*s,.035,.085,'steel',12)
+   cylinder((x,board_offset+s*.57,z),Y*s,.045,.13,'rubber',16)
+   cylinder((x,board_offset+s*.617,z),Y*s,.035,.085,'steel',12)
  # A shallow seam at the foot of each board face catches light at close range.
- box((0,s*.57,29.95),(36.6,.025,.055),'rubber',.008)
+ box((0,board_offset+s*.57,29.95),(36.6,.025,.055),'rubber',.008)
 # Formed saddle clamps on the back of the board and two short folded stays.
 for x in (-16.7,16.7):
  for z in (31.0,37.8):
-  box((x,-.91,z),(3.5,.50,1.2),'steel',.12)
-  for dx in (-1.35,1.35):screw((x+dx,-1.18,z),-Y,.14)
+  box((x,-.875,z),(3.5,.25,1.2),'steel',.08)
+  box((x,.82,z),(3.5,.16,1.2),'steel',.05)
+  for dx in (-1.55,1.55):box((x+dx,-.015,z),(.32,1.7,1.2),'steel',.07)
+  for dx in (-1.35,1.35):screw((x+dx,-1.025,z),-Y,.14)
  G.tube(m,[P(x,-.9,30.3),P(x,-1.8,27.8),P(x,-.70,26.2)],.18,'steel',sides=12,bend_radius=.3)
 m.material_overrides={p:MAT+'/'+p+'.vmat' for p in ('white','red','yellow','rubber','steel')};m.tile_overrides={p:16 for p in m.polygons}
 count=K.write_model(MODEL,RES,'road_barrier',m)

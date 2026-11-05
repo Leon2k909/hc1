@@ -12,10 +12,42 @@ var newModel = Model.Load(paths[1]);
 var reviewPad = Model.Load(paths[2]);
 if (newModel is null || newModel.IsError || reviewPad is null || reviewPad.IsError) throw new Exception("Model failed to load");
 var root = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(projectRoot, "Assets/scenes/maps/Riverside/riverside.scene"))).AsObject();
-var visual = new System.Collections.Generic.HashSet<string>(new[] { "Moon", "Sky", "Fog", "Look", "Riverside", "Lights", "Fires", "Burn Drums", "Cooler", "Teddy", "Propane Cylinders", "Lawn Chairs", "Reflection Probes", "Volumetric Fog" }, StringComparer.OrdinalIgnoreCase);
+var visual = new System.Collections.Generic.HashSet<string>(new[] { "Moon", "Sky", "Fog", "Look", "Riverside", "Lights" }, StringComparer.OrdinalIgnoreCase);
 var nodes = new System.Text.Json.Nodes.JsonArray();
 foreach (var node in root["GameObjects"].AsArray())
-    if (visual.Contains(node["Name"]?.GetValue<string>() ?? "")) nodes.Add(node.DeepClone());
+{
+    var name = node["Name"]?.GetValue<string>() ?? "";
+    if (!visual.Contains(name)) continue;
+    var copy = node.DeepClone();
+    if (name == "Riverside")
+    {
+        var keep = new System.Collections.Generic.HashSet<string>(new[] { "Ground", "Ground Patches", "Pad", "Lucky Stop", "Terrace Trailers" });
+        var children = new System.Text.Json.Nodes.JsonArray();
+        foreach (var child in copy["Children"].AsArray())
+        {
+            if (!keep.Contains(child["Name"]?.GetValue<string>() ?? "")) continue;
+            var clone = child.DeepClone();
+            var components = new System.Text.Json.Nodes.JsonArray();
+            foreach (var c in clone["Components"].AsArray())
+                if (c["__type"]?.GetValue<string>() == "Sandbox.ModelRenderer") components.Add(c.DeepClone());
+            clone["Components"] = components;
+            children.Add(clone);
+        }
+        copy["Children"] = children;
+    }
+    if (name == "Lights")
+    {
+        var children = new System.Text.Json.Nodes.JsonArray();
+        foreach (var child in copy["Children"].AsArray())
+        {
+            var value = child["Position"]?.GetValue<string>() ?? "0,0,0";
+            var xyz = value.Split(',').Select(s => float.Parse(s, System.Globalization.CultureInfo.InvariantCulture)).ToArray();
+            if ((new Vector3(xyz[0], xyz[1], xyz[2]) - new Vector3(-80, -140, 96)).Length < 1000) children.Add(child.DeepClone());
+        }
+        copy["Children"] = children;
+    }
+    nodes.Add(copy);
+}
 root["GameObjects"] = nodes;
 root["SceneProperties"]["NavMesh"]["Enabled"] = false;
 root["SceneProperties"]["WantsSystemScene"] = false;
@@ -28,6 +60,7 @@ try
     CameraComponent camera;
     ModelRenderer pad;
     GameObject replacement;
+    GameObject inspectionLight;
     var origin = new Vector3(-80, -140, 96);
     var frame = Rotation.FromYaw(-73.300755766f);
     using (scene.Push())
@@ -38,6 +71,12 @@ try
         replacement.WorldPosition = origin;
         replacement.WorldRotation = frame;
         replacement.Components.Create<ModelRenderer>().Model = newModel;
+        inspectionLight = new GameObject(false, "Temporary inspection light");
+        inspectionLight.WorldPosition = origin + frame * new Vector3(45, -50, 68);
+        var detailLight = inspectionLight.Components.Create<PointLight>();
+        detailLight.Radius = 300;
+        detailLight.LightColor = new Color(2.0f, 1.9f, 1.7f);
+        detailLight.Shadows = true;
         foreach (var tonemap in scene.GetAllComponents<Tonemapping>())
         {
             var hold = (tonemap.MinimumExposure + tonemap.MaximumExposure) / 2f;
@@ -57,7 +96,9 @@ try
     var oldPad = pad.Model;
     var materials = scene.GetAllComponents<ModelRenderer>().Where(r => r.Model is not null).SelectMany(r => r.Model.Materials).Concat(newModel.Materials).Distinct().ToArray();
     var textures = materials.SelectMany(m => new[] { "g_tColor", "g_tNormal", "g_tRoughness", "g_tAmbientOcclusion", "SkyTexture" }.Select(m.GetTexture).Append(m.FirstTexture)).Where(t => t is not null).Distinct().ToArray();
-    foreach (var t in textures) t.MarkUsed(2048);
+    foreach (var t in textures) t.MarkUsed(512);
+    var crateTextures = newModel.Materials.SelectMany(m => new[] { "g_tColor", "g_tNormal", "g_tRoughness", "g_tAmbientOcclusion" }.Select(m.GetTexture)).Where(t => t is not null).Distinct().ToArray();
+    foreach (var t in crateTextures) t.MarkUsed(2048);
     for (var f = 0; f < 150; f++)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -71,12 +112,13 @@ try
         ("player", new Vector3(86, -90, 64), new Vector3(0, 0, 11))
     };
     var captures = new System.Collections.Generic.List<string>();
-    foreach (var variant in new[] { "settling", "old", "new" })
+    foreach (var variant in new[] { "old-lit", "new-lit" })
     {
         using (scene.Push())
         {
-            replacement.Enabled = variant == "new";
-            pad.Model = variant == "new" ? reviewPad : oldPad;
+            replacement.Enabled = variant.StartsWith("new");
+            pad.Model = variant.StartsWith("new") ? reviewPad : oldPad;
+            inspectionLight.Enabled = variant.EndsWith("-lit");
         }
         foreach (var shot in shots)
         {
@@ -93,7 +135,7 @@ try
                     preCamera.Invoke(scene, null);
                     camera.RenderToBitmap(bitmap);
                 }
-                foreach (var t in textures) t.MarkUsed(2048);
+                foreach (var t in crateTextures) t.MarkUsed(2048);
                 await Task.Delay(16, cancellationToken);
             }
             if (variant == "settling") continue;

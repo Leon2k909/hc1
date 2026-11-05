@@ -1,0 +1,1 @@
+Riverside sandbags v2: review candidate completed 2026-11-04 after the crate installation. Sources/Riverside/sandbag-v2/. Native comparison and verification passed; no scene or collision replacement yet. Evidence: output/asset-improvement-20261030/riverside-sandbags/before-after.png.

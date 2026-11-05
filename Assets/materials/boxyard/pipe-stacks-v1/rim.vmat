@@ -1,0 +1,12 @@
+"Layer0"
+{
+ shader "shaders/complex.shader"
+ F_SPECULAR "1"
+ TextureColor "materials/boxyard/pipe-stacks-v1/pipe_color.png"
+ TextureNormal "materials/boxyard/pipe-stacks-v1/pipe_normal.png"
+ TextureRoughness "materials/boxyard/pipe-stacks-v1/pipe_rough.png"
+ TextureAmbientOcclusion "materials/default/default_ao.tga"
+ g_vColorTint "[1.22 1.2 1.12 1]"
+ g_flMetalness "0.68"
+ g_flRoughnessScaleFactor "0.78"
+}

@@ -1,0 +1,16 @@
+var project=Sandbox.Project.Current.GetRootPath();var folder=System.IO.Path.Combine(project,"Assets/materials/riverside/neon-sign-v1");
+var modelSource=System.IO.File.ReadAllText(System.IO.Path.Combine(project,"Assets/models/maps/riverside/neon-sign-v1/neon_sign.vmdl"));
+if(modelSource.Contains("/tube_glow.vmat") || modelSource.Contains("/tube.vmat") || !modelSource.Contains("/neon_red.vmat"))throw new Exception("Final model does not exclusively use the verified red tube material");
+var session=Editor.SceneEditorSession.Active;var before=new{Scene=session.Scene.Id,Dirty=session.HasUnsavedChanges,Playing=Game.IsPlaying};
+foreach(var name in new[]{"tube.vmat","tube_glow.vmat","tube_color.png"})
+{
+ var asset=Editor.AssetSystem.FindByPath("materials/riverside/neon-sign-v1/"+name);if(asset!=null)asset.Delete();
+ foreach(var suffix in new[]{"",".meta","_c"})
+ {
+  var path=System.IO.Path.GetFullPath(System.IO.Path.Combine(folder,name+suffix));
+  if(!string.Equals(System.IO.Path.GetDirectoryName(path),System.IO.Path.GetFullPath(folder),StringComparison.OrdinalIgnoreCase))throw new Exception("Unexpected trial deletion target");
+  if(System.IO.File.Exists(path))System.IO.File.Delete(path);
+ }
+}
+var result=new{UnusedTuningMaterialsRemoved=true,OriginalSignRetained=true,UserStatePreserved=before.Scene==session.Scene.Id && before.Dirty==session.HasUnsavedChanges && before.Playing==Game.IsPlaying};
+System.IO.File.WriteAllText("C:/sbox-projects/hc1/neon-sign-review/output/riverside/neon-sign-v1/trials-cleaned.json",Json.Serialize(result));return result;

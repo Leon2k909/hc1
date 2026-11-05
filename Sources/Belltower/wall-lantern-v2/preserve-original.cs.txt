@@ -1,0 +1,18 @@
+// Retain the complete original fixture as a separately reusable asset. Delete nothing.
+var root=Sandbox.Project.Current.GetRootPath();
+if(!string.Equals(System.IO.Path.GetFullPath(root).TrimEnd('\\','/'),@"C:\sbox-projects\hc1\forked-shooter-main",StringComparison.OrdinalIgnoreCase))throw new InvalidOperationException("Wrong checkout.");
+var directory=System.IO.Path.Combine(System.IO.Path.GetTempPath(),"belltower-wall-lantern-v2/install-stage");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(directory,"manifest.json")));
+string Hash(string p) {using var stream=System.IO.File.OpenRead(p);return Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(stream)).ToLowerInvariant();}
+var previous=Editor.SceneEditorSession.Active;var playing=Game.IsPlaying;var runtime=Game.ActiveScene?.Id;
+foreach(var p in manifest["retained_original_files"].AsObject().OrderBy(p=>p.Key.EndsWith(".vmdl") ? 1:0))
+{
+ if(!p.Key.StartsWith("Assets/models/maps/belltower/wall-lantern-original/") || p.Key.Contains(".."))throw new InvalidOperationException("Unexpected retained asset path.");
+ var source=System.IO.Path.Combine(directory,p.Key);var target=System.IO.Path.Combine(root,p.Key);var hash=p.Value.GetValue<string>();
+ if(Hash(source)!=hash || (System.IO.File.Exists(target) && Hash(target)!=hash))throw new InvalidOperationException("Retained original differs.");
+ System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target));
+ if(!System.IO.File.Exists(target))System.IO.File.Copy(source,target);
+ Editor.AssetSystem.RegisterFile(target);
+}
+if(!ReferenceEquals(previous,Editor.SceneEditorSession.Active)||playing!=Game.IsPlaying||runtime!=Game.ActiveScene?.Id)throw new InvalidOperationException("Editor state changed.");
+return new{OriginalAssetPreserved="models/maps/belltower/wall-lantern-original/wall_lantern_original.vmdl",OriginalTriangles=960,FilesDeleted=0};

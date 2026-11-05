@@ -18,12 +18,12 @@
                             <Icon class="glyph" Tint="@(mine ? "white" : entry.AttackerColor.Hex)" File="/ui/wings.png" size="18" />
                         }
 
-                        @if ( entry.Attacker.Contains( "BOT" ) )
+                        @if ( entry.AttackerIsBot )
                         {
                             <Icon class="bot" Tint="@entry.AttackerColor.Hex" File="/ui/bot.png" size="16" />
                         }
 
-                        <label style="@(mine ? "" : $"color:{entry.AttackerColor.Hex}")">@entry.Attacker.Replace( "BOT", "" ).Trim()</label>
+                        <label style="@(mine ? "" : $"color:{entry.AttackerColor.Hex}")">@entry.Attacker</label>
                     </div>
                 }
 
@@ -65,12 +65,12 @@
                 @if ( entry.Victim is not null )
                 {
                     <div class="name @(died ? "is-me" : "")">
-                        @if ( entry.Victim.Contains( "BOT" ) )
+                        @if ( entry.VictimIsBot )
                         {
                             <Icon class="bot" Tint="@entry.VictimColor.Hex" File="/ui/bot.png" size="16" />
                         }
 
-                        <label style="@(died ? "" : $"color:{entry.VictimColor.Hex}")">@entry.Victim.Replace( "BOT", "" ).Trim()</label>
+                        <label style="@(died ? "" : $"color:{entry.VictimColor.Hex}")">@entry.Victim</label>
                     </div>
                 }
 
@@ -95,7 +95,7 @@
     }
 
     public record KillFeedEntry( int Id, string Attacker, Color AttackerColor, string Inflictor, string Victim, Color VictimColor, HitboxTags HitboxTags, DamageFlags DamageFlags,
-        RealTimeSince TimeSinceAdded, ulong AttackerSteamId, ulong VictimSteamId )
+        RealTimeSince TimeSinceAdded, ulong AttackerSteamId, ulong VictimSteamId, bool AttackerIsBot, bool VictimIsBot )
     {
         public string AttackerIcon => Attacker.Replace("icon:", "");
         public string InflictorIcon => Inflictor.Replace("icon:", "");
@@ -108,12 +108,12 @@
 
     [Rpc.Broadcast]
     public static void BroadcastKillFeedEvent( string attacker, Color attackerColor, string inflictor, string victim, Color victimColor, HitboxTags tags, DamageFlags flags,
-        ulong attackerSteamId, ulong victimSteamId )
+        ulong attackerSteamId, ulong victimSteamId, bool attackerIsBot, bool victimIsBot )
     {
         if ( !Instance.IsValid() )
             return;
 
-        Instance.Entries.Add( new KillFeedEntry( ++_nextId, attacker, attackerColor, inflictor, victim, victimColor, tags, flags, 0, attackerSteamId, victimSteamId ) );
+        Instance.Entries.Add( new KillFeedEntry( ++_nextId, attacker, attackerColor, inflictor, victim, victimColor, tags, flags, 0, attackerSteamId, victimSteamId, attackerIsBot, victimIsBot ) );
         Instance.StateHasChanged();
     }
 
@@ -123,7 +123,7 @@
         var inflictorDesc = GameUtils.GetDescription( damageInfo.Inflictor );
         var victimDesc = GameUtils.GetDescription( damageInfo.Victim );
 
-        var attacker = attackerDesc?.DisplayName;
+        var attacker = ActorName( attackerDesc );
         if ( !string.IsNullOrEmpty( attackerDesc?.Icon ) ) attacker = $"icon:{attackerDesc.Icon}";
 
         // The gun's silhouette where there is one. A bot's shots come from the bot itself, so its gun is looked up.
@@ -132,7 +132,7 @@
         if ( !string.IsNullOrEmpty( weapon?.Icon ) ) inflictor = $"icon:{weapon.Icon}";
         else if ( !string.IsNullOrEmpty( inflictorDesc?.Icon ) ) inflictor = $"icon:{inflictorDesc.Icon}";
 
-        var victim = victimDesc?.DisplayName;
+        var victim = ActorName( victimDesc );
         if ( !string.IsNullOrEmpty( victimDesc?.Icon ) ) victim = $"icon:{victimDesc.Icon}";
 
         BroadcastKillFeedEvent(
@@ -143,9 +143,29 @@
             damageInfo.Hitbox,
             damageInfo.Flags,
             SteamIdOf( damageInfo.Attacker ),
-            SteamIdOf( damageInfo.Victim )
+            SteamIdOf( damageInfo.Victim ),
+            IsBot( attackerDesc ),
+            IsBot( victimDesc )
         );
 
+    }
+
+    // Bot labels come from actor identity, never from words in a human's name.
+    private static bool IsBot( IDescription description ) => description is LightweightCombatBot
+        || description is PlayerPawn pawn && pawn.Client.IsValid() && pawn.Client.IsBot;
+
+    private static string ActorName( IDescription description )
+    {
+        if ( description is LightweightCombatBot bot ) return bot.BotName;
+        var name = description?.DisplayName;
+        if ( description is PlayerPawn pawn && pawn.Client.IsValid() && pawn.Client.IsBot )
+        {
+            var clan = pawn.Client.ClanTag;
+            var marker = (string.IsNullOrWhiteSpace( clan ) ? "" : $"[{clan}] ") + "BOT ";
+            if ( name?.StartsWith( marker, StringComparison.Ordinal ) == true )
+                return marker[..^4] + name[marker.Length..];
+        }
+        return name;
     }
 
     // Capture identity with the event so renames and duplicate display names cannot change its highlights.

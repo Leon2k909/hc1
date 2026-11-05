@@ -1,0 +1,4 @@
+var session=Editor.SceneEditorSession.All.Single(s=>s.Scene.IsEditor && s.Scene.Source?.ResourcePath=="scenes/maps/belltower/belltower.scene");
+var chairs=session.Scene.GetAllComponents<ModelRenderer>().Where(r=>r.Model?.ResourcePath=="models/maps/belltower/bistro-chair-v2/bistro_chair.vmdl").ToArray();
+if(chairs.Length!=21 || chairs.Any(r=>r.Model.IsError) || session.HasUnsavedChanges)throw new InvalidOperationException("Installed chairs differ.");
+return new{InstalledChairs=chairs.Length,AllModelsLoaded=chairs.All(r=>!r.Model.IsError),Saved=!session.HasUnsavedChanges};

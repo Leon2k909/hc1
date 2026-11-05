@@ -1,0 +1,8 @@
+var model=Model.Load("models/maps/riverside/neon-sign-v1/neon_sign.vmdl");
+if(model.IsError || model.Materials.Any(m=>m==null || m.IsError))throw new Exception("Neon material or model missing");
+if(model.MeshInfo.LodCount!=3)throw new Exception("Expected three LODs");
+var mats=model.Materials.Select(m=>new{m.ResourcePath,m.IsError,m.ShaderName,Emission=m.GetFeature("F_SELF_ILLUM"),ColorWidth=m.GetTexture("g_tColor")?.Width,ColorHeight=m.GetTexture("g_tColor")?.Height}).ToArray();
+if(mats.Count(m=>m.Emission==1)!=1 || !mats.Single(m=>m.Emission==1).ResourcePath.EndsWith("/neon_red.vmat"))throw new Exception("Only the actual tubes may be emissive");
+if(mats.Any(m=>m.ColorWidth==null))throw new Exception("A color texture binding failed");
+var report=new{AllMaterialsLoaded=true,OnlyTubesEmissive=true,Mesh=model.MeshInfo,Materials=mats};
+System.IO.File.WriteAllText("C:/sbox-projects/hc1/neon-sign-review/output/riverside/neon-sign-v1/materials-verified.json",Json.Serialize(report));return new{report.AllMaterialsLoaded,report.OnlyTubesEmissive,MaterialCount=mats.Length,Triangles=model.MeshInfo.Meshes.Select(m=>m.Triangles).ToArray(),Materials=mats};

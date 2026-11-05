@@ -8,7 +8,7 @@ hazard-striped plinth, two hinged doors with pressed louvres, an instrument pane
 padlock, three floor conduits up its side into the roof, and a caged green status lamp. Blue-grey enamel over red oxide over steel, with about a third
 of the paint broken by rust.
 
-- Triangles: 21,610 / 10,840 / 5,204 / 1,832 (LOD 0-3, thresholds 30, 80, 180), against about 200 for the old box and its lamp.
+- Triangles after the 2026-11-04 instrument pass: 21,982 / 11,022 / 5,324 / 1,882 (LOD 0-3, thresholds 30, 80, 180), previously 21,610 / 10,840 / 5,204 / 1,832.
 - One material. Painted at 3072 (13.5 px/in, doors 16); colour and normal are saved at 4096, the rest at 2048, as the engine can't filter a
   normal map that isn't a power of two. About 14 MB compiled for colour and normal together.
 - The carcass fills the old box (X +-18, Y +-38, Z 0..115), so its old hull in `sewage_details.vmdl` still serves it. This model's only collision is a
@@ -28,3 +28,22 @@ of the paint broken by rust.
   triangles, and its collision block is identical.
 
 Not done: not seen in a live match, as the editor is shared. The rubble round the first two is still plain boxes, and some sits against the plinth.
+
+## Approved instrument details (2026-11-04)
+
+- A folded steel rain hood protects the control panel, with a sloped top, downturned drip lip, side cheeks, mounting strip and bolts.
+- Both meters have raised, tapered pointers beneath the centre bosses. Numbered scales and A/V unit markings replace the generic unnumbered faces.
+  These are static decorative instruments; the voltage pointer reads about 440 on a 0-500 scale.
+- One material and the existing atlas sizes are retained. The installed ModelDoc, material resource, conduit collider, map collision and three placements are retained.
+  The `export-meshes` stage writes only the four OBJ mesh inputs while the editor is open.
+- `run.ps1` builds and bakes in a hidden, idle-priority Blender process using two threads. Current work: `output/cabinet-instruments-20261104/work`.
+  Paint with `paint_cabinet.py <work> <installed materials folder> cabinet`, then compile the installed material and model through the native editor.
+- `verify_detail.py` checks every LOD's bounds, normals and UVs, all closed shells' outward winding, texture sizes, asset references and the three scene placements.
+  Open shells with intentionally removed hidden faces are excluded from signed-volume checks. The current LOD 0 has 263 closed outward pieces and 23 open shells.
+- Approved isolated engine views use identical cameras, light and texture-streaming settling to the original comparison. Current work and captures: `output/cabinet-instruments-20261104/work` and `after`.
+  This pass has not been checked in live gameplay or benchmarked.
+- Native full model/material compilation passed. An isolated load of the actual Sewage scene found all three cabinets with no error models; all nine door/conduit/clearance
+  rays matched their expected results. Two map views confirm the hood under the existing lighting, including the catwalk location. The active Riverside scene and play
+  state were preserved. Receipts and map captures: `output/cabinet-instruments-20261104/map-check/`.
+- The user accepted this modest improvement and asked for more substantial changes to future models. The improved cabinet remains installed at the existing path for all
+  three placements. Superseded original build files and the current before/comparison files were removed; the approved model and current build inputs were retained.

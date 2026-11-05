@@ -167,7 +167,28 @@ def magazine(x, y, top, yaw, tilt):
         @ Matrix.Rotation(tilt, 4, "X")
         @ Matrix(((1, 0, 0, 0), (0, 0, -1, 0), (0, 1, 0, 0), (0, 0, 0, 1)))
     )
-    prism(add(Part(MAG, 2, bevel=0.035, angle=40, name="magazine")), outline, -0.62, 0.62, to_world)
+    shell = add(Part(MAG, 2, bevel=0.025, angle=40, name="magazine"))
+    prism(shell, outline, -0.62, 0.62, to_world)
+    # Real pressed ribs follow the shell's curve. Keep them in its Part so the finish matches the magazine,
+    # including tan and alloy variants, and the existing LOD decimation can simplify them with the shell.
+    for offset in (-0.75, 0.65):
+        zs = np.linspace(-1.45, zt - 0.65, 4)
+        rib = [(side(z) + offset + 0.10, z) for z in zs]
+        rib += [(side(z) + offset - 0.10, z) for z in reversed(zs)]
+        for low, high in ((-0.70, -0.60), (0.60, 0.70)):
+            prism(shell, rib, low, high, to_world)
+    # A rolled reinforcement near the throat breaks up the old unbroken slab silhouette.
+    neck = [(side(z) + x, z) for x, z in
+            ((1.58, zt - 0.55), (1.52, zt - 0.23), (-1.48, zt - 0.23), (-1.56, zt - 0.55))]
+    prism(shell, neck, -0.67, 0.67, to_world)
+    # Folded steel feed lips surround the cartridge rather than leaving it on a featureless flat top.
+    lips = add(Part(HARD, 1, bevel=0.015, angle=40, name="feed lips"))
+    for sign in (-1, 1):
+        ys = sorted((sign * 0.43, sign * 0.61))
+        # Cross section is in the magazine's side profile, extruded across its width.
+        profile = [(-1.28, zt - 0.10), (1.10, zt - 0.10), (1.04, zt + 0.35),
+                   (0.68, zt + 0.43), (-1.28, zt + 0.43)]
+        prism(lips, profile, ys[0], ys[1], to_world)
     # The top round, its tip to the magazine's front.
     frame_round = Matrix.Translation((x, y, 0)) @ Matrix.Rotation(yaw, 4, "Z") @ Matrix.Rotation(tilt, 4, "X") @ frame((-0.2, 0, zt + 0.25), (1, 0, 0))
     lathe(add(Part(BRASS, 0, name="round")), [(0, -1.05), (0.25, -1.05), (0.25, 0.12), (0.15, 0.36), (0.15, 0.72)], 8, frame_round)
@@ -346,7 +367,7 @@ def bake_stage():
     bake_one(AO_SIZE, "AO", None, 48, "bake_ac_ao")
 
 
-def export_stage():
+def export_stage(write_resources=True):
     bpy.ops.wm.open_mainfile(filepath=BLEND)
     out = os.path.join(ROOT, "Assets", MODEL)
     mats = os.path.join(ROOT, "Assets", MATS)
@@ -410,6 +431,9 @@ def export_stage():
             h.writelines(faces)
         counts[lod] = n_tris
         print("lod", lod, "tris", n_tris, flush=True)
+    if not write_resources:
+        print("exported meshes", counts, flush=True)
+        return
     with open(os.path.join(out, "ammo_case.mtl"), "w", newline="\n") as h:
         h.write("newmtl ac_chest\nKd 1 1 1\nd 1\n")
     meshes = ",\n".join(
@@ -511,4 +535,6 @@ if "bake" in STAGES:
     bake_stage()
 if "export" in STAGES:
     export_stage()
+if "export-meshes" in STAGES:
+    export_stage(write_resources=False)
 print("ammo case stages done", flush=True)

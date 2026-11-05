@@ -1,0 +1,14 @@
+Layer0
+{
+ shader "shaders/complex.shader"
+ F_SPECULAR 1
+ F_METALNESS_TEXTURE 1
+ TextureColor "materials/riverside/roof_vent_v1/vent_color.png"
+ TextureNormal "materials/riverside/roof_vent_v1/vent_normal.png"
+ TextureRoughness "materials/riverside/roof_vent_v1/vent_rough.png"
+ TextureMetalness "materials/riverside/roof_vent_v1/vent_metal.png"
+ g_flRoughnessScaleFactor "1"
+ g_flModelTintAmount "1"
+ g_vColorTint "[1 1 1 0]"
+ g_bFogEnabled "1"
+}

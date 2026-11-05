@@ -1,0 +1,45 @@
+var project=Sandbox.Project.Current.GetRootPath();
+var output=System.IO.Path.Combine(project,"output/sewage/platform-rails-v1");
+var editor=Editor.SceneEditorSession.Active;
+var state=new{Scene=editor.Scene.Id,Runtime=Game.ActiveScene?.Id,Game.IsPlaying,Dirty=editor.HasUnsavedChanges};
+var root=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(project,"Assets/scenes/maps/sewage/sewage.scene"))).AsObject();
+var visual=new System.Collections.Generic.HashSet<string>{"Waterworks shell","Waterworks tower","Waterworks catwalks","Waterworks pipework","Waterworks details","Power cabinet 1","Power cabinet 2","Power cabinet 3","Waterworks signage","Waterworks water","Waterworks cascades","Practical work lights","Ambient reflected green","Chamber atmosphere","Basin mist","Chamber reflection 0","Chamber reflection 1","Chamber reflection 2","Skylight shaft 0","Skylight shaft 1","Skylight shaft 2","Chamber suspended moisture","Waterworks caged work lamps","Waterworks valve wheels","Waterworks bolted flanges","Waterworks louvred vent housings"};
+var objects=new System.Text.Json.Nodes.JsonArray();
+foreach(var go in root["GameObjects"].AsArray())if(visual.Contains(go["Name"]?.GetValue<string>()??""))objects.Add(go.DeepClone());
+root["GameObjects"]=objects;root["SceneProperties"]["NavMesh"]["Enabled"]=false;root["SceneProperties"]["WantsSystemScene"]=false;
+var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic;
+var preRender=typeof(Scene).GetMethod("PreRender",flags,null,Type.EmptyTypes,null);
+var preCamera=typeof(Scene).GetMethod("PreCameraRender",flags,null,Type.EmptyTypes,null);
+Vector3 W(float e,float n,float z)=>new(n,-e,z);
+var scene=Scene.CreateEditorScene();var report=new System.Collections.Generic.List<object>();
+try {
+ CameraComponent camera;ModelRenderer signage;
+ using(scene.Push()) {
+  scene.Deserialize(root);
+  signage=scene.GetAllObjects(true).Single(g=>g.Name=="Waterworks catwalks").Components.Get<ModelRenderer>();
+  var holder=new GameObject(false,"Tunnel gate review camera");camera=holder.Components.Create<CameraComponent>();
+  camera.IsMainCamera=false;camera.EnablePostProcessing=true;camera.FovAxis=CameraComponent.Axis.Horizontal;camera.CustomSize=new Vector2(1440,1000);camera.ZNear=1;camera.ZFar=20000;holder.Enabled=true;
+ }
+ foreach(var mat in scene.GetAllComponents<ModelRenderer>().Where(r=>r.Model!=null).SelectMany(r=>r.Model.Materials).Distinct())
+  foreach(var tex in new[]{"g_tColor","g_tNormal","g_tRoughness","g_tSelfIllumMask"}.Select(mat.GetTexture).Append(mat.FirstTexture).Where(t=>t!=null).Distinct())tex.MarkUsed(4096);
+ float time=0;
+ var views=new[]{(Name:"platform",Eye:W(-390,-210,228),Target:W(90,95,182),Fov:61f),(Name:"fittings",Eye:W(-95,-2,196),Target:W(10,95,182),Fov:50f)};
+ foreach(var view in views)foreach(var variant in new[]{"before","after"}) {
+  using(scene.Push()) {
+   signage.Model=Model.Load(variant=="after"?"models/maps/sewage/sewage_catwalks.vmdl":"models/maps/sewage/platform-rails-v1/before.vmdl");
+   if(signage.Model==null||signage.Model.IsError)throw new Exception("Failed model: "+variant);
+   camera.WorldPosition=view.Eye;camera.WorldRotation=Rotation.LookAt(view.Target-view.Eye);camera.FieldOfView=view.Fov;
+   foreach(var mat in signage.Model.Materials)foreach(var tex in new[]{"g_tColor","g_tNormal","g_tRoughness"}.Select(mat.GetTexture).Append(mat.FirstTexture).Where(t=>t!=null).Distinct())tex.MarkUsed(2048);
+  }
+  using var bitmap=new Bitmap(1440,1000);
+  for(var frame=0;frame<45;frame++) {
+   cancellationToken.ThrowIfCancellationRequested();
+   using(scene.Push()){scene.EditorTick(time+=.016f,.016f);preRender.Invoke(scene,null);preCamera.Invoke(scene,null);camera.RenderToBitmap(bitmap,false);}
+   await Task.Delay(20,cancellationToken);
+  }
+  var path=System.IO.Path.Combine(output,view.Name+"-"+variant+".png");System.IO.File.WriteAllBytes(path,bitmap.ToPng());
+  report.Add(new{File=path,Variant=variant,View=view.Name,Model=signage.Model.ResourcePath,Camera=camera.WorldPosition.ToString(),Rotation=camera.WorldRotation.ToString(),camera.FieldOfView});
+ }
+}finally{scene.Destroy();}
+var result=new{Captures=report,MatchedCameraAndLighting=true,UserStatePreserved=editor.Scene.Id==state.Scene&&Game.ActiveScene?.Id==state.Runtime&&Game.IsPlaying==state.IsPlaying&&editor.HasUnsavedChanges==state.Dirty};
+System.IO.File.WriteAllText(System.IO.Path.Combine(output,"capture-report.json"),System.Text.Json.JsonSerializer.Serialize(result,new System.Text.Json.JsonSerializerOptions{WriteIndented=true}));return result;

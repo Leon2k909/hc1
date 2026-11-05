@@ -1,0 +1,26 @@
+var session=Editor.SceneEditorSession.Active;var scene=session.Scene;
+var before=new{Scene=scene.Id,Dirty=session.HasUnsavedChanges,Playing=Game.IsPlaying,Runtime=Game.ActiveScene,Objects=scene.GetAllObjects(true).Count()};
+var folder="C:/sbox-projects/hc1/shop-sign-review/output/riverside/shop-sign-v1";
+var images=new System.Collections.Generic.List<string>();
+foreach(var variant in new[]{"before","after"})
+{
+ var resource="models/maps/riverside/shop-sign-v1/"+(variant=="before"?"bright_reference.vmdl":"shop_sign.vmdl");var model=Model.Load(resource);
+ if(model.IsError || model.Materials.Any(m=>m==null || m.IsError))throw new Exception("Sign preview resource failed");
+ var world=new SceneWorld();
+ try
+ {
+  var obj=new SceneObject(world,model,Transform.Zero);
+  // Same sign-local floodlight position/radius/color as Riverside, relative to the sign's base.
+  var light=new SceneLight(world,new Vector3(-60,0,60),420,new Color(2.2f,1.584f,.924f)*(variant=="before"?1f:.20f));
+  var camera=new SceneCamera("Sign lighting asset preview") {
+   World=world,Position=new Vector3(-204,-100,-65),Rotation=Rotation.LookAt(new Vector3(204,100,115)),FieldOfView=55,ZNear=.5f,ZFar=1000,
+   Size=new Vector2(1200,900),AmbientLightColor=new Color(.06f,.07f,.09f),BackgroundColor=new Color(.025f,.035f,.05f),AntiAliasing=true,EnablePostProcessing=true
+  };
+  var pixmap=new Editor.Pixmap(1200,900);Sandbox.SandboxToolExtensions.RenderToPixmap(camera,pixmap,false);
+  var path=System.IO.Path.Combine(folder,"lighting-engine-"+variant+".png");pixmap.SavePng(path);images.Add(path);
+ }
+ finally{world.Delete();}
+}
+var preserved=scene.Id==before.Scene && session.HasUnsavedChanges==before.Dirty && Game.IsPlaying==before.Playing && Game.ActiveScene==before.Runtime && scene.GetAllObjects(true).Count()==before.Objects;
+if(!preserved)throw new Exception("Preview changed user editor state");
+var result=new{PreviewOnly=true,IsolatedEnginePreview=true,UserStatePreserved=preserved,Images=images};System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"lighting-engine.json"),Json.Serialize(result));return result;

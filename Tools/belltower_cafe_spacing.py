@@ -39,8 +39,11 @@ def quantized(p):
 
 def apply_east(model, paint_map):
     """Keep the asymmetric spacing on a full map regeneration."""
-    lookup = {}; expected = Counter(); hulls = {}
+    lookup = {}; expected = Counter(); hulls = {}; prop_lookup = {}
     for k, group in enumerate(original_groups(paint_map)):
+        for prop in group.props:
+            if prop.get('kind') in ('bistro_chair','bistro_table'):
+                prop_lookup[(prop['kind'],quantized(prop['position']))]=k
         for paint, polygons in group.polygons.items():
             for points, _ in polygons:
                 key = (paint, frozenset(quantized(p) for p in points))
@@ -79,6 +82,17 @@ def apply_east(model, paint_map):
         updated.append((points, surface))
     assert found_hulls == set(hulls)
     model.hulls = updated
+    # Standalone furniture follows the exact same accepted group translations.
+    updated_props=[];found_props=set()
+    for prop in model.props:
+        key=(prop.get('kind'),quantized(prop['position']))
+        if key in prop_lookup:
+            found_props.add(key);shift=delta(prop_lookup[key])
+            if shift is None:continue
+            prop={**prop,'position':tuple(np.asarray(prop['position'])+shift)}
+        updated_props.append(prop)
+    assert found_props==set(prop_lookup),'Expected the original standalone blue cafe furniture.'
+    model.props=updated_props
 
 
 def clearances():

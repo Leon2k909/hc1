@@ -1,8 +1,8 @@
 # Wall-buy board v2
 
 Created 2026-10-30 and installed the same day at the user's word ("ye install it") after a before/after.
-`ZombiesRoundSystem.CreateStation` now loads it. **It hasn't been compiled or seen in s&box yet**, and until it compiles the station
-logs a warning and builds the old board instead. Nothing is committed.
+`ZombiesRoundSystem.CreateStation` loads it. The model and material were fully compiled through the native editor on
+2026-11-04 and inspected in matched engine captures. The missing-model fallback remains available.
 
 ## Why this one
 
@@ -47,7 +47,8 @@ could float or sink, which the old board, hanging in mid-air, never showed.
 - `Assets/models/zombies/wall_buy_board_v2/`, `Assets/materials/zombies/wall_buy_board_v2/`: the model and its maps.
 - `board.py` builds, bakes and exports. `paint_board.py` paints. `render_board.py` and `make_sheets.py` make the comparison.
   `verify_board.py` checks the files. `run_idle.ps1` runs any of them at idle priority.
-- Work files and renders: `output/asset-improvement-20261030/wall-buy-board/`.
+- Approved paint/build inputs: `output/wall-rack-detail-20261104/work/`; native captures: `after/`.
+  Superseded build and comparison files and the gallery's OLD rack were removed after approval.
 
 ## Checked and not checked
 
@@ -62,15 +63,20 @@ Checked, from the files (`verify_board.py`):
 Checked by eye, in Blender renders: the stencils read the right way round, the AK-105 sits 0.3 in off the saddles without touching
 them, and LOD 1 and 2 have no cracks or floating parts from across a room.
 
-Known weakness: the plank grain is stretched hard along its length, so within about 18 inches it looks soft and streaky (the padlock
-sheet shows it). From where a player stands it reads as weathered timber. The two art passes the brief allowed were used up, so this
-wasn't fixed. It's a paint-only change in `paint_board.py`: short, crisp pore marks across the grain, with no rebuild or rebake.
+### Timber and lettering refresh (2026-11-04)
+
+- Repainted from the existing geometry bakes: shorter knot-following grain, small pores, saw marks, and roughness/normal
+  detail replace the strongest smeared bands. The weathered grey-brown palette and bolt stains remain.
+- Removed the heavy horizontal cut through the sprayed lettering and reduced its source blur; ARMS ISSUE and
+  CLEAR BEFORE RACKING now read as single lines instead of looking doubled.
+- Uses the same meshes, LODs, UVs and 2048 atlas. Triangle counts, texture dimensions, station fit and gun placement do not change.
+- Full native material/model compilation and offline asset checks passed. Matched whole-rack and close-detail engine
+  approved captures remain in `output/wall-rack-detail-20261104/after/`; the active scene and play state were preserved.
 
 **Not checked:**
 
-- **It has not been compiled or seen in s&box.** The user asked for this round to stay offline, so the editor, `sbox-cli` and the bridge
-  weren't used. The sheets are Blender (Cycles, ACES 1.3) renders, not engine screenshots. Nothing in a match has loaded it, so the
-  fallback may be what shows at first. An open editor may compile the files by itself, so look for `_c` files before repeating this.
+- **A live match.** The current model and material have been compiled and rendered in an isolated native scene; a player
+  walking up to a live wall-buy station still needs checking.
 - Whether the LOD thresholds (0, 20, 60, copied from the town house doors) switch at sensible distances.
 - Other guns. The render has only the AK-105, placed by the station's own sums from its default parts. Its real in-game bounds may
   differ slightly if they count other bodygroups. A pistol is thinner, so it will stand further off the saddles. No pistol was measured.

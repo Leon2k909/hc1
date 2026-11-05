@@ -1,0 +1,55 @@
+{
+  "source": "Assets/models/maps/riverside/riverside_low.obj",
+  "before_sha256": "b71aa332fdf4915c011f73dcea3c05dc15339cb2c13ad0a075eb9469ee533bfe",
+  "after_sha256": "2c5bb32ea358cee9b59839c791f1d4471ad9fd669a9e0d884b3b8ac43ddfc224",
+  "model_sha256": "6b82180726da8b121095a51fd5d1d787747e2cb168fbe7b3321889297239730d",
+  "scene_sha256": "8e1feaadf1fcd1c25982667d7d7207de9a35752f0b6156f70c2584345824634d",
+  "removed_triangles": 48,
+  "group": {
+    "__guid": "4bd79b4f-0ea7-58a9-a9a5-443393817534",
+    "__version": 2,
+    "Flags": 0,
+    "Name": "Precast Entry Steps",
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Tags": "",
+    "Enabled": true,
+    "NetworkMode": 2,
+    "NetworkFlags": 0,
+    "NetworkOrphaned": 0,
+    "NetworkTransmit": true,
+    "OwnerTransfer": 1,
+    "Components": [],
+    "Children": [
+      {
+        "__guid": "d8ad2eed-b6d2-560d-8924-26d2d4a4a57e",
+        "__version": 2,
+        "Flags": 0,
+        "Name": "T2 Precast Entry Steps",
+        "Position": "955.000000,891.826513,0.000000",
+        "Rotation": "0,0,-0.0000000,1.0000000",
+        "Scale": "1,1,1",
+        "Tags": "",
+        "Enabled": true,
+        "NetworkMode": 2,
+        "NetworkFlags": 0,
+        "NetworkOrphaned": 0,
+        "NetworkTransmit": true,
+        "OwnerTransfer": 1,
+        "Components": [
+          {
+            "__type": "Sandbox.ModelRenderer",
+            "__guid": "5e0cdcc3-8f51-5eee-adab-e46c21407269",
+            "__enabled": true,
+            "Flags": 0,
+            "Model": "models/props/riverside/t2_precast_entry_v1/entry_steps.vmdl",
+            "RenderType": "On",
+            "Tint": "1,1,1,1"
+          }
+        ],
+        "Children": []
+      }
+    ]
+  }
+}

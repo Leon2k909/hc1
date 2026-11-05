@@ -1,0 +1,22 @@
+{
+  "target": "East taxi-rank head sign at (1488,1180,0)",
+  "existing_improvement_found": false,
+  "checked": [
+    "Assets model filenames for taxi/sign/pole variants",
+    "Sources upgrade README/status/installed records",
+    "Tools and notes for taxi_post/taxi_rank",
+    "Historical output variants named taxi",
+    "Riverside speed_sign_v2 reusable model"
+  ],
+  "findings": [
+    "The live rank sign still matches railhead_dress_detail.taxi_post: ten-sided pole, solid rectangular slab and simple collars",
+    "rw_taxi_sign and railhead_furniture.taxi_sign belong to car roof lamps, not rank signs",
+    "The existing Riverside sign is a single US speed-limit sheet on a perforated U-channel, not this double-sided taxi panel",
+    "Newer planter, chair, speaker and inspection-cover assets were excluded from selection"
+  ],
+  "reuse": [
+    "Unchanged existing rw_signs taxi artwork, on both faces",
+    "Existing stainless/white/dark finishes",
+    "Shared lathe, bevel and face construction helpers"
+  ]
+}

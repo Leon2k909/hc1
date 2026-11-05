@@ -1,0 +1,1 @@
+Riverside crossarm pin insulators claimed in Install new chairs, 2026-11-04. Next private candidate after streetlight-head installation. Sources/Riverside/pole-insulator-v2/. Preserve actual wire endpoints/crossarms, poles, transformer bushings and the approved streetlights. Roof AC, shelving and pipe stacks belong to other chats.

@@ -1,0 +1,3 @@
+# Riverdale sand bin — review, 2026-11-04
+
+After checking existing upgrades and finding no suitable sand/grit bin, rebuilt the crude court bin at plan (-1250,258): rounded tapered body, formed sloping lid and weather lip, hinge knuckles/pins, recessed handle and skids. Original yellow finish and SAND artwork retained; no new texture. Exactly 38 old triangles removed only from a private review base. All other source geometry, saved scene and collision are unchanged. Native in-game comparison, source guards and validation: `output/riverdale/sand-bin-v1/`. Reproduction: `Sources/Riverdale/sand-bin-v1/README.md`. Staged pending approval.

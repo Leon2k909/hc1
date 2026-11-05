@@ -23,6 +23,10 @@
 { from = "ext_v2_dark.vmat" to = "materials/props/extinguisher-v2/dark.vmat" },
 { from = "ext_v2_seal.vmat" to = "materials/props/extinguisher-v2/seal.vmat" },
 
+							{ from = "rh_as_rw_black.vmat" to = "materials/railhead/rw_black.vmat" },
+							{ from = "rh_as_rw_line_yellow.vmat" to = "materials/railhead/rw_line_yellow.vmat" },
+							{ from = "rh_as_rw_stainless.vmat" to = "materials/railhead/rw_stainless.vmat" },
+							{ from = "rh_as_rw_steel_dark.vmat" to = "materials/railhead/rw_steel_dark.vmat" },
 							{ from = "copper_brown.vmat" to = "materials/buildings/copper_brown.vmat" },
 							{ from = "dress_asphalt_fresh.vmat" to = "materials/railhead/dress/dress_asphalt_fresh.vmat" },
 							{ from = "dress_asphalt_track.vmat" to = "materials/railhead/dress/dress_asphalt_track.vmat" },
@@ -173,6 +177,19 @@
 						_class = "RenderMeshFile"
 						name = "railhead_dress_west"
 						filename = "models/maps/railhead/extinguisher-v2/west-base.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+					{
+						_class = "RenderMeshFile"
+						name = "ashtray"
+						filename = "models/maps/railhead/ashtray-v1/installed_ashtrays_west.obj"
 						import_translation = [ 0.0, 0.0, 0.0 ]
 						import_rotation = [ 0.0, 0.0, 0.0 ]
 						import_scale = 1.0

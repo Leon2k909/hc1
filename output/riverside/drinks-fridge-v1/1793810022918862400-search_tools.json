@@ -1,0 +1,2460 @@
+{
+  "tools": [
+    {
+      "name": "add_component",
+      "title": "Add Component",
+      "toolset": "scene",
+      "description": "Add a component to a game object, optionally setting its properties in the same call. The user can undo this. Returns the component's id.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The game object's id, from scene_tree or find_game_objects."
+          },
+          "type": {
+            "type": "string",
+            "description": "The component type name, e.g. 'ModelRenderer'. get_component_type documents what exists."
+          },
+          "properties": {
+            "type": "object",
+            "description": "Optional json object of property values, e.g. {\"LightColor\": \"1,0.8,0.6,1\", \"Radius\": 512}."
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "Id": {
+            "type": "string"
+          },
+          "Type": {
+            "type": "string"
+          },
+          "GameObject": {
+            "type": "string"
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "add_component_to_new_object",
+      "title": "Add Component To New Object",
+      "toolset": "bridge_component",
+      "description": "Create a new GameObject, add a component, set its properties, and optionally parent/position/tag it — all in one atomic call. Collapses the create_gameobject → add_component_with_properties → set_parent sequence. NOTE: a freshly GENERATED component type only resolves after a trigger_hotload; generate the script, hotload, THEN call this.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "component": {
+            "type": "string",
+            "description": "Component type name to add (e.g. 'CameraComponent', 'ObjectiveManager'). Use list_available_components to find valid types."
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name for the new GameObject. Defaults to the component type name."
+          },
+          "properties": {
+            "description": "Key-value map of property names to values, auto-converted to the right type (same convention as add_component_with_properties). JSON value."
+          },
+          "position": {
+            "type": "string",
+            "description": "World position. As \"x,y,z\" (or JSON {x,y,z})."
+          },
+          "rotation": {
+            "type": "string",
+            "description": "World rotation. As \"pitch,yaw,roll\" degrees."
+          },
+          "scale": {
+            "type": "string",
+            "description": "World scale (per-axis). As \"x,y,z\" (or JSON {x,y,z})."
+          },
+          "parentId": {
+            "type": "string",
+            "description": "GUID of a parent GameObject. Omit for scene root."
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Tags to add to the new GameObject (e.g. ['player'])."
+          }
+        },
+        "required": [
+          "component"
+        ]
+      }
+    },
+    {
+      "name": "add_component_with_properties",
+      "title": "Add Component With Properties",
+      "toolset": "bridge_component",
+      "description": "Add a component to a GameObject and configure its properties in one call (properties PERSIST through save+reload). Use list_available_components to find valid types. Returns appliedProperties + failedProperties so you can see exactly what stuck.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of the GameObject."
+          },
+          "component": {
+            "type": "string",
+            "description": "Component type name (e.g. 'ModelRenderer', 'Rigidbody', 'BoxCollider')."
+          },
+          "properties": {
+            "description": "Key-value map of property names to values, each auto-converted to the property's real type. Primitives '5'/true; Color/Vector3 as comma strings '1,0,0,1'; enum member names; ASSET refs as a path ('Model':'models/dev/box.vmdl', 'MaterialOverride':'materials/x.vmat'); GameObject/Component refs as a target GUID. Best-effort per key — failures are reported in failedProperties, not silently dropped. JSON value."
+          }
+        },
+        "required": [
+          "id",
+          "component"
+        ]
+      }
+    },
+    {
+      "name": "add_daynight_sun",
+      "title": "Add Daynight Sun",
+      "toolset": "bridge_visuals",
+      "description": "Generate a sun/sky driver component for the clock made by create_day_night_clock — a COMPANION, not a replacement: the clock owns TimeOfDay, this renders it. Every frame it reads TimeOfDay/SunriseHour/SunsetHour off the clock (sibling first, else first in scene, retrying 1/s) and drives a DirectionalLight: sunrise→sunset maps to a 0-180° pitch arc (continuing below the horizon at night), LightColor runs a hardcoded gradient (warm dawn → white noon → orange dusk → dim blue night, HDR-scaled by Intensity since s&box lights have no Brightness field), and optionally lerps the SkyBox2D Tint between night blue and day white. The clock CLASS NAME is baked in as a typed reference — the call ERRORS if `clockClass` isn't found in the TypeLibrary or any project .cs (run create_day_night_clock first; a bad token would break the whole game-assembly compile). Returns {created, path, className, clockClass, sunYaw, intensity, driveSkybox, placedOn, note, nextSteps[]}. Next: trigger_hotload → attach to the DirectionalLight's GameObject → start_play, set_runtime_property TimeOfDay on the clock (6/12/20/0) + capture_view to verify the looks. File/scene-mutating — refused during play mode.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class name for the generated component. Defaults to 'DayNightSun'."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory for the generated .cs file. Defaults to 'Code'."
+          },
+          "clockClass": {
+            "type": "string",
+            "description": "Class name of the day-night clock to bind to (the `name` you gave create_day_night_clock). Defaults to 'DayNightClock'. Must already exist as a compiled type or a project .cs file."
+          },
+          "sunYaw": {
+            "type": "number",
+            "description": "Compass heading of the sun's arc in degrees. Defaults to 30."
+          },
+          "intensity": {
+            "type": "number",
+            "description": "Brightness multiplier on the colour gradient (HDR, &gt;1 valid; intensity = colour magnitude). Defaults to 1."
+          },
+          "driveSkybox": {
+            "type": "boolean",
+            "description": "Also tint the scene's SkyBox2D between night blue and day white. Defaults to true."
+          },
+          "targetId": {
+            "type": "string",
+            "description": "GUID of a GameObject to attach to (only attaches if the type is already loaded — hotload first)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "add_interaction_prompt",
+      "title": "Add Interaction Prompt",
+      "toolset": "bridge_scaffold_gameplay",
+      "description": "Generate an eye-traced interaction-prompt HUD — a PanelComponent (.razor + .razor.scss pair, like create_leaderboard_panel) that every frame traces a ray from the scene camera (Scene.Trace.Ray, out to [Property] float Range) and, when the crosshair is on a component implementing Component.IPressable, shows a centered \"Press E\"-style pill. The prompt text comes from the target's IPressable.GetTooltip() when it overrides it (most don't), else a [Property] DefaultPrompt built from the action. This is the visible half of the interaction loop: it PAIRS with create_interactable / add_interaction_station (which implement IPressable) — this tool tells the player they CAN press, those tools handle the press. Host it under a ScreenPanel (add_screen_panel), then add the component to that panel object. The generated Razor is razor_lint-safe by construction: PanelComponent + BuildHash override folding the visible state, no switch-expressions and no non-ASCII in @code, and a class root selector in the SCSS. LOCAL/visual-only (no [Sync]).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class/file name for the generated .razor. Defaults to 'InteractionPrompt'."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory for the generated .razor + .razor.scss. Defaults to 'Code/UI'."
+          },
+          "action": {
+            "type": "string",
+            "description": "Verb woven into the default prompt text ('Press E to &lt;action&gt;'). Defaults to 'use'."
+          },
+          "range": {
+            "type": "number",
+            "description": "Eye-trace reach in world units — how close the crosshair must be to a pressable to show the prompt. Defaults to 120."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "add_joint",
+      "title": "Add Joint",
+      "toolset": "bridge_physics",
+      "description": "Add a physics joint/constraint component to a GameObject, optionally connected to a target body (targetId). Returns { added, id, joint, targetId } — joint is the component type added (FixedJoint/SpringJoint/SliderJoint). If targetId is omitted the joint is added unconnected; wire it later via set_property. Both objects need physics (add_physics) for the constraint to simulate in play mode.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of the GameObject to add the joint to."
+          },
+          "type": {
+            "type": "string",
+            "description": "Type of joint to create. One of: fixed | spring | slider."
+          },
+          "targetId": {
+            "type": "string",
+            "description": "GUID of the target GameObject to connect to."
+          },
+          "frequency": {
+            "type": "number",
+            "description": "Spring frequency (spring joints only)."
+          },
+          "damping": {
+            "type": "number",
+            "description": "Damping ratio (spring joints only). 0 = no damping, 1 = critical."
+          }
+        },
+        "required": [
+          "id",
+          "type"
+        ]
+      }
+    },
+    {
+      "name": "add_network_helper",
+      "title": "Add Network Helper",
+      "toolset": "bridge_networking",
+      "description": "Add a NetworkHelper component (with StartServer=true) to an existing GameObject for quick multiplayer setup — at runtime it creates the lobby and spawns the player prefab per connection. Returns { added, id, component:'NetworkHelper' }. NOTE: the current handler requires id (create a holder with create_gameobject first) and does not apply maxPlayers/playerPrefab — wire PlayerPrefab afterward with set_prefab_ref/set_property.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of the GameObject to attach to. Required in practice — the current handler errors when omitted (create a holder with create_gameobject first)."
+          },
+          "name": {
+            "type": "string",
+            "description": "Rename the target GameObject to this. Omit to keep its current name."
+          },
+          "maxPlayers": {
+            "type": "number",
+            "description": "Maximum number of players in the lobby (currently not applied by the handler)."
+          },
+          "playerPrefab": {
+            "type": "string",
+            "description": "Path to the player prefab to spawn for each connection (currently not applied by the handler — set the NetworkHelper's PlayerPrefab afterward with set_prefab_ref)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "add_post_process",
+      "title": "Add Post Process",
+      "toolset": "bridge_visuals",
+      "description": "Add (or update) a post-processing effect on the scene's main camera (auto-enables post-processing). Generic: pass the effect component name + any of its properties. Examples — Bloom {Strength, Threshold, Tint}, Tonemapping, ColorAdjustments {Saturation, Brightness, Contrast}, Vignette {Intensity, Color}, FilmGrain, DepthOfField, ChromaticAberration, MotionBlur, Sharpen, AmbientOcclusion. Call describe_type &lt;Effect&gt; to discover a given effect's properties.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "effect": {
+            "type": "string",
+            "description": "Post-process component type name, e.g. 'Bloom', 'Vignette', 'ColorAdjustments'."
+          },
+          "properties": {
+            "description": "Property name -&gt; value. Floats/ints/bools as numbers/bools, colours as {r,g,b,a}, enums as their string name. JSON value."
+          },
+          "cameraId": {
+            "type": "string",
+            "description": "GUID of a specific camera GameObject (default: the scene's main camera)."
+          }
+        },
+        "required": [
+          "effect"
+        ]
+      }
+    },
+    {
+      "name": "add_steam_stat_currency",
+      "title": "Add Steam Stat Currency",
+      "toolset": "bridge_scaffold_gameplay",
+      "description": "Generate a currency component (sealed) persisted over Sandbox.Services.Stats — Steam-cloud persistence, per Steam account, per package ident, with NO local save file. The stat stores the ABSOLUTE balance: every Add(double)/TrySpend(double) pushes Stats.SetValue(statName, balance); Flush() (and OnDestroy) pushes the buffered writes. On start it reads the balance back asynchronously via Stats.GetLocalPlayerStats(ident) -&gt; Refresh() -&gt; Get(statName).Value and fires the static OnBalanceLoaded(double); wait for IsLoaded before showing the balance. CLOUD SEMANTICS (surprising): stat writes are buffered/rate-limited by the backend and apply ONLY to the LOCAL Steam user — calling this for another player silently does nothing, so attach it to the LOCAL player's GameObject (IsProxy guards keep remote copies inert); read-back is eventually consistent and can lag minutes behind writes — the in-session Balance property is the runtime truth. Dev sessions without a real published package ident may read back nothing (balance starts 0 with a log line). packageIdent defaults to the running package (Game.Ident). Returns { created, path, className, statName, packageIdent, flushEveryChange, placedOn, note, nextSteps }. Next: trigger_hotload, attach to the local player, bind OnBalanceChanged for the HUD. Refused during play mode. Use create_economy_wallet/create_currency_account for in-run networked money, create_signed_save for offline local persistence; pair with create_leaderboard_panel (the same stat can back a leaderboard).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class name for the generated component. Defaults to 'SteamStatCurrency'."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory for the generated .cs file. Defaults to 'Code'."
+          },
+          "statName": {
+            "type": "string",
+            "description": "Sandbox.Services stat that stores the balance (the stat-name string is the contract between write and read-back). Defaults to 'currency'."
+          },
+          "packageIdent": {
+            "type": "string",
+            "description": "Package ident to read stats from. Omit/empty = the running package (Game.Ident)."
+          },
+          "flushEveryChange": {
+            "type": "boolean",
+            "description": "Call Stats.Flush() after every balance change instead of relying on the buffered flush + OnDestroy flush (the backend rate-limits flushes). Defaults to false."
+          },
+          "targetId": {
+            "type": "string",
+            "description": "GUID of the LOCAL player's GameObject to attach to (only attaches if the type is already loaded — hotload first)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "add_sync_property",
+      "title": "Add Sync Property",
+      "toolset": "bridge_networking",
+      "description": "Annotate an EXISTING public property in a C# script with the [Sync] attribute so s&box replicates it across the network. This does NOT create a new property — the property named by `propertyName` must already be declared in the file; the tool only inserts the [Sync] attribute above it. Returns { added, path, property, attribute } — attribute echoes the exact [Sync...] emitted; errors if the property already has [Sync] or isn't found. Follow with trigger_hotload, then get_compile_errors.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Relative path to the script file (e.g. 'code/Player.cs')."
+          },
+          "propertyName": {
+            "type": "string",
+            "description": "Name of the existing public property to annotate with [Sync]."
+          },
+          "propertyType": {
+            "type": "string",
+            "description": "Currently ignored — not yet implemented. The addon only annotates an existing property; it does not declare a new one, so the type comes from the existing declaration."
+          },
+          "syncFlags": {
+            "type": "string",
+            "description": "Optional SyncFlags to emit as [Sync( SyncFlags.X )] — e.g. 'Interpolate' (smooth interpolation), 'Query', 'FromHost'. Omit for a plain [Sync]."
+          },
+          "defaultValue": {
+            "type": "string",
+            "description": "Currently ignored — not yet implemented. The addon does not create or initialize a property, so no default is written."
+          }
+        },
+        "required": [
+          "path",
+          "propertyName"
+        ]
+      }
+    },
+    {
+      "name": "add_tts_voice",
+      "title": "Add Tts Voice",
+      "toolset": "bridge_audio",
+      "description": "Generate a text-to-speech speaker component over Sandbox.Speech.Synthesizer (the OS speech engine — dynamic NPC dialog with zero recorded VO): call &lt;class&gt;.Say(\"text\") from game code and it builds a Synthesizer (TrySetVoice by exact VoiceName, else gender/age hint, else OS default) -&gt; WithText -&gt; WithRate -&gt; Play(), returning a tracked SoundHandle — positional 3D parented to the speaker (default) or flat 2D, with stop-previous-on-say interruption, IsSpeaking, StopSpeaking(), and LogVoices() to enumerate installed OS voices. Returns {created, path, className, propertyNames[], note}. Next: trigger_hotload + get_compile_errors, attach (targetId or add_component_with_properties), then Say from game code — LOCAL audio only, wrap the Say call in an [Rpc.Broadcast] handler for everyone to hear. Limits & honesty: the editor cannot playtest audio, so RUNTIME speech is UNVERIFIED (the API surface compiles — verify with your ears in play mode); voices are machine/OS-specific and TrySetVoice is best-effort; LIPSYNC IS NOT AUTO-WIRED — s&box's Sandbox.LipSync component consumes a BaseSoundComponent, not the raw SoundHandle TTS produces, and Synthesizer.OnVisemeReached's delegate arg types can't be confirmed via reflection; enableVisemeData:true enables Handle.LipSync.Visemes for your own mouth-drive code (runtime-unverified). Refuses to overwrite an existing file; refused during play mode.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class/file name. Defaults to 'TtsSpeaker'. Sanitized to a valid C# identifier."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory under the project root for the .cs file. Defaults to 'Code'."
+          },
+          "voiceName": {
+            "type": "string",
+            "description": "Exact installed OS voice name (machine-specific — the generated LogVoices() lists them at runtime). Empty = use voiceGender/voiceAge, or the OS default."
+          },
+          "voiceGender": {
+            "type": "string",
+            "description": "Voice gender hint used only when voiceName is empty (e.g. 'Female', 'Male'). Must be paired with voiceAge. Passed through unvalidated."
+          },
+          "voiceAge": {
+            "type": "string",
+            "description": "Voice age hint paired with voiceGender (e.g. 'Adult', 'Child', 'Senior'). Passed through unvalidated."
+          },
+          "rate": {
+            "type": "number",
+            "description": "Speaking rate offset (integer): negative = slower, positive = faster. Defaults to 0 (normal)."
+          },
+          "volume": {
+            "type": "number",
+            "description": "Playback volume for spoken lines. Defaults to 1."
+          },
+          "positional": {
+            "type": "boolean",
+            "description": "true (default): 3D sound parented to the speaker GameObject (follows it). false: flat 2D voice on the listener (narrator/UI style)."
+          },
+          "stopPreviousOnSay": {
+            "type": "boolean",
+            "description": "true (default): a new Say() fades out the still-playing previous line. false: lines overlap."
+          },
+          "stopFadeSeconds": {
+            "type": "number",
+            "description": "Fade-out duration used when interrupting/stopping a line. Defaults to 0.1."
+          },
+          "enableVisemeData": {
+            "type": "boolean",
+            "description": "true: sets Handle.LipSync.Enabled on each played line so custom mouth-drive code can read Handle.LipSync.Visemes. Runtime behavior unverified (editor can't playtest audio). Defaults to false."
+          },
+          "targetId": {
+            "type": "string",
+            "description": "GUID of the speaker GameObject to attach to (only attaches if the type is already in the TypeLibrary — hotload first)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "add_water_body",
+      "title": "Add Water Body",
+      "toolset": "bridge_world",
+      "description": "Create a swimmable/buoyant water region: a GameObject with a WaterVolume (s&box's buoyancy + drag physics volume, region defined by a trigger BoxCollider sized to `size`) plus, by default, a simple flat translucent-blue surface box at the water line so it's visible. HONEST LIMIT: the visual is a tinted dev-box stand-in, NOT a Gerstner/water shader — the dev material may render the tint opaque; swap in a real water material later. Only the WaterVolume properties you pass are set (engine defaults otherwise). Returns {created, gameObject{id,...}, size, appliedProperties[], surface{id,...}|null, note, nextSteps[]}. Next: start_play and drop a physics prop in to verify buoyancy; tune FluidDensity/LinearDrag/WaveAmplitude etc. with set_property on the WaterVolume. Scene-mutating — refused during play mode.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "GameObject name. Defaults to 'Water'."
+          },
+          "position": {
+            "type": "string",
+            "description": "World position of the volume's CENTRE (the surface sits at z + size.z/2 + surfaceOffset). As \"x,y,z\" (or JSON {x,y,z})."
+          },
+          "size": {
+            "type": "string",
+            "description": "Full extents of the volume as 'x,y,z' world units. Defaults to '512,512,128'."
+          },
+          "density": {
+            "type": "number",
+            "description": "WaterVolume.FluidDensity — higher = more buoyant. Engine default when omitted."
+          },
+          "linearDrag": {
+            "type": "number",
+            "description": "WaterVolume.LinearDrag on submerged bodies. Engine default when omitted."
+          },
+          "angularDrag": {
+            "type": "number",
+            "description": "WaterVolume.AngularDrag on submerged bodies. Engine default when omitted."
+          },
+          "waveAmplitude": {
+            "type": "number",
+            "description": "WaterVolume.WaveAmplitude — physics wave height (does NOT animate the visual surface)."
+          },
+          "waveFrequency": {
+            "type": "number",
+            "description": "WaterVolume.WaveFrequency — physics wave frequency."
+          },
+          "fluidVelocity": {
+            "type": "string",
+            "description": "WaterVolume.FluidVelocity — current/flow direction and speed, world units/s. As \"x,y,z\" (or JSON {x,y,z})."
+          },
+          "surfaceOffset": {
+            "type": "number",
+            "description": "WaterVolume.SurfaceOffset — shifts the water line relative to the top of the box."
+          },
+          "visualSurface": {
+            "type": "boolean",
+            "description": "Create the tinted surface box child. Defaults to true."
+          },
+          "surfaceColor": {
+            "type": "string",
+            "description": "Tint of the visual surface. Defaults to translucent blue (0.15,0.35,0.55,0.6). As \"r,g,b[,a]\" (0-1 floats)."
+          },
+          "parentId": {
+            "type": "string",
+            "description": "GUID of a parent GameObject."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "assign_material",
+      "title": "Assign Material",
+      "toolset": "bridge_material",
+      "description": "Apply a material to a GameObject by setting its ModelRenderer's MaterialOverride (overrides the whole model's material). Requires an existing ModelRenderer (assign_model first) and errors if the material path can't be loaded. Returns { assigned, id, material } — tweak values afterwards with set_material_property.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of the GameObject."
+          },
+          "material": {
+            "type": "string",
+            "description": "Material path (e.g. 'materials/walls/brick.vmat')."
+          },
+          "slot": {
+            "type": "number",
+            "description": "Material slot index. Defaults to 0 (first slot)."
+          }
+        },
+        "required": [
+          "id",
+          "material"
+        ]
+      }
+    },
+    {
+      "name": "assign_model",
+      "title": "Assign Model",
+      "toolset": "bridge_material",
+      "description": "Set a 3D model on a GameObject's ModelRenderer. Creates the renderer component if it doesn't exist; errors if the model path can't be loaded. Returns { assigned, id, model } — follow with assign_material / set_material_property to style it, or take a screenshot to verify.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of the GameObject."
+          },
+          "model": {
+            "type": "string",
+            "description": "Model path (e.g. 'models/citizen/citizen.vmdl', 'models/dev/box.vmdl')."
+          }
+        },
+        "required": [
+          "id",
+          "model"
+        ]
+      }
+    },
+    {
+      "name": "assign_patrol_route",
+      "title": "Assign Patrol Route",
+      "toolset": "bridge_npc",
+      "description": "Wire a placed route (or an arbitrary ordered GUID list) into an NpcBrain's Waypoints list on a target NPC. This is the list-of-GameObject-references case that plain set_property can't express. Pass either waypointIds (explicit order) or routeId (a route parent whose children become the waypoints in hierarchy order). The list count is returned; List&lt;GameObject&gt; refs may read back as handles/GUIDs via get_property, so trust the count or confirm patrol in play mode.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "npcId": {
+            "type": "string",
+            "description": "GUID of the GameObject holding the NpcBrain (or any component with a List&lt;GameObject&gt; waypoint property)."
+          },
+          "waypointIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Ordered waypoint GameObject GUIDs (e.g. from place_patrol_route). Takes precedence over routeId."
+          },
+          "routeId": {
+            "type": "string",
+            "description": "A route parent GUID whose children (in hierarchy order) become the waypoints."
+          },
+          "property": {
+            "type": "string",
+            "description": "The List&lt;GameObject&gt; property name to set. Defaults to 'Waypoints'. (Use 'SpawnPoints' to wire spawn points on a spawner.)."
+          }
+        },
+        "required": [
+          "npcId"
+        ]
+      }
+    },
+    {
+      "name": "batch_add_component",
+      "title": "Batch Add Component",
+      "toolset": "bridge_batch",
+      "description": "Add one component type to MANY GameObjects in one call (e.g. BoxCollider on every crate). Skips objects that already have the component unless skipExisting:false. dryRun:true validates the type and reports per-object alreadyHas WITHOUT adding. Returns { total, succeeded, failed, skipped, dryRun, results }. Follow with batch_set_property to configure the new components. Scene-mutating: refused during play mode.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "GUIDs of the target GameObjects (from find_objects or get_selected_objects)."
+          },
+          "component": {
+            "type": "string",
+            "description": "Component type name to add, e.g. 'BoxCollider', 'PointLight' (search with list_available_components)."
+          },
+          "skipExisting": {
+            "type": "boolean",
+            "description": "Skip objects that already have this component type. Default true."
+          },
+          "dryRun": {
+            "type": "boolean",
+            "description": "true = validate and report without adding anything. Default false."
+          }
+        },
+        "required": [
+          "ids",
+          "component"
+        ]
+      }
+    },
+    {
+      "name": "batch_set_property",
+      "title": "Batch Set Property",
+      "toolset": "bridge_batch",
+      "description": "Set ONE component property to the same value across MANY GameObjects in a single call. Pass dryRun:true first: it performs the same type coercion and reference resolution as apply, reports current/proposed values, and sets wouldChange:false when they already match. Apply skips no-op setters. Returns { total, succeeded, failed, dryRun, changed, unchanged, results }. Scene-mutating: refused during play mode. Value coercion matches set_property.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "GUIDs of the GameObjects to modify (from find_objects, get_scene_hierarchy, or get_selected_objects)."
+          },
+          "component": {
+            "type": "string",
+            "description": "Component type name present on each object, e.g. 'ModelRenderer', 'PointLight'."
+          },
+          "property": {
+            "type": "string",
+            "description": "Property name to set, e.g. 'Tint', 'Enabled', 'LightColor' (see get_all_properties)."
+          },
+          "value": {
+            "description": "New value — number, bool, string, enum name, 'x,y,z' vector, color, or asset path. JSON value."
+          },
+          "dryRun": {
+            "type": "boolean",
+            "description": "true = validate and report current values without changing anything. Default false."
+          }
+        },
+        "required": [
+          "ids",
+          "component",
+          "property",
+          "value"
+        ]
+      }
+    },
+    {
+      "name": "create_camera_effects",
+      "title": "Create Camera Effects",
+      "toolset": "bridge_scaffold_polish",
+      "description": "Generate static conveniences over the SDK's BUILT-IN camera effects — CameraComponent.AddShake(amplitude, frequency, duration), AddPunch(Vector3 direction, amplitude, frequency, duration, fovAmplitude), AddPunch(Angles, ...) and AddTilt(Angles, duration, easeTime), all fire-and-forget, self-expiring, whitelist-verified in sandboxed game code 2026-07-13: a sealed Component exposing {name}.Shake/ShakeAt/Punch/PunchAngles/Tilt statics that resolve the main camera (Scene.Camera, else IsMainCamera search, else first camera; warn + return null when the scene has none) and return the live Sandbox.CameraEffectSystem.BaseEffect (Stop()/IsDone; ShakeAt sets Epicenter+Radius for distance falloff), plus one-word preset triggers — HitPunch() / ExplosionShake() / ExplosionShakeAt(position, radius) / LandingTilt() — driven by [Property] tunables. Statics work with NO instance placed; place the component only to tune presets in the inspector. RELATIONSHIP: create_camera_shake is the CONTINUOUS trauma model (AddTrauma accumulates and decays); these built-ins are ONE-SHOT engine effects — they compose safely, but don't fire both for the same event or hits feel doubled. Returns {created, path, className, staticApi[], presetTriggers[], propertyNames[], note}. Next: trigger_hotload + get_compile_errors, call the statics from game code (e.g. {name}.Shake(4, 25, 0.8) on explosion) or attach via targetId and trigger presets. Limits & honesty: compile + camera resolution verified; the editor cannot judge FEEL — tune amplitudes in a human playtest; effects are LOCAL visuals (wrap in [Rpc.Broadcast] for everyone). Refused during play mode; refuses to overwrite an existing file.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class/file name. Defaults to 'CameraFx'. Sanitized to a valid C# identifier."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory under the project root for the .cs file. Defaults to 'Code'."
+          },
+          "hitPunchDirection": {
+            "type": "string",
+            "description": "HitPunch preset: punch direction. Defaults to Vector3.Backward (camera kicks back). As \"x,y,z\" (or JSON {x,y,z})."
+          },
+          "hitPunchAmplitude": {
+            "type": "number",
+            "description": "HitPunch preset: positional kick strength. Defaults to 8."
+          },
+          "hitPunchFrequency": {
+            "type": "number",
+            "description": "HitPunch preset: oscillation frequency. Defaults to 20."
+          },
+          "hitPunchDuration": {
+            "type": "number",
+            "description": "HitPunch preset: seconds. Defaults to 0.25."
+          },
+          "hitPunchFovAmplitude": {
+            "type": "number",
+            "description": "HitPunch preset: FOV kick amount (0 = none). Defaults to 3."
+          },
+          "explosionShakeAmplitude": {
+            "type": "number",
+            "description": "ExplosionShake preset: shake strength. Defaults to 5."
+          },
+          "explosionShakeFrequency": {
+            "type": "number",
+            "description": "ExplosionShake preset: oscillation frequency. Defaults to 25."
+          },
+          "explosionShakeDuration": {
+            "type": "number",
+            "description": "ExplosionShake preset: seconds. Defaults to 0.8."
+          },
+          "landingTiltAngles": {
+            "type": "string",
+            "description": "LandingTilt preset as {x: pitch, y: yaw, z: roll} degrees (or 'p,y,r'). Defaults to 5 pitch / 0 yaw / 2 roll. As \"x,y,z\" (or JSON {x,y,z})."
+          },
+          "landingTiltDuration": {
+            "type": "number",
+            "description": "LandingTilt preset: seconds the tilt lasts. Defaults to 0.35."
+          },
+          "landingTiltEase": {
+            "type": "number",
+            "description": "LandingTilt preset: ease-in/out time within the duration. Defaults to 0.15."
+          },
+          "targetId": {
+            "type": "string",
+            "description": "GUID of a GameObject to attach the component to — only needed to tune presets in the inspector; the statics work with no instance (only attaches if the type is already in the TypeLibrary — hotload first)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_carry_system",
+      "title": "Create Carry System",
+      "toolset": "bridge_scaffold_gameplay",
+      "description": "Generate a first-person pickup / carry / throw component (sealed Component) for physics props. Attach it to the PLAYER (the object that owns the camera). It eye-traces from Scene.Camera for a Rigidbody-bearing GameObject tagged [Property] CarryTag (default 'carryable') within [Property] Range; grabbing routes a host-authoritative [Rpc.Host] request that re-validates the target and caller, hands the object's network ownership to the carrier (GameObject.Network.AssignOwnership), and disables the rigidbody's MotionEnabled while held. The held object follows a hold point ([Property] Vector3 HoldOffset in front of the camera) each FixedUpdate; dropping restores physics, throwing applies an impulse ([Property] float ThrowForce). The held-object id is [Sync(SyncFlags.FromHost)] so proxies see the carrying state, and static OnPickedUp / OnDropped events fire uniformly for SFX/VFX. PAIRS with physics props — give each carryable a Rigidbody + Collider and the CarryTag (set_tags); network-spawn them for multiplayer so ownership + transform replicate. Single-player safe (IsProxy is false and RPCs run locally with no session). Inputs: GrabAction (default 'use') grabs/drops, ThrowAction (default 'attack1') throws. Optionally attach to an existing player GameObject by GUID after a hotload.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class name for the generated component. Defaults to 'CarrySystem'."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory for the generated .cs file. Defaults to 'Code'."
+          },
+          "range": {
+            "type": "number",
+            "description": "Eye-trace reach for grabbing a carryable, in world units. Defaults to 130."
+          },
+          "throwForce": {
+            "type": "number",
+            "description": "Impulse magnitude applied on throw (scales with the prop's mass — tune per game). Defaults to 20000."
+          },
+          "carryTag": {
+            "type": "string",
+            "description": "Only objects with this tag (and a Rigidbody) can be picked up; lower-cased/underscored to match s&box tag convention. Defaults to 'carryable'."
+          },
+          "targetId": {
+            "type": "string",
+            "description": "GUID of the PLAYER GameObject (the one with the camera) to attach to (only attaches if the type is already loaded — hotload first)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_combo_meter",
+      "title": "Create Combo Meter",
+      "toolset": "bridge_scaffold_polish",
+      "description": "Generate a combo system: a sealed Component (the authoritative, headless state) PLUS a small Razor HUD (PanelComponent + scss). Three files: &lt;Name&gt;.cs + &lt;Name&gt;Hud.razor + &lt;Name&gt;Hud.razor.scss. The component exposes a static Bump() — call it on every hit and the Count rises; an idle window (ComboWindowSeconds, tracked with TimeSince) resets it; the Multiplier steps up through [Property] tier thresholds (Tier2Hits/Tier3Hits/Tier4Hits =&gt; 2x/3x/4x); and a static OnComboChanged(int count, float multiplier) event fires so any HUD/audio reacts without a reference (Bump() targets the active instance, so callers never need a handle — attach ONE to a persistent object). The HUD subscribes to OnComboChanged, shows \"&lt;count&gt; HITS x&lt;mult&gt;\", and pulses via a CSS animation on every change (razor_lint-safe: BuildHash folds count/mult/pulse, no switch-expressions / non-ASCII in @code, class-selector SCSS root; host it under a ScreenPanel via add_screen_panel). Pairs with create_health_system / create_floating_combat_text — call Bump() from the damage path and Spawn a popup that reflects the multiplier.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class name for the combo component; the HUD is generated as &lt;Name&gt;Hud. Defaults to 'ComboMeter'."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory for the generated .cs + .razor + .razor.scss. Defaults to 'Code'."
+          },
+          "comboWindowSeconds": {
+            "type": "number",
+            "description": "Idle seconds before the combo resets back to zero (clamped to &gt;= 0.25). Defaults to 3."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_elo_rating_system",
+      "title": "Create Elo Rating System",
+      "toolset": "bridge_scaffold_gameplay",
+      "description": "Generate a self-contained, host-authoritative elo rating component: standard elo math (expected = 1/(1+10^((Rb-Ra)/400)), delta = K * (score - expected)) with a [Property] K-factor, ratings in a [Sync(SyncFlags.FromHost)] NetDictionary&lt;long,float&gt; keyed by SteamId, and host-side persistence via FileSystem.Data JSON. API on a static Instance: ReportMatch(winnerSteamId, loserSteamId) for 1v1 and ReportTeamMatch(winnerIds, loserIds) for teams (team-average elo, uniform delta per member) — both are IsProxy-guarded no-ops on clients; GetRating(steamId) works anywhere (unknown players = defaultRating); the static OnRatingChanged(steamId, newRating) fires on EVERY machine via an [Rpc.Broadcast]. Returns { created, path, className, kFactor, defaultRating, placedOn, note, nextSteps }. After trigger_hotload: place ONE in the scene and network its GameObject (network_spawn) or the [Sync] never replicates. Only the HOST's disk holds the ratings ledger. Fails if the file already exists.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class name for the generated component. Defaults to 'EloRatingSystem'."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory for the generated .cs file. Defaults to 'Code'."
+          },
+          "kFactor": {
+            "type": "number",
+            "description": "Elo K-factor — how far one result moves ratings (32 = fast, 16 = stable). Defaults to 32, clamped to &gt;= 1."
+          },
+          "defaultRating": {
+            "type": "number",
+            "description": "Rating assigned to players with no recorded matches. Defaults to 1000."
+          },
+          "fileName": {
+            "type": "string",
+            "description": "Save file name inside FileSystem.Data (host-side ledger). Defaults to 'elo_ratings.json'."
+          },
+          "targetId": {
+            "type": "string",
+            "description": "GUID of a GameObject to attach to (only attaches if the type is already loaded — hotload first)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_event_director",
+      "title": "Create Event Director",
+      "toolset": "bridge_scaffold_gameplay",
+      "description": "Generate a generalized L4D-style AI/pacing director component (host-authoritative). On a configurable interval the host rolls a weighted pick over a [Property] List&lt;GameObject&gt; EventPrefabs (with a parallel List&lt;float&gt; Weights), skips any event already active (dedupe) and anything past a MaxActive concurrency cap, clones the chosen prefab, NetworkSpawns it, and attaches a generated {name}TimedEvent companion so each spawned event self-destructs after EventLifetime seconds. Great for ambient events, waves, and world events. Single-player safe (IsProxy guard; NetworkSpawn falls back to a local clone). Fill EventPrefabs/Weights in the inspector or via the bridge after a hotload; edit the RollInterval() stub to make pacing adaptive (player-count/inactivity/time-pressure factors) per the ai-director cookbook. Optionally attached to an existing GameObject by GUID (after a hotload). NOTE: emits ONE .cs file containing two classes ({name} + {name}TimedEvent); the type only resolves after trigger_hotload.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class name for the director (a {name}TimedEvent companion is generated alongside it). Defaults to 'EventDirector'."
+          },
+          "path": {
+            "type": "string",
+            "description": "Subdirectory for the generated .cs file. Defaults to 'Code'."
+          },
+          "intervalSeconds": {
+            "type": "number",
+            "description": "Base seconds between director rolls. Defaults to 30 (clamped to &gt;= 0.1)."
+          },
+          "maxActive": {
+            "type": "integer",
+            "description": "Maximum number of concurrently-live events. Defaults to 3 (clamped to &gt;= 1)."
+          },
+          "eventLifetime": {
+            "type": "number",
+            "description": "Seconds before each spawned event self-destructs. Defaults to 60 (clamped to &gt;= 0.1)."
+          },
+          "targetId": {
+            "type": "string",
+            "description": "GUID of an existing GameObject to attach the director to (only attaches if the type is already loaded — hotload first)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_gacha_drop_table",
+      "title": "Create Gacha Drop Table",
+      "toolset": "bridge_scaffold_gameplay",
+      "description": "Generate a host-authoritative gacha / loot-box roller component. Two-level pick: parallel [Property] lists RarityNames + RarityWeights select a RARITY by cumulative weight (the create_weighted_loot_table shape), then a flat 'Rarity:Item' [Property] list (e.g. 'Legendary:Dragon Fang') picks an ITEM uniformly within that rarity — simple and inspector-editable. A pity counter (PityAfter, default 50) guarantees the rarest tier (the LAST entry in RarityNames) after N rolls without it and resets on a hit. Duplicate detection against an owned-items set fires a host-side OnDuplicate hook (marked TODO: convert dupes to shards/currency). Roll() routes to the host via an [Rpc.Host] RequestRoll (Rpc.Caller re-validated — NetFlags is not security) and the result fans out via [Rpc.Broadcast] so every machine fires the static OnRolled(rarity, item, isDuplicate) event; single-player safe (RPCs run locally). Use create_weighted_loot_table instead for a simpler single-tier weighted pick with no pity/dupe/networking. Pairs with create_economy_wallet (spend currency to roll) and create_inventory (store the pulls).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class name for the generated component. Defaults to 'GachaDropTable'."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory for the generated .cs file. Defaults to 'Code'."
+          },
+          "pityAfter": {
+            "type": "integer",
+            "description": "Rolls without a rarest-tier hit before the next roll is guaranteed rarest. 0 disables pity. Defaults to 50."
+          },
+          "targetId": {
+            "type": "string",
+            "description": "GUID of a per-player/manager GameObject to attach to (only attaches if the type is already loaded — hotload first)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_game_manager",
+      "title": "Create Game Manager",
+      "toolset": "bridge_scaffold_gameplay",
+      "description": "Generate a minimal game-manager Component: a static Instance singleton, [Property] MaxPlayers / GameState, and a Component.INetworkListener OnActive hook that logs player connects. Writes &lt;name&gt;.cs and returns { created, path, className }. NOTE: the includeScore/includeTimer/includeSpawning params are not currently applied — the same minimal manager is always generated (for richer game-loop scaffolds see create_round_phase_machine / create_objective_system / create_economy_wallet). Follow with trigger_hotload, then get_compile_errors, then place via add_component_to_new_object.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class name. Defaults to 'GameManager'."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory under code/ for the file."
+          },
+          "includeScore": {
+            "type": "boolean",
+            "description": "Include score tracking (currently not applied by the handler)."
+          },
+          "includeTimer": {
+            "type": "boolean",
+            "description": "Include round timer with countdown (currently not applied by the handler)."
+          },
+          "includeSpawning": {
+            "type": "boolean",
+            "description": "Include player spawning from prefab at spawn point (currently not applied by the handler)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_hold_to_confirm",
+      "title": "Create Hold To Confirm",
+      "toolset": "bridge_scaffold_gameplay",
+      "description": "Generate a hold-to-confirm action component (sealed Component). While a named input action is held (Input.Down), a public Progress value fills 0→1 over [Property] float HoldSeconds; releasing early snaps back to 0, or drains down if [Property] bool DecayOnRelease. Reaching 1 fires the static OnConfirmed(GameObject) event, then a short CooldownSeconds blocks re-triggering. The classic 'hold E to disarm / open / revive' interaction. No UI is generated — read the public Progress (0..1) from your own HUD to draw a radial or bar; a #region Feedback hook marks where to tie in a sound/effect. LOCAL/owner-only: input is IsProxy-guarded so it never fires on proxies and is single-player safe. For a host-authoritative outcome, call an [Rpc.Host] from inside the OnConfirmed subscriber. Attach to the player (or any owned object that reads input); optionally attach to an existing GameObject by GUID after a hotload.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class name for the generated component. Defaults to 'HoldToConfirm'."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory for the generated .cs file. Defaults to 'Code'."
+          },
+          "action": {
+            "type": "string",
+            "description": "Input action name that must be held (must exist in the project's Input settings — see ensure_input_action). Defaults to 'use'."
+          },
+          "holdSeconds": {
+            "type": "number",
+            "description": "Seconds of continuous hold required to confirm. Defaults to 1.5."
+          },
+          "decayOnRelease": {
+            "type": "boolean",
+            "description": "Baked default for DecayOnRelease: if true, releasing early drains Progress back down instead of snapping to 0 (editable per-instance). Defaults to false."
+          },
+          "targetId": {
+            "type": "string",
+            "description": "GUID of a GameObject to attach the component to (only attaches if the type is already loaded — hotload first)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_idle_economy",
+      "title": "Create Idle Economy",
+      "toolset": "bridge_scaffold_gameplay",
+      "description": "Generate a geometric idle-economy component (sealed): generators on the classic BaseCost * Growth^Owned cost curve with Buy 1 / Buy N / Buy Max — CostOf(index, count), MaxAffordable(index), TryBuy(index, count) and BuyMax(index) all use the CLOSED-FORM geometric series (cost = c0*(g^n-1)/(g-1), buyMax = floor(log_g(funds*(g-1)/c0+1))) — no per-copy loops, Buy 1000 is the same math as Buy 1. Wallet wiring is TypeLibrary reflection with NO compile-time wallet dependency (the shipped create_idle_income pattern): each income tick invokes AddMoney(long|int) on the first sibling component that has one, purchases invoke TrySpend(long|int), Buy Max reads the sibling's Money (or Balance) property — works out of the box next to create_economy_wallet or create_currency_account; with NO wallet sibling, purchases are refused with a Log.Warning (never silent) while TotalEarned still accumulates. Host-authoritative: mutations IsProxy-guarded; owned counts are HOST-SIDE state (not replicated); TotalEarned is [Sync(FromHost)]. Static events OnPurchased(index, count, cost) and OnIncomeTick(amount, total). BuyMax steps down once past a whole-currency rounding edge rather than failing. Returns { created, path, className, generators, tickSeconds, placedOn, note, nextSteps }. Next: trigger_hotload, place it NEXT TO a wallet on the same GameObject, tune the parallel GeneratorNames/BaseCosts/Growths/IncomesPerSecond lists with set_property. Refused during play mode. Pair with create_offline_progress for away-time earnings; use create_idle_income for a bare income ticker with no purchasing.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class name for the generated component. Defaults to 'IdleEconomy'."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory for the generated .cs file. Defaults to 'Code'."
+          },
+          "tickSeconds": {
+            "type": "number",
+            "description": "Seconds between income grants (floored at 0.1). Defaults to 1."
+          },
+          "generators": {
+            "description": "Baked-in generator defaults (inspector-tunable after generation). Omit for a starter trio: Cursor 15/1.15/0.5, Farm 200/1.15/4, Factory 3000/1.12/30. JSON array."
+          },
+          "targetId": {
+            "type": "string",
+            "description": "GUID of the GameObject to attach to — put it on the SAME GameObject as the wallet so the reflection wiring finds it (only attaches if the type is already loaded — hotload first)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_interactable",
+      "title": "Create Interactable",
+      "toolset": "bridge_scaffold_gameplay",
+      "description": "Generate a Component.IPressable interactable: the built-in PlayerController 'use' key drives Press()/Hover()/Blur() with no custom player code. Includes a static OnPressed event, an optional cooldown (TimeUntil), and a private OnPress() extensionpoint for effects. For host-authoritative side-effects call an [Rpc.Host] from OnPress(). The Prompt property is left to your game's HUD. Optionally attached to an existing GameObject by GUID (after a hotload).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class name. Defaults to 'Interactable'."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory for the .cs file. Defaults to 'Code'."
+          },
+          "prompt": {
+            "type": "string",
+            "description": "Prompt string shown by the game's HUD when hovering. Defaults to 'Press'."
+          },
+          "cooldownSeconds": {
+            "type": "number",
+            "description": "Seconds before the interactable can be pressed again. 0 = no cooldown. Defaults to 0."
+          },
+          "targetId": {
+            "type": "string",
+            "description": "GUID of an existing GameObject to attach the component to (only attaches if the type is already loaded — hotload first)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_killcam",
+      "title": "Create Killcam",
+      "toolset": "bridge_moviemaker",
+      "description": "Generate a sealed killcam Component: a rolling-buffer MovieRecorder keeps ONLY the last MaxBufferSeconds of a target's gameplay (BufferDuration verified live: the compiled clip's Duration equals the buffer, re-based to 0), and TriggerReplay() plays that history back through a MoviePlayer while the main camera chase-follows the target (Scene.Camera takeover in OnPreRender, restored exactly afterwards; static OnReplayFinished event + IsReplaying flag). Sandbox-safe: live-verified that GAME code can construct and drive MovieRecorder/MoviePlayer at runtime, and killcams/replays are the official recording-api use case — this is the real MovieMaker path, not a transform-history approximation. The replay REWINDS THE LIVE TARGET through its recorded past (classic killcam — the target is dead/inactive when it runs; disable a still-alive controller for the duration). wholeScene:true makes the generated component default to MovieRecorderOptions.Default (all renderers/cameras/sound points/particles — the replay rewinds everything, killer included; heavy in dense scenes), and it stays toggleable per-instance via the RecordWholeScene property. Returns { created, path, className, bufferSeconds, sampleRate, cameraDistance, cameraHeight, nextSteps }. Then: trigger_hotload → attach to a MANAGER object → set_component_reference Target to the player → arm via WatchOnStart or StartWatching() from spawn code → call TriggerReplay() from death code (pairs with create_health_system). LOCAL/visual-only — wrap in an [Rpc.Broadcast] for all clients. Refuses if the file already exists.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Component class/file name (default \"Killcam\")."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Project folder for the .cs file (default \"Code\")."
+          },
+          "bufferSeconds": {
+            "type": "number",
+            "description": "Rolling-buffer length in seconds — the replay shows at most this much history (default 10, clamped 2-120)."
+          },
+          "sampleRate": {
+            "type": "integer",
+            "description": "Recorder samples per second (default 30, clamped 1-120)."
+          },
+          "cameraDistance": {
+            "type": "number",
+            "description": "Replay chase-camera distance behind the target (default 150, clamped 10-2000)."
+          },
+          "cameraHeight": {
+            "type": "number",
+            "description": "Replay chase-camera height above the target (default 60, clamped 0-2000)."
+          },
+          "wholeScene": {
+            "type": "boolean",
+            "description": "Generated default for RecordWholeScene: true = buffer the WHOLE scene via MovieRecorderOptions.Default (replay rewinds everything; heavy in dense scenes), false = only the Target hierarchy (default)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_lobby_manager",
+      "title": "Create Lobby Manager",
+      "toolset": "bridge_networking",
+      "description": "Generate a lobby manager Component implementing Component.INetworkListener: a static Instance singleton, a [Sync] PlayerCount maintained in OnActive/OnDisconnected, and a LobbyState [Property] that flips to 'playing' when the lobby fills. Writes &lt;name&gt;.cs and returns { created, path, className }. Follow with trigger_hotload, then get_compile_errors, then place via add_component_to_new_object.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class name. Defaults to 'LobbyManager'."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory under code/."
+          },
+          "maxPlayers": {
+            "type": "number",
+            "description": "Currently not applied by the handler — the generated MaxPlayers [Property] defaults to 16; tune it per-instance with set_property."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_local_player_resolver",
+      "title": "Create Local Player Resolver",
+      "toolset": "bridge_networking",
+      "description": "Generate a proxy-safe 'who is MY player?' resolver — the corpus footgun-killer that stops you running local-player logic against a proxy of someone else's player. The generated sealed Component exposes a static Local property that lazily finds the player GameObject belonging to THIS machine: online it's the tagged object whose Network.Owner is the local connection (Network.Owner == Connection.Local, or Network.IsOwner); offline/solo (no session) it's the first/only tagged player. The result is cached and revalidated with IsValid() so a destroyed or respawned player is re-resolved automatically. Also exposes a static IsLocal(GameObject) helper for filtering events (e.g. only open a station overlay for your own player). Works identically online and offline — no `if (Network.IsOwner)` guard that silently disables everything in a solo playtest. Attach ONE to a persistent object (your game manager) so PlayerTag is configurable in the inspector; the resolver is static and callable from anywhere. Next steps: hotload, attach, tag each player GameObject with the PlayerTag, then read &lt;Name&gt;.Local / filter with &lt;Name&gt;.IsLocal(go). Optionally attached to an existing GameObject by GUID (after a hotload).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class name for the generated component. Defaults to 'LocalPlayerResolver'."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory for the generated .cs file. Defaults to 'Code'."
+          },
+          "playerTag": {
+            "type": "string",
+            "description": "Tag that marks a player GameObject (players must carry this tag). Baked as the default PlayerTag, editable per-instance in the inspector. Defaults to 'player'."
+          },
+          "targetId": {
+            "type": "string",
+            "description": "GUID of a GameObject to attach to (only attaches if the type is already loaded — hotload first)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_loot_table_resource",
+      "title": "Create Loot Table Resource",
+      "toolset": "bridge_scaffold_gameplay",
+      "description": "Generate GameResource-based loot tables — the data-asset sibling of create_weighted_loot_table. One .cs file containing THREE types: an entry POCO { Name, Weight, optional NestedTable reference }, a [AssetType]-registered GameResource loot-table class (designers author '.loot' files in the editor asset browser — New &gt; Loot Table — after the hotload; NOTE: [AssetType(Name=..., Extension=..., Category=...)] is used because GameResourceAttribute is [Obsolete] on this SDK), and a '&lt;name&gt;Resolver' Component that rolls an assigned table by cumulative weight. Nested tables: an entry with a NestedTable rolls INTO that table instead of dropping its Name, capped at maxDepth (default 4) with a self-reference guard so cycles terminate (at the cap the deepest entry's Name is returned). Resolver.Roll() returns the item name (null + warning when no Table is assigned or the table is empty; entries with weight &lt;= 0 never win; all-zero weights fall back to the first entry) and fires the static OnLoot(GameObject, item) event; roll HOST-SIDE and replicate the result yourself. targetId attaches the RESOLVER (the resource is an asset type, not a component). SURPRISING: pick an extension that is NOT a suffix of a built-in one (e.g. avoid 'cfg') or ResourceLibrary picks up engine files as phantom instances. Returns { created, path, className, resolverClass, extension, maxDepth, placedOn, note, nextSteps }. Next: trigger_hotload -&gt; author .loot assets in the editor -&gt; assign the resolver's Table (set_property with the asset path). Refused during play mode. Use create_weighted_loot_table for a single inline component with no asset files; create_gacha_drop_table for pity + duplicate mechanics.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class name for the generated GameResource (the resolver becomes '&lt;name&gt;Resolver'). Defaults to 'LootTableResource'."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory for the generated .cs file. Defaults to 'Code'."
+          },
+          "extension": {
+            "type": "string",
+            "description": "Asset file extension (lowercase alphanumerics; avoid suffixes of built-in extensions like 'cfg'). Defaults to 'loot'."
+          },
+          "title": {
+            "type": "string",
+            "description": "Display name of the asset type in the editor's New-asset menu. Defaults to 'Loot Table'."
+          },
+          "maxDepth": {
+            "type": "integer",
+            "description": "Default nested-table resolve depth cap baked into the resolver (clamped 0..16; also a [Property]). Defaults to 4."
+          },
+          "targetId": {
+            "type": "string",
+            "description": "GUID of a GameObject to attach the RESOLVER component to (only attaches if the type is already loaded — hotload first)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_needs_system",
+      "title": "Create Needs System",
+      "toolset": "bridge_scaffold_gameplay",
+      "description": "Generate a sim/tycoon needs engine component: a [Property] list of need definitions (name, decay rate/s, critical threshold, weight) with per-need 0..100 values that decay over Time.Delta, Satisfy(name, amount) to restore, an aggregate Happiness (weighted mean, [Sync(FromHost)] when networked), and static OnNeedCritical (edge-triggered: fires once crossing below threshold, re-arms above) + OnHappinessChanged (&gt;0.25-point moves) events. Returns {created, path, className, needs[], propertyNames[], note}. Next: trigger_hotload, get_compile_errors, then attach via targetId re-call or add_component_with_properties; drive from game code (e.g. a create_interactable that calls Satisfy). Limits: per-need values live on the simulating machine only (host) — sync per-need UI yourself via RPCs; events fire on the simulating machine only; networked default true means a no-session solo playtest won't tick (everything is a proxy) — pass networked:false to iterate solo. Refused during play mode; refuses to overwrite an existing file.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class/file name. Defaults to 'NeedsSystem'. Sanitized to a valid C# identifier."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory under the project root for the .cs file. Defaults to 'Code'."
+          },
+          "needs": {
+            "description": "Need definitions baked as inspector-editable defaults. Defaults to the classic sim trio: Hunger(0.8/s), Energy(0.5/s), Fun(0.3/s). JSON array."
+          },
+          "networked": {
+            "type": "boolean",
+            "description": "true (default): host-authoritative (IsProxy guard) + [Sync(FromHost)] Happiness — needs a host session. false: local build that ticks in a solo playtest."
+          },
+          "targetId": {
+            "type": "string",
+            "description": "GUID of a GameObject to attach the component to (only attaches if the type is already in the TypeLibrary — hotload first, then re-call or use add_component_with_properties)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_networked_player",
+      "title": "Create Networked Player",
+      "toolset": "bridge_networking",
+      "description": "Generate a network-aware player controller with [Sync] properties, owner-only input, and [Rpc.Broadcast] actions. Writes &lt;name&gt;.cs and returns { created, path, className }. The generated Component syncs PlayerName/Health, moves a CharacterController from Input.AnalogMove behind an IsProxy guard, and exposes a [Property] MoveSpeed plus an [Rpc.Broadcast] TakeDamage(int). Follow with trigger_hotload, then get_compile_errors, then attach + network_spawn.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class name. Defaults to 'NetworkedPlayer'."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory under code/."
+          },
+          "moveSpeed": {
+            "type": "number",
+            "description": "Movement speed (generated MoveSpeed [Property]). Defaults to 200."
+          },
+          "includeHealth": {
+            "type": "boolean",
+            "description": "Currently not applied by the handler — the [Sync] Health and [Rpc.Broadcast] TakeDamage are always generated."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_npc_brain",
+      "title": "Create Npc Brain",
+      "toolset": "bridge_npc",
+      "description": "Generate an NpcBrain Component: a behavior state machine (Idle/Patrol/Wander/Chase/Search/Flee/Ambush) driven by occlusion-aware perception — FOV cone + sight range + a line-of-sight trace (respects walls/trees) + proximity hearing — with last-known-position memory (lose-LOS -&gt; search -&gt; give up -&gt; resume). This is the decision layer on top of bake_navmesh / NavMeshAgent movement. Pick a behavior preset, then tune via the generated [Property] fields with set_property. After generating: trigger_hotload + get_compile_errors, place a route with place_patrol_route + assign_patrol_route, bake_navmesh, and verify perception in EDIT mode with simulate_npc_perception (chase/search behavior needs play mode). The component is added to a GameObject like any other; it auto-adds a NavMeshAgent in OnStart.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class/file name. Defaults to 'NpcBrain'. Sanitized to a valid C# identifier."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory under the project root for the .cs file. Defaults to 'Code'."
+          },
+          "behavior": {
+            "type": "string",
+            "description": "Preset (sets StartState + flee toggle): 'patrol' (walk waypoints), 'guard' (Ambush near spawn until a target enters range), 'hunter' (patrol-&gt;chase-&gt;search, the Sasquatch), 'swarm' (wander/idle-&gt;chase nearest, RUN mobs), 'skittish' (chase but flee on low health). The generated file is the same shape; the preset just changes defaults. Defaults to 'hunter'. One of: patrol | guard | hunter | swarm | skittish."
+          },
+          "targetTag": {
+            "type": "string",
+            "description": "Tag the NPC hunts (its candidates are GameObjects with this tag). Defaults to 'player'."
+          },
+          "moveSpeed": {
+            "type": "number",
+            "description": "Patrol/wander speed (NavMeshAgent MaxSpeed). Default 130."
+          },
+          "chaseSpeed": {
+            "type": "number",
+            "description": "Chase/flee speed. Default 200."
+          },
+          "sightRange": {
+            "type": "number",
+            "description": "Max sight distance. Default 1500."
+          },
+          "fovDegrees": {
+            "type": "number",
+            "description": "Full field-of-view cone angle in degrees. Default 110. (Baked into a cosine threshold for cheap, trig-free checks.)."
+          },
+          "eyeHeight": {
+            "type": "number",
+            "description": "Trace origin height above the NPC's feet. Default 64."
+          },
+          "hearingRadius": {
+            "type": "number",
+            "description": "Proximity-hearing radius — a target within it is investigated (sets last-known-pos) but NOT instantly aggroed. Default 600."
+          },
+          "giveUpTime": {
+            "type": "number",
+            "description": "Seconds to search after losing line-of-sight before giving up and resuming the start state. Default 6."
+          },
+          "searchRadius": {
+            "type": "number",
+            "description": "Wander radius around the last-known position while searching. Default 400."
+          },
+          "waypointStopDistance": {
+            "type": "number",
+            "description": "How close the NPC must get to a waypoint/target before it counts as reached. Default 80."
+          },
+          "canFlee": {
+            "type": "boolean",
+            "description": "Enable the Flee state (else the NPC never flees). Defaults from the preset."
+          },
+          "fleeHealthFrac": {
+            "type": "number",
+            "description": "Flee when CurrentHealthFrac drops to/below this (the game sets CurrentHealthFrac 0..1). Default 0.25."
+          },
+          "networked": {
+            "type": "boolean",
+            "description": "When true (default), emit a host-authoritative brain: 'if (IsProxy) return;' + [Sync] CurrentState. NOTE: a no-session solo playtest makes everything a proxy, so a networked brain won't think until a host session exists — pass false to iterate solo in the edit scene."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_npc_schedule_brain",
+      "title": "Create Npc Schedule Brain",
+      "toolset": "bridge_npc",
+      "description": "Generate a daily-routine NPC brain: a [Property] list of schedule entries (startHour/endHour 0..24, taskName, target = named scene GameObject or fixed position), the hour read from any create_day_night_clock component (capability match: a float TimeOfDay property, same GameObject first then scene-wide) with an HONEST fallback to its own internal clock when none exists (check the generated UsingClockComponent bool), walking the NPC to the active entry's target and idling outside the schedule, plus a static OnTaskChanged(brain, taskName) event and [Sync(FromHost)] CurrentTask. Entries with endHour &lt; startHour wrap past midnight. Returns {created, path, className, tasks[], propertyNames[], note}. Next: trigger_hotload + get_compile_errors, attach (targetId or add_component_with_properties), create the named target GameObjects (e.g. 'WorkSpot'), pair with create_day_night_clock for shared time, verify via get_runtime_property CurrentTask in play mode. Limits: default movement is a direct transform walk (walks through walls) — pass useNavMeshAgent:true for pathfinding (then bake_navmesh is REQUIRED); a clock with a different shape (e.g. 0..1 DayProgress) will NOT bind; networked default true won't tick in a no-session solo playtest (networked:false to iterate). Refused during play mode; refuses to overwrite an existing file.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class/file name. Defaults to 'NpcScheduleBrain'. Sanitized to a valid C# identifier."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory under the project root for the .cs file. Defaults to 'Code'."
+          },
+          "schedule": {
+            "description": "Schedule entries baked as inspector-editable defaults. Defaults to Work 8-17 @ 'WorkSpot', Relax 17-22 @ 'HomeSpot' (idles/sleeps otherwise). JSON array."
+          },
+          "moveSpeed": {
+            "type": "number",
+            "description": "Walk speed in world units/s. Defaults to 100."
+          },
+          "arriveDistance": {
+            "type": "number",
+            "description": "Distance at which the NPC counts as arrived and idles at the spot. Defaults to 32."
+          },
+          "useNavMeshAgent": {
+            "type": "boolean",
+            "description": "true: move via NavMeshAgent.MoveTo (real pathfinding — REQUIRES bake_navmesh or the NPC won't move). Defaults to false (direct transform walk, no navmesh needed, walks through walls)."
+          },
+          "fallbackDayLengthSeconds": {
+            "type": "number",
+            "description": "Internal fallback clock only: real seconds per 24 in-game hours when NO TimeOfDay clock component exists. Defaults to 600."
+          },
+          "fallbackStartHour": {
+            "type": "number",
+            "description": "Internal fallback clock only: starting hour 0..24. Defaults to 8."
+          },
+          "networked": {
+            "type": "boolean",
+            "description": "true (default): host-authoritative (IsProxy guard) + [Sync(FromHost)] CurrentTask. false: local build for solo iteration."
+          },
+          "targetId": {
+            "type": "string",
+            "description": "GUID of the NPC GameObject to attach to (only attaches if the type is already in the TypeLibrary — hotload first)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_npc_spawner",
+      "title": "Create Npc Spawner",
+      "toolset": "bridge_npc",
+      "description": "Generate a spawner Component that instantiates an NPC prefab over time / in escalating waves at spawn points, capped by maxAlive. RUN's swarm backbone and Sasquatched's round-start spawn. After generating: set NpcPrefab via set_prefab_ref, set SpawnPoints (reuse place_patrol_route to make a set of empties, then assign_patrol_route with property='SpawnPoints'), trigger_hotload + get_compile_errors. Verify by watching the GameObject count over time in play mode. Networked spawns use NetworkSpawn() and are host-only.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class/file name. Defaults to 'NpcSpawner'."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory under the project root. Defaults to 'Code'."
+          },
+          "mode": {
+            "type": "string",
+            "description": "'continuous' (one every interval), 'waves' (a batch every interval, waveCount times), 'burst' (one batch then stop). Default 'waves'. One of: continuous | waves | burst."
+          },
+          "count": {
+            "type": "number",
+            "description": "NPCs per wave (waves) or per batch (burst/continuous batch). Default 5."
+          },
+          "interval": {
+            "type": "number",
+            "description": "Seconds between spawns (continuous) or between waves (waves). Default 8."
+          },
+          "waveCount": {
+            "type": "number",
+            "description": "Number of waves (waves mode). Default 3."
+          },
+          "waveGrowth": {
+            "type": "number",
+            "description": "Multiply count each wave (&gt;1 = escalating). Default 1.0."
+          },
+          "radius": {
+            "type": "number",
+            "description": "Random scatter radius around a spawn point. Default 200."
+          },
+          "maxAlive": {
+            "type": "number",
+            "description": "Cap on concurrent live NPCs (important so swarms don't melt the frame rate). Default 12."
+          },
+          "networked": {
+            "type": "boolean",
+            "description": "When true (default), spawn via NetworkSpawn() (host-only, try/catch solo-safe) so clients see the NPCs; false = a plain local Clone for solo/edit testing."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_prefab",
+      "title": "Create Prefab",
+      "toolset": "bridge_prefab",
+      "description": "Save an existing GameObject as a real .prefab file — FULL engine serialization: every component with its property values, and all children, in the same JSON format the editor writes. Returns { created, path, sourceId, components, children } — pass path to instantiate_prefab to spawn copies or get_prefab_info to inspect. Errors if the source GameObject is missing; overwrites an existing file at path.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of the GameObject to save as prefab."
+          },
+          "path": {
+            "type": "string",
+            "description": "Path for the prefab file relative to project root (e.g. 'prefabs/enemies/grunt.prefab')."
+          }
+        },
+        "required": [
+          "id",
+          "path"
+        ]
+      }
+    },
+    {
+      "name": "create_proxy_nametag",
+      "title": "Create Proxy Nametag",
+      "toolset": "bridge_scaffold_polish",
+      "description": "Generate a sealed Component that floats the OWNER'S display name above a networked player. TextRenderer-based (not WorldPanel): a nametag is one short string with a distance fade, so a TextRenderer on a managed child object is far simpler than a WorldPanel + Razor + WorldInput stack — no UI assets, no panel host, per-frame alpha is a one-liner (mirrors create_floating_combat_text). Reads GameObject.Network.Owner.DisplayName (Owner and OwnerConnection are the same Connection on this SDK; falls back to the object name offline). Visibility is the INVERSE of the usual proxy guard: it renders only when GameObject.Network.IsProxy is true — i.e. on OTHER clients' copies of the player — so you never see a tag over your own head (offline / no networking =&gt; IsProxy false everywhere =&gt; no tags, expected). Spawns a CHILD GameObject for the text so billboarding never rotates the player model; cleaned up on disable. [Property] MaxDistance fades the tag out with distance, HeightOffset floats it above the head, FontSize sizes it. Attach to the ROOT of your networked player object. Pairs with create_networked_player (add it to the generated player prefab so every remote player is labeled). Returns { created, path, className, maxDistance, heightOffset, note, nextSteps }. Follow with trigger_hotload, then get_compile_errors, then attach via add_component_with_properties (component=className).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class name for the generated component. Defaults to 'ProxyNametag'."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory for the generated .cs file. Defaults to 'Code'."
+          },
+          "maxDistance": {
+            "type": "number",
+            "description": "Full alpha up close; fades to zero as the camera approaches this distance and is hidden past it, in world units. Defaults to 2000."
+          },
+          "heightOffset": {
+            "type": "number",
+            "description": "Height above the object's origin to float the tag, in world units (~72 clears a Citizen's head). Defaults to 72."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_razor_ui",
+      "title": "Create Razor Ui",
+      "toolset": "bridge_ui",
+      "description": "Create a Razor UI component file (.razor). Returns { created, path, componentName }; errors if the file already exists. NOTE: the current handler generates one fixed basic panel (a root div + label bound to a Title [Property]) from name+directory only — panelType/content/styles/includeStyles are not applied and no .scss is written; for custom markup or a PanelComponent you can host via add_screen_panel, write the files with write_file and check them with razor_lint. Follow with trigger_hotload, then get_compile_errors.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Component name (e.g. 'GameHud', 'MainMenu')."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory under code/ for the file. Defaults to 'UI'."
+          },
+          "panelType": {
+            "type": "string",
+            "description": "Type of panel to generate: 'basic' (simple panel), 'hud' (health/score overlay), 'menu' (title + buttons). Defaults to 'basic'. One of: basic | hud | menu."
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of what this UI panel does."
+          },
+          "includeStyles": {
+            "type": "boolean",
+            "description": "Generate a companion .razor.scss stylesheet. Defaults to true."
+          },
+          "content": {
+            "type": "string",
+            "description": "Raw .razor content (skips boilerplate generation)."
+          },
+          "styles": {
+            "type": "string",
+            "description": "Raw .razor.scss content (only used with raw content mode)."
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "create_round_phase_machine",
+      "title": "Create Round Phase Machine",
+      "toolset": "bridge_scaffold_gameplay",
+      "description": "Generate a host-authoritative round/phase machine: a [Sync(SyncFlags.FromHost)] CurrentPhase cycled through your named phases on a per-phase timer (host-only), with a static OnPhaseChanged event that fires on every machine. Great for round/match flow, match phases, or a day/night cycle. Single-player safe. Optionally attached to an existing GameObject by GUID (after a hotload). Mined from the round-flow pattern across the 51 games.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class name. Defaults to 'GameDirector'."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory for the .cs file. Defaults to 'Code'."
+          },
+          "phases": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Ordered phase names (become an enum), e.g. [\"Lobby\",\"Day\",\"Night\",\"Payout\"]. Defaults to [\"Lobby\",\"Active\",\"Ended\"]."
+          },
+          "duration": {
+            "type": "number",
+            "description": "Default seconds per phase (each phase also gets its own tunable [Property]). Defaults to 60."
+          },
+          "loop": {
+            "type": "boolean",
+            "description": "Loop back to the first phase after the last (true) or hold on the last phase (false). Defaults to true."
+          },
+          "targetId": {
+            "type": "string",
+            "description": "GUID of an existing GameObject to attach to (only if the type is already loaded — hotload first)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_round_state_machine",
+      "title": "Create Round State Machine",
+      "toolset": "bridge_scaffold_gameplay",
+      "description": "Generate a host-authoritative MULTI-STATE round machine (the complex variant of create_round_phase_machine). Produces one .cs file: a RoundManager singleton component + an abstract RoundState base (Begin/Tick/OnTimeUp/Finish lifecycle with a per-state [Sync(SyncFlags.FromHost)] TimeUntil timer) + one sealed stub class per named state. The manager auto-attaches the state components on start (you only place the manager), ticks ONLY the active state on the host, Advance()s on timeout with index-wrap, SKIPS any state whose CanEnter() returns false, and announces every transition via a static OnStateChanged event plus an [Rpc.Broadcast] mirror so the host fires immediately and proxies converge without waiting a snapshot (the [Sync] index reconciles late joiners). Single-player safe. USE THIS (not create_round_phase_machine) when each phase needs its OWN behaviour — entry side-effects, per-frame Tick logic, a skip condition, or copy-data-out-on-exit; use the phase machine for 3–5 light phases that differ only in duration. Optionally attached to an existing GameObject by GUID (after a hotload).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Manager class name. Defaults to 'RoundManager'. The abstract base is derived from it (RoundManager → RoundState)."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory for the .cs file (path override). Defaults to 'Code'."
+          },
+          "states": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Ordered state names — each becomes a sealed {Name}State stub class. Defaults to [\"Waiting\",\"Active\",\"PostRound\"]."
+          },
+          "duration": {
+            "type": "number",
+            "description": "Default seconds each state lasts (each state also gets its own tunable [Property] Duration). 0 = no auto-advance for a state. Defaults to 30."
+          },
+          "durations": {
+            "description": "Optional per-state duration override: an array aligned to `states` ([10,120,8]) OR an object keyed by state name ({\"Waiting\":10,\"Active\":120}). Any state not covered falls back to `duration`. JSON value."
+          },
+          "loop": {
+            "type": "boolean",
+            "description": "Loop back to the first state after the last (true) or hold on the last state (false). Defaults to true."
+          },
+          "targetId": {
+            "type": "string",
+            "description": "GUID of an existing GameObject to attach the manager to (only if the type is already loaded — trigger_hotload first)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_round_timer_hud",
+      "title": "Create Round Timer Hud",
+      "toolset": "bridge_scaffold_polish",
+      "description": "Generate a Razor screen-panel HUD (.razor + .razor.scss) showing the active round/phase time remaining as mm:ss with the phase/state name above it. NO code coupling to your round machine: at runtime it discovers one by TypeLibrary property reflection — same-GameObject components first, then the whole scene, re-scanning every 2s while unbound — matching either shipped machine shape: create_round_phase_machine output (a [Sync] TimeUntil 'PhaseTimer' + 'CurrentPhase' enum for the label) or create_round_state_machine output (a manager with 'StateIndex' + 'Current', whose active state carries a [Sync] TimeUntil 'TimeLeft' + 'Identifier'). First matching component wins; any hand-written machine exposing those member names also binds. Adaptive BuildHash folds the WHOLE second remaining so the panel re-renders at 1 Hz, not every frame. Optional low-time warning: at/below lowTimeSeconds the clock gets the 'low' CSS class (red by default). Shows '--:--' (and fades out via the 'unbound' class) until a machine exists. Returns { created, razorPath, scssPath, className, lowTimeSeconds, note, nextSteps }. Renders NOTHING without a ScreenPanel host: follow with trigger_hotload, then add_screen_panel, then add_component_with_properties (component=className) on the same object; verify with capture_view (renderUI=true) in play mode.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class name for the generated panel. Defaults to 'RoundTimerHud'."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory for the generated .razor + .razor.scss. Defaults to 'Code/UI'."
+          },
+          "lowTimeSeconds": {
+            "type": "number",
+            "description": "Remaining-seconds threshold at/below which the clock gets the 'low' warning class (clamped to &gt;= 0; 0 disables). Editable per-instance via the LowTimeSeconds [Property]. Defaults to 10."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_script",
+      "title": "Create Script",
+      "toolset": "bridge_project",
+      "description": "Create a new C# component script in the project — a minimal s&box Component class (name is sanitized to a valid identifier), or your exact code when content is provided. Errors if the file already exists. Returns { path, created, className } — the new type is NOT live until a recompile, so call trigger_hotload, then attach it with add_component_with_properties (component=className).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class name for the component (e.g. 'PlayerController'). Will also be the filename."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory under code/ to place the script (e.g. 'Components'). Defaults to 'code/'."
+          },
+          "description": {
+            "type": "string",
+            "description": "Description of what this component does — used to generate appropriate code."
+          },
+          "properties": {
+            "description": "List of [Property] fields to include in the component. JSON array."
+          },
+          "content": {
+            "type": "string",
+            "description": "Full C# file content. If provided, ignores name/properties and writes this directly."
+          }
+        },
+        "required": [
+          "name"
+        ]
+      }
+    },
+    {
+      "name": "create_trigger_zone",
+      "title": "Create Trigger Zone",
+      "toolset": "bridge_scaffold_gameplay",
+      "description": "Generate a trigger-zone Component (Component.ITriggerListener): auto-adds a trigger BoxCollider on start, filters entrants by a TriggerTag [Property] (default 'player'), and logs enter/exit via private OnPlayerEnter/OnPlayerExit extension points you fill in. Writes &lt;name&gt;.cs and returns { created, path, className }. NOTE: the action/filterTag params are not currently applied at generation time — the zone always logs; implement teleport/damage/spawn in the generated methods (edit_script). Follow with trigger_hotload, then get_compile_errors.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class name. Defaults to 'TriggerZone'."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory under code/ for the file."
+          },
+          "action": {
+            "type": "string",
+            "description": "What happens on trigger (currently not applied by the handler — the generated zone always logs; implement the effect in OnPlayerEnter yourself). One of: log | teleport | damage | spawn."
+          },
+          "filterTag": {
+            "type": "string",
+            "description": "Only trigger for objects with this tag (currently not applied at generation — the generated TriggerTag [Property] defaults to 'player'; change it per-instance with set_property)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_utility_ai",
+      "title": "Create Utility Ai",
+      "toolset": "bridge_npc",
+      "description": "Generate a utility-AI (scored-action) brain: one file with an abstract {name}Action : Component base (Score() 0..1 + Begin/Tick/End lifecycle), a sealed {name}Brain that every EvaluateInterval picks the highest-scoring sibling action (score × ScoreWeight, current action gets +HysteresisBonus so near-ties don't flip-flop), and two example actions — {name}IdleAction (constant fallback score) and {name}WanderAction (desire builds while idle, walks to random points by direct transform movement, no navmesh). How it differs from create_npc_brain: the FSM has a FIXED transition table; here behavior EMERGES from per-frame scores — add behaviors by subclassing the base on the same GameObject, no transition wiring. Returns {created, path, classNames[4], propertyNames[], note}. Next: trigger_hotload + get_compile_errors, attach the brain AND example actions to one GameObject (targetId attaches only the brain), verify in play mode via get_runtime_property CurrentActionName. Limits: networked default true = host-authoritative (won't tick in a no-session solo playtest — use networked:false); actions Tick on the simulating machine only. Refused during play mode; refuses to overwrite an existing file.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "System prefix — generates {name}Action / {name}Brain / {name}IdleAction / {name}WanderAction in {name}Ai.cs. Defaults to 'Utility'. Sanitized to a valid C# identifier."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory under the project root for the .cs file. Defaults to 'Code'."
+          },
+          "evaluateInterval": {
+            "type": "number",
+            "description": "Seconds between score evaluations (the active action still Ticks every frame). Defaults to 0.25."
+          },
+          "hysteresisBonus": {
+            "type": "number",
+            "description": "Score bonus the current action gets during evaluation — stickiness that prevents flip-flopping between near-tied actions. Defaults to 0.15."
+          },
+          "moveSpeed": {
+            "type": "number",
+            "description": "Example WanderAction walk speed in world units/s. Defaults to 80."
+          },
+          "wanderRadius": {
+            "type": "number",
+            "description": "Example WanderAction roam radius around its start position. Defaults to 300."
+          },
+          "networked": {
+            "type": "boolean",
+            "description": "true (default): host-authoritative brain (IsProxy guard) + [Sync(FromHost)] CurrentActionName. false: local build for solo iteration."
+          },
+          "targetId": {
+            "type": "string",
+            "description": "GUID of a GameObject to attach the BRAIN to (actions must be added separately; only attaches if the type is already in the TypeLibrary — hotload first)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "create_worldpanel_ui",
+      "title": "Create Worldpanel Ui",
+      "toolset": "bridge_scaffold_polish",
+      "description": "Generate a diegetic, clickable world-space UI: a Razor PanelComponent (+ .razor.scss) meant to sit on a GameObject that ALSO carries a Sandbox.WorldPanel — the WorldPanel is the world-space render surface (PanelSize / RenderScale / InteractionRange), this component is the actual UI it renders (PanelComponent has no world-panel mode of its own). Ships two example buttons wired to @onclick that raise a static event OnButtonPressed(string id), so game code reacts WITHOUT editing the panel (subscribe: &lt;Name&gt;.OnButtonPressed += id =&gt; ...). razor_lint-safe by construction (BuildHash override, no switch-expressions / non-ASCII in @code, class-selector SCSS root). SCENE PREREQUISITE FOR CLICKS: a WorldPanel's buttons only fire when a Sandbox.WorldInput exists in the scene (typically on the camera or the player) with its LeftMouseAction set to your click input action (e.g. \"attack1\"); on this SDK WorldInput drives itself from the camera + that action — there is no manual ray to feed, and WorldInput.Hovered (read-only) reflects the panel under the cursor. Without a WorldInput present, @onclick never fires. Setup: add_world_panel to a GameObject, add this component to the same object, add a WorldInput to the scene.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class name for the generated panel. Defaults to 'WorldPanelUi'."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory for the generated .razor + .razor.scss. Defaults to 'Code/UI'."
+          },
+          "title": {
+            "type": "string",
+            "description": "Heading text baked into the panel (editable per-instance via the Title [Property]). Defaults to 'Interact'."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "drive_player",
+      "title": "Drive Player",
+      "toolset": "bridge_playtest",
+      "description": "EXPERIMENTAL — Drive the active PlayerController DURING PLAY MODE across multiple frames: synthesize sustained look (EyeAngles), analog movement (wish velocity), and/or hold a named action down long enough that Input.Pressed fires its rising edge. This is the reliable alternative to simulate_input, which only sets an action for ONE frame and so MISSES edge-triggered controls (Input.Pressed) and cannot inject analog move/look at all. Requires start_play first. Runs ASYNC across editor frames and returns immediately — the job keeps applying for `frames` (or `durationMs`) frames. After it runs, confirm with drive_player_status, then verify the actual effect with capture_view / get_runtime_property. Provide at least one of look / lookDelta / move / action.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of the GameObject holding the controller. Omit to auto-resolve the first PlayerController (or *Controller with EyeAngles/WishVelocity) in the play scene."
+          },
+          "component": {
+            "type": "string",
+            "description": "Controller component type name to target (e.g. 'PlayerController'). Omit to auto-detect."
+          },
+          "frames": {
+            "type": "integer",
+            "description": "How many editor frames to drive for (1–1800, ~60/sec). Default 30 (~0.5s). Takes precedence over durationMs."
+          },
+          "durationMs": {
+            "type": "integer",
+            "description": "Duration in ms, converted at ~60fps (ignored if `frames` is given). Default ~500ms."
+          },
+          "look": {
+            "type": "string",
+            "description": "Absolute EyeAngles target {pitch,yaw,roll} held for the whole duration (aim the camera/body). Object, [pitch,yaw,roll], or 'pitch,yaw,roll'. pitch is clamped to ±89. As \"pitch,yaw,roll\" degrees."
+          },
+          "lookDelta": {
+            "type": "string",
+            "description": "Per-frame EyeAngles delta added each frame (turn/pan over time, e.g. {yaw:2} to sweep right). Combine with `frames` to control total rotation. As \"pitch,yaw,roll\" degrees."
+          },
+          "move": {
+            "description": "Analog movement in the controller's facing frame: x = forward(+)/back(-), y = left(+)/right(-). Magnitude clamped to 1. e.g. {x:1} walks forward for the whole duration. JSON value."
+          },
+          "moveSpeed": {
+            "type": "number",
+            "description": "Units/sec used when synthesizing WishVelocity from `move` (default 160). Ignored if the controller exposes its own AnalogMove field."
+          },
+          "action": {
+            "type": "string",
+            "description": "A named input action ('jump','use','attack1',…) HELD DOWN every frame for the whole duration, so Input.Pressed catches the edge single-frame simulate_input misses. Auto-released on the final frame."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "find_broken_references",
+      "title": "Find Broken References",
+      "toolset": "bridge_validation",
+      "description": "Scan the project for broken references, two layers in one call: (1) every GameObject in the open scene — renderers with no Model (missing_model), component properties pointing at DESTROYED GameObjects/Components (dead_gameobject_ref / dead_component_ref), null component entries whose type no longer exists (missing_component); (2) every .scene/.prefab FILE — prefab references to deleted/renamed files (missing_prefab_file). Returns { total, showing, truncated, objectsScanned, filesScanned, issues } — each issue has { id, name, component, kind, detail } (file-level issues carry the file path in name). Fix missing models with assign_model, dead refs with set_property/set_component_reference, missing prefab files by fixing the path or recreating via create_prefab. Read-only; safe any time. Results cap at `limit` (default 100, max 500).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "Max issues to return (default 100, max 500). total still counts everything."
+          },
+          "scanFiles": {
+            "type": "boolean",
+            "description": "Include the .scene/.prefab file scan for missing prefab references. Default true."
+          }
+        },
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "generate_lipsync_dialogue",
+      "title": "Generate Lipsync Dialogue",
+      "toolset": "bridge_scaffold_polish",
+      "description": "Generate a lipsync dialogue performer — NPCs SPEAK their lines with MOVING MOUTHS: a sealed Component holding a [Property] line list (speaker GameObject name + text) that, per line, (a) mirrors the line into a generated create_dialogue_system HUD when one exists (loose TypeLibrary capability bind: List&lt;string&gt; Lines + Begin() + bool IsActive — neither system references the other), (b) speaks the text via Sandbox.Speech.Synthesizer positionally AT the speaker (per-speaker voice name/gender/age/rate via the Voices list), (c) drives the speaker's SkinnedModelRenderer mouth morphs from the live viseme stream — Handle.LipSync.Visemes (IReadOnlyList&lt;float&gt; in the engine's 15-viseme order, read live from Sandbox.LipSync.VisemeNames 2026-07-13) multiplied through the model's own baked viseme-&gt;morph table (Model.GetVisemeMorph — verified nonzero on Citizen, e.g. viseme_AA -&gt; openjawL/R; NOT a hand-guessed morph map), with MorphScale + smoothing, and (d) advances when the audio handle stops (LineGapSeconds pause, LineTimeoutSeconds safety-skip, Skip() to cut a line short, StopDialogue() to abort). Static events: OnLineStarted(dialogue, lineIndex, speaker) + OnDialogueFinished(dialogue). Returns {created, path, className, lineCount, voiceCount, propertyNames[], note}. Next: trigger_hotload + get_compile_errors, attach (targetId re-call or add_component_with_properties), fill Lines/Voices in the inspector or bake them via params, call Begin() from game code (or autoStart:true; pair with create_interactable). Limits & honesty: the editor cannot playtest audio, so the LIVE viseme stream is RUNTIME-UNVERIFIED — the generated LogVisemes() helper + DebugLogVisemes property confirm it in seconds in play mode (the API surface and mapping data ARE live-verified); models without baked viseme data log a warning and stay audio-only (Citizen has it); voices are machine/OS-specific and TrySetVoice is best-effort; LOCAL-only — call Begin() inside an [Rpc.Broadcast] for everyone; a bound HUD's own advance input stays active (it only ends that HUD's display, not the audio). Refused during play mode; refuses to overwrite an existing file.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class/file name. Defaults to 'LipsyncDialogue'. Sanitized to a valid C# identifier."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory under the project root for the .cs file. Defaults to 'Code'."
+          },
+          "lines": {
+            "description": "Dialogue lines baked as inspector-editable defaults. Defaults to a two-line demo on the own GameObject. JSON array."
+          },
+          "voices": {
+            "description": "Per-speaker voice settings baked as defaults. Defaults to empty (every speaker uses the OS default voice). JSON array."
+          },
+          "volume": {
+            "type": "number",
+            "description": "Playback volume for spoken lines. Defaults to 1."
+          },
+          "positional": {
+            "type": "boolean",
+            "description": "true (default): 3D audio parented to the speaker GameObject. false: flat 2D narrator voice."
+          },
+          "driveMouth": {
+            "type": "boolean",
+            "description": "true (default): drive the speaker's SkinnedModelRenderer mouth morphs from the viseme stream. false: audio-only."
+          },
+          "morphScale": {
+            "type": "number",
+            "description": "Multiplier on viseme-derived morph weights (same idea as Sandbox.LipSync.MorphScale). Defaults to 1."
+          },
+          "mouthSmoothSeconds": {
+            "type": "number",
+            "description": "Seconds of exponential smoothing on mouth morphs (0 = raw viseme weights). Defaults to 0.05."
+          },
+          "lineGapSeconds": {
+            "type": "number",
+            "description": "Pause between a line's audio ending and the next line starting. Defaults to 0.2."
+          },
+          "lineTimeoutSeconds": {
+            "type": "number",
+            "description": "Safety: a line whose audio never starts (synthesis pending/failed) is skipped after this many seconds. Defaults to 20."
+          },
+          "bindHud": {
+            "type": "boolean",
+            "description": "true (default): loosely bind a create_dialogue_system HUD in the scene (TypeLibrary capability match) and mirror each line into it. false: no HUD mirroring."
+          },
+          "autoStart": {
+            "type": "boolean",
+            "description": "true: Begin() fires in OnStart. Defaults to false (call Begin() from game code)."
+          },
+          "debugLogVisemes": {
+            "type": "boolean",
+            "description": "true: log the live viseme stream ~4x/second while speaking — the fast way to runtime-verify the mouth drive. Defaults to false."
+          },
+          "targetId": {
+            "type": "string",
+            "description": "GUID of a GameObject to attach the component to (only attaches if the type is already in the TypeLibrary — hotload first, then re-call or use add_component_with_properties)."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "get_all_properties",
+      "title": "Get All Properties",
+      "toolset": "bridge_component",
+      "description": "Dump all public properties of every component on a GameObject. Returns { id, components } where each entry is { component, properties: [{ name, type, value }] } — values are stringified (unreadable ones show '&lt;error&gt;'). Use the exact component/property names it reports with set_property or get_property; can be large on component-heavy objects.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of the GameObject."
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "get_component_type",
+      "title": "Get Component Type",
+      "toolset": "component",
+      "description": "Documentation for a component type by name - its class name, display title, description, group, and every inspector property with title, description, type and read-only state. Matches exact names first, then substrings; multiple substring matches come back as a candidate list.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The component's type name, e.g. 'ModelRenderer'. Case insensitive, substrings work."
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "get_property",
+      "title": "Get Property",
+      "toolset": "bridge_component",
+      "description": "Read a single property value from a component on a GameObject.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of the GameObject."
+          },
+          "component": {
+            "type": "string",
+            "description": "Component type name (e.g. 'ModelRenderer', 'PlayerController')."
+          },
+          "property": {
+            "type": "string",
+            "description": "Property name to read."
+          }
+        },
+        "required": [
+          "id",
+          "component",
+          "property"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "get_runtime_property",
+      "title": "Get Runtime Property",
+      "toolset": "bridge_playmode",
+      "description": "Read a component property value during play mode. Must call start_play first.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of the GameObject."
+          },
+          "component": {
+            "type": "string",
+            "description": "Component type name."
+          },
+          "property": {
+            "type": "string",
+            "description": "Property name to read."
+          }
+        },
+        "required": [
+          "id",
+          "component",
+          "property"
+        ]
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "instantiate_prefab",
+      "title": "Instantiate Prefab",
+      "toolset": "bridge_prefab",
+      "description": "Spawn a FULL prefab instance into the active scene — components and children recreated. Uses the engine's GameObject.Clone for registered prefabs, with a guid-remapped deserialize fallback for freshly-written files (repeat instantiations never collide). Returns { instantiated, prefab, method, gameObject, components, childCount } — gameObject.id is the new GUID for set_transform/set_property follow-ups. Optional name/position/rotation override the spawned root.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Path to the .prefab file (e.g. 'prefabs/enemies/grunt.prefab')."
+          },
+          "name": {
+            "type": "string",
+            "description": "Rename the spawned root (defaults to the prefab's root name)."
+          },
+          "position": {
+            "type": "string",
+            "description": "World position to spawn at — object {x,y,z} or comma string \"x,y,z\". Defaults to origin. As \"x,y,z\" (or JSON {x,y,z})."
+          },
+          "rotation": {
+            "type": "string",
+            "description": "Rotation as euler angles. Defaults to identity. As \"pitch,yaw,roll\" degrees."
+          },
+          "scale": {
+            "type": "number",
+            "description": "Uniform scale multiplier. Defaults to 1.0."
+          },
+          "parent": {
+            "type": "string",
+            "description": "GUID of parent GameObject to attach to."
+          }
+        },
+        "required": [
+          "path"
+        ]
+      }
+    },
+    {
+      "name": "list_available_components",
+      "title": "List Available Components",
+      "toolset": "bridge_component",
+      "description": "List all instantiable component types in the TypeLibrary — built-in AND your project's custom components (abstract types excluded); filter does a substring match on the type name. Returns { count, components } with { name, title, description, fullName } per type, sorted by name — the unfiltered list is LARGE, so pass filter. Use the returned name with add_component_with_properties, and describe_type for a type's full property list.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "filter": {
+            "type": "string",
+            "description": "Search filter — matches against component name and title."
+          },
+          "category": {
+            "type": "string",
+            "description": "Filter by category/group (e.g. 'Rendering', 'Physics', 'Audio')."
+          }
+        },
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "playtest",
+      "title": "Playtest",
+      "toolset": "bridge_playtest",
+      "description": "Run a scripted gameplay-verification sequence in PLAY MODE and get a pass/fail transcript (start_play first; poll playtest_status until finished). Each step is an object with ONE verb: • { \"move\": {\"x\":1,\"y\":0}, \"frames\":60 } — analog move in the controller frame (x=fwd/back, y=left/right); auto-sets UseInputControls=false and zeroes WishVelocity after. Movement is controller-specific/best-effort. • { \"look\": {\"pitch\":0,\"yaw\":90,\"roll\":0} } / { \"lookDelta\": {\"yaw\":2}, \"frames\":30 } — set/sweep EyeAngles. • { \"action\": \"use\", \"frames\":20 } — hold a named input action down (rising-edge safe; for use/dig/attack handled by gameplay components). • { \"jump\": \"0,0,400\" } — invoke the controller's Jump(velocity). • { \"set\": {\"component\":\"PlayerController\",\"property\":\"WorldPosition\",\"to\":\"100,0,0\"} } — set a runtime property (toggles, or teleport via WorldPosition — the robust positioning fallback). • { \"wait\": 10 } — advance N frames. • { \"capture\": \"after-jump\" } — screenshot the live player-POV camera at this frame; the PNG path is recorded in the transcript (diagnostic, never pass/fail). Pass true for no label. • { \"assert\": {\"read\":\"Displacement\",\"op\":\"&gt;\",\"value\":50,\"desc\":\"moved &gt;50u\"} } — read a value and compare IN-FRAME. read = \"Displacement\" (scalar distance moved from job start — the clean facing-independent movement proof), \"WorldPosition[.x|.y|.z]\", or \"&lt;Component&gt;.&lt;Property&gt;[.x|.y|.z|.Count]\". op = &gt; &lt; &gt;= &lt;= == != changed. Records pass/fail. Tip: prove movement with read:'Displacement' op:'&gt;' (facing-independent, unambiguous), and catch transient state (IsAirborne) right after the action.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "steps": {
+            "description": "Ordered step objects (see verbs above). Runs top-to-bottom in the frame loop. JSON array."
+          },
+          "id": {
+            "type": "string",
+            "description": "GUID of the player/controller GameObject. Omit to auto-resolve the first PlayerController."
+          },
+          "component": {
+            "type": "string",
+            "description": "Controller component type to target (e.g. 'PlayerController'). Omit to auto-detect."
+          }
+        },
+        "required": [
+          "steps"
+        ]
+      }
+    },
+    {
+      "name": "scaffold_map_vote_flow",
+      "title": "Scaffold Map Vote Flow",
+      "toolset": "bridge_scaffold_gameplay",
+      "description": "Scaffold an end-of-round map vote. Three files: &lt;Name&gt;.cs (sealed host-authoritative controller) + &lt;Name&gt;Panel.razor + &lt;Name&gt;Panel.razor.scss (vote UI: one button per map, live tallies, countdown, own-pick highlight, winner banner). Flow: host calls StartVote() (usually from a post-round phase/state, or set the AutoStart [Property]) -&gt; clients click -&gt; votes route client-to-host via [Rpc.Host] SubmitVote with the caller re-resolved HOST-SIDE from Rpc.Caller (null-checked — Connection has no IsValid on this SDK) and the map index re-validated (re-votes overwrite, keyed by SteamId) -&gt; tallies replicate via [Sync(FromHost)] NetList&lt;int&gt; -&gt; when the [Sync] TimeUntil countdown expires the host picks the winner (most votes; ties break deterministically via one LCG scramble of a time seed — no System.Random) -&gt; after resultLingerSeconds the HOST calls Scene.LoadFromFile(winner) (API verified live on this SDK; clients follow via the scene networking layer — verify the client hand-off in a real multi-client session). Static event OnVoteFinished(sceneFile) fires on every machine. Returns { created, componentPath, razorPath, scssPath, className, panelClassName, maps, voteDurationSeconds, resultLingerSeconds, autoStart, note, nextSteps }. REQUIREMENTS: the controller must sit on a NETWORK-SPAWNED object in multiplayer or [Sync] never replicates; if maps is omitted the MapScenes list is generated EMPTY and StartVote() refuses with a warning until you fill it in the inspector. Follow with trigger_hotload, attach via add_component_with_properties, host the panel under add_screen_panel.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Class name for the controller; the panel is generated as &lt;Name&gt;Panel. Defaults to 'MapVote'."
+          },
+          "directory": {
+            "type": "string",
+            "description": "Subdirectory for the generated .cs + .razor + .razor.scss. Defaults to 'Code'."
+          },
+          "maps": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Scene files to vote between, e.g. [\"scenes/arena.scene\", \"scenes/docks.scene\"] (find them with list_scenes). Baked into the MapScenes [Property] list, editable later in the inspector. Defaults to an EMPTY list (StartVote() then refuses until it's filled)."
+          },
+          "voteDurationSeconds": {
+            "type": "number",
+            "description": "Seconds the vote stays open once StartVote() is called (clamped to &gt;= 3). Defaults to 20."
+          },
+          "resultLingerSeconds": {
+            "type": "number",
+            "description": "Seconds the winner banner shows before the host loads the winning scene (clamped to &gt;= 0). Defaults to 4."
+          },
+          "autoStart": {
+            "type": "boolean",
+            "description": "Start the vote automatically on spawn (host only). Usually false — call StartVote() from your round machine's post-round state instead. Defaults to false."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "set_component",
+      "title": "Set Component",
+      "toolset": "scene",
+      "description": "Set properties on a component. Give the component's id, or its game object's id plus a type name. Values use the same serialized forms get_game_object shows - strings, numbers, 'x,y,z' vectors, colors as 'r,g,b,a', asset paths as strings. Everything validates before anything applies, and the user can undo it.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The component's id, or its game object's id."
+          },
+          "properties": {
+            "type": "object",
+            "description": "A json object of property name to new value."
+          },
+          "type": {
+            "type": "string",
+            "description": "The component type to change, when id is a game object."
+          }
+        },
+        "required": [
+          "id",
+          "properties"
+        ]
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "Id": {
+            "type": "string"
+          },
+          "Type": {
+            "type": "string"
+          },
+          "Applied": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "set_component_reference",
+      "title": "Set Component Reference",
+      "toolset": "bridge_component",
+      "description": "Wire a component's GameObject/Component-typed property to ANOTHER live object in the scene by GUID (e.g. ObjectiveManager.Player = the player, a camera's follow target, a door's hinge). Preferred for object/component refs (can pick a specific component type off the target via targetComponent, and validates). set_property also accepts a GUID for ref props; set_prefab_ref is for prefab assets. Set clear:true to null the reference.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of the GameObject that HOLDS the component you're writing into."
+          },
+          "component": {
+            "type": "string",
+            "description": "Component type name on that object (e.g. 'ObjectiveManager', 'CameraComponent')."
+          },
+          "property": {
+            "type": "string",
+            "description": "The property to set (must be a GameObject- or Component-typed property)."
+          },
+          "targetId": {
+            "type": "string",
+            "description": "GUID of the GameObject to reference. Required unless clear:true."
+          },
+          "targetComponent": {
+            "type": "string",
+            "description": "If the property is a Component subtype, the specific component type to pull off the target object. Omit to auto-match by the property's type."
+          },
+          "clear": {
+            "type": "boolean",
+            "description": "If true, set the reference to null instead of assigning a target."
+          }
+        },
+        "required": [
+          "id",
+          "component",
+          "property"
+        ]
+      }
+    },
+    {
+      "name": "set_fog",
+      "title": "Set Fog",
+      "toolset": "bridge_visuals",
+      "description": "Add or update fog in the active scene. Types: 'gradient' (distance haze — great for mood/horror), 'cubemap' (sky-tinted distance fog), 'volumetric' (a localized fog volume). Re-running with the same targetId updates it rather than duplicating; without targetId each call creates a new fog object. Returns { created, type, gameObject } — gameObject.id addresses the fog object for later set_property/delete_gameobject; screenshot to verify the look.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Fog type (default gradient). One of: gradient | cubemap | volumetric."
+          },
+          "name": {
+            "type": "string",
+            "description": "GameObject name when creating a new fog object."
+          },
+          "targetId": {
+            "type": "string",
+            "description": "GUID of an existing GameObject to host the fog (else a new fog object is created)."
+          },
+          "color": {
+            "type": "string",
+            "description": "Fog colour (gradient/volumetric Color, cubemap Tint). As \"r,g,b[,a]\" (0-1 floats)."
+          },
+          "startDistance": {
+            "type": "number",
+            "description": "gradient/cubemap: distance (units) where fog begins."
+          },
+          "endDistance": {
+            "type": "number",
+            "description": "gradient/cubemap: distance (units) where fog reaches full density."
+          },
+          "height": {
+            "type": "number",
+            "description": "gradient: world height the fog settles around."
+          },
+          "falloff": {
+            "type": "number",
+            "description": "Distance/density falloff exponent (higher = sharper onset)."
+          },
+          "blur": {
+            "type": "number",
+            "description": "cubemap: sky blur amount."
+          },
+          "heightStart": {
+            "type": "number",
+            "description": "cubemap: world height where height-fog starts."
+          },
+          "heightWidth": {
+            "type": "number",
+            "description": "cubemap: height-fog band width."
+          },
+          "heightExponent": {
+            "type": "number",
+            "description": "cubemap: height-fog falloff exponent."
+          },
+          "strength": {
+            "type": "number",
+            "description": "volumetric: fog density/strength."
+          },
+          "size": {
+            "type": "string",
+            "description": "volumetric: bounds size (units) centred on the object — object {x,y,z} or comma string \"x,y,z\". As \"x,y,z\" (or JSON {x,y,z})."
+          }
+        },
+        "required": []
+      }
+    },
+    {
+      "name": "set_material_property",
+      "title": "Set Material Property",
+      "toolset": "bridge_material",
+      "description": "Change a property on the material assigned to a GameObject — color, roughness, metallic, texture, etc. Operates on the ModelRenderer's MaterialOverride; if none is assigned it auto-creates one from the default complex shader (no separate assign_material step needed). Returns { set, id, property, autoCreatedMaterial } — screenshot to verify the visual change.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of the GameObject."
+          },
+          "property": {
+            "type": "string",
+            "description": "Material property name (e.g. 'Color', 'Roughness', 'Metalness', 'Normal')."
+          },
+          "value": {
+            "description": "Property value — number for floats, string for texture paths/colors, {r,g,b,a} for colors. JSON value."
+          }
+        },
+        "required": [
+          "id",
+          "property",
+          "value"
+        ]
+      }
+    },
+    {
+      "name": "set_prefab_ref",
+      "title": "Set Prefab Ref",
+      "toolset": "bridge_prefab",
+      "description": "Set a GameObject-typed property on a component to a loaded prefab. Use this when set_property can't handle prefab references (which it can't, because prefabs are GameObjects not primitives).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of the GameObject holding the component."
+          },
+          "component": {
+            "type": "string",
+            "description": "Component type name."
+          },
+          "property": {
+            "type": "string",
+            "description": "Property name to set (must be GameObject-typed)."
+          },
+          "prefabPath": {
+            "type": "string",
+            "description": "Prefab asset path (e.g. 'prefabs/player.prefab')."
+          }
+        },
+        "required": [
+          "id",
+          "component",
+          "property",
+          "prefabPath"
+        ]
+      }
+    },
+    {
+      "name": "set_property",
+      "title": "Set Property",
+      "toolset": "bridge_component",
+      "description": "Set a property value on a component (editor mode), and PERSIST it (survives save+reload). Handles primitives, enums, value types (Color/Vector3 as comma strings), AND references: pass an asset PATH for Model/Material/Texture/SoundEvent props, or a GameObject GUID for GameObject/Component-typed props (resolved like set_component_reference). Returns success=false with a clear error if a path/GUID can't be resolved (no more silent null). For wiring object refs prefer set_component_reference; for prefab refs use set_prefab_ref.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of the GameObject."
+          },
+          "component": {
+            "type": "string",
+            "description": "Component type name."
+          },
+          "property": {
+            "type": "string",
+            "description": "Property name to set."
+          },
+          "value": {
+            "description": "New value. Primitive: '5', 'true'. Color/Vector3: a comma string ('1,0,0,1' / '0,0,200'), an array ([0,0,200]), or an object ({r,g,b,a} / {x,y,z}). Enum: the member name. Asset ref (Model/Material/...): the asset path e.g. 'models/dev/box.vmdl'. GameObject/Component ref: the target GameObject's GUID. Empty/'null' clears the property. JSON value."
+          }
+        },
+        "required": [
+          "id",
+          "component",
+          "property",
+          "value"
+        ]
+      }
+    },
+    {
+      "name": "set_runtime_property",
+      "title": "Set Runtime Property",
+      "toolset": "bridge_playmode",
+      "description": "Set a component property value during play mode — tweak values live while the game runs. Errors if the game is not playing (start_play first). Returns { set, id, component, property, value } like set_property; read it back with get_runtime_property. Runtime changes are DISCARDED when play mode stops — use set_property in edit mode to persist.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of the GameObject."
+          },
+          "component": {
+            "type": "string",
+            "description": "Component type name."
+          },
+          "property": {
+            "type": "string",
+            "description": "Property name to set."
+          },
+          "value": {
+            "description": "New value. JSON value."
+          }
+        },
+        "required": [
+          "id",
+          "component",
+          "property",
+          "value"
+        ]
+      }
+    },
+    {
+      "name": "simulate_npc_perception",
+      "title": "Simulate Npc Perception",
+      "toolset": "bridge_npc",
+      "description": "READ-ONLY edit-mode verifier: evaluate the NPC's perception math RIGHT NOW without entering play mode. Given an NPC (reads its NpcBrain SightRange/FovDegrees/EyeHeight/TargetTag + transform) and either a targetId or a point, it runs the SAME line-of-sight check the brain uses — FOV cone (dot vs the baked cosine), sight-range gate, and an occlusion trace from the eye to the target — and reports the result AND why. This is the keystone verifier: it makes the perception layer checkable in edit mode (no flaky screenshot timing) — e.g. place the Sasquatch, place a camper behind a tree, and confirm the tree blocks LOS. Call params override the brain's values, so it also works before/without an NpcBrain (uses defaults). Safe in play mode too (read-only, like raycast).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "npcId": {
+            "type": "string",
+            "description": "GUID of the NPC GameObject (ideally with an NpcBrain; its perception [Property] values are read)."
+          },
+          "targetId": {
+            "type": "string",
+            "description": "GUID of the target GameObject to test visibility to (e.g. a player). Provide this OR point."
+          },
+          "point": {
+            "type": "string",
+            "description": "A raw world point to test visibility to. Provide this OR targetId. As \"x,y,z\" (or JSON {x,y,z})."
+          },
+          "sightRange": {
+            "type": "number",
+            "description": "Override the sight range for this check (else read from the NpcBrain / default 1500)."
+          },
+          "fovDegrees": {
+            "type": "number",
+            "description": "Override the FOV cone angle for this check (else read from the NpcBrain / default 110)."
+          },
+          "eyeHeight": {
+            "type": "number",
+            "description": "Override the eye height for this check (else read from the NpcBrain / default 64)."
+          },
+          "targetTag": {
+            "type": "string",
+            "description": "Override the target tag (canSee also requires the target to carry this tag; else read from the NpcBrain / default 'player')."
+          }
+        },
+        "required": [
+          "npcId"
+        ]
+      }
+    },
+    {
+      "name": "start_play",
+      "title": "Start Play",
+      "toolset": "bridge_playmode",
+      "description": "Enter play mode — starts running the game in the editor. Scripts execute, physics simulate, everything goes live. Returns { started, method } (method 'EditorScene.Play', or 'SetPlaying (fallback)' with editorErrorSkipped when the safe path failed). While playing, scene-mutating tools refuse — use get/set_runtime_property, capture_view, and playtest, then stop_play to edit again.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      }
+    },
+    {
+      "name": "tune_vehicle",
+      "title": "Tune Vehicle",
+      "toolset": "bridge_vehicle",
+      "description": "Apply a handling preset to a vehicle component on a GameObject: arcade (forgiving), drift (low grip, sharp steering), offroad (soft long-travel suspension), or race (fast, planted). Sets EngineForce/MaxSpeed/SteerStrength/GripFactor/SuspensionStrength/SuspensionDamping by name via reflection — targets create_vehicle_controller scaffolds out of the box, partially tunes anything exposing those property names. Returns { tuned, preset, component, applied, missing } — missing lists properties the component lacks. Auto-finds the first component with 'Vehicle' in its type name; pass component to target explicitly. Scene-mutating: refused during play mode (use set_property on runtime objects while playing).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "GUID of the GameObject carrying the vehicle component (from find_objects)."
+          },
+          "preset": {
+            "type": "string",
+            "description": "Handling preset to apply. One of: arcade | drift | offroad | race."
+          },
+          "component": {
+            "type": "string",
+            "description": "Component type name to tune. Default: first component with 'Vehicle' in its name."
+          }
+        },
+        "required": [
+          "id",
+          "preset"
+        ]
+      }
+    },
+    {
+      "name": "ui_matched_rules",
+      "title": "Matched Rules",
+      "toolset": "ui",
+      "description": "Every style rule that matched a panel, in the order the style system applied them - so for any property, the last rule to set it is the one that won. Each rule reports its selector, the file and line it came from, and its declarations. Anything set on the panel directly comes back as Inline, which beats all of them. This is how you find out why a panel doesn't look like the css you wrote.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "panel": {
+            "type": "string",
+            "description": "Panel path from ui_panel_dump, or a selector. Empty uses the first root."
+          }
+        },
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    },
+    {
+      "name": "ui_panel_dump",
+      "title": "Panel Dump",
+      "toolset": "ui",
+      "description": "The panel tree with each panel's screen rect, like a browser's elements pane. Every panel comes back with a path, which is how the rest of these tools address it. UI only exists while the scene runs, so play_start first.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "panel": {
+            "type": "string",
+            "description": "Panel path like '0/3/1', or a selector like '.mainmenu button'. Empty starts at the roots."
+          },
+          "depth": {
+            "type": "integer",
+            "description": "How many levels of children to include. ChildCount says what's below the cut.",
+            "minimum": 0,
+            "maximum": 32,
+            "default": 3
+          },
+          "styles": {
+            "type": "boolean",
+            "description": "Include the computed style. Every property that's set, so ask for one panel.",
+            "default": false
+          },
+          "styleFilter": {
+            "type": "string",
+            "description": "Only computed properties whose name contains this, e.g. 'border' or 'font'."
+          }
+        },
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      }
+    }
+  ],
+  "total": 402
+}

@@ -1,0 +1,28 @@
+var session=Editor.SceneEditorSession.Active;
+if (session?.Scene is null || !session.Scene.Name.Equals("riverside",StringComparison.OrdinalIgnoreCase) || session.IsPlaying || session.HasUnsavedChanges) throw new Exception("Need clean Riverside edit mode");
+var root=Sandbox.Project.Current.GetRootPath();
+var folder=System.IO.Path.Combine(root,"output/asset-improvement-20261030/riverside-speed-sign/installed");
+var plan=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"plan.json")));
+var source=System.IO.Path.Combine(root,plan["source"].GetValue<string>());
+var modelSource=System.IO.Path.ChangeExtension(source,".vmdl");
+string Hash(byte[] b)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(b)).ToLowerInvariant();
+var before=Hash(System.IO.File.ReadAllBytes(source));
+if (before!=plan["before_sha256"].GetValue<string>() && before!=plan["after_sha256"].GetValue<string>()) throw new Exception("Pad changed after staging");
+if (Hash(System.IO.File.ReadAllBytes(modelSource))!=plan["model_sha256"].GetValue<string>()) throw new Exception("Pad ModelDoc changed after staging");
+foreach (var path in new[] { "models/props/riverside/speed_sign_v2/speed_sign.vmdl" })
+{
+    var asset=Editor.AssetSystem.FindByPath(path) ?? throw new Exception("Missing model: "+path);
+    await asset.CompileIfNeededAsync();
+    if (Model.Load(path).IsError) throw new Exception("Invalid model: "+path);
+}
+if (before==plan["before_sha256"].GetValue<string>())
+    System.IO.File.WriteAllBytes(source,System.IO.File.ReadAllBytes(System.IO.Path.Combine(folder,"pad-without-old-sign.obj")));
+using (session.Scene.Push())
+{
+    var group=session.Scene.GetAllObjects(true).SingleOrDefault(g=>g.Name=="Speed-Limit Signs");
+    if (group is null) { group=new GameObject(false,"Speed-Limit Signs");group.Deserialize(plan["group"].AsObject()); }
+    var renderers=group.GetComponentsInChildren<ModelRenderer>().ToArray();
+    if (renderers.Length!=1 || renderers[0].Model.IsError) throw new Exception("Expected one valid installed sign");
+    session.HasUnsavedChanges=true;
+    return new { Instances=renderers.Length,Position=renderers[0].WorldPosition.ToString(),Rotation=renderers[0].WorldRotation.ToString(),RemovedOldTriangles=16,OriginalCollisionUnchanged=Hash(System.IO.File.ReadAllBytes(modelSource))==plan["model_sha256"].GetValue<string>(),NeedsSave=true };
+}

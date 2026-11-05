@@ -1,0 +1,3 @@
+# Riverdale sand bin realism revision — staged
+
+User liked the new shape but requested greater realism. V2 smooths the curved body/lid normals and replaces uniform yellow with dedicated object-space plastic PBR maps: muted fading, fine grain, scattered shallow scuffs, foot dirt and varied roughness. Zero metalness, no painted rust and no baked light. Original label, shape/footprint and hardware retained. The new surfaces affect only this private candidate. Actual-play comparison is v1 proposal BEFORE versus v2 AFTER. Files, source guards and validation are in `output/riverdale/sand-bin-v2/`; source/reproduction in `Sources/Riverdale/sand-bin-v2/README.md`. Pending installation approval.

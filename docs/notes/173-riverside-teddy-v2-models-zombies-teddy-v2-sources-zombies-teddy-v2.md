@@ -6,3 +6,4 @@
 - A scene tab opened before a file install keeps the old scene, and saving it would wipe the install. After writing a scene, check the open tab (`Editor.SceneEditorSession.Resolve( file ).Reload()`,
   if it has no unsaved changes).
 - Seen as installed in an isolated editor scene under the map's own light. **Not yet seen in a live match.** See the folder's README.
+- The 2026-11-04 sewn-button/soft-plush detail pass was rejected by the user. The previous approved meshes, textures and generators were restored; the rejected build and comparison folder was deleted. Native model/material compilation confirmed the restored 4,770 / 2,384 / 748 triangle version.

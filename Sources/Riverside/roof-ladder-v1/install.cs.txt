@@ -1,0 +1,16 @@
+var project=Sandbox.Project.Current.GetRootPath();var folder="C:/sbox-projects/hc1/roof-ladder-review/output/riverside/roof-ladder-v1";var plan=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"install-plan.json")));
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+foreach(var p in plan["before"].AsObject())if(Hash(System.IO.Path.Combine(project,p.Key))!=p.Value.GetValue<string>())throw new Exception("Public source changed before installation");
+foreach(var p in plan["files"].AsObject())
+{
+ if(p.Key.Contains("..") || !(p.Key=="Assets/models/maps/riverside/riverside_levee.vmdl" || p.Key.StartsWith("Assets/models/maps/riverside/roof-ladder-v1/")))throw new Exception("Unexpected target");
+ if(Hash(System.IO.Path.Combine(folder,"install-stage",p.Key))!=p.Value.GetValue<string>())throw new Exception("Staged file changed");
+}
+var session=Editor.SceneEditorSession.Active;var before=new{Id=session.Scene.Id,Dirty=session.HasUnsavedChanges,Playing=Game.IsPlaying};
+foreach(var p in plan["files"].AsObject().OrderBy(p=>p.Key.EndsWith(".vmdl")?1:0))
+{
+ var target=System.IO.Path.Combine(project,p.Key);System.IO.File.Copy(System.IO.Path.Combine(folder,"install-stage",p.Key),target,true);Editor.AssetSystem.RegisterFile(target);
+}
+var model=Model.Load("models/maps/riverside/riverside_levee.vmdl");if(model.IsError)throw new Exception("Installed model failed to load");
+var old=Model.Load("models/maps/riverside/roof-ladder-v1/legacy_ladder.vmdl");if(old.IsError)throw new Exception("Preserved old asset failed to load");
+var result=new{Installed=true,OriginalAssetPreserved=old.ResourcePath,UserStatePreserved=session.Scene.Id==before.Id&&session.HasUnsavedChanges==before.Dirty&&Game.IsPlaying==before.Playing,Mesh=model.MeshInfo};System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"installed-native.json"),Json.Serialize(result));return new{result.Installed,result.OriginalAssetPreserved,result.UserStatePreserved};

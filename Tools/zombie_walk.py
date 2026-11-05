@@ -1,4 +1,8 @@
-"""The zombies' walk, made from a person's gait instead of ported from a clip (zombie_anims.py writes it as walk_a).
+"""The zombies' asymmetric shamble, built on constrained foot contacts (zombie_anims.py writes it as walk_a).
+
+The 2026-11-04 direction is deliberately zombie-like: uneven step timing, one low recovery step, a slumped torso,
+and one weakly reaching arm opposite a hanging arm. The human gait curves below are a joint-safety starting point,
+not the intended character. Planted feet still move backwards at the actual ground speed.
 
 None of No More Room in Hell's shambles walks like a person: they waddle, lurch, limp or hold the arms out, and the
 one upright one (walk7) shuffles. Ported and IK'd to the Walkers' 70 u/s, walk7 still walked "a bit weird" (the user,
@@ -29,7 +33,7 @@ hips' height.
 from __future__ import annotations
 
 import argparse
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 
 import numpy as np
@@ -45,8 +49,8 @@ UP, FWD, LEFT = np.array([0.0, 0.0, 1.0]), np.array([1.0, 0.0, 0.0]), np.array([
 
 @dataclass(frozen=True)
 class Walk:
-    # The stride. 70 u/s is the Walkers' speed, so ZombieAI plays it at 1x; a cadence of ~138 steps a minute makes
-    # 0.77 m steps, a person's brisk walk. The stride is rounded to whole frames (26).
+    # Keep the Walker's 70 u/s and 26-frame stride; the unequal timing and low recovery step give it a shamble
+    # without changing gameplay speed or running the feet faster than the ground.
     speed: float = 70.0
     cadence: float = 138.5
     fps: float = 30.0
@@ -54,6 +58,10 @@ class Walk:
     # hip this share of the way through its stance, so a foot lands less far ahead than it leaves behind.
     stance: float = 0.57
     mid: float = 0.40
+    # The right foot arrives late: a dragging recovery step rather than an even human march.
+    right_step: float = 0.54
+    drag_knee: float = 48.0
+    drag_clearance: float = 0.2
     # The foot: toes up this far as the heel lands, flat by this share of the stance, then the heel rising (HEEL_RISE)
     # to this pitch as the toes leave. It rolls about the ball, the toes flat on the floor, up to `toe_bend`, then
     # over the toes' tips.
@@ -92,27 +100,31 @@ class Walk:
     toes: float = 2.5
     # The pelvis (degrees, inches): turning with the swinging leg, dropping on its side, tilting with the steps,
     # shifting over the planted foot and surging forward and back.
-    pel_yaw: float = 5.0
-    pel_list: float = 4.0
+    pel_yaw: float = 3.0
+    pel_list: float = 2.5
     pel_tilt: float = 1.5
-    shift: float = 0.8
+    shift: float = 0.55
     surge: float = 0.35
     # The chest turns against the pelvis and leans a little forward, the head turning back `head_yaw` of the way.
-    chest_yaw: float = 3.5
-    lean: float = 4.0
-    chest_pitch: float = 1.0
-    head_yaw: float = 0.25
+    chest_yaw: float = 2.5
+    lean: float = 24.0
+    chest_pitch: float = 0.65
+    head_yaw: float = 0.1
+    shoulder_drop: float = 5.0
+    head_pitch: float = 10.0
     # The arms hang `arm_pitch` forward (negative: back), `arm_abd` out and turned `arm_rot`, and swing `arm_amp` each
     # way, `arm_lag` of a stride after the opposite leg, about an axis turned `arm_in` towards the body. The elbows bend
     # `elbow_mean`, `elbow_amp` more or less as the arm swings, and the clavicles follow `clav`.
-    arm_pitch: float = -6.0
+    arm_pitch: float = -2.0
+    # One hand reaches weakly while the other hangs; neither pumps like a healthy walker.
+    arm_reach: float = 42.0
     arm_abd: float = 10.0
     arm_rot: float = 15.0
-    arm_amp: float = 15.0
-    arm_lag: float = 0.05
+    arm_amp: float = 5.0
+    arm_lag: float = 0.13
     arm_in: float = 12.0
-    elbow_mean: float = 18.0
-    elbow_amp: float = 10.0
+    elbow_mean: float = 22.0
+    elbow_amp: float = 3.0
     elbow_lag: float = 0.08
     clav: float = 2.5
 
@@ -176,8 +188,7 @@ def turn(world: list[np.ndarray], sub: list[int], pivot: np.ndarray, rot: np.nda
 
 
 def standing(cit: z.Skeleton, p: Walk) -> list[np.ndarray]:
-    """The citizen's own upright trunk, shoulders and head, the arms hanging just clear of the body with the elbows a
-    little bent, and relaxed hands."""
+    """The citizen's trunk before slumping it, one arm reaching and one hanging, with relaxed hands."""
     ci = cit.index
     local = [m.copy() for m in cit.bind_local]
     world = z.world_of(cit.parents, local)
@@ -187,7 +198,8 @@ def standing(cit: z.Skeleton, p: Walk) -> list[np.ndarray]:
         upper, lower = ci[f"arm_upper_{s}"], ci[f"arm_lower_{s}"]
         chest = world[ci["spine_2"]][:3, :3] @ cit.bind_world[ci["spine_2"]][:3, :3].T
         # The upper arm's direction, and its elbow's hinge facing forward, turned `arm_rot` in.
-        d = np.array([np.tan(R(p.arm_pitch)), sign * np.tan(R(p.arm_abd)), -1.0])
+        pitch = p.arm_pitch + (p.arm_reach if s == "L" else 0.0)
+        d = np.array([np.tan(R(pitch)), sign * np.tan(R(p.arm_abd)), -1.0])
         d = chest @ (d / np.linalg.norm(d))
         f = chest @ np.array([1.0, -sign * np.tan(R(p.arm_rot)), 0.0])
         f -= np.dot(f, d) * d
@@ -202,7 +214,8 @@ def standing(cit: z.Skeleton, p: Walk) -> list[np.ndarray]:
         a = posed[lower][:3, 3] - posed[upper][:3, 3]
         b = posed[ci[f"hand_{s}"]][:3, 3] - posed[lower][:3, 3]
         bend = np.arccos(np.clip(np.dot(a, b) / np.linalg.norm(a) / np.linalg.norm(b), -1, 1))
-        local[lower][:3, :3] = local[lower][:3, :3] @ z.axis_rotation(np.array([0, 0, 1.0]), R(p.elbow_mean) - bend)
+        elbow = p.elbow_mean + (8.0 if s == "L" else -6.0)
+        local[lower][:3, :3] = local[lower][:3, :3] @ z.axis_rotation(np.array([0, 0, 1.0]), R(elbow) - bend)
         for name in z.HAND_BONES:
             if name.endswith(s):
                 local[ci[name]][:3, :3] = relaxed[name]
@@ -211,7 +224,7 @@ def standing(cit: z.Skeleton, p: Walk) -> list[np.ndarray]:
 
 def upper_body(cit: z.Skeleton, base: list[np.ndarray], p: Walk, n: int) -> list[list[np.ndarray]]:
     """The stride's n + 1 frames (the last is the first) with the pelvis, trunk, head and arms moving; the left foot
-    lands on frame 0 and the right half way. The legs are left for the gait."""
+    lands on frame 0 and the right at `right_step`. The legs are left for the gait."""
     ci = cit.index
     sub = subtrees(cit)
     pelvis, chest = ci["pelvis"], ci["spine_2"]
@@ -229,14 +242,16 @@ def upper_body(cit: z.Skeleton, base: list[np.ndarray], p: Walk, n: int) -> list
                 @ z.axis_rotation(LEFT, R(p.pel_tilt) * cos(2, 0.47)))
         turn(w, sub["pelvis"], w[pelvis][:3, 3].copy(), tilt)
         # The chest: turned against the pelvis and leaning, spread over the spine.
-        target = (z.axis_rotation(UP, R(p.chest_yaw) * cos(1))
+        target = (z.axis_rotation(FWD, R(p.shoulder_drop)) @ z.axis_rotation(UP, R(p.chest_yaw) * cos(1))
                   @ z.axis_rotation(LEFT, R(p.lean) + R(p.chest_pitch) * cos(2, 0.1))) @ base[chest][:3, :3]
         fix = z.rotation_vector(target @ w[chest][:3, :3].T)
         for b in z.SPINE:
             turn(w, sub[b], w[ci[b]][:3, 3].copy(), z.from_rotation_vector(fix / 3))
         # The head turns back towards where the walk's going, half of that in the neck.
         head, neck = ci["head"], ci["neck_0"]
-        aim = z.axis_rotation(UP, R(p.chest_yaw * p.head_yaw) * cos(1)) @ base[head][:3, :3]
+        aim = (z.axis_rotation(LEFT, R(p.head_pitch))
+               @ z.axis_rotation(FWD, R(p.shoulder_drop * 0.6))
+               @ z.axis_rotation(UP, R(p.chest_yaw * p.head_yaw) * cos(1, 0.08))) @ base[head][:3, :3]
         fix = z.rotation_vector(aim @ w[head][:3, :3].T)
         turn(w, sub["neck_0"], w[neck][:3, 3].copy(), z.from_rotation_vector(fix / 2))
         fix = z.rotation_vector(aim @ w[head][:3, :3].T)
@@ -250,7 +265,7 @@ def upper_body(cit: z.Skeleton, base: list[np.ndarray], p: Walk, n: int) -> list
             angle = R(p.clav) * cos(1, lag + p.arm_lag)
             turn(w, sub[f"clavicle_{side}"], w[clavicle][:3, 3].copy(), z.axis_rotation(vertical, -sign * angle))
             upper = ci[f"arm_upper_{side}"]
-            swing = R(p.arm_amp) * cos(1, lag + p.arm_lag)
+            swing = R(p.arm_amp * (0.6 if side == "L" else 1.0)) * cos(1, lag + p.arm_lag)
             axis = z.axis_rotation(vertical, -sign * R(p.arm_in)) @ lateral
             turn(w, sub[f"arm_upper_{side}"], w[upper][:3, 3].copy(), z.axis_rotation(axis, -swing))
             lower = ci[f"arm_lower_{side}"]
@@ -466,8 +481,9 @@ def hips(cit: z.Skeleton, frames: list[list[np.ndarray]], p: Walk):
     pelvis = ci["pelvis"]
     hip_of = lambda w, s: (w[pelvis] @ np.linalg.inv(cit.bind_world[pelvis]) @ cit.bind_world[ci[f"leg_upper_{s}"]])[:3, 3]
     mid_y = float(np.mean([w[pelvis][1, 3] for w in frames[:n]]))
-    legs = {s: Leg(cit, s, p, n, down, float(np.mean([hip_of(w, s)[0] for w in frames[:n]])), mid_y)
-            for s, down in (("L", 0.0), ("R", n / 2))}
+    legs = {s: Leg(cit, s, p if s == "L" else replace(p, knee_peak=p.drag_knee, clearance=p.drag_clearance),
+                   n, down, float(np.mean([hip_of(w, s)[0] for w in frames[:n]])), mid_y)
+            for s, down in (("L", 0.0), ("R", n * p.right_step))}
     hips0 = {s: np.array([hip_of(w, s) for w in frames[:n]]) for s in "LR"}
 
     def hip0(s: str, t: float) -> np.ndarray:
@@ -588,7 +604,7 @@ def walk(cit: z.Skeleton, p: Walk = WALK) -> tuple[list[list[np.ndarray]], dict]
     frames = upper_body(cit, standing(cit, p), p, n)
     legs, hip_at, drop = hips(cit, frames, p)
     for s, leg in legs.items():
-        make_swing(leg, lambda t, s=s: hip_at(s, t), p)
+        make_swing(leg, lambda t, s=s: hip_at(s, t), leg.p)
     below_pelvis = subtrees(cit)["pelvis"]
     for t, world in enumerate(frames):
         for i in below_pelvis:
@@ -606,7 +622,9 @@ def walk(cit: z.Skeleton, p: Walk = WALK) -> tuple[list[list[np.ndarray]], dict]
     for world in frames:
         for m in world:
             m[:2, 3] -= mean[:2]
-    stats = dict(n=n, cadence=2 * 60.0 / (n / p.fps), drop=drop, swing_lowest=min(leg.swing_path["lowest"] for leg in legs.values()))
+    stats = dict(n=n, cadence=2 * 60.0 / (n / p.fps), drop=drop,
+                 swing_lowest=min(leg.swing_path["lowest"] for leg in legs.values()),
+                 swing_lowest_by_leg={s: leg.swing_path["lowest"] for s, leg in legs.items()})
     return frames, stats
 
 
@@ -630,10 +648,14 @@ def report(cit: z.Skeleton, frames: list[list[np.ndarray]], stats: dict, p: Walk
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--citizen-data", default=str(z.WORK / "zombie_work/citizen_human_male_data.txt"))
+    parser.add_argument("--write", action="store_true", help="Write only walk_a.dmx; leaves the other zombie clips and ModelDoc unchanged.")
     args = parser.parse_args()
     cit = z.read_model_skeleton(Path(args.citizen_data))
     frames, stats = walk(cit)
     report(cit, frames, stats)
+    if args.write:
+        z.dmx.write_animation(z.ROOT / "Assets" / z.ASSET_DIR / "anims/walk_a.dmx", "walk_a",
+                              list(zip(cit.names, cit.parents)), [z.local_frames(cit, f) for f in frames], WALK.fps)
 
 
 if __name__ == "__main__":

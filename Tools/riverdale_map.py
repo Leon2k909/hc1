@@ -1615,6 +1615,8 @@ def write_scene( written, light_list, probe_list ):
     world["Children"].append( NOTICE_BOARDS.scene_group( ids ) )
     world["Children"].append( HOSE_REELS.scene_group( ids ) )
     world["Children"].append( EMERGENCY_PHONES.scene_group( ids ) )
+    from riverdale_shared_reel import scene_object as approved_reel
+    world["Children"].append(approved_reel())
     world["Children"].append( FIRST_AID.scene_group( ids ) )
     light_objects = [ light_object( light ) for light in light_list ]
 

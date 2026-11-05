@@ -77,7 +77,7 @@ public partial class Client
 		LastDamageInfo = damageInfo;
 	}
 
-	protected void OnRespawnStateChanged( LifeState oldValue, LifeState newValue )
+	protected void OnRespawnStateChanged( RespawnState oldValue, RespawnState newValue )
 	{
 		TimeSinceRespawnStateChanged = 0f;
 	}

@@ -66,7 +66,6 @@
 		"element" "1d57c38c-1822-5f4c-abe7-7d2a5b772c1c",
 		"element" "90e90a29-f177-5127-9d43-96417227c653",
 		"element" "ac7a7f00-c904-5d9e-83d1-5cd1a937cc45",
-		"element" "eb815fb4-9642-57aa-9fab-ab15f55cbc6e",
 		"element" "2be4a168-6904-5022-a101-87ba59f96975",
 		"element" "3a093ade-c66e-5f06-8453-757372b8d46e",
 		"element" "df827fa0-4061-50dd-bdb8-40aea869af4c",
@@ -78,7 +77,6 @@
 		"element" "93794f50-5090-56fc-bd73-17ac45697099",
 		"element" "3cddb692-5afb-51fc-b8a6-922a6fbe7d13",
 		"element" "5376c900-1495-5edf-b6d0-6f2d54a7efd6",
-		"element" "dbb5fe6a-e89c-5538-99dd-3dabbdde69a1",
 		"element" "e9affa15-e15c-5ebb-a5d9-5d7874600c9f",
 		"element" "27aaa7b1-1380-5676-a563-483bef670be2",
 		"element" "9a8219a6-eda3-5d23-aa21-cfd6cbf22efb",
@@ -103,9 +101,6 @@
 		"element" "563dcd16-176d-54ac-aadd-3e25a39d6e66",
 		"element" "68aca165-231d-5644-a7ab-f54d37a36bad",
 		"element" "e2c43a52-30ee-5f78-a9c5-0155d556763b",
-		"element" "ef4d89e1-a28b-53dc-8982-4e36c9fcd49c",
-		"element" "61994c2b-1660-5010-9108-60ad2ef6def9",
-		"element" "d5fc3ba6-c7fc-51ce-a21f-3f4c3a0158b0",
 		"element" "77fce9e4-00ff-58d7-95b7-c27810d0b241",
 		"element" "42d993a2-f4ff-576f-a132-94dac371854f",
 		"element" "d938d8ce-3e14-5b9e-8fc9-6bee473f4fe4",
@@ -117,7 +112,12 @@
 		"element" "45b47635-541b-520c-8688-112c85e43751",
 		"element" "4465b8bb-5b5e-51be-8544-ef9a15615768",
 		"element" "d3787951-bf07-500d-83bb-ca0df3f74007",
-		"element" "7d742512-0cc2-54d7-ba2e-43a901e7b8d2"
+		"element" "7d742512-0cc2-54d7-ba2e-43a901e7b8d2",
+		"element" "dbb5fe6a-e89c-5538-99dd-3dabbdde69a1",
+		"element" "ef4d89e1-a28b-53dc-8982-4e36c9fcd49c",
+		"element" "61994c2b-1660-5010-9108-60ad2ef6def9",
+		"element" "d5fc3ba6-c7fc-51ce-a21f-3f4c3a0158b0",
+		"element" "eb815fb4-9642-57aa-9fab-ab15f55cbc6e"
 	]
 	"baseStates" "element_array"
 	[
@@ -403,16 +403,16 @@
 {
 	"id" "elementid" "39ec2d62-5416-5fbc-9909-5931a2f16575"
 	"name" "string" "pelvis"
-	"position" "vector3" "0.500020 -0.627883 87.498235"
-	"orientation" "quaternion" "0.509561 0.479126 0.533091 -0.476026"
+	"position" "vector3" "0.500020 -0.431657 87.422686"
+	"orientation" "quaternion" "0.503188 0.489959 0.522620 -0.483332"
 }
 
 "DmeTransform"
 {
 	"id" "elementid" "9a626f33-4adc-5887-915f-8e2440aa6c8c"
 	"name" "string" "pelvis"
-	"position" "vector3" "0.500020 -0.627883 87.498235"
-	"orientation" "quaternion" "0.509561 0.479126 0.533091 -0.476026"
+	"position" "vector3" "0.500020 -0.431657 87.422686"
+	"orientation" "quaternion" "0.503188 0.489959 0.522620 -0.483332"
 }
 
 "DmeJoint"
@@ -434,7 +434,7 @@
 	"id" "elementid" "a32cca4a-750d-5ae2-9fd6-e54fd950a0ab"
 	"name" "string" "spine_0"
 	"position" "vector3" "7.999916 0.750030 0.000018"
-	"orientation" "quaternion" "0.024617 -0.004309 0.018504 0.999516"
+	"orientation" "quaternion" "0.018260 0.008930 0.075630 0.996929"
 }
 
 "DmeTransform"
@@ -442,7 +442,7 @@
 	"id" "elementid" "64aaa033-89d9-58d5-847e-dfc5adccb8e8"
 	"name" "string" "spine_0"
 	"position" "vector3" "7.999916 0.750030 0.000018"
-	"orientation" "quaternion" "0.024617 -0.004309 0.018504 0.999516"
+	"orientation" "quaternion" "0.018260 0.008930 0.075630 0.996929"
 }
 
 "DmeJoint"
@@ -464,7 +464,7 @@
 	"id" "elementid" "5693c6d2-aed7-5acc-95ac-027268aaddae"
 	"name" "string" "spine_1"
 	"position" "vector3" "11.250102 -0.000030 -0.000038"
-	"orientation" "quaternion" "0.024617 -0.004309 0.018504 0.999516"
+	"orientation" "quaternion" "0.018260 0.008930 0.075630 0.996929"
 }
 
 "DmeTransform"
@@ -472,7 +472,7 @@
 	"id" "elementid" "d901921d-1884-50bb-8483-d7cbe15328e9"
 	"name" "string" "spine_1"
 	"position" "vector3" "11.250102 -0.000030 -0.000038"
-	"orientation" "quaternion" "0.024617 -0.004309 0.018504 0.999516"
+	"orientation" "quaternion" "0.018260 0.008930 0.075630 0.996929"
 }
 
 "DmeJoint"
@@ -496,7 +496,7 @@
 	"id" "elementid" "8f75cd51-f78c-50da-a537-b70748049af6"
 	"name" "string" "spine_2"
 	"position" "vector3" "11.250102 0.000028 0.000003"
-	"orientation" "quaternion" "0.024618 -0.004309 0.018504 0.999516"
+	"orientation" "quaternion" "0.018261 0.008929 0.075630 0.996929"
 }
 
 "DmeTransform"
@@ -504,7 +504,7 @@
 	"id" "elementid" "f0084001-def1-558b-aa3b-e79a9e2b2275"
 	"name" "string" "spine_2"
 	"position" "vector3" "11.250102 0.000028 0.000003"
-	"orientation" "quaternion" "0.024618 -0.004309 0.018504 0.999516"
+	"orientation" "quaternion" "0.018261 0.008929 0.075630 0.996929"
 }
 
 "DmeJoint"
@@ -526,7 +526,7 @@
 	"id" "elementid" "64fbaafc-b111-5d69-ae8c-188a08c695c1"
 	"name" "string" "neck_0"
 	"position" "vector3" "21.748153 -2.420693 0.000292"
-	"orientation" "quaternion" "-0.011123 0.002743 0.177848 0.983991"
+	"orientation" "quaternion" "-0.014970 -0.001808 0.136094 0.990581"
 }
 
 "DmeTransform"
@@ -534,7 +534,7 @@
 	"id" "elementid" "4dc4da30-f475-5234-8f55-d7a36e37c62d"
 	"name" "string" "neck_0"
 	"position" "vector3" "21.748153 -2.420693 0.000292"
-	"orientation" "quaternion" "-0.011123 0.002743 0.177848 0.983991"
+	"orientation" "quaternion" "-0.014970 -0.001808 0.136094 0.990581"
 }
 
 "DmeJoint"
@@ -557,7 +557,7 @@
 	"id" "elementid" "971fa55d-4dc8-5510-a374-4469016f79dc"
 	"name" "string" "head"
 	"position" "vector3" "8.920965 -0.000117 -0.000124"
-	"orientation" "quaternion" "-0.011123 0.002743 -0.218969 0.975665"
+	"orientation" "quaternion" "-0.014970 -0.001808 -0.259997 0.965492"
 }
 
 "DmeTransform"
@@ -565,7 +565,7 @@
 	"id" "elementid" "0504ad95-b02f-5962-a2cc-7d95958bcf1f"
 	"name" "string" "head"
 	"position" "vector3" "8.920965 -0.000117 -0.000124"
-	"orientation" "quaternion" "-0.011123 0.002743 -0.218969 0.975665"
+	"orientation" "quaternion" "-0.014970 -0.001808 -0.259997 0.965492"
 }
 
 "DmeJoint"
@@ -585,16 +585,16 @@
 {
 	"id" "elementid" "7306a333-2e25-5530-8e6e-69a9dc3c9589"
 	"name" "string" "eye_L"
-	"position" "vector3" "10.522372 7.897473 3.283211"
-	"orientation" "quaternion" "-0.000000 -0.000000 0.000000 1.000000"
+	"position" "vector3" "10.522372 7.897460 3.283211"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeTransform"
 {
 	"id" "elementid" "46ab1532-fd91-5d45-b426-b0be4b5fc61a"
 	"name" "string" "eye_L"
-	"position" "vector3" "10.522372 7.897473 3.283211"
-	"orientation" "quaternion" "-0.000000 -0.000000 0.000000 1.000000"
+	"position" "vector3" "10.522372 7.897460 3.283211"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -615,7 +615,7 @@
 	"id" "elementid" "45468fbb-b8fd-50f5-955e-21c541764bfb"
 	"name" "string" "eye_R"
 	"position" "vector3" "10.410886 8.093500 -3.686236"
-	"orientation" "quaternion" "-0.000000 -0.000000 0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeTransform"
@@ -623,7 +623,7 @@
 	"id" "elementid" "b6de3959-229e-5a9f-8a8d-071a8d5d92af"
 	"name" "string" "eye_R"
 	"position" "vector3" "10.410886 8.093500 -3.686236"
-	"orientation" "quaternion" "-0.000000 -0.000000 0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 0.000000 -0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -645,7 +645,7 @@
 	"id" "elementid" "c9eaadae-bcca-51cf-8e93-6db6dc16acc3"
 	"name" "string" "clavicle_L"
 	"position" "vector3" "14.497653 -2.003426 1.999614"
-	"orientation" "quaternion" "0.083414 -0.735157 -0.031448 0.672010"
+	"orientation" "quaternion" "0.079506 -0.735327 -0.027173 0.672484"
 }
 
 "DmeTransform"
@@ -653,7 +653,7 @@
 	"id" "elementid" "1e159b55-8237-5dd9-bb4c-3d23a393b574"
 	"name" "string" "clavicle_L"
 	"position" "vector3" "14.497653 -2.003426 1.999614"
-	"orientation" "quaternion" "0.083414 -0.735157 -0.031448 0.672010"
+	"orientation" "quaternion" "0.079506 -0.735327 -0.027173 0.672484"
 }
 
 "DmeJoint"
@@ -677,7 +677,7 @@
 	"id" "elementid" "8b8c892b-a389-560b-b1a3-a72a930d616d"
 	"name" "string" "arm_upper_L"
 	"position" "vector3" "16.760500 -0.000056 -0.000262"
-	"orientation" "quaternion" "0.229995 -0.571425 0.021826 0.787464"
+	"orientation" "quaternion" "-0.065108 -0.516381 0.411649 0.748102"
 }
 
 "DmeTransform"
@@ -685,7 +685,7 @@
 	"id" "elementid" "b73170b9-3aae-56fe-822e-76f31e0fe973"
 	"name" "string" "arm_upper_L"
 	"position" "vector3" "16.760500 -0.000056 -0.000262"
-	"orientation" "quaternion" "0.229995 -0.571425 0.021826 0.787464"
+	"orientation" "quaternion" "-0.065108 -0.516381 0.411649 0.748102"
 }
 
 "DmeJoint"
@@ -706,7 +706,7 @@
 	"id" "elementid" "f1754cb3-cd66-5718-983b-615a16fa6912"
 	"name" "string" "arm_upper_L_twist1"
 	"position" "vector3" "13.378270 0.000023 -0.000069"
-	"orientation" "quaternion" "-0.175800 -0.000000 0.000001 0.984426"
+	"orientation" "quaternion" "-0.122349 -0.000000 0.000000 0.992487"
 }
 
 "DmeTransform"
@@ -714,7 +714,7 @@
 	"id" "elementid" "932fe919-e0af-55d5-936a-2d34e639c588"
 	"name" "string" "arm_upper_L_twist1"
 	"position" "vector3" "13.378270 0.000023 -0.000069"
-	"orientation" "quaternion" "-0.175800 -0.000000 0.000001 0.984426"
+	"orientation" "quaternion" "-0.122349 -0.000000 0.000000 0.992487"
 }
 
 "DmeJoint"
@@ -739,7 +739,7 @@
 	"id" "elementid" "a6f74538-0d2e-56fa-bd60-b9932d537aa6"
 	"name" "string" "arm_lower_L"
 	"position" "vector3" "26.756525 0.000046 -0.000079"
-	"orientation" "quaternion" "0.000000 0.000000 0.097188 0.995266"
+	"orientation" "quaternion" "0.000000 -0.000000 0.252525 0.967590"
 }
 
 "DmeTransform"
@@ -747,7 +747,7 @@
 	"id" "elementid" "a52166a3-8d9b-5e4c-8776-e30d0e3acbf1"
 	"name" "string" "arm_lower_L"
 	"position" "vector3" "26.756525 0.000046 -0.000079"
-	"orientation" "quaternion" "0.000000 0.000000 0.097188 0.995266"
+	"orientation" "quaternion" "0.000000 -0.000000 0.252525 0.967590"
 }
 
 "DmeJoint"
@@ -863,7 +863,7 @@
 	"id" "elementid" "85fbb452-0d95-5bc9-bb8f-9259f23dcbd3"
 	"name" "string" "clavicle_R"
 	"position" "vector3" "14.497739 -2.003419 -1.999639"
-	"orientation" "quaternion" "-0.055465 0.735830 -0.000922 0.674891"
+	"orientation" "quaternion" "-0.059388 0.735812 -0.005200 0.674557"
 }
 
 "DmeTransform"
@@ -871,7 +871,7 @@
 	"id" "elementid" "492b51b0-d8ef-5aa0-afc4-216890ea9661"
 	"name" "string" "clavicle_R"
 	"position" "vector3" "14.497739 -2.003419 -1.999639"
-	"orientation" "quaternion" "-0.055465 0.735830 -0.000922 0.674891"
+	"orientation" "quaternion" "-0.059388 0.735812 -0.005200 0.674557"
 }
 
 "DmeJoint"
@@ -895,7 +895,7 @@
 	"id" "elementid" "b049ddde-f355-5347-82f8-499df6a240bb"
 	"name" "string" "arm_upper_R"
 	"position" "vector3" "16.760632 -0.000064 0.000117"
-	"orientation" "quaternion" "-0.054181 0.604648 0.192937 0.770870"
+	"orientation" "quaternion" "-0.100866 0.596616 0.155006 0.780928"
 }
 
 "DmeTransform"
@@ -903,7 +903,7 @@
 	"id" "elementid" "8eb10a42-77c0-5d4d-8831-79a6a0223cbc"
 	"name" "string" "arm_upper_R"
 	"position" "vector3" "16.760632 -0.000064 0.000117"
-	"orientation" "quaternion" "-0.054181 0.604648 0.192937 0.770870"
+	"orientation" "quaternion" "-0.100866 0.596616 0.155006 0.780928"
 }
 
 "DmeJoint"
@@ -924,7 +924,7 @@
 	"id" "elementid" "0d7b65c1-157c-57b1-9225-d258fbf51526"
 	"name" "string" "arm_upper_R_twist1"
 	"position" "vector3" "13.378242 0.000003 -0.000107"
-	"orientation" "quaternion" "0.128890 -0.000000 -0.000000 0.991659"
+	"orientation" "quaternion" "0.142600 -0.000000 -0.000000 0.989780"
 }
 
 "DmeTransform"
@@ -932,7 +932,7 @@
 	"id" "elementid" "f1e317dc-8434-5e27-a481-3382991b6aaa"
 	"name" "string" "arm_upper_R_twist1"
 	"position" "vector3" "13.378242 0.000003 -0.000107"
-	"orientation" "quaternion" "0.128890 -0.000000 -0.000000 0.991659"
+	"orientation" "quaternion" "0.142600 -0.000000 -0.000000 0.989780"
 }
 
 "DmeJoint"
@@ -956,16 +956,16 @@
 {
 	"id" "elementid" "22607db9-2eb5-5fcd-b6f4-d5c8333ce9f7"
 	"name" "string" "arm_lower_R"
-	"position" "vector3" "26.756530 -0.000000 -0.000069"
-	"orientation" "quaternion" "-0.000001 0.000000 0.215123 0.976587"
+	"position" "vector3" "26.756530 0.000000 -0.000069"
+	"orientation" "quaternion" "-0.000001 -0.000000 0.145618 0.989341"
 }
 
 "DmeTransform"
 {
 	"id" "elementid" "d13de3dc-75f7-51ba-854a-7dd3fc3569ef"
 	"name" "string" "arm_lower_R"
-	"position" "vector3" "26.756530 -0.000000 -0.000069"
-	"orientation" "quaternion" "-0.000001 0.000000 0.215123 0.976587"
+	"position" "vector3" "26.756530 0.000000 -0.000069"
+	"orientation" "quaternion" "-0.000001 -0.000000 0.145618 0.989341"
 }
 
 "DmeJoint"
@@ -1083,7 +1083,7 @@
 	"id" "elementid" "1a5386c3-7cd3-5175-a475-a6830795812b"
 	"name" "string" "leg_upper_R"
 	"position" "vector3" "-4.417569 -1.164191 -9.965387"
-	"orientation" "quaternion" "-0.201350 0.977329 -0.057709 0.030908"
+	"orientation" "quaternion" "-0.201958 0.977551 -0.057871 0.016072"
 }
 
 "DmeTransform"
@@ -1091,7 +1091,7 @@
 	"id" "elementid" "54182a1a-6947-5e6a-a68b-0122548ee734"
 	"name" "string" "leg_upper_R"
 	"position" "vector3" "-4.417569 -1.164191 -9.965387"
-	"orientation" "quaternion" "-0.201350 0.977329 -0.057709 0.030908"
+	"orientation" "quaternion" "-0.201958 0.977551 -0.057871 0.016072"
 }
 
 "DmeJoint"
@@ -1112,7 +1112,7 @@
 	"id" "elementid" "9466d60e-7007-51b7-acd5-d8a071e85458"
 	"name" "string" "leg_upper_R_twist1"
 	"position" "vector3" "20.847666 0.000020 -0.000043"
-	"orientation" "quaternion" "0.000086 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000086 -0.000000 0.000000 1.000000"
 }
 
 "DmeTransform"
@@ -1120,7 +1120,7 @@
 	"id" "elementid" "899d8fd2-68a0-5f66-b725-36fc59fdeb73"
 	"name" "string" "leg_upper_R_twist1"
 	"position" "vector3" "20.847666 0.000020 -0.000043"
-	"orientation" "quaternion" "0.000086 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000086 -0.000000 0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -1145,7 +1145,7 @@
 	"id" "elementid" "488e816a-33b9-58c3-bd26-84f0fa2a6872"
 	"name" "string" "leg_lower_R"
 	"position" "vector3" "40.773005 0.000005 -0.000511"
-	"orientation" "quaternion" "0.003630 -0.008033 -0.104565 0.994479"
+	"orientation" "quaternion" "0.003368 -0.002660 -0.059422 0.998224"
 }
 
 "DmeTransform"
@@ -1153,7 +1153,7 @@
 	"id" "elementid" "21f064a3-a238-5f04-946b-24259b090120"
 	"name" "string" "leg_lower_R"
 	"position" "vector3" "40.773005 0.000005 -0.000511"
-	"orientation" "quaternion" "0.003630 -0.008033 -0.104565 0.994479"
+	"orientation" "quaternion" "0.003368 -0.002660 -0.059422 0.998224"
 }
 
 "DmeJoint"
@@ -1174,7 +1174,7 @@
 	"id" "elementid" "9d13ebc2-49d8-537e-99a3-5c4ea5284174"
 	"name" "string" "leg_lower_R_twist0"
 	"position" "vector3" "0.000038 0.000025 -0.000056"
-	"orientation" "quaternion" "0.000000 -0.007910 0.265314 0.964130"
+	"orientation" "quaternion" "0.000000 -0.028054 0.222735 0.974475"
 }
 
 "DmeTransform"
@@ -1182,7 +1182,7 @@
 	"id" "elementid" "bcb14728-821f-542f-894a-c5cbad2f7ca4"
 	"name" "string" "leg_lower_R_twist0"
 	"position" "vector3" "0.000038 0.000025 -0.000056"
-	"orientation" "quaternion" "0.000000 -0.007910 0.265314 0.964130"
+	"orientation" "quaternion" "0.000000 -0.028054 0.222735 0.974475"
 }
 
 "DmeJoint"
@@ -1204,7 +1204,7 @@
 	"id" "elementid" "6d20244a-07e2-5683-a50d-cc57da84a812"
 	"name" "string" "ankle_R"
 	"position" "vector3" "39.293716 0.000038 -0.000028"
-	"orientation" "quaternion" "-0.030582 0.036450 0.535488 0.843202"
+	"orientation" "quaternion" "-0.013936 0.024778 0.595372 0.802947"
 }
 
 "DmeTransform"
@@ -1212,7 +1212,7 @@
 	"id" "elementid" "c55955c3-3f8d-580e-b617-a2ce6395a46e"
 	"name" "string" "ankle_R"
 	"position" "vector3" "39.293716 0.000038 -0.000028"
-	"orientation" "quaternion" "-0.030582 0.036450 0.535488 0.843202"
+	"orientation" "quaternion" "-0.013936 0.024778 0.595372 0.802947"
 }
 
 "DmeJoint"
@@ -1233,7 +1233,7 @@
 	"id" "elementid" "524d5cdf-2da6-5656-875b-7eba382fc063"
 	"name" "string" "ball_R"
 	"position" "vector3" "13.492659 -0.009149 -0.084938"
-	"orientation" "quaternion" "0.001400 0.000467 0.492465 0.870331"
+	"orientation" "quaternion" "0.000521 0.000168 0.386969 0.922093"
 }
 
 "DmeTransform"
@@ -1241,7 +1241,7 @@
 	"id" "elementid" "dd268f4d-a36d-5632-ad56-f7ca59bd04a9"
 	"name" "string" "ball_R"
 	"position" "vector3" "13.492659 -0.009149 -0.084938"
-	"orientation" "quaternion" "0.001400 0.000467 0.492465 0.870331"
+	"orientation" "quaternion" "0.000521 0.000168 0.386969 0.922093"
 }
 
 "DmeJoint"
@@ -1265,7 +1265,7 @@
 	"id" "elementid" "de94e676-a3dd-597e-8438-5e64b674f8bd"
 	"name" "string" "leg_upper_L"
 	"position" "vector3" "-4.417549 -1.164173 9.965359"
-	"orientation" "quaternion" "0.210178 0.977028 0.034166 0.008587"
+	"orientation" "quaternion" "0.212576 0.976458 0.034039 0.013488"
 }
 
 "DmeTransform"
@@ -1273,7 +1273,7 @@
 	"id" "elementid" "84cb8712-bfc6-5d71-b28c-469218b0eae1"
 	"name" "string" "leg_upper_L"
 	"position" "vector3" "-4.417549 -1.164173 9.965359"
-	"orientation" "quaternion" "0.210178 0.977028 0.034166 0.008587"
+	"orientation" "quaternion" "0.212576 0.976458 0.034039 0.013488"
 }
 
 "DmeJoint"
@@ -1294,7 +1294,7 @@
 	"id" "elementid" "4346b840-322b-55d5-87b5-1e7f1db856bd"
 	"name" "string" "leg_upper_L_twist1"
 	"position" "vector3" "20.847607 0.000038 -0.000071"
-	"orientation" "quaternion" "-0.000086 -0.000000 0.000000 1.000000"
+	"orientation" "quaternion" "-0.000086 0.000000 0.000000 1.000000"
 }
 
 "DmeTransform"
@@ -1302,7 +1302,7 @@
 	"id" "elementid" "16fff9d4-c120-537a-9c81-a3f1cfb243e6"
 	"name" "string" "leg_upper_L_twist1"
 	"position" "vector3" "20.847607 0.000038 -0.000071"
-	"orientation" "quaternion" "-0.000086 -0.000000 0.000000 1.000000"
+	"orientation" "quaternion" "-0.000086 0.000000 0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -1327,7 +1327,7 @@
 	"id" "elementid" "97412779-5221-57c5-8354-488b096b9685"
 	"name" "string" "leg_lower_L"
 	"position" "vector3" "40.772962 0.000025 0.000409"
-	"orientation" "quaternion" "-0.007601 -0.006752 -0.043094 0.999019"
+	"orientation" "quaternion" "-0.007634 -0.005214 -0.043307 0.999019"
 }
 
 "DmeTransform"
@@ -1335,7 +1335,7 @@
 	"id" "elementid" "2afb5c72-fb91-5f29-a0c9-219ace120ad8"
 	"name" "string" "leg_lower_L"
 	"position" "vector3" "40.772962 0.000025 0.000409"
-	"orientation" "quaternion" "-0.007601 -0.006752 -0.043094 0.999019"
+	"orientation" "quaternion" "-0.007634 -0.005214 -0.043307 0.999019"
 }
 
 "DmeJoint"
@@ -1355,16 +1355,16 @@
 {
 	"id" "elementid" "cc0a9ea3-4cb0-59e7-bd47-c5c6a5f2eb8d"
 	"name" "string" "leg_lower_L_twist0"
-	"position" "vector3" "-0.000000 0.000005 -0.000043"
-	"orientation" "quaternion" "-0.000000 0.083380 -0.203957 0.975423"
+	"position" "vector3" "0.000000 0.000005 -0.000043"
+	"orientation" "quaternion" "-0.000000 0.086865 -0.205885 0.974713"
 }
 
 "DmeTransform"
 {
 	"id" "elementid" "34dcf35c-338f-5d6d-9b5b-a8f32cb29c01"
 	"name" "string" "leg_lower_L_twist0"
-	"position" "vector3" "-0.000000 0.000005 -0.000043"
-	"orientation" "quaternion" "-0.000000 0.083380 -0.203957 0.975423"
+	"position" "vector3" "0.000000 0.000005 -0.000043"
+	"orientation" "quaternion" "-0.000000 0.086865 -0.205885 0.974713"
 }
 
 "DmeJoint"
@@ -1386,7 +1386,7 @@
 	"id" "elementid" "8218b9bc-a197-59a8-a7ef-d3159645270d"
 	"name" "string" "ankle_L"
 	"position" "vector3" "39.293630 0.000003 -0.000023"
-	"orientation" "quaternion" "-0.042714 0.060723 0.395175 0.915601"
+	"orientation" "quaternion" "-0.025422 0.054497 0.394073 0.917110"
 }
 
 "DmeTransform"
@@ -1394,7 +1394,7 @@
 	"id" "elementid" "6caebfc4-1e24-5125-9898-25ebc78e6341"
 	"name" "string" "ankle_L"
 	"position" "vector3" "39.293630 0.000003 -0.000023"
-	"orientation" "quaternion" "-0.042714 0.060723 0.395175 0.915601"
+	"orientation" "quaternion" "-0.025422 0.054497 0.394073 0.917110"
 }
 
 "DmeJoint"
@@ -1482,35 +1482,6 @@
 	"name" "string" "foot_L_IK_target"
 	"position" "vector3" "-5.394468 18.878219 9.168603"
 	"orientation" "quaternion" "0.644470 0.291139 -0.162741 0.688049"
-}
-
-"DmeJoint"
-{
-	"id" "elementid" "eb815fb4-9642-57aa-9fab-ab15f55cbc6e"
-	"name" "string" "arm_upper_L_twist0"
-	"transform" "element" "0b32c287-02ac-5510-bfb7-739049eb7a34"
-	"shape" "element" ""
-	"visible" "bool" "1"
-	"lockInfluenceWeights" "bool" "0"
-	"children" "element_array"
-	[
-	]
-}
-
-"DmeTransform"
-{
-	"id" "elementid" "0b32c287-02ac-5510-bfb7-739049eb7a34"
-	"name" "string" "arm_upper_L_twist0"
-	"position" "vector3" "0.000038 0.000018 -0.000117"
-	"orientation" "quaternion" "-0.346123 -0.000001 0.000001 0.938189"
-}
-
-"DmeTransform"
-{
-	"id" "elementid" "0fee0a89-9c7c-5cb2-8d72-41429e95cd60"
-	"name" "string" "arm_upper_L_twist0"
-	"position" "vector3" "0.000038 0.000018 -0.000117"
-	"orientation" "quaternion" "-0.346123 -0.000001 0.000001 0.938189"
 }
 
 "DmeJoint"
@@ -1842,35 +1813,6 @@
 
 "DmeJoint"
 {
-	"id" "elementid" "dbb5fe6a-e89c-5538-99dd-3dabbdde69a1"
-	"name" "string" "finger_middle_2_L"
-	"transform" "element" "2e89243f-0720-586b-81ce-ba5010de68c9"
-	"shape" "element" ""
-	"visible" "bool" "1"
-	"lockInfluenceWeights" "bool" "0"
-	"children" "element_array"
-	[
-	]
-}
-
-"DmeTransform"
-{
-	"id" "elementid" "2e89243f-0720-586b-81ce-ba5010de68c9"
-	"name" "string" "finger_middle_2_L"
-	"position" "vector3" "3.153457 -0.000074 -0.000213"
-	"orientation" "quaternion" "-0.000121 -0.150571 -0.001153 0.988599"
-}
-
-"DmeTransform"
-{
-	"id" "elementid" "7d662c08-a93b-5c59-a2e9-b25220795441"
-	"name" "string" "finger_middle_2_L"
-	"position" "vector3" "3.153457 -0.000074 -0.000213"
-	"orientation" "quaternion" "-0.000121 -0.150571 -0.001153 0.988599"
-}
-
-"DmeJoint"
-{
 	"id" "elementid" "e9affa15-e15c-5ebb-a5d9-5d7874600c9f"
 	"name" "string" "finger_ring_meta_L"
 	"transform" "element" "eae36832-613d-524e-80e6-758607e87a34"
@@ -2154,7 +2096,7 @@
 	"id" "elementid" "890ef3e1-8925-5329-a546-6a2a603f31a9"
 	"name" "string" "arm_elbow_helper_L"
 	"position" "vector3" "0.000058 -0.000025 -0.000058"
-	"orientation" "quaternion" "0.000001 0.000000 -0.740671 0.671868"
+	"orientation" "quaternion" "0.000001 0.000000 -0.791367 0.611341"
 }
 
 "DmeTransform"
@@ -2162,7 +2104,7 @@
 	"id" "elementid" "5389a398-8824-5a12-8666-84d03e7f1663"
 	"name" "string" "arm_elbow_helper_L"
 	"position" "vector3" "0.000058 -0.000025 -0.000058"
-	"orientation" "quaternion" "0.000001 0.000000 -0.740671 0.671868"
+	"orientation" "quaternion" "0.000001 0.000000 -0.791367 0.611341"
 }
 
 "DmeJoint"
@@ -2183,7 +2125,7 @@
 	"id" "elementid" "c00dc6d1-6291-554b-bea7-aacfd52ea970"
 	"name" "string" "arm_upper_R_twist0"
 	"position" "vector3" "0.000010 0.000010 -0.000086"
-	"orientation" "quaternion" "0.255630 -0.000000 -0.000001 0.966775"
+	"orientation" "quaternion" "0.282285 -0.000000 -0.000001 0.959331"
 }
 
 "DmeTransform"
@@ -2191,7 +2133,7 @@
 	"id" "elementid" "767b60c7-59cd-5ed7-b5b8-e7ab27791093"
 	"name" "string" "arm_upper_R_twist0"
 	"position" "vector3" "0.000010 0.000010 -0.000086"
-	"orientation" "quaternion" "0.255630 -0.000000 -0.000001 0.966775"
+	"orientation" "quaternion" "0.282285 -0.000000 -0.000001 0.959331"
 }
 
 "DmeJoint"
@@ -2582,95 +2524,6 @@
 
 "DmeJoint"
 {
-	"id" "elementid" "ef4d89e1-a28b-53dc-8982-4e36c9fcd49c"
-	"name" "string" "finger_ring_0_R"
-	"transform" "element" "37af2df4-3211-567a-a326-6463c9472903"
-	"shape" "element" ""
-	"visible" "bool" "1"
-	"lockInfluenceWeights" "bool" "0"
-	"children" "element_array"
-	[
-		"element" "61994c2b-1660-5010-9108-60ad2ef6def9"
-	]
-}
-
-"DmeTransform"
-{
-	"id" "elementid" "37af2df4-3211-567a-a326-6463c9472903"
-	"name" "string" "finger_ring_0_R"
-	"position" "vector3" "6.184928 0.000107 -0.000097"
-	"orientation" "quaternion" "-0.007477 0.290871 -0.070748 0.954114"
-}
-
-"DmeTransform"
-{
-	"id" "elementid" "ff12eb21-8d71-5222-a91e-3f2c42392d1e"
-	"name" "string" "finger_ring_0_R"
-	"position" "vector3" "6.184928 0.000107 -0.000097"
-	"orientation" "quaternion" "-0.007477 0.290871 -0.070748 0.954114"
-}
-
-"DmeJoint"
-{
-	"id" "elementid" "61994c2b-1660-5010-9108-60ad2ef6def9"
-	"name" "string" "finger_ring_1_R"
-	"transform" "element" "95c0dc13-68d8-5bcd-8447-06cbd106f704"
-	"shape" "element" ""
-	"visible" "bool" "1"
-	"lockInfluenceWeights" "bool" "0"
-	"children" "element_array"
-	[
-		"element" "d5fc3ba6-c7fc-51ce-a21f-3f4c3a0158b0"
-	]
-}
-
-"DmeTransform"
-{
-	"id" "elementid" "95c0dc13-68d8-5bcd-8447-06cbd106f704"
-	"name" "string" "finger_ring_1_R"
-	"position" "vector3" "4.651156 0.000185 -0.000155"
-	"orientation" "quaternion" "-0.008640 0.339317 -0.043564 0.939623"
-}
-
-"DmeTransform"
-{
-	"id" "elementid" "2accdf39-5ea8-5ade-9604-69a2fb6ccf42"
-	"name" "string" "finger_ring_1_R"
-	"position" "vector3" "4.651156 0.000185 -0.000155"
-	"orientation" "quaternion" "-0.008640 0.339317 -0.043564 0.939623"
-}
-
-"DmeJoint"
-{
-	"id" "elementid" "d5fc3ba6-c7fc-51ce-a21f-3f4c3a0158b0"
-	"name" "string" "finger_ring_2_R"
-	"transform" "element" "92af9167-9e27-53a3-afd6-c63527a1ef36"
-	"shape" "element" ""
-	"visible" "bool" "1"
-	"lockInfluenceWeights" "bool" "0"
-	"children" "element_array"
-	[
-	]
-}
-
-"DmeTransform"
-{
-	"id" "elementid" "92af9167-9e27-53a3-afd6-c63527a1ef36"
-	"name" "string" "finger_ring_2_R"
-	"position" "vector3" "2.924905 0.000150 -0.000155"
-	"orientation" "quaternion" "-0.001130 0.134300 -0.032160 0.990418"
-}
-
-"DmeTransform"
-{
-	"id" "elementid" "dd910897-7be7-5ebe-8d40-385a45340429"
-	"name" "string" "finger_ring_2_R"
-	"position" "vector3" "2.924905 0.000150 -0.000155"
-	"orientation" "quaternion" "-0.001130 0.134300 -0.032160 0.990418"
-}
-
-"DmeJoint"
-{
 	"id" "elementid" "77fce9e4-00ff-58d7-95b7-c27810d0b241"
 	"name" "string" "finger_pinky_meta_R"
 	"transform" "element" "021024b7-3b7f-56b4-ad79-4c4493d48c7a"
@@ -2835,7 +2688,7 @@
 	"id" "elementid" "a3780a5c-629b-5af7-9aed-4e5dd93f9b2e"
 	"name" "string" "arm_elbow_helper_R"
 	"position" "vector3" "0.000020 0.000015 -0.000117"
-	"orientation" "quaternion" "-0.000000 0.000000 -0.779462 0.626449"
+	"orientation" "quaternion" "-0.000000 -0.000000 -0.756841 0.653599"
 }
 
 "DmeTransform"
@@ -2843,7 +2696,7 @@
 	"id" "elementid" "74f0197e-1924-5b71-b9a4-8a28bfd7c11e"
 	"name" "string" "arm_elbow_helper_R"
 	"position" "vector3" "0.000020 0.000015 -0.000117"
-	"orientation" "quaternion" "-0.000000 0.000000 -0.779462 0.626449"
+	"orientation" "quaternion" "-0.000000 -0.000000 -0.756841 0.653599"
 }
 
 "DmeJoint"
@@ -2864,7 +2717,7 @@
 	"id" "elementid" "915eb0a0-4b4e-5802-aef1-7693165bda70"
 	"name" "string" "leg_upper_R_twist0"
 	"position" "vector3" "0.000058 0.000015 -0.000081"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 -0.000000 0.000000 1.000000"
 }
 
 "DmeTransform"
@@ -2872,7 +2725,7 @@
 	"id" "elementid" "e5c50338-8b8a-58d9-93c8-0dfd8008a64c"
 	"name" "string" "leg_upper_R_twist0"
 	"position" "vector3" "0.000058 0.000015 -0.000081"
-	"orientation" "quaternion" "0.000000 -0.000000 -0.000000 1.000000"
+	"orientation" "quaternion" "0.000000 -0.000000 0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -2893,7 +2746,7 @@
 	"id" "elementid" "ab3bd176-ddcf-5e54-9099-26b2f4db8991"
 	"name" "string" "leg_lower_R_twist1"
 	"position" "vector3" "19.646894 0.000028 -0.000046"
-	"orientation" "quaternion" "-0.003680 -0.000000 0.000000 0.999993"
+	"orientation" "quaternion" "0.008584 -0.000000 0.000000 0.999963"
 }
 
 "DmeTransform"
@@ -2901,7 +2754,7 @@
 	"id" "elementid" "db49af44-4ae7-51ab-a269-7e52c8fe726e"
 	"name" "string" "leg_lower_R_twist1"
 	"position" "vector3" "19.646894 0.000028 -0.000046"
-	"orientation" "quaternion" "-0.003680 -0.000000 0.000000 0.999993"
+	"orientation" "quaternion" "0.008584 -0.000000 0.000000 0.999963"
 }
 
 "DmeJoint"
@@ -2922,7 +2775,7 @@
 	"id" "elementid" "80a90222-f9cb-50b0-b8f1-50ea9dea622a"
 	"name" "string" "leg_knee_helper_R"
 	"position" "vector3" "0.000053 0.000023 -0.000051"
-	"orientation" "quaternion" "0.001489 0.004150 0.743151 0.669109"
+	"orientation" "quaternion" "-0.000286 0.002126 0.727811 0.685775"
 }
 
 "DmeTransform"
@@ -2930,7 +2783,7 @@
 	"id" "elementid" "5c8cd773-9856-5eaa-aa3a-7cb7e8074081"
 	"name" "string" "leg_knee_helper_R"
 	"position" "vector3" "0.000053 0.000023 -0.000051"
-	"orientation" "quaternion" "0.001489 0.004150 0.743151 0.669109"
+	"orientation" "quaternion" "-0.000286 0.002126 0.727811 0.685775"
 }
 
 "DmeJoint"
@@ -2951,7 +2804,7 @@
 	"id" "elementid" "ace1ec1e-1ee3-50db-81fd-f302d6103127"
 	"name" "string" "leg_upper_L_twist0"
 	"position" "vector3" "0.000048 0.000018 -0.000089"
-	"orientation" "quaternion" "-0.000000 -0.000000 0.000000 1.000000"
+	"orientation" "quaternion" "-0.000000 0.000000 0.000000 1.000000"
 }
 
 "DmeTransform"
@@ -2959,7 +2812,7 @@
 	"id" "elementid" "afe7bb81-f1c9-5323-87f9-3415849bb742"
 	"name" "string" "leg_upper_L_twist0"
 	"position" "vector3" "0.000048 0.000018 -0.000089"
-	"orientation" "quaternion" "-0.000000 -0.000000 0.000000 1.000000"
+	"orientation" "quaternion" "-0.000000 0.000000 0.000000 1.000000"
 }
 
 "DmeJoint"
@@ -2980,7 +2833,7 @@
 	"id" "elementid" "1a1a9b4c-7f66-5cd7-96c3-bad02928f7dc"
 	"name" "string" "leg_lower_L_twist1"
 	"position" "vector3" "19.646833 0.000005 -0.000033"
-	"orientation" "quaternion" "-0.046899 0.000000 0.000000 0.998900"
+	"orientation" "quaternion" "-0.037697 -0.000000 -0.000000 0.999289"
 }
 
 "DmeTransform"
@@ -2988,7 +2841,7 @@
 	"id" "elementid" "fbf9c5a9-bc95-555b-bcbd-d5cd0bfadd80"
 	"name" "string" "leg_lower_L_twist1"
 	"position" "vector3" "19.646833 0.000005 -0.000033"
-	"orientation" "quaternion" "-0.046899 0.000000 0.000000 0.998900"
+	"orientation" "quaternion" "-0.037697 -0.000000 -0.000000 0.999289"
 }
 
 "DmeJoint"
@@ -3009,7 +2862,7 @@
 	"id" "elementid" "48c721d4-f4ec-546d-aaec-57fc88878e2b"
 	"name" "string" "leg_knee_helper_L"
 	"position" "vector3" "0.000015 0.000005 -0.000046"
-	"orientation" "quaternion" "0.005078 -0.000219 0.722173 0.691694"
+	"orientation" "quaternion" "0.004555 -0.000782 0.722248 0.691619"
 }
 
 "DmeTransform"
@@ -3017,7 +2870,154 @@
 	"id" "elementid" "264d37a6-1e76-5148-ba15-8503dd3bd29f"
 	"name" "string" "leg_knee_helper_L"
 	"position" "vector3" "0.000015 0.000005 -0.000046"
-	"orientation" "quaternion" "0.005078 -0.000219 0.722173 0.691694"
+	"orientation" "quaternion" "0.004555 -0.000782 0.722248 0.691619"
+}
+
+"DmeJoint"
+{
+	"id" "elementid" "dbb5fe6a-e89c-5538-99dd-3dabbdde69a1"
+	"name" "string" "finger_middle_2_L"
+	"transform" "element" "2e89243f-0720-586b-81ce-ba5010de68c9"
+	"shape" "element" ""
+	"visible" "bool" "1"
+	"lockInfluenceWeights" "bool" "0"
+	"children" "element_array"
+	[
+	]
+}
+
+"DmeTransform"
+{
+	"id" "elementid" "2e89243f-0720-586b-81ce-ba5010de68c9"
+	"name" "string" "finger_middle_2_L"
+	"position" "vector3" "3.153457 -0.000074 -0.000213"
+	"orientation" "quaternion" "-0.000121 -0.150571 -0.001153 0.988599"
+}
+
+"DmeTransform"
+{
+	"id" "elementid" "7d662c08-a93b-5c59-a2e9-b25220795441"
+	"name" "string" "finger_middle_2_L"
+	"position" "vector3" "3.153457 -0.000074 -0.000213"
+	"orientation" "quaternion" "-0.000121 -0.150571 -0.001153 0.988599"
+}
+
+"DmeJoint"
+{
+	"id" "elementid" "ef4d89e1-a28b-53dc-8982-4e36c9fcd49c"
+	"name" "string" "finger_ring_0_R"
+	"transform" "element" "37af2df4-3211-567a-a326-6463c9472903"
+	"shape" "element" ""
+	"visible" "bool" "1"
+	"lockInfluenceWeights" "bool" "0"
+	"children" "element_array"
+	[
+		"element" "61994c2b-1660-5010-9108-60ad2ef6def9"
+	]
+}
+
+"DmeTransform"
+{
+	"id" "elementid" "37af2df4-3211-567a-a326-6463c9472903"
+	"name" "string" "finger_ring_0_R"
+	"position" "vector3" "6.184928 0.000107 -0.000097"
+	"orientation" "quaternion" "-0.007477 0.290871 -0.070748 0.954114"
+}
+
+"DmeTransform"
+{
+	"id" "elementid" "ff12eb21-8d71-5222-a91e-3f2c42392d1e"
+	"name" "string" "finger_ring_0_R"
+	"position" "vector3" "6.184928 0.000107 -0.000097"
+	"orientation" "quaternion" "-0.007477 0.290871 -0.070748 0.954114"
+}
+
+"DmeJoint"
+{
+	"id" "elementid" "61994c2b-1660-5010-9108-60ad2ef6def9"
+	"name" "string" "finger_ring_1_R"
+	"transform" "element" "95c0dc13-68d8-5bcd-8447-06cbd106f704"
+	"shape" "element" ""
+	"visible" "bool" "1"
+	"lockInfluenceWeights" "bool" "0"
+	"children" "element_array"
+	[
+		"element" "d5fc3ba6-c7fc-51ce-a21f-3f4c3a0158b0"
+	]
+}
+
+"DmeTransform"
+{
+	"id" "elementid" "95c0dc13-68d8-5bcd-8447-06cbd106f704"
+	"name" "string" "finger_ring_1_R"
+	"position" "vector3" "4.651156 0.000185 -0.000155"
+	"orientation" "quaternion" "-0.008640 0.339317 -0.043564 0.939623"
+}
+
+"DmeTransform"
+{
+	"id" "elementid" "2accdf39-5ea8-5ade-9604-69a2fb6ccf42"
+	"name" "string" "finger_ring_1_R"
+	"position" "vector3" "4.651156 0.000185 -0.000155"
+	"orientation" "quaternion" "-0.008640 0.339317 -0.043564 0.939623"
+}
+
+"DmeJoint"
+{
+	"id" "elementid" "d5fc3ba6-c7fc-51ce-a21f-3f4c3a0158b0"
+	"name" "string" "finger_ring_2_R"
+	"transform" "element" "92af9167-9e27-53a3-afd6-c63527a1ef36"
+	"shape" "element" ""
+	"visible" "bool" "1"
+	"lockInfluenceWeights" "bool" "0"
+	"children" "element_array"
+	[
+	]
+}
+
+"DmeTransform"
+{
+	"id" "elementid" "92af9167-9e27-53a3-afd6-c63527a1ef36"
+	"name" "string" "finger_ring_2_R"
+	"position" "vector3" "2.924905 0.000150 -0.000155"
+	"orientation" "quaternion" "-0.001130 0.134300 -0.032160 0.990418"
+}
+
+"DmeTransform"
+{
+	"id" "elementid" "dd910897-7be7-5ebe-8d40-385a45340429"
+	"name" "string" "finger_ring_2_R"
+	"position" "vector3" "2.924905 0.000150 -0.000155"
+	"orientation" "quaternion" "-0.001130 0.134300 -0.032160 0.990418"
+}
+
+"DmeJoint"
+{
+	"id" "elementid" "eb815fb4-9642-57aa-9fab-ab15f55cbc6e"
+	"name" "string" "arm_upper_L_twist0"
+	"transform" "element" "0b32c287-02ac-5510-bfb7-739049eb7a34"
+	"shape" "element" ""
+	"visible" "bool" "1"
+	"lockInfluenceWeights" "bool" "0"
+	"children" "element_array"
+	[
+	]
+}
+
+"DmeTransform"
+{
+	"id" "elementid" "0b32c287-02ac-5510-bfb7-739049eb7a34"
+	"name" "string" "arm_upper_L_twist0"
+	"position" "vector3" "0.000038 0.000018 -0.000117"
+	"orientation" "quaternion" "-0.242859 -0.000000 0.000001 0.970062"
+}
+
+"DmeTransform"
+{
+	"id" "elementid" "0fee0a89-9c7c-5cb2-8d72-41429e95cd60"
+	"name" "string" "arm_upper_L_twist0"
+	"position" "vector3" "0.000038 0.000018 -0.000117"
+	"orientation" "quaternion" "-0.242859 -0.000000 0.000001 0.970062"
 }
 
 "DmeTransformList"
@@ -3071,7 +3071,6 @@
 		"element" "317ff304-9ddd-5aaa-b7f9-62a4e842ea3b",
 		"element" "bc6ff0c2-940e-50c3-9e83-e53ca60e8da4",
 		"element" "332fef3f-cbbc-55c9-ba5b-21593ed820c5",
-		"element" "0fee0a89-9c7c-5cb2-8d72-41429e95cd60",
 		"element" "0a352cc1-8a3c-501b-9705-1782078a94d4",
 		"element" "1fec93d1-2ead-514a-8763-533422c16eb9",
 		"element" "44305591-eceb-544c-940c-c9110500c371",
@@ -3083,7 +3082,6 @@
 		"element" "7b081e9e-efed-521c-9b46-bf6c1b7569b9",
 		"element" "1ceb7877-d5ae-50d6-a5fb-f28386a85b4e",
 		"element" "37e867bb-f5fa-5492-ae55-b4aedab6b5bb",
-		"element" "7d662c08-a93b-5c59-a2e9-b25220795441",
 		"element" "715913c4-3872-5a19-b177-e806d92ff4fe",
 		"element" "03b718a1-c845-544c-b368-d0873c8132ac",
 		"element" "94ae4ca1-5ad0-5007-ab26-25185b4f3a7f",
@@ -3108,9 +3106,6 @@
 		"element" "9143010c-a3fd-5a29-95a3-a23eb071999b",
 		"element" "74a1fb7a-0116-5636-bd46-122a6e0872e8",
 		"element" "da8af3c1-7681-56a8-bc0c-c3e3a011512d",
-		"element" "ff12eb21-8d71-5222-a91e-3f2c42392d1e",
-		"element" "2accdf39-5ea8-5ade-9604-69a2fb6ccf42",
-		"element" "dd910897-7be7-5ebe-8d40-385a45340429",
 		"element" "19309c2e-0c8c-5127-b8ae-afc4d7bed424",
 		"element" "dd2519da-fcef-5833-b99a-8dbfaca305c8",
 		"element" "8e2aa6cf-5bde-53d4-8938-7df496dee52c",
@@ -3122,7 +3117,12 @@
 		"element" "5c8cd773-9856-5eaa-aa3a-7cb7e8074081",
 		"element" "afe7bb81-f1c9-5323-87f9-3415849bb742",
 		"element" "fbf9c5a9-bc95-555b-bcbd-d5cd0bfadd80",
-		"element" "264d37a6-1e76-5148-ba15-8503dd3bd29f"
+		"element" "264d37a6-1e76-5148-ba15-8503dd3bd29f",
+		"element" "7d662c08-a93b-5c59-a2e9-b25220795441",
+		"element" "ff12eb21-8d71-5222-a91e-3f2c42392d1e",
+		"element" "2accdf39-5ea8-5ade-9604-69a2fb6ccf42",
+		"element" "dd910897-7be7-5ebe-8d40-385a45340429",
+		"element" "0fee0a89-9c7c-5cb2-8d72-41429e95cd60"
 	]
 }
 
@@ -4710,33 +4710,33 @@
 	]
 	"values" "vector3_array"
 	[
-		"0.500020 -0.627883 87.498235",
-		"0.913160 -0.147147 88.981287",
-		"1.231654 0.342143 89.640141",
-		"1.382540 0.811551 90.517314",
-		"1.331251 1.233797 91.459667",
-		"1.089538 1.584342 92.092676",
-		"0.712772 1.842813 92.416340",
-		"0.287268 1.994189 92.413581",
-		"-0.089497 2.029672 92.018371",
-		"-0.331211 1.947200 91.230708",
-		"-0.382500 1.751567 90.005259",
-		"-0.231614 1.454141 88.342024",
-		"0.086881 1.072208 87.285073",
-		"0.500020 0.627964 87.498126",
-		"0.913160 0.147228 88.981180",
-		"1.231654 -0.342062 89.640044",
-		"1.382540 -0.811470 90.517212",
-		"1.331251 -1.233716 91.459564",
-		"1.089538 -1.584261 92.092572",
-		"0.712772 -1.842732 92.416236",
-		"0.287268 -1.994107 92.413478",
-		"-0.089497 -2.029591 92.018269",
-		"-0.331211 -1.947119 91.230608",
-		"-0.382500 -1.751485 90.005231",
-		"-0.231614 -1.454059 88.342138",
-		"0.086881 -1.072126 87.285185",
-		"0.500020 -0.627883 87.498235"
+		"0.500020 -0.431657 87.422686",
+		"0.913160 -0.101151 88.015223",
+		"1.231654 0.235236 89.782934",
+		"1.382540 0.557954 90.425807",
+		"1.331251 0.848248 91.584690",
+		"1.089538 1.089248 92.348380",
+		"0.712772 1.266947 92.716876",
+		"0.287268 1.371017 92.690180",
+		"-0.089497 1.395412 92.193730",
+		"-0.331211 1.338713 91.227526",
+		"-0.382500 1.204215 90.241023",
+		"-0.231614 0.999734 89.234220",
+		"0.086881 0.737156 88.207118",
+		"0.500020 0.431738 87.174248",
+		"0.913160 0.101232 87.411381",
+		"1.231654 -0.235155 88.918516",
+		"1.382540 -0.557873 89.638411",
+		"1.331251 -0.848167 90.523715",
+		"1.089538 -1.089167 91.574428",
+		"0.712772 -1.266865 92.313762",
+		"0.287268 -1.370936 92.734044",
+		"-0.089497 -1.395331 92.793891",
+		"-0.331211 -1.338631 92.406006",
+		"-0.382500 -1.204133 91.557352",
+		"-0.231614 -0.999653 90.047621",
+		"0.086881 -0.737074 88.100153",
+		"0.500020 -0.431657 87.422686"
 	]
 }
 
@@ -4806,33 +4806,33 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.509561 0.479126 0.533091 -0.476026",
-		"0.506211 0.474696 0.535191 -0.481647",
-		"0.503334 0.470836 0.534332 -0.489344",
-		"0.500715 0.468203 0.530910 -0.498201",
-		"0.498035 0.467479 0.525619 -0.507099",
-		"0.494980 0.469209 0.519303 -0.514939",
-		"0.491345 0.473656 0.512777 -0.520854",
-		"0.487125 0.480702 0.506653 -0.524345",
-		"0.482560 0.489830 0.501230 -0.525330",
-		"0.478148 0.500187 0.496488 -0.524106",
-		"0.474588 0.510713 0.492178 -0.521248",
-		"0.472652 0.520311 0.487973 -0.517455",
-		"0.473006 0.528009 0.483631 -0.513393",
-		"0.476023 0.533092 0.479124 -0.509563",
-		"0.481645 0.535193 0.474694 -0.506213",
-		"0.489342 0.534334 0.470834 -0.503336",
-		"0.498199 0.530912 0.468201 -0.500717",
-		"0.507097 0.525621 0.467477 -0.498037",
-		"0.514937 0.519305 0.469207 -0.494982",
-		"0.520852 0.512779 0.473654 -0.491347",
-		"0.524343 0.506655 0.480700 -0.487127",
-		"0.525328 0.501231 0.489828 -0.482562",
-		"0.524104 0.496490 0.500185 -0.478150",
-		"0.521246 0.492180 0.510711 -0.474590",
-		"0.517453 0.487975 0.520309 -0.472654",
-		"0.513391 0.483633 0.528007 -0.473008",
-		"0.509561 0.479126 0.533091 -0.476026"
+		"0.503188 0.489959 0.522620 -0.483332",
+		"0.501652 0.486657 0.523432 -0.487369",
+		"0.500860 0.483249 0.521990 -0.493088",
+		"0.500451 0.480362 0.518753 -0.499696",
+		"0.499954 0.478692 0.514418 -0.506235",
+		"0.498923 0.478844 0.509769 -0.511781",
+		"0.497053 0.481180 0.505501 -0.515628",
+		"0.494274 0.485709 0.502062 -0.517411",
+		"0.490790 0.492056 0.499569 -0.517143",
+		"0.487074 0.499514 0.497822 -0.515187",
+		"0.483800 0.507174 0.496402 -0.512150",
+		"0.481707 0.514087 0.494830 -0.508740",
+		"0.481430 0.519428 0.492730 -0.505605",
+		"0.483330 0.522622 0.489957 -0.503190",
+		"0.487367 0.523434 0.486655 -0.501654",
+		"0.493086 0.521992 0.483247 -0.500862",
+		"0.499694 0.518755 0.480360 -0.500453",
+		"0.506233 0.514420 0.478690 -0.499956",
+		"0.511779 0.509771 0.478842 -0.498925",
+		"0.515626 0.505503 0.481178 -0.497055",
+		"0.517409 0.502063 0.485707 -0.494276",
+		"0.517141 0.499571 0.492054 -0.490792",
+		"0.515185 0.497824 0.499512 -0.487076",
+		"0.512148 0.496404 0.507172 -0.483802",
+		"0.508738 0.494832 0.514085 -0.481709",
+		"0.505603 0.492732 0.519426 -0.481432",
+		"0.503188 0.489959 0.522620 -0.483332"
 	]
 }
 
@@ -4998,33 +4998,33 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.024617 -0.004309 0.018504 0.999516",
-		"0.023794 -0.006927 0.018335 0.999525",
-		"0.021563 -0.009139 0.016659 0.999587",
-		"0.018070 -0.010784 0.013859 0.999682",
-		"0.013536 -0.011752 0.010575 0.999783",
-		"0.008241 -0.011996 0.007558 0.999866",
-		"0.002492 -0.011535 0.005502 0.999915",
-		"-0.003387 -0.010429 0.004879 0.999928",
-		"-0.009072 -0.008765 0.005833 0.999903",
-		"-0.014250 -0.006638 0.008143 0.999843",
-		"-0.018626 -0.004147 0.011279 0.999754",
-		"-0.021941 -0.001400 0.014521 0.999653",
-		"-0.023985 0.001472 0.017128 0.999564",
-		"-0.024619 0.004309 0.018504 0.999516",
-		"-0.023796 0.006927 0.018335 0.999525",
-		"-0.021565 0.009139 0.016659 0.999587",
-		"-0.018072 0.010784 0.013859 0.999682",
-		"-0.013538 0.011752 0.010575 0.999783",
-		"-0.008243 0.011996 0.007558 0.999866",
-		"-0.002494 0.011535 0.005502 0.999915",
-		"0.003385 0.010429 0.004879 0.999928",
-		"0.009070 0.008765 0.005833 0.999903",
-		"0.014248 0.006638 0.008143 0.999843",
-		"0.018624 0.004147 0.011279 0.999754",
-		"0.021939 0.001400 0.014521 0.999653",
-		"0.023983 -0.001472 0.017128 0.999565",
-		"0.024617 -0.004309 0.018504 0.999516"
+		"0.018260 0.008930 0.075630 0.996929",
+		"0.017505 0.007390 0.075183 0.996989",
+		"0.015900 0.006245 0.073502 0.997149",
+		"0.013539 0.005587 0.070971 0.997371",
+		"0.010565 0.005473 0.068168 0.997603",
+		"0.007156 0.005908 0.065736 0.997794",
+		"0.003507 0.006851 0.064229 0.997905",
+		"-0.000179 0.008223 0.063993 0.997916",
+		"-0.003697 0.009925 0.065077 0.997824",
+		"-0.006846 0.011853 0.067229 0.997644",
+		"-0.009439 0.013905 0.069951 0.997409",
+		"-0.011307 0.015983 0.072615 0.997168",
+		"-0.012322 0.017985 0.074608 0.996975",
+		"-0.012406 0.019801 0.075471 0.996874",
+		"-0.011550 0.021316 0.075007 0.996888",
+		"-0.009814 0.022422 0.073319 0.997008",
+		"-0.007322 0.023034 0.070794 0.997198",
+		"-0.004249 0.023109 0.068009 0.997408",
+		"-0.000793 0.022648 0.065603 0.997588",
+		"0.002840 0.021700 0.064129 0.997702",
+		"0.006449 0.020344 0.063930 0.997726",
+		"0.009847 0.018675 0.065054 0.997658",
+		"0.012862 0.016790 0.067246 0.997512",
+		"0.015336 0.014779 0.070008 0.997319",
+		"0.017128 0.012735 0.072711 0.997125",
+		"0.018127 0.010749 0.074738 0.996980",
+		"0.018260 0.008930 0.075630 0.996929"
 	]
 }
 
@@ -5190,33 +5190,33 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.024617 -0.004309 0.018504 0.999516",
-		"0.023794 -0.006927 0.018335 0.999525",
-		"0.021563 -0.009139 0.016659 0.999587",
-		"0.018070 -0.010784 0.013859 0.999682",
-		"0.013536 -0.011752 0.010575 0.999783",
-		"0.008241 -0.011996 0.007558 0.999866",
-		"0.002492 -0.011535 0.005502 0.999915",
-		"-0.003387 -0.010429 0.004879 0.999928",
-		"-0.009072 -0.008765 0.005833 0.999903",
-		"-0.014250 -0.006638 0.008143 0.999843",
-		"-0.018626 -0.004147 0.011279 0.999754",
-		"-0.021941 -0.001400 0.014521 0.999653",
-		"-0.023985 0.001472 0.017128 0.999564",
-		"-0.024619 0.004309 0.018504 0.999516",
-		"-0.023796 0.006927 0.018335 0.999525",
-		"-0.021565 0.009139 0.016659 0.999587",
-		"-0.018072 0.010784 0.013859 0.999682",
-		"-0.013538 0.011752 0.010575 0.999783",
-		"-0.008243 0.011996 0.007558 0.999866",
-		"-0.002494 0.011535 0.005502 0.999915",
-		"0.003385 0.010429 0.004879 0.999928",
-		"0.009070 0.008765 0.005833 0.999903",
-		"0.014248 0.006638 0.008143 0.999843",
-		"0.018624 0.004147 0.011279 0.999754",
-		"0.021939 0.001400 0.014521 0.999653",
-		"0.023983 -0.001472 0.017128 0.999565",
-		"0.024617 -0.004309 0.018504 0.999516"
+		"0.018260 0.008930 0.075630 0.996929",
+		"0.017505 0.007390 0.075183 0.996989",
+		"0.015900 0.006245 0.073502 0.997149",
+		"0.013539 0.005587 0.070971 0.997371",
+		"0.010565 0.005473 0.068168 0.997603",
+		"0.007156 0.005908 0.065736 0.997794",
+		"0.003507 0.006851 0.064229 0.997905",
+		"-0.000179 0.008223 0.063993 0.997916",
+		"-0.003697 0.009925 0.065077 0.997824",
+		"-0.006846 0.011853 0.067229 0.997644",
+		"-0.009439 0.013905 0.069951 0.997409",
+		"-0.011307 0.015983 0.072615 0.997168",
+		"-0.012322 0.017985 0.074608 0.996975",
+		"-0.012406 0.019801 0.075472 0.996874",
+		"-0.011550 0.021316 0.075007 0.996888",
+		"-0.009814 0.022422 0.073319 0.997008",
+		"-0.007322 0.023034 0.070794 0.997198",
+		"-0.004249 0.023109 0.068009 0.997408",
+		"-0.000793 0.022648 0.065603 0.997588",
+		"0.002840 0.021700 0.064129 0.997702",
+		"0.006449 0.020344 0.063930 0.997726",
+		"0.009847 0.018675 0.065054 0.997658",
+		"0.012862 0.016789 0.067246 0.997512",
+		"0.015336 0.014779 0.070008 0.997319",
+		"0.017128 0.012734 0.072711 0.997125",
+		"0.018127 0.010749 0.074738 0.996980",
+		"0.018260 0.008930 0.075630 0.996929"
 	]
 }
 
@@ -5382,33 +5382,33 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.024618 -0.004309 0.018504 0.999516",
-		"0.023795 -0.006927 0.018335 0.999525",
-		"0.021564 -0.009139 0.016659 0.999587",
-		"0.018071 -0.010784 0.013859 0.999682",
-		"0.013537 -0.011752 0.010575 0.999783",
-		"0.008242 -0.011996 0.007558 0.999866",
-		"0.002493 -0.011535 0.005502 0.999915",
-		"-0.003386 -0.010429 0.004879 0.999928",
-		"-0.009071 -0.008765 0.005833 0.999903",
-		"-0.014249 -0.006638 0.008143 0.999843",
-		"-0.018625 -0.004147 0.011279 0.999754",
-		"-0.021940 -0.001400 0.014521 0.999653",
-		"-0.023984 0.001472 0.017128 0.999565",
-		"-0.024618 0.004309 0.018504 0.999516",
-		"-0.023795 0.006927 0.018335 0.999525",
-		"-0.021564 0.009139 0.016659 0.999587",
-		"-0.018071 0.010784 0.013859 0.999682",
-		"-0.013537 0.011752 0.010575 0.999783",
-		"-0.008242 0.011996 0.007558 0.999866",
-		"-0.002493 0.011535 0.005502 0.999915",
-		"0.003386 0.010429 0.004879 0.999928",
-		"0.009071 0.008765 0.005833 0.999903",
-		"0.014249 0.006638 0.008143 0.999843",
-		"0.018625 0.004147 0.011279 0.999754",
-		"0.021940 0.001400 0.014521 0.999653",
-		"0.023984 -0.001472 0.017128 0.999565",
-		"0.024618 -0.004309 0.018504 0.999516"
+		"0.018261 0.008929 0.075630 0.996929",
+		"0.017506 0.007390 0.075183 0.996989",
+		"0.015901 0.006245 0.073502 0.997149",
+		"0.013540 0.005587 0.070971 0.997371",
+		"0.010566 0.005473 0.068168 0.997603",
+		"0.007157 0.005908 0.065736 0.997794",
+		"0.003508 0.006851 0.064229 0.997905",
+		"-0.000178 0.008223 0.063993 0.997916",
+		"-0.003696 0.009925 0.065077 0.997824",
+		"-0.006845 0.011853 0.067229 0.997644",
+		"-0.009438 0.013905 0.069951 0.997409",
+		"-0.011306 0.015983 0.072615 0.997168",
+		"-0.012321 0.017985 0.074608 0.996975",
+		"-0.012405 0.019801 0.075472 0.996874",
+		"-0.011549 0.021316 0.075007 0.996888",
+		"-0.009813 0.022422 0.073319 0.997008",
+		"-0.007321 0.023034 0.070794 0.997198",
+		"-0.004248 0.023108 0.068009 0.997408",
+		"-0.000792 0.022648 0.065603 0.997588",
+		"0.002841 0.021700 0.064129 0.997702",
+		"0.006450 0.020344 0.063930 0.997726",
+		"0.009848 0.018675 0.065054 0.997658",
+		"0.012863 0.016789 0.067246 0.997512",
+		"0.015337 0.014779 0.070008 0.997319",
+		"0.017129 0.012734 0.072711 0.997125",
+		"0.018128 0.010749 0.074738 0.996980",
+		"0.018261 0.008929 0.075630 0.996929"
 	]
 }
 
@@ -5574,33 +5574,33 @@
 	]
 	"values" "quaternion_array"
 	[
-		"-0.011123 0.002743 0.177848 0.983991",
-		"-0.010796 0.002680 0.177074 0.984135",
-		"-0.009846 0.002440 0.177273 0.984109",
-		"-0.008328 0.002044 0.178401 0.983920",
-		"-0.006326 0.001528 0.180199 0.983609",
-		"-0.003952 0.000937 0.182254 0.983243",
-		"-0.001345 0.000314 0.184096 0.982907",
-		"0.001345 -0.000310 0.185302 0.982681",
-		"0.003959 -0.000910 0.185597 0.982617",
-		"0.006340 -0.001467 0.184914 0.982733",
-		"0.008347 -0.001959 0.183409 0.982999",
-		"0.009866 -0.002357 0.181426 0.983352",
-		"0.010808 -0.002628 0.179419 0.983710",
-		"0.011123 -0.002743 0.177848 0.983991",
-		"0.010796 -0.002680 0.177074 0.984135",
-		"0.009846 -0.002440 0.177273 0.984109",
-		"0.008328 -0.002044 0.178401 0.983920",
-		"0.006326 -0.001528 0.180199 0.983609",
-		"0.003952 -0.000937 0.182254 0.983243",
-		"0.001345 -0.000314 0.184096 0.982907",
-		"-0.001345 0.000310 0.185302 0.982681",
-		"-0.003959 0.000910 0.185597 0.982617",
-		"-0.006340 0.001467 0.184914 0.982733",
-		"-0.008347 0.001959 0.183409 0.982999",
-		"-0.009866 0.002357 0.181426 0.983352",
-		"-0.010808 0.002628 0.179419 0.983710",
-		"-0.011123 0.002743 0.177848 0.983991"
+		"-0.014970 -0.001808 0.136094 0.990581",
+		"-0.014601 -0.001978 0.135582 0.990656",
+		"-0.013746 -0.002443 0.135697 0.990652",
+		"-0.012454 -0.003173 0.136407 0.990569",
+		"-0.010798 -0.004116 0.137547 0.990428",
+		"-0.008871 -0.005207 0.138849 0.990260",
+		"-0.006789 -0.006378 0.140006 0.990107",
+		"-0.004675 -0.007558 0.140746 0.990006",
+		"-0.002658 -0.008686 0.140891 0.989983",
+		"-0.000860 -0.009702 0.140399 0.990047",
+		"0.000614 -0.010553 0.139375 0.990183",
+		"0.001679 -0.011193 0.138046 0.990361",
+		"0.002280 -0.011581 0.136713 0.990540",
+		"0.002389 -0.011690 0.135676 0.990681",
+		"0.002005 -0.011508 0.135173 0.990753",
+		"0.001154 -0.011047 0.135319 0.990740",
+		"-0.000118 -0.010336 0.136084 0.990643",
+		"-0.001742 -0.009422 0.137296 0.990484",
+		"-0.003631 -0.008364 0.138684 0.990295",
+		"-0.005680 -0.007224 0.139938 0.990118",
+		"-0.007771 -0.006062 0.140779 0.989992",
+		"-0.009783 -0.004940 0.141022 0.989946",
+		"-0.011593 -0.003912 0.140621 0.989988",
+		"-0.013093 -0.003035 0.139675 0.990106",
+		"-0.014195 -0.002363 0.138407 0.990271",
+		"-0.014832 -0.001942 0.137114 0.990442",
+		"-0.014970 -0.001808 0.136094 0.990581"
 	]
 }
 
@@ -5766,33 +5766,33 @@
 	]
 	"values" "quaternion_array"
 	[
-		"-0.011123 0.002743 -0.218969 0.975665",
-		"-0.010796 0.002680 -0.219738 0.975496",
-		"-0.009846 0.002440 -0.219544 0.975550",
-		"-0.008328 0.002044 -0.218431 0.975815",
-		"-0.006326 0.001528 -0.216654 0.976227",
-		"-0.003952 0.000937 -0.214618 0.976690",
-		"-0.001345 0.000314 -0.212791 0.977097",
-		"0.001345 -0.000310 -0.211592 0.977357",
-		"0.003959 -0.000910 -0.211295 0.977414",
-		"0.006340 -0.001467 -0.211970 0.977255",
-		"0.008347 -0.001959 -0.213460 0.976914",
-		"0.009866 -0.002357 -0.215424 0.976468",
-		"0.010808 -0.002628 -0.217412 0.976017",
-		"0.011123 -0.002743 -0.218969 0.975665",
-		"0.010796 -0.002680 -0.219738 0.975496",
-		"0.009846 -0.002440 -0.219544 0.975550",
-		"0.008328 -0.002044 -0.218431 0.975815",
-		"0.006326 -0.001528 -0.216654 0.976227",
-		"0.003952 -0.000937 -0.214618 0.976690",
-		"0.001345 -0.000314 -0.212791 0.977097",
-		"-0.001345 0.000310 -0.211592 0.977357",
-		"-0.003959 0.000910 -0.211295 0.977414",
-		"-0.006340 0.001467 -0.211970 0.977255",
-		"-0.008347 0.001959 -0.213460 0.976914",
-		"-0.009866 0.002357 -0.215424 0.976468",
-		"-0.010808 0.002628 -0.217412 0.976017",
-		"-0.011123 0.002743 -0.218969 0.975665"
+		"-0.014970 -0.001808 -0.259997 0.965492",
+		"-0.014601 -0.001978 -0.260498 0.965362",
+		"-0.013746 -0.002443 -0.260391 0.965402",
+		"-0.012454 -0.003173 -0.259704 0.965603",
+		"-0.010798 -0.004116 -0.258599 0.965916",
+		"-0.008871 -0.005207 -0.257335 0.966268",
+		"-0.006789 -0.006378 -0.256209 0.966577",
+		"-0.004675 -0.007558 -0.255487 0.966772",
+		"-0.002658 -0.008686 -0.255345 0.966807",
+		"-0.000860 -0.009702 -0.255823 0.966674",
+		"0.000614 -0.010553 -0.256820 0.966401",
+		"0.001679 -0.011193 -0.258113 0.966048",
+		"0.002280 -0.011581 -0.259411 0.965695",
+		"0.002389 -0.011690 -0.260421 0.965422",
+		"0.002005 -0.011508 -0.260912 0.965292",
+		"0.001154 -0.011047 -0.260773 0.965336",
+		"-0.000118 -0.010336 -0.260031 0.965545",
+		"-0.001742 -0.009422 -0.258852 0.965869",
+		"-0.003631 -0.008364 -0.257499 0.966235",
+		"-0.005680 -0.007224 -0.256275 0.966560",
+		"-0.007771 -0.006062 -0.255452 0.966772",
+		"-0.009783 -0.004940 -0.255210 0.966824",
+		"-0.011593 -0.003912 -0.255596 0.966706",
+		"-0.013093 -0.003035 -0.256513 0.966447",
+		"-0.014195 -0.002363 -0.257745 0.966106",
+		"-0.014832 -0.001942 -0.259004 0.965760",
+		"-0.014970 -0.001808 -0.259997 0.965492"
 	]
 }
 
@@ -5862,33 +5862,33 @@
 	]
 	"values" "vector3_array"
 	[
-		"10.522372 7.897473 3.283211",
-		"10.522372 7.897473 3.283211",
-		"10.522372 7.897473 3.283211",
-		"10.522372 7.897473 3.283211",
-		"10.522372 7.897473 3.283211",
-		"10.522372 7.897473 3.283211",
-		"10.522372 7.897473 3.283211",
-		"10.522372 7.897473 3.283211",
-		"10.522372 7.897473 3.283211",
-		"10.522372 7.897473 3.283211",
-		"10.522372 7.897473 3.283211",
-		"10.522372 7.897473 3.283211",
-		"10.522372 7.897473 3.283211",
-		"10.522372 7.897473 3.283211",
-		"10.522372 7.897473 3.283211",
-		"10.522372 7.897473 3.283211",
-		"10.522372 7.897473 3.283211",
-		"10.522372 7.897473 3.283211",
-		"10.522372 7.897473 3.283211",
-		"10.522372 7.897473 3.283211",
-		"10.522372 7.897473 3.283211",
-		"10.522372 7.897473 3.283211",
-		"10.522372 7.897473 3.283211",
-		"10.522372 7.897473 3.283211",
-		"10.522372 7.897473 3.283211",
-		"10.522372 7.897473 3.283211",
-		"10.522372 7.897473 3.283211"
+		"10.522372 7.897460 3.283211",
+		"10.522372 7.897460 3.283211",
+		"10.522372 7.897460 3.283211",
+		"10.522372 7.897460 3.283211",
+		"10.522372 7.897460 3.283211",
+		"10.522372 7.897460 3.283211",
+		"10.522372 7.897460 3.283211",
+		"10.522372 7.897460 3.283211",
+		"10.522372 7.897460 3.283211",
+		"10.522372 7.897460 3.283211",
+		"10.522372 7.897460 3.283211",
+		"10.522372 7.897460 3.283211",
+		"10.522372 7.897460 3.283211",
+		"10.522372 7.897460 3.283211",
+		"10.522372 7.897460 3.283211",
+		"10.522372 7.897460 3.283211",
+		"10.522372 7.897460 3.283211",
+		"10.522372 7.897460 3.283211",
+		"10.522372 7.897460 3.283211",
+		"10.522372 7.897460 3.283211",
+		"10.522372 7.897460 3.283211",
+		"10.522372 7.897460 3.283211",
+		"10.522372 7.897460 3.283211",
+		"10.522372 7.897460 3.283211",
+		"10.522372 7.897460 3.283211",
+		"10.522372 7.897460 3.283211",
+		"10.522372 7.897460 3.283211"
 	]
 }
 
@@ -5958,33 +5958,33 @@
 	]
 	"values" "quaternion_array"
 	[
-		"-0.000000 -0.000000 0.000000 1.000000",
-		"0.000000 -0.000000 -0.000000 1.000000",
-		"0.000000 0.000000 0.000000 1.000000",
 		"0.000000 0.000000 -0.000000 1.000000",
+		"0.000000 0.000000 -0.000000 1.000000",
+		"0.000000 -0.000000 -0.000000 1.000000",
+		"0.000000 -0.000000 -0.000000 1.000000",
 		"-0.000000 0.000000 0.000000 1.000000",
-		"0.000000 -0.000000 0.000000 1.000000",
-		"-0.000000 -0.000000 0.000000 1.000000",
-		"0.000000 0.000000 0.000000 1.000000",
-		"-0.000000 0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 0.000000 1.000000",
-		"0.000000 0.000000 0.000000 1.000000",
-		"0.000000 0.000000 -0.000000 1.000000",
-		"0.000000 0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 0.000000 1.000000",
-		"0.000000 -0.000000 0.000000 1.000000",
-		"0.000000 0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 0.000000 1.000000",
-		"0.000000 -0.000000 0.000000 1.000000",
 		"-0.000000 0.000000 0.000000 1.000000",
-		"-0.000000 0.000000 -0.000000 1.000000",
 		"0.000000 0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 -0.000000 1.000000",
 		"-0.000000 -0.000000 -0.000000 1.000000",
-		"0.000000 0.000000 -0.000000 1.000000",
+		"0.000000 0.000000 0.000000 1.000000",
+		"0.000000 -0.000000 0.000000 1.000000",
+		"-0.000000 0.000000 0.000000 1.000000",
 		"-0.000000 -0.000000 0.000000 1.000000",
-		"-0.000000 -0.000000 0.000000 1.000000"
+		"0.000000 -0.000000 0.000000 1.000000",
+		"0.000000 0.000000 0.000000 1.000000",
+		"0.000000 0.000000 -0.000000 1.000000",
+		"-0.000000 0.000000 -0.000000 1.000000",
+		"-0.000000 0.000000 0.000000 1.000000",
+		"0.000000 0.000000 -0.000000 1.000000",
+		"-0.000000 0.000000 0.000000 1.000000",
+		"0.000000 0.000000 0.000000 1.000000",
+		"-0.000000 -0.000000 -0.000000 1.000000",
+		"-0.000000 -0.000000 0.000000 1.000000",
+		"0.000000 -0.000000 -0.000000 1.000000",
+		"-0.000000 0.000000 0.000000 1.000000",
+		"0.000000 0.000000 -0.000000 1.000000",
+		"0.000000 -0.000000 -0.000000 1.000000",
+		"0.000000 0.000000 -0.000000 1.000000"
 	]
 }
 
@@ -6150,33 +6150,33 @@
 	]
 	"values" "quaternion_array"
 	[
-		"-0.000000 -0.000000 0.000000 1.000000",
-		"0.000000 -0.000000 -0.000000 1.000000",
-		"0.000000 0.000000 0.000000 1.000000",
 		"0.000000 0.000000 -0.000000 1.000000",
+		"0.000000 0.000000 -0.000000 1.000000",
+		"0.000000 -0.000000 -0.000000 1.000000",
+		"0.000000 -0.000000 -0.000000 1.000000",
 		"-0.000000 0.000000 0.000000 1.000000",
-		"0.000000 -0.000000 0.000000 1.000000",
-		"-0.000000 -0.000000 0.000000 1.000000",
-		"0.000000 0.000000 0.000000 1.000000",
-		"-0.000000 0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 0.000000 1.000000",
-		"0.000000 0.000000 0.000000 1.000000",
-		"0.000000 0.000000 -0.000000 1.000000",
-		"0.000000 0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 0.000000 1.000000",
-		"0.000000 -0.000000 0.000000 1.000000",
-		"0.000000 0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 0.000000 1.000000",
-		"0.000000 -0.000000 0.000000 1.000000",
 		"-0.000000 0.000000 0.000000 1.000000",
-		"-0.000000 0.000000 -0.000000 1.000000",
 		"0.000000 0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 -0.000000 1.000000",
 		"-0.000000 -0.000000 -0.000000 1.000000",
-		"0.000000 0.000000 -0.000000 1.000000",
+		"0.000000 0.000000 0.000000 1.000000",
+		"0.000000 -0.000000 0.000000 1.000000",
+		"-0.000000 0.000000 0.000000 1.000000",
 		"-0.000000 -0.000000 0.000000 1.000000",
-		"-0.000000 -0.000000 0.000000 1.000000"
+		"0.000000 -0.000000 0.000000 1.000000",
+		"0.000000 0.000000 0.000000 1.000000",
+		"0.000000 0.000000 -0.000000 1.000000",
+		"-0.000000 0.000000 -0.000000 1.000000",
+		"-0.000000 0.000000 0.000000 1.000000",
+		"0.000000 0.000000 -0.000000 1.000000",
+		"-0.000000 0.000000 0.000000 1.000000",
+		"0.000000 0.000000 0.000000 1.000000",
+		"-0.000000 -0.000000 -0.000000 1.000000",
+		"-0.000000 -0.000000 0.000000 1.000000",
+		"0.000000 -0.000000 -0.000000 1.000000",
+		"-0.000000 0.000000 0.000000 1.000000",
+		"0.000000 0.000000 -0.000000 1.000000",
+		"0.000000 -0.000000 -0.000000 1.000000",
+		"0.000000 0.000000 -0.000000 1.000000"
 	]
 }
 
@@ -6342,33 +6342,33 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.083414 -0.735157 -0.031448 0.672010",
-		"0.084093 -0.735125 -0.032191 0.671925",
-		"0.083923 -0.735133 -0.032004 0.671947",
-		"0.082912 -0.735180 -0.030899 0.672072",
-		"0.081120 -0.735260 -0.028938 0.672291",
-		"0.078649 -0.735361 -0.026237 0.672584",
-		"0.075644 -0.735471 -0.022951 0.672929",
-		"0.072277 -0.735577 -0.019272 0.673299",
-		"0.068744 -0.735668 -0.015414 0.673669",
-		"0.065251 -0.735738 -0.011599 0.674016",
-		"0.062000 -0.735785 -0.008052 0.674323",
-		"0.059181 -0.735812 -0.004977 0.674576",
-		"0.056959 -0.735825 -0.002554 0.674768",
-		"0.055464 -0.735828 -0.000923 0.674892",
-		"0.054782 -0.735829 -0.000179 0.674948",
-		"0.054953 -0.735829 -0.000366 0.674934",
-		"0.055968 -0.735828 -0.001473 0.674850",
-		"0.057767 -0.735821 -0.003435 0.674699",
-		"0.060246 -0.735803 -0.006138 0.674482",
-		"0.063258 -0.735769 -0.009425 0.674206",
-		"0.066630 -0.735712 -0.013105 0.673881",
-		"0.070164 -0.735633 -0.016964 0.673523",
-		"0.073655 -0.735536 -0.020778 0.673150",
-		"0.076900 -0.735427 -0.024324 0.672787",
-		"0.079711 -0.735319 -0.027397 0.672460",
-		"0.081925 -0.735225 -0.029819 0.672193",
-		"0.083414 -0.735157 -0.031448 0.672010"
+		"0.079506 -0.735327 -0.027173 0.672484",
+		"0.081773 -0.735231 -0.029653 0.672212",
+		"0.083324 -0.735161 -0.031350 0.672021",
+		"0.084070 -0.735126 -0.032166 0.671928",
+		"0.083968 -0.735131 -0.032054 0.671941",
+		"0.083023 -0.735175 -0.031020 0.672059",
+		"0.081290 -0.735252 -0.029124 0.672270",
+		"0.078869 -0.735353 -0.026477 0.672559",
+		"0.075900 -0.735462 -0.023231 0.672900",
+		"0.072555 -0.735569 -0.019576 0.673269",
+		"0.069028 -0.735661 -0.015724 0.673640",
+		"0.065524 -0.735733 -0.011898 0.673990",
+		"0.062246 -0.735782 -0.008321 0.674300",
+		"0.059387 -0.735811 -0.005201 0.674558",
+		"0.057112 -0.735824 -0.002720 0.674755",
+		"0.055554 -0.735828 -0.001021 0.674885",
+		"0.054805 -0.735829 -0.000205 0.674946",
+		"0.054908 -0.735829 -0.000317 0.674938",
+		"0.055857 -0.735828 -0.001352 0.674860",
+		"0.057597 -0.735822 -0.003249 0.674713",
+		"0.060026 -0.735805 -0.005898 0.674502",
+		"0.063002 -0.735772 -0.009145 0.674230",
+		"0.066352 -0.735718 -0.012801 0.673909",
+		"0.069880 -0.735641 -0.016654 0.673552",
+		"0.073382 -0.735544 -0.020480 0.673180",
+		"0.076654 -0.735436 -0.024055 0.672815",
+		"0.079506 -0.735327 -0.027173 0.672484"
 	]
 }
 
@@ -6534,33 +6534,33 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.229995 -0.571425 0.021826 0.787464",
-		"0.234040 -0.569769 0.017618 0.787577",
-		"0.233024 -0.570190 0.018676 0.787550",
-		"0.226994 -0.572625 0.024940 0.787371",
-		"0.216229 -0.576727 0.036049 0.786976",
-		"0.201245 -0.581926 0.051355 0.786273",
-		"0.182800 -0.587537 0.069955 0.785169",
-		"0.161879 -0.592885 0.090742 0.783613",
-		"0.139660 -0.597427 0.112471 0.781618",
-		"0.117447 -0.600836 0.133850 0.779286",
-		"0.096586 -0.603041 0.153622 0.776796",
-		"0.078369 -0.604197 0.170654 0.774391",
-		"0.063932 -0.604614 0.183999 0.772334",
-		"0.054182 -0.604649 0.192936 0.770870",
-		"0.049727 -0.604599 0.196999 0.770181",
-		"0.050848 -0.604615 0.195978 0.770355",
-		"0.057473 -0.604659 0.189926 0.771371",
-		"0.069189 -0.604513 0.179155 0.773098",
-		"0.085261 -0.603843 0.164235 0.775326",
-		"0.104683 -0.602299 0.145982 0.777796",
-		"0.126245 -0.599619 0.125423 0.780249",
-		"0.148622 -0.595733 0.103749 0.782464",
-		"0.170473 -0.590816 0.082242 0.784290",
-		"0.190535 -0.585288 0.062187 0.785664",
-		"0.207702 -0.579757 0.044781 0.786598",
-		"0.221076 -0.574918 0.031059 0.787166",
-		"0.229995 -0.571425 0.021826 0.787464"
+		"-0.065108 -0.516381 0.411649 0.748102",
+		"-0.061914 -0.516719 0.409505 0.749316",
+		"-0.059724 -0.516919 0.408040 0.750154",
+		"-0.058670 -0.517006 0.407337 0.750559",
+		"-0.058815 -0.516994 0.407433 0.750504",
+		"-0.060150 -0.516882 0.408324 0.749991",
+		"-0.062595 -0.516652 0.409961 0.749056",
+		"-0.066004 -0.516276 0.412253 0.747763",
+		"-0.070173 -0.515731 0.415071 0.746200",
+		"-0.074852 -0.515005 0.418255 0.744466",
+		"-0.079766 -0.514111 0.421621 0.742672",
+		"-0.084625 -0.513094 0.424975 0.740925",
+		"-0.089148 -0.512027 0.428117 0.739321",
+		"-0.093076 -0.511004 0.430864 0.737948",
+		"-0.096188 -0.510130 0.433052 0.736873",
+		"-0.098311 -0.509501 0.434551 0.736145",
+		"-0.099331 -0.509189 0.435272 0.735797",
+		"-0.099191 -0.509232 0.435173 0.735845",
+		"-0.097899 -0.509625 0.434260 0.736286",
+		"-0.095525 -0.510321 0.432585 0.737101",
+		"-0.092200 -0.511240 0.430250 0.738253",
+		"-0.088108 -0.512283 0.427393 0.739688",
+		"-0.083480 -0.513346 0.424182 0.741334",
+		"-0.078581 -0.514339 0.420807 0.743103",
+		"-0.073697 -0.515195 0.417467 0.744892",
+		"-0.069115 -0.515878 0.414354 0.746594",
+		"-0.065108 -0.516381 0.411649 0.748102"
 	]
 }
 
@@ -6726,33 +6726,33 @@
 	]
 	"values" "quaternion_array"
 	[
-		"-0.175800 -0.000000 0.000001 0.984426",
-		"-0.176884 -0.000000 0.000001 0.984232",
-		"-0.176611 -0.000000 0.000001 0.984281",
-		"-0.174996 -0.000000 0.000001 0.984569",
-		"-0.172119 -0.000000 0.000001 0.985076",
-		"-0.168129 -0.000000 0.000000 0.985765",
-		"-0.163232 -0.000000 0.000000 0.986588",
-		"-0.157686 -0.000000 0.000000 0.987489",
-		"-0.151795 -0.000000 0.000000 0.988412",
-		"-0.145892 -0.000000 0.000000 0.989301",
-		"-0.140324 -0.000000 0.000000 0.990106",
-		"-0.135433 -0.000000 0.000000 0.990786",
-		"-0.131536 -0.000000 0.000000 0.991311",
-		"-0.128890 -0.000000 0.000000 0.991659",
-		"-0.127677 -0.000000 0.000000 0.991816",
-		"-0.127982 -0.000000 0.000000 0.991776",
-		"-0.129784 -0.000000 0.000000 0.991542",
-		"-0.132957 -0.000000 0.000000 0.991122",
-		"-0.137287 -0.000000 0.000000 0.990531",
-		"-0.142488 -0.000000 0.000000 0.989796",
-		"-0.148233 -0.000000 0.000000 0.988953",
-		"-0.154173 -0.000000 0.000000 0.988044",
-		"-0.159964 -0.000000 0.000000 0.987123",
-		"-0.165284 -0.000000 0.000000 0.986246",
-		"-0.169847 -0.000000 0.000000 0.985470",
-		"-0.173413 -0.000000 0.000001 0.984849",
-		"-0.175800 -0.000000 0.000001 0.984426"
+		"-0.122349 -0.000000 0.000000 0.992487",
+		"-0.123390 -0.000000 0.000000 0.992358",
+		"-0.124103 -0.000000 0.000000 0.992269",
+		"-0.124447 -0.000000 0.000000 0.992226",
+		"-0.124400 -0.000000 0.000000 0.992232",
+		"-0.123965 -0.000000 0.000000 0.992287",
+		"-0.123168 -0.000000 0.000000 0.992386",
+		"-0.122057 -0.000000 0.000000 0.992523",
+		"-0.120699 -0.000000 0.000000 0.992689",
+		"-0.119176 -0.000000 0.000000 0.992873",
+		"-0.117578 -0.000000 0.000000 0.993064",
+		"-0.115999 -0.000000 0.000000 0.993249",
+		"-0.114530 -0.000000 0.000000 0.993420",
+		"-0.113256 -0.000000 0.000000 0.993566",
+		"-0.112246 -0.000000 0.000000 0.993680",
+		"-0.111558 -0.000000 0.000000 0.993758",
+		"-0.111227 -0.000000 0.000000 0.993795",
+		"-0.111272 -0.000000 0.000000 0.993790",
+		"-0.111691 -0.000000 0.000000 0.993743",
+		"-0.112461 -0.000000 0.000000 0.993656",
+		"-0.113540 -0.000000 0.000000 0.993533",
+		"-0.114868 -0.000000 0.000000 0.993381",
+		"-0.116371 -0.000000 0.000000 0.993206",
+		"-0.117963 -0.000000 0.000000 0.993018",
+		"-0.119552 -0.000000 0.000000 0.992828",
+		"-0.121043 -0.000000 0.000000 0.992647",
+		"-0.122349 -0.000000 0.000000 0.992487"
 	]
 }
 
@@ -6918,33 +6918,33 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000000 0.000000 0.097188 0.995266",
-		"0.000000 0.000000 0.083756 0.996486",
-		"-0.000000 0.000000 0.074552 0.997217",
-		"-0.000000 0.000000 0.070124 0.997538",
-		"-0.000000 0.000000 0.070732 0.997495",
-		"0.000000 0.000000 0.076342 0.997082",
-		"0.000000 0.000000 0.086620 0.996241",
-		"0.000000 0.000000 0.100958 0.994891",
-		"0.000000 0.000000 0.118504 0.992954",
-		"0.000000 0.000000 0.138218 0.990402",
-		"-0.000000 -0.000000 0.158934 0.987289",
-		"-0.000000 -0.000000 0.179435 0.983770",
-		"-0.000000 -0.000000 0.198530 0.980095",
-		"-0.000000 -0.000000 0.215123 0.976587",
-		"-0.000000 -0.000000 0.228276 0.973597",
-		"-0.000000 -0.000000 0.237254 0.971448",
-		"-0.000000 -0.000000 0.241566 0.970384",
-		"-0.000000 -0.000000 0.240974 0.970532",
-		"-0.000000 -0.000000 0.235511 0.971872",
-		"-0.000000 -0.000000 0.225476 0.974249",
-		"-0.000000 -0.000000 0.211423 0.977395",
-		"-0.000000 -0.000000 0.194137 0.980974",
-		"-0.000000 -0.000000 0.174599 0.984640",
-		"0.000000 0.000000 0.153935 0.988081",
-		"0.000000 0.000000 0.133350 0.991069",
-		"0.000000 0.000000 0.114053 0.993475",
-		"0.000000 0.000000 0.097188 0.995266"
+		"0.000000 -0.000000 0.252525 0.967590",
+		"0.000000 -0.000000 0.246832 0.969058",
+		"0.000000 -0.000000 0.241829 0.970319",
+		"0.000000 -0.000000 0.237811 0.971311",
+		"0.000000 -0.000000 0.235014 0.971992",
+		"0.000000 -0.000000 0.233603 0.972332",
+		"0.000000 -0.000000 0.233662 0.972318",
+		"0.000000 -0.000000 0.235188 0.971950",
+		"0.000000 -0.000000 0.238090 0.971243",
+		"0.000000 -0.000000 0.242197 0.970227",
+		"0.000000 -0.000000 0.247267 0.968947",
+		"0.000000 -0.000000 0.253001 0.967466",
+		"-0.000000 0.000000 0.259064 0.965860",
+		"-0.000000 0.000000 0.265103 0.964220",
+		"-0.000000 0.000000 0.270767 0.962645",
+		"-0.000000 0.000000 0.275730 0.961235",
+		"-0.000000 0.000000 0.279706 0.960086",
+		"-0.000000 0.000000 0.282469 0.959276",
+		"-0.000000 0.000000 0.283861 0.958865",
+		"-0.000000 0.000000 0.283802 0.958883",
+		"-0.000000 0.000000 0.282297 0.959327",
+		"-0.000000 0.000000 0.279430 0.960166",
+		"-0.000000 0.000000 0.275366 0.961340",
+		"-0.000000 0.000000 0.270336 0.962766",
+		"-0.000000 0.000000 0.264629 0.964350",
+		"0.000000 -0.000000 0.258575 0.965991",
+		"0.000000 -0.000000 0.252525 0.967590"
 	]
 }
 
@@ -7686,33 +7686,33 @@
 	]
 	"values" "quaternion_array"
 	[
-		"-0.055465 0.735830 -0.000922 0.674891",
-		"-0.054783 0.735830 -0.000178 0.674947",
-		"-0.054954 0.735830 -0.000365 0.674933",
-		"-0.055969 0.735829 -0.001472 0.674849",
-		"-0.057768 0.735822 -0.003434 0.674698",
-		"-0.060247 0.735805 -0.006137 0.674481",
-		"-0.063259 0.735770 -0.009424 0.674205",
-		"-0.066631 0.735713 -0.013104 0.673880",
-		"-0.070165 0.735635 -0.016963 0.673521",
-		"-0.073656 0.735537 -0.020777 0.673148",
-		"-0.076901 0.735428 -0.024323 0.672785",
-		"-0.079712 0.735320 -0.027396 0.672458",
-		"-0.081926 0.735226 -0.029818 0.672192",
-		"-0.083415 0.735158 -0.031447 0.672009",
-		"-0.084094 0.735126 -0.032190 0.671924",
-		"-0.083924 0.735134 -0.032003 0.671946",
-		"-0.082913 0.735181 -0.030898 0.672071",
-		"-0.081121 0.735261 -0.028937 0.672290",
-		"-0.078650 0.735362 -0.026236 0.672583",
-		"-0.075645 0.735472 -0.022950 0.672928",
-		"-0.072278 0.735578 -0.019271 0.673298",
-		"-0.068745 0.735669 -0.015413 0.673668",
-		"-0.065252 0.735739 -0.011598 0.674015",
-		"-0.062001 0.735786 -0.008051 0.674322",
-		"-0.059182 0.735813 -0.004976 0.674575",
-		"-0.056960 0.735826 -0.002553 0.674766",
-		"-0.055465 0.735830 -0.000922 0.674891"
+		"-0.059388 0.735812 -0.005200 0.674557",
+		"-0.057113 0.735825 -0.002719 0.674753",
+		"-0.055555 0.735829 -0.001020 0.674883",
+		"-0.054806 0.735830 -0.000204 0.674945",
+		"-0.054909 0.735830 -0.000316 0.674936",
+		"-0.055858 0.735829 -0.001351 0.674858",
+		"-0.057598 0.735823 -0.003248 0.674712",
+		"-0.060027 0.735807 -0.005897 0.674500",
+		"-0.063003 0.735773 -0.009144 0.674229",
+		"-0.066353 0.735719 -0.012800 0.673908",
+		"-0.069881 0.735642 -0.016653 0.673551",
+		"-0.073383 0.735545 -0.020479 0.673178",
+		"-0.076655 0.735437 -0.024054 0.672814",
+		"-0.079507 0.735328 -0.027172 0.672482",
+		"-0.081774 0.735232 -0.029652 0.672211",
+		"-0.083325 0.735162 -0.031349 0.672020",
+		"-0.084071 0.735127 -0.032165 0.671927",
+		"-0.083969 0.735132 -0.032053 0.671940",
+		"-0.083024 0.735176 -0.031019 0.672057",
+		"-0.081291 0.735254 -0.029123 0.672269",
+		"-0.078870 0.735354 -0.026476 0.672557",
+		"-0.075901 0.735463 -0.023231 0.672899",
+		"-0.072556 0.735570 -0.019575 0.673268",
+		"-0.069029 0.735662 -0.015723 0.673639",
+		"-0.065525 0.735734 -0.011897 0.673989",
+		"-0.062247 0.735783 -0.008320 0.674299",
+		"-0.059388 0.735812 -0.005200 0.674557"
 	]
 }
 
@@ -7878,33 +7878,33 @@
 	]
 	"values" "quaternion_array"
 	[
-		"-0.054181 0.604648 0.192937 0.770870",
-		"-0.049726 0.604598 0.197000 0.770182",
-		"-0.050847 0.604614 0.195979 0.770356",
-		"-0.057472 0.604658 0.189927 0.771371",
-		"-0.069188 0.604512 0.179156 0.773099",
-		"-0.085260 0.603842 0.164236 0.775327",
-		"-0.104682 0.602297 0.145983 0.777797",
-		"-0.126244 0.599618 0.125423 0.780250",
-		"-0.148621 0.595732 0.103750 0.782465",
-		"-0.170472 0.590815 0.082243 0.784291",
-		"-0.190534 0.585287 0.062187 0.785665",
-		"-0.207701 0.579756 0.044782 0.786599",
-		"-0.221075 0.574917 0.031060 0.787167",
-		"-0.229994 0.571424 0.021827 0.787465",
-		"-0.234039 0.569769 0.017618 0.787578",
-		"-0.233023 0.570189 0.018677 0.787551",
-		"-0.226993 0.572624 0.024941 0.787372",
-		"-0.216228 0.576726 0.036049 0.786977",
-		"-0.201244 0.581925 0.051355 0.786274",
-		"-0.182799 0.587536 0.069956 0.785170",
-		"-0.161878 0.592884 0.090742 0.783614",
-		"-0.139659 0.597425 0.112472 0.781619",
-		"-0.117446 0.600835 0.133850 0.779287",
-		"-0.096585 0.603040 0.153623 0.776797",
-		"-0.078368 0.604196 0.170655 0.774392",
-		"-0.063931 0.604613 0.183999 0.772334",
-		"-0.054181 0.604648 0.192937 0.770870"
+		"-0.100866 0.596616 0.155006 0.780928",
+		"-0.095932 0.596885 0.159574 0.780424",
+		"-0.092546 0.597013 0.162696 0.780090",
+		"-0.090915 0.597058 0.164197 0.779933",
+		"-0.091140 0.597052 0.163991 0.779955",
+		"-0.093205 0.596992 0.162090 0.780154",
+		"-0.096985 0.596836 0.158601 0.780529",
+		"-0.102249 0.596523 0.153722 0.781073",
+		"-0.108676 0.595986 0.147733 0.781770",
+		"-0.115877 0.595181 0.140979 0.782596",
+		"-0.123422 0.594102 0.133853 0.783513",
+		"-0.130866 0.592798 0.126771 0.784471",
+		"-0.137778 0.591368 0.120149 0.785407",
+		"-0.143768 0.589957 0.114373 0.786257",
+		"-0.148506 0.588725 0.109782 0.786954",
+		"-0.151734 0.587826 0.106640 0.787443",
+		"-0.153283 0.587377 0.105129 0.787681",
+		"-0.153070 0.587439 0.105336 0.787648",
+		"-0.151107 0.588004 0.107250 0.787347",
+		"-0.147498 0.588995 0.110760 0.786804",
+		"-0.142434 0.590285 0.115663 0.786065",
+		"-0.136189 0.591716 0.121675 0.785188",
+		"-0.129112 0.593127 0.128444 0.784240",
+		"-0.121603 0.594384 0.135575 0.783287",
+		"-0.114101 0.595400 0.142650 0.782388",
+		"-0.107047 0.596139 0.149254 0.781590",
+		"-0.100866 0.596616 0.155006 0.780928"
 	]
 }
 
@@ -8070,33 +8070,33 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.128890 -0.000000 -0.000000 0.991659",
-		"0.127678 -0.000000 -0.000000 0.991816",
-		"0.127983 -0.000000 -0.000000 0.991776",
-		"0.129785 -0.000000 -0.000000 0.991542",
-		"0.132958 -0.000000 -0.000000 0.991122",
-		"0.137287 -0.000000 -0.000000 0.990531",
-		"0.142488 -0.000000 -0.000000 0.989796",
-		"0.148233 -0.000000 -0.000000 0.988953",
-		"0.154172 -0.000000 -0.000000 0.988044",
-		"0.159963 -0.000000 -0.000000 0.987123",
-		"0.165284 -0.000000 -0.000000 0.986246",
-		"0.169846 -0.000000 -0.000000 0.985471",
-		"0.173413 -0.000000 -0.000000 0.984849",
-		"0.175799 -0.000000 -0.000000 0.984426",
-		"0.176883 -0.000000 -0.000000 0.984232",
-		"0.176611 -0.000000 -0.000000 0.984281",
-		"0.174995 -0.000000 -0.000000 0.984569",
-		"0.172119 -0.000000 -0.000000 0.985076",
-		"0.168129 -0.000000 -0.000000 0.985765",
-		"0.163231 -0.000000 -0.000000 0.986588",
-		"0.157686 -0.000000 -0.000000 0.987489",
-		"0.151795 -0.000000 -0.000000 0.988412",
-		"0.145892 -0.000000 -0.000000 0.989301",
-		"0.140324 -0.000000 -0.000000 0.990106",
-		"0.135434 -0.000000 -0.000000 0.990786",
-		"0.131536 -0.000000 -0.000000 0.991311",
-		"0.128890 -0.000000 -0.000000 0.991659"
+		"0.142600 -0.000000 -0.000000 0.989780",
+		"0.141266 -0.000000 -0.000000 0.989972",
+		"0.140349 -0.000000 -0.000000 0.990102",
+		"0.139907 -0.000000 -0.000000 0.990165",
+		"0.139967 -0.000000 -0.000000 0.990156",
+		"0.140527 -0.000000 -0.000000 0.990077",
+		"0.141551 -0.000000 -0.000000 0.989931",
+		"0.142973 -0.000000 -0.000000 0.989727",
+		"0.144705 -0.000000 -0.000000 0.989475",
+		"0.146639 -0.000000 -0.000000 0.989190",
+		"0.148658 -0.000000 -0.000000 0.988889",
+		"0.150645 -0.000000 -0.000000 0.988588",
+		"0.152484 -0.000000 -0.000000 0.988306",
+		"0.154073 -0.000000 -0.000000 0.988059",
+		"0.155327 -0.000000 -0.000000 0.987863",
+		"0.156181 -0.000000 -0.000000 0.987729",
+		"0.156590 -0.000000 -0.000000 0.987664",
+		"0.156533 -0.000000 -0.000000 0.987673",
+		"0.156015 -0.000000 -0.000000 0.987755",
+		"0.155061 -0.000000 -0.000000 0.987905",
+		"0.153719 -0.000000 -0.000000 0.988115",
+		"0.152061 -0.000000 -0.000000 0.988371",
+		"0.150177 -0.000000 -0.000000 0.988659",
+		"0.148172 -0.000000 -0.000000 0.988962",
+		"0.146162 -0.000000 -0.000000 0.989261",
+		"0.144266 -0.000000 -0.000000 0.989539",
+		"0.142600 -0.000000 -0.000000 0.989780"
 	]
 }
 
@@ -8166,16 +8166,9 @@
 	]
 	"values" "vector3_array"
 	[
-		"26.756530 -0.000000 -0.000069",
-		"26.756530 0.000000 -0.000069",
-		"26.756530 0.000000 -0.000069",
-		"26.756530 0.000000 -0.000069",
-		"26.756530 0.000000 -0.000069",
 		"26.756530 0.000000 -0.000069",
 		"26.756530 -0.000000 -0.000069",
-		"26.756530 0.000000 -0.000069",
 		"26.756530 -0.000000 -0.000069",
-		"26.756530 0.000000 -0.000069",
 		"26.756530 -0.000000 -0.000069",
 		"26.756530 0.000000 -0.000069",
 		"26.756530 0.000000 -0.000069",
@@ -8183,6 +8176,9 @@
 		"26.756530 0.000000 -0.000069",
 		"26.756530 0.000000 -0.000069",
 		"26.756530 0.000000 -0.000069",
+		"26.756530 -0.000000 -0.000069",
+		"26.756530 -0.000000 -0.000069",
+		"26.756530 0.000000 -0.000069",
 		"26.756530 0.000000 -0.000069",
 		"26.756530 0.000000 -0.000069",
 		"26.756530 -0.000000 -0.000069",
@@ -8192,7 +8188,11 @@
 		"26.756530 0.000000 -0.000069",
 		"26.756530 0.000000 -0.000069",
 		"26.756530 0.000000 -0.000069",
-		"26.756530 -0.000000 -0.000069"
+		"26.756530 0.000000 -0.000069",
+		"26.756530 0.000000 -0.000069",
+		"26.756530 0.000000 -0.000069",
+		"26.756530 0.000000 -0.000069",
+		"26.756530 0.000000 -0.000069"
 	]
 }
 
@@ -8262,33 +8262,33 @@
 	]
 	"values" "quaternion_array"
 	[
-		"-0.000001 0.000000 0.215123 0.976587",
-		"-0.000001 0.000000 0.228276 0.973597",
-		"-0.000001 0.000000 0.237254 0.971448",
-		"-0.000001 0.000000 0.241566 0.970385",
-		"-0.000001 0.000000 0.240974 0.970532",
-		"-0.000001 0.000000 0.235511 0.971872",
-		"-0.000001 0.000000 0.225476 0.974249",
-		"-0.000001 0.000000 0.211423 0.977395",
-		"-0.000001 -0.000000 0.194137 0.980974",
-		"-0.000001 -0.000000 0.174599 0.984640",
-		"-0.000001 -0.000000 0.153935 0.988081",
-		"-0.000001 -0.000000 0.133349 0.991069",
-		"-0.000001 -0.000000 0.114053 0.993475",
-		"-0.000001 -0.000000 0.097188 0.995266",
-		"-0.000001 -0.000000 0.083756 0.996486",
-		"-0.000001 -0.000000 0.074552 0.997217",
-		"-0.000001 -0.000000 0.070124 0.997538",
-		"-0.000001 -0.000000 0.070732 0.997495",
-		"-0.000001 -0.000000 0.076342 0.997082",
-		"-0.000001 -0.000000 0.086620 0.996241",
-		"-0.000001 -0.000000 0.100958 0.994891",
-		"-0.000001 -0.000000 0.118504 0.992954",
-		"-0.000001 -0.000000 0.138217 0.990402",
-		"-0.000001 -0.000000 0.158934 0.987289",
-		"-0.000001 -0.000000 0.179435 0.983770",
-		"-0.000001 -0.000000 0.198530 0.980095",
-		"-0.000001 0.000000 0.215123 0.976587"
+		"-0.000001 -0.000000 0.145618 0.989341",
+		"-0.000001 -0.000000 0.151432 0.988468",
+		"-0.000001 -0.000000 0.156530 0.987673",
+		"-0.000001 -0.000000 0.160616 0.987017",
+		"-0.000001 -0.000000 0.163457 0.986550",
+		"-0.000001 -0.000000 0.164889 0.986312",
+		"-0.000001 -0.000000 0.164828 0.986322",
+		"-0.000001 -0.000000 0.163280 0.986580",
+		"-0.000001 -0.000000 0.160333 0.987063",
+		"-0.000001 -0.000000 0.156155 0.987733",
+		"-0.000001 -0.000000 0.150989 0.988535",
+		"-0.000001 -0.000000 0.145132 0.989412",
+		"-0.000001 -0.000000 0.138923 0.990303",
+		"-0.000001 -0.000000 0.132723 0.991153",
+		"-0.000001 -0.000000 0.126894 0.991916",
+		"-0.000001 -0.000000 0.121775 0.992558",
+		"-0.000001 -0.000000 0.117665 0.993053",
+		"-0.000001 -0.000000 0.114806 0.993388",
+		"-0.000001 -0.000000 0.113364 0.993554",
+		"-0.000001 -0.000000 0.113425 0.993547",
+		"-0.000001 -0.000000 0.114984 0.993367",
+		"-0.000001 -0.000000 0.117951 0.993019",
+		"-0.000001 -0.000000 0.122151 0.992512",
+		"-0.000001 -0.000000 0.127338 0.991859",
+		"-0.000001 -0.000000 0.133210 0.991088",
+		"-0.000001 -0.000000 0.139424 0.990233",
+		"-0.000001 -0.000000 0.145618 0.989341"
 	]
 }
 
@@ -9030,33 +9030,33 @@
 	]
 	"values" "quaternion_array"
 	[
-		"-0.201350 0.977329 -0.057709 0.030908",
-		"-0.162522 0.984047 -0.055658 0.046260",
-		"-0.097381 0.992021 -0.052148 0.060768",
-		"-0.024194 0.995954 -0.048007 0.072014",
-		"0.042918 0.995003 -0.044023 0.078669",
-		"0.106045 0.990254 -0.040124 0.080886",
-		"0.160823 0.983295 -0.036652 0.076964",
-		"0.207653 0.975122 -0.033608 0.069913",
-		"0.241295 0.968003 -0.031389 0.061330",
-		"0.260028 0.963787 -0.030187 0.050879",
-		"0.266205 0.962715 -0.029881 0.037708",
-		"0.258796 0.965195 -0.030550 0.022125",
-		"0.242830 0.969536 -0.031818 0.004665",
-		"0.210178 0.977028 -0.034168 -0.008584",
-		"0.195140 0.979980 -0.035251 -0.017779",
-		"0.184533 0.981796 -0.036023 -0.026959",
-		"0.170999 0.983907 -0.036981 -0.036307",
-		"0.136340 0.988746 -0.039304 -0.047415",
-		"0.097479 0.992827 -0.041810 -0.055168",
-		"0.054517 0.995813 -0.044465 -0.058372",
-		"0.007859 0.997259 -0.047220 -0.056411",
-		"-0.038204 0.996816 -0.049810 -0.049158",
-		"-0.086344 0.994184 -0.052382 -0.037404",
-		"-0.126905 0.990173 -0.054422 -0.022137",
-		"-0.170942 0.983648 -0.056525 -0.004522",
-		"-0.199381 0.978122 -0.057768 0.013698",
-		"-0.201350 0.977329 -0.057709 0.030908"
+		"-0.201958 0.977551 -0.057871 0.016072",
+		"-0.198645 0.977976 -0.057606 0.028024",
+		"-0.155026 0.985563 -0.055348 0.039606",
+		"-0.133208 0.988373 -0.054140 0.049424",
+		"-0.088121 0.993265 -0.051719 0.054628",
+		"0.014551 0.997159 -0.045931 0.057902",
+		"0.093467 0.993072 -0.041164 0.058121",
+		"0.149982 0.986570 -0.037626 0.052632",
+		"0.198616 0.978471 -0.034491 0.044236",
+		"0.234331 0.970988 -0.032139 0.035175",
+		"0.255581 0.965961 -0.030746 0.025555",
+		"0.264242 0.963875 -0.030233 0.014386",
+		"0.259209 0.965332 -0.030693 0.001778",
+		"0.245585 0.968785 -0.031751 -0.011648",
+		"0.214108 0.975999 -0.033987 -0.020697",
+		"0.202784 0.978283 -0.034785 -0.025136",
+		"0.192227 0.980259 -0.035526 -0.029646",
+		"0.182183 0.982036 -0.036220 -0.033214",
+		"0.146423 0.987716 -0.038602 -0.038562",
+		"0.105641 0.992689 -0.041222 -0.041344",
+		"0.059791 0.996396 -0.044050 -0.040993",
+		"0.009866 0.998151 -0.046996 -0.037264",
+		"-0.039273 0.997532 -0.049757 -0.030196",
+		"-0.089390 0.994404 -0.052436 -0.020521",
+		"-0.116299 0.991719 -0.053775 -0.008738",
+		"-0.173446 0.983210 -0.056586 0.003574",
+		"-0.201958 0.977551 -0.057871 0.016072"
 	]
 }
 
@@ -9222,33 +9222,33 @@
 	]
 	"values" "quaternion_array"
 	[
+		"0.000086 -0.000000 0.000000 1.000000",
+		"0.000086 -0.000000 0.000000 1.000000",
+		"0.000086 0.000000 -0.000000 1.000000",
 		"0.000086 -0.000000 -0.000000 1.000000",
+		"0.000086 -0.000000 0.000000 1.000000",
 		"0.000086 0.000000 0.000000 1.000000",
-		"0.000086 0.000000 -0.000000 1.000000",
-		"0.000086 -0.000000 0.000000 1.000000",
 		"0.000086 0.000000 0.000000 1.000000",
 		"0.000086 -0.000000 -0.000000 1.000000",
-		"0.000086 -0.000000 0.000000 1.000000",
-		"0.000086 -0.000000 -0.000000 1.000000",
-		"0.000086 -0.000000 0.000000 1.000000",
-		"0.000086 -0.000000 0.000000 1.000000",
-		"0.000086 0.000000 -0.000000 1.000000",
-		"0.000086 -0.000000 0.000000 1.000000",
 		"0.000086 0.000000 -0.000000 1.000000",
 		"0.000086 -0.000000 -0.000000 1.000000",
-		"0.000086 -0.000000 0.000000 1.000000",
-		"0.000086 0.000000 -0.000000 1.000000",
-		"0.000086 -0.000000 0.000000 1.000000",
-		"0.000086 0.000000 -0.000000 1.000000",
-		"0.000086 0.000000 0.000000 1.000000",
 		"0.000086 0.000000 -0.000000 1.000000",
 		"0.000086 0.000000 0.000000 1.000000",
 		"0.000086 0.000000 0.000000 1.000000",
 		"0.000086 0.000000 -0.000000 1.000000",
-		"0.000086 -0.000000 -0.000000 1.000000",
-		"0.000086 -0.000000 -0.000000 1.000000",
+		"0.000086 0.000000 0.000000 1.000000",
+		"0.000086 -0.000000 0.000000 1.000000",
+		"0.000086 0.000000 0.000000 1.000000",
+		"0.000086 0.000000 0.000000 1.000000",
+		"0.000086 -0.000000 0.000000 1.000000",
 		"0.000086 0.000000 -0.000000 1.000000",
-		"0.000086 -0.000000 -0.000000 1.000000"
+		"0.000086 -0.000000 -0.000000 1.000000",
+		"0.000086 -0.000000 0.000000 1.000000",
+		"0.000086 -0.000000 0.000000 1.000000",
+		"0.000086 0.000000 0.000000 1.000000",
+		"0.000086 -0.000000 0.000000 1.000000",
+		"0.000086 -0.000000 -0.000000 1.000000",
+		"0.000086 -0.000000 0.000000 1.000000"
 	]
 }
 
@@ -9414,33 +9414,33 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.003630 -0.008033 -0.104565 0.994479",
-		"0.002168 -0.011519 -0.177920 0.983975",
-		"-0.001552 -0.013190 -0.276819 0.960830",
-		"-0.006092 -0.010485 -0.363108 0.931668",
-		"-0.008963 -0.004387 -0.431237 0.902184",
-		"-0.008810 0.003666 -0.482116 0.876056",
-		"-0.003974 0.011366 -0.484461 0.874730",
-		"0.003087 0.018568 -0.456354 0.889599",
-		"0.010120 0.024712 -0.404370 0.914205",
-		"0.015286 0.027857 -0.328439 0.943991",
-		"0.016643 0.025616 -0.229896 0.972736",
-		"0.013606 0.018168 -0.132584 0.990912",
-		"0.007124 0.007054 -0.044532 0.998958",
-		"0.007601 0.006753 -0.043095 0.999019",
-		"0.012237 0.011456 -0.077566 0.996846",
-		"0.016759 0.014575 -0.108872 0.993808",
-		"0.021891 0.016350 -0.144778 0.989087",
-		"0.021201 0.011957 -0.136194 0.990383",
-		"0.019039 0.007177 -0.119465 0.992630",
-		"0.015882 0.003065 -0.097755 0.995079",
-		"0.012290 0.000235 -0.073949 0.997186",
-		"0.009525 -0.001329 -0.057560 0.998296",
-		"0.006965 -0.001956 -0.042491 0.999071",
-		"0.006105 -0.002968 -0.046121 0.998913",
-		"0.004577 -0.003333 -0.043492 0.999038",
-		"0.004003 -0.004909 -0.060549 0.998145",
-		"0.003630 -0.008033 -0.104565 0.994479"
+		"0.003368 -0.002660 -0.059422 0.998224",
+		"0.003308 -0.003868 -0.102300 0.994741",
+		"0.002731 -0.004565 -0.174783 0.984593",
+		"0.000695 -0.002474 -0.203805 0.979008",
+		"-0.000254 0.000212 -0.256924 0.966432",
+		"0.000632 0.004568 -0.385725 0.922602",
+		"0.003451 0.010295 -0.464330 0.885596",
+		"0.008845 0.014889 -0.464506 0.885401",
+		"0.014793 0.018822 -0.419210 0.907573",
+		"0.019021 0.021758 -0.352096 0.935518",
+		"0.020699 0.022512 -0.277956 0.960107",
+		"0.019172 0.019783 -0.195745 0.980268",
+		"0.014739 0.013870 -0.117451 0.992872",
+		"0.008294 0.006006 -0.046155 0.998882",
+		"0.008169 0.005211 -0.042803 0.999037",
+		"0.012770 0.008728 -0.079945 0.996679",
+		"0.016023 0.010092 -0.106210 0.994163",
+		"0.020742 0.011292 -0.147058 0.988846",
+		"0.019283 0.007845 -0.137579 0.990272",
+		"0.016810 0.004461 -0.121057 0.992493",
+		"0.013693 0.001707 -0.099544 0.994937",
+		"0.010411 -0.000095 -0.075881 0.997063",
+		"0.007956 -0.001045 -0.059394 0.998202",
+		"0.005815 -0.001385 -0.044673 0.998984",
+		"0.007063 -0.003212 -0.078742 0.996865",
+		"0.004130 -0.002309 -0.050424 0.998717",
+		"0.003368 -0.002660 -0.059422 0.998224"
 	]
 }
 
@@ -9606,33 +9606,33 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000000 -0.007910 0.265314 0.964130",
-		"0.000000 0.008296 0.297775 0.954600",
-		"0.000000 0.020193 0.331182 0.943351",
-		"0.000000 0.024412 0.347438 0.937385",
-		"0.000000 0.021629 0.353829 0.935060",
-		"0.000000 0.013258 0.347944 0.937421",
-		"0.000000 0.000019 0.298228 0.954495",
-		"0.000000 -0.015861 0.221759 0.974972",
-		"0.000000 -0.032331 0.131617 0.990773",
-		"0.000000 -0.047437 0.031713 0.998371",
-		"0.000000 -0.059189 -0.076456 0.995315",
-		"-0.000000 -0.066881 -0.166253 0.983812",
-		"-0.000000 -0.071637 -0.236008 0.969107",
-		"-0.000000 -0.083378 -0.203944 0.975426",
-		"-0.000000 -0.097248 -0.154063 0.983264",
-		"0.000000 -0.109493 -0.111364 0.987729",
-		"0.000000 -0.120200 -0.060705 0.990892",
-		"0.000000 -0.124864 -0.033745 0.991600",
-		"0.000000 -0.125498 -0.011221 0.992030",
-		"0.000000 -0.122083 0.009961 0.992470",
-		"0.000000 -0.114704 0.032367 0.992872",
-		"0.000000 -0.103410 0.061380 0.992743",
-		"0.000000 -0.088509 0.093630 0.991665",
-		"0.000000 -0.069980 0.136879 0.988113",
-		"0.000000 -0.049638 0.177272 0.982909",
-		"0.000000 -0.028247 0.221406 0.974772",
-		"0.000000 -0.007910 0.265314 0.964130"
+		"0.000000 -0.028054 0.222735 0.974475",
+		"0.000000 -0.015096 0.260594 0.965330",
+		"0.000000 -0.005476 0.287792 0.957677",
+		"0.000000 0.000635 0.294503 0.955650",
+		"0.000000 0.000589 0.303056 0.952972",
+		"0.000000 -0.005429 0.334490 0.942384",
+		"0.000000 -0.014275 0.341817 0.939658",
+		"0.000000 -0.026639 0.288258 0.957182",
+		"0.000000 -0.041510 0.191877 0.980541",
+		"0.000000 -0.055974 0.084292 0.994868",
+		"0.000000 -0.068096 -0.014983 0.997566",
+		"0.000000 -0.077225 -0.107729 0.991176",
+		"-0.000000 -0.083291 -0.180450 0.980051",
+		"-0.000000 -0.087258 -0.236219 0.967774",
+		"-0.000000 -0.094216 -0.207456 0.973697",
+		"-0.000000 -0.102324 -0.158967 0.981967",
+		"0.000000 -0.108039 -0.121732 0.986666",
+		"0.000000 -0.112591 -0.070084 0.991167",
+		"0.000000 -0.112395 -0.043273 0.992721",
+		"0.000000 -0.109407 -0.018872 0.993818",
+		"0.000000 -0.103707 0.005251 0.994594",
+		"0.000000 -0.095470 0.031040 0.994948",
+		"0.000000 -0.084841 0.063102 0.994394",
+		"0.000000 -0.072191 0.097850 0.992579",
+		"0.000000 -0.056799 0.157928 0.985816",
+		"0.000000 -0.042485 0.186155 0.981601",
+		"0.000000 -0.028054 0.222735 0.974475"
 	]
 }
 
@@ -9798,33 +9798,33 @@
 	]
 	"values" "quaternion_array"
 	[
-		"-0.030582 0.036450 0.535488 0.843202",
-		"-0.035762 0.034342 0.350717 0.935168",
-		"-0.038852 0.031483 0.178641 0.982643",
-		"-0.030904 0.035413 0.217487 0.974931",
-		"-0.019106 0.036572 0.295200 0.954544",
-		"-0.005785 0.033660 0.385679 0.922001",
-		"0.008197 0.025307 0.464650 0.885095",
-		"0.019347 0.011441 0.510979 0.859299",
-		"0.026745 -0.005366 0.512944 0.857988",
-		"0.031626 -0.022999 0.493822 0.868683",
-		"0.034856 -0.039687 0.464027 0.884245",
-		"0.037739 -0.052128 0.431667 0.899735",
-		"0.040662 -0.060271 0.405534 0.911184",
-		"0.042848 -0.060667 0.395068 0.915644",
-		"0.041620 -0.058760 0.392940 0.916741",
-		"0.038627 -0.054806 0.369960 0.926625",
-		"0.028525 -0.051401 0.418866 0.906143",
-		"0.019045 -0.045809 0.448060 0.892626",
-		"0.009234 -0.038766 0.471582 0.880921",
-		"-0.000343 -0.030576 0.491524 0.870327",
-		"-0.009174 -0.021463 0.509903 0.859915",
-		"-0.017019 -0.011347 0.531585 0.846758",
-		"-0.023080 -0.000586 0.554382 0.831942",
-		"-0.027271 0.011065 0.583061 0.811895",
-		"-0.028732 0.022229 0.607732 0.793311",
-		"-0.029072 0.031365 0.601483 0.797740",
-		"-0.030582 0.036450 0.535488 0.843202"
+		"-0.013936 0.024778 0.595372 0.802947",
+		"-0.015043 0.028963 0.508630 0.860367",
+		"-0.019822 0.028784 0.308432 0.950604",
+		"-0.021859 0.029148 0.143908 0.988920",
+		"-0.015872 0.030893 0.185144 0.982097",
+		"-0.009237 0.027959 0.270276 0.962333",
+		"-0.001107 0.023528 0.370268 0.928626",
+		"0.008825 0.014679 0.458168 0.888700",
+		"0.016459 -0.000090 0.510723 0.859587",
+		"0.020020 -0.016849 0.514499 0.857092",
+		"0.021168 -0.032033 0.495814 0.867580",
+		"0.021525 -0.044608 0.466278 0.883251",
+		"0.022288 -0.053034 0.434004 0.899072",
+		"0.023335 -0.057937 0.407673 0.910989",
+		"0.024129 -0.056414 0.396519 0.915974",
+		"0.022214 -0.053281 0.396691 0.916135",
+		"0.020313 -0.048839 0.367646 0.928460",
+		"0.012623 -0.044221 0.416376 0.908029",
+		"0.006552 -0.038390 0.444307 0.895028",
+		"0.000761 -0.031832 0.467504 0.883417",
+		"-0.004450 -0.024704 0.487662 0.872672",
+		"-0.008863 -0.017082 0.506798 0.861850",
+		"-0.012446 -0.008824 0.529615 0.848101",
+		"-0.014711 -0.000180 0.554037 0.832362",
+		"-0.016289 0.009979 0.596912 0.802080",
+		"-0.014847 0.018175 0.620207 0.784087",
+		"-0.013936 0.024778 0.595372 0.802947"
 	]
 }
 
@@ -9990,12 +9990,13 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.001400 0.000467 0.492465 0.870331",
+		"0.000521 0.000168 0.386969 0.922093",
+		"0.001612 0.000539 0.517329 0.855785",
 		"0.002886 0.000974 0.660205 0.751080",
-		"0.002869 0.000968 0.658388 0.752673",
-		"0.002280 0.000767 0.593580 0.804772",
-		"0.001224 0.000407 0.471731 0.881742",
-		"0.000275 0.000084 0.356560 0.934272",
+		"0.002876 0.000970 0.659098 0.752051",
+		"0.002316 0.000779 0.597615 0.801780",
+		"0.001268 0.000422 0.476974 0.878916",
+		"0.000303 0.000093 0.360054 0.932931",
 		"0.000002 -0.000009 0.322536 0.946557",
 		"0.000002 -0.000009 0.322536 0.946557",
 		"0.000002 -0.000009 0.322536 0.946557",
@@ -10013,10 +10014,9 @@
 		"0.000002 -0.000009 0.322536 0.946557",
 		"0.000002 -0.000009 0.322536 0.946557",
 		"0.000002 -0.000009 0.322536 0.946557",
-		"0.000026 -0.000001 0.325556 0.945523",
-		"0.000070 0.000014 0.331088 0.943600",
-		"0.000453 0.000145 0.378651 0.925539",
-		"0.001400 0.000467 0.492465 0.870331"
+		"0.000027 -0.000001 0.325659 0.945487",
+		"0.000002 -0.000009 0.322536 0.946557",
+		"0.000521 0.000168 0.386969 0.922093"
 	]
 }
 
@@ -10182,33 +10182,33 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.210178 0.977028 0.034166 0.008587",
-		"0.195140 0.979980 0.035250 0.017781",
-		"0.184532 0.981796 0.036022 0.026962",
-		"0.170999 0.983907 0.036980 0.036309",
-		"0.136340 0.988746 0.039304 0.047417",
-		"0.097478 0.992827 0.041809 0.055170",
-		"0.054516 0.995813 0.044464 0.058374",
-		"0.007858 0.997259 0.047220 0.056412",
-		"-0.038204 0.996816 0.049810 0.049158",
-		"-0.086345 0.994184 0.052382 0.037404",
-		"-0.126895 0.990175 0.054421 0.022137",
-		"-0.170943 0.983648 0.056525 0.004522",
-		"-0.199384 0.978121 0.057767 -0.013698",
-		"-0.201356 0.977328 0.057708 -0.030909",
-		"-0.162532 0.984046 0.055657 -0.046260",
-		"-0.097417 0.992017 0.052149 -0.060769",
-		"-0.024237 0.995953 0.048008 -0.072011",
-		"0.042895 0.995005 0.044022 -0.078660",
-		"0.106032 0.990256 0.040122 -0.080874",
-		"0.160816 0.983297 0.036650 -0.076952",
-		"0.207650 0.975123 0.033606 -0.069902",
-		"0.241295 0.968004 0.031387 -0.061320",
-		"0.260031 0.963787 0.030184 -0.050871",
-		"0.266209 0.962714 0.029879 -0.037702",
-		"0.258800 0.965194 0.030548 -0.022121",
-		"0.242833 0.969535 0.031816 -0.004662",
-		"0.210178 0.977028 0.034166 0.008587"
+		"0.212576 0.976458 0.034039 0.013488",
+		"0.243450 0.969339 0.031885 0.009829",
+		"0.184704 0.981865 0.035985 0.023034",
+		"0.183674 0.981979 0.036074 0.026063",
+		"0.143226 0.988347 0.038780 0.033946",
+		"0.100301 0.993310 0.041544 0.039358",
+		"0.055214 0.996625 0.044330 0.041527",
+		"0.008432 0.998049 0.047096 0.040116",
+		"-0.033094 0.997618 0.049440 0.034913",
+		"-0.071125 0.995779 0.051492 0.026711",
+		"-0.128195 0.990114 0.054449 0.016585",
+		"-0.168153 0.984137 0.056386 0.004450",
+		"-0.196158 0.978839 0.057655 -0.008453",
+		"-0.204865 0.976838 0.057963 -0.021421",
+		"-0.175387 0.982286 0.056413 -0.034207",
+		"-0.108352 0.991583 0.052868 -0.047197",
+		"-0.033364 0.996591 0.048680 -0.057650",
+		"0.036440 0.996315 0.044577 -0.063566",
+		"0.102163 0.991833 0.040548 -0.064702",
+		"0.159373 0.984705 0.036934 -0.059941",
+		"0.208462 0.976020 0.033735 -0.052827",
+		"0.243886 0.968269 0.031381 -0.044602",
+		"0.263801 0.963480 0.030078 -0.034800",
+		"0.270562 0.961974 0.029709 -0.022809",
+		"0.263047 0.964260 0.030358 -0.009320",
+		"0.246439 0.968629 0.031640 0.004952",
+		"0.212576 0.976458 0.034039 0.013488"
 	]
 }
 
@@ -10374,33 +10374,33 @@
 	]
 	"values" "quaternion_array"
 	[
-		"-0.000086 -0.000000 0.000000 1.000000",
-		"-0.000086 -0.000000 -0.000000 1.000000",
-		"-0.000086 -0.000000 -0.000000 1.000000",
 		"-0.000086 0.000000 0.000000 1.000000",
-		"-0.000086 -0.000000 0.000000 1.000000",
-		"-0.000086 -0.000000 -0.000000 1.000000",
-		"-0.000086 0.000000 0.000000 1.000000",
-		"-0.000086 -0.000000 -0.000000 1.000000",
-		"-0.000086 0.000000 0.000000 1.000000",
-		"-0.000086 -0.000000 -0.000000 1.000000",
-		"-0.000086 0.000000 0.000000 1.000000",
-		"-0.000086 -0.000000 0.000000 1.000000",
-		"-0.000086 0.000000 0.000000 1.000000",
-		"-0.000086 -0.000000 0.000000 1.000000",
-		"-0.000086 0.000000 0.000000 1.000000",
-		"-0.000086 -0.000000 0.000000 1.000000",
-		"-0.000086 -0.000000 -0.000000 1.000000",
-		"-0.000086 0.000000 0.000000 1.000000",
-		"-0.000086 -0.000000 0.000000 1.000000",
 		"-0.000086 0.000000 -0.000000 1.000000",
 		"-0.000086 0.000000 -0.000000 1.000000",
+		"-0.000086 0.000000 -0.000000 1.000000",
+		"-0.000086 -0.000000 -0.000000 1.000000",
+		"-0.000086 0.000000 -0.000000 1.000000",
+		"-0.000086 0.000000 -0.000000 1.000000",
+		"-0.000086 0.000000 0.000000 1.000000",
+		"-0.000086 -0.000000 -0.000000 1.000000",
+		"-0.000086 0.000000 -0.000000 1.000000",
+		"-0.000086 0.000000 0.000000 1.000000",
+		"-0.000086 0.000000 -0.000000 1.000000",
+		"-0.000086 0.000000 0.000000 1.000000",
+		"-0.000086 -0.000000 -0.000000 1.000000",
 		"-0.000086 -0.000000 0.000000 1.000000",
+		"-0.000086 -0.000000 0.000000 1.000000",
+		"-0.000086 -0.000000 -0.000000 1.000000",
+		"-0.000086 0.000000 0.000000 1.000000",
 		"-0.000086 -0.000000 -0.000000 1.000000",
 		"-0.000086 0.000000 -0.000000 1.000000",
 		"-0.000086 0.000000 0.000000 1.000000",
 		"-0.000086 -0.000000 -0.000000 1.000000",
-		"-0.000086 -0.000000 0.000000 1.000000"
+		"-0.000086 -0.000000 0.000000 1.000000",
+		"-0.000086 -0.000000 -0.000000 1.000000",
+		"-0.000086 -0.000000 0.000000 1.000000",
+		"-0.000086 0.000000 -0.000000 1.000000",
+		"-0.000086 0.000000 0.000000 1.000000"
 	]
 }
 
@@ -10566,33 +10566,33 @@
 	]
 	"values" "quaternion_array"
 	[
-		"-0.007601 -0.006752 -0.043094 0.999019",
-		"-0.012238 -0.011455 -0.077566 0.996846",
-		"-0.016760 -0.014574 -0.108872 0.993808",
-		"-0.021892 -0.016348 -0.144777 0.989087",
-		"-0.021202 -0.011955 -0.136194 0.990383",
-		"-0.019040 -0.007176 -0.119464 0.992630",
-		"-0.015883 -0.003064 -0.097755 0.995079",
-		"-0.012290 -0.000233 -0.073948 0.997186",
-		"-0.009525 0.001330 -0.057559 0.998296",
-		"-0.006965 0.001956 -0.042491 0.999071",
-		"-0.006107 0.002970 -0.046142 0.998912",
-		"-0.004577 0.003333 -0.043491 0.999038",
-		"-0.004003 0.004910 -0.060549 0.998145",
-		"-0.003630 0.008034 -0.104565 0.994479",
-		"-0.002168 0.011521 -0.177919 0.983975",
-		"0.001552 0.013191 -0.276818 0.960830",
-		"0.006091 0.010487 -0.363108 0.931668",
-		"0.008958 0.004390 -0.431236 0.902184",
-		"0.008804 -0.003662 -0.482115 0.876056",
-		"0.003968 -0.011362 -0.484461 0.874730",
-		"-0.003093 -0.018565 -0.456353 0.889600",
-		"-0.010124 -0.024709 -0.404370 0.914206",
-		"-0.015290 -0.027855 -0.328438 0.943991",
-		"-0.016645 -0.025615 -0.229895 0.972736",
-		"-0.013608 -0.018167 -0.132583 0.990912",
-		"-0.007124 -0.007053 -0.044531 0.998958",
-		"-0.007601 -0.006752 -0.043094 0.999019"
+		"-0.007634 -0.005214 -0.043307 0.999019",
+		"-0.021857 -0.018967 -0.169507 0.985104",
+		"-0.014969 -0.010575 -0.105384 0.994263",
+		"-0.021951 -0.014154 -0.166775 0.985649",
+		"-0.019768 -0.009884 -0.147351 0.988837",
+		"-0.016826 -0.005915 -0.122965 0.992251",
+		"-0.013602 -0.002800 -0.097378 0.995151",
+		"-0.010548 -0.000730 -0.073812 0.997216",
+		"-0.009152 0.000521 -0.067442 0.997681",
+		"-0.008762 0.001726 -0.074319 0.997195",
+		"-0.005359 0.001542 -0.043592 0.999034",
+		"-0.004385 0.001890 -0.043578 0.999039",
+		"-0.004166 0.002817 -0.060682 0.998144",
+		"-0.004377 0.004600 -0.104772 0.994476",
+		"-0.004010 0.006298 -0.178181 0.983969",
+		"-0.002146 0.006361 -0.277409 0.960728",
+		"0.000465 0.003642 -0.367318 0.930088",
+		"0.001689 -0.000922 -0.438023 0.898962",
+		"0.000192 -0.006140 -0.484789 0.874610",
+		"-0.004744 -0.010717 -0.481268 0.876495",
+		"-0.010798 -0.015390 -0.452477 0.891578",
+		"-0.016278 -0.019718 -0.402886 0.914893",
+		"-0.019656 -0.022036 -0.328506 0.944040",
+		"-0.019216 -0.020335 -0.230382 0.972698",
+		"-0.014791 -0.014442 -0.133038 0.990895",
+		"-0.007527 -0.005603 -0.044736 0.998955",
+		"-0.007634 -0.005214 -0.043307 0.999019"
 	]
 }
 
@@ -10662,15 +10662,7 @@
 	]
 	"values" "vector3_array"
 	[
-		"-0.000000 0.000005 -0.000043",
-		"-0.000000 0.000005 -0.000043",
-		"-0.000000 0.000005 -0.000043",
 		"0.000000 0.000005 -0.000043",
-		"0.000000 0.000005 -0.000043",
-		"0.000000 0.000005 -0.000043",
-		"0.000000 0.000005 -0.000043",
-		"-0.000000 0.000005 -0.000043",
-		"-0.000000 0.000005 -0.000043",
 		"0.000000 0.000005 -0.000043",
 		"0.000000 0.000005 -0.000043",
 		"0.000000 0.000005 -0.000043",
@@ -10681,14 +10673,22 @@
 		"0.000000 0.000005 -0.000043",
 		"0.000000 0.000005 -0.000043",
 		"0.000000 0.000005 -0.000043",
+		"-0.000000 0.000005 -0.000043",
+		"0.000000 0.000005 -0.000043",
+		"-0.000000 0.000005 -0.000043",
+		"0.000000 0.000005 -0.000043",
+		"-0.000000 0.000005 -0.000043",
 		"0.000000 0.000005 -0.000043",
 		"0.000000 0.000005 -0.000043",
 		"0.000000 0.000005 -0.000043",
 		"0.000000 0.000005 -0.000043",
 		"-0.000000 0.000005 -0.000043",
 		"0.000000 0.000005 -0.000043",
+		"0.000000 0.000005 -0.000043",
+		"0.000000 0.000005 -0.000043",
 		"-0.000000 0.000005 -0.000043",
-		"-0.000000 0.000005 -0.000043"
+		"0.000000 0.000005 -0.000043",
+		"0.000000 0.000005 -0.000043"
 	]
 }
 
@@ -10758,33 +10758,33 @@
 	]
 	"values" "quaternion_array"
 	[
-		"-0.000000 0.083380 -0.203957 0.975423",
-		"-0.000000 0.097250 -0.154077 0.983261",
-		"-0.000000 0.109495 -0.111377 0.987728",
-		"-0.000000 0.120202 -0.060718 0.990891",
-		"-0.000000 0.124865 -0.033758 0.991599",
-		"-0.000000 0.125499 -0.011234 0.992030",
-		"0.000000 0.122084 0.009948 0.992470",
-		"0.000000 0.114705 0.032354 0.992873",
-		"0.000000 0.103410 0.061367 0.992744",
-		"0.000000 0.088509 0.093617 0.991666",
-		"0.000000 0.069979 0.136877 0.988113",
-		"0.000000 0.049638 0.177260 0.982912",
-		"0.000000 0.028247 0.221395 0.974775",
-		"0.000000 0.007909 0.265306 0.964132",
-		"0.000000 -0.008297 0.297771 0.954601",
-		"0.000000 -0.020196 0.331204 0.943343",
-		"0.000000 -0.024412 0.347465 0.937375",
-		"0.000000 -0.021624 0.353838 0.935057",
-		"0.000000 -0.013251 0.347944 0.937422",
-		"0.000000 -0.000011 0.298222 0.954496",
-		"0.000000 0.015869 0.221749 0.974975",
-		"0.000000 0.032338 0.131603 0.990775",
-		"0.000000 0.047443 0.031696 0.998371",
-		"-0.000000 0.059194 -0.076474 0.995313",
-		"-0.000000 0.066884 -0.166271 0.983809",
-		"-0.000000 0.071639 -0.236023 0.969103",
-		"-0.000000 0.083380 -0.203957 0.975423"
+		"-0.000000 0.086865 -0.205885 0.974713",
+		"-0.000000 0.100185 -0.111204 0.988735",
+		"-0.000000 0.101411 -0.115438 0.988124",
+		"-0.000000 0.108379 -0.052054 0.992746",
+		"-0.000000 0.109612 -0.030445 0.993508",
+		"-0.000000 0.108559 -0.011709 0.994021",
+		"0.000000 0.105078 0.007682 0.994434",
+		"0.000000 0.099057 0.030566 0.994612",
+		"0.000000 0.090320 0.065292 0.993770",
+		"0.000000 0.078716 0.109609 0.990853",
+		"0.000000 0.065890 0.135313 0.988610",
+		"0.000000 0.051191 0.174546 0.983318",
+		"0.000000 0.035696 0.218588 0.975164",
+		"0.000000 0.020342 0.269447 0.962800",
+		"0.000000 0.007679 0.311043 0.950365",
+		"0.000000 -0.001244 0.342748 0.939427",
+		"0.000000 -0.004661 0.360814 0.932626",
+		"0.000000 -0.002533 0.367462 0.930035",
+		"0.000000 0.004268 0.355082 0.934826",
+		"0.000000 0.015692 0.296927 0.954771",
+		"0.000000 0.029695 0.217630 0.975579",
+		"0.000000 0.044442 0.128374 0.990730",
+		"0.000000 0.058322 0.028904 0.997879",
+		"-0.000000 0.069463 -0.079519 0.994410",
+		"-0.000000 0.076436 -0.169373 0.982583",
+		"-0.000000 0.080051 -0.238892 0.967741",
+		"-0.000000 0.086865 -0.205885 0.974713"
 	]
 }
 
@@ -10950,33 +10950,33 @@
 	]
 	"values" "quaternion_array"
 	[
-		"-0.042714 0.060723 0.395175 0.915601",
-		"-0.041487 0.058815 0.393047 0.916697",
-		"-0.038493 0.054858 0.370069 0.926584",
-		"-0.028394 0.051458 0.418973 0.906095",
-		"-0.018916 0.045868 0.448166 0.892572",
-		"-0.009107 0.038827 0.471687 0.880864",
-		"0.000466 0.030639 0.491629 0.870265",
-		"0.009296 0.021527 0.510008 0.859850",
-		"0.017137 0.011412 0.531690 0.846689",
-		"0.023194 0.000654 0.554486 0.831870",
-		"0.027381 -0.010995 0.583173 0.811812",
-		"0.028838 -0.022155 0.607842 0.793225",
-		"0.029177 -0.031292 0.601601 0.797650",
-		"0.030691 -0.036387 0.535636 0.843106",
-		"0.035882 -0.034305 0.350919 0.935089",
-		"0.038975 -0.031474 0.178976 0.982577",
-		"0.031026 -0.035393 0.217798 0.974858",
-		"0.019227 -0.036533 0.295460 0.954463",
-		"0.005905 -0.033604 0.385878 0.921919",
-		"-0.008078 -0.025238 0.464796 0.885021",
-		"-0.019228 -0.011365 0.511092 0.859236",
-		"-0.026624 0.005442 0.513052 0.857927",
-		"-0.031502 0.023072 0.493929 0.868625",
-		"-0.034728 0.039755 0.464133 0.884191",
-		"-0.037608 0.052190 0.431773 0.899685",
-		"-0.040530 0.060329 0.405640 0.911139",
-		"-0.042714 0.060723 0.395175 0.915601"
+		"-0.025422 0.054497 0.394073 0.917110",
+		"-0.021036 0.053083 0.433235 0.899471",
+		"-0.024454 0.047986 0.367080 0.928629",
+		"-0.016799 0.044238 0.427716 0.902674",
+		"-0.011706 0.039053 0.452136 0.891017",
+		"-0.006358 0.033183 0.472399 0.880737",
+		"-0.001026 0.026682 0.490862 0.870828",
+		"0.004004 0.019542 0.509675 0.860136",
+		"0.008809 0.011384 0.536115 0.844022",
+		"0.012744 0.002258 0.568664 0.822468",
+		"0.014343 -0.005792 0.577264 0.816411",
+		"0.015487 -0.014141 0.578468 0.815435",
+		"0.016149 -0.022037 0.567774 0.822731",
+		"0.017130 -0.028962 0.540509 0.840665",
+		"0.021669 -0.031038 0.404624 0.913699",
+		"0.027251 -0.029639 0.219949 0.974680",
+		"0.022989 -0.032751 0.253990 0.966379",
+		"0.015541 -0.033335 0.322102 0.945990",
+		"0.006168 -0.030584 0.401524 0.915317",
+		"-0.004691 -0.022710 0.471098 0.881776",
+		"-0.012931 -0.009830 0.512104 0.858770",
+		"-0.017657 0.005667 0.513480 0.857901",
+		"-0.020060 0.021968 0.494114 0.868888",
+		"-0.021001 0.037335 0.463947 0.884827",
+		"-0.021906 0.048420 0.431186 0.900697",
+		"-0.023396 0.055226 0.404737 0.912464",
+		"-0.025422 0.054497 0.394073 0.917110"
 	]
 }
 
@@ -11152,11 +11152,11 @@
 		"-0.000123 0.000036 0.322417 0.946598",
 		"-0.000123 0.000036 0.322417 0.946598",
 		"-0.000123 0.000036 0.322417 0.946598",
-		"-0.000147 0.000028 0.325437 0.945564",
-		"-0.000191 0.000014 0.330961 0.943644",
-		"-0.000570 -0.000110 0.378520 0.925593",
-		"-0.001507 -0.000416 0.492322 0.870412",
-		"-0.002974 -0.000898 0.660111 0.751162",
+		"-0.000195 0.000013 0.331531 0.943444",
+		"-0.000445 -0.000069 0.362912 0.931823",
+		"-0.000858 -0.000204 0.413946 0.910301",
+		"-0.001489 -0.000410 0.490185 0.871617",
+		"-0.002924 -0.000882 0.654551 0.756012",
 		"-0.002958 -0.000893 0.658293 0.752755",
 		"-0.002377 -0.000702 0.593479 0.804846",
 		"-0.001333 -0.000359 0.471620 0.881801",
@@ -11585,198 +11585,6 @@
 
 "DmeVector3LogLayer"
 {
-	"id" "elementid" "655d281c-9800-548a-adb4-d87fd944b60b"
-	"name" "string" "arm_upper_L_twist0_p"
-	"times" "time_array"
-	[
-		"0.000000",
-		"0.033333",
-		"0.066667",
-		"0.100000",
-		"0.133333",
-		"0.166667",
-		"0.200000",
-		"0.233333",
-		"0.266667",
-		"0.300000",
-		"0.333333",
-		"0.366667",
-		"0.400000",
-		"0.433333",
-		"0.466667",
-		"0.500000",
-		"0.533333",
-		"0.566667",
-		"0.600000",
-		"0.633333",
-		"0.666667",
-		"0.700000",
-		"0.733333",
-		"0.766667",
-		"0.800000",
-		"0.833333",
-		"0.866667"
-	]
-	"curvetypes" "int_array"
-	[
-	]
-	"values" "vector3_array"
-	[
-		"0.000038 0.000018 -0.000117",
-		"0.000038 0.000018 -0.000117",
-		"0.000038 0.000018 -0.000117",
-		"0.000038 0.000018 -0.000117",
-		"0.000038 0.000018 -0.000117",
-		"0.000038 0.000018 -0.000117",
-		"0.000038 0.000018 -0.000117",
-		"0.000038 0.000018 -0.000117",
-		"0.000038 0.000018 -0.000117",
-		"0.000038 0.000018 -0.000117",
-		"0.000038 0.000018 -0.000117",
-		"0.000038 0.000018 -0.000117",
-		"0.000038 0.000018 -0.000117",
-		"0.000038 0.000018 -0.000117",
-		"0.000038 0.000018 -0.000117",
-		"0.000038 0.000018 -0.000117",
-		"0.000038 0.000018 -0.000117",
-		"0.000038 0.000018 -0.000117",
-		"0.000038 0.000018 -0.000117",
-		"0.000038 0.000018 -0.000117",
-		"0.000038 0.000018 -0.000117",
-		"0.000038 0.000018 -0.000117",
-		"0.000038 0.000018 -0.000117",
-		"0.000038 0.000018 -0.000117",
-		"0.000038 0.000018 -0.000117",
-		"0.000038 0.000018 -0.000117",
-		"0.000038 0.000018 -0.000117"
-	]
-}
-
-"DmeVector3Log"
-{
-	"id" "elementid" "a4f01ee8-f18a-5329-971b-b744a5fdf11e"
-	"name" "string" "arm_upper_L_twist0_p"
-	"layers" "element_array"
-	[
-		"element" "655d281c-9800-548a-adb4-d87fd944b60b"
-	]
-	"curveinfo" "element" ""
-	"usedefaultvalue" "bool" "0"
-	"defaultvalue" "vector3" "0.000000 0.000000 0.000000"
-}
-
-"DmeChannel"
-{
-	"id" "elementid" "ab9fa178-69d8-5057-aa48-3acdcbdbe9fa"
-	"name" "string" "arm_upper_L_twist0_p"
-	"fromElement" "element" ""
-	"fromAttribute" "string" ""
-	"fromIndex" "int" "0"
-	"toElement" "element" "0b32c287-02ac-5510-bfb7-739049eb7a34"
-	"toAttribute" "string" "position"
-	"toIndex" "int" "0"
-	"mode" "int" "1"
-	"log" "element" "a4f01ee8-f18a-5329-971b-b744a5fdf11e"
-}
-
-"DmeQuaternionLogLayer"
-{
-	"id" "elementid" "d799556a-b2cd-5f8a-b502-a1dac1bb5417"
-	"name" "string" "arm_upper_L_twist0_o"
-	"times" "time_array"
-	[
-		"0.000000",
-		"0.033333",
-		"0.066667",
-		"0.100000",
-		"0.133333",
-		"0.166667",
-		"0.200000",
-		"0.233333",
-		"0.266667",
-		"0.300000",
-		"0.333333",
-		"0.366667",
-		"0.400000",
-		"0.433333",
-		"0.466667",
-		"0.500000",
-		"0.533333",
-		"0.566667",
-		"0.600000",
-		"0.633333",
-		"0.666667",
-		"0.700000",
-		"0.733333",
-		"0.766667",
-		"0.800000",
-		"0.833333",
-		"0.866667"
-	]
-	"curvetypes" "int_array"
-	[
-	]
-	"values" "quaternion_array"
-	[
-		"-0.346123 -0.000001 0.000001 0.938189",
-		"-0.348190 -0.000001 0.000001 0.937424",
-		"-0.347670 -0.000001 0.000001 0.937617",
-		"-0.344591 -0.000001 0.000001 0.938753",
-		"-0.339102 -0.000001 0.000001 0.940750",
-		"-0.331472 -0.000001 0.000001 0.943465",
-		"-0.322085 -0.000001 0.000001 0.946711",
-		"-0.311427 -0.000001 0.000001 0.950270",
-		"-0.300073 -0.000001 0.000001 0.953916",
-		"-0.288662 -0.000001 0.000001 0.957431",
-		"-0.277870 -0.000000 0.000001 0.960619",
-		"-0.268371 -0.000000 0.000001 0.963316",
-		"-0.260785 -0.000000 0.000001 0.965397",
-		"-0.255629 -0.000000 0.000001 0.966775",
-		"-0.253264 -0.000000 0.000001 0.967397",
-		"-0.253860 -0.000000 0.000001 0.967241",
-		"-0.257373 -0.000000 0.000001 0.966312",
-		"-0.263554 -0.000000 0.000001 0.964645",
-		"-0.271974 -0.000000 0.000001 0.962305",
-		"-0.282069 -0.000000 0.000001 0.959394",
-		"-0.293190 -0.000001 0.000001 0.956054",
-		"-0.304658 -0.000001 0.000001 0.952462",
-		"-0.315808 -0.000001 0.000001 0.948823",
-		"-0.326021 -0.000001 0.000001 0.945362",
-		"-0.334758 -0.000001 0.000001 0.942304",
-		"-0.341572 -0.000001 0.000001 0.939856",
-		"-0.346123 -0.000001 0.000001 0.938189"
-	]
-}
-
-"DmeQuaternionLog"
-{
-	"id" "elementid" "2dc4315f-7423-573d-9899-163cc61dcda9"
-	"name" "string" "arm_upper_L_twist0_o"
-	"layers" "element_array"
-	[
-		"element" "d799556a-b2cd-5f8a-b502-a1dac1bb5417"
-	]
-	"curveinfo" "element" ""
-	"usedefaultvalue" "bool" "0"
-	"defaultvalue" "quaternion" "0.000000 0.000000 0.000000 1.000000"
-}
-
-"DmeChannel"
-{
-	"id" "elementid" "bc937d99-8c9a-5657-94ee-c2a709f6fe8b"
-	"name" "string" "arm_upper_L_twist0_o"
-	"fromElement" "element" ""
-	"fromAttribute" "string" ""
-	"fromIndex" "int" "0"
-	"toElement" "element" "0b32c287-02ac-5510-bfb7-739049eb7a34"
-	"toAttribute" "string" "orientation"
-	"toIndex" "int" "0"
-	"mode" "int" "1"
-	"log" "element" "2dc4315f-7423-573d-9899-163cc61dcda9"
-}
-
-"DmeVector3LogLayer"
-{
 	"id" "elementid" "7d314f69-bbf9-517f-a4e0-3d376ff18d0e"
 	"name" "string" "arm_lower_L_twist1_p"
 	"times" "time_array"
@@ -11816,13 +11624,6 @@
 	[
 		"12.419997 0.000000 -0.000028",
 		"12.419997 0.000000 -0.000028",
-		"12.419997 -0.000000 -0.000028",
-		"12.419997 0.000000 -0.000028",
-		"12.419997 -0.000000 -0.000028",
-		"12.419997 0.000000 -0.000028",
-		"12.419997 -0.000000 -0.000028",
-		"12.419997 -0.000000 -0.000028",
-		"12.419997 -0.000000 -0.000028",
 		"12.419997 0.000000 -0.000028",
 		"12.419997 0.000000 -0.000028",
 		"12.419997 -0.000000 -0.000028",
@@ -11833,13 +11634,20 @@
 		"12.419997 0.000000 -0.000028",
 		"12.419997 0.000000 -0.000028",
 		"12.419997 0.000000 -0.000028",
+		"12.419997 -0.000000 -0.000028",
+		"12.419997 -0.000000 -0.000028",
+		"12.419997 0.000000 -0.000028",
+		"12.419997 0.000000 -0.000028",
+		"12.419997 0.000000 -0.000028",
+		"12.419997 -0.000000 -0.000028",
 		"12.419997 0.000000 -0.000028",
 		"12.419997 -0.000000 -0.000028",
 		"12.419997 0.000000 -0.000028",
 		"12.419997 0.000000 -0.000028",
+		"12.419997 0.000000 -0.000028",
 		"12.419997 -0.000000 -0.000028",
 		"12.419997 0.000000 -0.000028",
-		"12.419997 0.000000 -0.000028",
+		"12.419997 -0.000000 -0.000028",
 		"12.419997 0.000000 -0.000028"
 	]
 }
@@ -13889,198 +13697,6 @@
 
 "DmeVector3LogLayer"
 {
-	"id" "elementid" "b541eee0-ac46-5fac-a4d0-d858a3fe663a"
-	"name" "string" "finger_middle_2_L_p"
-	"times" "time_array"
-	[
-		"0.000000",
-		"0.033333",
-		"0.066667",
-		"0.100000",
-		"0.133333",
-		"0.166667",
-		"0.200000",
-		"0.233333",
-		"0.266667",
-		"0.300000",
-		"0.333333",
-		"0.366667",
-		"0.400000",
-		"0.433333",
-		"0.466667",
-		"0.500000",
-		"0.533333",
-		"0.566667",
-		"0.600000",
-		"0.633333",
-		"0.666667",
-		"0.700000",
-		"0.733333",
-		"0.766667",
-		"0.800000",
-		"0.833333",
-		"0.866667"
-	]
-	"curvetypes" "int_array"
-	[
-	]
-	"values" "vector3_array"
-	[
-		"3.153457 -0.000074 -0.000213",
-		"3.153457 -0.000074 -0.000213",
-		"3.153457 -0.000074 -0.000213",
-		"3.153457 -0.000074 -0.000213",
-		"3.153457 -0.000074 -0.000213",
-		"3.153457 -0.000074 -0.000213",
-		"3.153457 -0.000074 -0.000213",
-		"3.153457 -0.000074 -0.000213",
-		"3.153457 -0.000074 -0.000213",
-		"3.153457 -0.000074 -0.000213",
-		"3.153457 -0.000074 -0.000213",
-		"3.153457 -0.000074 -0.000213",
-		"3.153457 -0.000074 -0.000213",
-		"3.153457 -0.000074 -0.000213",
-		"3.153457 -0.000074 -0.000213",
-		"3.153457 -0.000074 -0.000213",
-		"3.153457 -0.000074 -0.000213",
-		"3.153457 -0.000074 -0.000213",
-		"3.153457 -0.000074 -0.000213",
-		"3.153457 -0.000074 -0.000213",
-		"3.153457 -0.000074 -0.000213",
-		"3.153457 -0.000074 -0.000213",
-		"3.153457 -0.000074 -0.000213",
-		"3.153457 -0.000074 -0.000213",
-		"3.153457 -0.000074 -0.000213",
-		"3.153457 -0.000074 -0.000213",
-		"3.153457 -0.000074 -0.000213"
-	]
-}
-
-"DmeVector3Log"
-{
-	"id" "elementid" "a88c9680-ee05-5ea8-985a-bfc94cb98d60"
-	"name" "string" "finger_middle_2_L_p"
-	"layers" "element_array"
-	[
-		"element" "b541eee0-ac46-5fac-a4d0-d858a3fe663a"
-	]
-	"curveinfo" "element" ""
-	"usedefaultvalue" "bool" "0"
-	"defaultvalue" "vector3" "0.000000 0.000000 0.000000"
-}
-
-"DmeChannel"
-{
-	"id" "elementid" "950ecfb0-23fa-5a96-9ae2-c1f34ef5a330"
-	"name" "string" "finger_middle_2_L_p"
-	"fromElement" "element" ""
-	"fromAttribute" "string" ""
-	"fromIndex" "int" "0"
-	"toElement" "element" "2e89243f-0720-586b-81ce-ba5010de68c9"
-	"toAttribute" "string" "position"
-	"toIndex" "int" "0"
-	"mode" "int" "1"
-	"log" "element" "a88c9680-ee05-5ea8-985a-bfc94cb98d60"
-}
-
-"DmeQuaternionLogLayer"
-{
-	"id" "elementid" "d7ef8b18-f624-58ea-a9a9-9f7b825da9b7"
-	"name" "string" "finger_middle_2_L_o"
-	"times" "time_array"
-	[
-		"0.000000",
-		"0.033333",
-		"0.066667",
-		"0.100000",
-		"0.133333",
-		"0.166667",
-		"0.200000",
-		"0.233333",
-		"0.266667",
-		"0.300000",
-		"0.333333",
-		"0.366667",
-		"0.400000",
-		"0.433333",
-		"0.466667",
-		"0.500000",
-		"0.533333",
-		"0.566667",
-		"0.600000",
-		"0.633333",
-		"0.666667",
-		"0.700000",
-		"0.733333",
-		"0.766667",
-		"0.800000",
-		"0.833333",
-		"0.866667"
-	]
-	"curvetypes" "int_array"
-	[
-	]
-	"values" "quaternion_array"
-	[
-		"-0.000121 -0.150571 -0.001153 0.988599",
-		"-0.000121 -0.150571 -0.001153 0.988599",
-		"-0.000121 -0.150571 -0.001153 0.988599",
-		"-0.000121 -0.150571 -0.001153 0.988599",
-		"-0.000121 -0.150571 -0.001153 0.988599",
-		"-0.000121 -0.150571 -0.001153 0.988599",
-		"-0.000121 -0.150571 -0.001153 0.988599",
-		"-0.000121 -0.150571 -0.001153 0.988599",
-		"-0.000121 -0.150571 -0.001153 0.988599",
-		"-0.000121 -0.150571 -0.001153 0.988599",
-		"-0.000121 -0.150571 -0.001153 0.988599",
-		"-0.000121 -0.150571 -0.001153 0.988599",
-		"-0.000121 -0.150571 -0.001153 0.988599",
-		"-0.000121 -0.150571 -0.001153 0.988599",
-		"-0.000121 -0.150571 -0.001153 0.988599",
-		"-0.000121 -0.150571 -0.001153 0.988599",
-		"-0.000121 -0.150571 -0.001153 0.988599",
-		"-0.000121 -0.150571 -0.001153 0.988599",
-		"-0.000121 -0.150571 -0.001153 0.988599",
-		"-0.000121 -0.150571 -0.001153 0.988599",
-		"-0.000121 -0.150571 -0.001153 0.988599",
-		"-0.000121 -0.150571 -0.001153 0.988599",
-		"-0.000121 -0.150571 -0.001153 0.988599",
-		"-0.000121 -0.150571 -0.001153 0.988599",
-		"-0.000121 -0.150571 -0.001153 0.988599",
-		"-0.000121 -0.150571 -0.001153 0.988599",
-		"-0.000121 -0.150571 -0.001153 0.988599"
-	]
-}
-
-"DmeQuaternionLog"
-{
-	"id" "elementid" "59e27796-f5f8-58c9-ba12-296f884e49ff"
-	"name" "string" "finger_middle_2_L_o"
-	"layers" "element_array"
-	[
-		"element" "d7ef8b18-f624-58ea-a9a9-9f7b825da9b7"
-	]
-	"curveinfo" "element" ""
-	"usedefaultvalue" "bool" "0"
-	"defaultvalue" "quaternion" "0.000000 0.000000 0.000000 1.000000"
-}
-
-"DmeChannel"
-{
-	"id" "elementid" "af4a338c-8b6d-59e8-b55e-746d65691f33"
-	"name" "string" "finger_middle_2_L_o"
-	"fromElement" "element" ""
-	"fromAttribute" "string" ""
-	"fromIndex" "int" "0"
-	"toElement" "element" "2e89243f-0720-586b-81ce-ba5010de68c9"
-	"toAttribute" "string" "orientation"
-	"toIndex" "int" "0"
-	"mode" "int" "1"
-	"log" "element" "59e27796-f5f8-58c9-ba12-296f884e49ff"
-}
-
-"DmeVector3LogLayer"
-{
 	"id" "elementid" "9787411b-42b8-5561-ad20-c6c71e02581e"
 	"name" "string" "finger_ring_meta_L_p"
 	"times" "time_array"
@@ -15942,33 +15558,33 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000001 0.000000 -0.740671 0.671868",
-		"0.000001 0.000000 -0.736123 0.676847",
-		"0.000001 0.000000 -0.732991 0.680238",
-		"0.000001 0.000000 -0.731479 0.681864",
-		"0.000001 0.000000 -0.731687 0.681641",
-		"0.000001 0.000000 -0.733601 0.679580",
-		"0.000001 0.000000 -0.737096 0.675789",
-		"0.000001 0.000000 -0.741942 0.670464",
-		"0.000001 0.000000 -0.747831 0.663889",
-		"0.000001 0.000000 -0.754393 0.656423",
-		"0.000001 0.000000 -0.761227 0.648486",
-		"0.000001 0.000000 -0.767931 0.640533",
-		"0.000001 0.000000 -0.774122 0.633036",
-		"0.000001 0.000000 -0.779462 0.626449",
-		"0.000001 0.000000 -0.783669 0.621178",
-		"0.000001 0.000000 -0.786528 0.617554",
-		"0.000001 0.000000 -0.787898 0.615806",
-		"0.000001 0.000000 -0.787710 0.616047",
-		"0.000001 0.000000 -0.785974 0.618260",
-		"0.000001 0.000000 -0.782776 0.622304",
-		"0.000001 0.000000 -0.778274 0.627924",
-		"0.000001 0.000000 -0.772702 0.634769",
-		"0.000001 0.000000 -0.766355 0.642418",
-		"0.000001 0.000000 -0.759584 0.650410",
-		"0.000001 0.000000 -0.752778 0.658275",
-		"0.000001 0.000000 -0.746342 0.665563",
-		"0.000001 0.000000 -0.740671 0.671868"
+		"0.000001 0.000000 -0.791367 0.611341",
+		"0.000001 0.000000 -0.789567 0.613665",
+		"0.000001 0.000000 -0.787981 0.615699",
+		"0.000001 0.000000 -0.786705 0.617329",
+		"0.000001 0.000000 -0.785816 0.618461",
+		"0.000001 0.000000 -0.785367 0.619031",
+		"0.000001 0.000000 -0.785386 0.619007",
+		"0.000001 0.000000 -0.785871 0.618390",
+		"0.000001 0.000000 -0.786794 0.617216",
+		"0.000001 0.000000 -0.788098 0.615550",
+		"0.000001 0.000000 -0.789704 0.613488",
+		"0.000001 0.000000 -0.791518 0.611146",
+		"0.000001 0.000000 -0.793430 0.608661",
+		"0.000001 0.000000 -0.795331 0.606176",
+		"0.000001 0.000000 -0.797109 0.603835",
+		"0.000001 0.000000 -0.798664 0.601777",
+		"0.000001 0.000000 -0.799908 0.600123",
+		"0.000001 0.000000 -0.800771 0.598971",
+		"0.000001 0.000000 -0.801205 0.598389",
+		"0.000001 0.000000 -0.801187 0.598414",
+		"0.000001 0.000000 -0.800717 0.599042",
+		"0.000001 0.000000 -0.799822 0.600238",
+		"0.000001 0.000000 -0.798550 0.601928",
+		"0.000001 0.000000 -0.796974 0.604014",
+		"0.000001 0.000000 -0.795182 0.606371",
+		"0.000001 0.000000 -0.793276 0.608862",
+		"0.000001 0.000000 -0.791367 0.611341"
 	]
 }
 
@@ -16134,33 +15750,33 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.255630 -0.000000 -0.000001 0.966775",
-		"0.253265 -0.000000 -0.000001 0.967397",
-		"0.253861 -0.000000 -0.000001 0.967241",
-		"0.257374 -0.000000 -0.000001 0.966312",
-		"0.263555 -0.000000 -0.000001 0.964644",
-		"0.271975 -0.000000 -0.000001 0.962304",
-		"0.282069 -0.000000 -0.000001 0.959394",
-		"0.293190 -0.000000 -0.000001 0.956054",
-		"0.304658 -0.000000 -0.000001 0.952462",
-		"0.315807 -0.000000 -0.000001 0.948823",
-		"0.326020 -0.000000 -0.000001 0.945363",
-		"0.334757 -0.000000 -0.000001 0.942304",
-		"0.341571 -0.000000 -0.000001 0.939856",
-		"0.346122 -0.000000 -0.000001 0.938189",
-		"0.348188 -0.000000 -0.000001 0.937425",
-		"0.347669 -0.000000 -0.000001 0.937617",
-		"0.344590 -0.000000 -0.000001 0.938753",
-		"0.339100 -0.000000 -0.000001 0.940750",
-		"0.331471 -0.000000 -0.000001 0.943466",
-		"0.322084 -0.000000 -0.000001 0.946711",
-		"0.311427 -0.000000 -0.000001 0.950270",
-		"0.300073 -0.000000 -0.000001 0.953916",
-		"0.288662 -0.000000 -0.000001 0.957431",
-		"0.277871 -0.000000 -0.000001 0.960619",
-		"0.268372 -0.000000 -0.000001 0.963315",
-		"0.260786 -0.000000 -0.000001 0.965397",
-		"0.255630 -0.000000 -0.000001 0.966775"
+		"0.282285 -0.000000 -0.000001 0.959331",
+		"0.279699 -0.000000 -0.000001 0.960088",
+		"0.277920 -0.000000 -0.000001 0.960604",
+		"0.277061 -0.000000 -0.000001 0.960852",
+		"0.277179 -0.000000 -0.000001 0.960818",
+		"0.278266 -0.000000 -0.000001 0.960504",
+		"0.280251 -0.000000 -0.000001 0.959927",
+		"0.283008 -0.000000 -0.000001 0.959117",
+		"0.286363 -0.000000 -0.000001 0.958121",
+		"0.290107 -0.000000 -0.000001 0.956994",
+		"0.294013 -0.000000 -0.000001 0.955801",
+		"0.297851 -0.000000 -0.000001 0.954612",
+		"0.301401 -0.000000 -0.000001 0.953498",
+		"0.304466 -0.000000 -0.000001 0.952523",
+		"0.306884 -0.000000 -0.000001 0.951747",
+		"0.308528 -0.000000 -0.000001 0.951215",
+		"0.309316 -0.000000 -0.000001 0.950959",
+		"0.309207 -0.000000 -0.000001 0.950995",
+		"0.308209 -0.000000 -0.000001 0.951319",
+		"0.306370 -0.000000 -0.000001 0.951912",
+		"0.303784 -0.000000 -0.000001 0.952741",
+		"0.300586 -0.000000 -0.000001 0.953755",
+		"0.296948 -0.000000 -0.000001 0.954894",
+		"0.293073 -0.000000 -0.000001 0.956090",
+		"0.289185 -0.000000 -0.000001 0.957273",
+		"0.285514 -0.000000 -0.000001 0.958374",
+		"0.282285 -0.000000 -0.000001 0.959331"
 	]
 }
 
@@ -18689,582 +18305,6 @@
 
 "DmeVector3LogLayer"
 {
-	"id" "elementid" "7d3a8730-78db-50a5-a124-fd16427e3805"
-	"name" "string" "finger_ring_0_R_p"
-	"times" "time_array"
-	[
-		"0.000000",
-		"0.033333",
-		"0.066667",
-		"0.100000",
-		"0.133333",
-		"0.166667",
-		"0.200000",
-		"0.233333",
-		"0.266667",
-		"0.300000",
-		"0.333333",
-		"0.366667",
-		"0.400000",
-		"0.433333",
-		"0.466667",
-		"0.500000",
-		"0.533333",
-		"0.566667",
-		"0.600000",
-		"0.633333",
-		"0.666667",
-		"0.700000",
-		"0.733333",
-		"0.766667",
-		"0.800000",
-		"0.833333",
-		"0.866667"
-	]
-	"curvetypes" "int_array"
-	[
-	]
-	"values" "vector3_array"
-	[
-		"6.184928 0.000107 -0.000097",
-		"6.184928 0.000107 -0.000097",
-		"6.184928 0.000107 -0.000097",
-		"6.184928 0.000107 -0.000097",
-		"6.184928 0.000107 -0.000097",
-		"6.184928 0.000107 -0.000097",
-		"6.184928 0.000107 -0.000097",
-		"6.184928 0.000107 -0.000097",
-		"6.184928 0.000107 -0.000097",
-		"6.184928 0.000107 -0.000097",
-		"6.184928 0.000107 -0.000097",
-		"6.184928 0.000107 -0.000097",
-		"6.184928 0.000107 -0.000097",
-		"6.184928 0.000107 -0.000097",
-		"6.184928 0.000107 -0.000097",
-		"6.184928 0.000107 -0.000097",
-		"6.184928 0.000107 -0.000097",
-		"6.184928 0.000107 -0.000097",
-		"6.184928 0.000107 -0.000097",
-		"6.184928 0.000107 -0.000097",
-		"6.184928 0.000107 -0.000097",
-		"6.184928 0.000107 -0.000097",
-		"6.184928 0.000107 -0.000097",
-		"6.184928 0.000107 -0.000097",
-		"6.184928 0.000107 -0.000097",
-		"6.184928 0.000107 -0.000097",
-		"6.184928 0.000107 -0.000097"
-	]
-}
-
-"DmeVector3Log"
-{
-	"id" "elementid" "05150e37-d7eb-5b87-842e-fd496b431278"
-	"name" "string" "finger_ring_0_R_p"
-	"layers" "element_array"
-	[
-		"element" "7d3a8730-78db-50a5-a124-fd16427e3805"
-	]
-	"curveinfo" "element" ""
-	"usedefaultvalue" "bool" "0"
-	"defaultvalue" "vector3" "0.000000 0.000000 0.000000"
-}
-
-"DmeChannel"
-{
-	"id" "elementid" "8f5d3f70-ffcc-53d2-a147-67a16ed9d0e1"
-	"name" "string" "finger_ring_0_R_p"
-	"fromElement" "element" ""
-	"fromAttribute" "string" ""
-	"fromIndex" "int" "0"
-	"toElement" "element" "37af2df4-3211-567a-a326-6463c9472903"
-	"toAttribute" "string" "position"
-	"toIndex" "int" "0"
-	"mode" "int" "1"
-	"log" "element" "05150e37-d7eb-5b87-842e-fd496b431278"
-}
-
-"DmeQuaternionLogLayer"
-{
-	"id" "elementid" "2d155212-0389-5820-b221-8e9fe3e169b0"
-	"name" "string" "finger_ring_0_R_o"
-	"times" "time_array"
-	[
-		"0.000000",
-		"0.033333",
-		"0.066667",
-		"0.100000",
-		"0.133333",
-		"0.166667",
-		"0.200000",
-		"0.233333",
-		"0.266667",
-		"0.300000",
-		"0.333333",
-		"0.366667",
-		"0.400000",
-		"0.433333",
-		"0.466667",
-		"0.500000",
-		"0.533333",
-		"0.566667",
-		"0.600000",
-		"0.633333",
-		"0.666667",
-		"0.700000",
-		"0.733333",
-		"0.766667",
-		"0.800000",
-		"0.833333",
-		"0.866667"
-	]
-	"curvetypes" "int_array"
-	[
-	]
-	"values" "quaternion_array"
-	[
-		"-0.007477 0.290871 -0.070748 0.954114",
-		"-0.007477 0.290871 -0.070748 0.954114",
-		"-0.007477 0.290871 -0.070748 0.954114",
-		"-0.007477 0.290871 -0.070748 0.954114",
-		"-0.007477 0.290871 -0.070748 0.954114",
-		"-0.007477 0.290871 -0.070748 0.954114",
-		"-0.007477 0.290871 -0.070748 0.954114",
-		"-0.007477 0.290871 -0.070748 0.954114",
-		"-0.007477 0.290871 -0.070748 0.954114",
-		"-0.007477 0.290871 -0.070748 0.954114",
-		"-0.007477 0.290871 -0.070748 0.954114",
-		"-0.007477 0.290871 -0.070748 0.954114",
-		"-0.007477 0.290871 -0.070748 0.954114",
-		"-0.007477 0.290871 -0.070748 0.954114",
-		"-0.007477 0.290871 -0.070748 0.954114",
-		"-0.007477 0.290871 -0.070748 0.954114",
-		"-0.007477 0.290871 -0.070748 0.954114",
-		"-0.007477 0.290871 -0.070748 0.954114",
-		"-0.007477 0.290871 -0.070748 0.954114",
-		"-0.007477 0.290871 -0.070748 0.954114",
-		"-0.007477 0.290871 -0.070748 0.954114",
-		"-0.007477 0.290871 -0.070748 0.954114",
-		"-0.007477 0.290871 -0.070748 0.954114",
-		"-0.007477 0.290871 -0.070748 0.954114",
-		"-0.007477 0.290871 -0.070748 0.954114",
-		"-0.007477 0.290871 -0.070748 0.954114",
-		"-0.007477 0.290871 -0.070748 0.954114"
-	]
-}
-
-"DmeQuaternionLog"
-{
-	"id" "elementid" "8aa5fdf7-afee-50fe-8516-60205850ba03"
-	"name" "string" "finger_ring_0_R_o"
-	"layers" "element_array"
-	[
-		"element" "2d155212-0389-5820-b221-8e9fe3e169b0"
-	]
-	"curveinfo" "element" ""
-	"usedefaultvalue" "bool" "0"
-	"defaultvalue" "quaternion" "0.000000 0.000000 0.000000 1.000000"
-}
-
-"DmeChannel"
-{
-	"id" "elementid" "ab12aaa6-a55d-5026-892f-0a0d5177c01c"
-	"name" "string" "finger_ring_0_R_o"
-	"fromElement" "element" ""
-	"fromAttribute" "string" ""
-	"fromIndex" "int" "0"
-	"toElement" "element" "37af2df4-3211-567a-a326-6463c9472903"
-	"toAttribute" "string" "orientation"
-	"toIndex" "int" "0"
-	"mode" "int" "1"
-	"log" "element" "8aa5fdf7-afee-50fe-8516-60205850ba03"
-}
-
-"DmeVector3LogLayer"
-{
-	"id" "elementid" "dbfa3787-1c34-5166-91e5-9f6ba85f2a04"
-	"name" "string" "finger_ring_1_R_p"
-	"times" "time_array"
-	[
-		"0.000000",
-		"0.033333",
-		"0.066667",
-		"0.100000",
-		"0.133333",
-		"0.166667",
-		"0.200000",
-		"0.233333",
-		"0.266667",
-		"0.300000",
-		"0.333333",
-		"0.366667",
-		"0.400000",
-		"0.433333",
-		"0.466667",
-		"0.500000",
-		"0.533333",
-		"0.566667",
-		"0.600000",
-		"0.633333",
-		"0.666667",
-		"0.700000",
-		"0.733333",
-		"0.766667",
-		"0.800000",
-		"0.833333",
-		"0.866667"
-	]
-	"curvetypes" "int_array"
-	[
-	]
-	"values" "vector3_array"
-	[
-		"4.651156 0.000185 -0.000155",
-		"4.651156 0.000185 -0.000155",
-		"4.651156 0.000185 -0.000155",
-		"4.651156 0.000185 -0.000155",
-		"4.651156 0.000185 -0.000155",
-		"4.651156 0.000185 -0.000155",
-		"4.651156 0.000185 -0.000155",
-		"4.651156 0.000185 -0.000155",
-		"4.651156 0.000185 -0.000155",
-		"4.651156 0.000185 -0.000155",
-		"4.651156 0.000185 -0.000155",
-		"4.651156 0.000185 -0.000155",
-		"4.651156 0.000185 -0.000155",
-		"4.651156 0.000185 -0.000155",
-		"4.651156 0.000185 -0.000155",
-		"4.651156 0.000185 -0.000155",
-		"4.651156 0.000185 -0.000155",
-		"4.651156 0.000185 -0.000155",
-		"4.651156 0.000185 -0.000155",
-		"4.651156 0.000185 -0.000155",
-		"4.651156 0.000185 -0.000155",
-		"4.651156 0.000185 -0.000155",
-		"4.651156 0.000185 -0.000155",
-		"4.651156 0.000185 -0.000155",
-		"4.651156 0.000185 -0.000155",
-		"4.651156 0.000185 -0.000155",
-		"4.651156 0.000185 -0.000155"
-	]
-}
-
-"DmeVector3Log"
-{
-	"id" "elementid" "8a093bcc-5910-5ca6-b276-acaa7d93c99a"
-	"name" "string" "finger_ring_1_R_p"
-	"layers" "element_array"
-	[
-		"element" "dbfa3787-1c34-5166-91e5-9f6ba85f2a04"
-	]
-	"curveinfo" "element" ""
-	"usedefaultvalue" "bool" "0"
-	"defaultvalue" "vector3" "0.000000 0.000000 0.000000"
-}
-
-"DmeChannel"
-{
-	"id" "elementid" "9446c413-d5be-53df-9870-14c1ab1258ea"
-	"name" "string" "finger_ring_1_R_p"
-	"fromElement" "element" ""
-	"fromAttribute" "string" ""
-	"fromIndex" "int" "0"
-	"toElement" "element" "95c0dc13-68d8-5bcd-8447-06cbd106f704"
-	"toAttribute" "string" "position"
-	"toIndex" "int" "0"
-	"mode" "int" "1"
-	"log" "element" "8a093bcc-5910-5ca6-b276-acaa7d93c99a"
-}
-
-"DmeQuaternionLogLayer"
-{
-	"id" "elementid" "92484f1a-288d-5a8b-bd32-b26aabb78d5e"
-	"name" "string" "finger_ring_1_R_o"
-	"times" "time_array"
-	[
-		"0.000000",
-		"0.033333",
-		"0.066667",
-		"0.100000",
-		"0.133333",
-		"0.166667",
-		"0.200000",
-		"0.233333",
-		"0.266667",
-		"0.300000",
-		"0.333333",
-		"0.366667",
-		"0.400000",
-		"0.433333",
-		"0.466667",
-		"0.500000",
-		"0.533333",
-		"0.566667",
-		"0.600000",
-		"0.633333",
-		"0.666667",
-		"0.700000",
-		"0.733333",
-		"0.766667",
-		"0.800000",
-		"0.833333",
-		"0.866667"
-	]
-	"curvetypes" "int_array"
-	[
-	]
-	"values" "quaternion_array"
-	[
-		"-0.008640 0.339317 -0.043564 0.939623",
-		"-0.008640 0.339317 -0.043564 0.939623",
-		"-0.008640 0.339317 -0.043564 0.939623",
-		"-0.008640 0.339317 -0.043564 0.939623",
-		"-0.008640 0.339317 -0.043564 0.939623",
-		"-0.008640 0.339317 -0.043564 0.939623",
-		"-0.008640 0.339317 -0.043564 0.939623",
-		"-0.008640 0.339317 -0.043564 0.939623",
-		"-0.008640 0.339317 -0.043564 0.939623",
-		"-0.008640 0.339317 -0.043564 0.939623",
-		"-0.008640 0.339317 -0.043564 0.939623",
-		"-0.008640 0.339317 -0.043564 0.939623",
-		"-0.008640 0.339317 -0.043564 0.939623",
-		"-0.008640 0.339317 -0.043564 0.939623",
-		"-0.008640 0.339317 -0.043564 0.939623",
-		"-0.008640 0.339317 -0.043564 0.939623",
-		"-0.008640 0.339317 -0.043564 0.939623",
-		"-0.008640 0.339317 -0.043564 0.939623",
-		"-0.008640 0.339317 -0.043564 0.939623",
-		"-0.008640 0.339317 -0.043564 0.939623",
-		"-0.008640 0.339317 -0.043564 0.939623",
-		"-0.008640 0.339317 -0.043564 0.939623",
-		"-0.008640 0.339317 -0.043564 0.939623",
-		"-0.008640 0.339317 -0.043564 0.939623",
-		"-0.008640 0.339317 -0.043564 0.939623",
-		"-0.008640 0.339317 -0.043564 0.939623",
-		"-0.008640 0.339317 -0.043564 0.939623"
-	]
-}
-
-"DmeQuaternionLog"
-{
-	"id" "elementid" "2216fb07-140f-503b-8588-3047480eee4c"
-	"name" "string" "finger_ring_1_R_o"
-	"layers" "element_array"
-	[
-		"element" "92484f1a-288d-5a8b-bd32-b26aabb78d5e"
-	]
-	"curveinfo" "element" ""
-	"usedefaultvalue" "bool" "0"
-	"defaultvalue" "quaternion" "0.000000 0.000000 0.000000 1.000000"
-}
-
-"DmeChannel"
-{
-	"id" "elementid" "1015ace7-39bf-5506-9eaa-51ce90d12ae9"
-	"name" "string" "finger_ring_1_R_o"
-	"fromElement" "element" ""
-	"fromAttribute" "string" ""
-	"fromIndex" "int" "0"
-	"toElement" "element" "95c0dc13-68d8-5bcd-8447-06cbd106f704"
-	"toAttribute" "string" "orientation"
-	"toIndex" "int" "0"
-	"mode" "int" "1"
-	"log" "element" "2216fb07-140f-503b-8588-3047480eee4c"
-}
-
-"DmeVector3LogLayer"
-{
-	"id" "elementid" "615e617f-4b3b-564e-b882-46fd6fe54ff2"
-	"name" "string" "finger_ring_2_R_p"
-	"times" "time_array"
-	[
-		"0.000000",
-		"0.033333",
-		"0.066667",
-		"0.100000",
-		"0.133333",
-		"0.166667",
-		"0.200000",
-		"0.233333",
-		"0.266667",
-		"0.300000",
-		"0.333333",
-		"0.366667",
-		"0.400000",
-		"0.433333",
-		"0.466667",
-		"0.500000",
-		"0.533333",
-		"0.566667",
-		"0.600000",
-		"0.633333",
-		"0.666667",
-		"0.700000",
-		"0.733333",
-		"0.766667",
-		"0.800000",
-		"0.833333",
-		"0.866667"
-	]
-	"curvetypes" "int_array"
-	[
-	]
-	"values" "vector3_array"
-	[
-		"2.924905 0.000150 -0.000155",
-		"2.924905 0.000150 -0.000155",
-		"2.924905 0.000150 -0.000155",
-		"2.924905 0.000150 -0.000155",
-		"2.924905 0.000150 -0.000155",
-		"2.924905 0.000150 -0.000155",
-		"2.924905 0.000150 -0.000155",
-		"2.924905 0.000150 -0.000155",
-		"2.924905 0.000150 -0.000155",
-		"2.924905 0.000150 -0.000155",
-		"2.924905 0.000150 -0.000155",
-		"2.924905 0.000150 -0.000155",
-		"2.924905 0.000150 -0.000155",
-		"2.924905 0.000150 -0.000155",
-		"2.924905 0.000150 -0.000155",
-		"2.924905 0.000150 -0.000155",
-		"2.924905 0.000150 -0.000155",
-		"2.924905 0.000150 -0.000155",
-		"2.924905 0.000150 -0.000155",
-		"2.924905 0.000150 -0.000155",
-		"2.924905 0.000150 -0.000155",
-		"2.924905 0.000150 -0.000155",
-		"2.924905 0.000150 -0.000155",
-		"2.924905 0.000150 -0.000155",
-		"2.924905 0.000150 -0.000155",
-		"2.924905 0.000150 -0.000155",
-		"2.924905 0.000150 -0.000155"
-	]
-}
-
-"DmeVector3Log"
-{
-	"id" "elementid" "4375e394-02ae-5d31-82ff-db745de35651"
-	"name" "string" "finger_ring_2_R_p"
-	"layers" "element_array"
-	[
-		"element" "615e617f-4b3b-564e-b882-46fd6fe54ff2"
-	]
-	"curveinfo" "element" ""
-	"usedefaultvalue" "bool" "0"
-	"defaultvalue" "vector3" "0.000000 0.000000 0.000000"
-}
-
-"DmeChannel"
-{
-	"id" "elementid" "0c2ce277-1008-5b7b-b0f4-a2a9b1050474"
-	"name" "string" "finger_ring_2_R_p"
-	"fromElement" "element" ""
-	"fromAttribute" "string" ""
-	"fromIndex" "int" "0"
-	"toElement" "element" "92af9167-9e27-53a3-afd6-c63527a1ef36"
-	"toAttribute" "string" "position"
-	"toIndex" "int" "0"
-	"mode" "int" "1"
-	"log" "element" "4375e394-02ae-5d31-82ff-db745de35651"
-}
-
-"DmeQuaternionLogLayer"
-{
-	"id" "elementid" "135b9dea-9cae-5451-afc5-7ac2348a907d"
-	"name" "string" "finger_ring_2_R_o"
-	"times" "time_array"
-	[
-		"0.000000",
-		"0.033333",
-		"0.066667",
-		"0.100000",
-		"0.133333",
-		"0.166667",
-		"0.200000",
-		"0.233333",
-		"0.266667",
-		"0.300000",
-		"0.333333",
-		"0.366667",
-		"0.400000",
-		"0.433333",
-		"0.466667",
-		"0.500000",
-		"0.533333",
-		"0.566667",
-		"0.600000",
-		"0.633333",
-		"0.666667",
-		"0.700000",
-		"0.733333",
-		"0.766667",
-		"0.800000",
-		"0.833333",
-		"0.866667"
-	]
-	"curvetypes" "int_array"
-	[
-	]
-	"values" "quaternion_array"
-	[
-		"-0.001130 0.134300 -0.032160 0.990418",
-		"-0.001130 0.134300 -0.032160 0.990418",
-		"-0.001130 0.134300 -0.032160 0.990418",
-		"-0.001130 0.134300 -0.032160 0.990418",
-		"-0.001130 0.134300 -0.032160 0.990418",
-		"-0.001130 0.134300 -0.032160 0.990418",
-		"-0.001130 0.134300 -0.032160 0.990418",
-		"-0.001130 0.134300 -0.032160 0.990418",
-		"-0.001130 0.134300 -0.032160 0.990418",
-		"-0.001130 0.134300 -0.032160 0.990418",
-		"-0.001130 0.134300 -0.032160 0.990418",
-		"-0.001130 0.134300 -0.032160 0.990418",
-		"-0.001130 0.134300 -0.032160 0.990418",
-		"-0.001130 0.134300 -0.032160 0.990418",
-		"-0.001130 0.134300 -0.032160 0.990418",
-		"-0.001130 0.134300 -0.032160 0.990418",
-		"-0.001130 0.134300 -0.032160 0.990418",
-		"-0.001130 0.134300 -0.032160 0.990418",
-		"-0.001130 0.134300 -0.032160 0.990418",
-		"-0.001130 0.134300 -0.032160 0.990418",
-		"-0.001130 0.134300 -0.032160 0.990418",
-		"-0.001130 0.134300 -0.032160 0.990418",
-		"-0.001130 0.134300 -0.032160 0.990418",
-		"-0.001130 0.134300 -0.032160 0.990418",
-		"-0.001130 0.134300 -0.032160 0.990418",
-		"-0.001130 0.134300 -0.032160 0.990418",
-		"-0.001130 0.134300 -0.032160 0.990418"
-	]
-}
-
-"DmeQuaternionLog"
-{
-	"id" "elementid" "4197b0b9-12c6-558b-909b-77b34286e93e"
-	"name" "string" "finger_ring_2_R_o"
-	"layers" "element_array"
-	[
-		"element" "135b9dea-9cae-5451-afc5-7ac2348a907d"
-	]
-	"curveinfo" "element" ""
-	"usedefaultvalue" "bool" "0"
-	"defaultvalue" "quaternion" "0.000000 0.000000 0.000000 1.000000"
-}
-
-"DmeChannel"
-{
-	"id" "elementid" "7d50f250-d666-51b3-b15c-966c59732058"
-	"name" "string" "finger_ring_2_R_o"
-	"fromElement" "element" ""
-	"fromAttribute" "string" ""
-	"fromIndex" "int" "0"
-	"toElement" "element" "92af9167-9e27-53a3-afd6-c63527a1ef36"
-	"toAttribute" "string" "orientation"
-	"toIndex" "int" "0"
-	"mode" "int" "1"
-	"log" "element" "4197b0b9-12c6-558b-909b-77b34286e93e"
-}
-
-"DmeVector3LogLayer"
-{
 	"id" "elementid" "61be6ed3-0369-56ff-bb4a-18757ab3c3ab"
 	"name" "string" "finger_pinky_meta_R_p"
 	"times" "time_array"
@@ -20358,33 +19398,33 @@
 	]
 	"values" "quaternion_array"
 	[
-		"-0.000000 0.000000 -0.779462 0.626449",
-		"-0.000000 0.000001 -0.783669 0.621178",
-		"-0.000000 0.000001 -0.786528 0.617554",
-		"-0.000000 0.000001 -0.787898 0.615806",
-		"-0.000000 0.000001 -0.787710 0.616047",
-		"-0.000000 0.000000 -0.785974 0.618260",
-		"-0.000000 0.000000 -0.782776 0.622304",
-		"-0.000000 0.000000 -0.778274 0.627924",
-		"-0.000000 0.000000 -0.772702 0.634769",
-		"-0.000000 0.000000 -0.766355 0.642418",
-		"-0.000000 0.000000 -0.759584 0.650410",
-		"-0.000000 0.000000 -0.752778 0.658275",
-		"-0.000000 0.000000 -0.746342 0.665563",
-		"-0.000000 0.000000 -0.740671 0.671868",
-		"-0.000000 0.000000 -0.736123 0.676847",
-		"-0.000000 0.000000 -0.732991 0.680238",
-		"-0.000000 0.000000 -0.731479 0.681864",
-		"-0.000000 0.000000 -0.731687 0.681641",
-		"-0.000000 0.000000 -0.733601 0.679580",
-		"-0.000000 0.000000 -0.737095 0.675789",
-		"-0.000000 0.000000 -0.741942 0.670464",
-		"-0.000000 0.000000 -0.747831 0.663889",
-		"-0.000000 0.000000 -0.754393 0.656423",
-		"-0.000000 0.000000 -0.761227 0.648486",
-		"-0.000000 0.000000 -0.767931 0.640533",
-		"-0.000000 0.000000 -0.774122 0.633036",
-		"-0.000000 0.000000 -0.779462 0.626449"
+		"-0.000000 -0.000000 -0.756841 0.653599",
+		"-0.000000 -0.000000 -0.758759 0.651371",
+		"-0.000000 -0.000000 -0.760437 0.649412",
+		"-0.000000 -0.000000 -0.761779 0.647837",
+		"0.000000 -0.000001 -0.762711 0.646739",
+		"0.000000 -0.000001 -0.763180 0.646186",
+		"-0.000000 -0.000000 -0.763160 0.646209",
+		"-0.000000 -0.000000 -0.762653 0.646808",
+		"-0.000000 -0.000000 -0.761686 0.647946",
+		"-0.000000 -0.000000 -0.760314 0.649556",
+		"-0.000000 -0.000000 -0.758613 0.651541",
+		"-0.000000 -0.000000 -0.756681 0.653785",
+		"-0.000000 -0.000000 -0.754626 0.656155",
+		"-0.000000 -0.000000 -0.752570 0.658513",
+		"-0.000000 0.000000 -0.750631 0.660722",
+		"-0.000000 0.000000 -0.748924 0.662656",
+		"-0.000000 0.000000 -0.747551 0.664205",
+		"-0.000000 0.000000 -0.746594 0.665280",
+		"-0.000000 0.000000 -0.746111 0.665821",
+		"-0.000000 0.000000 -0.746131 0.665799",
+		"-0.000000 0.000000 -0.746654 0.665213",
+		"-0.000000 0.000000 -0.747646 0.664097",
+		"-0.000000 0.000000 -0.749049 0.662514",
+		"-0.000000 0.000000 -0.750779 0.660554",
+		"-0.000000 -0.000000 -0.752732 0.658328",
+		"-0.000000 -0.000000 -0.754792 0.655964",
+		"-0.000000 -0.000000 -0.756841 0.653599"
 	]
 }
 
@@ -20550,33 +19590,33 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.000000 -0.000000 -0.000000 1.000000",
-		"-0.000000 0.000000 0.000000 1.000000",
-		"0.000000 0.000000 -0.000000 1.000000",
-		"-0.000000 -0.000000 0.000000 1.000000",
-		"-0.000000 -0.000000 0.000000 1.000000",
-		"-0.000000 -0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 -0.000000 1.000000",
-		"-0.000000 -0.000000 -0.000000 1.000000",
-		"-0.000000 -0.000000 0.000000 1.000000",
-		"-0.000000 -0.000000 0.000000 1.000000",
-		"-0.000000 0.000000 -0.000000 1.000000",
-		"-0.000000 -0.000000 0.000000 1.000000",
 		"0.000000 -0.000000 0.000000 1.000000",
-		"0.000000 0.000000 -0.000000 1.000000",
-		"-0.000000 0.000000 0.000000 1.000000",
-		"-0.000000 0.000000 -0.000000 1.000000",
 		"-0.000000 -0.000000 0.000000 1.000000",
-		"-0.000000 0.000000 -0.000000 1.000000",
-		"-0.000000 0.000000 -0.000000 1.000000",
+		"0.000000 0.000000 0.000000 1.000000",
+		"-0.000000 -0.000000 0.000000 1.000000",
+		"0.000000 -0.000000 -0.000000 1.000000",
+		"0.000000 0.000000 0.000000 1.000000",
+		"-0.000000 0.000000 0.000000 1.000000",
 		"0.000000 0.000000 -0.000000 1.000000",
+		"-0.000000 0.000000 -0.000000 1.000000",
+		"-0.000000 0.000000 -0.000000 1.000000",
+		"-0.000000 0.000000 0.000000 1.000000",
+		"-0.000000 0.000000 0.000000 1.000000",
+		"-0.000000 0.000000 0.000000 1.000000",
+		"-0.000000 0.000000 -0.000000 1.000000",
+		"0.000000 0.000000 0.000000 1.000000",
+		"-0.000000 0.000000 0.000000 1.000000",
+		"-0.000000 0.000000 0.000000 1.000000",
+		"-0.000000 0.000000 0.000000 1.000000",
+		"-0.000000 -0.000000 0.000000 1.000000",
+		"-0.000000 0.000000 0.000000 1.000000",
+		"0.000000 -0.000000 -0.000000 1.000000",
 		"0.000000 -0.000000 0.000000 1.000000",
+		"0.000000 -0.000000 -0.000000 1.000000",
 		"-0.000000 0.000000 0.000000 1.000000",
 		"0.000000 0.000000 -0.000000 1.000000",
 		"0.000000 -0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 -0.000000 1.000000",
-		"-0.000000 0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 -0.000000 1.000000"
+		"0.000000 -0.000000 0.000000 1.000000"
 	]
 }
 
@@ -20742,33 +19782,33 @@
 	]
 	"values" "quaternion_array"
 	[
-		"-0.003680 -0.000000 0.000000 0.999993",
-		"-0.011980 -0.000000 0.000000 0.999928",
-		"-0.019454 -0.000000 0.000000 0.999811",
-		"-0.015145 -0.000000 0.000000 0.999885",
-		"-0.007102 -0.000000 0.000000 0.999975",
-		"0.002729 -0.000000 0.000000 0.999996",
-		"0.013580 -0.000000 0.000000 0.999908",
-		"0.023383 -0.000000 0.000000 0.999727",
-		"0.030677 -0.000000 0.000000 0.999529",
-		"0.036304 -0.000000 0.000000 0.999341",
-		"0.040637 0.000000 -0.000000 0.999174",
-		"0.043786 0.000000 -0.000000 0.999041",
-		"0.046192 0.000000 -0.000000 0.998933",
-		"0.046932 0.000000 -0.000000 0.998898",
-		"0.045864 0.000000 -0.000000 0.998948",
-		"0.042889 0.000000 -0.000000 0.999080",
-		"0.039116 0.000000 -0.000000 0.999235",
-		"0.034559 -0.000000 0.000000 0.999403",
-		"0.029360 -0.000000 0.000000 0.999569",
-		"0.023892 -0.000000 0.000000 0.999715",
-		"0.018491 -0.000000 0.000000 0.999829",
-		"0.013414 -0.000000 0.000000 0.999910",
-		"0.009013 -0.000000 0.000000 0.999959",
-		"0.005435 -0.000000 0.000000 0.999985",
-		"0.003028 -0.000000 0.000000 0.999995",
-		"0.000488 -0.000000 0.000000 1.000000",
-		"-0.003680 -0.000000 0.000000 0.999993"
+		"0.008584 -0.000000 0.000000 0.999963",
+		"0.004007 -0.000000 0.000000 0.999992",
+		"-0.005093 -0.000000 0.000000 0.999987",
+		"-0.012426 -0.000000 0.000000 0.999923",
+		"-0.008419 -0.000000 0.000000 0.999965",
+		"-0.001512 -0.000000 0.000000 0.999999",
+		"0.006653 -0.000000 0.000000 0.999978",
+		"0.016122 -0.000000 0.000000 0.999870",
+		"0.024810 -0.000000 0.000000 0.999692",
+		"0.030473 -0.000000 0.000000 0.999536",
+		"0.033896 -0.000000 0.000000 0.999425",
+		"0.035994 -0.000000 0.000000 0.999352",
+		"0.037242 -0.000000 0.000000 0.999306",
+		"0.038017 -0.000000 0.000000 0.999277",
+		"0.037649 -0.000000 0.000000 0.999291",
+		"0.036056 -0.000000 0.000000 0.999350",
+		"0.033238 -0.000000 0.000000 0.999447",
+		"0.030281 -0.000000 0.000000 0.999541",
+		"0.027145 -0.000000 0.000000 0.999631",
+		"0.023832 -0.000000 0.000000 0.999716",
+		"0.020552 -0.000000 0.000000 0.999789",
+		"0.017484 -0.000000 0.000000 0.999847",
+		"0.014773 -0.000000 0.000000 0.999891",
+		"0.012619 -0.000000 0.000000 0.999920",
+		"0.011098 -0.000000 0.000000 0.999938",
+		"0.010671 -0.000000 0.000000 0.999943",
+		"0.008584 -0.000000 0.000000 0.999963"
 	]
 }
 
@@ -20934,33 +19974,33 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.001489 0.004150 0.743151 0.669109",
-		"0.003235 0.004904 0.767426 0.641110",
-		"0.005183 0.004230 0.798992 0.601305",
-		"0.005919 0.001671 0.825552 0.564293",
-		"0.004848 -0.001576 0.845935 0.533262",
-		"0.001943 -0.004507 0.860840 0.508852",
-		"-0.002598 -0.005624 0.861517 0.507691",
-		"-0.007756 -0.005738 0.853306 0.521321",
-		"-0.012460 -0.005461 0.837911 0.545637",
-		"-0.015357 -0.004748 0.814920 0.579351",
-		"-0.014965 -0.003434 0.784113 0.620428",
-		"-0.011222 -0.001799 0.752482 0.658515",
-		"-0.005014 -0.000058 0.722671 0.691174",
-		"-0.005080 0.000216 0.722174 0.691693",
-		"-0.008384 0.000139 0.733995 0.679103",
-		"-0.011100 0.000591 0.744564 0.667458",
-		"-0.013574 0.001740 0.756504 0.653846",
-		"-0.011793 0.003080 0.753675 0.657135",
-		"-0.009346 0.004045 0.748119 0.663486",
-		"-0.006777 0.004423 0.740841 0.671631",
-		"-0.004499 0.004189 0.732773 0.680446",
-		"-0.002961 0.003788 0.727165 0.686446",
-		"-0.001824 0.003123 0.721969 0.691916",
-		"-0.001163 0.003188 0.723225 0.690604",
-		"-0.000487 0.002787 0.722317 0.691556",
-		"0.000268 0.003154 0.728196 0.685362",
-		"0.001489 0.004150 0.743151 0.669109"
+		"-0.000286 0.002126 0.727811 0.685775",
+		"0.000156 0.002540 0.742392 0.669960",
+		"0.000607 0.002595 0.766412 0.642343",
+		"0.000612 0.001133 0.775823 0.630949",
+		"0.000017 -0.000167 0.792756 0.609540",
+		"-0.001847 -0.001447 0.832382 0.554198",
+		"-0.004946 -0.002564 0.855657 0.517513",
+		"-0.008573 -0.002334 0.855695 0.517404",
+		"-0.012103 -0.001652 0.842338 0.538812",
+		"-0.014598 -0.001220 0.822158 0.569070",
+		"-0.015387 -0.000898 0.799289 0.600749",
+		"-0.013817 -0.000443 0.773162 0.634058",
+		"-0.010129 0.000141 0.747446 0.664245",
+		"-0.005070 0.000725 0.723232 0.690586",
+		"-0.004748 0.000967 0.722074 0.691799",
+		"-0.007626 0.001304 0.734808 0.678231",
+		"-0.009274 0.001946 0.743681 0.668468",
+		"-0.011399 0.003160 0.757272 0.652992",
+		"-0.009671 0.003892 0.754146 0.656624",
+		"-0.007600 0.004246 0.748660 0.662897",
+		"-0.005518 0.004149 0.741450 0.670972",
+		"-0.003709 0.003654 0.733435 0.679739",
+		"-0.002497 0.003141 0.727798 0.685780",
+		"-0.001609 0.002518 0.722725 0.691129",
+		"-0.001422 0.003610 0.734414 0.678691",
+		"-0.000682 0.002264 0.724713 0.689047",
+		"-0.000286 0.002126 0.727811 0.685775"
 	]
 }
 
@@ -21126,33 +20166,33 @@
 	]
 	"values" "quaternion_array"
 	[
-		"-0.000000 -0.000000 0.000000 1.000000",
+		"-0.000000 0.000000 0.000000 1.000000",
+		"0.000000 0.000000 -0.000000 1.000000",
+		"-0.000000 0.000000 0.000000 1.000000",
 		"-0.000000 0.000000 -0.000000 1.000000",
 		"0.000000 0.000000 -0.000000 1.000000",
 		"-0.000000 0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 0.000000 1.000000",
 		"-0.000000 0.000000 -0.000000 1.000000",
-		"0.000000 -0.000000 0.000000 1.000000",
-		"-0.000000 -0.000000 -0.000000 1.000000",
 		"0.000000 0.000000 0.000000 1.000000",
+		"-0.000000 -0.000000 -0.000000 1.000000",
+		"-0.000000 0.000000 0.000000 1.000000",
+		"0.000000 0.000000 0.000000 1.000000",
+		"0.000000 0.000000 0.000000 1.000000",
+		"0.000000 0.000000 0.000000 1.000000",
+		"-0.000000 -0.000000 -0.000000 1.000000",
+		"-0.000000 0.000000 0.000000 1.000000",
+		"-0.000000 -0.000000 0.000000 1.000000",
 		"0.000000 -0.000000 -0.000000 1.000000",
-		"0.000000 0.000000 0.000000 1.000000",
-		"-0.000000 -0.000000 0.000000 1.000000",
-		"-0.000000 0.000000 0.000000 1.000000",
-		"-0.000000 -0.000000 0.000000 1.000000",
-		"-0.000000 0.000000 0.000000 1.000000",
-		"-0.000000 -0.000000 0.000000 1.000000",
-		"-0.000000 -0.000000 -0.000000 1.000000",
-		"0.000000 0.000000 0.000000 1.000000",
-		"-0.000000 -0.000000 0.000000 1.000000",
-		"-0.000000 0.000000 0.000000 1.000000",
-		"-0.000000 0.000000 0.000000 1.000000",
-		"-0.000000 0.000000 0.000000 1.000000",
-		"-0.000000 -0.000000 -0.000000 1.000000",
 		"-0.000000 0.000000 -0.000000 1.000000",
-		"0.000000 0.000000 0.000000 1.000000",
 		"-0.000000 -0.000000 -0.000000 1.000000",
-		"-0.000000 -0.000000 0.000000 1.000000"
+		"0.000000 0.000000 -0.000000 1.000000",
+		"-0.000000 0.000000 0.000000 1.000000",
+		"-0.000000 -0.000000 -0.000000 1.000000",
+		"0.000000 -0.000000 0.000000 1.000000",
+		"-0.000000 -0.000000 -0.000000 1.000000",
+		"-0.000000 0.000000 0.000000 1.000000",
+		"-0.000000 -0.000000 -0.000000 1.000000",
+		"-0.000000 0.000000 0.000000 1.000000"
 	]
 }
 
@@ -21318,33 +20358,33 @@
 	]
 	"values" "quaternion_array"
 	[
-		"-0.046899 0.000000 0.000000 0.998900",
-		"-0.045831 0.000000 0.000000 0.998949",
-		"-0.042855 0.000000 0.000000 0.999081",
-		"-0.039083 0.000000 0.000000 0.999236",
-		"-0.034525 -0.000000 -0.000000 0.999404",
-		"-0.029326 -0.000000 -0.000000 0.999570",
-		"-0.023858 -0.000000 -0.000000 0.999715",
-		"-0.018458 -0.000000 -0.000000 0.999830",
-		"-0.013381 -0.000000 -0.000000 0.999910",
-		"-0.008980 -0.000000 -0.000000 0.999960",
-		"-0.005402 -0.000000 -0.000000 0.999985",
-		"-0.002996 -0.000000 -0.000000 0.999996",
-		"-0.000456 -0.000000 -0.000000 1.000000",
-		"0.003711 -0.000000 -0.000000 0.999993",
-		"0.012011 -0.000000 -0.000000 0.999928",
-		"0.019479 -0.000000 -0.000000 0.999810",
-		"0.015170 -0.000000 -0.000000 0.999885",
-		"0.007128 -0.000000 -0.000000 0.999975",
-		"-0.002701 -0.000000 -0.000000 0.999996",
-		"-0.013549 -0.000000 -0.000000 0.999908",
-		"-0.023351 -0.000000 -0.000000 0.999727",
-		"-0.030645 -0.000000 -0.000000 0.999530",
-		"-0.036271 -0.000000 -0.000000 0.999342",
-		"-0.040604 0.000000 0.000000 0.999175",
-		"-0.043753 0.000000 0.000000 0.999042",
-		"-0.046159 0.000000 0.000000 0.998934",
-		"-0.046899 0.000000 0.000000 0.998900"
+		"-0.037697 -0.000000 -0.000000 0.999289",
+		"-0.036681 -0.000000 -0.000000 0.999327",
+		"-0.034870 -0.000000 -0.000000 0.999392",
+		"-0.032516 -0.000000 -0.000000 0.999471",
+		"-0.029854 -0.000000 -0.000000 0.999554",
+		"-0.026799 -0.000000 -0.000000 0.999641",
+		"-0.023555 -0.000000 -0.000000 0.999723",
+		"-0.020317 -0.000000 -0.000000 0.999794",
+		"-0.017222 -0.000000 -0.000000 0.999852",
+		"-0.014518 -0.000000 -0.000000 0.999895",
+		"-0.012221 -0.000000 -0.000000 0.999925",
+		"-0.009783 -0.000000 -0.000000 0.999952",
+		"-0.007237 -0.000000 -0.000000 0.999974",
+		"-0.004203 -0.000000 -0.000000 0.999991",
+		"0.003022 -0.000000 -0.000000 0.999995",
+		"0.011968 -0.000000 -0.000000 0.999928",
+		"0.009466 -0.000000 -0.000000 0.999955",
+		"0.003755 -0.000000 -0.000000 0.999993",
+		"-0.003832 -0.000000 -0.000000 0.999993",
+		"-0.012866 -0.000000 -0.000000 0.999917",
+		"-0.020968 -0.000000 -0.000000 0.999780",
+		"-0.026752 -0.000000 -0.000000 0.999642",
+		"-0.030964 -0.000000 -0.000000 0.999521",
+		"-0.033959 -0.000000 -0.000000 0.999423",
+		"-0.035886 -0.000000 -0.000000 0.999356",
+		"-0.037310 -0.000000 -0.000000 0.999304",
+		"-0.037697 -0.000000 -0.000000 0.999289"
 	]
 }
 
@@ -21510,33 +20550,33 @@
 	]
 	"values" "quaternion_array"
 	[
-		"0.005078 -0.000219 0.722173 0.691694",
-		"0.008382 -0.000142 0.733994 0.679104",
-		"0.011097 -0.000594 0.744564 0.667459",
-		"0.013572 -0.001744 0.756503 0.653847",
-		"0.011790 -0.003084 0.753674 0.657136",
-		"0.009344 -0.004048 0.748118 0.663488",
-		"0.006774 -0.004426 0.740840 0.671632",
-		"0.004497 -0.004192 0.732772 0.680447",
-		"0.002959 -0.003791 0.727164 0.686447",
-		"0.001821 -0.003126 0.721968 0.691917",
-		"0.001160 -0.003192 0.723232 0.690597",
-		"0.000484 -0.002790 0.722316 0.691557",
-		"-0.000271 -0.003157 0.728195 0.685362",
-		"-0.001492 -0.004153 0.743150 0.669110",
-		"-0.003237 -0.004907 0.767425 0.641111",
-		"-0.005186 -0.004233 0.798991 0.601306",
-		"-0.005921 -0.001675 0.825551 0.564294",
-		"-0.004849 0.001570 0.845934 0.533263",
-		"-0.001944 0.004500 0.860840 0.508853",
-		"0.002598 0.005617 0.861517 0.507692",
-		"0.007755 0.005732 0.853306 0.521322",
-		"0.012459 0.005456 0.837911 0.545638",
-		"0.015356 0.004744 0.814919 0.579352",
-		"0.014963 0.003430 0.784112 0.620429",
-		"0.011220 0.001796 0.752481 0.658516",
-		"0.005011 0.000055 0.722670 0.691175",
-		"0.005078 -0.000219 0.722173 0.691694"
+		"0.004555 -0.000782 0.722248 0.691619",
+		"0.014483 -0.000790 0.764625 0.644313",
+		"0.009061 -0.001408 0.743404 0.668779",
+		"0.012838 -0.002556 0.763743 0.645388",
+		"0.010556 -0.003330 0.757374 0.652888",
+		"0.008110 -0.003731 0.749295 0.662176",
+		"0.005863 -0.003727 0.740719 0.671779",
+		"0.004043 -0.003408 0.732729 0.680500",
+		"0.003106 -0.003371 0.730554 0.682839",
+		"0.002547 -0.003669 0.732904 0.680317",
+		"0.001388 -0.002418 0.722351 0.691521",
+		"0.000917 -0.002205 0.722347 0.691527",
+		"0.000516 -0.002462 0.728242 0.685315",
+		"-0.000028 -0.003178 0.743223 0.669037",
+		"-0.000753 -0.003668 0.767517 0.641018",
+		"-0.001453 -0.003056 0.799186 0.601074",
+		"-0.001456 -0.001165 0.826835 0.562441",
+		"-0.000293 0.000938 0.847944 0.530084",
+		"0.002125 0.002337 0.861620 0.507545",
+		"0.005584 0.002261 0.860590 0.509263",
+		"0.009456 0.001816 0.852169 0.523178",
+		"0.012941 0.001448 0.837472 0.546325",
+		"0.014895 0.001093 0.814950 0.579339",
+		"0.014046 0.000625 0.784279 0.620249",
+		"0.010349 0.000044 0.752639 0.658352",
+		"0.004652 -0.000606 0.722742 0.691102",
+		"0.004555 -0.000782 0.722248 0.691619"
 	]
 }
 
@@ -21565,6 +20605,966 @@
 	"toIndex" "int" "0"
 	"mode" "int" "1"
 	"log" "element" "a0fdf005-62c7-5b85-965b-9dbf7bce628d"
+}
+
+"DmeVector3LogLayer"
+{
+	"id" "elementid" "b541eee0-ac46-5fac-a4d0-d858a3fe663a"
+	"name" "string" "finger_middle_2_L_p"
+	"times" "time_array"
+	[
+		"0.000000",
+		"0.033333",
+		"0.066667",
+		"0.100000",
+		"0.133333",
+		"0.166667",
+		"0.200000",
+		"0.233333",
+		"0.266667",
+		"0.300000",
+		"0.333333",
+		"0.366667",
+		"0.400000",
+		"0.433333",
+		"0.466667",
+		"0.500000",
+		"0.533333",
+		"0.566667",
+		"0.600000",
+		"0.633333",
+		"0.666667",
+		"0.700000",
+		"0.733333",
+		"0.766667",
+		"0.800000",
+		"0.833333",
+		"0.866667"
+	]
+	"curvetypes" "int_array"
+	[
+	]
+	"values" "vector3_array"
+	[
+		"3.153457 -0.000074 -0.000213",
+		"3.153457 -0.000074 -0.000213",
+		"3.153457 -0.000074 -0.000213",
+		"3.153457 -0.000074 -0.000213",
+		"3.153457 -0.000074 -0.000213",
+		"3.153457 -0.000074 -0.000213",
+		"3.153457 -0.000074 -0.000213",
+		"3.153457 -0.000074 -0.000213",
+		"3.153457 -0.000074 -0.000213",
+		"3.153457 -0.000074 -0.000213",
+		"3.153457 -0.000074 -0.000213",
+		"3.153457 -0.000074 -0.000213",
+		"3.153457 -0.000074 -0.000213",
+		"3.153457 -0.000074 -0.000213",
+		"3.153457 -0.000074 -0.000213",
+		"3.153457 -0.000074 -0.000213",
+		"3.153457 -0.000074 -0.000213",
+		"3.153457 -0.000074 -0.000213",
+		"3.153457 -0.000074 -0.000213",
+		"3.153457 -0.000074 -0.000213",
+		"3.153457 -0.000074 -0.000213",
+		"3.153457 -0.000074 -0.000213",
+		"3.153457 -0.000074 -0.000213",
+		"3.153457 -0.000074 -0.000213",
+		"3.153457 -0.000074 -0.000213",
+		"3.153457 -0.000074 -0.000213",
+		"3.153457 -0.000074 -0.000213"
+	]
+}
+
+"DmeVector3Log"
+{
+	"id" "elementid" "a88c9680-ee05-5ea8-985a-bfc94cb98d60"
+	"name" "string" "finger_middle_2_L_p"
+	"layers" "element_array"
+	[
+		"element" "b541eee0-ac46-5fac-a4d0-d858a3fe663a"
+	]
+	"curveinfo" "element" ""
+	"usedefaultvalue" "bool" "0"
+	"defaultvalue" "vector3" "0.000000 0.000000 0.000000"
+}
+
+"DmeChannel"
+{
+	"id" "elementid" "950ecfb0-23fa-5a96-9ae2-c1f34ef5a330"
+	"name" "string" "finger_middle_2_L_p"
+	"fromElement" "element" ""
+	"fromAttribute" "string" ""
+	"fromIndex" "int" "0"
+	"toElement" "element" "2e89243f-0720-586b-81ce-ba5010de68c9"
+	"toAttribute" "string" "position"
+	"toIndex" "int" "0"
+	"mode" "int" "1"
+	"log" "element" "a88c9680-ee05-5ea8-985a-bfc94cb98d60"
+}
+
+"DmeQuaternionLogLayer"
+{
+	"id" "elementid" "d7ef8b18-f624-58ea-a9a9-9f7b825da9b7"
+	"name" "string" "finger_middle_2_L_o"
+	"times" "time_array"
+	[
+		"0.000000",
+		"0.033333",
+		"0.066667",
+		"0.100000",
+		"0.133333",
+		"0.166667",
+		"0.200000",
+		"0.233333",
+		"0.266667",
+		"0.300000",
+		"0.333333",
+		"0.366667",
+		"0.400000",
+		"0.433333",
+		"0.466667",
+		"0.500000",
+		"0.533333",
+		"0.566667",
+		"0.600000",
+		"0.633333",
+		"0.666667",
+		"0.700000",
+		"0.733333",
+		"0.766667",
+		"0.800000",
+		"0.833333",
+		"0.866667"
+	]
+	"curvetypes" "int_array"
+	[
+	]
+	"values" "quaternion_array"
+	[
+		"-0.000121 -0.150571 -0.001153 0.988599",
+		"-0.000121 -0.150571 -0.001153 0.988599",
+		"-0.000121 -0.150571 -0.001153 0.988599",
+		"-0.000121 -0.150571 -0.001153 0.988599",
+		"-0.000121 -0.150571 -0.001153 0.988599",
+		"-0.000121 -0.150571 -0.001153 0.988599",
+		"-0.000121 -0.150571 -0.001153 0.988599",
+		"-0.000121 -0.150571 -0.001153 0.988599",
+		"-0.000121 -0.150571 -0.001153 0.988599",
+		"-0.000121 -0.150571 -0.001153 0.988599",
+		"-0.000121 -0.150571 -0.001153 0.988599",
+		"-0.000121 -0.150571 -0.001153 0.988599",
+		"-0.000121 -0.150571 -0.001153 0.988599",
+		"-0.000121 -0.150571 -0.001153 0.988599",
+		"-0.000121 -0.150571 -0.001153 0.988599",
+		"-0.000121 -0.150571 -0.001153 0.988599",
+		"-0.000121 -0.150571 -0.001153 0.988599",
+		"-0.000121 -0.150571 -0.001153 0.988599",
+		"-0.000121 -0.150571 -0.001153 0.988599",
+		"-0.000121 -0.150571 -0.001153 0.988599",
+		"-0.000121 -0.150571 -0.001153 0.988599",
+		"-0.000121 -0.150571 -0.001153 0.988599",
+		"-0.000121 -0.150571 -0.001153 0.988599",
+		"-0.000121 -0.150571 -0.001153 0.988599",
+		"-0.000121 -0.150571 -0.001153 0.988599",
+		"-0.000121 -0.150571 -0.001153 0.988599",
+		"-0.000121 -0.150571 -0.001153 0.988599"
+	]
+}
+
+"DmeQuaternionLog"
+{
+	"id" "elementid" "59e27796-f5f8-58c9-ba12-296f884e49ff"
+	"name" "string" "finger_middle_2_L_o"
+	"layers" "element_array"
+	[
+		"element" "d7ef8b18-f624-58ea-a9a9-9f7b825da9b7"
+	]
+	"curveinfo" "element" ""
+	"usedefaultvalue" "bool" "0"
+	"defaultvalue" "quaternion" "0.000000 0.000000 0.000000 1.000000"
+}
+
+"DmeChannel"
+{
+	"id" "elementid" "af4a338c-8b6d-59e8-b55e-746d65691f33"
+	"name" "string" "finger_middle_2_L_o"
+	"fromElement" "element" ""
+	"fromAttribute" "string" ""
+	"fromIndex" "int" "0"
+	"toElement" "element" "2e89243f-0720-586b-81ce-ba5010de68c9"
+	"toAttribute" "string" "orientation"
+	"toIndex" "int" "0"
+	"mode" "int" "1"
+	"log" "element" "59e27796-f5f8-58c9-ba12-296f884e49ff"
+}
+
+"DmeVector3LogLayer"
+{
+	"id" "elementid" "7d3a8730-78db-50a5-a124-fd16427e3805"
+	"name" "string" "finger_ring_0_R_p"
+	"times" "time_array"
+	[
+		"0.000000",
+		"0.033333",
+		"0.066667",
+		"0.100000",
+		"0.133333",
+		"0.166667",
+		"0.200000",
+		"0.233333",
+		"0.266667",
+		"0.300000",
+		"0.333333",
+		"0.366667",
+		"0.400000",
+		"0.433333",
+		"0.466667",
+		"0.500000",
+		"0.533333",
+		"0.566667",
+		"0.600000",
+		"0.633333",
+		"0.666667",
+		"0.700000",
+		"0.733333",
+		"0.766667",
+		"0.800000",
+		"0.833333",
+		"0.866667"
+	]
+	"curvetypes" "int_array"
+	[
+	]
+	"values" "vector3_array"
+	[
+		"6.184928 0.000107 -0.000097",
+		"6.184928 0.000107 -0.000097",
+		"6.184928 0.000107 -0.000097",
+		"6.184928 0.000107 -0.000097",
+		"6.184928 0.000107 -0.000097",
+		"6.184928 0.000107 -0.000097",
+		"6.184928 0.000107 -0.000097",
+		"6.184928 0.000107 -0.000097",
+		"6.184928 0.000107 -0.000097",
+		"6.184928 0.000107 -0.000097",
+		"6.184928 0.000107 -0.000097",
+		"6.184928 0.000107 -0.000097",
+		"6.184928 0.000107 -0.000097",
+		"6.184928 0.000107 -0.000097",
+		"6.184928 0.000107 -0.000097",
+		"6.184928 0.000107 -0.000097",
+		"6.184928 0.000107 -0.000097",
+		"6.184928 0.000107 -0.000097",
+		"6.184928 0.000107 -0.000097",
+		"6.184928 0.000107 -0.000097",
+		"6.184928 0.000107 -0.000097",
+		"6.184928 0.000107 -0.000097",
+		"6.184928 0.000107 -0.000097",
+		"6.184928 0.000107 -0.000097",
+		"6.184928 0.000107 -0.000097",
+		"6.184928 0.000107 -0.000097",
+		"6.184928 0.000107 -0.000097"
+	]
+}
+
+"DmeVector3Log"
+{
+	"id" "elementid" "05150e37-d7eb-5b87-842e-fd496b431278"
+	"name" "string" "finger_ring_0_R_p"
+	"layers" "element_array"
+	[
+		"element" "7d3a8730-78db-50a5-a124-fd16427e3805"
+	]
+	"curveinfo" "element" ""
+	"usedefaultvalue" "bool" "0"
+	"defaultvalue" "vector3" "0.000000 0.000000 0.000000"
+}
+
+"DmeChannel"
+{
+	"id" "elementid" "8f5d3f70-ffcc-53d2-a147-67a16ed9d0e1"
+	"name" "string" "finger_ring_0_R_p"
+	"fromElement" "element" ""
+	"fromAttribute" "string" ""
+	"fromIndex" "int" "0"
+	"toElement" "element" "37af2df4-3211-567a-a326-6463c9472903"
+	"toAttribute" "string" "position"
+	"toIndex" "int" "0"
+	"mode" "int" "1"
+	"log" "element" "05150e37-d7eb-5b87-842e-fd496b431278"
+}
+
+"DmeQuaternionLogLayer"
+{
+	"id" "elementid" "2d155212-0389-5820-b221-8e9fe3e169b0"
+	"name" "string" "finger_ring_0_R_o"
+	"times" "time_array"
+	[
+		"0.000000",
+		"0.033333",
+		"0.066667",
+		"0.100000",
+		"0.133333",
+		"0.166667",
+		"0.200000",
+		"0.233333",
+		"0.266667",
+		"0.300000",
+		"0.333333",
+		"0.366667",
+		"0.400000",
+		"0.433333",
+		"0.466667",
+		"0.500000",
+		"0.533333",
+		"0.566667",
+		"0.600000",
+		"0.633333",
+		"0.666667",
+		"0.700000",
+		"0.733333",
+		"0.766667",
+		"0.800000",
+		"0.833333",
+		"0.866667"
+	]
+	"curvetypes" "int_array"
+	[
+	]
+	"values" "quaternion_array"
+	[
+		"-0.007477 0.290871 -0.070748 0.954114",
+		"-0.007477 0.290871 -0.070748 0.954114",
+		"-0.007477 0.290871 -0.070748 0.954114",
+		"-0.007477 0.290871 -0.070748 0.954114",
+		"-0.007477 0.290871 -0.070748 0.954114",
+		"-0.007477 0.290871 -0.070748 0.954114",
+		"-0.007477 0.290871 -0.070748 0.954114",
+		"-0.007477 0.290871 -0.070748 0.954114",
+		"-0.007477 0.290871 -0.070748 0.954114",
+		"-0.007477 0.290871 -0.070748 0.954114",
+		"-0.007477 0.290871 -0.070748 0.954114",
+		"-0.007477 0.290871 -0.070748 0.954114",
+		"-0.007477 0.290871 -0.070748 0.954114",
+		"-0.007477 0.290871 -0.070748 0.954114",
+		"-0.007477 0.290871 -0.070748 0.954114",
+		"-0.007477 0.290871 -0.070748 0.954114",
+		"-0.007477 0.290871 -0.070748 0.954114",
+		"-0.007477 0.290871 -0.070748 0.954114",
+		"-0.007477 0.290871 -0.070748 0.954114",
+		"-0.007477 0.290871 -0.070748 0.954114",
+		"-0.007477 0.290871 -0.070748 0.954114",
+		"-0.007477 0.290871 -0.070748 0.954114",
+		"-0.007477 0.290871 -0.070748 0.954114",
+		"-0.007477 0.290871 -0.070748 0.954114",
+		"-0.007477 0.290871 -0.070748 0.954114",
+		"-0.007477 0.290871 -0.070748 0.954114",
+		"-0.007477 0.290871 -0.070748 0.954114"
+	]
+}
+
+"DmeQuaternionLog"
+{
+	"id" "elementid" "8aa5fdf7-afee-50fe-8516-60205850ba03"
+	"name" "string" "finger_ring_0_R_o"
+	"layers" "element_array"
+	[
+		"element" "2d155212-0389-5820-b221-8e9fe3e169b0"
+	]
+	"curveinfo" "element" ""
+	"usedefaultvalue" "bool" "0"
+	"defaultvalue" "quaternion" "0.000000 0.000000 0.000000 1.000000"
+}
+
+"DmeChannel"
+{
+	"id" "elementid" "ab12aaa6-a55d-5026-892f-0a0d5177c01c"
+	"name" "string" "finger_ring_0_R_o"
+	"fromElement" "element" ""
+	"fromAttribute" "string" ""
+	"fromIndex" "int" "0"
+	"toElement" "element" "37af2df4-3211-567a-a326-6463c9472903"
+	"toAttribute" "string" "orientation"
+	"toIndex" "int" "0"
+	"mode" "int" "1"
+	"log" "element" "8aa5fdf7-afee-50fe-8516-60205850ba03"
+}
+
+"DmeVector3LogLayer"
+{
+	"id" "elementid" "dbfa3787-1c34-5166-91e5-9f6ba85f2a04"
+	"name" "string" "finger_ring_1_R_p"
+	"times" "time_array"
+	[
+		"0.000000",
+		"0.033333",
+		"0.066667",
+		"0.100000",
+		"0.133333",
+		"0.166667",
+		"0.200000",
+		"0.233333",
+		"0.266667",
+		"0.300000",
+		"0.333333",
+		"0.366667",
+		"0.400000",
+		"0.433333",
+		"0.466667",
+		"0.500000",
+		"0.533333",
+		"0.566667",
+		"0.600000",
+		"0.633333",
+		"0.666667",
+		"0.700000",
+		"0.733333",
+		"0.766667",
+		"0.800000",
+		"0.833333",
+		"0.866667"
+	]
+	"curvetypes" "int_array"
+	[
+	]
+	"values" "vector3_array"
+	[
+		"4.651156 0.000185 -0.000155",
+		"4.651156 0.000185 -0.000155",
+		"4.651156 0.000185 -0.000155",
+		"4.651156 0.000185 -0.000155",
+		"4.651156 0.000185 -0.000155",
+		"4.651156 0.000185 -0.000155",
+		"4.651156 0.000185 -0.000155",
+		"4.651156 0.000185 -0.000155",
+		"4.651156 0.000185 -0.000155",
+		"4.651156 0.000185 -0.000155",
+		"4.651156 0.000185 -0.000155",
+		"4.651156 0.000185 -0.000155",
+		"4.651156 0.000185 -0.000155",
+		"4.651156 0.000185 -0.000155",
+		"4.651156 0.000185 -0.000155",
+		"4.651156 0.000185 -0.000155",
+		"4.651156 0.000185 -0.000155",
+		"4.651156 0.000185 -0.000155",
+		"4.651156 0.000185 -0.000155",
+		"4.651156 0.000185 -0.000155",
+		"4.651156 0.000185 -0.000155",
+		"4.651156 0.000185 -0.000155",
+		"4.651156 0.000185 -0.000155",
+		"4.651156 0.000185 -0.000155",
+		"4.651156 0.000185 -0.000155",
+		"4.651156 0.000185 -0.000155",
+		"4.651156 0.000185 -0.000155"
+	]
+}
+
+"DmeVector3Log"
+{
+	"id" "elementid" "8a093bcc-5910-5ca6-b276-acaa7d93c99a"
+	"name" "string" "finger_ring_1_R_p"
+	"layers" "element_array"
+	[
+		"element" "dbfa3787-1c34-5166-91e5-9f6ba85f2a04"
+	]
+	"curveinfo" "element" ""
+	"usedefaultvalue" "bool" "0"
+	"defaultvalue" "vector3" "0.000000 0.000000 0.000000"
+}
+
+"DmeChannel"
+{
+	"id" "elementid" "9446c413-d5be-53df-9870-14c1ab1258ea"
+	"name" "string" "finger_ring_1_R_p"
+	"fromElement" "element" ""
+	"fromAttribute" "string" ""
+	"fromIndex" "int" "0"
+	"toElement" "element" "95c0dc13-68d8-5bcd-8447-06cbd106f704"
+	"toAttribute" "string" "position"
+	"toIndex" "int" "0"
+	"mode" "int" "1"
+	"log" "element" "8a093bcc-5910-5ca6-b276-acaa7d93c99a"
+}
+
+"DmeQuaternionLogLayer"
+{
+	"id" "elementid" "92484f1a-288d-5a8b-bd32-b26aabb78d5e"
+	"name" "string" "finger_ring_1_R_o"
+	"times" "time_array"
+	[
+		"0.000000",
+		"0.033333",
+		"0.066667",
+		"0.100000",
+		"0.133333",
+		"0.166667",
+		"0.200000",
+		"0.233333",
+		"0.266667",
+		"0.300000",
+		"0.333333",
+		"0.366667",
+		"0.400000",
+		"0.433333",
+		"0.466667",
+		"0.500000",
+		"0.533333",
+		"0.566667",
+		"0.600000",
+		"0.633333",
+		"0.666667",
+		"0.700000",
+		"0.733333",
+		"0.766667",
+		"0.800000",
+		"0.833333",
+		"0.866667"
+	]
+	"curvetypes" "int_array"
+	[
+	]
+	"values" "quaternion_array"
+	[
+		"-0.008640 0.339317 -0.043564 0.939623",
+		"-0.008640 0.339317 -0.043564 0.939623",
+		"-0.008640 0.339317 -0.043564 0.939623",
+		"-0.008640 0.339317 -0.043564 0.939623",
+		"-0.008640 0.339317 -0.043564 0.939623",
+		"-0.008640 0.339317 -0.043564 0.939623",
+		"-0.008640 0.339317 -0.043564 0.939623",
+		"-0.008640 0.339317 -0.043564 0.939623",
+		"-0.008640 0.339317 -0.043564 0.939623",
+		"-0.008640 0.339317 -0.043564 0.939623",
+		"-0.008640 0.339317 -0.043564 0.939623",
+		"-0.008640 0.339317 -0.043564 0.939623",
+		"-0.008640 0.339317 -0.043564 0.939623",
+		"-0.008640 0.339317 -0.043564 0.939623",
+		"-0.008640 0.339317 -0.043564 0.939623",
+		"-0.008640 0.339317 -0.043564 0.939623",
+		"-0.008640 0.339317 -0.043564 0.939623",
+		"-0.008640 0.339317 -0.043564 0.939623",
+		"-0.008640 0.339317 -0.043564 0.939623",
+		"-0.008640 0.339317 -0.043564 0.939623",
+		"-0.008640 0.339317 -0.043564 0.939623",
+		"-0.008640 0.339317 -0.043564 0.939623",
+		"-0.008640 0.339317 -0.043564 0.939623",
+		"-0.008640 0.339317 -0.043564 0.939623",
+		"-0.008640 0.339317 -0.043564 0.939623",
+		"-0.008640 0.339317 -0.043564 0.939623",
+		"-0.008640 0.339317 -0.043564 0.939623"
+	]
+}
+
+"DmeQuaternionLog"
+{
+	"id" "elementid" "2216fb07-140f-503b-8588-3047480eee4c"
+	"name" "string" "finger_ring_1_R_o"
+	"layers" "element_array"
+	[
+		"element" "92484f1a-288d-5a8b-bd32-b26aabb78d5e"
+	]
+	"curveinfo" "element" ""
+	"usedefaultvalue" "bool" "0"
+	"defaultvalue" "quaternion" "0.000000 0.000000 0.000000 1.000000"
+}
+
+"DmeChannel"
+{
+	"id" "elementid" "1015ace7-39bf-5506-9eaa-51ce90d12ae9"
+	"name" "string" "finger_ring_1_R_o"
+	"fromElement" "element" ""
+	"fromAttribute" "string" ""
+	"fromIndex" "int" "0"
+	"toElement" "element" "95c0dc13-68d8-5bcd-8447-06cbd106f704"
+	"toAttribute" "string" "orientation"
+	"toIndex" "int" "0"
+	"mode" "int" "1"
+	"log" "element" "2216fb07-140f-503b-8588-3047480eee4c"
+}
+
+"DmeVector3LogLayer"
+{
+	"id" "elementid" "615e617f-4b3b-564e-b882-46fd6fe54ff2"
+	"name" "string" "finger_ring_2_R_p"
+	"times" "time_array"
+	[
+		"0.000000",
+		"0.033333",
+		"0.066667",
+		"0.100000",
+		"0.133333",
+		"0.166667",
+		"0.200000",
+		"0.233333",
+		"0.266667",
+		"0.300000",
+		"0.333333",
+		"0.366667",
+		"0.400000",
+		"0.433333",
+		"0.466667",
+		"0.500000",
+		"0.533333",
+		"0.566667",
+		"0.600000",
+		"0.633333",
+		"0.666667",
+		"0.700000",
+		"0.733333",
+		"0.766667",
+		"0.800000",
+		"0.833333",
+		"0.866667"
+	]
+	"curvetypes" "int_array"
+	[
+	]
+	"values" "vector3_array"
+	[
+		"2.924905 0.000150 -0.000155",
+		"2.924905 0.000150 -0.000155",
+		"2.924905 0.000150 -0.000155",
+		"2.924905 0.000150 -0.000155",
+		"2.924905 0.000150 -0.000155",
+		"2.924905 0.000150 -0.000155",
+		"2.924905 0.000150 -0.000155",
+		"2.924905 0.000150 -0.000155",
+		"2.924905 0.000150 -0.000155",
+		"2.924905 0.000150 -0.000155",
+		"2.924905 0.000150 -0.000155",
+		"2.924905 0.000150 -0.000155",
+		"2.924905 0.000150 -0.000155",
+		"2.924905 0.000150 -0.000155",
+		"2.924905 0.000150 -0.000155",
+		"2.924905 0.000150 -0.000155",
+		"2.924905 0.000150 -0.000155",
+		"2.924905 0.000150 -0.000155",
+		"2.924905 0.000150 -0.000155",
+		"2.924905 0.000150 -0.000155",
+		"2.924905 0.000150 -0.000155",
+		"2.924905 0.000150 -0.000155",
+		"2.924905 0.000150 -0.000155",
+		"2.924905 0.000150 -0.000155",
+		"2.924905 0.000150 -0.000155",
+		"2.924905 0.000150 -0.000155",
+		"2.924905 0.000150 -0.000155"
+	]
+}
+
+"DmeVector3Log"
+{
+	"id" "elementid" "4375e394-02ae-5d31-82ff-db745de35651"
+	"name" "string" "finger_ring_2_R_p"
+	"layers" "element_array"
+	[
+		"element" "615e617f-4b3b-564e-b882-46fd6fe54ff2"
+	]
+	"curveinfo" "element" ""
+	"usedefaultvalue" "bool" "0"
+	"defaultvalue" "vector3" "0.000000 0.000000 0.000000"
+}
+
+"DmeChannel"
+{
+	"id" "elementid" "0c2ce277-1008-5b7b-b0f4-a2a9b1050474"
+	"name" "string" "finger_ring_2_R_p"
+	"fromElement" "element" ""
+	"fromAttribute" "string" ""
+	"fromIndex" "int" "0"
+	"toElement" "element" "92af9167-9e27-53a3-afd6-c63527a1ef36"
+	"toAttribute" "string" "position"
+	"toIndex" "int" "0"
+	"mode" "int" "1"
+	"log" "element" "4375e394-02ae-5d31-82ff-db745de35651"
+}
+
+"DmeQuaternionLogLayer"
+{
+	"id" "elementid" "135b9dea-9cae-5451-afc5-7ac2348a907d"
+	"name" "string" "finger_ring_2_R_o"
+	"times" "time_array"
+	[
+		"0.000000",
+		"0.033333",
+		"0.066667",
+		"0.100000",
+		"0.133333",
+		"0.166667",
+		"0.200000",
+		"0.233333",
+		"0.266667",
+		"0.300000",
+		"0.333333",
+		"0.366667",
+		"0.400000",
+		"0.433333",
+		"0.466667",
+		"0.500000",
+		"0.533333",
+		"0.566667",
+		"0.600000",
+		"0.633333",
+		"0.666667",
+		"0.700000",
+		"0.733333",
+		"0.766667",
+		"0.800000",
+		"0.833333",
+		"0.866667"
+	]
+	"curvetypes" "int_array"
+	[
+	]
+	"values" "quaternion_array"
+	[
+		"-0.001130 0.134300 -0.032160 0.990418",
+		"-0.001130 0.134300 -0.032160 0.990418",
+		"-0.001130 0.134300 -0.032160 0.990418",
+		"-0.001130 0.134300 -0.032160 0.990418",
+		"-0.001130 0.134300 -0.032160 0.990418",
+		"-0.001130 0.134300 -0.032160 0.990418",
+		"-0.001130 0.134300 -0.032160 0.990418",
+		"-0.001130 0.134300 -0.032160 0.990418",
+		"-0.001130 0.134300 -0.032160 0.990418",
+		"-0.001130 0.134300 -0.032160 0.990418",
+		"-0.001130 0.134300 -0.032160 0.990418",
+		"-0.001130 0.134300 -0.032160 0.990418",
+		"-0.001130 0.134300 -0.032160 0.990418",
+		"-0.001130 0.134300 -0.032160 0.990418",
+		"-0.001130 0.134300 -0.032160 0.990418",
+		"-0.001130 0.134300 -0.032160 0.990418",
+		"-0.001130 0.134300 -0.032160 0.990418",
+		"-0.001130 0.134300 -0.032160 0.990418",
+		"-0.001130 0.134300 -0.032160 0.990418",
+		"-0.001130 0.134300 -0.032160 0.990418",
+		"-0.001130 0.134300 -0.032160 0.990418",
+		"-0.001130 0.134300 -0.032160 0.990418",
+		"-0.001130 0.134300 -0.032160 0.990418",
+		"-0.001130 0.134300 -0.032160 0.990418",
+		"-0.001130 0.134300 -0.032160 0.990418",
+		"-0.001130 0.134300 -0.032160 0.990418",
+		"-0.001130 0.134300 -0.032160 0.990418"
+	]
+}
+
+"DmeQuaternionLog"
+{
+	"id" "elementid" "4197b0b9-12c6-558b-909b-77b34286e93e"
+	"name" "string" "finger_ring_2_R_o"
+	"layers" "element_array"
+	[
+		"element" "135b9dea-9cae-5451-afc5-7ac2348a907d"
+	]
+	"curveinfo" "element" ""
+	"usedefaultvalue" "bool" "0"
+	"defaultvalue" "quaternion" "0.000000 0.000000 0.000000 1.000000"
+}
+
+"DmeChannel"
+{
+	"id" "elementid" "7d50f250-d666-51b3-b15c-966c59732058"
+	"name" "string" "finger_ring_2_R_o"
+	"fromElement" "element" ""
+	"fromAttribute" "string" ""
+	"fromIndex" "int" "0"
+	"toElement" "element" "92af9167-9e27-53a3-afd6-c63527a1ef36"
+	"toAttribute" "string" "orientation"
+	"toIndex" "int" "0"
+	"mode" "int" "1"
+	"log" "element" "4197b0b9-12c6-558b-909b-77b34286e93e"
+}
+
+"DmeVector3LogLayer"
+{
+	"id" "elementid" "655d281c-9800-548a-adb4-d87fd944b60b"
+	"name" "string" "arm_upper_L_twist0_p"
+	"times" "time_array"
+	[
+		"0.000000",
+		"0.033333",
+		"0.066667",
+		"0.100000",
+		"0.133333",
+		"0.166667",
+		"0.200000",
+		"0.233333",
+		"0.266667",
+		"0.300000",
+		"0.333333",
+		"0.366667",
+		"0.400000",
+		"0.433333",
+		"0.466667",
+		"0.500000",
+		"0.533333",
+		"0.566667",
+		"0.600000",
+		"0.633333",
+		"0.666667",
+		"0.700000",
+		"0.733333",
+		"0.766667",
+		"0.800000",
+		"0.833333",
+		"0.866667"
+	]
+	"curvetypes" "int_array"
+	[
+	]
+	"values" "vector3_array"
+	[
+		"0.000038 0.000018 -0.000117",
+		"0.000038 0.000018 -0.000117",
+		"0.000038 0.000018 -0.000117",
+		"0.000038 0.000018 -0.000117",
+		"0.000038 0.000018 -0.000117",
+		"0.000038 0.000018 -0.000117",
+		"0.000038 0.000018 -0.000117",
+		"0.000038 0.000018 -0.000117",
+		"0.000038 0.000018 -0.000117",
+		"0.000038 0.000018 -0.000117",
+		"0.000038 0.000018 -0.000117",
+		"0.000038 0.000018 -0.000117",
+		"0.000038 0.000018 -0.000117",
+		"0.000038 0.000018 -0.000117",
+		"0.000038 0.000018 -0.000117",
+		"0.000038 0.000018 -0.000117",
+		"0.000038 0.000018 -0.000117",
+		"0.000038 0.000018 -0.000117",
+		"0.000038 0.000018 -0.000117",
+		"0.000038 0.000018 -0.000117",
+		"0.000038 0.000018 -0.000117",
+		"0.000038 0.000018 -0.000117",
+		"0.000038 0.000018 -0.000117",
+		"0.000038 0.000018 -0.000117",
+		"0.000038 0.000018 -0.000117",
+		"0.000038 0.000018 -0.000117",
+		"0.000038 0.000018 -0.000117"
+	]
+}
+
+"DmeVector3Log"
+{
+	"id" "elementid" "a4f01ee8-f18a-5329-971b-b744a5fdf11e"
+	"name" "string" "arm_upper_L_twist0_p"
+	"layers" "element_array"
+	[
+		"element" "655d281c-9800-548a-adb4-d87fd944b60b"
+	]
+	"curveinfo" "element" ""
+	"usedefaultvalue" "bool" "0"
+	"defaultvalue" "vector3" "0.000000 0.000000 0.000000"
+}
+
+"DmeChannel"
+{
+	"id" "elementid" "ab9fa178-69d8-5057-aa48-3acdcbdbe9fa"
+	"name" "string" "arm_upper_L_twist0_p"
+	"fromElement" "element" ""
+	"fromAttribute" "string" ""
+	"fromIndex" "int" "0"
+	"toElement" "element" "0b32c287-02ac-5510-bfb7-739049eb7a34"
+	"toAttribute" "string" "position"
+	"toIndex" "int" "0"
+	"mode" "int" "1"
+	"log" "element" "a4f01ee8-f18a-5329-971b-b744a5fdf11e"
+}
+
+"DmeQuaternionLogLayer"
+{
+	"id" "elementid" "d799556a-b2cd-5f8a-b502-a1dac1bb5417"
+	"name" "string" "arm_upper_L_twist0_o"
+	"times" "time_array"
+	[
+		"0.000000",
+		"0.033333",
+		"0.066667",
+		"0.100000",
+		"0.133333",
+		"0.166667",
+		"0.200000",
+		"0.233333",
+		"0.266667",
+		"0.300000",
+		"0.333333",
+		"0.366667",
+		"0.400000",
+		"0.433333",
+		"0.466667",
+		"0.500000",
+		"0.533333",
+		"0.566667",
+		"0.600000",
+		"0.633333",
+		"0.666667",
+		"0.700000",
+		"0.733333",
+		"0.766667",
+		"0.800000",
+		"0.833333",
+		"0.866667"
+	]
+	"curvetypes" "int_array"
+	[
+	]
+	"values" "quaternion_array"
+	[
+		"-0.242859 -0.000000 0.000001 0.970062",
+		"-0.244893 -0.000000 0.000001 0.969550",
+		"-0.246288 -0.000000 0.000001 0.969197",
+		"-0.246960 -0.000000 0.000001 0.969026",
+		"-0.246867 -0.000000 0.000001 0.969049",
+		"-0.246017 -0.000000 0.000001 0.969266",
+		"-0.244459 -0.000000 0.000001 0.969660",
+		"-0.242288 -0.000000 0.000001 0.970204",
+		"-0.239634 -0.000000 0.000001 0.970863",
+		"-0.236654 -0.000000 0.000001 0.971594",
+		"-0.233525 -0.000000 0.000001 0.972351",
+		"-0.230432 -0.000000 0.000001 0.973088",
+		"-0.227553 -0.000000 0.000001 0.973766",
+		"-0.225054 -0.000000 0.000001 0.974346",
+		"-0.223074 -0.000000 0.000001 0.974802",
+		"-0.221722 -0.000000 0.000001 0.975110",
+		"-0.221074 -0.000000 0.000001 0.975257",
+		"-0.221163 -0.000000 0.000001 0.975237",
+		"-0.221985 -0.000000 0.000001 0.975050",
+		"-0.223495 -0.000000 0.000001 0.974705",
+		"-0.225611 -0.000000 0.000001 0.974217",
+		"-0.228215 -0.000000 0.000001 0.973611",
+		"-0.231161 -0.000000 0.000001 0.972915",
+		"-0.234280 -0.000000 0.000001 0.972169",
+		"-0.237389 -0.000000 0.000001 0.971415",
+		"-0.240307 -0.000000 0.000001 0.970697",
+		"-0.242859 -0.000000 0.000001 0.970062"
+	]
+}
+
+"DmeQuaternionLog"
+{
+	"id" "elementid" "2dc4315f-7423-573d-9899-163cc61dcda9"
+	"name" "string" "arm_upper_L_twist0_o"
+	"layers" "element_array"
+	[
+		"element" "d799556a-b2cd-5f8a-b502-a1dac1bb5417"
+	]
+	"curveinfo" "element" ""
+	"usedefaultvalue" "bool" "0"
+	"defaultvalue" "quaternion" "0.000000 0.000000 0.000000 1.000000"
+}
+
+"DmeChannel"
+{
+	"id" "elementid" "bc937d99-8c9a-5657-94ee-c2a709f6fe8b"
+	"name" "string" "arm_upper_L_twist0_o"
+	"fromElement" "element" ""
+	"fromAttribute" "string" ""
+	"fromIndex" "int" "0"
+	"toElement" "element" "0b32c287-02ac-5510-bfb7-739049eb7a34"
+	"toAttribute" "string" "orientation"
+	"toIndex" "int" "0"
+	"mode" "int" "1"
+	"log" "element" "2dc4315f-7423-573d-9899-163cc61dcda9"
 }
 
 "DmeTimeFrame"
@@ -21679,8 +21679,6 @@
 		"element" "6c576d39-2a50-563f-a70b-063ae718a090",
 		"element" "023026f8-acff-57c6-9342-2b53f306df8a",
 		"element" "caacf701-417b-5f39-afae-f2c9234e7318",
-		"element" "ab9fa178-69d8-5057-aa48-3acdcbdbe9fa",
-		"element" "bc937d99-8c9a-5657-94ee-c2a709f6fe8b",
 		"element" "37b9d7ab-3b01-5b71-95c8-c8541195d35b",
 		"element" "a3deb3e5-c766-5bc4-9e62-c8d476da6824",
 		"element" "d238c802-5a4a-592f-8b9b-bb51c8ef4801",
@@ -21703,8 +21701,6 @@
 		"element" "1d1f5780-ae9f-590c-a3c5-9bfa3fd6c118",
 		"element" "fd434542-be01-5db3-87f0-4f1f779fedb2",
 		"element" "d0502d76-2c12-5802-b7c1-e21a978035a7",
-		"element" "950ecfb0-23fa-5a96-9ae2-c1f34ef5a330",
-		"element" "af4a338c-8b6d-59e8-b55e-746d65691f33",
 		"element" "c414d5a0-9aad-5919-9cfa-f91e4e5ecddd",
 		"element" "6383ce48-9987-5720-926c-8dbaa917788e",
 		"element" "27d193fc-4192-55cb-aba3-383d06c54428",
@@ -21753,12 +21749,6 @@
 		"element" "ee7cd342-832c-5d09-8e25-1c324750940a",
 		"element" "3a60d33e-8ee8-53be-af3f-0b266dd918a5",
 		"element" "783dcd02-eca5-5855-aae6-dce50346ea2c",
-		"element" "8f5d3f70-ffcc-53d2-a147-67a16ed9d0e1",
-		"element" "ab12aaa6-a55d-5026-892f-0a0d5177c01c",
-		"element" "9446c413-d5be-53df-9870-14c1ab1258ea",
-		"element" "1015ace7-39bf-5506-9eaa-51ce90d12ae9",
-		"element" "0c2ce277-1008-5b7b-b0f4-a2a9b1050474",
-		"element" "7d50f250-d666-51b3-b15c-966c59732058",
 		"element" "2d6ac67e-0eba-5f9f-9a9f-b7551dea4da2",
 		"element" "0b12c224-0566-5f8f-b87e-9a1c91c93153",
 		"element" "15855d26-0153-5e01-93c0-8900eb5dcc51",
@@ -21782,7 +21772,17 @@
 		"element" "d4f46a35-9382-5c0a-930c-a4f72bc1b33c",
 		"element" "d180f2cc-9c74-562c-8080-314d9c258381",
 		"element" "5190a7fb-fec7-5fae-b309-4467c643ce8f",
-		"element" "b4f258d1-ddc4-5904-85bc-d1633768efa3"
+		"element" "b4f258d1-ddc4-5904-85bc-d1633768efa3",
+		"element" "950ecfb0-23fa-5a96-9ae2-c1f34ef5a330",
+		"element" "af4a338c-8b6d-59e8-b55e-746d65691f33",
+		"element" "8f5d3f70-ffcc-53d2-a147-67a16ed9d0e1",
+		"element" "ab12aaa6-a55d-5026-892f-0a0d5177c01c",
+		"element" "9446c413-d5be-53df-9870-14c1ab1258ea",
+		"element" "1015ace7-39bf-5506-9eaa-51ce90d12ae9",
+		"element" "0c2ce277-1008-5b7b-b0f4-a2a9b1050474",
+		"element" "7d50f250-d666-51b3-b15c-966c59732058",
+		"element" "ab9fa178-69d8-5057-aa48-3acdcbdbe9fa",
+		"element" "bc937d99-8c9a-5657-94ee-c2a709f6fe8b"
 	]
 	"frameRate" "int" "30"
 }

@@ -1,0 +1,9 @@
+var model=Model.Load("models/maps/riverside/riverside_dressing.vmdl");
+if(model.IsError)throw new InvalidOperationException("Public dressing model failed to load");
+var mats=model.Materials.Select(m=>m.ResourcePath).ToArray();
+var missing=new[]{"enamel","alloy","rubber","plate","brass"}.Where(n=>!mats.Contains("materials/riverside/searchlight-v1/"+n+".vmat")).ToArray();
+if(missing.Length>0)throw new InvalidOperationException("Missing searchlight bindings: "+string.Join(",",missing));
+var root=Sandbox.Project.Current.GetRootPath();
+var report=new{Model=model.ResourcePath,Error=model.IsError,SearchlightMaterials=5,MaterialBindings=mats.Where(m=>m.Contains("searchlight-v1")).ToArray()};
+System.IO.File.WriteAllText(System.IO.Path.Combine(root,"output/riverside/searchlight-v1/public-resource.json"),System.Text.Json.JsonSerializer.Serialize(report,new System.Text.Json.JsonSerializerOptions{WriteIndented=true}));
+return report;

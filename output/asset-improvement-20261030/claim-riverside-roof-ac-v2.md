@@ -1,0 +1,1 @@
+Withdrawn before modeling: Continue from Claude is already preparing roof-ac-v1. Preserve that candidate. Install new chairs is improving the cobra-head streetlight instead, Sources/Riverside/street-lamp-v2/.

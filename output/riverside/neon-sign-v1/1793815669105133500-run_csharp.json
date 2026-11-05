@@ -1,0 +1,5 @@
+ArgumentException: mcp-script.cs(1,106): error CS1061: 'Material' does not contain a definition for 'GetFloat' and no accessible extension method 'GetFloat' accepting a first argument of type 'Material' could be found (are you missing a using directive or an assembly reference?)
+at Editor.Mcp.ScriptTools.Compile(String code, Assembly[] assemblies, CancellationToken cancellation)
+at System.Threading.Tasks.Task`1.InnerInvoke()
+at System.Threading.ExecutionContext.RunFromThreadPoolDispatchLoop(Thread threadPoolThread, ExecutionContext executionContext, ContextCallback callback, Object state)
+--- End of stack trace from previous location ---

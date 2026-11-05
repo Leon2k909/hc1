@@ -225,57 +225,18 @@ def rod(model, a, b, r, paint, sides=8):
 
 
 def bistro_table(model, centre, z=0.0, top="iron_green", frame="iron_black"):
-    """ A round café table, 27 across and 29 high: a four-footed cast base, a column and a painted steel top with a
-    rolled edge. Its collision is left to the caller. Returns the top's height. """
-    c = np.array((centre[0], centre[1], z), float)
-    for k in range(4):
-        a = math.pi/4 + k*math.pi/2
-        d = np.array((math.cos(a), math.sin(a), 0.0))
-        model.beam(c + d*1.2 + (0, 0, 9), c + d*11 + (0, 0, 0.8), (1.6, 1.1), frame)
-        model.cylinder(tuple(c[:2] + d[:2]*11), 1.4, z, z + 0.8, {"side": frame, "top": frame}, sides=8)
-    model.cylinder(tuple(c[:2]), 2.4, z + 6, z + 10, {"side": frame, "top": frame}, sides=12)
-    rod(model, c + (0, 0, 6), c + (0, 0, 27.4), 1.2, frame, sides=10)
-    for k in range(4):
-        a = k*math.pi/2
-        d = np.array((math.cos(a), math.sin(a), 0.0))
-        model.beam(c + (0, 0, 26.6), c + d*9 + (0, 0, 27.4), (0.8, 0.8), frame)
-    model.cylinder(tuple(c[:2]), 13.5, z + 27.4, z + 29, {"side": top, "top": top, "bottom": top}, sides=32)
-    model.cylinder(tuple(c[:2]), 13.8, z + 28.3, z + 29.2, {"side": top}, sides=32)
+    """Approved rolled-steel/cast-pedestal table; caller retains the original collision."""
+    import belltower_bistro_tables as Tables
+    assert (top,frame)==("iron_green","iron_black"), "A separate material variant is required for custom table finishes"
+    Tables.place(model,centre,z)
     return z + 29
 
 
 def bistro_chair(model, centre, yaw, z=0.0, frame="iron_green", slats="planks"):
-    """ A café chair facing yaw: a steel frame with splayed round legs, a seat of five wooden slats at 18 and a
-    two-slat back raked a little. No collision. """
-    at, x, y = local((centre[0], centre[1], z), yaw)
-    h = 7.5
-    for sx in (-1, 1):
-        for sy in (-1, 1):
-            rod(model, at((sx*(h + 1.2), sy*(h + 1.2), 0)), at((sx*h, sy*h, 17)), 0.45, frame, sides=6)
-    for sy in (-1, 1):
-        # The back legs carry on up as the back's uprights, raked back.
-        rod(model, at((-h, sy*h, 17)), at((-h - 2.4, sy*(h - 0.6), 33)), 0.45, frame, sides=6)
-    for a0, a1 in (((h, -h), (h, h)), ((-h, -h), (-h, h)), ((-h, -h), (h, -h)), ((-h, h), (h, h))):
-        model.beam(at((*a0, 17)), at((*a1, 17)), (0.9, 0.9), frame)
-        model.beam(at((a0[0]*1.1, a0[1]*1.1, 6)), at((a1[0]*1.1, a1[1]*1.1, 6)), (0.5, 0.5), frame)
-    width = 2*h / 5
-    for k in range(5):
-        y0 = -h + k*width + 0.2
-        # Front to back, rounded down over the front edge.
-        corners = lambda xa, xb, za, zb: (at((xa, y0, za)), at((xb, y0 + width - 0.4, zb)))
-        lo, hi = corners(-h - 0.4, h - 1.0, 17.45, 18.2)
-        model.oriented_box((lo + hi)/2, (x, y, (0, 0, 1)), (2*h - 0.6, width - 0.4, 0.75), slats)
-        nose = at((h - 0.4, y0 + (width - 0.4)/2, 17.5))
-        model.oriented_box(nose, (x, y, (0, 0, 1)), (1.4, width - 0.4, 1.2), slats)
-    for zb in (24.0, 30.0):
-        t = (zb - 17)/16
-        xb = -h - 2.4*t - 0.4
-        for s0, s1 in ((-1, -0.35), (-0.35, 0.35), (0.35, 1)):
-            # Curved round the sitter's back: three straight pieces.
-            bow = lambda s: 1.2*(1 - s*s)
-            a = at((xb + bow(s0), s0*(h - 0.6*t), zb))
-            b = at((xb + bow(s1), s1*(h - 0.6*t), zb))
-            model.beam(a, b, (0.6, 3.6), slats, up=(-x*0.25 + np.array((0, 0, 1.0))))
+    """Approved curved timber/steel chair, with independent LODs. No collision."""
+    import belltower_bistro_chairs as Chairs
+    assert (frame,slats)==("iron_green","planks"), "A separate material variant is required for custom chair finishes"
+    Chairs.place(model,centre,yaw,z)
 
 
 def parasol(model, centre, z_rim, z_top, radius, colours=("parasol_red", "parasol_cream"), gores=8, turn=0.0,
@@ -572,6 +533,14 @@ def hanging_lantern(model, hook, yaw=0.0, scale=1.0, **kw):
 
 
 def dish_lamp(model, hook, scale=1.0, shade="iron_black", inside="lamp_reflector", bulb="lamp_bulb", sides=16):
+    import belltower_dish_lamps as Lamps
+    if scale!=1.0 or (shade,inside,bulb)!=("iron_black","lamp_reflector","lamp_bulb"):
+        return _legacy_dish_lamp(model,hook,scale,shade,inside,bulb,sides)
+    Lamps.place(model,hook[:2],hook[2])
+    return np.asarray(hook,float)-(0,0,8.5)
+
+
+def _legacy_dish_lamp(model, hook, scale=1.0, shade="iron_black", inside="lamp_reflector", bulb="lamp_bulb", sides=16):
     """ A street lamp hung from its wire: an enamelled dish shade on a drop rod, white and lit inside, a bare bulb under
     its socket. 18 across, hook: where it hangs. No collision. Returns the bulb's centre. """
     h, s = np.asarray(hook, float), scale
@@ -612,22 +581,9 @@ def wire(model, a, b, sag, paint="iron_black", thick=0.45, segments=10):
 
 
 def sandwich_board(model, centre, yaw, picture, z=0.0, frame="planks_dark"):
-    """ An A-frame chalkboard on the pavement: two 24 x 36 boards hinged at the top and 16 apart at the foot, each
-    showing picture (belltower_fronts' chalkboard_<k>, its own frame drawn in) on its outer face, the front one
-    facing yaw. No collision. """
-    at, x, _ = local((centre[0], centre[1], z), yaw)
-    foot, top, height = 8.0, 0.9, 35.0
-    for side in (-1, 1):
-        p0, p1 = at((side*foot, 0, 0)), at((side*top, 0, height))
-        model.beam(p0, p1, (24.0, 1.2), frame)
-        along = (p1 - p0)/np.linalg.norm(p1 - p0)
-        out = side*x*height/math.hypot(height, foot - top) + np.array((0, 0, (foot - top)/math.hypot(height, foot - top)))
-        out = out/np.linalg.norm(out)
-        y = np.cross(out, along)
-        f = 0.7
-        pts = [p0 + out*f - y*12, p0 + out*f + y*12, p1 + out*f + y*12, p1 + out*f - y*12]
-        outward(model, picture, pts, out)
-    rod(model, at((0, -12.5, height + 0.4)), at((0, 12.5, height + 0.4)), 0.5, "iron_black", sides=6)
+    """Accepted A-frame with physical joinery and its existing menu variant. No collision."""
+    import belltower_menu_boards as Boards
+    Boards.place(model,centre,yaw,picture,z)
 
 
 def lathe(model, centre, z, profile, paint, sides=12, caps=(False, False), turn=0.0):

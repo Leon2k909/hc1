@@ -1,0 +1,18 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var relative="models/props/riverside/roof_vent_v1/review";
+var folder=System.IO.Path.GetFullPath(System.IO.Path.Combine(root,"Assets",relative));
+var expected=System.IO.Path.GetFullPath(System.IO.Path.Combine(root,"Assets/models/props/riverside/roof_vent_v1/review"));
+if(!folder.Equals(expected,StringComparison.OrdinalIgnoreCase))throw new Exception("Unexpected cleanup directory");
+foreach(var s in Editor.SceneEditorSession.All)
+    if(s.Scene.Serialize().ToJsonString().Contains(relative,StringComparison.OrdinalIgnoreCase))throw new Exception("Comparison resource is referenced in an open scene");
+var archive=System.IO.Path.Combine(root,"output/riverside/roof-vent-v1/retired-review-assets");
+System.IO.Directory.CreateDirectory(archive);
+var files=System.IO.Directory.GetFiles(folder);
+foreach(var file in files)System.IO.File.Copy(file,System.IO.Path.Combine(archive,System.IO.Path.GetFileName(file)),true);
+foreach(var path in new[]{relative+"/low_without_vent.vmdl",relative+"/old_vent.obj",relative+"/low_without_vent.obj"})
+{
+    var asset=Editor.AssetSystem.FindByPath(path);if(asset is not null)asset.Delete();
+}
+foreach(var file in files)if(System.IO.File.Exists(file))System.IO.File.Delete(file);
+if(!System.IO.Directory.EnumerateFileSystemEntries(folder).Any())System.IO.Directory.Delete(folder);
+return new {OldBoxFacesRemoved=12,RetiredComparisonFiles=files.Length,Archive=archive};

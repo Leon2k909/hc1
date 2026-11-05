@@ -1,0 +1,5 @@
+var session=Editor.SceneEditorSession.All.Single(s=>s.Scene.IsEditor && s.Scene.Source?.ResourcePath=="scenes/maps/belltower/belltower.scene");
+var fixtures=session.Scene.GetAllComponents<ModelRenderer>().Where(r=>r.Model?.ResourcePath=="models/maps/belltower/wall-lantern-v2/wall_lantern.vmdl").ToArray();
+var original=Model.Load("models/maps/belltower/wall-lantern-original/wall_lantern_original.vmdl");
+if(fixtures.Length!=24 || fixtures.Any(r=>r.Model.IsError) || session.HasUnsavedChanges || original is null || original.IsError)throw new InvalidOperationException("Installed/retained lanterns differ.");
+return new{InstalledLanterns=fixtures.Length,AllModelsLoaded=true,Saved=true,OriginalRetainedAndLoaded=true,OriginalResource=original.ResourcePath};

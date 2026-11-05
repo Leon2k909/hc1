@@ -1,0 +1,7 @@
+var model=Model.Load("models/maps/boxyard/boxyard_props.vmdl");
+if(model.IsError)throw new InvalidOperationException("Public props model failed");
+var paths=model.Materials.Select(m=>m.ResourcePath).ToArray();
+foreach(var mat in new[]{"outer","inner","rim","band"})if(!paths.Contains("materials/boxyard/pipe-stacks-v1/"+mat+".vmat"))throw new InvalidOperationException("Missing pipe material: "+mat);
+var report=new{Model=model.ResourcePath,Error=model.IsError,PipeMaterials=4};
+System.IO.File.WriteAllText(System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(),"output/boxyard/pipe-stacks-v1/public-resource.json"),System.Text.Json.JsonSerializer.Serialize(report));
+return report;

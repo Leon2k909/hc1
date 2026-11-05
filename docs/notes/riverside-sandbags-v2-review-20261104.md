@@ -1,0 +1,9 @@
+## Riverside sandbags v2 — installed, 2026-11-04
+
+- User approved the native comparison after the crate installation. All 54 new bags are installed and saved across four barricades.
+- `models/props/riverside/sandbag_v2/sandbag_{0,1,2}.vmdl`: compressed closed bodies, sewn closures, side hems/stitches, twine binding/knot, gathered cloth mouth. Each has 2,372 / 744 / 134 triangles. All share a 2k PBR atlas derived from the project's existing Lowtide jute image.
+- Review uses the 54 authored bag positions across four barricades (pad 5, store 27, dressing 22), alternate tied-end directions and damp lower-course tints. Disposable backgrounds hide the old bag faces only in separate review assets.
+- Native s&box loaded every new model without errors. Matched north-lane, close-detail and Lucky Stop captures plus a single-bag tie view are in `output/asset-improvement-20261030/riverside-sandbags/`. `before-after.png` explains the temporary inspection light.
+- Geometry/UV/normal checks passed for all nine meshes. Installation removed exactly 3,456 old triangles and preserved every unrelated face; all three collision VMDLs are byte-for-byte unchanged. The saved 54 positions, rotations, scales, tints and models match the approved placements. No live match/LOD transition playtest.
+- Canonical generator records `SANDBAGS` and emits a `Sandbags` group. Installation scripts, guarded mesh edits, backups and verification are documented in `Sources/Riverside/sandbag-v2/README.md`. Preserve original fabric collision walls; avoid regenerating the entire map.
+- Reconciled a later ice-cabinet render import that carried the 1,728 old store bag faces. Removed those duplicates only; all unrelated imported lines and the public ModelDoc/physics/scene were preserved. Receipt: `output/asset-improvement-20261030/riverside-sandbags/installed/store-import-reconciliation/`.

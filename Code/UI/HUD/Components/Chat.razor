@@ -19,7 +19,10 @@
         <div class="chat-container hud flex column-reverse with-deadzone top-left with-px">
             <div class="layout gap">
                 <div class="when-open flex align-center gap-sm shrink-0">
-                    <InputHint Action="Score" class="small" Size="@InputGlyphSize.Small" />
+                    @if ( !GameUtils.IsFreeForAllMode )
+                    {
+                        <InputHint Action="Score" class="small" Size="@InputGlyphSize.Small" />
+                    }
                     <label>
                         @Tr( ChatMode == ChatModes.All ? "All" : "Team" )
                     </label>
@@ -98,7 +101,9 @@
         All,
     }
 
-    private ChatModes ChatMode = ChatModes.Team;
+    private ChatModes SelectedChatMode = ChatModes.Team;
+    // Free-for-all has no teammates to receive a team-filtered message.
+    private ChatModes ChatMode => GameUtils.IsFreeForAllMode ? ChatModes.All : SelectedChatMode;
     private ChatBox InputBox { get; set; }
 
     /// <summary> A chat line. A system line's message is the host's English, filled in with <c>subject</c> (a player's name) and <c>team</c> where it has them. </summary>
@@ -173,7 +178,9 @@
 
     void ChangeChatMode()
     {
-        ChatMode = ChatMode == ChatModes.All ? ChatModes.Team : ChatModes.All;
+        if ( GameUtils.IsFreeForAllMode ) return;
+
+        SelectedChatMode = SelectedChatMode == ChatModes.All ? ChatModes.Team : ChatModes.All;
         Log.Info( $"Chat mode changed to {ChatMode}" );
     }
 

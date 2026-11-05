@@ -1,0 +1,40 @@
+var project=Sandbox.Project.Current.GetRootPath();var output=System.IO.Path.Combine(project,"output/orion/yard-case-reuse-v1/native");System.IO.Directory.CreateDirectory(output);
+var plan=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(project,"output/orion/yard-case-reuse-v1/manifest.json")));
+var active=Editor.SceneEditorSession.Active?.Scene?.Id;var playing=Game.IsPlaying;
+var data=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(project,"Assets/scenes/maps/Orion/orion.scene"))).AsObject();
+var visual=new[]{"Sun","Sky","Fog","Look","Orion","Lights","Reflection Probes","Orion Launch Vehicle"}.ToHashSet(StringComparer.OrdinalIgnoreCase);
+var roots=new System.Text.Json.Nodes.JsonArray();foreach(var item in data["GameObjects"].AsArray())if(visual.Contains(item["Name"]?.GetValue<string>()??""))roots.Add(item.DeepClone());data["GameObjects"]=roots;
+data["SceneProperties"]["NavMesh"]["Enabled"]=false;data["SceneProperties"]["WantsSystemScene"]=false;
+var scene=Scene.CreateEditorScene();
+var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic;
+var preRender=typeof(Scene).GetMethod("PreRender",flags,null,Type.EmptyTypes,null);var preCamera=typeof(Scene).GetMethod("PreCameraRender",flags,null,Type.EmptyTypes,null);
+Vector3 ReadVector(System.Text.Json.Nodes.JsonNode n)=>new(n[0].GetValue<float>(),n[1].GetValue<float>(),n[2].GetValue<float>());
+Vector3 World(Vector3 p)=>new(p.y,-p.x,p.z);
+try{
+ CameraComponent camera;ModelRenderer props,replacement;Model old,cut;
+ using(scene.Push()){
+  scene.Deserialize(data);
+  props=scene.GetAllComponents<ModelRenderer>().Single(r=>r.Model?.ResourcePath=="models/maps/orion/orion_props.vmdl");old=props.Model;cut=Model.Load("models/props/orion/yard_case_reuse_v1/preview.vmdl");
+  replacement=new GameObject(true,"Reused approved equipment case").AddComponent<ModelRenderer>();replacement.Model=Model.Load(plan["existing_model_reused"].GetValue<string>());replacement.WorldPosition=ReadVector(plan["position_world"]);replacement.WorldScale=ReadVector(plan["scale_world"]);replacement.GameObject.Enabled=false;
+  if(old.IsError||cut.IsError||replacement.Model.IsError)throw new Exception("Invalid review model");
+  camera=new GameObject(true,"Yard case review camera").AddComponent<CameraComponent>();camera.ZNear=1;camera.ZFar=120000;
+  foreach(var tone in scene.GetAllComponents<Tonemapping>()){tone.AutoExposureEnabled=false;tone.ExposureCompensation=1;}
+  scene.EditorTick(.016f,.016f);preRender?.Invoke(scene,null);preCamera?.Invoke(scene,null);
+ }
+ var materialNames=new[]{"g_tColor","g_tNormal","g_tRoughness","g_tSelfIllumMask","g_tAmbientOcclusion"};
+ foreach(var mat in old.Materials.Concat(replacement.Model.Materials).Distinct())foreach(var tex in materialNames.Select(mat.GetTexture).Append(mat.FirstTexture).Where(t=>t is not null).Distinct())tex.MarkUsed(2048);
+ for(var i=0;i<30;i++){using(scene.Push()){scene.EditorTick(.016f,.016f);preRender?.Invoke(scene,null);}await Task.Delay(20,cancellationToken);}
+ var views=new[]{("player",new Vector3(-50,505,64),new Vector3(17.338f,600.565f,28),65f),("close",new Vector3(-30,530,57),new Vector3(17.338f,600.565f,31),45f)};
+ foreach(var after in new[]{false,true}){
+  using(scene.Push()){props.Model=after?cut:old;replacement.GameObject.Enabled=after;}
+  foreach(var view in views){using var bitmap=new Bitmap(1200,850);
+   for(var frame=0;frame<24;frame++){cancellationToken.ThrowIfCancellationRequested();using(scene.Push()){
+    camera.WorldPosition=World(view.Item2);camera.WorldRotation=Rotation.LookAt(World(view.Item3)-camera.WorldPosition);camera.FieldOfView=view.Item4;scene.EditorTick(.016f,.016f);preRender?.Invoke(scene,null);preCamera?.Invoke(scene,null);camera.RenderToBitmap(bitmap,false);
+   }await Task.Delay(16,cancellationToken);}
+   System.IO.File.WriteAllBytes(System.IO.Path.Combine(output,view.Item1+(after?"-after":"-before")+".png"),bitmap.ToPng());
+  }
+ }
+ var trace=scene.Trace.Ray(World(new Vector3(-50,505,64)),World(new Vector3(-50,505,-20))).Run();
+ var result=new{PreviewOnly=true,ReusedModel=replacement.Model.ResourcePath,Triangles=replacement.Model.MeshInfo.Meshes.Sum(x=>x.Triangles),ReplacementPosition=replacement.WorldPosition.ToString(),ReplacementScale=replacement.WorldScale.ToString(),AddedColliders=replacement.GameObject.Components.GetAll<ModelCollider>().Count(),PlayerEyeHeight=64,PlayerFloorHit=trace.Hit,PlayerFloorZ=trace.EndPosition.z,SceneUnchanged=active==Editor.SceneEditorSession.Active?.Scene?.Id,PlayStateUnchanged=playing==Game.IsPlaying};
+ System.IO.File.WriteAllText(System.IO.Path.Combine(output,"validation.json"),System.Text.Json.JsonSerializer.Serialize(result));return result;
+}finally{scene.Destroy();}

@@ -1,0 +1,2 @@
+var model=Model.Load("models/maps/riverside/riverside_store.vmdl");
+return new{model.IsError,model.MeshInfo.LodCount,model.MeshInfo.LodSwitchDistances,Meshes=model.MeshInfo.Meshes.Select(m=>new{m.Name,m.Triangles,m.LodMask,m.BoundsMin,m.BoundsMax,Materials=m.DrawCalls.Select(d=>d.Material.ResourcePath).Distinct().ToArray()}).ToArray()};

@@ -36,8 +36,9 @@ public sealed class Spottable : Component,
 
 	[Property] public float Height { get; set; }
 
-	public bool IsSpotted => Static ? HasBeenSpotted : LastSpotted < 1;
-	public bool WasSpotted => !IsSpotted && LastSpotted < 5;
+	// A new timer must not reveal an actor before their first real spotting event.
+	public bool IsSpotted => HasBeenSpotted && (Static || LastSpotted < 1);
+	public bool WasSpotted => HasBeenSpotted && !IsSpotted && LastSpotted < 5;
 
 	protected override void OnUpdate()
 	{

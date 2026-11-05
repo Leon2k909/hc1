@@ -1,0 +1,7 @@
+    # Lockers along the south wall's east (west) part.
+    for k in range( 7 ):
+        e = s * ( 1200.0 + k * 26.0 )
+        lo = ( e - 12.5, HALL_N0, 0 )
+        hi = ( e + 12.5, HALL_N0 + 22, 84 )
+        m.box( lo, hi, { "default": "ar_steel", "+n": "ar_gunmetal" } )
+        m.box( ( e - 2, HALL_N0 + 22, 50 ), ( e + 2, HALL_N0 + 23, 56 ), "ar_brass" )

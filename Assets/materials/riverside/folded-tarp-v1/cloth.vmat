@@ -1,0 +1,11 @@
+Layer0
+{
+ shader "shaders/complex.shader"
+ F_SPECULAR 1
+ TextureColor "materials/riverside/folded-tarp-v1/weave.png"
+ TextureNormal "materials/riverside/folded-tarp-v1/normal.png"
+ TextureRoughness "[0.72 0.72 0.72 0]"
+ g_flRoughnessScaleFactor "1"
+ g_flMetalness "0"
+ g_vColorTint "[0.117647 0.27451 0.509804 1]"
+}

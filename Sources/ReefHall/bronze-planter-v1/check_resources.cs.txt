@@ -1,0 +1,14 @@
+var paths=new[]{"before","planter","lobby_preview"};
+var reports=new System.Collections.Generic.List<object>();
+foreach(var name in paths) {
+ var model=Model.Load("models/maps/reefhall/bronze-planter-v1/"+name+".vmdl");
+ if(model.IsError)throw new InvalidOperationException(name+" failed to load");
+ var mats=model.Materials.Select(m=>m.ResourcePath).ToArray();
+ if(name!="before")foreach(var mat in new[]{"bronze","edge","toe"})
+  if(!mats.Contains("materials/reefhall/bronze-planter-v1/"+mat+".vmat"))throw new InvalidOperationException("Missing material "+mat);
+ reports.Add(new{Model=model.ResourcePath,Error=model.IsError,Materials=mats.Length});
+}
+var editor=Editor.SceneEditorSession.Active;
+var report=new{Models=reports,Scene=editor.Scene.Name,Dirty=editor.HasUnsavedChanges,Game.IsPlaying};
+System.IO.File.WriteAllText(System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(),"Sources/ReefHall/bronze-planter-v1/review/resource-check.json"),System.Text.Json.JsonSerializer.Serialize(report));
+return report;

@@ -96,7 +96,7 @@ def material(name,metal=0,emission=None):
         text+=f'    F_SELF_ILLUM "1"\n    g_vSelfIllumTint "[{emission}]"\n    g_flSelfIllumBrightness "3"\n    TextureSelfIllumMask "materials/default/default_ao.tga"\n'
     K.write_text(MAT/f'{name}.vmat',text+'}\n')
 
-def sign(name,lines,size=(768,1024),red=False,symbol=False):
+def sign(name,lines,size=(768,1024),red=False,symbol=False,fit_text=False):
     w,h=size
     substrate=Image.open(MAT/'concrete_color.png').resize(size)
     pixels=np.asarray(substrate).astype(float)*.72
@@ -110,13 +110,30 @@ def sign(name,lines,size=(768,1024),red=False,symbol=False):
         d.ellipse((cx-8,cy+r*.23,cx+8,cy+r*.39),fill=(190,193,160,230))
         top=int(h*.47)
     avail=h-top-int(h*.08)
+    # Warning boards need real glyph metrics: character-count estimates clip wide text.
+    fitted_font=None
+    if fit_text:
+        fs=max(1,int(avail/max(1,len(lines))*.74))
+        safe_width=int(w*.80)
+        while fs>1:
+            fitted_font=ImageFont.truetype('C:/Windows/Fonts/arialbd.ttf',fs)
+            bounds=[d.textbbox((0,0),line,font=fitted_font) for line in lines]
+            if all(b[2]-b[0]<=safe_width for b in bounds):break
+            fs-=1
     for k,line in enumerate(lines):
-        fs=min(int(avail/len(lines)*.74),int(w/(max(1,len(line))*.55)))
-        font=ImageFont.truetype('C:/Windows/Fonts/arialbd.ttf',fs)
+        if fitted_font is None:
+            fs=min(int(avail/len(lines)*.74),int(w/(max(1,len(line))*.55)))
+            font=ImageFont.truetype('C:/Windows/Fonts/arialbd.ttf',fs)
+        else:
+            font=fitted_font
         bbox=d.textbbox((0,0),line,font=font)
         x=(w-(bbox[2]-bbox[0]))//2
+        y=top+k*avail/len(lines)
+        if fit_text:
+            x-=bbox[0]
+            y=top+(k+.5)*avail/len(lines)-(bbox[1]+bbox[3])/2
         color=(122,31,20,235) if red else (196,195,163,225)
-        d.text((x,top+k*avail/len(lines)),line,font=font,fill=color)
+        d.text((x,y),line,font=font,fill=color)
     a=np.asarray(layer).copy()
     wear=noise((h,w),5)*.5+noise((h,w),40)*.5
     a[:,:,3]=(a[:,:,3]*(np.clip((wear-.27)*3,0,1))).astype(np.uint8)
@@ -144,7 +161,7 @@ def materials():
     sign('cleaner',['CLEANER','TOMORROW','','A BRIGHTER','HUMANITY'])
     sign('progress',['WASTE','FEEDS','PROGRESS'],size=(512,768))
     sign('purify',['PURIFY','PRESERVE','PROTECT'],size=(512,768))
-    sign('warning',['WATCH','YOUR STEP'],size=(768,512))
+    sign('warning',['WATCH','YOUR STEP'],size=(768,512),fit_text=True)
     sign('gate',['GATE A'],size=(1024,256))
     sign('flow',['FLOW CONTROL','B'],size=(1024,384))
     sign('sector',['SECTOR C','C'],size=(512,512))
@@ -253,6 +270,11 @@ def torus(m,center,axis,r,minor,paint='rust',steps=48):
     for a,b in zip(pts,pts[1:]): tube(m,a,b,minor,paint,8,False)
 
 def rail(m,a,b,z,height=42,collide=True):
+    from sewage_platform_rails import matches,emit
+    if matches(a,b,z,height):
+        emit(m,a,b,z,height)
+        if collide:m.beam((*a,z+height*.5),(*b,z+height*.5),(3,height),None,'metal')
+        return
     a=np.array([*a,z],float);b=np.array([*b,z],float)
     n=max(1,math.ceil(np.linalg.norm(b-a)/64))
     for t in np.linspace(0,1,n+1):
@@ -271,11 +293,15 @@ def catwalk(m,lo,hi,z):
 
 def stairs(m,e0,e1,n0,n1,z0,z1):
     count=math.ceil(abs(z1-z0)/8)
-    for i in range(count):
-        a=n0+(n1-n0)*i/count;b=n0+(n1-n0)*(i+1)/count
-        h=z0+(z1-z0)*(i+1)/count
-        m.box((e0,min(a,b),h-4),(e1,max(a,b)+.1,h),{'default':'steel','+z':'grate'})
-        m.box((e0,min(a,b),h),(e1,min(a,b)+2,h+.6),'yellow')
+    from sewage_stair_treads import MAIN_FLIGHT,emit as draw_open_treads
+    if (e0,e1,n0,n1,z0,z1)==MAIN_FLIGHT:
+        draw_open_treads(m,e0,e1,n0,n1,z0,z1)
+    else:
+        for i in range(count):
+            a=n0+(n1-n0)*i/count;b=n0+(n1-n0)*(i+1)/count
+            h=z0+(z1-z0)*(i+1)/count
+            m.box((e0,min(a,b),h-4),(e1,max(a,b)+.1,h),{'default':'steel','+z':'grate'})
+            m.box((e0,min(a,b),h),(e1,min(a,b)+2,h+.6),'yellow')
     # Smooth walkable collision ramp, both nav and character movement use this.
     pts=[(e0,n0,z0-5),(e1,n0,z0-5),(e0,n1,z1-5),(e1,n1,z1-5),
          (e0,n0,z0),(e1,n0,z0),(e0,n1,z1),(e1,n1,z1)]
@@ -329,8 +355,9 @@ def arc_tunnel(m,e0,e1,ncenter,r=115,spring=48):
     for n in [ncenter-r,ncenter+r]:m.box((min(e0,e1),n-10,0),(max(e0,e1),n+10,spring),'brick','default')
     # Closed maintenance branches end in heavy grilles.
     end=e1
-    m.box((end-10,ncenter-r,-10),(end+10,ncenter+r,170),'concrete','default')
-    for n in np.arange(ncenter-r+12,ncenter+r,15):tube(m,(end-12,n,0),(end-12,n,150),2,'steel',8)
+    m.collision_box((end-10,ncenter-r,-10),(end+10,ncenter+r,170),'default')
+    from sewage_tunnel_gates import emit as draw_tunnel_gate
+    draw_tunnel_gate(m,e0,e1,ncenter)
 
 def build():
     shell=model(); tower=model(); walks=model(); pipes=model(); detail=model(); signs=model(); water=model(); falls=model()
@@ -496,11 +523,8 @@ def build():
     for e,n,z in [(610,-20,740),(820,240,680)]:
         for off in [-13,13]:
             for h in np.arange(z+30,1120,13):torus(detail,(e+off,n,h),(1,0,0) if int(h/13)%2 else (0,1,0),5,1.2,'steel',12)
-        detail.box((e-23,n-20,z),(e+23,n+20,z+84),'yellow')
-        for h in range(0,75,22):detail.beam((e-23,n-21,z+h),(e+23,n-21,z+h+22),(9,2),'steel')
-        # Curved hook.
-        pts=[(e+18*math.cos(t),n,z-23+27*math.sin(t)) for t in np.linspace(-math.pi*.95,math.pi*.45,16)]
-        for a,b in zip(pts,pts[1:]):tube(detail,a,b,6,'steel',12)
+        from sewage_crane_blocks import block as draw_crane_block
+        draw_crane_block(detail,(e,n,z))
     # Wall stencils and utility signage mirror the reference's locations.
     for paint,c,right,size in [
         ('cleaner',(-973,-140,400),(0,1,0),(245,300)),('flow',(-970,-230,235),(0,1,0),(260,90)),
@@ -509,6 +533,9 @@ def build():
         ('buried',(971,-100,180),(0,-1,0),(150,215)),('number',(762,106,644),(1,0,0),(110,115)),
         ('warning',(-615,-400,35),(0,-1,0),(110,65)),('direction',(-570,-50,700),(1,0,0),(250,145))]:
         signface(signs,paint,c,right,(0,0,1),size)
+        if paint=='warning':
+            from sewage_warning_sign import emit as draw_warning_sign_hardware
+            draw_warning_sign_hardware(signs,c)
     # Work lamps are placed as visible fixtures, not unexplained point lights.
     for p in [(-960,-560,310),(-720,-600,52),(-680,-110,205),(-850,260,226),(-900,670,414),(-380,920,424),(460,920,424),(900,620,414),(880,-300,220),(-850,-380,610),(850,-350,610),(-360,180,610),(470,180,610)]:lamp(detail,p,'amber',360,1.6)
     for p in [(-100,240,815),(410,320,815),(250,780,815)]:lamp(detail,p,'amber',330,1.2)
@@ -519,9 +546,8 @@ def build():
     for p in [(-500,0,410),(500,320,410),(-180,-620,340)]:LIGHTS.append((np.array(p),(.065,.13,.11),1100,False))
     # Barrels, ruptured drums, power cabinets, cable trays and piled rubble.
     for e,n,z in [(-670,-680,0),(-956,-430,0),(-710,640,0),(820,-650,0),(850,500,0),(-580,830,352)]:
-        detail.cylinder((e,n),20,z,z+54,'rust',sides=24,surface='metal')
-        for h in [3,17,40,51]:torus(detail,(e,n,z+h),(0,0,1),20,1.3,'steel',24)
-        detail.cylinder((e+8,n-5),3,z+54,z+56,'steel',sides=10)
+        from sewage_salvage_drums import emit as draw_salvage_drum
+        draw_salvage_drum(detail,(e,n,z))
     # The cabinets themselves are models/maps/sewage/power_cabinet_v2, placed in the scene. Their bodies' collision stays here, and each green light
     # stays in this list, at the new model's status lamp.
     for e,n,z,turn in CABINETS:

@@ -101,10 +101,61 @@ Reset();
 GameUtils.MapFallback = Spawn( 1234 );
 Check( Pick().Position.x == 1234, "Missing tagged spawns must use the map fallback without indexing an empty list." );
 
-Console.WriteLine( $"PASS: {checks} spawn safety checks against the production spawn assigner." );
+var teamAssigner = new TeamSpawnAssigner();
+SpawnPointInfo PickTeam( params float[] positions )
+{
+	GameUtils.Spawns = positions.Select( Spawn ).ToArray();
+	return teamAssigner.GetSpawnPoint( owner );
+}
+foreach ( var botOccupant in new[] { false, true } )
+foreach ( var reverse in new[] { false, true } )
+{
+	Reset();
+	owner.Team = Team.Terrorist;
+	GameUtils.ReverseShuffle = reverse;
+	if ( botOccupant ) Bot( 0, Team.Terrorist );
+	else Human( 0, Team.Terrorist );
+	Human( 10100, Team.CounterTerrorist );
+	teamAssigner.Scene.Trace.IsBlocked = (_, _) => false;
+	Check( PickTeam( 0, 10000 ).Position.x == 10000,
+		"A free team spawn must beat an occupied one even when the free spawn is close to and visible from an enemy." );
+}
+
+Reset();
+owner.Team = Team.Terrorist;
+teamAssigner.Scene.Trace.IsBlocked = (_, _) => true;
+Human( 0, Team.CounterTerrorist );
+Check( PickTeam( 500, 2000 ).Position.x == 2000, "Free team spawns must retain their enemy-distance ranking." );
+teamAssigner.Scene.Trace.IsBlocked = (from, _) => from.x < 0;
+Check( PickTeam( 1500, -1500 ).Position.x == -1500, "Free team spawns at equal distance must still prefer cover." );
+
+Reset();
+owner.Team = Team.Terrorist;
+teamAssigner.Scene.Trace.IsBlocked = (_, _) => true;
+Human( 0, Team.Terrorist );
+Bot( 2000, Team.Terrorist );
+Human( 2100, Team.CounterTerrorist );
+Check( PickTeam( 2000, 0 ).Position.x == 0, "When every spawn is occupied, retain the safest available fallback." );
+
+Reset();
+owner.Team = Team.Terrorist;
+teamAssigner.Scene.Trace.IsBlocked = (_, _) => true;
+Human( 0, Team.Terrorist, alive: false );
+Bot( 0, Team.Terrorist, alive: false );
+Check( PickTeam( 0, 500 ).Position.x == 0, "Dead humans and bots must not occupy team spawns." );
+var ownPawn = Human( 0, Team.Terrorist );
+ownPawn.Client = owner;
+Check( PickTeam( 0, 500 ).Position.x == 0, "A respawning player's old pawn must not occupy their team spawn." );
+
+Reset();
+owner.Team = Team.Terrorist;
+GameUtils.MapFallback = Spawn( 4321 );
+Check( PickTeam().Position.x == 4321, "Missing team spawns must preserve the map fallback." );
+
+Console.WriteLine( $"PASS: {checks} spawn safety checks against the production spawn assigners." );
 
 // Minimal engine seams keep these policy checks offline. Spawn selection and tracing decisions above
-// execute the production RandomSpawnAssigner; only world data, trace hits and shuffle order are supplied here.
+// execute the production random and team spawn assigners; only world data, trace hits and shuffle order are supplied here.
 namespace Sandbox
 {
 	public class Component
@@ -114,12 +165,15 @@ namespace Sandbox
 	}
 	public static class Validity { public static bool IsValid( this Component component ) => component?.Valid == true; }
 	public sealed class PropertyAttribute : Attribute;
+	public sealed class InlineEditorAttribute : Attribute;
 	public sealed class TitleAttribute( string title ) : Attribute { public string Title { get; } = title; }
 	public class TagSet : List<string>;
 	public readonly record struct Vector3( float x, float y, float z )
 	{
 		public static Vector3 Up => new( 0, 0, 1 );
 		public float LengthSquared => x * x + y * y + z * z;
+		public float DistanceSquared( Vector3 other ) => (this - other).LengthSquared;
+		public float Distance( Vector3 other ) => MathF.Sqrt( DistanceSquared( other ) );
 		public static Vector3 operator +( Vector3 a, Vector3 b ) => new( a.x + b.x, a.y + b.y, a.z + b.z );
 		public static Vector3 operator -( Vector3 a, Vector3 b ) => new( a.x - b.x, a.y - b.y, a.z - b.z );
 		public static Vector3 operator *( Vector3 a, float scale ) => new( a.x * scale, a.y * scale, a.z * scale );
@@ -143,16 +197,23 @@ namespace Sandbox
 		public TraceResult Run() { Calls.Add( (_from, _to) ); return new( IsBlocked( _from, _to ) ); }
 	}
 	public readonly record struct TraceResult( bool Hit );
-	public static class Log { public static void Warning( string message ) { } }
+	public static class Log { public static void Warning( string message ) { } public static void Info( string message ) { } }
 }
+namespace Sandbox.Events { }
 namespace Facepunch
 {
+	public class SkirmishArena
+	{
+		public static SkirmishArena Settled { get; set; }
+		public SpawnPointInfo PickSpawn( Team team, object pawn ) => default;
+	}
 	public enum Team { Unassigned, Terrorist, CounterTerrorist }
 	public enum LifeState { Alive, Dead }
 	public class Client
 	{
 		public Team Team { get; set; }
 		public string DisplayName { get; set; }
+		public PlayerPawn PlayerPawn { get; set; }
 		public bool IsFriendly( Client other ) => Team != Team.Unassigned && Team == other.Team;
 	}
 	public class HealthComponent { public LifeState State { get; set; } }
@@ -161,12 +222,18 @@ namespace Facepunch
 		public Client Client { get; set; }
 		public Transform Transform { get; set; }
 		public HealthComponent HealthComponent { get; } = new();
+		public Vector3 WorldPosition => Transform.Position;
+		public Team Team => Client.Team;
+		public float TimeSinceLastRespawn { get; set; }
+		public List<string> SpawnPointTags { get; } = new();
+		public object GameObject => this;
 	}
 	public class LightweightCombatBot : Component
 	{
 		public bool IsAlive { get; set; } = true;
 		public Team Team { get; set; }
 		public Transform Transform { get; set; }
+		public Vector3 WorldPosition => Transform.Position;
 	}
 	public static class GameUtils
 	{
@@ -176,6 +243,7 @@ namespace Facepunch
 		public static SpawnPointInfo MapFallback { get; set; }
 		public static bool ReverseShuffle { get; set; }
 		public static IEnumerable<SpawnPointInfo> GetSpawnPoints( params string[] tags ) => Spawns;
+		public static IEnumerable<SpawnPointInfo> GetSpawnPoints( Team team, params string[] tags ) => Spawns;
 		public static SpawnPointInfo GetRandomSpawnPoint( Team team ) => MapFallback;
 		public static IReadOnlyList<T> Shuffle<T>( this IEnumerable<T> items ) => (ReverseShuffle ? items.Reverse() : items).ToArray();
 	}

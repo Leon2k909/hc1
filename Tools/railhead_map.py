@@ -665,8 +665,16 @@ def yard_clutter( m, s ):
     detail( "tyre_stack", m, face + s * 18.0, -2060.0, 0.3, 3, 0.4 )
     use( "pallet_stack", m, face + s * 24.0, -1990.0, 0.3, 6,
          stand_in=furniture_stand_in( "pallet_stack", face + s * 24.0, -1990.0 ) )
-    detail( "cable_drum", m, face + s * 18.0, -1632.0, 0.3, "e" )
-    detail( "brick_pallet", m, face + s * 24.0, -1580.0, 0.3, "n" )
+    if s > 0:
+        from railhead_cable_drum import append_to as append_approved_reel
+        append_approved_reel( m )
+    else:
+        detail( "cable_drum", m, face + s * 18.0, -1632.0, 0.3, "e" )
+    if s > 0:
+        from railhead_brick_pallet import append_to as append_approved_brick_pallet
+        append_approved_brick_pallet( m )
+    else:
+        detail( "brick_pallet", m, face + s * 24.0, -1580.0, 0.3, "n" )
     # A skip against the back fence, north of the containers, and a road works pit in the open with cones round it.
     detail( "skip_bin", m, s * 2155.0, -1575.0, "+n" )
     detail( "open_chamber", m, s * 1900.0, -1520.0, 0.0, "e" )
@@ -674,7 +682,11 @@ def yard_clutter( m, s ):
     # barrier across its south side.
     detail( "cone", m, s * 1868.0, -1566.0, 0.0 )
     detail( "cone", m, s * 1872.0, -1528.0, 0.0, tipped=True, heading=( 2.4 if s > 0 else 0.7 ) )
-    detail( "road_barrier", m, s * 1905.0, -1556.0, "e" )
+    if s > 0:
+        from railhead_road_barrier import append_to as append_approved_barrier
+        append_approved_barrier( m )
+    else:
+        detail( "road_barrier", m, s * 1905.0, -1556.0, "e" )
 
 
 def container( m, e, n, z0, size, axis, paint ):

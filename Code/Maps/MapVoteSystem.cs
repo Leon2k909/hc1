@@ -221,17 +221,17 @@ public partial class MapVoteSystem : SingletonComponent<MapVoteSystem>
 	/// RPCs a vote, targeted to the host, so it's not exposed to any public API.
 	/// </summary>
 	/// <param name="index"></param>
-	[Rpc.Broadcast]
+	[Rpc.Host]
 	private void RpcVote( int index )
 	{
-		var callerSteamId = Rpc.Caller.SteamId;
-		if ( index < 0 || index >= Options.Count )
+		// Close at the deadline, even if this request arrives before OnUpdate picks the winner.
+		if ( !Networking.IsHost || IsProxy || IsLeaving || TimeUntilDecidedWinner || WinningOption.HasValue )
 			return;
 
-		// did we already get a winning option?
-		if ( WinningOption is { } option )
+		if ( Rpc.Caller is not { } caller || index < 0 || index >= Options.Count )
 			return;
 
+		var callerSteamId = caller.SteamId;
 		Log.Info( $"{callerSteamId} trying to vote for index {index}" );
 
 		var existingVote = Votes.FirstOrDefault( x => x is not null && x.VoterId == callerSteamId );
@@ -256,10 +256,7 @@ public partial class MapVoteSystem : SingletonComponent<MapVoteSystem>
 	/// <param name="index"></param>
 	public void Vote( int index )
 	{
-		using ( Rpc.FilterInclude( Connection.Host ) )
-		{
-			RpcVote( index );
-		}
+		RpcVote( index );
 	}
 
 	/// <summary>

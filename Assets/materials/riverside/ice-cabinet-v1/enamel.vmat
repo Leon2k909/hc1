@@ -1,0 +1,11 @@
+Layer0
+{
+ shader "shaders/complex.shader"
+ F_SPECULAR 1
+ TextureColor "materials/riverside/ice-cabinet-v1/enamel_color.png"
+ TextureNormal "materials/riverside/ice-cabinet-v1/enamel_normal.png"
+ TextureRoughness "materials/riverside/ice-cabinet-v1/enamel_rough.png"
+ g_flRoughnessScaleFactor "1"
+ g_flMetalness "0"
+ g_vColorTint "[1 1 1 1]"
+}

@@ -1,0 +1,126 @@
+var root=Sandbox.Project.Current.GetRootPath();var folder=System.IO.Path.Combine(root,"output/zombie-hit-reactions-20261104");
+System.IO.Directory.CreateDirectory(folder);
+var editor=Editor.SceneEditorSession.Active;
+var user=new {Editor=editor.Scene.Id,Runtime=Game.ActiveScene?.Id,Game.IsPlaying,Dirty=editor.HasUnsavedChanges};
+var checks=new System.Collections.Generic.List<object>();
+void Check(string name,bool pass,object detail=null) {checks.Add(new{Name=name,Pass=pass,Detail=detail});System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"checks-progress.json"),System.Text.Json.JsonSerializer.Serialize(checks));}
+var stage="setup";
+var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic;
+Vector3 Field(Facepunch.ZombieHitReactionPose p,string name)=>(Vector3)typeof(Facepunch.ZombieHitReactionPose).GetField(name,flags).GetValue(p);
+var aiType=typeof(Facepunch.ZombieAI);
+void Set(object target,string property,object value)=>target.GetType().GetProperty(property,flags).SetValue(target,value);
+var preRender=typeof(Scene).GetMethod("PreRender",flags,null,Type.EmptyTypes,null);
+var preCamera=typeof(Scene).GetMethod("PreCameraRender",flags,null,Type.EmptyTypes,null);
+var source=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"Assets/scenes/maps/spillway/spillway.scene")));
+var roots=new System.Text.Json.Nodes.JsonArray();
+foreach(var g in source["GameObjects"].AsArray())if(new[]{"Sun","Sky","Sky Fill","Look","Reflection Probes"}.Contains(g["Name"]?.GetValue<string>()??""))roots.Add(g.DeepClone());
+source["GameObjects"]=roots;source["SceneProperties"]["NavMesh"]["Enabled"]=false;source["SceneProperties"]["WantsSystemScene"]=false;
+var scene=Scene.CreateEditorScene();float elapsed=0;
+var drivers=new System.Collections.Generic.List<SkinnedModelRenderer>();var bodies=new System.Collections.Generic.List<SkinnedModelRenderer>();
+var reactions=new System.Collections.Generic.List<Facepunch.ZombieHitReactionPose>();
+var captures=new System.Collections.Generic.List<string>();
+try {
+ CameraComponent camera;
+ using(scene.Push()) {
+  scene.Deserialize(source.AsObject());
+  var floor=new GameObject(true,"Diagnostic floor");floor.Components.Create<ModelRenderer>().Model=Model.Load("models/maps/spillway/service-cabinet-v1/review_floor.vmdl");
+  var paths=new[]{Facepunch.ZombieAI.ZombieModel,"models/zombie/zombie_female_01/zombie_female_01.vmdl","models/zombie/zombie_male_02.vmdl"};
+  for(var i=0;i<paths.Length;i++) {
+   var holder=new GameObject(true,"Hit reaction body "+i);holder.WorldPosition=new Vector3(0,(i-1)*54,0);
+   var driver=holder.Components.Create<SkinnedModelRenderer>();driver.Model=Model.Load(Facepunch.ZombieAI.DriverModel);driver.UseAnimGraph=false;
+   driver.RenderOptions.Game=false;driver.RenderType=ModelRenderer.ShadowRenderType.Off;
+   driver.Sequence.Name="idle";driver.Sequence.Looping=true;driver.Sequence.Time=.25f;driver.Sequence.PlaybackRate=0;
+   var bodyGo=new GameObject(holder,true,"Visible zombie");var body=bodyGo.Components.Create<SkinnedModelRenderer>();body.Model=Model.Load(paths[i]);body.BoneMergeTarget=driver;
+   drivers.Add(driver);bodies.Add(body);reactions.Add(new Facepunch.ZombieHitReactionPose());
+   Check("body asset "+i,!body.Model.IsError&&!driver.Model.IsError,paths[i]);
+  }
+  var lightGo=new GameObject(true,"Diagnostic fill");lightGo.WorldPosition=new Vector3(100,-80,120);var light=lightGo.Components.Create<PointLight>();light.LightColor=new Color(3,2.8f,2.6f);light.Radius=500;light.Shadows=false;
+  var cameraGo=new GameObject(true,"Diagnostic camera");camera=cameraGo.Components.Create<CameraComponent>();camera.IsMainCamera=false;camera.EnablePostProcessing=true;
+  camera.CustomSize=new Vector2(1440,1000);camera.ZNear=1;camera.ZFar=20000;camera.FovAxis=CameraComponent.Axis.Horizontal;
+  camera.WorldPosition=new Vector3(170,-175,88);camera.WorldRotation=Rotation.LookAt(new Vector3(0,0,36)-camera.WorldPosition);camera.FieldOfView=56;
+ }
+ foreach(var material in bodies.SelectMany(b=>b.Model.Materials).Distinct())foreach(var texture in new[]{material.FirstTexture,material.GetTexture("g_tColor"),material.GetTexture("g_tNormal")}.Where(t=>t!=null))texture.MarkUsed(2048);
+ void Tick() {using(scene.Push()){scene.EditorTick(elapsed+=1f/60f,1f/60f);preRender.Invoke(scene,null);preCamera.Invoke(scene,null);}}
+ void Capture(string name) {using var bitmap=new Bitmap(1440,1000);using(scene.Push())camera.RenderToBitmap(bitmap,false);var p=System.IO.Path.Combine(folder,name+".png");System.IO.File.WriteAllBytes(p,bitmap.ToPng());captures.Add(p);}
+ for(var frame=0;frame<35;frame++){Tick();await Task.Delay(20,cancellationToken);}
+ Transform Bone(SkinnedModelRenderer r,string name) {if(!r.TryGetBoneTransform(name,out var pose))throw new InvalidOperationException("Missing bone "+name);return pose;}
+ var headBefore=drivers.Select(d=>Bone(d,"head")).ToArray();var visibleBefore=bodies.Select(d=>Bone(d,"head")).ToArray();
+ var feetBefore=drivers.Select(d=>new[]{Bone(d,"ankle_L"),Bone(d,"ankle_R")}).ToArray();
+ Capture("neutral");
+ foreach(var p in reactions)p.Trigger(Vector3.Backward,1f,true,.25f);
+ for(var frame=0;frame<40;frame++) {
+  cancellationToken.ThrowIfCancellationRequested();Tick();
+  for(var i=0;i<drivers.Count;i++)using(scene.Push())reactions[i].Apply(drivers[i],1f/60f);
+  if(frame==3) {
+   Capture("impact");
+   for(var i=0;i<drivers.Count;i++) {
+    var shift=Bone(drivers[i],"head").Position.Distance(headBefore[i].Position);
+    var visibleShift=Bone(bodies[i],"head").Position.Distance(visibleBefore[i].Position);
+    var left=Bone(drivers[i],"ankle_L").Position.Distance(feetBefore[i][0].Position);
+    var right=Bone(drivers[i],"ankle_R").Position.Distance(feetBefore[i][1].Position);
+    Check("head visibly reacts "+i,shift>1f,new{Shift=shift,VisibleShift=visibleShift});
+    Check("bone merged body follows "+i,visibleShift>.5f,visibleShift);
+    Check("feet preserved "+i,left<.01f&&right<.01f,new{Left=left,Right=right});
+   }
+  }
+  if(frame%2==0&&frame<30)Capture("motion-"+(frame/2).ToString("000"));
+  await Task.Delay(15,cancellationToken);
+ }
+ Check("reaction recovers",reactions.All(p=>Field(p,"_torso").Length+Field(p,"_head").Length<.1f));
+ Check("sequence not replaced",drivers.All(d=>d.Sequence.Name=="idle"));
+ Capture("recovered");
+
+ stage="frame rate";
+ Vector3 AtRate(int rate) {
+  var p=new Facepunch.ZombieHitReactionPose();p.Trigger(new Vector3(-1,.4f,0),1f,false,.4f);
+  var time=0f;while(time<.3f){var dt=MathF.Min(1f/rate,.3f-time);p.Apply(null,dt);time+=dt;}
+  return Field(p,"_torso");
+ }
+ var low=AtRate(30);var medium=AtRate(60);var high=AtRate(144);
+ Check("30 60 144 fps agree",low.Distance(medium)<.001f&&low.Distance(high)<.001f,new{At30=low.ToString(),At60=medium.ToString(),At144=high.ToString()});
+ var front=new Facepunch.ZombieHitReactionPose();var back=new Facepunch.ZombieHitReactionPose();
+ front.Trigger(Vector3.Backward,1,false,0);back.Trigger(Vector3.Forward,1,false,0);front.Apply(null,.06f);back.Apply(null,.06f);
+ Check("opposite impact directions",Field(front,"_torso").x<0&&Field(back,"_torso").x>0);
+ var bodyHit=new Facepunch.ZombieHitReactionPose();var headHit=new Facepunch.ZombieHitReactionPose();
+ bodyHit.Trigger(Vector3.Backward,1,false,0);headHit.Trigger(Vector3.Backward,1,true,0);bodyHit.Apply(null,.06f);headHit.Apply(null,.06f);
+ Check("headshot stronger head kick",Field(headHit,"_head").Length>Field(bodyHit,"_head").Length*2);
+ var burst=new Facepunch.ZombieHitReactionPose();for(var i=0;i<100;i++){burst.Trigger(new Vector3(-1,1,0),1.2f,true,1);burst.Apply(null,1f/144f);}
+ Check("burst pose bounded",Field(burst,"_torso").Length<30f&&Field(burst,"_head").Length<42f);
+
+ // Exercise the actual damage/RPC path without touching the current match.
+ stage="damage probes";
+ if(Facepunch.ZombiesRoundSystem.Current?.IsPowerUpActive(Facepunch.ZombiesPowerUpType.OneHitKills)!=true) {
+  Facepunch.ZombieAI Probe(string name) {
+   using(scene.Push()) {
+    var go=new GameObject(true,name);go.WorldPosition=new Vector3(10000,0,0);
+    var renderer=go.Components.Create<SkinnedModelRenderer>();renderer.Model=Model.Load(Facepunch.ZombieAI.DriverModel);renderer.UseAnimGraph=false;renderer.RenderOptions.Game=false;
+    var agent=go.Components.Create<NavMeshAgent>();agent.Enabled=false;
+    var ai=go.Components.Create<Facepunch.ZombieAI>();Set(ai,"Renderer",renderer);Set(ai,"Agent",agent);Set(ai,"Health",1000f);
+    return ai;
+   }
+  }
+  stage="creating damage probe";var probe=Probe("Nonlethal damage probe");
+  stage="calling damage";
+  using(scene.Push())probe.OnDamage(new Sandbox.DamageInfo(10,null,null){Position=new Vector3(10000,0,32),Origin=new Vector3(10100,0,40)});
+  stage="reading reaction";var reaction=aiType.GetField("_hitReaction",flags).GetValue(probe) as Facepunch.ZombieHitReactionPose;
+  Check("actual damage triggers reaction",reaction!=null,new{probe.Health,Created=reaction!=null});
+  if(reaction!=null) {
+   var velocity=Field(reaction,"_torsoVelocity");
+   using(scene.Push())probe.OnDamage(new Sandbox.DamageInfo(1,null,null){Position=new Vector3(10000,0,32),Origin=new Vector3(10100,0,40)});
+   Check("shotgun pellet grouping",velocity==Field(reaction,"_torsoVelocity"));
+   var system=scene.GetSystem<Facepunch.BotSystem>();system.Zombies.Clear();system.Zombies.Add(probe);
+   using(scene.Push())typeof(Facepunch.BotSystem).GetMethod("FollowHands",flags).Invoke(system,null);
+   Check("finish update applies reaction",Field(reaction,"_torso").Length>0);
+  }
+  var burn=Probe("Burn damage probe");using(scene.Push())burn.OnDamage(new Sandbox.DamageInfo(5,null,null){Position=new Vector3(10000,0,32),Tags=new TagSet(new[]{"burn"})});
+  Check("burn does not flinch",aiType.GetField("_hitReaction",flags).GetValue(burn)==null&&burn.Health==995f);
+  var zero=Probe("Zero damage probe");using(scene.Push())zero.OnDamage(new Sandbox.DamageInfo(0,null,null){Position=new Vector3(10000,0,32)});
+  Check("zero damage does not flinch",aiType.GetField("_hitReaction",flags).GetValue(zero)==null);
+  Set(zero,"IsDead",true);aiType.GetMethod("ReactToHit",flags).Invoke(zero,new object[]{Vector3.Backward,1f,false,0f});
+  Check("dead zombie ignores reaction",aiType.GetField("_hitReaction",flags).GetValue(zero)==null);
+ } else Check("damage probes skipped during live one hit powerup",true);
+}catch(Exception error){System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"verification-error.txt"),stage+"\n"+error);throw;}finally {scene.Destroy();}
+var preserved=editor.Scene.Id==user.Editor&&Game.ActiveScene?.Id==user.Runtime&&Game.IsPlaying==user.IsPlaying&&editor.HasUnsavedChanges==user.Dirty;
+Check("user scene and play preserved",preserved);
+var report=new{Checks=checks,Captures=captures};
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"native-checks.json"),System.Text.Json.JsonSerializer.Serialize(report,new System.Text.Json.JsonSerializerOptions{WriteIndented=true}));return report;

@@ -1,0 +1,6 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var old=Model.Load("models/maps/sewage/sewage_details.vmdl");
+var disk=System.IO.File.ReadAllText(System.IO.Path.Combine(root,"Assets/scenes/maps/sewage/sewage.scene"));
+var scene=System.Text.Json.Nodes.JsonNode.Parse(disk);
+var groups=scene["GameObjects"].AsArray().Count(x=>x["Name"]?.GetValue<string>()=="Waterworks caged work lamps");
+return new{OldAssetExists=System.IO.File.Exists(System.IO.Path.Combine(root,"Assets/models/maps/sewage/sewage_details.vmdl")),OldAssetLoads=old is not null&&!old.IsError,OldSourceExists=System.IO.File.Exists(System.IO.Path.Combine(root,"Assets/models/maps/sewage/sewage_details.obj")),SavedNewBase=disk.Contains("models/maps/sewage/work-lamps-v1/base_details.vmdl"),SavedNewLamps=disk.Contains("models/maps/sewage/work-lamps-v1/lamps.vmdl"),NewGroups=groups};

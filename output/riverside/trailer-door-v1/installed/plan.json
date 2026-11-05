@@ -1,0 +1,54 @@
+{
+  "source": "Assets/models/maps/riverside/riverside_low.obj",
+  "before_sha256": "7d1123e53a124572187aff9a61abbef653fbb0825204e973c49cf45bd32eae7a",
+  "after_sha256": "e41a6d85795c64c59d699e1f7bdb8d31c3b6b1b155669966ad0a0cf8c27e2766",
+  "model_sha256": "6b82180726da8b121095a51fd5d1d787747e2cb168fbe7b3321889297239730d",
+  "removed_triangles": 16,
+  "group": {
+    "__guid": "2181f9fe-1d22-5eab-a50a-e5efebac76b4",
+    "__version": 2,
+    "Flags": 0,
+    "Name": "Trailer Entry Doors",
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Tags": "",
+    "Enabled": true,
+    "NetworkMode": 2,
+    "NetworkFlags": 0,
+    "NetworkOrphaned": 0,
+    "NetworkTransmit": true,
+    "OwnerTransfer": 1,
+    "Components": [],
+    "Children": [
+      {
+        "__guid": "b2c7e72f-d139-5844-bdda-cdcd6fc76ce6",
+        "__version": 2,
+        "Flags": 0,
+        "Name": "T2 Entry Door",
+        "Position": "995.000000,891.826513,30.000000",
+        "Rotation": "0,0,1.0000000,0.0000000",
+        "Scale": "1,1,1",
+        "Tags": "",
+        "Enabled": true,
+        "NetworkMode": 2,
+        "NetworkFlags": 0,
+        "NetworkOrphaned": 0,
+        "NetworkTransmit": true,
+        "OwnerTransfer": 1,
+        "Components": [
+          {
+            "__type": "Sandbox.ModelRenderer",
+            "__guid": "6ddba3a5-81a9-5599-90a3-64ab4d3f3d4b",
+            "__enabled": true,
+            "Flags": 0,
+            "Model": "models/props/riverside/trailer_door_v1/door.vmdl",
+            "RenderType": "On",
+            "Tint": "1,1,1,1"
+          }
+        ],
+        "Children": []
+      }
+    ]
+  }
+}

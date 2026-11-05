@@ -1,0 +1,14 @@
+// AI-generated albedo, physically scaled fine chips in yellow enamel.
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    g_flMetalness ".08"
+    g_flRoughness ".67"
+    TextureColor "materials/sewage/rail-texture-v1/enamel_color.png"
+    TextureNormal "materials/default/default_normal.tga"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vTexCoordScale "[3.25 3.25]"
+    g_vColorTint "[1 1 1 1]"
+    g_flModelTintAmount "1"
+}

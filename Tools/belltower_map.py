@@ -622,8 +622,8 @@ def door_pot( model, wall, r, key ):
         return False
     d, sign, _ = wall_out( wall )
     c = wall.point( r, d + sign * 12, 0.0 )
-    Detail.lathe( model, c[:2], 0.0, [ ( 7.0, 0.0 ), ( 9.0, 15.0 ), ( 10.2, 15.5 ), ( 10.2, 18.0 ), ( 9.2, 18.0 ), ( 9.0, 16.5 ) ],
-                  "clay_pot", sides=14 )
+    import belltower_pots as Pots
+    Pots.place( model, c )
     soil = [ np.array( ( c[0] + 9.0 * math.cos( t ), c[1] + 9.0 * math.sin( t ), 16.5 ) )
              for t in np.linspace( 0.0, 2 * math.pi, 14, endpoint=False ) ]
     Detail.outward( model, "soil", soil, ( 0, 0, 1 ) )
@@ -760,6 +760,19 @@ def fixture_room( wall, r0, r1, z0, z1, but=None ):
 
 
 def wall_lantern( model, wall, r, z_top, but=None, reach=15.0, scale=0.8 ):
+    """Approved standalone fixture, retaining the original clearance and placement rules."""
+    import belltower_wall_lanterns as Lanterns
+    if not Lanterns.matches(reach,scale):
+        return _legacy_wall_lantern(model,wall,r,z_top,but=but,reach=reach,scale=scale)
+    box=(r-6,r+6,z_top-22,z_top+3)
+    if not fixture_room(wall,*box,but=but):return False
+    wall.fixtures=list(getattr(wall,"fixtures",()))+[box]
+    d,sign,out=wall_out(wall)
+    Lanterns.place(model,wall.point(r,d,z_top),math.degrees(math.atan2(out[1],out[0])))
+    return True
+
+
+def _legacy_wall_lantern( model, wall, r, z_top, but=None, reach=15.0, scale=0.8 ):
     """ A lantern hanging from a wrought-iron bracket on the wall at r: a back plate, an arm reach out at z_top with a
     brace and a scroll under it, a finial on its end and the lantern (belltower_detail's, scale 0.8) on a hook near it.
     Only where fixture_room() finds the wall clear; it's then noted in wall.fixtures. Drawn only. """
@@ -1401,10 +1414,7 @@ def fountain( model ):
 
 def market_cross( model ):
     StoneWear.market_steps( model, MARKET_CROSS, STONE )
-    model.cylinder( MARKET_CROSS, 13, 36, 200, { "side": "ashlar" }, sides=8, surface=STONE, turn=math.pi / 8 )
-    e, n = MARKET_CROSS
-    model.beam( ( e, n, 212 ), ( e, n, 266 ), ( 8, 8 ), "ashlar" )
-    model.beam( ( e - 20, n, 244 ), ( e + 20, n, 244 ), ( 8, 8 ), "ashlar" )
+    model.cylinder( MARKET_CROSS, 13, 36, 200, {}, sides=8, surface=STONE, turn=math.pi / 8 )
 
 
 def garden_well( model ):
@@ -1484,11 +1494,14 @@ def barrels( model, centre, count, rng, z=0.0, placements=None ):
 
 
 def sacks( model, centre, yaw, count, z=0.0 ):
+    import belltower_sack_piles as Piles
+    assert count==7 and yaw==0, "A different sack-pile arrangement requires its own model."
+    Piles.place(model,centre,yaw,z)
     p = Place( ( centre[0], centre[1], z ), yaw )
     for k in range( count ):
         row, level = k % 3, k // 3
         p.box( model, ( row * 22 - 22 + level * 6, -14, level * 14 ), ( row * 22 - 2 + level * 6, 14, level * 14 + 14 ),
-               "canvas_plain", FABRIC if level == 0 else None )
+               None, FABRIC if level == 0 else None )
 
 
 def cart( model, centre, yaw, z=0.0, load="sacks" ):
@@ -1914,10 +1927,8 @@ def inn( model, lights, rng ):
 
 def picnic_table( model, centre, yaw, z=0.0 ):
     p = Place( ( centre[0], centre[1], z ), yaw )
-    p.box( model, ( -42, -16, 27 ), ( 42, 16, 30 ), "planks" )
-    for s in ( -1, 1 ):
-        p.box( model, ( -42, s * 30 - 6, 15 ), ( 42, s * 30 + 6, 18 ), "planks" )
-        p.box( model, ( s * 32 - 2, -34, 0 ), ( s * 32 + 2, 34, 27 ), "planks_dark" )
+    from belltower_picnic_table import append_to
+    append_to( model, p )
     p.box( model, ( -42, -36, 0 ), ( 42, 36, 30 ), None, WOOD )
 
 
@@ -2232,7 +2243,8 @@ def street_props( model, rng ):
     barrels( model, ( -1890, 1060 ), 3, rng )
     barrels( model, ( -1890, -870 ), 2, rng )
     StoneWear.trough( model, ( -2290, 330, 0 ), ( -2260, 430, 30 ), STONE )
-    for n in ( -800, -350, 450, 1000, 1550 ):
+    # The door at n=475 has its own wall lantern; keep the pavement clear beside it.
+    for n in ( -800, -350, 1000, 1550 ):
         lamp_post( model, ( -1870, n ) )
     # Menu boards on the pavement: the café's onto the square, the Bakery's and the Inn's by their doors.
     Detail.sandwich_board( model, ( -628, -218 ), 0, "chalkboard_a" )
@@ -2922,9 +2934,32 @@ CATCH_FLOOR_Z = -6500
 
 
 def write_scene( lights, models ):
+    import belltower_pots as Pots
+    import belltower_menu_boards as Boards
+    import belltower_bistro_chairs as Chairs
+    import belltower_bistro_tables as Tables
+    import belltower_dish_lamps as Lamps
+    import belltower_market_cross as Cross
+    import belltower_sack_piles as Piles
+    import belltower_wall_lanterns as Lanterns
     foliage = []
+    pot_positions = []
+    board_positions = []
+    chair_positions = []
+    table_positions = []
+    lantern_positions = []
+    lamp_positions = []
+    pile_positions = []
     for region, model in models:
-        for index, prop in enumerate( model.props ):
+        pot_positions += [ ( region, prop["position"] ) for prop in model.props if prop.get( "kind" ) == "doorway_pot" ]
+        board_positions += [ ( region, prop["position"], prop["yaw"], prop["picture"] ) for prop in model.props if prop.get( "kind" ) == "menu_board" ]
+        chair_positions += [ ( region, prop["position"], prop["yaw"] ) for prop in model.props if prop.get( "kind" ) == "bistro_chair" ]
+        table_positions += [ ( region, prop["position"] ) for prop in model.props if prop.get( "kind" ) == "bistro_table" ]
+        lantern_positions += [ ( region, prop["position"], prop["yaw"] ) for prop in model.props if prop.get( "kind" ) == "wall_lantern" ]
+        lamp_positions += [ ( region, prop["position"] ) for prop in model.props if prop.get( "kind" ) == "dish_lamp" ]
+        pile_positions += [ ( region, prop["position"] ) for prop in model.props if prop.get( "kind" ) == "sack_pile" ]
+        # Standalone props must not renumber the existing trees and planting.
+        for index, prop in enumerate( p for p in model.props if p.get( "kind" ) not in ( "doorway_pot", "menu_board", "bistro_chair", "bistro_table", "wall_lantern", "dish_lamp", "sack_pile" ) ):
             key = f"foliage/{region}/{index}"
             foliage.append( K.game_object( ids, prop["name"], key, K.to_world( prop["position"] ),
                 K.yaw_rotation( prop["yaw"] ), scale=K.vec( prop["scale"] ), components=[
@@ -3037,6 +3072,14 @@ def write_scene( lights, models ):
         reflections_object(),
         town,
         K.game_object( ids, "Trees and planting", "foliage", children=foliage ),
+        Pots.group( ids, pot_positions ),
+        Boards.group( ids, board_positions ),
+        Chairs.group( ids, chair_positions ),
+        Tables.group( ids, table_positions ),
+        Lanterns.group( ids, lantern_positions ),
+        Lamps.group( ids, lamp_positions ),
+        Piles.group( ids, pile_positions ),
+        Cross.group( ids ),
         K.game_object( ids, "Lights", "lights", children=light_objects ),
         # Free-for-all modes spawn at every active spawn point, so the spawn roads' team spawns are left out of them.
         mode_group( "Team Spawns", "spawns", ( "Deathmatch", "Gun Game" ), team_spawns, inverse=True ),

@@ -1,0 +1,35 @@
+var session=Editor.SceneEditorSession.Active;
+if (session?.Scene is null || !session.Scene.Name.Equals("riverside",StringComparison.OrdinalIgnoreCase) || session.IsPlaying || session.HasUnsavedChanges) throw new Exception("Need clean Riverside edit mode");
+var project=Sandbox.Project.Current.GetRootPath();
+var folder=System.IO.Path.Combine(project,"output/asset-improvement-20261030/riverside-pole-insulator/installed");
+var plan=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"plan.json")));
+string Hash(byte[] b)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(b)).ToLowerInvariant();
+var source=System.IO.Path.Combine(project,plan["source"].GetValue<string>());
+var modelSource=System.IO.Path.ChangeExtension(source,".vmdl");
+void Guard()
+{
+    var hash=Hash(System.IO.File.ReadAllBytes(source));
+    if (hash!=plan["before_sha256"].GetValue<string>() && hash!=plan["after_sha256"].GetValue<string>()) throw new Exception("Dressing changed after staging");
+    if (Hash(System.IO.File.ReadAllBytes(modelSource))!=plan["model_sha256"].GetValue<string>()) throw new Exception("Dressing ModelDoc changed after staging");
+}
+Guard();
+foreach (var name in new[] { "pole_insulator", "pole_insulator_bare" })
+{
+    var path="models/props/riverside/pole_insulator_v2/"+name+".vmdl";
+    var asset=Editor.AssetSystem.FindByPath(path) ?? throw new Exception("Missing approved model: "+path);
+    await asset.CompileIfNeededAsync();
+    if (Model.Load(path).IsError) throw new Exception("Invalid model: "+path);
+}
+Guard();
+var staged=System.IO.File.ReadAllBytes(System.IO.Path.Combine(folder,"dressing-without-old-insulators.obj"));
+if (Hash(staged)!=plan["after_sha256"].GetValue<string>()) throw new Exception("Staged cut mismatch");
+System.IO.File.WriteAllBytes(source,staged);
+using (session.Scene.Push())
+{
+    var group=session.Scene.GetAllObjects(true).SingleOrDefault(g=>g.Name=="Pole Insulators");
+    if (group is null) { group=new GameObject(false,"Pole Insulators");group.Deserialize(plan["group"].AsObject()); }
+    var renderers=group.GetComponentsInChildren<ModelRenderer>().ToArray();
+    if (renderers.Length!=48 || renderers.Any(r=>r.Model is null || r.Model.IsError)) throw new Exception("Expected 48 valid insulators");
+    session.HasUnsavedChanges=true;
+    return new {Insulators=renderers.Length,Wired=renderers.Count(r=>r.Model.ResourcePath.EndsWith("/pole_insulator.vmdl")),Bare=renderers.Count(r=>r.Model.ResourcePath.EndsWith("/pole_insulator_bare.vmdl")),OldFacesRemoved=768,AddedLights=group.GetComponentsInChildren<Light>().Count(),AddedColliders=group.GetComponentsInChildren<Collider>().Count(),NeedsSave=true};
+}

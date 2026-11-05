@@ -1,0 +1,11 @@
+var project=Sandbox.Project.Current.GetRootPath();
+var path="materials/riverside/rs_porch_light.vmat";
+var source=System.IO.Path.Combine(project,"Assets",path);
+var folder=System.IO.Path.Combine(project,"output/asset-improvement-20261030/riverside-porch-light/installed/legacy-cleanup/retired-material");
+System.IO.Directory.CreateDirectory(folder);
+if (!System.IO.File.Exists(source)) return new { AlreadyDeleted=true };
+foreach (var suffix in new[] { "", ".meta", "_c" })
+    if (System.IO.File.Exists(source+suffix)) System.IO.File.Copy(source+suffix,System.IO.Path.Combine(folder,"rs_porch_light.vmat"+suffix),true);
+var asset=Editor.AssetSystem.FindByPath(path) ?? throw new Exception("Legacy material not registered");
+if (!asset.Delete()) throw new Exception("Could not delete retired material");
+return new { Deleted=true,SourceRemains=System.IO.File.Exists(source),CompiledRemains=System.IO.File.Exists(source+"_c"),MetadataRemains=System.IO.File.Exists(source+".meta") };

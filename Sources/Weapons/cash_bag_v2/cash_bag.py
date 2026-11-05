@@ -220,16 +220,43 @@ def shoulder_strap():
     pts = spline([rings[-1]] + body + [rings[1]], 2)
     normals = [v.normalized() for v in spline([Vector((0, -1, 0))] + outs + [Vector((0, 1, 0))], 2)]
     ribbon(add(Part(WEB, 3, name="shoulder strap")), pts, normals, 1.1, 0.1)
-    p, _ = surface(-0.12, 1.36, 0.08)
-    box(add(Part(ZINC, 2, bevel=0.015, angle=40, name="slider")), (6.3, p.y - 0.34, p.z - 0.72), (6.47, p.y + 0.34, p.z + 0.72))
+    # A tri-glide, with daylight through its two slots rather than a solid plate.
+    i = min(range(1, len(pts) - 1), key=lambda i: abs(pts[i].y - (YC - HALF * 0.12)))
+    m = frame(pts[i] + normals[i] * 0.06, normals[i], pts[i+1] - pts[i-1])
+    outline = rounded_rectangle(0.46, 0.66, 0.17)
+    tube(add(Part(ZINC, 2, name="slider frame")), [m @ v for v in outline], 0.085, 6, closed=True)
+    tube(add(Part(ZINC, 2, name="slider bar")), [m @ Vector((0, -0.66, 0)), m @ Vector((0, 0.66, 0))], 0.095, 6)
+
+
+def rounded_rectangle(hx, hy, radius):
+    points = []
+    for cx, cy, start in ((hx-radius, hy-radius, 0), (-hx+radius, hy-radius, 90),
+                          (-hx+radius, -hy+radius, 180), (hx-radius, -hy+radius, 270)):
+        for angle in np.linspace(start, start + 90, 4):
+            a = math.radians(angle)
+            points.append(Vector((cx + radius * math.cos(a), cy + radius * math.sin(a), 0)))
+    return points
+
+
+def zip_teeth():
+    # Real teeth catch light along the open rim. Tiny parts drop out beyond LOD 0.
+    for side in (-1, 1):
+        for y in np.arange(YC - 9.25, YC + 9.26, 0.28):
+            t = (y - YC) / HALF
+            phi = OPEN_MAX * max(0, 1 - (y / OPEN_HALF) ** 2) ** 0.6
+            p, out = surface(t, side * (math.pi - phi), 0.1)
+            m = frame(p + out * 0.04 + Vector((-side * 0.065, 0, 0)), out, (0, 1, 0))
+            box(add(Part(ZINC, 0, name="zip tooth")), (-0.085, -0.13, -0.035), (0.085, 0.13, 0.035), m)
 
 
 def zip_pulls():
     for y, side in ((YC + OPEN_HALF * 0.86, 1), (YC - OPEN_HALF * 0.86, -1)):
         p, out = surface((y - YC) / HALF, side * (math.pi - 0.2), 0.14)
         box(add(Part(ZINC, 2, bevel=0.015, angle=40, name="zip slider")), (p.x - 0.28, p.y - 0.42, p.z - 0.06), (p.x + 0.28, p.y + 0.42, p.z + 0.15))
-        pull = spline([(p.x, p.y, p.z + 0.12), (p.x + side * 0.5, p.y + 0.28, p.z + 0.2), (p.x + side * 1.25, p.y + 0.34, p.z - 0.05)], 2)
-        tube(add(Part(RUBBER, 1, name="zip pull")), pull, 0.13, 6, flatten=0.5)
+        m = frame((p.x + side * 0.78, p.y + 0.2, p.z + 0.18), (0, 0, 1), (side, 0.24, 0))
+        pull = [m @ v for v in rounded_rectangle(0.57, 0.22, 0.14)]
+        tube(add(Part(ZINC, 1, name="zip pull")), pull, 0.075, 6, closed=True)
+        tube(add(Part(ZINC, 1, name="zip pull hinge")), [(p.x, p.y, p.z + 0.16), (p.x + side * 0.28, p.y + 0.07, p.z + 0.18)], 0.065, 6)
 
 
 def banknote_bundle(x, y, z, yaw, roll, pitch):
@@ -262,6 +289,7 @@ def geometry():
     for side in (-1, 1):
         handle(side)
     shoulder_strap()
+    zip_teeth()
     zip_pulls()
     contents()
 
@@ -428,7 +456,7 @@ def write_hull(out):
             h.write("f " + " ".join(str(i) for i in f) + "\n")
 
 
-def export_stage():
+def export_stage(write_resources=True):
     bpy.ops.wm.open_mainfile(filepath=BLEND)
     out = os.path.join(ROOT, "Assets", OUT_DIR)
     os.makedirs(out, exist_ok=True)
@@ -490,6 +518,9 @@ def export_stage():
             h.writelines(faces)
         counts[lod] = n_tris
         print("lod", lod, "tris", n_tris, flush=True)
+    if not write_resources:
+        print("exported meshes", counts, flush=True)
+        return
     with open(os.path.join(out, "cash_bag.mtl"), "w", newline="\n") as h:
         h.write("newmtl cb_bag\nKd 1 1 1\nd 1\n")
     write_hull(out)
@@ -618,4 +649,6 @@ if "bake" in STAGES:
     bake_stage()
 if "export" in STAGES:
     export_stage()
+if "export-meshes" in STAGES:
+    export_stage(write_resources=False)
 print("cash bag stages done", flush=True)

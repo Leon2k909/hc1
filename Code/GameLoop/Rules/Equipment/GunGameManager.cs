@@ -20,7 +20,7 @@ public sealed class GunGameManager : Component,
 	public List<EquipmentResource> WeaponProgression { get; set; } = new();
 
 	/// <summary>
-	/// Synced dictionary of PlayerPawn component Guid -> current tier index.
+	/// Synced dictionary of persistent Client component Guid -> current tier index.
 	/// </summary>
 	[Sync( SyncFlags.FromHost )]
 	public NetDictionary<Guid, int> PlayerTiers { get; private set; } = new();
@@ -48,8 +48,11 @@ public sealed class GunGameManager : Component,
 	public int GetPlayerTier( PlayerPawn player )
 	{
 		if ( !player.IsValid() ) return 0;
-		return PlayerTiers.GetValueOrDefault( player.Id, 0 );
+		return PlayerTiers.GetValueOrDefault( TierKey( player ), 0 );
 	}
+
+	// Respawning replaces the pawn, while its client persists for the match.
+	private static Guid TierKey( PlayerPawn player ) => player.Client.IsValid() ? player.Client.Id : player.Id;
 
 	/// <summary>
 	/// Gets the EquipmentResource for a given tier index.
@@ -111,24 +114,24 @@ public sealed class GunGameManager : Component,
 		// ── Victim demotion ──────────────────────────────────────────────────
 		if ( killedWithKnife && KnifeKillsDemote )
 		{
-			var victimTier = PlayerTiers.GetValueOrDefault( victimPlayer.Id, 0 );
+			var victimTier = GetPlayerTier( victimPlayer );
 			if ( victimTier > 0 )
 			{
 				var demotedTier = victimTier - 1;
-				PlayerTiers[victimPlayer.Id] = demotedTier;
+				PlayerTiers[TierKey( victimPlayer )] = demotedTier;
 				GivePlayerWeapon( victimPlayer, GetWeaponForTier( demotedTier ) );
 				BroadcastTierChanged( victimPlayer, demotedTier, false );
 			}
 		}
 
 		// ── Killer advancement ───────────────────────────────────────────────
-		var currentTier = PlayerTiers.GetValueOrDefault( killerPlayer.Id, 0 );
+		var currentTier = GetPlayerTier( killerPlayer );
 		var nextTier = currentTier + 1;
 
 		// If the player is already on the last tier AND killed with knife → WIN
 		if ( currentTier == TotalTiers - 1 && killedWithKnife )
 		{
-			PlayerTiers[killerPlayer.Id] = TotalTiers;
+			PlayerTiers[TierKey( killerPlayer )] = TotalTiers;
 			BroadcastWin( killerPlayer );
 			return;
 		}
@@ -139,7 +142,7 @@ public sealed class GunGameManager : Component,
 			nextTier = TotalTiers - 1; // Stay on the knife tier
 		}
 
-		PlayerTiers[killerPlayer.Id] = nextTier;
+		PlayerTiers[TierKey( killerPlayer )] = nextTier;
 		GivePlayerWeapon( killerPlayer, GetWeaponForTier( nextTier ) );
 		BroadcastTierChanged( killerPlayer, nextTier, true );
 	}

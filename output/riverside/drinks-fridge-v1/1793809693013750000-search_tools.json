@@ -1,0 +1,79 @@
+{
+  "tools": [
+    {
+      "name": "editor_status",
+      "title": "Get Editor Status",
+      "toolset": "editor",
+      "description": "Get the current state of the editor - engine version, which project is open, the active scene and whether it has unsaved changes, whether play mode is running or paused, how many tools are registered, the directory paths that matter (logs, project code and assets), and the state of the code compiler. Check IsCompiling/LastCompileSucceeded here after editing code instead of relying on read_console - a successful compile can scroll out of view or be mistaken for the last failure you saw.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "annotations": {
+        "readOnlyHint": true
+      },
+      "outputSchema": {
+        "type": "object",
+        "properties": {
+          "EngineVersion": {
+            "type": "string"
+          },
+          "Project": {
+            "type": "string"
+          },
+          "ProjectTitle": {
+            "type": "string"
+          },
+          "ActiveScene": {
+            "type": "string"
+          },
+          "ActiveScenePath": {
+            "type": "string"
+          },
+          "SceneHasUnsavedChanges": {
+            "type": "boolean"
+          },
+          "IsPlaying": {
+            "type": "boolean"
+          },
+          "IsPaused": {
+            "type": "boolean"
+          },
+          "ToolCount": {
+            "type": "integer"
+          },
+          "IsCompiling": {
+            "type": "boolean"
+          },
+          "LastCompileSucceeded": {
+            "type": "boolean"
+          },
+          "LastCompileErrors": {
+            "type": "integer"
+          },
+          "Paths": {
+            "type": "object",
+            "properties": {
+              "Engine": {
+                "type": "string"
+              },
+              "Logs": {
+                "type": "string"
+              },
+              "ProjectRoot": {
+                "type": "string"
+              },
+              "ProjectSettings": {
+                "type": "string"
+              }
+            },
+            "required": []
+          }
+        },
+        "required": []
+      }
+    }
+  ],
+  "total": 402
+}

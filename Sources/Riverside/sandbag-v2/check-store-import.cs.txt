@@ -1,0 +1,29 @@
+var project=Sandbox.Project.Current.GetRootPath();
+var model=Model.Load("models/maps/riverside/riverside_store.vmdl");
+if (model is null || model.IsError) throw new Exception("Compiled store is invalid");
+string PathOf(object material)
+{
+    var type=material.GetType();
+    return (type.GetProperty("ResourcePath")?.GetValue(material) ?? type.GetProperty("Name")?.GetValue(material) ?? material.ToString())?.ToString() ?? "";
+}
+var names=model.Materials.Select(m=>PathOf(m)).ToArray();
+var publicModel=System.IO.Path.Combine(project,"Assets/models/maps/riverside/riverside_store.vmdl");
+var imports=System.Text.RegularExpressions.Regex.Matches(System.IO.File.ReadAllText(publicModel),"filename\\s*=\\s*\"([^\"]+\\.obj)\"").Cast<System.Text.RegularExpressions.Match>().Select(m=>m.Groups[1].Value).Distinct().ToArray();
+var oldFaces=0;
+foreach (var import in imports)
+{
+    var material="";
+    foreach (var line in System.IO.File.ReadLines(System.IO.Path.Combine(project,"Assets",import)))
+    {
+        if (line.StartsWith("usemtl ")) material=line.Substring(7).Trim();
+        if (material=="rs_sandbag" && line.StartsWith("f ")) oldFaces++;
+    }
+}
+if (oldFaces!=0) throw new Exception("Published store import contains old bag faces: " + oldFaces);
+var compiled=publicModel+"_c";
+var fresh=imports.All(p=>System.IO.File.GetLastWriteTimeUtc(compiled)>System.IO.File.GetLastWriteTimeUtc(System.IO.Path.Combine(project,"Assets",p))) && System.IO.File.GetLastWriteTimeUtc(compiled)>System.IO.File.GetLastWriteTimeUtc(publicModel);
+if (!fresh) throw new Exception("Compiled store is older than its source");
+var session=Editor.SceneEditorSession.Active;
+var report=new { ModelValid=!model.IsError,CompiledAfterSources=fresh,OldBagSourceFaces=oldFaces,UnusedOldMaterialInTable=names.Any(n=>n.Contains("rs_sandbag",StringComparison.OrdinalIgnoreCase)),MaterialCount=names.Length,SavedBags=session.Scene.GetAllComponents<ModelRenderer>().Count(r=>r.Model?.ResourcePath.Contains("sandbag_v2/sandbag_")==true),SceneDirty=session.HasUnsavedChanges,session.IsPlaying };
+System.IO.File.WriteAllText(System.IO.Path.Combine(project,"output/asset-improvement-20261030/riverside-sandbags/installed/store-import-reconciliation/loaded-check.json"),System.Text.Json.JsonSerializer.Serialize(report,new System.Text.Json.JsonSerializerOptions{WriteIndented=true}));
+return report;

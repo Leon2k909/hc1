@@ -747,3 +747,10 @@
   and the 94-spot collision/reachability checks. A short live performance sample preceded the 1,600 landscape trees;
   it is not a benchmark for the final map. Full bot, mode and runtime navmesh validation remains separate work.
 
+- Doorway lamp overlap (2026-11-04): removed the two mirrored street posts at plan `(±1870,450)`;
+  the doorway at n475 keeps its wall lantern. `belltower_map.py` preserves the removal on regeneration.
+  `Tools/belltower_remove_doorway_posts.py` stages only their render triangles and four collision hulls;
+  native import uses `Sources/Belltower/editor/import-doorway-post-removal-v1.cs.txt`.
+  Both models compiled, four physics rays changed from hits to clear, and native west/east captures confirm
+  the removal. The scene and other referenced meshes are unchanged; Riverside stayed selected and stopped.
+  `Sources/Belltower/props/doorway-post-removal-v1.json` records the installed hashes and captures.

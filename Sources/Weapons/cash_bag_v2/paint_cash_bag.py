@@ -114,18 +114,16 @@ for side in (-1, 1):
 stitch_mask = stitches.astype(np.float32)
 c_color = mix(c_color, flat((170, 160, 128)), stitch_mask * 0.82)
 c_height = c_height + stitch_mask * 0.012 - smooth(0.14, 0.0, np.abs(to_lip - 0.74)) * 0.006
-# Zip tape on the canvas, with the teeth down its middle.
-teeth = (0.5 + 0.5 * np.sin(Y * 2 * math.pi / 0.2)) * smooth(0.2, 0.06, to_lip)
+# Zip tape on the canvas. Teeth are mesh parts, so the tape has no painted metal stripe.
 c_color = mix(c_color, flat((26, 26, 26)) * (0.8 + 0.3 * fine[..., None]), tape)
-c_color = mix(c_color, flat((150, 150, 142)), teeth * tape * 0.8)
-c_height = c_height + tape * 0.02 + teeth * tape * 0.02
+c_height = c_height + tape * 0.02
 # Grime in the creases, a stain low down, and dust on the top.
 stain = smooth(0.56, 0.78, field(noise(pts, 0.28, 24, 4)))
 c_color = c_color * (1 - stain[..., None] * np.array((0.2, 0.22, 0.26), np.float32))
 c_color = mix(c_color, flat((142, 128, 100)), smooth(0.5, 0.95, np.clip(NZ, 0, 1) * 0.84 + (big - 0.5) * 0.3) * 0.16)
 color = np.where(bag[..., None], c_color, color)
 rough = np.where(bag, np.where(tape > 0.5, 0.62, 0.9 + 0.08 * fine), rough)
-metal = np.where(bag, teeth * tape * 0.8, metal)
+metal = np.where(bag, 0.0, metal)
 height = np.where(bag, c_height, height)
 
 # Dark lining.

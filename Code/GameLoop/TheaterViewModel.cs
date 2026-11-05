@@ -433,7 +433,7 @@ public sealed class TheaterViewModel
 		if ( effects.SmokeScale > 0f )
 			Particle( weapon.Smoke, muzzle, effects.SmokeScale, "Muzzle smoke" );
 
-		viewModel.EjectCasing( weapon.Ejection );
+		viewModel.EjectCasing( weapon.Ejection, resource: weapon.Resource );
 	}
 
 	static void Particle( GameObject prefab, GameObject muzzle, float scale, string name )

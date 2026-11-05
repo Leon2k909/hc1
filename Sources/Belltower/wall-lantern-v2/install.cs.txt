@@ -1,0 +1,89 @@
+// User approved the wall lantern. Preserve all 24 placements and retain the original asset.
+var root=Sandbox.Project.Current.GetRootPath();
+var directory=System.IO.Path.Combine(System.IO.Path.GetTempPath(),"belltower-wall-lantern-v2/install-stage");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(directory,"manifest.json")));
+if(manifest["revision"].GetValue<string>()!="belltower-wall-lantern-v2-install" || manifest["lanterns"].GetValue<int>()!=24)throw new InvalidOperationException("Wrong installation plan.");
+string Hash(string path) {using var s=System.IO.File.OpenRead(path);return Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(s)).ToLowerInvariant();}
+var session=Editor.SceneEditorSession.All.Single(s=>s.Scene.IsEditor && s.Scene.Source?.ResourcePath?.Equals("scenes/maps/belltower/belltower.scene",StringComparison.OrdinalIgnoreCase)==true);
+if(session.HasUnsavedChanges || session.IsPlaying)throw new InvalidOperationException("Requires the saved, stopped Belltower editor scene.");
+var previous=Editor.SceneEditorSession.Active;var game=Game.ActiveScene?.Id;var playing=Game.IsPlaying;
+var scene=session.Scene;var scenePath=System.IO.Path.Combine(root,"Assets/scenes/maps/Belltower/belltower.scene");
+if(Hash(scenePath)!=manifest["scene_before"].GetValue<string>())throw new InvalidOperationException("Scene changed since staging.");
+foreach(var p in manifest["protected"].AsObject())if(Hash(System.IO.Path.Combine(root,p.Key))!=p.Value.GetValue<string>())throw new InvalidOperationException("Protected source changed: "+p.Key);
+var groupPath=System.IO.Path.Combine(directory,"lanterns.json");
+if(Hash(groupPath)!=manifest["group_sha256"].GetValue<string>())throw new InvalidOperationException("Lantern placements changed.");
+var data=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(groupPath)).AsObject();
+var id=Guid.Parse(data["__guid"].GetValue<string>());
+if(scene.GetAllObjects(true).Any(o=>o.Id==id || o.Name=="Wall lanterns"))throw new InvalidOperationException("Lantern group already present; inspect before repeating.");
+var pot=Model.Load("models/maps/belltower/wall-lantern-v2/wall_lantern.vmdl");
+if(pot is null || pot.IsError)throw new InvalidOperationException("Approved model did not load.");
+var original=Model.Load("models/maps/belltower/wall-lantern-original/wall_lantern_original.vmdl");
+if(original is null || original.IsError)throw new InvalidOperationException("Retained original failed to load.");
+var plan=new System.Collections.Generic.List<(string Target,string Source,string Backup,string Before,string After)>();
+foreach(var p in manifest["files"].AsObject())
+{
+ if(p.Key.Contains("..") || !(p.Key.StartsWith("Assets/models/maps/belltower/") || p.Key.StartsWith("Assets/models/compare_old/headstone-preview/")))throw new InvalidOperationException("Unexpected target.");
+ var r=p.Value;var target=System.IO.Path.Combine(root,p.Key);var source=r["source"].GetValue<string>();var backup=r["backup"].GetValue<string>();var before=r["before"].GetValue<string>();var after=r["after"].GetValue<string>();
+ var current=Hash(target);
+ if(Hash(source)!=after || Hash(backup)!=before || (current!=before && current!=after))throw new InvalidOperationException("Publication input changed: "+p.Key);
+ if(current!=after)plan.Add((target,source,backup,before,after));
+}
+System.IO.File.Copy(scenePath,System.IO.Path.Combine(directory,"belltower-before.scene"),true);
+var originalObjects=scene.GetAllObjects(true).ToArray();
+var oldIds=originalObjects.Select(o=>o.Id).ToHashSet();
+var oldPhysics=scene.GetAllComponents<ModelCollider>().Select(c=>c.Serialize().ToJsonString()).ToArray();
+foreach(var item in plan)
+{
+ cancellationToken.ThrowIfCancellationRequested();
+ var incoming=System.IO.Path.Combine(directory,"incoming",System.IO.Path.GetRelativePath(root,item.Target));
+ System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(incoming));
+ System.IO.File.Copy(item.Source,incoming,true);
+ if(Hash(incoming)!=item.After)throw new InvalidOperationException("Incoming asset differs.");
+ for(var attempt=0;attempt<20;attempt++)
+ {
+  try
+  {
+   // Hold a delete-sharing read lease so fresh diff previews cannot reopen
+   // the old mapped source between validation and the atomic replacement.
+   using var lease=new System.IO.FileStream(item.Target,System.IO.FileMode.Open,System.IO.FileAccess.Read,System.IO.FileShare.Delete);
+   var leasedHash=Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(lease)).ToLowerInvariant();
+   if(leasedHash!=item.Before)throw new InvalidOperationException("Source changed before replacement: "+item.Target);
+   try {System.IO.File.Move(incoming,item.Target,true);}
+   catch(Exception e) when(e is System.IO.IOException || e is UnauthorizedAccessException)
+   {
+    var retained=System.IO.Path.Combine(directory,"retained",System.IO.Path.GetRelativePath(root,item.Target));
+    System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(retained));
+    System.IO.File.Move(item.Target,retained,true);
+    try {System.IO.File.Move(incoming,item.Target);}
+    catch {System.IO.File.Move(retained,item.Target);throw;}
+   }
+   break;
+  }
+  catch(Exception error) when(error is System.IO.IOException || error is UnauthorizedAccessException)
+  {
+   var current=System.IO.File.Exists(item.Target) ? Hash(item.Target) : null;
+   if(current==item.After)break;
+   if(current!=item.Before || attempt==19)throw new InvalidOperationException("Could not publish: "+item.Target+"; "+error.Message,error);
+   cancellationToken.ThrowIfCancellationRequested();
+   System.Threading.Thread.Sleep(100);
+  }
+ }
+ if(Hash(item.Target)!=item.After)throw new InvalidOperationException("Published source differs.");
+ Editor.AssetSystem.RegisterFile(item.Target);
+}
+GameObject added=null;
+try
+{
+ using(scene.Push()) {added=scene.CreateObject(false);added.Deserialize(data.DeepClone().AsObject());}
+ if(added.Children.Count!=24 || added.Children.Any(o=>o.Components.Get<ModelRenderer>()?.Model?.ResourcePath is not string modelPath || (modelPath!=pot.ResourcePath)))throw new InvalidOperationException("Not all 24 lanterns were created.");
+ if(!oldPhysics.SequenceEqual(scene.GetAllComponents<ModelCollider>().Select(c=>c.Serialize().ToJsonString())))throw new InvalidOperationException("Physics changed.");
+ session.HasUnsavedChanges=true;
+ session.Save(false);
+ if(session.HasUnsavedChanges)throw new InvalidOperationException("Belltower did not save.");
+ var preserved=ReferenceEquals(previous,Editor.SceneEditorSession.Active)&&Game.ActiveScene?.Id==game&&Game.IsPlaying==playing;
+ if(!preserved)throw new InvalidOperationException("Previous editor/play state changed; inspect completed save.");
+ var result=new{LanternsInstalled=24,OldTrianglesRemoved=23040,SourceSceneSha256=Hash(scenePath),SceneSaved=true,ExistingObjectIdsPreserved=oldIds.IsSubsetOf(scene.GetAllObjects(true).Select(o=>o.Id).ToHashSet()),PhysicsPreserved=true,PreviousEditorAndGamePreserved=preserved};
+ System.IO.File.WriteAllText(System.IO.Path.Combine(directory,"installed.json"),System.Text.Json.JsonSerializer.Serialize(result));
+ return result;
+}
+catch {if(added.IsValid())session.HasUnsavedChanges=true;throw;}

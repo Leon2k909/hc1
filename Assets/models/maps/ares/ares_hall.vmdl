@@ -13,6 +13,11 @@
 						_class = "DefaultMaterialGroup"
 						remaps =
 						[
+{ from = "ar_in_locker_ar_gunmetal.vmat" to = "materials/ares/ar_gunmetal.vmat" },
+{ from = "ar_in_locker_ar_steel.vmat" to = "materials/ares/ar_steel.vmat" },
+{ from = "ar_in_locker_ar_dark.vmat" to = "materials/ares/ar_dark.vmat" },
+{ from = "ar_in_locker_ar_white.vmat" to = "materials/ares/ar_white.vmat" },
+{ from = "ar_in_locker_ar_brass.vmat" to = "materials/ares/ar_brass.vmat" },
 { from = "ar_in_alloy.vmat" to = "materials/ares/interior-v1/alloy.vmat" },
 { from = "ar_in_dark.vmat" to = "materials/ares/interior-v1/dark.vmat" },
 { from = "ar_in_floor.vmat" to = "materials/ares/floor-finish-v4/plate.vmat" },
@@ -80,7 +85,20 @@
 				_class = "RenderMeshList"
 				children =
 				[
-					{
+										{
+						_class = "RenderMeshFile"
+						name = "storage_lockers"
+						filename = "models/maps/ares/locker-v1/installed_lockers.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
 						_class = "RenderMeshFile"
 						name = "ares_hall"
 						filename = "models/maps/ares/pressure-doors-v2/hall_base.obj"

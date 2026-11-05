@@ -1,0 +1,5 @@
+var session=Editor.SceneEditorSession.All.Single(s=>s.Scene?.Name.Equals("riverside",StringComparison.OrdinalIgnoreCase)==true && !s.IsPlaying);
+if(session.HasUnsavedChanges)throw new Exception("Unsaved Riverside");
+var path=System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(),"output/riverside/t2-precast-entry-v1/installed/session-before.json");
+System.IO.File.WriteAllText(path,session.Scene.Serialize().ToJsonString());
+return new {session.HasUnsavedChanges};

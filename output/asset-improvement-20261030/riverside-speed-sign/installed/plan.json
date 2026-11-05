@@ -1,0 +1,55 @@
+{
+  "source": "Assets\\models\\maps\\riverside\\riverside_pad.obj",
+  "before_sha256": "1908a3c23220a8b7c69ffae5c2ff4a836b3e89328b3152548c9381da7db2b8b5",
+  "after_sha256": "416a82aa3e3d2343143143694ff11a1e56f47821f4491849cda262ff7b7a140d",
+  "removed_triangles": 16,
+  "model_sha256": "b188aa86cc883e6b6934b1e148c252f7fd69bcd55192aead0e881376d13e81ac",
+  "group": {
+    "__guid": "cc6d0b7c-8f47-53ec-8884-d0334f2582e1",
+    "__version": 2,
+    "Flags": 0,
+    "Name": "Speed-Limit Signs",
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Tags": "",
+    "Enabled": true,
+    "NetworkMode": 2,
+    "NetworkFlags": 0,
+    "NetworkOrphaned": 0,
+    "NetworkTransmit": true,
+    "OwnerTransfer": 1,
+    "Components": [],
+    "Children": [
+      {
+        "__guid": "cae06991-75c6-5e28-a6fb-d458a9bb6f65",
+        "__version": 2,
+        "Flags": 0,
+        "Name": "Speed-Limit Sign",
+        "Position": "-30.00000,85.00000,96.00000",
+        "Rotation": "0,0,-0.9819564,0.1891075",
+        "Scale": "1,1,1",
+        "Tags": "",
+        "Enabled": true,
+        "NetworkMode": 2,
+        "NetworkFlags": 0,
+        "NetworkOrphaned": 0,
+        "NetworkTransmit": true,
+        "OwnerTransfer": 1,
+        "Components": [
+          {
+            "__type": "Sandbox.ModelRenderer",
+            "__guid": "5a3f939d-d757-505c-a0e6-2199b28922e2",
+            "__enabled": true,
+            "Flags": 0,
+            "BodyGroups": 18446744073709551615,
+            "Model": "models/props/riverside/speed_sign_v2/speed_sign.vmdl",
+            "RenderType": "On",
+            "Tint": "1,1,1,1"
+          }
+        ],
+        "Children": []
+      }
+    ]
+  }
+}

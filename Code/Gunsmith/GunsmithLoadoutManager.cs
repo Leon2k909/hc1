@@ -688,11 +688,13 @@ public static class GunsmithLoadoutManager
 		payload = null;
 		error = null;
 
-		var clean = code.Trim();
+		if ( !WeaponBuildCodeText.TryNormalize( code, MaxSharedBuildCodeLength, out var clean ) )
+		{
+			error = "That build code is not valid.";
+			return false;
+		}
 		if ( clean.StartsWith( WeaponBuildCodePrefix, StringComparison.OrdinalIgnoreCase ) )
 			clean = clean.Substring( WeaponBuildCodePrefix.Length );
-
-		clean = clean.Replace( "\r", "" ).Replace( "\n", "" ).Replace( " ", "" );
 
 		try
 		{
