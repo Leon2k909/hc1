@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../Code/Utils/Explosion.cs" Link="Explosion.cs" />
+    <Compile Include="../../Code/Utils/BlastImpulseRules.cs" Link="BlastImpulseRules.cs" />
+  </ItemGroup>
+</Project>
