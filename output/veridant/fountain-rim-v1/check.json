@@ -1,0 +1,1 @@
+{"code":"var s=Editor.SceneEditorSession.All.First(x=>x.Scene.Name==\"veridant\");var m=Model.Load(\"models/maps/veridant/fountain-rim-v1/coping.vmdl\");return new{m.IsError,Objects=s.Scene.GetAllObjects(true).Count(x=>x.Name==\"Forecourt fountain coping\"),s.HasUnsavedChanges,Game.IsPlaying};"}

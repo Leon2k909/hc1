@@ -1,0 +1,1 @@
+{"code":"var t=AppDomain.CurrentDomain.GetAssemblies().Select(a=>a.GetType(\"Sandbox.ScreenshotService\")).First(x=>x!=null);return t.GetMethod(\"RequestCapture\",System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic).Invoke(null,null);"}

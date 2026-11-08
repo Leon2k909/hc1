@@ -1,0 +1,5 @@
+# Ares concourse pillar guard — native review
+
+REJECTED by the user on 2026-11-05. Original was never replaced and remains active. Verified all public/source hashes unchanged; retired private candidate game assets outside Assets. See `rejected.json`. Historical description follows; do not install the proposal.
+
+At plan `-650,-1076,0`,24 actual old sleeve/cap triangles become3,184 private guard triangles. Structural pillar, original29×29×32 envelope, collision, public scene and shared materials unchanged. Four fitted hazard panels/gaskets, L-section corner guards, small anchors, sixteen panel fasteners and folded brass return. Existing Collider88-inch structural base audited and unsuitable for this jacket. Matching engine inspection views use identical temporary point light in both variants because the saved concourse is dark; saved lighting unchanged. Original remains active. See `Sources/Ares/concourse-column-guard-v1/README.md` and `output/ares/concourse-column-guard-v1/verification.json`.

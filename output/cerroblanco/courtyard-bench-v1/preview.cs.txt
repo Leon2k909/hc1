@@ -1,0 +1,34 @@
+var folder="C:/sbox-projects/hc1/forked-shooter-main/output/cerroblanco/courtyard-bench-v1";
+var root=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(folder+"/before-install.scene")).AsObject();
+var labels=new System.Collections.Generic.HashSet<string>{"Sun","Sky","Fog","Look","Cerro Blanco","Trees","Lights","Art Lights","Reflection Probes","Cerro Blanco construction details","Museum indirect light","Garden lawn relief - REVIEW TRIAL"};
+var objects=new System.Text.Json.Nodes.JsonArray();
+foreach(var item in root["GameObjects"].AsArray()) if(labels.Contains(item["Name"]?.GetValue<string>()??"")) objects.Add(item.DeepClone());
+root["GameObjects"]=objects;
+root["SceneProperties"]["NavMesh"]["Enabled"]=false;
+root["SceneProperties"]["WantsSystemScene"]=false;
+var scene=new Scene();
+try {
+ CameraComponent camera;
+ using(scene.Push()) {
+  scene.Deserialize(root);
+  var holder=new GameObject(false,"Bench review camera");
+  camera=holder.Components.Create<CameraComponent>();
+  camera.WorldPosition=new Vector3(-910,340,56);
+  camera.WorldRotation=Rotation.LookAt(new Vector3(-800,250,12)-camera.WorldPosition,Vector3.Up);
+  camera.FieldOfView=65;camera.ZNear=.2f;camera.ZFar=100000;
+  camera.EnablePostProcessing=true;
+  holder.Enabled=true;
+ }
+ var dressing=scene.GetAllComponents<ModelRenderer>().Single(r=>r.Model?.ResourcePath=="models/maps/cerroblanco/quality-v1/cerroblanco_dressing_v2.vmdl");
+ using var bitmap=new Bitmap(1440,960);
+ float elapsed=0;
+ foreach(var version in new[]{"before","after"}) {
+  if(version=="after") dressing.Model=Model.Load("models/maps/cerroblanco/courtyard-bench-v1/courtyard_dressing.vmdl");
+  for(int i=0;i<24;i++) {
+   using(scene.Push()){scene.EditorTick(elapsed+=.016f,.016f);camera.RenderToBitmap(bitmap);}
+   await Task.Delay(35,cancellationToken);
+  }
+  System.IO.File.WriteAllBytes(folder+"/"+version+".png",bitmap.ToPng());
+ }
+ return new {Captured=true,ModelError=dressing.Model.IsError,MaterialErrors=dressing.Model.Materials.Count(m=>m is null||m.IsError),LiveSceneUnchanged=true};
+} finally {scene.Destroy();}

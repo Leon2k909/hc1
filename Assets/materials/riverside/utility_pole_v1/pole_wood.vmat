@@ -1,0 +1,14 @@
+// Riverside utility pole v1: creosoted timber from the project's real brown_planks_03 scan (crate atlas crops),
+// graded to the old rs_pole's brown; see Sources/Riverside/utility-pole-v1/README.md.
+Layer0
+{
+ shader "shaders/complex.shader"
+ F_SPECULAR 1
+ TextureColor "materials/riverside/utility_pole_v1/pole_wood_color.png"
+ TextureNormal "materials/riverside/utility_pole_v1/pole_wood_normal.png"
+ TextureRoughness "materials/riverside/utility_pole_v1/pole_wood_rough.png"
+ g_flRoughnessScaleFactor "1.0"
+ g_flModelTintAmount "1.0"
+ g_vColorTint "[1.0 1.0 1.0 0.0]"
+ g_bFogEnabled "1"
+}

@@ -1003,6 +1003,11 @@ public static class GunsmithLoadoutManager
 			catch ( System.Exception e ) { Log.Warning( $"Gunsmith: couldn't load reticle '{customReticleShape.CamoTexture}': {e.Message}" ); }
 		}
 
+		var materialReplacements = attachmentPoints.Where( p => p.CurrentPart.IsValid() )
+			.SelectMany( p => p.CurrentPart.MaterialReplacements ?? new() )
+			.GroupBy( p => p.Key, StringComparer.OrdinalIgnoreCase )
+			.ToDictionary( g => g.Key, g => g.Last().Value, StringComparer.OrdinalIgnoreCase );
+
 		foreach ( var renderer in root.Components.GetAll<ModelRenderer>( FindMode.EverythingInSelfAndDescendants ) )
 		{
 			// Only re-skin the gun itself — never the first-person arms / hands.
@@ -1050,6 +1055,11 @@ public static class GunsmithLoadoutManager
 			for ( int i = 0; i < mats.Length; i++ )
 			{
 				var original = mats[i];
+				if ( original is not null && materialReplacements.TryGetValue( original.Name, out var replacementPath ) )
+				{
+					var replacement = Material.Load( replacementPath );
+					if ( replacement is not null && !replacement.IsError ) original = replacement;
+				}
 				if ( original is null )
 				{
 					renderer.Materials.SetOverride( i, null );

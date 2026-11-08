@@ -1,0 +1,1 @@
+{"code": "if(!Game.IsPlaying || Game.ActiveScene.Name!=\"veridant\")throw new Exception(\"Wrong runtime scene\"); var c=Game.ActiveScene.Camera;if(c==null)return \"No active runtime camera\";c.WorldPosition=new Vector3(-1250,-780,64);c.WorldRotation=Rotation.From(new Angles(16,110,0));await Task.Delay(300,cancellationToken);return new{c.WorldPosition,c.WorldRotation};"}

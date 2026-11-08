@@ -14841,7 +14841,7 @@
         "100d9f09-2c5b-41ea-a4d6-e73e2e7a7474": "d941bdae-5d9b-51ba-b085-f80a99239e6f",
         "eb59db6f-2e1b-4290-8ea3-98f00b7ad4bc": "2abb3c29-68e3-53c6-ab73-8be17d9e583c",
         "6f8c1e1b-00f3-4ad6-a2d3-f73657da9d04": "e87145c4-9a22-5d3c-91ff-129ae0d7e18d",
-        "504cffff-8d79-4211-a71c-c9f62cdd84c0": "ca690216-73c1-8eae-867b-ee730c1a2652"
+        "05f4ecdb-02b2-4320-8ee9-0ffc1a67b8a9": "fd70b006-7405-8707-8f5e-725b9a7ae3f0"
       }
     },
     {
@@ -23241,6 +23241,990 @@
               "Model": {
                 "Id": "6cd47e58-d879-4d47-98d5-513a0dd2a915",
                 "Path": "models/props/riverside/store_timber_steps_v1/steps.vmdl"
+              },
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null,
+              "RenderOptions": {
+                "GameLayer": true,
+                "OverlayLayer": false,
+                "BloomLayer": false,
+                "AfterUILayer": false
+              },
+              "RenderType": "On",
+              "Tint": "1,1,1,1"
+            }
+          ],
+          "Children": []
+        }
+      ]
+    },
+    {
+      "__guid": "13a337a6-19f4-4b14-a720-5854d391fec7",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Entrance soil relief - REVIEW TRIAL",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.ModelRenderer",
+          "__guid": "9ee1de10-dd92-466d-83c4-bccb5c13f69c",
+          "__enabled": true,
+          "Flags": 0,
+          "BodyGroups": 18446744073709551615,
+          "CreateAttachments": false,
+          "LodOverride": null,
+          "MaterialGroup": null,
+          "MaterialOverride": null,
+          "Materials": null,
+          "Model": {
+            "Id": "903b8afe-8cc1-41a6-922f-ce783643ea61",
+            "Path": "models/maps/riverside/entrance-relief-v1/entrance_soil_relief.vmdl"
+          },
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "RenderOptions": {
+            "GameLayer": true,
+            "OverlayLayer": false,
+            "BloomLayer": false,
+            "AfterUILayer": false
+          },
+          "RenderType": "On",
+          "Tint": "1,1,1,1"
+        },
+        {
+          "__type": "Sandbox.ModelCollider",
+          "__guid": "151cf7f8-fbec-4212-883b-4609ad5291ff",
+          "__enabled": true,
+          "Flags": 0,
+          "ColliderFlags": 0,
+          "Elasticity": null,
+          "Friction": null,
+          "IsTrigger": false,
+          "Model": {
+            "Id": "903b8afe-8cc1-41a6-922f-ce783643ea61",
+            "Path": "models/maps/riverside/entrance-relief-v1/entrance_soil_relief.vmdl"
+          },
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "OnObjectTriggerEnter": null,
+          "OnObjectTriggerExit": null,
+          "OnTriggerEnter": null,
+          "OnTriggerExit": null,
+          "RollingResistance": null,
+          "Static": true,
+          "Surface": null,
+          "SurfaceVelocity": "0,0,0"
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "93af2e40-45e0-4685-b5ec-f1a12215e1bd",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Trailer yard relief - REVIEW TRIAL",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.ModelRenderer",
+          "__guid": "7cfd3a3e-6264-4515-9703-a073f45d1a4b",
+          "__enabled": true,
+          "Flags": 0,
+          "BodyGroups": 18446744073709551615,
+          "CreateAttachments": false,
+          "LodOverride": null,
+          "MaterialGroup": null,
+          "MaterialOverride": null,
+          "Materials": null,
+          "Model": {
+            "Id": "bed126c4-c9d6-455c-a01c-bf5a8dbbdc2b",
+            "Path": "models/maps/riverside/trailer-yard-relief-v1/trailer_yard_relief.vmdl"
+          },
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "RenderOptions": {
+            "GameLayer": true,
+            "OverlayLayer": false,
+            "BloomLayer": false,
+            "AfterUILayer": false
+          },
+          "RenderType": "On",
+          "Tint": "1,1,1,1"
+        },
+        {
+          "__type": "Sandbox.ModelCollider",
+          "__guid": "c11724cc-1d9c-45dc-9ebf-47fab116f274",
+          "__enabled": true,
+          "Flags": 0,
+          "ColliderFlags": 0,
+          "Elasticity": null,
+          "Friction": null,
+          "IsTrigger": false,
+          "Model": {
+            "Id": "bed126c4-c9d6-455c-a01c-bf5a8dbbdc2b",
+            "Path": "models/maps/riverside/trailer-yard-relief-v1/trailer_yard_relief.vmdl"
+          },
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "OnObjectTriggerEnter": null,
+          "OnObjectTriggerExit": null,
+          "OnTriggerEnter": null,
+          "OnTriggerExit": null,
+          "RollingResistance": null,
+          "Static": true,
+          "Surface": null,
+          "SurfaceVelocity": "0,0,0"
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "320aa567-9241-5701-8d35-72eb38c9471e",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "T2 Sliding Window Frame",
+      "Position": "995,820,76",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.ModelRenderer",
+          "__guid": "db9e9a30-57a4-56f6-910f-490da69ef4f1",
+          "__enabled": true,
+          "Flags": 0,
+          "BodyGroups": 18446744073709551615,
+          "CreateAttachments": false,
+          "LodOverride": null,
+          "MaterialGroup": null,
+          "MaterialOverride": null,
+          "Materials": null,
+          "Model": {
+            "Id": "dd630a3f-35ff-480c-a667-116ddc6ace5e",
+            "Path": "models/props/riverside/sliding_window_v1/window.vmdl"
+          },
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "RenderOptions": {
+            "GameLayer": true,
+            "OverlayLayer": false,
+            "BloomLayer": false,
+            "AfterUILayer": false
+          },
+          "RenderType": "On",
+          "Tint": "1,1,1,1"
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "8b44237e-4abb-4f4f-822d-f3de4d9db6f0",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "West Yard Fences",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [],
+      "Children": [
+        {
+          "__guid": "4a1ef759-a71b-4d1c-8dd6-5ebc172f601c",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "West Yard Privacy Fence",
+          "Position": "960,1400,0",
+          "Rotation": "0,0,0.707106769,0.707106769",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.ModelRenderer",
+              "__guid": "5f7021cf-d768-4aa3-adb0-c07966f4b269",
+              "__enabled": true,
+              "Flags": 0,
+              "BodyGroups": 18446744073709551615,
+              "CreateAttachments": false,
+              "LodOverride": null,
+              "MaterialGroup": null,
+              "MaterialOverride": null,
+              "Materials": null,
+              "Model": {
+                "Id": "074c7e48-bdb8-4c95-b54e-17843d19971d",
+                "Path": "models/props/riverside/yard_fence_v1/fence.vmdl"
+              },
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null,
+              "RenderOptions": {
+                "GameLayer": true,
+                "OverlayLayer": false,
+                "BloomLayer": false,
+                "AfterUILayer": false
+              },
+              "RenderType": "On",
+              "Tint": "1,1,1,1"
+            }
+          ],
+          "Children": []
+        }
+      ]
+    },
+    {
+      "__guid": "2c6425dc-088a-5cc1-bbbb-0637d5fc4202",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Office Entry Doors",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [],
+      "Children": [
+        {
+          "__guid": "f3ca5778-54da-569c-afd8-8be888b4829b",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Office Entry Door",
+          "Position": "-580,692.76709,126",
+          "Rotation": "0,0,-0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.ModelRenderer",
+              "__guid": "a49826ad-cd56-5f91-b7da-d5a015c686cd",
+              "__enabled": true,
+              "Flags": 0,
+              "BodyGroups": 18446744073709551615,
+              "CreateAttachments": false,
+              "LodOverride": null,
+              "MaterialGroup": null,
+              "MaterialOverride": null,
+              "Materials": null,
+              "Model": {
+                "Id": "9c6ad574-0b75-4541-bad8-09a0e7f8ab48",
+                "Path": "models/props/riverside/trailer_door_v1/door.vmdl"
+              },
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null,
+              "RenderOptions": {
+                "GameLayer": true,
+                "OverlayLayer": false,
+                "BloomLayer": false,
+                "AfterUILayer": false
+              },
+              "RenderType": "On",
+              "Tint": "1,1,1,1"
+            }
+          ],
+          "Children": []
+        }
+      ]
+    },
+    {
+      "__guid": "8e1a3866-2b82-5e9d-962d-675193a488a7",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Office Rules Signs",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [],
+      "Children": [
+        {
+          "__guid": "c79135eb-4546-5195-84e8-e52fc45ee3ce",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Office Rules Sign",
+          "Position": "-579.400024,622.76709,176",
+          "Rotation": "0,0,-0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.ModelRenderer",
+              "__guid": "3dc8f4d9-30bb-5034-a53a-d46a6da7247e",
+              "__enabled": true,
+              "Flags": 0,
+              "BodyGroups": 18446744073709551615,
+              "CreateAttachments": false,
+              "LodOverride": null,
+              "MaterialGroup": null,
+              "MaterialOverride": null,
+              "Materials": null,
+              "Model": {
+                "Id": "f06512de-03e9-40aa-9f59-6591ea2d649a",
+                "Path": "models/props/riverside/office_rules_plaque_v1/plaque.vmdl"
+              },
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null,
+              "RenderOptions": {
+                "GameLayer": true,
+                "OverlayLayer": false,
+                "BloomLayer": false,
+                "AfterUILayer": false
+              },
+              "RenderType": "On",
+              "Tint": "1,1,1,1"
+            }
+          ],
+          "Children": []
+        }
+      ]
+    },
+    {
+      "__guid": "c74aa7a8-e8d1-5cad-b114-6ed816285a0d",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Lucky Stop Glazed Windows",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.ModelRenderer",
+          "__guid": "4f13a1d8-dfb3-55fb-a767-be8bcb149c16",
+          "__enabled": true,
+          "Flags": 0,
+          "BodyGroups": 18446744073709551615,
+          "CreateAttachments": false,
+          "LodOverride": null,
+          "MaterialGroup": null,
+          "MaterialOverride": null,
+          "Materials": null,
+          "Model": {
+            "Id": "0e35d31c-5780-4c44-b269-c7fbfdc7605c",
+            "Path": "models/props/riverside/storefront_depth_v1/windows.vmdl"
+          },
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "RenderOptions": {
+            "GameLayer": true,
+            "OverlayLayer": false,
+            "BloomLayer": false,
+            "AfterUILayer": false
+          },
+          "RenderType": "On",
+          "Tint": "1,1,1,1"
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "a52448bd-bac1-4219-b241-636d43d9b8a3",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Watch Deck",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [],
+      "Children": [
+        {
+          "__guid": "e0e18ee5-520b-4336-8ad2-b304aa4e87a5",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Timber Watch Deck",
+          "Position": "-445,-60,96",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.ModelRenderer",
+              "__guid": "851c4361-dafe-4a10-b3eb-6a5536323228",
+              "__enabled": true,
+              "Flags": 0,
+              "BodyGroups": 18446744073709551615,
+              "CreateAttachments": false,
+              "LodOverride": null,
+              "MaterialGroup": null,
+              "MaterialOverride": null,
+              "Materials": null,
+              "Model": {
+                "Id": "a80ed98d-d712-49ae-84c6-bd48595c3a79",
+                "Path": "models/props/riverside/watch_deck_v1/deck.vmdl"
+              },
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null,
+              "RenderOptions": {
+                "GameLayer": true,
+                "OverlayLayer": false,
+                "BloomLayer": false,
+                "AfterUILayer": false
+              },
+              "RenderType": "On",
+              "Tint": "1,1,1,1"
+            }
+          ],
+          "Children": []
+        }
+      ]
+    },
+    {
+      "__guid": "38506aae-3945-4a8a-9816-b558caaa7d0c",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Utility Poles",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [],
+      "Children": [
+        {
+          "__guid": "f1f9faa3-523e-464f-be45-bd7ccda1a6d7",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Utility Pole 1",
+          "Position": "-5,110,96",
+          "Rotation": "0,0,-0.671005249,0.741452575",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.ModelRenderer",
+              "__guid": "d0c6e53e-9360-4d8d-8a57-4128a7ba037b",
+              "__enabled": true,
+              "Flags": 0,
+              "BodyGroups": 18446744073709551615,
+              "CreateAttachments": false,
+              "LodOverride": null,
+              "MaterialGroup": null,
+              "MaterialOverride": null,
+              "Materials": null,
+              "Model": {
+                "Id": "90a639e6-9033-4db1-a563-432b0bea4d03",
+                "Path": "models/props/riverside/utility_pole_v1/pole_2arm.vmdl"
+              },
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null,
+              "RenderOptions": {
+                "GameLayer": true,
+                "OverlayLayer": false,
+                "BloomLayer": false,
+                "AfterUILayer": false
+              },
+              "RenderType": "On",
+              "Tint": "1,1,1,1"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "08f21f75-8941-4080-be1f-9ee446457d99",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Utility Pole 2",
+          "Position": "520,255,96",
+          "Rotation": "0,0,-0.671005249,0.741452575",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.ModelRenderer",
+              "__guid": "070823d4-a56f-47f1-b437-de378534c28d",
+              "__enabled": true,
+              "Flags": 0,
+              "BodyGroups": 18446744073709551615,
+              "CreateAttachments": false,
+              "LodOverride": null,
+              "MaterialGroup": null,
+              "MaterialOverride": null,
+              "Materials": null,
+              "Model": {
+                "Id": "90a639e6-9033-4db1-a563-432b0bea4d03",
+                "Path": "models/props/riverside/utility_pole_v1/pole_2arm.vmdl"
+              },
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null,
+              "RenderOptions": {
+                "GameLayer": true,
+                "OverlayLayer": false,
+                "BloomLayer": false,
+                "AfterUILayer": false
+              },
+              "RenderType": "On",
+              "Tint": "1,1,1,1"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "eb68ff1b-ea9d-47e4-b60d-fa980a41a192",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Utility Pole 3",
+          "Position": "1050,340,0",
+          "Rotation": "0,0,-0.671005249,0.741452575",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.ModelRenderer",
+              "__guid": "c76aeb6a-ed5c-4623-9f1e-ef78fd10f85a",
+              "__enabled": true,
+              "Flags": 0,
+              "BodyGroups": 18446744073709551615,
+              "CreateAttachments": false,
+              "LodOverride": null,
+              "MaterialGroup": null,
+              "MaterialOverride": null,
+              "Materials": null,
+              "Model": {
+                "Id": "90a639e6-9033-4db1-a563-432b0bea4d03",
+                "Path": "models/props/riverside/utility_pole_v1/pole_2arm.vmdl"
+              },
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null,
+              "RenderOptions": {
+                "GameLayer": true,
+                "OverlayLayer": false,
+                "BloomLayer": false,
+                "AfterUILayer": false
+              },
+              "RenderType": "On",
+              "Tint": "1,1,1,1"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "e3c52a26-84f8-43d4-b96a-0d9b72bc821e",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Utility Pole 4",
+          "Position": "1720,500,0",
+          "Rotation": "0,0,-0.671005249,0.741452575",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.ModelRenderer",
+              "__guid": "0612e358-b98b-4510-8bf3-108afd5a0480",
+              "__enabled": true,
+              "Flags": 0,
+              "BodyGroups": 18446744073709551615,
+              "CreateAttachments": false,
+              "LodOverride": null,
+              "MaterialGroup": null,
+              "MaterialOverride": null,
+              "Materials": null,
+              "Model": {
+                "Id": "90a639e6-9033-4db1-a563-432b0bea4d03",
+                "Path": "models/props/riverside/utility_pole_v1/pole_2arm.vmdl"
+              },
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null,
+              "RenderOptions": {
+                "GameLayer": true,
+                "OverlayLayer": false,
+                "BloomLayer": false,
+                "AfterUILayer": false
+              },
+              "RenderType": "On",
+              "Tint": "1,1,1,1"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "fd66281d-18ec-4f7b-bc83-ce9c22c9be58",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Utility Pole 5",
+          "Position": "2330,660,0",
+          "Rotation": "0,0,-0.671005249,0.741452575",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.ModelRenderer",
+              "__guid": "be308897-807f-48d9-ba0f-b653bb924346",
+              "__enabled": true,
+              "Flags": 0,
+              "BodyGroups": 18446744073709551615,
+              "CreateAttachments": false,
+              "LodOverride": null,
+              "MaterialGroup": null,
+              "MaterialOverride": null,
+              "Materials": null,
+              "Model": {
+                "Id": "90a639e6-9033-4db1-a563-432b0bea4d03",
+                "Path": "models/props/riverside/utility_pole_v1/pole_2arm.vmdl"
+              },
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null,
+              "RenderOptions": {
+                "GameLayer": true,
+                "OverlayLayer": false,
+                "BloomLayer": false,
+                "AfterUILayer": false
+              },
+              "RenderType": "On",
+              "Tint": "1,1,1,1"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "6b7f0633-e2a2-4762-80b1-0a4340be6046",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Utility Pole 6",
+          "Position": "2880,750,0",
+          "Rotation": "0,0,-0.671005249,0.741452575",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.ModelRenderer",
+              "__guid": "135e10a2-8ea0-4d84-a2ca-f807db35230a",
+              "__enabled": true,
+              "Flags": 0,
+              "BodyGroups": 18446744073709551615,
+              "CreateAttachments": false,
+              "LodOverride": null,
+              "MaterialGroup": null,
+              "MaterialOverride": null,
+              "Materials": null,
+              "Model": {
+                "Id": "90a639e6-9033-4db1-a563-432b0bea4d03",
+                "Path": "models/props/riverside/utility_pole_v1/pole_2arm.vmdl"
+              },
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null,
+              "RenderOptions": {
+                "GameLayer": true,
+                "OverlayLayer": false,
+                "BloomLayer": false,
+                "AfterUILayer": false
+              },
+              "RenderType": "On",
+              "Tint": "1,1,1,1"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "bb173ee4-cb7f-4554-8a9c-429a91ead917",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Utility Pole 7",
+          "Position": "1060,-230,0",
+          "Rotation": "0,0,0.707106769,0.707106769",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.ModelRenderer",
+              "__guid": "11fe3b2f-2b07-41ed-93cf-e5ab499dff9a",
+              "__enabled": true,
+              "Flags": 0,
+              "BodyGroups": 18446744073709551615,
+              "CreateAttachments": false,
+              "LodOverride": null,
+              "MaterialGroup": null,
+              "MaterialOverride": null,
+              "Materials": null,
+              "Model": {
+                "Id": "df875d16-b6ad-4a43-8dde-c93d889e097a",
+                "Path": "models/props/riverside/utility_pole_v1/pole_1arm.vmdl"
+              },
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null,
+              "RenderOptions": {
+                "GameLayer": true,
+                "OverlayLayer": false,
+                "BloomLayer": false,
+                "AfterUILayer": false
+              },
+              "RenderType": "On",
+              "Tint": "1,1,1,1"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "587ba33c-2fef-4016-a95c-0796481b27df",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Utility Pole 8",
+          "Position": "1300,-30,0",
+          "Rotation": "0,0,0.707106769,0.707106769",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.ModelRenderer",
+              "__guid": "089c196d-70be-4f1c-ad3b-c349a63c1eef",
+              "__enabled": true,
+              "Flags": 0,
+              "BodyGroups": 18446744073709551615,
+              "CreateAttachments": false,
+              "LodOverride": null,
+              "MaterialGroup": null,
+              "MaterialOverride": null,
+              "Materials": null,
+              "Model": {
+                "Id": "df875d16-b6ad-4a43-8dde-c93d889e097a",
+                "Path": "models/props/riverside/utility_pole_v1/pole_1arm.vmdl"
+              },
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null,
+              "RenderOptions": {
+                "GameLayer": true,
+                "OverlayLayer": false,
+                "BloomLayer": false,
+                "AfterUILayer": false
+              },
+              "RenderType": "On",
+              "Tint": "1,1,1,1"
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "390f3332-7518-45c4-9383-1ba96c3ce18b",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Utility Pole 9",
+          "Position": "1820,60,0",
+          "Rotation": "0,0,0.707106769,0.707106769",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.ModelRenderer",
+              "__guid": "b7898fdd-4738-4249-8b77-d1324b669544",
+              "__enabled": true,
+              "Flags": 0,
+              "BodyGroups": 18446744073709551615,
+              "CreateAttachments": false,
+              "LodOverride": null,
+              "MaterialGroup": null,
+              "MaterialOverride": null,
+              "Materials": null,
+              "Model": {
+                "Id": "df875d16-b6ad-4a43-8dde-c93d889e097a",
+                "Path": "models/props/riverside/utility_pole_v1/pole_1arm.vmdl"
               },
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,

@@ -1,0 +1,14 @@
+{
+  "note": "Native editor viewport captures (bridge screenshot_game = PrintWindow of the editor window, cropped to the 3D viewport: x428 y100 w1102 h455, so every image is 1102 x 455). The editor dock layout changed during the work (Asset Browser + Console under the viewport; the viewport used to be h713), so BEFORE and AFTER were both retaken in this layout; the first-layout shots and poses are in superseded/. Editor camera set with set_editor_camera (FOV 80). World axes: +x north, +y west. Camera poses are identical for BEFORE and AFTER of a pair. BEFORE = old masts restored by the live revert.py; AFTER = new masts installed by install.py; 9 s settle after each camera move; textures requested with MarkUsed (2048 at most).",
+  "target": "Yard floodlight mast 1 at plan (570,-400) = world (-400,-570,0) in scenes/maps/spillway/spillway.scene (Yard Floodlight Mast 1)",
+  "close": {"before": "before.png",      "after": "after.png",      "position": "-325.12,-520.08,64", "angles": "22,-146.31,0",  "distance_in": 90},
+  "far":   {"before": "before_far.png",  "after": "after_far.png",  "position": "-7.27,-308.18,64",   "angles": "-10,-146.31,0", "distance_in": 472},
+  "head":  {"before": "before_head.png", "after": "after_head.png", "position": "-183.67,-425.78,64", "angles": "-35,-146.31,0", "distance_in": 260},
+  "other_masts_new_model_only": {
+    "note": "420 in (10.7 m) from each mast's axis; the file names say 12m loosely.",
+    "mast2": {"file": "other_masts/mast2_12m.png", "target_world": "-600,1110,0",    "position": "-600,690,80",    "angles": "-9.5,90,0"},
+    "mast3": {"file": "other_masts/mast3_12m.png", "target_world": "-250,-1290,0",   "position": "-250,-870,80",   "angles": "-9.5,-90,0"},
+    "mast4": {"file": "other_masts/mast4_12m.png", "target_world": "-1600,-1630,128", "position": "-1180,-1630,208", "angles": "-9.5,179.9,0"}
+  },
+  "mean_luma_before_after": {"close": "29.7 / 30.5", "far": "69.1 / 69.1", "head": "129.4 / 129.3"}
+}

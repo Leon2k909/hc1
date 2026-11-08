@@ -1,0 +1,1 @@
+{"code":"var s=Editor.SceneEditorSession.All.First(x=>x.Scene.Name==\"veridant\");return new {s.HasUnsavedChanges,Ground=s.Scene.GetAllComponents<ModelRenderer>().Where(x=>x.Model?.ResourcePath==\"models/maps/veridant/veridant_ground.vmdl\").Select(x=>new{x.GameObject.Name,x.Model.IsError,x.Model.ResourcePath}).ToArray(),IsPlaying=Game.IsPlaying};"}

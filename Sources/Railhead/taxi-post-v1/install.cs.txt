@@ -1,0 +1,13 @@
+var root=Sandbox.Project.Current.GetRootPath();var output=System.IO.Path.Combine(root,"output/railhead/taxi-post-v1");var plan=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(output,"install-plan.json")));
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+foreach(var p in plan["protected"].AsObject())if(Hash(System.IO.Path.Combine(root,p.Key))!=p.Value.GetValue<string>())throw new Exception("Input changed: "+p.Key);
+foreach(var p in plan["files"].AsObject())if(Hash(System.IO.Path.Combine(output,"install-stage",p.Key))!=p.Value.GetValue<string>())throw new Exception("Stage changed");
+var session=Editor.SceneEditorSession.Active;var active=session?.Scene?.Id;var playing=Game.IsPlaying;var dirty=session?.HasUnsavedChanges;
+if(string.Equals(session?.Scene?.Name,"railhead",StringComparison.OrdinalIgnoreCase)||Game.ActiveScene?.Source?.ResourcePath?.Equals("scenes/maps/railhead/railhead.scene",StringComparison.OrdinalIgnoreCase)==true)throw new Exception("Target active; use scene tools");
+var model=Model.Load("models/maps/railhead/taxi-post-v1/taxi_post.vmdl");if(model.IsError)throw new Exception("Invalid console/LODs");
+var asset=Editor.AssetSystem.FindByPath("scenes/maps/railhead/railhead.scene");var resource=asset.LoadResource<SceneFile>();resource.LoadFromJson(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"Assets/scenes/maps/Railhead/railhead.scene")));
+if(resource.GameObjects.Any(x=>x["Name"]?.GetValue<string>()=="East Taxi Rank Head Post"))throw new Exception("Already installed; inspect");
+var node=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(output,"install-stage/node.json"))).AsObject();
+var target=System.IO.Path.Combine(root,"Assets",plan["active_base"].GetValue<string>());System.IO.File.Copy(System.IO.Path.Combine(output,"install-stage/east_without_taxi.obj"),target,true);Editor.AssetSystem.RegisterFile(target);
+resource.GameObjects=resource.GameObjects.Append(node).ToArray();if(!asset.SaveToDisk(resource))throw new Exception("Scene save failed");
+var result=new{Installed=true,OldFacesRemoved=124,AddedRenderers=1,AddedColliders=0,SceneUnchanged=active==Editor.SceneEditorSession.Active?.Scene?.Id,PlayStateUnchanged=playing==Game.IsPlaying,DirtyStateUnchanged=dirty==Editor.SceneEditorSession.Active?.HasUnsavedChanges};System.IO.File.WriteAllText(System.IO.Path.Combine(output,"installed.json"),System.Text.Json.JsonSerializer.Serialize(result));return result;

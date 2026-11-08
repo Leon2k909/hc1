@@ -1,0 +1,1 @@
+{"code":"return Editor.SceneEditorSession.All.Single(s=>s.Scene?.Name==\"cerroblanco\").Scene.GetAllComponents<ModelRenderer>().Where(r=>r.Model?.ResourcePath.Contains(\"fitout\")==true).Select(r=>new{r.Id,r.GameObject.Name,Model=r.Model.ResourcePath}).ToArray();"}

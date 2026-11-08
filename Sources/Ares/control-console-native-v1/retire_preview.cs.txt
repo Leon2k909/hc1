@@ -1,0 +1,4 @@
+var root=Sandbox.Project.Current.GetRootPath();var output=System.IO.Path.Combine(root,"output/ares/control-console-native-v1");var proof=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(output,"installed/validation.json")));
+if(proof["Lods"].GetValue<int>()!=3||!proof["Installed"].GetValue<bool>())throw new Exception("Installation not verified");
+foreach(var path in new[]{"models/props/ares/control_console_native_v1/preview.vmdl","models/props/ares/control_console_native_v1/preview.obj"}){var asset=Editor.AssetSystem.FindByPath(path);if(asset!=null)asset.Delete();}
+return new{RetiredPreview=true,ApprovedConsoleRetained=System.IO.File.Exists(System.IO.Path.Combine(root,"Assets/models/props/ares/control_console_native_v1/console.vmdl"))};

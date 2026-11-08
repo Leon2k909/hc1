@@ -1,0 +1,9 @@
+var session=Editor.SceneEditorSession.All.Single(s=>s.Scene?.Name.Equals("riverside",StringComparison.OrdinalIgnoreCase)==true && !s.IsPlaying);
+if(session.HasUnsavedChanges)throw new Exception("Unsaved Riverside");
+var path=System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(),"output/riverside/office-door-reuse-v1/installed/session-before.json");
+System.IO.File.WriteAllText(path,session.Scene.Serialize().ToJsonString());
+var disk=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(),"Assets/scenes/maps/Riverside/riverside.scene")));
+var liveIds=session.Scene.Serialize()["GameObjects"].AsArray().Select(g=>g["__guid"]?.ToString().Trim('"')).ToHashSet();
+var missing=disk["GameObjects"].AsArray().Where(g=>!liveIds.Contains(g["__guid"]?.ToString().Trim('"'))).Select(g=>g["Name"]?.GetValue<string>()).ToArray();
+if(missing.Length>0)throw new Exception("Saved roots absent from live session: "+string.Join(",",missing));
+return new {session.HasUnsavedChanges,MissingRoots=missing};

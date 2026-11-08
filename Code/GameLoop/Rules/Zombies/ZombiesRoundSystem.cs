@@ -247,6 +247,7 @@ public sealed class ZombiesRoundSystem : Component
 
 	private void StartNextRound()
 	{
+		RoundBloodDecals.ResetRound();
 		CurrentRound++;
 		IsIntermission = false;
 		TimeSinceRoundStart = 0;
@@ -300,6 +301,7 @@ public sealed class ZombiesRoundSystem : Component
 
 	private void RestartGame()
 	{
+		RoundBloodDecals.ResetRound();
 		foreach ( var z in Scene.GetAllComponents<ZombieAI>().ToList() ) z.GameObject.Destroy();
 		foreach ( var p in Scene.GetAllComponents<ZombiesPowerUp>().ToList() ) p.GameObject.Destroy();
 

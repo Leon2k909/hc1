@@ -1,0 +1,655 @@
+{
+  "label": "AFTER",
+  "note": "locker_bank_4 (52 in, 4 doors) x 6 and locker_bank_6 (80 in, 6 doors) x 2, three LODs each. No new textures: the five materials (rv_steel, rv_dark, rv_stainless, rv_galv, rv_white) are the map's own. Collision unchanged (same 8 boxes, kept in the map vmdls).",
+  "instances": {
+    "locker_bank_4": 6,
+    "locker_bank_6": 2
+  },
+  "lod_switch_thresholds": [
+    0.0,
+    30.0,
+    80.0
+  ],
+  "models": {
+    "locker_bank_4": {
+      "label": "AFTER locker_bank_4 (52 in, 4 doors)",
+      "objs": [
+        {
+          "triangles": 1762,
+          "vertices": 3964,
+          "materials": [
+            "rv_dark",
+            "rv_galv",
+            "rv_stainless",
+            "rv_steel",
+            "rv_white"
+          ],
+          "extent_in": [
+            52.0,
+            80.0,
+            20.11
+          ],
+          "extent_m": [
+            1.321,
+            2.032,
+            0.511
+          ],
+          "bytes": 290848,
+          "path": "models/props/riverdale/locker_bank_v1/locker_bank_4_lod0.obj"
+        },
+        {
+          "triangles": 794,
+          "vertices": 1660,
+          "materials": [
+            "rv_dark",
+            "rv_stainless",
+            "rv_steel"
+          ],
+          "extent_in": [
+            52.0,
+            80.0,
+            20.11
+          ],
+          "extent_m": [
+            1.321,
+            2.032,
+            0.511
+          ],
+          "bytes": 120064,
+          "path": "models/props/riverdale/locker_bank_v1/locker_bank_4_lod1.obj"
+        },
+        {
+          "triangles": 114,
+          "vertices": 228,
+          "materials": [
+            "rv_dark",
+            "rv_steel"
+          ],
+          "extent_in": [
+            52.0,
+            80.0,
+            20.04
+          ],
+          "extent_m": [
+            1.321,
+            2.032,
+            0.509
+          ],
+          "bytes": 14456,
+          "path": "models/props/riverdale/locker_bank_v1/locker_bank_4_lod2.obj"
+        }
+      ],
+      "textures": [
+        {
+          "vmat": "materials/riverdale/rv_dark.vmat",
+          "slot": "TextureMetalness",
+          "path": "materials/riverdale/rv_dark_metal.png",
+          "w": 1024,
+          "h": 1024,
+          "file_bytes": 5133,
+          "est_gpu_bytes": 5592265,
+          "compiled_bytes": 0
+        },
+        {
+          "vmat": "materials/riverdale/rv_dark.vmat",
+          "slot": "TextureColor",
+          "path": "materials/riverdale/rv_dark_color.jpg",
+          "w": 1024,
+          "h": 1024,
+          "file_bytes": 189037,
+          "est_gpu_bytes": 5592265,
+          "compiled_bytes": 414069
+        },
+        {
+          "vmat": "materials/riverdale/rv_dark.vmat",
+          "slot": "TextureNormal",
+          "path": "materials/riverdale/rv_dark_normal.png",
+          "w": 1024,
+          "h": 1024,
+          "file_bytes": 1198408,
+          "est_gpu_bytes": 5592265,
+          "compiled_bytes": 1075930
+        },
+        {
+          "vmat": "materials/riverdale/rv_dark.vmat",
+          "slot": "TextureRoughness",
+          "path": "materials/riverdale/rv_dark_rough.png",
+          "w": 1024,
+          "h": 1024,
+          "file_bytes": 527251,
+          "est_gpu_bytes": 5592265,
+          "compiled_bytes": 0
+        },
+        {
+          "vmat": "materials/riverdale/rv_dark.vmat",
+          "slot": "TextureAmbientOcclusion",
+          "path": "materials/riverdale/rv_dark_ao.png",
+          "w": 1024,
+          "h": 1024,
+          "file_bytes": 546661,
+          "est_gpu_bytes": 5592265,
+          "compiled_bytes": 634326
+        },
+        {
+          "vmat": "materials/riverdale/rv_galv.vmat",
+          "slot": "TextureMetalness",
+          "path": "materials/riverdale/rv_galv_metal.png",
+          "w": 1024,
+          "h": 1024,
+          "file_bytes": 248942,
+          "est_gpu_bytes": 5592265,
+          "compiled_bytes": 0
+        },
+        {
+          "vmat": "materials/riverdale/rv_galv.vmat",
+          "slot": "TextureColor",
+          "path": "materials/riverdale/rv_galv_color.jpg",
+          "w": 1024,
+          "h": 1024,
+          "file_bytes": 159572,
+          "est_gpu_bytes": 5592265,
+          "compiled_bytes": 636776
+        },
+        {
+          "vmat": "materials/riverdale/rv_galv.vmat",
+          "slot": "TextureNormal",
+          "path": "materials/riverdale/rv_galv_normal.png",
+          "w": 1024,
+          "h": 1024,
+          "file_bytes": 1413322,
+          "est_gpu_bytes": 5592265,
+          "compiled_bytes": 1235871
+        },
+        {
+          "vmat": "materials/riverdale/rv_galv.vmat",
+          "slot": "TextureRoughness",
+          "path": "materials/riverdale/rv_galv_rough.png",
+          "w": 1024,
+          "h": 1024,
+          "file_bytes": 404013,
+          "est_gpu_bytes": 5592265,
+          "compiled_bytes": 0
+        },
+        {
+          "vmat": "materials/riverdale/rv_stainless.vmat",
+          "slot": "TextureColor",
+          "path": "materials/riverdale/rv_stainless_color.jpg",
+          "w": 1024,
+          "h": 1024,
+          "file_bytes": 182104,
+          "est_gpu_bytes": 5592265,
+          "compiled_bytes": 129984
+        },
+        {
+          "vmat": "materials/riverdale/rv_stainless.vmat",
+          "slot": "TextureNormal",
+          "path": "materials/riverdale/rv_stainless_normal.png",
+          "w": 1024,
+          "h": 1024,
+          "file_bytes": 51860,
+          "est_gpu_bytes": 5592265,
+          "compiled_bytes": 394553
+        },
+        {
+          "vmat": "materials/riverdale/rv_stainless.vmat",
+          "slot": "TextureRoughness",
+          "path": "materials/riverdale/rv_stainless_rough.png",
+          "w": 1024,
+          "h": 1024,
+          "file_bytes": 249147,
+          "est_gpu_bytes": 5592265,
+          "compiled_bytes": 0
+        },
+        {
+          "vmat": "materials/riverdale/rv_steel.vmat",
+          "slot": "TextureMetalness",
+          "path": "materials/riverdale/rv_steel_metal.png",
+          "w": 1024,
+          "h": 1024,
+          "file_bytes": 6183,
+          "est_gpu_bytes": 5592265,
+          "compiled_bytes": 0
+        },
+        {
+          "vmat": "materials/riverdale/rv_steel.vmat",
+          "slot": "TextureColor",
+          "path": "materials/riverdale/rv_steel_color.jpg",
+          "w": 1024,
+          "h": 1024,
+          "file_bytes": 189425,
+          "est_gpu_bytes": 5592265,
+          "compiled_bytes": 531826
+        },
+        {
+          "vmat": "materials/riverdale/rv_steel.vmat",
+          "slot": "TextureNormal",
+          "path": "materials/riverdale/rv_steel_normal.png",
+          "w": 1024,
+          "h": 1024,
+          "file_bytes": 1199911,
+          "est_gpu_bytes": 5592265,
+          "compiled_bytes": 3560184
+        },
+        {
+          "vmat": "materials/riverdale/rv_steel.vmat",
+          "slot": "TextureRoughness",
+          "path": "materials/riverdale/rv_steel_rough.png",
+          "w": 1024,
+          "h": 1024,
+          "file_bytes": 527914,
+          "est_gpu_bytes": 5592265,
+          "compiled_bytes": 0
+        },
+        {
+          "vmat": "materials/riverdale/rv_steel.vmat",
+          "slot": "TextureAmbientOcclusion",
+          "path": "materials/riverdale/rv_steel_ao.png",
+          "w": 1024,
+          "h": 1024,
+          "file_bytes": 546233,
+          "est_gpu_bytes": 5592265,
+          "compiled_bytes": 634283
+        },
+        {
+          "vmat": "materials/riverdale/rv_white.vmat",
+          "slot": "TextureMetalness",
+          "path": "materials/riverdale/rv_white_metal.png",
+          "w": 1024,
+          "h": 1024,
+          "file_bytes": 5408,
+          "est_gpu_bytes": 5592265,
+          "compiled_bytes": 0
+        },
+        {
+          "vmat": "materials/riverdale/rv_white.vmat",
+          "slot": "TextureColor",
+          "path": "materials/riverdale/rv_white_color.jpg",
+          "w": 1024,
+          "h": 1024,
+          "file_bytes": 206545,
+          "est_gpu_bytes": 5592265,
+          "compiled_bytes": 973045
+        },
+        {
+          "vmat": "materials/riverdale/rv_white.vmat",
+          "slot": "TextureNormal",
+          "path": "materials/riverdale/rv_white_normal.png",
+          "w": 1024,
+          "h": 1024,
+          "file_bytes": 937754,
+          "est_gpu_bytes": 5592265,
+          "compiled_bytes": 2150160
+        },
+        {
+          "vmat": "materials/riverdale/rv_white.vmat",
+          "slot": "TextureRoughness",
+          "path": "materials/riverdale/rv_white_rough.png",
+          "w": 1024,
+          "h": 1024,
+          "file_bytes": 542174,
+          "est_gpu_bytes": 5592265,
+          "compiled_bytes": 0
+        },
+        {
+          "vmat": "materials/riverdale/rv_white.vmat",
+          "slot": "TextureAmbientOcclusion",
+          "path": "materials/riverdale/rv_white_ao.png",
+          "w": 1024,
+          "h": 1024,
+          "file_bytes": 529317,
+          "est_gpu_bytes": 5592265,
+          "compiled_bytes": 636929
+        }
+      ],
+      "vmdl": [
+        {
+          "path": "models/props/riverdale/locker_bank_v1/locker_bank_4.vmdl",
+          "vmdl_c_bytes": 57280,
+          "lods": [
+            [
+              "lod0",
+              "models/props/riverdale/locker_bank_v1/locker_bank_4_lod0.obj",
+              null
+            ],
+            [
+              "lod1",
+              "models/props/riverdale/locker_bank_v1/locker_bank_4_lod1.obj",
+              null
+            ],
+            [
+              "lod2",
+              "models/props/riverdale/locker_bank_v1/locker_bank_4_lod2.obj",
+              null
+            ]
+          ]
+        }
+      ],
+      "totals": {
+        "unique_textures": 22,
+        "texture_pixels": 23068672,
+        "est_gpu_bytes": 123029830,
+        "compiled_vtex_bytes": 13007936
+      }
+    },
+    "locker_bank_6": {
+      "label": "AFTER locker_bank_6 (80 in, 6 doors)",
+      "objs": [
+        {
+          "triangles": 2538,
+          "vertices": 5716,
+          "materials": [
+            "rv_dark",
+            "rv_galv",
+            "rv_stainless",
+            "rv_steel",
+            "rv_white"
+          ],
+          "extent_in": [
+            80.0,
+            80.0,
+            20.11
+          ],
+          "extent_m": [
+            2.032,
+            2.032,
+            0.511
+          ],
+          "bytes": 421745,
+          "path": "models/props/riverdale/locker_bank_v1/locker_bank_6_lod0.obj"
+        },
+        {
+          "triangles": 1086,
+          "vertices": 2260,
+          "materials": [
+            "rv_dark",
+            "rv_stainless",
+            "rv_steel"
+          ],
+          "extent_in": [
+            80.0,
+            80.0,
+            20.11
+          ],
+          "extent_m": [
+            2.032,
+            2.032,
+            0.511
+          ],
+          "bytes": 164604,
+          "path": "models/props/riverdale/locker_bank_v1/locker_bank_6_lod1.obj"
+        },
+        {
+          "triangles": 142,
+          "vertices": 284,
+          "materials": [
+            "rv_dark",
+            "rv_steel"
+          ],
+          "extent_in": [
+            80.0,
+            80.0,
+            20.04
+          ],
+          "extent_m": [
+            2.032,
+            2.032,
+            0.509
+          ],
+          "bytes": 18138,
+          "path": "models/props/riverdale/locker_bank_v1/locker_bank_6_lod2.obj"
+        }
+      ],
+      "textures": [
+        {
+          "vmat": "materials/riverdale/rv_dark.vmat",
+          "slot": "TextureMetalness",
+          "path": "materials/riverdale/rv_dark_metal.png",
+          "w": 1024,
+          "h": 1024,
+          "file_bytes": 5133,
+          "est_gpu_bytes": 5592265,
+          "compiled_bytes": 0
+        },
+        {
+          "vmat": "materials/riverdale/rv_dark.vmat",
+          "slot": "TextureColor",
+          "path": "materials/riverdale/rv_dark_color.jpg",
+          "w": 1024,
+          "h": 1024,
+          "file_bytes": 189037,
+          "est_gpu_bytes": 5592265,
+          "compiled_bytes": 414069
+        },
+        {
+          "vmat": "materials/riverdale/rv_dark.vmat",
+          "slot": "TextureNormal",
+          "path": "materials/riverdale/rv_dark_normal.png",
+          "w": 1024,
+          "h": 1024,
+          "file_bytes": 1198408,
+          "est_gpu_bytes": 5592265,
+          "compiled_bytes": 1075930
+        },
+        {
+          "vmat": "materials/riverdale/rv_dark.vmat",
+          "slot": "TextureRoughness",
+          "path": "materials/riverdale/rv_dark_rough.png",
+          "w": 1024,
+          "h": 1024,
+          "file_bytes": 527251,
+          "est_gpu_bytes": 5592265,
+          "compiled_bytes": 0
+        },
+        {
+          "vmat": "materials/riverdale/rv_dark.vmat",
+          "slot": "TextureAmbientOcclusion",
+          "path": "materials/riverdale/rv_dark_ao.png",
+          "w": 1024,
+          "h": 1024,
+          "file_bytes": 546661,
+          "est_gpu_bytes": 5592265,
+          "compiled_bytes": 634326
+        },
+        {
+          "vmat": "materials/riverdale/rv_galv.vmat",
+          "slot": "TextureMetalness",
+          "path": "materials/riverdale/rv_galv_metal.png",
+          "w": 1024,
+          "h": 1024,
+          "file_bytes": 248942,
+          "est_gpu_bytes": 5592265,
+          "compiled_bytes": 0
+        },
+        {
+          "vmat": "materials/riverdale/rv_galv.vmat",
+          "slot": "TextureColor",
+          "path": "materials/riverdale/rv_galv_color.jpg",
+          "w": 1024,
+          "h": 1024,
+          "file_bytes": 159572,
+          "est_gpu_bytes": 5592265,
+          "compiled_bytes": 636776
+        },
+        {
+          "vmat": "materials/riverdale/rv_galv.vmat",
+          "slot": "TextureNormal",
+          "path": "materials/riverdale/rv_galv_normal.png",
+          "w": 1024,
+          "h": 1024,
+          "file_bytes": 1413322,
+          "est_gpu_bytes": 5592265,
+          "compiled_bytes": 1235871
+        },
+        {
+          "vmat": "materials/riverdale/rv_galv.vmat",
+          "slot": "TextureRoughness",
+          "path": "materials/riverdale/rv_galv_rough.png",
+          "w": 1024,
+          "h": 1024,
+          "file_bytes": 404013,
+          "est_gpu_bytes": 5592265,
+          "compiled_bytes": 0
+        },
+        {
+          "vmat": "materials/riverdale/rv_stainless.vmat",
+          "slot": "TextureColor",
+          "path": "materials/riverdale/rv_stainless_color.jpg",
+          "w": 1024,
+          "h": 1024,
+          "file_bytes": 182104,
+          "est_gpu_bytes": 5592265,
+          "compiled_bytes": 129984
+        },
+        {
+          "vmat": "materials/riverdale/rv_stainless.vmat",
+          "slot": "TextureNormal",
+          "path": "materials/riverdale/rv_stainless_normal.png",
+          "w": 1024,
+          "h": 1024,
+          "file_bytes": 51860,
+          "est_gpu_bytes": 5592265,
+          "compiled_bytes": 394553
+        },
+        {
+          "vmat": "materials/riverdale/rv_stainless.vmat",
+          "slot": "TextureRoughness",
+          "path": "materials/riverdale/rv_stainless_rough.png",
+          "w": 1024,
+          "h": 1024,
+          "file_bytes": 249147,
+          "est_gpu_bytes": 5592265,
+          "compiled_bytes": 0
+        },
+        {
+          "vmat": "materials/riverdale/rv_steel.vmat",
+          "slot": "TextureMetalness",
+          "path": "materials/riverdale/rv_steel_metal.png",
+          "w": 1024,
+          "h": 1024,
+          "file_bytes": 6183,
+          "est_gpu_bytes": 5592265,
+          "compiled_bytes": 0
+        },
+        {
+          "vmat": "materials/riverdale/rv_steel.vmat",
+          "slot": "TextureColor",
+          "path": "materials/riverdale/rv_steel_color.jpg",
+          "w": 1024,
+          "h": 1024,
+          "file_bytes": 189425,
+          "est_gpu_bytes": 5592265,
+          "compiled_bytes": 531826
+        },
+        {
+          "vmat": "materials/riverdale/rv_steel.vmat",
+          "slot": "TextureNormal",
+          "path": "materials/riverdale/rv_steel_normal.png",
+          "w": 1024,
+          "h": 1024,
+          "file_bytes": 1199911,
+          "est_gpu_bytes": 5592265,
+          "compiled_bytes": 3560184
+        },
+        {
+          "vmat": "materials/riverdale/rv_steel.vmat",
+          "slot": "TextureRoughness",
+          "path": "materials/riverdale/rv_steel_rough.png",
+          "w": 1024,
+          "h": 1024,
+          "file_bytes": 527914,
+          "est_gpu_bytes": 5592265,
+          "compiled_bytes": 0
+        },
+        {
+          "vmat": "materials/riverdale/rv_steel.vmat",
+          "slot": "TextureAmbientOcclusion",
+          "path": "materials/riverdale/rv_steel_ao.png",
+          "w": 1024,
+          "h": 1024,
+          "file_bytes": 546233,
+          "est_gpu_bytes": 5592265,
+          "compiled_bytes": 634283
+        },
+        {
+          "vmat": "materials/riverdale/rv_white.vmat",
+          "slot": "TextureMetalness",
+          "path": "materials/riverdale/rv_white_metal.png",
+          "w": 1024,
+          "h": 1024,
+          "file_bytes": 5408,
+          "est_gpu_bytes": 5592265,
+          "compiled_bytes": 0
+        },
+        {
+          "vmat": "materials/riverdale/rv_white.vmat",
+          "slot": "TextureColor",
+          "path": "materials/riverdale/rv_white_color.jpg",
+          "w": 1024,
+          "h": 1024,
+          "file_bytes": 206545,
+          "est_gpu_bytes": 5592265,
+          "compiled_bytes": 973045
+        },
+        {
+          "vmat": "materials/riverdale/rv_white.vmat",
+          "slot": "TextureNormal",
+          "path": "materials/riverdale/rv_white_normal.png",
+          "w": 1024,
+          "h": 1024,
+          "file_bytes": 937754,
+          "est_gpu_bytes": 5592265,
+          "compiled_bytes": 2150160
+        },
+        {
+          "vmat": "materials/riverdale/rv_white.vmat",
+          "slot": "TextureRoughness",
+          "path": "materials/riverdale/rv_white_rough.png",
+          "w": 1024,
+          "h": 1024,
+          "file_bytes": 542174,
+          "est_gpu_bytes": 5592265,
+          "compiled_bytes": 0
+        },
+        {
+          "vmat": "materials/riverdale/rv_white.vmat",
+          "slot": "TextureAmbientOcclusion",
+          "path": "materials/riverdale/rv_white_ao.png",
+          "w": 1024,
+          "h": 1024,
+          "file_bytes": 529317,
+          "est_gpu_bytes": 5592265,
+          "compiled_bytes": 636929
+        }
+      ],
+      "vmdl": [
+        {
+          "path": "models/props/riverdale/locker_bank_v1/locker_bank_6.vmdl",
+          "vmdl_c_bytes": 75936,
+          "lods": [
+            [
+              "lod0",
+              "models/props/riverdale/locker_bank_v1/locker_bank_6_lod0.obj",
+              null
+            ],
+            [
+              "lod1",
+              "models/props/riverdale/locker_bank_v1/locker_bank_6_lod1.obj",
+              null
+            ],
+            [
+              "lod2",
+              "models/props/riverdale/locker_bank_v1/locker_bank_6_lod2.obj",
+              null
+            ]
+          ]
+        }
+      ],
+      "totals": {
+        "unique_textures": 22,
+        "texture_pixels": 23068672,
+        "est_gpu_bytes": 123029830,
+        "compiled_vtex_bytes": 13007936
+      }
+    }
+  }
+}

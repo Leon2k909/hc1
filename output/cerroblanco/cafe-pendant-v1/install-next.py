@@ -1,0 +1,7 @@
+from pathlib import Path
+import json,hashlib
+R=Path('C:/sbox-projects/hc1/forked-shooter-main');O=R/'output/cerroblanco/cafe-pendant-v1';S=R/'Assets/models/maps/cerroblanco/cerroblanco_fitout_fine.obj'
+p=json.loads((O/'checks.json').read_text());assert hashlib.sha256(S.read_bytes()).hexdigest()==p['source_sha256'];b=O/'installed';b.mkdir(exist_ok=True);(b/'before.obj').write_bytes(S.read_bytes())
+(O/'install.json').write_text(json.dumps({'code':'var root=Sandbox.Project.Current.GetRootPath();var o=System.IO.Path.Combine(root,"output/cerroblanco/cafe-pendant-v1");var dest=System.IO.Path.Combine(root,"Assets/models/maps/cerroblanco/cerroblanco_fitout_fine.obj");System.IO.File.WriteAllText(dest,System.IO.File.ReadAllText(System.IO.Path.Combine(o,"stage/models/maps/cerroblanco/cafe-pendant-v1/fine.obj")).Replace("mtllib fine.mtl","mtllib cerroblanco_fitout_fine.mtl"));Editor.AssetSystem.RegisterFile(dest);return new{Installed=true};'}))
+(R/'Tools/cerroblanco_cafe_pendant.py').write_text((R/'Sources/CerroBlanco/cafe-pendant-v1/model.py').read_text())
+f=R/'Tools/cerroblanco_fitout.py';s=f.read_text();old='        lathe( m, "cbf_track", p - UP * 56, [ ( 6.5, 0.0 ), ( 5.8, 3.0 ), ( 2.4, 10.0 ), ( 0.6, 12.0 ) ], sides=16 )';assert old in s;s=s.replace(old,'        if e==620:\n            from cerroblanco_cafe_pendant import build as shade\n            m.extend(shade())\n        else:\n    '+old);f.write_text(s)

@@ -136,10 +136,11 @@ def bent( a, b, bend, steps=4, rng=None, wobble=0.0 ):
 # Stairs, balustrades
 
 def stone_stair( m, foot, head, width, z0, z1, tread="vr_stone_light", riser="vr_stone", side="vr_stone", led=True,
-                 sides=( True, True ), surface=STONE, going=11.0, name="stair" ):
+                 sides=( True, True ), surface=STONE, going=11.0, name="stair", closed=False ):
     """ A straight flight of solid stone steps from foot (plan: the bottom nosing's middle) to head (the top nosing's
     middle), width across. Each tread overhangs its riser by an inch with a warm LED strip under the nosing. One wedge
-    hull carries walking. sides: which ends of the steps are drawn (False where they butt a wall). Returns the riser. """
+    hull carries walking. sides: which ends of the steps are drawn (False where they butt a wall).
+    closed seals the side, nosing ends, rear and bottom when the flight can be seen from behind. Returns the riser. """
     foot, head = v( foot[0], foot[1], 0 ), v( head[0], head[1], 0 )
     along = head - foot
     run = float( np.linalg.norm( along ) )
@@ -162,9 +163,18 @@ def stone_stair( m, foot, head, width, z0, z1, tread="vr_stone_light", riser="vr
             card( m, "vr_led", [ p - s * 0.98 - d * 0.05 + UP * ( zt - 2.6 ), p + s * 0.98 - d * 0.05 + UP * ( zt - 2.6 ),
                                  p + s * 0.98 - d * 0.05 + UP * ( zt - 1.6 ), p - s * 0.98 - d * 0.05 + UP * ( zt - 1.6 ) ], -d )
         for sgn, want in zip( ( -1, 1 ), sides ):
-            if want:
+            if want or closed:
                 o = s * sgn
                 card( m, side, [ p + o + UP * z0, q + o + UP * z0, q + o + UP * zt, p + o + UP * zt ], o )
+            if closed:
+                o = s * sgn
+                card( m, tread, [ p - lip + o + UP * ( zt - 1.5 ), p + o + UP * ( zt - 1.5 ),
+                                  p + o + UP * zt, p - lip + o + UP * zt ], o )
+    if closed:
+        card( m, side, [ head - s + UP * z0, head + s + UP * z0,
+                         head + s + UP * z1, head - s + UP * z1 ], d )
+        card( m, side, [ foot - s + UP * z0, head - s + UP * z0,
+                         head + s + UP * z0, foot + s + UP * z0 ], -UP )
     lo = [ foot - s - d * 2 + UP * z0, foot + s - d * 2 + UP * z0, head - s + UP * z0, head + s + UP * z0 ]
     hi = [ head - s + d * 1 + UP * z1, head + s + d * 1 + UP * z1, foot - s - d * 2 + UP * ( z0 + 0.5 ), foot + s - d * 2 + UP * ( z0 + 0.5 ) ]
     m.hull( lo + hi + [ head - s + d + UP * z0, head + s + d + UP * z0 ], surface )
@@ -217,6 +227,18 @@ def steel_rail( m, pts, z, height=42.0, clip_to=72.0, name="steel rail", bars=11
     """ A black steel balustrade. style "bars": square posts every 48, a flat top rail, a bottom rail and flat bars
     between them. "rails": the picture's light one, round posts every 54 with a round top rail and a middle rail.
     "tube": a heavy frame of 3 in square tube, posts every 72, a top rail and a kick rail. """
+    if name=="court stair rail" and list(pts)==[(660,-255),(473,-255)] and z==0 and height==42 and slope==[7,128] and style=="rails":
+        from veridant_court_stair_rail import build_into
+        build_into(m)
+        if clip_to is not None:
+            clip(name,v(660,-255,0),v(473,-255,0),7,128+clip_to)
+        return
+    if name=="reception stair rail" and list(pts)==[(-83,260),(-83,447)] and z==0 and height==42 and slope==[7,128] and style=="rails":
+        from veridant_reception_stair_rail import build_into
+        build_into(m)
+        if clip_to is not None:
+            clip(name,v(-83,260,0),v(-83,447,0),7,128+clip_to)
+        return
     if style != "bars":
         return _rail( m, pts, z, height, clip_to, name, slope, style )
     pts = [ v( p[0], p[1], 0.0 ) for p in pts ]
@@ -271,6 +293,9 @@ def _rail( m, pts, z, height, clip_to, name, slope, style ):
             rod( m, A + UP * ( height * 0.52 ), B + UP * ( height * 0.52 ), 0.45, "vr_steel", 5 )
         posts = max( 1, int( math.ceil( L / spacing ) ) )
         for i in range( posts + 1 ):
+            if name == "court landing rail" and k == 0 and i == 0:
+                # The mounted courtyard stair rail supplies this shared end support.
+                continue
             f = i / posts
             p = a + dvec * f
             zp = za + ( zb - za ) * f
@@ -396,8 +421,12 @@ def wall_washer( m, name, at, out, radius=260, light=True, size=( 9.0, 4.5 ), co
     right = np.cross( UP, out )
     c = v( *at ) + out * 0.25
     w, h = size
-    P.quad( m, "vr_dark", c, right, UP, w + 2.0, h + 2.0, off=0.0 )
-    P.quad( m, "vr_lamp", c + out * 0.1, right, UP, w, h, off=0.0 )
+    if name=="Reception door lamp" and tuple(at)==(170,200,108) and tuple(size)==(9,4.5):
+        from veridant_reception_light import build_into
+        build_into(m)
+    else:
+        P.quad( m, "vr_dark", c, right, UP, w + 2.0, h + 2.0, off=0.0 )
+        P.quad( m, "vr_lamp", c + out * 0.1, right, UP, w, h, off=0.0 )
     if light:
         LIGHTS.append( ( name, tuple( c + out * 16 + UP * rise ), colour, radius, shadows ) )
 
@@ -444,19 +473,18 @@ def lantern_roof( m, top ):
 
 
 def lantern_post( m, name, base, h=132.0, light=True, radius=420 ):
-    """ A promenade lamp post: a black steel column, a box lantern with lit glass. """
+    """Framed lantern family throughout Veridant; original collision and lighting."""
     from veridant_lamp_placement import placed_base
+    from veridant_east_lantern import build_one
     b = v( *placed_base( name, base ) )
-    P.cylinder( m, ( b[0], b[1] ), 4.5, b[2], b[2] + 10, "vr_steel", 10, top="vr_steel", surface=METAL )
-    P.cylinder( m, ( b[0], b[1] ), 2.2, b[2] + 10, b[2] + h - 16, "vr_steel", 8, surface=METAL )
-    top = b + UP * ( h - 16 )
-    box( m, top[0] - 6, top[0] + 6, top[1] - 6, top[1] + 6, top[2], top[2] + 2, "vr_steel" )
-    for sx, sy in ( ( -1, -1 ), ( 1, -1 ), ( 1, 1 ), ( -1, 1 ) ):
-        box( m, top[0] + sx * 5.2 - 0.6, top[0] + sx * 5.2 + 0.6, top[1] + sy * 5.2 - 0.6, top[1] + sy * 5.2 + 0.6, top[2] + 2, top[2] + 14, "vr_steel" )
-    box( m, top[0] - 4.6, top[0] + 4.6, top[1] - 4.6, top[1] + 4.6, top[2] + 2, top[2] + 14, "vr_lamp" )
-    lantern_roof( m, top )
+    collision = K.Model()
+    P.cylinder(collision,(b[0],b[1]),4.5,b[2],b[2]+10,"vr_steel",10,top="vr_steel",surface=METAL)
+    P.cylinder(collision,(b[0],b[1]),2.2,b[2]+10,b[2]+h-16,"vr_steel",8,surface=METAL)
+    m.hulls.extend(collision.hulls)
+    m.boxes.extend(collision.boxes)
+    build_one(m,b,h)
     if light:
-        LIGHTS.append( ( name, tuple( top + UP * 8 ), WARM, radius, False ) )
+        LIGHTS.append((name,tuple(b+UP*(h-8)),WARM,radius,False))
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -732,6 +760,13 @@ def umbrella_closed( m, base, h=110.0, paint="vr_umbrella", z0=0.0 ):
     P.cylinder( m, ( b[0], b[1] ), 11, z0, z0 + 3, "vr_steel", 14, top="vr_steel", surface=METAL )
     P.cylinder( m, ( b[0], b[1] ), 1.2, z0 + 3, z0 + h, "vr_steel", 8 )
     top = z0 + h
+    if tuple(base)==(30,470) and h==182 and z0==128 and paint=="vr_umbrella":
+        from veridant_umbrella_cloth import build_into
+        build_into(m,base,h,z0)
+        P.cylinder(m,(b[0],b[1]),.9,top,top+5,"vr_steel",6,top="vr_steel")
+        P.lathe(m,b,[(1.6,top+5),(1.8,top+7),(0.,top+10)],"vr_steel",8)
+        m.collision_box((b[0]-9,b[1]-9,z0),(b[0]+9,b[1]+9,z0+3),METAL)
+        return
     # The canopy, top to bottom: ( radius, z ). Its eight panels hang in pleats between the ribs, the rib tips poking
     # out at the bottom.
     profile = [ ( 0.9, top ), ( 2.0, top - 4 ), ( 4.2, top - 14 ), ( 6.8, top - 28 ), ( 9.2, top - 44 ), ( 10.8, top - 58 ),
@@ -775,6 +810,10 @@ def flag( m, base, h=210.0, name="flag", z0=0.0, along=( 0, 1 ), size=( 44.0, 66
     d = unit( v( along[0], along[1], 0 ) )
     out = np.cross( UP, d )
     top = z0 + h - 4
+    if tuple(base)==(-514.0,413.0) and h==200 and z0==128:
+        from veridant_terrace_flag import build_into
+        build_into(m,base,z0)
+        return
     cols = 5
     prev = None
     for i in range( cols + 1 ):
@@ -799,9 +838,13 @@ def banner( m, centre_top, right, h, name="banner", light=True, light_name="Bann
     w = h * VM.aspect( VM.PRINTS, name )
     top = v( *centre_top )
     rod( m, top - right * ( w / 2 + 3 ) + out * 4, top + right * ( w / 2 + 3 ) + out * 4, 1.0, "vr_steel", 8, caps=True )
-    picture( m, name, top - UP * ( h / 2 + 1 ) + out * 4, right, h, off=0.0, both=False )
-    # A slight hollow behind it so it reads as cloth: its back face.
-    P.quad( m, "vr_black", top - UP * ( h / 2 + 1 ) + out * 3.9, -right, UP, w, h )
+    if name=="banner" and tuple(centre_top)==(10,-418,392) and h==200:
+        from veridant_operations_banner import build_into
+        build_into(m,centre_top,right,h,name)
+    else:
+        picture( m, name, top - UP * ( h / 2 + 1 ) + out * 4, right, h, off=0.0, both=False )
+        # A slight hollow behind it so it reads as cloth: its back face.
+        P.quad( m, "vr_black", top - UP * ( h / 2 + 1 ) + out * 3.9, -right, UP, w, h )
     # The canopy and its LED, over the banner.
     c = top + UP * 10 + out * 6
     obox( m, c, right, ( w + 16, 12, 3 ), "vr_steel" )

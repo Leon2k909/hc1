@@ -1,0 +1,1 @@
+{"code":"var s=Editor.SceneEditorSession.All.First(x=>x.Scene.Name==\"veridant\");var m=Model.Load(\"models/maps/veridant/pergola-brackets-v1/brackets.vmdl\");return new{m.IsError,Objects=s.Scene.GetAllObjects(true).Count(x=>x.Name==\"Cafe terrace pergola brackets\"),s.HasUnsavedChanges,Game.IsPlaying};"}

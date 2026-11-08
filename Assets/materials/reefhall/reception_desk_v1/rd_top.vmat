@@ -1,0 +1,15 @@
+// Sources/ReefHall/reception-desk-v1/desk.py: the existing concrete_wall_009 scan, at its true scale
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    TextureColor "materials/spillway/scans/concrete_wall_009_diff_2k.jpg"
+    TextureNormal "materials/collider/finish-v1/concrete_wall_009_nor_gl_2k.jpg"
+    TextureRoughness "materials/spillway/scans/concrete_wall_009_rough_2k.jpg"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_flMetalness "0.0"
+    g_flRoughnessScaleFactor "0.55"
+    g_vTexCoordScale "[1.0 1.0]"
+    g_vColorTint "[0.36 0.4 0.48 1]"
+    g_flModelTintAmount "1"
+}

@@ -1,0 +1,1 @@
+var property=typeof(ModelRenderer).GetProperty("Materials");return new{Type=property?.PropertyType.FullName,Members=property?.PropertyType.GetMembers().Where(x=>x.MemberType==System.Reflection.MemberTypes.Method||x.MemberType==System.Reflection.MemberTypes.Property).Select(x=>x.ToString()).ToArray()};

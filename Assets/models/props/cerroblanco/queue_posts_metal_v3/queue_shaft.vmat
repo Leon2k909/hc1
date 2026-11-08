@@ -1,0 +1,13 @@
+"Layer0"
+{
+ shader "shaders/complex.shader"
+ F_SPECULAR "1"
+ g_flMetalness "1"
+ g_flRoughnessScaleFactor "1"
+ TextureColor "models/props/cerroblanco/queue_posts_metal_v3/shaft_color.png"
+ TextureNormal "models/props/cerroblanco/queue_posts_metal_v3/shaft_normal.png"
+ TextureRoughness "models/props/cerroblanco/queue_posts_metal_v3/shaft_rough.png"
+ TextureAmbientOcclusion "materials/default/default_ao.tga"
+ g_vColorTint "[1 1 1 1]"
+ g_flModelTintAmount "1"
+}

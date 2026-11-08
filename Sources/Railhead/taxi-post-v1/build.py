@@ -63,7 +63,7 @@ if '--candidate-only' in sys.argv:
  manifest=json.loads((OUT/'manifest.json').read_text());assert sha(ROOT/manifest['source'])==manifest['source_sha256'],'Live base changed; rebuild preview splice'
  manifest['files']={str(p.relative_to(STAGE)).replace('\\','/'):sha(p) for p in STAGE.rglob('*') if p.is_file()};manifest['triangles']=count
  (OUT/'manifest.json').write_text(json.dumps(manifest,indent=2));print(json.dumps(dict(new_triangles=count,candidate_only=True)));sys.exit(0)
-legacy=K.Model();D.taxi_post(legacy,1488.,1180.,'+n',0.);R.configure(legacy);K.write_obj(OUT/'legacy-taxi.obj',legacy,'legacy_taxi')
+legacy=K.Model();D.legacy_taxi_post(legacy,1488.,1180.,'+n',0.);R.configure(legacy);K.write_obj(OUT/'legacy-taxi.obj',legacy,'legacy_taxi')
 def records(path):
  lines=path.read_text().splitlines(keepends=True);vs=[tuple(round(float(v),3) for v in l.split()[1:4]) for l in lines if l.startswith('v ')]
  paint='';result=[]

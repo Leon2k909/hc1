@@ -1,0 +1,1 @@
+var t = typeof( Editor.Mcp.SceneTools ).GetMethod( "CreateGameObject" ).ReturnType; return t.GetMembers( System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance ).Where( m => m.MemberType == System.Reflection.MemberTypes.Property || m.MemberType == System.Reflection.MemberTypes.Field ).Select( m => m.MemberType + " " + m.Name ).ToArray();

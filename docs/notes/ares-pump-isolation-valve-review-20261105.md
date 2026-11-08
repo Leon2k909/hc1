@@ -1,0 +1,5 @@
+# Ares northeast pump isolation valve — native review
+
+Approved and installed on 2026-11-05. Exact pipe migration plus one stable shared-model renderer saved natively, reactor compiled, installed captures checked and generator gap/cover-collision test passed. Private review-only reactor assets retired outside Assets. See `installed-verification.json`; the account below is historical review evidence.
+
+Reuses the already accepted/compiled Collider valve, fitted to one northeast pump feed riser at plan `284.1421,255.8579,92`. Cast housing, bolted flanges, threaded stem and worn red handwheel; all shared model/material sources unchanged. Only 32 original pipe triangles are clipped in a private preview, retaining 96 lower/upper fragments and all unrelated records/physics. Original map/riser remains active. Matching engine inspection views use the same temporary review light in both variants. Source, scope, clipping, normals and native checks pass; source integration and distance/performance review remain before repeated installation. See `Sources/Ares/pump-isolation-valve-v1/README.md` and `output/ares/pump-isolation-valve-v1/verification.json`.

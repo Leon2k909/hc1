@@ -282,6 +282,7 @@ public partial class HealthComponent : Component, IRespawnable//, Component.IDam
 		GameObject.Root.Dispatch( new DamageTakenEvent( damageInfo ) );
 
 		Scene.Dispatch( new DamageTakenGlobalEvent( damageInfo ) );
+		RoundBloodDecals.OnDamage( Scene, damageInfo );
 
 		if ( damageInfo.Attacker.IsValid() )
 		{

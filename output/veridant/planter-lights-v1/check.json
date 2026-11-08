@@ -1,0 +1,1 @@
+{"code":"var s=Editor.SceneEditorSession.All.First(x=>x.Scene.Name==\"veridant\");var m=Model.Load(\"models/maps/veridant/planter-lights-v1/housings.vmdl\");return new{m.IsError,Objects=s.Scene.GetAllObjects(true).Count(x=>x.Name==\"Courtyard planter light housings\"),s.HasUnsavedChanges,Game.IsPlaying};"}

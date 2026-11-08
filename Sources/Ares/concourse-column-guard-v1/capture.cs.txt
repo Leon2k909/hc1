@@ -1,0 +1,32 @@
+var root=Sandbox.Project.Current.GetRootPath();var output=System.IO.Path.Combine(root,"output/ares/concourse-column-guard-v1/native");System.IO.Directory.CreateDirectory(output);
+var active=Editor.SceneEditorSession.Active?.Scene?.Id;var playing=Game.IsPlaying;
+var data=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"Assets/scenes/maps/Ares/ares.scene"))).AsObject();
+var names=new[]{"Sun","Sky","Fog","Look","Ares","Lights","Reflection Probes","Ares bounced lighting","Core Process Console","Lower Hall Bulkhead Lamp","West Control Room Display","West Stair Landing Rail","West Control Room Operator Console","ARES transport cases"}.ToHashSet(StringComparer.OrdinalIgnoreCase);
+var roots=new System.Text.Json.Nodes.JsonArray();foreach(var n in data["GameObjects"].AsArray())if(names.Contains(n["Name"]?.GetValue<string>()??""))roots.Add(n.DeepClone());data["GameObjects"]=roots;
+data["SceneProperties"]["NavMesh"]["Enabled"]=false;data["SceneProperties"]["WantsSystemScene"]=false;
+var elapsed=0f;var look=data["GameObjects"].AsArray().Single(n=>n["Name"]?.GetValue<string>()=="Look");var savedTone=look["Components"].AsArray().Single(n=>n["__type"]?.GetValue<string>()=="Sandbox.Tonemapping");savedTone["AutoExposureEnabled"]=true;savedTone["MinimumExposure"]=2.2f;savedTone["MaximumExposure"]=2.2f;var scene=Scene.CreateEditorScene();var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic;
+var preRender=typeof(Scene).GetMethod("PreRender",flags,null,Type.EmptyTypes,null);var preCamera=typeof(Scene).GetMethod("PreCameraRender",flags,null,Type.EmptyTypes,null);
+try{
+ CameraComponent camera;ModelRenderer room,replacement;Model old,cut;
+ using(scene.Push()){
+  scene.Deserialize(data);var inspection=new GameObject(true,"Identical review inspection light");inspection.WorldPosition=new Vector3(-1125,595,75);var key=inspection.AddComponent<PointLight>();key.Radius=240;key.LightColor=new Color(4,3.8f,3.4f);key.Shadows=true;room=scene.GetAllComponents<ModelRenderer>().Single(r=>r.Model?.ResourcePath=="models/maps/ares/ares_hall.vmdl");old=room.Model;cut=Model.Load("models/props/ares/concourse_column_guard_v1/preview.vmdl");
+  replacement=new GameObject(true,"Column guard review").AddComponent<ModelRenderer>();replacement.Model=Model.Load("models/props/ares/concourse_column_guard_v1/guard.vmdl");replacement.WorldPosition=Vector3.Zero;replacement.LodOverride=0;
+  if(old.IsError||cut.IsError||replacement.Model.IsError)throw new Exception("Invalid model");
+  var holder=new GameObject(false,"Review camera");camera=holder.AddComponent<CameraComponent>();camera.IsMainCamera=false;camera.EnablePostProcessing=true;camera.ZNear=.5f;camera.ZFar=14000;
+  var tone=camera.GameObject.AddComponent<Tonemapping>();tone.Mode=Tonemapping.TonemappingMode.ACES;tone.AutoExposureEnabled=false;tone.ExposureCompensation=2.2f;
+  holder.Enabled=true;scene.EditorTick(elapsed+=.016f,.016f);preRender?.Invoke(scene,null);preCamera?.Invoke(scene,null);
+ }
+ foreach(var mat in old.Materials.Concat(replacement.Model.Materials).Distinct())foreach(var tex in new[]{"g_tColor","g_tNormal","g_tRoughness","g_tAmbientOcclusion"}.Select(mat.GetTexture).Append(mat.FirstTexture).Where(t=>t is not null).Distinct())tex.MarkUsed(2048);
+ for(var i=0;i<30;i++){using(scene.Push()){scene.EditorTick(elapsed+=.016f,.016f);preRender?.Invoke(scene,null);}await Task.Delay(20,cancellationToken);}
+ var views=new[]{("player",new Vector3(-1146,590,64),new Vector3(-1076,650,18),45f),("detail",new Vector3(-1121,610,36),new Vector3(-1076,650,16),50f)};
+ foreach(var after in new[]{false,true}){
+  using(scene.Push()){room.Model=after?cut:old;replacement.GameObject.Enabled=after;}
+  foreach(var view in views){using var bitmap=new Bitmap(1200,1000);
+   for(var frame=0;frame<90;frame++){using(scene.Push()){camera.WorldPosition=view.Item2;camera.WorldRotation=Rotation.LookAt(view.Item3-camera.WorldPosition);camera.FieldOfView=view.Item4;scene.EditorTick(elapsed+=.016f,.016f);preRender?.Invoke(scene,null);preCamera?.Invoke(scene,null);camera.RenderToBitmap(bitmap,false);}await Task.Delay(16,cancellationToken);}
+   System.IO.File.WriteAllBytes(System.IO.Path.Combine(output,view.Item1+(after?"-after":"-before")+".png"),bitmap.ToPng());
+  }
+ }
+ var trace=scene.Trace.Ray(new Vector3(-540,-290,64),new Vector3(-540,-290,-20)).Run();var info=replacement.Model.MeshInfo;
+ var result=new{PreviewOnly=true,IdenticalTemporaryInspectionLight=true,PurposeBuiltGuard=true,ModelsValid=true,Lods=info.LodCount,Triangles=info.Meshes.Sum(m=>m.Triangles),AddedColliders=replacement.GameObject.Components.GetAll<ModelCollider>().Count(),PlayerFloorHit=trace.Hit,PlayerFloorZ=trace.EndPosition.z,SceneUnchanged=active==Editor.SceneEditorSession.Active?.Scene?.Id,PlayStateUnchanged=playing==Game.IsPlaying};
+ System.IO.File.WriteAllText(System.IO.Path.Combine(output,"validation.json"),System.Text.Json.JsonSerializer.Serialize(result));return result;
+}finally{scene.Destroy();}

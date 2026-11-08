@@ -718,6 +718,9 @@ def gallery_bench( m, e, n, z, along_e, length=72.0 ):
 
 def vitrine( m, e, n, z, along_e, seed ):
     """ A vitrine: a white base, a glass hood (drawn only: shots go through it), three pieces of pottery inside. """
+    # Keep the upper North Gallery link doors and their swing clear.
+    if abs(e - 1274) < 0.1 and abs(n - 34) < 0.1 and z > 100:
+        e += 170
     rng = np.random.default_rng( seed )
     hl, hd = ( 22.0, 13.0 ) if along_e else ( 13.0, 22.0 )
     m.box( ( e - hl, n - hd, z ), ( e + hl, n + hd, z + 34.0 ), { "default": P.WHITE, "-z": None } )
@@ -736,6 +739,10 @@ def vitrine( m, e, n, z, along_e, seed ):
 
 def stanchions( m, points, z ):
     """ Queue posts (chrome, weighted bases) with black belts between them. """
+    from cerroblanco_queue_posts import LANES,build
+    if list(points)==LANES[0]:
+        m.extend(build());return
+    if list(points)==LANES[1]:return
     for p in points:
         m.cylinder( p, 6.0, z, z + 1.0, { "side": "cbf_chrome", "top": "cbf_chrome", "bottom": None }, sides=16 )
         P.rod( m, ( p[0], p[1], z + 1 ), ( p[0], p[1], z + 37.5 ), 1.1, "cbf_chrome", sides=10, caps=True )
@@ -790,21 +797,22 @@ def cafe( m, layout, C, log, stats ):
     top = 42.0
     # The espresso machine is espresso_machine_v2, placed in the scene by cerroblanco_espresso at ( 575, 615 ) on this top, so it isn't drawn here.
     # The grinder, the pastry case.
-    lathe( m, P.BLACK, ( 600.0, 616.0, top ), [ ( 0.0, 0.0 ), ( 3.4, 0.0 ), ( 3.0, 9.0 ), ( 1.5, 10.0 ) ], sides=12 )
-    lathe( m, "cbf_screen", ( 600.0, 616.0, top + 10.0 ), [ ( 1.5, 0.0 ), ( 3.6, 5.5 ), ( 3.8, 6.0 ) ], sides=12 )
+    from cerroblanco_cafe_grinder import build_into
+    build_into(m)
     e0, e1 = 628.0, 682.0
-    m.box( ( e0, 604, top ), ( e1, 626, top + 1.5 ), "cbf_track" )
-    m.box( ( e0, 604, top + 1.5 ), ( e1, 626, top + 14 ), { "default": GLASS, "-z": None } )
-    rng = np.random.default_rng( 5 )
-    for k in range( 9 ):
-        x = e0 + 6 + ( e1 - e0 - 12 ) * ( k % 5 ) / 4 + rng.uniform( -1.5, 1.5 )
-        y = 609 + 8 * ( k // 5 ) + rng.uniform( -1, 1 )
-        lathe( m, "cbf_pastry", ( x, y, top + 1.6 ), [ ( 0.0, 0.0 ), ( 2.4, 0.0 ), ( 2.6, 1.2 ), ( 1.6, 2.4 ), ( 0.0, 2.7 ) ], sides=10, cap_top=False )
+    from cerroblanco_cafe_display import build_into as display_case
+    display_case(m)
+    from cerroblanco_pan_dulce import build_into as pastries
+    pastries(m)
     # Pendant lights over the counter.
     for e in ( 560.0, 620.0, 680.0 ):
         p = np.array( ( e, 615.0, C.CAFE_TOP ) )
         P.rod( m, p, p - UP * 44, 0.18, "cbf_track", sides=4 )
-        lathe( m, "cbf_track", p - UP * 56, [ ( 6.5, 0.0 ), ( 5.8, 3.0 ), ( 2.4, 10.0 ), ( 0.6, 12.0 ) ], sides=16 )
+        if e==620:
+            from cerroblanco_cafe_pendant import build as shade
+            m.extend(shade())
+        else:
+            lathe( m, "cbf_track", p - UP * 56, [ ( 6.5, 0.0 ), ( 5.8, 3.0 ), ( 2.4, 10.0 ), ( 0.6, 12.0 ) ], sides=16 )
         lens_disc( m, p - UP * 55.9, ( 0, 0, -1 ), 5.4, sides=16 )
     # The menu board, hung from the ceiling on two rods over the back of the counter, facing the customers.
     menu = layout["signs"]["menu"]
@@ -829,16 +837,9 @@ def wall_light( m, centre, out ):
 
 
 def camera( m, at, out ):
-    """ A security camera on a wall bracket, looking out and down. """
-    o = unit( ( out[0], out[1], 0.0 ) )
-    side, right, up = frame_axes( o )
-    at = np.asarray( at, float )
-    m.oriented_box( at + o * 0.4, ( side, o, up ), ( 4.0, 0.8, 5.0 ), P.WHITE )
-    P.rod( m, at + o * 0.8, at + o * 6.0, 0.7, P.WHITE, sides=6 )
-    look = unit( o * 0.85 - up * 0.5 )
-    body = at + o * 7.0 - up * 1.5
-    P.rod( m, body - look * 4.5, body + look * 4.5, 2.0, P.WHITE, sides=8, caps=True )
-    lens_disc( m, body + look * 4.52, look, 1.2, sides=8, paint="cbf_screen" )
+    """Approved CCTV model at every museum camera placement; no primitive fallback."""
+    from cerroblanco_cctv import build_into
+    build_into(m,at,out)
 
 
 def roof_plant( m, e0, e1, n0, n1, z, seed ):

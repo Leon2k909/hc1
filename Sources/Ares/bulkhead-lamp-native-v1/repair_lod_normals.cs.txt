@@ -1,0 +1,2 @@
+var root=Sandbox.Project.Current.GetRootPath();var output=System.IO.Path.Combine(root,"output/ares/bulkhead-lamp-native-v1/stage/Assets/models/props/ares/bulkhead_lamp_native_v1");
+foreach(var f in new[]{"lamp_lod1.obj","lamp_lod2.obj"}){var target=System.IO.Path.Combine(root,"Assets/models/props/ares/bulkhead_lamp_native_v1",f);System.IO.File.Copy(System.IO.Path.Combine(output,f),target,true);Editor.AssetSystem.RegisterFile(target);}return true;

@@ -1,0 +1,3 @@
+# Ares lower-hall bulkhead lamp installed
+
+Approved native lamp installed at world `-300,1100,120`. Exactly 24 old embedded render triangles removed from the active dressing OBJ; shared materials, all other lamps and complete collision retained. One renderer added through native SceneFile save. Generator hooks prevent the old geometry returning. Approved close mesh retained; LODs 32,482/6,496/1,460. Native compilation, all-LOD renders, source checks and exact semantic scene comparison pass. Private review-only whole-map assets retired outside Assets. See `Sources/Ares/bulkhead-lamp-native-v1/README.md`, `output/ares/bulkhead-lamp-native-v1/installed-verification.json` and installed captures.

@@ -81,7 +81,7 @@ public static class AttachmentUnlocks
 	/// <summary> The weapon level <paramref name="part"/> unlocks at on <paramref name="weapon"/> (1: from the start). </summary>
 	public static int GetRequiredLevel( EquipmentResource weapon, GunsmithPart part )
 	{
-		if ( part is null || !IsAttachment( part.Category ) )
+		if ( part is null || part.IsCosmeticVariant || !IsAttachment( part.Category ) )
 			return 1;
 		if ( part.RequiredLevel > 1 )
 			return Math.Min( part.RequiredLevel, WeaponProgression.MaxLevel );
@@ -239,7 +239,7 @@ public static class AttachmentUnlocks
 	{
 		// Each slot's parts, plainest first; parts with a level of their own sit out of the deal.
 		var queues = GetWeaponParts( weapon )
-			.Where( p => p.RequiredLevel <= 1 )
+			.Where( p => p.RequiredLevel <= 1 && !p.IsCosmeticVariant )
 			.GroupBy( p => p.Category )
 			.ToDictionary( g => g.Key, g => new Queue<GunsmithPart>( g
 				.OrderBy( Tier )

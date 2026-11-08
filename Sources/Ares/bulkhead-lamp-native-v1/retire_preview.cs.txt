@@ -1,0 +1,5 @@
+var root=Sandbox.Project.Current.GetRootPath();var assets=System.IO.Path.Combine(root,"Assets/models/props/ares/bulkhead_lamp_native_v1");var archive=System.IO.Path.Combine(root,"output/ares/bulkhead-lamp-native-v1/retired-preview");System.IO.Directory.CreateDirectory(archive);
+var scene=System.IO.File.ReadAllText(System.IO.Path.Combine(root,"Assets/scenes/maps/Ares/ares.scene"));if(!scene.Contains("Lower Hall Bulkhead Lamp"))throw new Exception("Not installed");
+var files=new[]{"preview.obj","preview.obj.meta","preview.vmdl","preview.vmdl.meta","preview.vmdl_c","dressing_without_sign.mtl"};
+foreach(var f in files){var source=System.IO.Path.Combine(assets,f);var target=System.IO.Path.Combine(archive,f);if(System.IO.File.Exists(source)){if(System.IO.File.Exists(target))throw new Exception("Archive exists");System.IO.File.Move(source,target);}}
+return new{Retired=true,OnlyPrivatePreviewFiles=true};

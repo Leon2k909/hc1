@@ -1,0 +1,1 @@
+{"code": "if(!Game.IsPlaying) throw new Exception(\"Play mode required\"); var p=SWB.Player.PlayerBase.Local; if(p==null) return new { Scene=Game.ActiveScene.Name, LocalPlayer=false }; p.GameObject.WorldPosition=new Vector3(-1250,-780,1); p.EyeAngles=new Angles(16,110,0); return new { Scene=Game.ActiveScene.Name,p.GameObject.WorldPosition,p.EyeAngles };"}

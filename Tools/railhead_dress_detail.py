@@ -213,6 +213,13 @@ def city_light( model, e, n, facing, poster, bottom=40.0, atlas="rw_posters", de
     """ A wall-mounted City-Light case: an anodised aluminium frame 60 mm round the poster, 80 mm deep, with a
     glazed front, the poster behind the glass and a thin opal light line round its inside edge. (e, n) is on the
     wall's face; facing is the way the poster looks. No collision. Returns the light position just in front of it. """
+    if (e,n,facing,poster,bottom,atlas,depth)==(545.0,1299.5,'-n','poster_sea',34.0,'rw_posters',3.2):
+        return tuple(Frame(e,n,bottom,facing).p(0.0,14.0,CITY_LIGHT[1]/2))
+    return legacy_city_light(model,e,n,facing,poster,bottom,atlas,depth)
+
+
+def legacy_city_light(model,e,n,facing,poster,bottom=40.0,atlas='rw_posters',depth=3.2):
+    """Original case for other placements and guarded review baselines."""
     w, h = CITY_LIGHT
     F = Frame( e, n, bottom, facing )
     b = 2.4
@@ -398,6 +405,15 @@ def hatched_box( model, e0, e1, n0, n1, z, paint="rw_line_yellow", border=4.7, s
 def taxi_post( model, e, n, facing, z0=0.0 ):
     """ The taxi rank's sign: a galvanised 60 mm post 2.6 m tall with the "Taxi" plate (600 x 300 mm) at its top,
     reading both ways along the kerb. One thin collision box for the post. """
+    if (e, n, facing, z0) == (1488.0, 1180.0, '+n', 0.0):
+        # Approved independent renderer; retain the original thin post collision.
+        model.collision_box((e-1.2,n-1.2,z0),(e+1.2,n+1.2,z0+102.0),METAL)
+        return
+    legacy_taxi_post(model, e, n, facing, z0)
+
+
+def legacy_taxi_post(model, e, n, facing, z0=0.0):
+    """Original assembly, retained for review comparisons and unmodified placements."""
     F = Frame( e, n, z0, facing )
     model.cylinder( ( e, n ), 1.2, z0, z0 + 102.0, { "side": "rw_steel", "top": "rw_steel" }, sides=10, collide=None )
     disc( model, "rw_steel", ( e, n, z0 + 102.0 ), ( 0, 0, 1 ), 1.2, 10 )
@@ -1140,6 +1156,13 @@ def road_barrier( model, e, n, along="e", length=39.4, z0=0.0 ):
 def loudspeaker( model, e, n, z, facing, tilt=0.35 ):
     """ A platform PA loudspeaker: a light grey cabinet 300 x 200 x 160 mm on a short swivel arm, angled down at the
     platform (tilt radians), its dark grille on the front. (e, n) where the arm meets its support; no collision. """
+    if (e, n, z, facing, tilt) == (7.7, 820.0, 214.0, '+e', 0.35):
+        return  # Approved independent Central Platform PA Speaker renderer.
+    legacy_loudspeaker(model,e,n,z,facing,tilt)
+
+
+def legacy_loudspeaker(model,e,n,z,facing,tilt=0.35):
+    """Original PA speaker, retained for unmodified placements and review baselines."""
     F = Frame( e, n, z, facing )
     rod( model, F.p( 0.0, 0.0, 0.0 ), F.p( 0.0, 3.2, 0.0 ), 0.45, "rw_steel_dark", 8, caps=( False, True ) )
     c = F.p( 0.0, 6.4, -0.6 )

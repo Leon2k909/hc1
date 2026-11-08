@@ -1,4 +1,4 @@
-# Riverside Lucky Stop timber entrance steps - review candidate
+# Riverside Lucky Stop timber entrance steps - installed
 
 Player-route upgrade at the shop entrance, engine 490,-235,0. Rebuilds three stacked wooden boxes as six separate beveled tread
 boards, four sawtooth-cut timber stringers with diagonal undersides, rear support beam/feet, galvanized tread brackets and
@@ -18,3 +18,8 @@ The render envelope remains 30 x 90 inches, with 19.5-inch upper tread and only 
 
 Final matching native entrance captures report no error models and preserve the active Riverdale editor tab/play state.
 Images inspected; all protected public store and saved Riverside scene hashes still match. Final review: comparison.png.
+
+Approved installation completed 2026-11-05. Exactly 36 old triangles removed, one native renderer saved, generator hook added,
+original collision wedge/lights/public store ModelDoc preserved. Saved-map capture reports no error models and preserves the
+active gunsmith play session. Deleted all 12 legacy/private comparison resource files from Assets. Other chats' two soil-relief
+roots and an inspected shared zombies-prefab instance-ID refresh were retained. installed.json records final checks and cleanup.

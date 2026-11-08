@@ -1,0 +1,13 @@
+var root=Sandbox.Project.Current.GetRootPath();var directory=System.IO.Path.Combine(System.IO.Path.GetTempPath(),"belltower-gate-pier-v2");
+var old=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(directory,"previous-manifest.json")));
+var plan=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(directory,"manifest.json")));
+string Hash(string p){using var s=System.IO.File.OpenRead(p);return Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(s)).ToLowerInvariant();}
+foreach(var p in plan["guards"].AsObject())if(Hash(System.IO.Path.Combine(root,p.Key))!=p.Value.GetValue<string>())throw new InvalidOperationException("Shared source changed.");
+foreach(var p in plan["files"].AsObject())
+{
+ if(!p.Key.StartsWith("Assets/models/maps/belltower/gate-pier-v2/")||p.Key.Contains(".."))throw new InvalidOperationException("Unexpected private path.");
+ var source=System.IO.Path.Combine(directory,"stage",p.Key);var target=System.IO.Path.Combine(root,p.Key);var before=old["files"][p.Key].GetValue<string>();var after=p.Value.GetValue<string>();
+ if(Hash(source)!=after||Hash(target)!=before)throw new InvalidOperationException("Private source differs.");
+ if(before!=after){System.IO.File.Copy(source,target,true);Editor.AssetSystem.RegisterFile(target);}
+}
+return new{PrivateUpdateOnly=true};

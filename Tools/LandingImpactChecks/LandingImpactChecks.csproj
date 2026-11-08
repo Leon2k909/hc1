@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../../Code/PawnSystem/Player/LandingImpactRules.cs" Link="LandingImpactRules.cs" />
+    <Compile Include="../../Code/PawnSystem/Player/PlayerController/PlayerPawn.Landing.cs" Link="PlayerPawn.Landing.cs" />
+  </ItemGroup>
+</Project>

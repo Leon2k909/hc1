@@ -59,6 +59,7 @@ public sealed class Door : Component, IUse,
 	}
 
 	Transform StartTransform { get; set; }
+	Door PairedLeaf { get; set; }
 	Vector3 PivotPosition { get; set; }
 	bool ReverseDirection { get; set; }
 	[Sync( SyncFlags.FromHost )] public TimeSince LastUse { get; set; }
@@ -76,6 +77,16 @@ public sealed class Door : Component, IUse,
 		StartTransform = Transform.Local;
 		PivotPosition = Pivot is not null ? Pivot.WorldPosition : StartTransform.Position;
 		DefaultState = State;
+		if ( GameObject.Tags.Has( "paired_door" ) )
+		{
+			var name = GameObject.Name;
+			var otherName = name.EndsWith( " left", StringComparison.Ordinal )
+				? name[..^5] + " right"
+				: name.EndsWith( " right", StringComparison.Ordinal ) ? name[..^6] + " left" : null;
+			PairedLeaf = Scene.GetAllComponents<Door>().FirstOrDefault( door =>
+				door.GameObject.Name == otherName && door.GameObject.Tags.Has( "paired_door" )
+				&& door.WorldPosition.Distance( WorldPosition ) < 120f );
+		}
 	}
 
 	public UseResult CanUse( PlayerPawn player )
@@ -108,6 +119,14 @@ public sealed class Door : Component, IUse,
 	}
 
 	public void OnUse( PlayerPawn player )
+	{
+		var previousState = State;
+		Toggle( player );
+		if ( PairedLeaf.IsValid() && PairedLeaf != this && PairedLeaf.State == previousState )
+			PairedLeaf.Toggle( player );
+	}
+
+	private void Toggle( PlayerPawn player )
 	{
 		LastUse = 0.0f;
 

@@ -1,0 +1,11 @@
+{
+  "note": "Native editor viewport captures (bridge screenshot_game = PrintWindow of the editor window, cropped to the 3D viewport x428 y100 w1102 h455, so every image is 1102 x 455). Editor camera set with set_editor_camera (FOV 80). World axes: +x north, +y west. Settle 10 s after each camera move. BEFORE = the old plain box in place; AFTER must use exactly the same poses. Editor gizmos (light icons, spawn mannequins, zone boxes) are part of the editor viewport and appear identically in both.",
+  "target": "Orion launch-deck control shed: plan (-230..-110, 1290..1380), deck z 240 to 350; door on the south face at plan (-170, 1290)",
+  "close": {"before": "before.png", "after": "after.png", "position": "1115.05,119.83,304", "angles": "3.8,16.00,0", "distance_in": 182, "note": "standing on the deck 182 in south-south-east of the door, eye 64 in above the deck"},
+  "far": {"before": "before_far.png", "after": "after_far.png", "position": "927.97,-65.00,304", "angles": "1.7,30.00,0", "distance_in": 470, "note": "about 12 m, from just inside the deck's south edge"},
+  "roof": {"before": "before_roof.png", "after": "after_roof.png", "position": "1165.65,155.18,430", "angles": "25.2,5.00,0", "distance_in": 170, "note": "editor camera 190 in above the deck, looking down on the front and roof (not a player position)"},
+  "mean_luma_before": {"close": 32.6, "far": 53.4, "roof": 41.3},
+  "mean_luma_after": {"close": 33.0, "far": 53.0, "roof": 40.9},
+  "after_note": "AFTER shot 2026-11-06 about 21:32-21:36 with the new shed installed in the live scene (ORION control shed, render-only) and the old 12 triangles cut from orion_launch_deck.obj. Same poses, same viewport crop (x428 y100 w1102 h455), 10 s settle, the shed's own textures requested with MarkUsed(2048) (3 texture objects, nothing else). The editor was not playing; the scene was left unchanged afterwards (Reef Hall restored as the active scene, camera restored).",
+  "not_kept": "Extra AFTER-only sanity views (east wall, back wall, 21 m, 45 m) were looked at for QA only and are not evidence pictures; they have no BEFORE twins."
+}

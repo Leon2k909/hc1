@@ -1,0 +1,4 @@
+var root=Sandbox.Project.Current.GetRootPath();var source=System.IO.Path.Combine(root,"Assets/models/props/ares/pump_isolation_valve_v1");var archive=System.IO.Path.Combine(root,"output/ares/pump-isolation-valve-v1/retired-preview");System.IO.Directory.CreateDirectory(archive);
+if(!System.IO.File.ReadAllText(System.IO.Path.Combine(root,"Assets/scenes/maps/Ares/ares.scene")).Contains("Northeast Pump Isolation Valve"))throw new Exception("Not installed");
+foreach(var p in System.IO.Directory.GetFiles(source)){var dest=System.IO.Path.Combine(archive,System.IO.Path.GetFileName(p));if(System.IO.File.Exists(dest))throw new Exception("Archive exists; inspect");System.IO.File.Move(p,dest);}
+return new{Retired=true,SharedApprovedValveRetained=true};

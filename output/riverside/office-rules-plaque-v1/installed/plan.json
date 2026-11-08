@@ -1,0 +1,55 @@
+{
+  "source": "Assets/models/maps/riverside/riverside_pad.obj",
+  "before_sha256": "9e49cdb27d9fc4df8d502d15826c58a9eae6de4ba787cf61b277b45631ae118f",
+  "after_sha256": "236703b93edaeb662400bee48e8ea159e2847d3d25b341d0a5e6d6cc1bc4088a",
+  "model_sha256": "dd98d6355f9d85fccbba54a67faa67e9663a47b9a5f0a7bc642b9fa780306f6b",
+  "scene_sha256": "9d2eea56028c903fe430515c47f11027841f67a9374111ab6215e7b29ccd256a",
+  "removed_triangles": 2,
+  "group": {
+    "__guid": "8e1a3866-2b82-5e9d-962d-675193a488a7",
+    "__version": 2,
+    "Flags": 0,
+    "Name": "Office Rules Signs",
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Tags": "",
+    "Enabled": true,
+    "NetworkMode": 2,
+    "NetworkFlags": 0,
+    "NetworkOrphaned": 0,
+    "NetworkTransmit": true,
+    "OwnerTransfer": 1,
+    "Components": [],
+    "Children": [
+      {
+        "__guid": "c79135eb-4546-5195-84e8-e52fc45ee3ce",
+        "__version": 2,
+        "Flags": 0,
+        "Name": "Office Rules Sign",
+        "Position": "-579.400000,622.767076,176.000000",
+        "Rotation": "0,0,-0.0000000,1.0000000",
+        "Scale": "1,1,1",
+        "Tags": "",
+        "Enabled": true,
+        "NetworkMode": 2,
+        "NetworkFlags": 0,
+        "NetworkOrphaned": 0,
+        "NetworkTransmit": true,
+        "OwnerTransfer": 1,
+        "Components": [
+          {
+            "__type": "Sandbox.ModelRenderer",
+            "__guid": "3dc8f4d9-30bb-5034-a53a-d46a6da7247e",
+            "__enabled": true,
+            "Flags": 0,
+            "Model": "models/props/riverside/office_rules_plaque_v1/plaque.vmdl",
+            "RenderType": "On",
+            "Tint": "1,1,1,1"
+          }
+        ],
+        "Children": []
+      }
+    ]
+  }
+}

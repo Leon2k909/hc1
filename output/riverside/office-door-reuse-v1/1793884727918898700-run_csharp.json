@@ -1,0 +1,5 @@
+InvalidOperationException: A value of type 'System.Guid' cannot be converted to a 'System.String'.
+at System.Text.Json.ThrowHelper.ThrowInvalidOperationException_NodeUnableToConvert(Type sourceType, Type destinationType)
+at System.Text.Json.Nodes.JsonValue`1.GetValue[T]()
+at McpScript.<>c.<Run>b__0_1(JsonNode g)
+at System.Linq.Enumerable.IListSelectIterator`2.MoveNext()

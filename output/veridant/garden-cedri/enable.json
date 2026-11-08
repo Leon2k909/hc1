@@ -1,0 +1,1 @@
+{"code":"var s=Editor.SceneEditorSession.Active;if(Game.IsPlaying||s.Scene.Name!=\"veridant\")throw new Exception(\"Wrong scene\");var g=s.Scene.GetAllObjects(false).Single(x=>x.Id==Guid.Parse(\"b57a8989-98f8-4c32-a636-d16ffbb4a7cd\"));g.Enabled=true;return new{g.Enabled,Count=g.Children.Count()};"}

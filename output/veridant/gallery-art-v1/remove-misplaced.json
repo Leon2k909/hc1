@@ -1,0 +1,1 @@
+{"code":"var matches=Editor.SceneEditorSession.All.SelectMany(s=>s.Scene.GetAllObjects(true)).Where(x=>x.Id==Guid.Parse(\"d410584c-66d1-4121-8032-0ee836c9cc09\")).ToArray();foreach(var x in matches)x.Destroy();return matches.Length;"}

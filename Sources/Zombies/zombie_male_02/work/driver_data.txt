@@ -1,0 +1,1407 @@
+	Resource Type: Model [Version 1] [Header Version: 12]
+	File Size: 345729 bytes
+
+
+--- Resource External Refs: ---
+	Id:               Resource Name:                                  
+	77928AE5F3A5E444  models/citizen_human/bodies/male/body_mode_dark.vmat
+	BB30D79398FD44AC  models/citizen_human/bodies/underwear.vmat      
+
+
+--- Resource Blocks: Count 10 ---
+	-- Block: MDAT  Size: 11584  bytes [Offset:    160]
+	-- Block: MBUF  Size: 130822 bytes [Offset:  11744]
+	-- Block: ANIM  Size: 177413 bytes [Offset: 142576]
+	-- Block: ASEQ  Size: 1125   bytes [Offset: 320000]
+	-- Block: AGRP  Size: 6011   bytes [Offset: 321136]
+	-- Block: PHYS  Size: 7823   bytes [Offset: 327152]
+	-- Block: CTRL  Size: 342    bytes [Offset: 334976]
+	-- Block: RERL  Size: 136    bytes [Offset: 335336]
+	-- Block: REDI  Size: 2791   bytes [Offset: 335472]
+	-- Block: DATA  Size: 7457   bytes [Offset: 338272]
+
+
+--- Data for block "DATA" ---
+<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:generic:version{7412167c-06e9-4698-aff2-e63eb59037e7} -->
+{
+	m_name = "models/zombie/zombie_driver.vmdl"
+	m_modelInfo = 
+	{
+		m_nFlags = 8389632
+		m_vHullMin = [ 0.0, 0.0, 0.0 ]
+		m_vHullMax = [ 0.0, 0.0, 0.0 ]
+		m_vViewMin = [ 0.0, 0.0, 0.0 ]
+		m_vViewMax = [ 0.0, 0.0, 0.0 ]
+		m_flMass = 0.0
+		m_vEyePosition = [ 0.0, 0.0, 0.0 ]
+		m_flMaxEyeDeflection = 0.0
+		m_sSurfaceProperty = ""
+		m_keyValueText = """
+<!-- kv3 encoding:text:version{e21c7f3c-8a33-41c5-9977-a76d3a32aa0d} format:vmdlkeys3:version{141d1e66-eebf-4440-be28-a74cd93426eb} -->
+{
+	BoneConstraintList = 
+	[
+		{
+			_class = "CTiltTwistConstraint"
+			m_name = ""
+			m_vUpVector = [ 0.0, 0.0, 0.0 ]
+			m_slaves = 
+			[
+				{
+					m_nBoneHash = 1311903910
+					m_flWeight = -0.5
+					m_vBasePosition = [ -0.000011, 0.000003, -0.000004 ]
+					m_qBaseOrientation = [ 0.0, -0.0, -0.0, 1.0 ]
+					m_sName = ""
+				},
+			]
+			m_targets = 
+			[
+				{
+					m_nBoneHash = 1258956371
+					m_flWeight = 1.0
+					m_vOffset = [ -0.000015, 0.000006, -0.000004 ]
+					m_qOffset = [ 0.139173, 0.0, -0.0, 0.990268 ]
+					m_bIsAttachment = false
+					m_sName = ""
+				},
+			]
+			m_nTargetAxis = 0
+			m_nSlaveAxis = 0
+		},
+		{
+			_class = "CParentConstraint"
+			m_name = ""
+			m_vUpVector = [ 0.0, 0.0, 0.0 ]
+			m_slaves = 
+			[
+				{
+					m_nBoneHash = 3732228795
+					m_flWeight = 1.75
+					m_vBasePosition = [ 0.0, 0.0, 0.0 ]
+					m_qBaseOrientation = [ 0.0, 0.0, 0.0, 1.0 ]
+					m_sName = ""
+				},
+			]
+			m_targets = 
+			[
+				{
+					m_nBoneHash = 3915255582
+					m_flWeight = 1.0
+					m_vOffset = [ 0.0, 0.0, 0.0 ]
+					m_qOffset = [ 0.0, 0.0, 0.0, 1.0 ]
+					m_bIsAttachment = true
+					m_sName = ""
+				},
+			]
+		},
+		{
+			_class = "CTiltTwistConstraint"
+			m_name = ""
+			m_vUpVector = [ 0.0, 0.0, 0.0 ]
+			m_slaves = 
+			[
+				{
+					m_nBoneHash = 3732228795
+					m_flWeight = -0.1
+					m_vBasePosition = [ -0.000011, 0.000006, -0.000004 ]
+					m_qBaseOrientation = [ 0.0, -0.0, 0.0, 1.0 ]
+					m_sName = ""
+				},
+			]
+			m_targets = 
+			[
+				{
+					m_nBoneHash = 1258956371
+					m_flWeight = 1.0
+					m_vOffset = [ -0.000015, 0.000006, -0.000004 ]
+					m_qOffset = [ 0.0, -0.0, 0.0, 1.0 ]
+					m_bIsAttachment = false
+					m_sName = ""
+				},
+			]
+			m_nTargetAxis = 0
+			m_nSlaveAxis = 0
+		},
+		{
+			_class = "CTiltTwistConstraint"
+			m_name = ""
+			m_vUpVector = [ 0.0, 0.0, 0.0 ]
+			m_slaves = 
+			[
+				{
+					m_nBoneHash = 3732228795
+					m_flWeight = -0.05
+					m_vBasePosition = [ -0.000011, 0.000006, -0.000004 ]
+					m_qBaseOrientation = [ 0.0, -0.0, 0.0, 1.0 ]
+					m_sName = ""
+				},
+			]
+			m_targets = 
+			[
+				{
+					m_nBoneHash = 542075771
+					m_flWeight = 1.0
+					m_vOffset = [ -0.000004, 0.000011, 0.0 ]
+					m_qOffset = [ 0.0, -0.0, 0.0, 1.0 ]
+					m_bIsAttachment = false
+					m_sName = ""
+				},
+			]
+			m_nTargetAxis = 2
+			m_nSlaveAxis = 2
+		},
+		{
+			_class = "CTiltTwistConstraint"
+			m_name = ""
+			m_vUpVector = [ 0.0, 0.0, 0.0 ]
+			m_slaves = 
+			[
+				{
+					m_nBoneHash = 3780610537
+					m_flWeight = -0.5
+					m_vBasePosition = [ -0.000027, 0.000002, -0.000061 ]
+					m_qBaseOrientation = [ 0.0, 0.0, 0.0, 1.0 ]
+					m_sName = ""
+				},
+			]
+			m_targets = 
+			[
+				{
+					m_nBoneHash = 1291619918
+					m_flWeight = 1.0
+					m_vOffset = [ -0.000031, 0.000004, -0.00008 ]
+					m_qOffset = [ -0.139173, -0.0, -0.0, 0.990268 ]
+					m_bIsAttachment = false
+					m_sName = ""
+				},
+			]
+			m_nTargetAxis = 0
+			m_nSlaveAxis = 0
+		},
+		{
+			_class = "CParentConstraint"
+			m_name = ""
+			m_vUpVector = [ 0.0, 0.0, 0.0 ]
+			m_slaves = 
+			[
+				{
+					m_nBoneHash = 3117775412
+					m_flWeight = 1.75
+					m_vBasePosition = [ 0.0, 0.0, 0.0 ]
+					m_qBaseOrientation = [ 0.0, 0.0, 0.0, 1.0 ]
+					m_sName = ""
+				},
+			]
+			m_targets = 
+			[
+				{
+					m_nBoneHash = 2592558455
+					m_flWeight = 1.0
+					m_vOffset = [ 0.0, 0.0, 0.0 ]
+					m_qOffset = [ 0.0, 0.0, 0.0, 1.0 ]
+					m_bIsAttachment = true
+					m_sName = ""
+				},
+			]
+		},
+		{
+			_class = "CTiltTwistConstraint"
+			m_name = ""
+			m_vUpVector = [ 0.0, 0.0, 0.0 ]
+			m_slaves = 
+			[
+				{
+					m_nBoneHash = 3117775412
+					m_flWeight = -0.1
+					m_vBasePosition = [ -0.000023, -0.000004, -0.000072 ]
+					m_qBaseOrientation = [ -0.0, -0.0, 0.0, 1.0 ]
+					m_sName = ""
+				},
+			]
+			m_targets = 
+			[
+				{
+					m_nBoneHash = 1291619918
+					m_flWeight = 1.0
+					m_vOffset = [ -0.000031, 0.000004, -0.00008 ]
+					m_qOffset = [ -0.0, -0.0, -0.0, 1.0 ]
+					m_bIsAttachment = false
+					m_sName = ""
+				},
+			]
+			m_nTargetAxis = 0
+			m_nSlaveAxis = 0
+		},
+		{
+			_class = "CTiltTwistConstraint"
+			m_name = ""
+			m_vUpVector = [ 0.0, 0.0, 0.0 ]
+			m_slaves = 
+			[
+				{
+					m_nBoneHash = 3117775412
+					m_flWeight = -0.05
+					m_vBasePosition = [ -0.000023, -0.000004, -0.000072 ]
+					m_qBaseOrientation = [ -0.0, -0.0, 0.0, 1.0 ]
+					m_sName = ""
+				},
+			]
+			m_targets = 
+			[
+				{
+					m_nBoneHash = 730178398
+					m_flWeight = 1.0
+					m_vOffset = [ -0.000011, 0.000004, -0.000061 ]
+					m_qOffset = [ 0.0, 0.0, 0.0, 1.0 ]
+					m_bIsAttachment = false
+					m_sName = ""
+				},
+			]
+			m_nTargetAxis = 2
+			m_nSlaveAxis = 2
+		},
+		{
+			_class = "CParentConstraint"
+			m_name = ""
+			m_vUpVector = [ 0.0, 0.0, 0.0 ]
+			m_slaves = 
+			[
+				{
+					m_nBoneHash = 1412660403
+					m_flWeight = 0.25
+					m_vBasePosition = [ 0.0, 0.0, 0.0 ]
+					m_qBaseOrientation = [ 0.0, 0.0, 0.0, 1.0 ]
+					m_sName = ""
+				},
+			]
+			m_targets = 
+			[
+				{
+					m_nBoneHash = 2111849469
+					m_flWeight = 1.0
+					m_vOffset = [ 0.0, 0.0, 0.0 ]
+					m_qOffset = [ 0.0, 0.0, 0.0, 1.0 ]
+					m_bIsAttachment = true
+					m_sName = ""
+				},
+			]
+		},
+		{
+			_class = "COrientConstraint"
+			m_name = ""
+			m_vUpVector = [ 0.0, 0.0, 0.0 ]
+			m_slaves = 
+			[
+				{
+					m_nBoneHash = 1412660403
+					m_flWeight = -1.0
+					m_vBasePosition = [ -0.000006, -0.00001, -0.000004 ]
+					m_qBaseOrientation = [ 0.0, -0.0, 0.0, 1.0 ]
+					m_sName = ""
+				},
+			]
+			m_targets = 
+			[
+				{
+					m_nBoneHash = 1258956371
+					m_flWeight = -0.5
+					m_vOffset = [ -0.000015, 0.000006, -0.000004 ]
+					m_qOffset = [ 0.0, 0.0, -0.652528, 0.757764 ]
+					m_bIsAttachment = false
+					m_sName = ""
+				},
+			]
+		},
+		{
+			_class = "CParentConstraint"
+			m_name = ""
+			m_vUpVector = [ 0.0, 0.0, 0.0 ]
+			m_slaves = 
+			[
+				{
+					m_nBoneHash = 2795886387
+					m_flWeight = 0.25
+					m_vBasePosition = [ 0.0, 0.0, 0.0 ]
+					m_qBaseOrientation = [ 0.0, 0.0, 0.0, 1.0 ]
+					m_sName = ""
+				},
+			]
+			m_targets = 
+			[
+				{
+					m_nBoneHash = 631420620
+					m_flWeight = 1.0
+					m_vOffset = [ 0.0, 0.0, 0.0 ]
+					m_qOffset = [ 0.0, 0.0, 0.0, 1.0 ]
+					m_bIsAttachment = true
+					m_sName = ""
+				},
+			]
+		},
+		{
+			_class = "COrientConstraint"
+			m_name = ""
+			m_vUpVector = [ 0.0, 0.0, 0.0 ]
+			m_slaves = 
+			[
+				{
+					m_nBoneHash = 2795886387
+					m_flWeight = -1.0
+					m_vBasePosition = [ -0.000006, -0.000019, -0.000046 ]
+					m_qBaseOrientation = [ -0.0, -0.0, 0.0, 1.0 ]
+					m_sName = ""
+				},
+			]
+			m_targets = 
+			[
+				{
+					m_nBoneHash = 1291619918
+					m_flWeight = -0.5
+					m_vOffset = [ -0.000031, 0.000004, -0.00008 ]
+					m_qOffset = [ -0.0, 0.0, -0.652528, 0.757765 ]
+					m_bIsAttachment = false
+					m_sName = ""
+				},
+			]
+		},
+		{
+			_class = "CParentConstraint"
+			m_name = ""
+			m_vUpVector = [ 0.0, 0.0, 0.0 ]
+			m_slaves = 
+			[
+				{
+					m_nBoneHash = 400205573
+					m_flWeight = 1.75
+					m_vBasePosition = [ 0.0, 0.0, 0.0 ]
+					m_qBaseOrientation = [ 0.0, 0.0, 0.0, 1.0 ]
+					m_sName = ""
+				},
+			]
+			m_targets = 
+			[
+				{
+					m_nBoneHash = 4277298284
+					m_flWeight = 1.0
+					m_vOffset = [ 0.0, 0.0, 0.0 ]
+					m_qOffset = [ 0.0, 0.0, 0.0, 1.0 ]
+					m_bIsAttachment = true
+					m_sName = ""
+				},
+			]
+		},
+		{
+			_class = "CTiltTwistConstraint"
+			m_name = ""
+			m_vUpVector = [ 0.0, 0.0, 0.0 ]
+			m_slaves = 
+			[
+				{
+					m_nBoneHash = 400205573
+					m_flWeight = 0.65
+					m_vBasePosition = [ -0.000015, 0.000025, 0.0 ]
+					m_qBaseOrientation = [ 0.0, 0.0, 0.0, 1.0 ]
+					m_sName = ""
+				},
+			]
+			m_targets = 
+			[
+				{
+					m_nBoneHash = 3782808388
+					m_flWeight = 1.0
+					m_vOffset = [ -0.00001, 0.000019, 0.000004 ]
+					m_qOffset = [ -0.0349, 0.0, 0.0, 0.999391 ]
+					m_bIsAttachment = false
+					m_sName = ""
+				},
+			]
+			m_nTargetAxis = 0
+			m_nSlaveAxis = 0
+		},
+		{
+			_class = "CParentConstraint"
+			m_name = ""
+			m_vUpVector = [ 0.0, 0.0, 0.0 ]
+			m_slaves = 
+			[
+				{
+					m_nBoneHash = 3983226597
+					m_flWeight = 1.75
+					m_vBasePosition = [ 0.0, 0.0, 0.0 ]
+					m_qBaseOrientation = [ 0.0, 0.0, 0.0, 1.0 ]
+					m_sName = ""
+				},
+			]
+			m_targets = 
+			[
+				{
+					m_nBoneHash = 3664009081
+					m_flWeight = 1.0
+					m_vOffset = [ 0.0, 0.0, 0.0 ]
+					m_qOffset = [ 0.0, 0.0, 0.0, 1.0 ]
+					m_bIsAttachment = true
+					m_sName = ""
+				},
+			]
+		},
+		{
+			_class = "CTiltTwistConstraint"
+			m_name = ""
+			m_vUpVector = [ 0.0, 0.0, 0.0 ]
+			m_slaves = 
+			[
+				{
+					m_nBoneHash = 3983226597
+					m_flWeight = 0.65
+					m_vBasePosition = [ -0.000017, 0.000002, -0.000076 ]
+					m_qBaseOrientation = [ 0.0, 0.0, -0.0, 1.0 ]
+					m_sName = ""
+				},
+			]
+			m_targets = 
+			[
+				{
+					m_nBoneHash = 2305728263
+					m_flWeight = 1.0
+					m_vOffset = [ -0.000017, -0.000011, -0.000088 ]
+					m_qOffset = [ 0.034899, -0.0, 0.0, 0.999391 ]
+					m_bIsAttachment = false
+					m_sName = ""
+				},
+			]
+			m_nTargetAxis = 0
+			m_nSlaveAxis = 0
+		},
+		{
+			_class = "CTiltTwistConstraint"
+			m_name = ""
+			m_vUpVector = [ 0.0, 0.0, 0.0 ]
+			m_slaves = 
+			[
+				{
+					m_nBoneHash = 1531966913
+					m_flWeight = -0.65
+					m_vBasePosition = [ -0.000015, 0.0, -0.000015 ]
+					m_qBaseOrientation = [ 0.0, -0.0, 0.0, 1.0 ]
+					m_sName = ""
+				},
+			]
+			m_targets = 
+			[
+				{
+					m_nBoneHash = 609771703
+					m_flWeight = 1.0
+					m_vOffset = [ -0.000015, 0.000001, -0.000015 ]
+					m_qOffset = [ -0.0, -0.999048, 0.04362, -0.0 ]
+					m_bIsAttachment = false
+					m_sName = ""
+				},
+			]
+			m_nTargetAxis = 0
+			m_nSlaveAxis = 0
+		},
+		{
+			_class = "CParentConstraint"
+			m_name = ""
+			m_vUpVector = [ 0.0, 0.0, 0.0 ]
+			m_slaves = 
+			[
+				{
+					m_nBoneHash = 892942652
+					m_flWeight = 1.75
+					m_vBasePosition = [ 0.0, 0.0, 0.0 ]
+					m_qBaseOrientation = [ 0.0, 0.0, 0.0, 1.0 ]
+					m_sName = ""
+				},
+			]
+			m_targets = 
+			[
+				{
+					m_nBoneHash = 301867486
+					m_flWeight = 1.0
+					m_vOffset = [ 0.0, 0.0, 0.0 ]
+					m_qOffset = [ 0.0, 0.0, 0.0, 1.0 ]
+					m_bIsAttachment = true
+					m_sName = ""
+				},
+			]
+		},
+		{
+			_class = "CTiltTwistConstraint"
+			m_name = ""
+			m_vUpVector = [ 0.0, 0.0, 0.0 ]
+			m_slaves = 
+			[
+				{
+					m_nBoneHash = 892942652
+					m_flWeight = -0.1
+					m_vBasePosition = [ -0.000011, 0.000002, -0.00001 ]
+					m_qBaseOrientation = [ 0.0, -0.0, 0.0, 1.0 ]
+					m_sName = ""
+				},
+			]
+			m_targets = 
+			[
+				{
+					m_nBoneHash = 609771703
+					m_flWeight = 1.0
+					m_vOffset = [ -0.000015, 0.000001, -0.000015 ]
+					m_qOffset = [ 0.0, -1.0, 0.0, -0.0 ]
+					m_bIsAttachment = false
+					m_sName = ""
+				},
+			]
+			m_nTargetAxis = 0
+			m_nSlaveAxis = 0
+		},
+		{
+			_class = "CTiltTwistConstraint"
+			m_name = ""
+			m_vUpVector = [ 0.0, 0.0, 0.0 ]
+			m_slaves = 
+			[
+				{
+					m_nBoneHash = 892942652
+					m_flWeight = -0.06
+					m_vBasePosition = [ -0.000011, 0.000002, -0.00001 ]
+					m_qBaseOrientation = [ 0.0, -0.0, 0.0, 1.0 ]
+					m_sName = ""
+				},
+			]
+			m_targets = 
+			[
+				{
+					m_nBoneHash = 2098558004
+					m_flWeight = 1.0
+					m_vOffset = [ -0.00001, 0.000004, -0.000007 ]
+					m_qOffset = [ 0.0, 0.0, 0.0, 1.0 ]
+					m_bIsAttachment = false
+					m_sName = ""
+				},
+			]
+			m_nTargetAxis = 2
+			m_nSlaveAxis = 2
+		},
+		{
+			_class = "CTiltTwistConstraint"
+			m_name = ""
+			m_vUpVector = [ 0.0, 0.0, 0.0 ]
+			m_slaves = 
+			[
+				{
+					m_nBoneHash = 1389595151
+					m_flWeight = -0.65
+					m_vBasePosition = [ -0.000031, -0.000002, -0.000038 ]
+					m_qBaseOrientation = [ -0.0, 0.0, -0.0, 1.0 ]
+					m_sName = ""
+				},
+			]
+			m_targets = 
+			[
+				{
+					m_nBoneHash = 475370876
+					m_flWeight = 1.0
+					m_vOffset = [ -0.000027, -0.000002, -0.000038 ]
+					m_qOffset = [ 0.0, 0.999048, 0.043619, -0.0 ]
+					m_bIsAttachment = false
+					m_sName = ""
+				},
+			]
+			m_nTargetAxis = 0
+			m_nSlaveAxis = 0
+		},
+		{
+			_class = "CParentConstraint"
+			m_name = ""
+			m_vUpVector = [ 0.0, 0.0, 0.0 ]
+			m_slaves = 
+			[
+				{
+					m_nBoneHash = 4249383454
+					m_flWeight = 1.75
+					m_vBasePosition = [ 0.0, 0.0, 0.0 ]
+					m_qBaseOrientation = [ 0.0, 0.0, 0.0, 1.0 ]
+					m_sName = ""
+				},
+			]
+			m_targets = 
+			[
+				{
+					m_nBoneHash = 1489793773
+					m_flWeight = 1.0
+					m_vOffset = [ 0.0, 0.0, 0.0 ]
+					m_qOffset = [ 0.0, 0.0, 0.0, 1.0 ]
+					m_bIsAttachment = true
+					m_sName = ""
+				},
+			]
+		},
+		{
+			_class = "CTiltTwistConstraint"
+			m_name = ""
+			m_vUpVector = [ 0.0, 0.0, 0.0 ]
+			m_slaves = 
+			[
+				{
+					m_nBoneHash = 4249383454
+					m_flWeight = -0.1
+					m_vBasePosition = [ -0.000021, -0.000006, -0.000029 ]
+					m_qBaseOrientation = [ 0.0, -0.0, -0.0, 1.0 ]
+					m_sName = ""
+				},
+			]
+			m_targets = 
+			[
+				{
+					m_nBoneHash = 475370876
+					m_flWeight = 1.0
+					m_vOffset = [ -0.000027, -0.000002, -0.000038 ]
+					m_qOffset = [ -0.0, -1.0, 0.0, 0.0 ]
+					m_bIsAttachment = false
+					m_sName = ""
+				},
+			]
+			m_nTargetAxis = 0
+			m_nSlaveAxis = 0
+		},
+		{
+			_class = "CTiltTwistConstraint"
+			m_name = ""
+			m_vUpVector = [ 0.0, 0.0, 0.0 ]
+			m_slaves = 
+			[
+				{
+					m_nBoneHash = 4249383454
+					m_flWeight = -0.06
+					m_vBasePosition = [ -0.000021, -0.000006, -0.000029 ]
+					m_qBaseOrientation = [ 0.0, -0.0, -0.0, 1.0 ]
+					m_sName = ""
+				},
+			]
+			m_targets = 
+			[
+				{
+					m_nBoneHash = 2883344725
+					m_flWeight = 1.0
+					m_vOffset = [ -0.000015, -0.000004, -0.000022 ]
+					m_qOffset = [ 0.0, 0.0, 0.0, 1.0 ]
+					m_bIsAttachment = false
+					m_sName = ""
+				},
+			]
+			m_nTargetAxis = 2
+			m_nSlaveAxis = 2
+		},
+		{
+			_class = "CParentConstraint"
+			m_name = ""
+			m_vUpVector = [ 0.0, 0.0, 0.0 ]
+			m_slaves = 
+			[
+				{
+					m_nBoneHash = 3932398185
+					m_flWeight = 0.2
+					m_vBasePosition = [ 0.0, 0.0, 0.0 ]
+					m_qBaseOrientation = [ 0.0, 0.0, 0.0, 1.0 ]
+					m_sName = ""
+				},
+			]
+			m_targets = 
+			[
+				{
+					m_nBoneHash = 3231311355
+					m_flWeight = 1.0
+					m_vOffset = [ 0.0, 0.0, 0.0 ]
+					m_qOffset = [ 0.0, 0.0, 0.0, 1.0 ]
+					m_bIsAttachment = true
+					m_sName = ""
+				},
+			]
+		},
+		{
+			_class = "COrientConstraint"
+			m_name = ""
+			m_vUpVector = [ 0.0, 0.0, 0.0 ]
+			m_slaves = 
+			[
+				{
+					m_nBoneHash = 3932398185
+					m_flWeight = -1.0
+					m_vBasePosition = [ 0.0, 0.000011, -0.000004 ]
+					m_qBaseOrientation = [ 0.0, 0.0, -0.0, 1.0 ]
+					m_sName = ""
+				},
+			]
+			m_targets = 
+			[
+				{
+					m_nBoneHash = 609771703
+					m_flWeight = -0.5
+					m_vOffset = [ -0.000015, 0.000001, -0.000015 ]
+					m_qOffset = [ -0.0, -0.0, 0.700598, 0.713556 ]
+					m_bIsAttachment = false
+					m_sName = ""
+				},
+			]
+		},
+		{
+			_class = "CParentConstraint"
+			m_name = ""
+			m_vUpVector = [ 0.0, 0.0, 0.0 ]
+			m_slaves = 
+			[
+				{
+					m_nBoneHash = 287096882
+					m_flWeight = 0.2
+					m_vBasePosition = [ 0.0, 0.0, 0.0 ]
+					m_qBaseOrientation = [ 0.0, 0.0, 0.0, 1.0 ]
+					m_sName = ""
+				},
+			]
+			m_targets = 
+			[
+				{
+					m_nBoneHash = 2496428710
+					m_flWeight = 1.0
+					m_vOffset = [ 0.0, 0.0, 0.0 ]
+					m_qOffset = [ 0.0, 0.0, 0.0, 1.0 ]
+					m_bIsAttachment = true
+					m_sName = ""
+				},
+			]
+		},
+		{
+			_class = "COrientConstraint"
+			m_name = ""
+			m_vUpVector = [ 0.0, 0.0, 0.0 ]
+			m_slaves = 
+			[
+				{
+					m_nBoneHash = 287096882
+					m_flWeight = -1.0
+					m_vBasePosition = [ -0.0, 0.000011, -0.000029 ]
+					m_qBaseOrientation = [ 0.0, 0.0, 0.0, 1.0 ]
+					m_sName = ""
+				},
+			]
+			m_targets = 
+			[
+				{
+					m_nBoneHash = 475370876
+					m_flWeight = -0.5
+					m_vOffset = [ -0.000027, -0.000002, -0.000038 ]
+					m_qOffset = [ -0.0, -0.0, 0.700598, 0.713557 ]
+					m_bIsAttachment = false
+					m_sName = ""
+				},
+			]
+		},
+		{
+			_class = "CParentConstraint"
+			m_name = ""
+			m_vUpVector = [ 0.0, 0.0, 0.0 ]
+			m_slaves = 
+			[
+				{
+					m_nBoneHash = 3828639509
+					m_flWeight = 1.75
+					m_vBasePosition = [ 0.0, 0.0, 0.0 ]
+					m_qBaseOrientation = [ 0.0, 0.0, 0.0, 1.0 ]
+					m_sName = ""
+				},
+			]
+			m_targets = 
+			[
+				{
+					m_nBoneHash = 3924115899
+					m_flWeight = 1.0
+					m_vOffset = [ 0.0, 0.0, 0.0 ]
+					m_qOffset = [ 0.0, 0.0, 0.0, 1.0 ]
+					m_bIsAttachment = true
+					m_sName = ""
+				},
+			]
+		},
+		{
+			_class = "CTiltTwistConstraint"
+			m_name = ""
+			m_vUpVector = [ 0.0, 0.0, 0.0 ]
+			m_slaves = 
+			[
+				{
+					m_nBoneHash = 3828639509
+					m_flWeight = 0.6
+					m_vBasePosition = [ -0.00001, 0.000006, -0.000003 ]
+					m_qBaseOrientation = [ 0.0, -0.0, 0.0, 1.0 ]
+					m_sName = ""
+				},
+			]
+			m_targets = 
+			[
+				{
+					m_nBoneHash = 236023422
+					m_flWeight = 1.0
+					m_vOffset = [ -0.0, 0.00001, 0.000004 ]
+					m_qOffset = [ -0.0, -0.0, 0.0, 1.0 ]
+					m_bIsAttachment = false
+					m_sName = ""
+				},
+			]
+			m_nTargetAxis = 0
+			m_nSlaveAxis = 0
+		},
+		{
+			_class = "CParentConstraint"
+			m_name = ""
+			m_vUpVector = [ 0.0, 0.0, 0.0 ]
+			m_slaves = 
+			[
+				{
+					m_nBoneHash = 348367883
+					m_flWeight = 1.75
+					m_vBasePosition = [ 0.0, 0.0, 0.0 ]
+					m_qBaseOrientation = [ 0.0, 0.0, 0.0, 1.0 ]
+					m_sName = ""
+				},
+			]
+			m_targets = 
+			[
+				{
+					m_nBoneHash = 1976244538
+					m_flWeight = 1.0
+					m_vOffset = [ 0.0, 0.0, 0.0 ]
+					m_qOffset = [ 0.0, 0.0, 0.0, 1.0 ]
+					m_bIsAttachment = true
+					m_sName = ""
+				},
+			]
+		},
+		{
+			_class = "CTiltTwistConstraint"
+			m_name = ""
+			m_vUpVector = [ 0.0, 0.0, 0.0 ]
+			m_slaves = 
+			[
+				{
+					m_nBoneHash = 348367883
+					m_flWeight = 0.6
+					m_vBasePosition = [ -0.00001, -0.000007, -0.000019 ]
+					m_qBaseOrientation = [ -0.0, 0.0, -0.0, 1.0 ]
+					m_sName = ""
+				},
+			]
+			m_targets = 
+			[
+				{
+					m_nBoneHash = 1135864906
+					m_flWeight = 1.0
+					m_vOffset = [ -0.000001, -0.000005, -0.000014 ]
+					m_qOffset = [ 0.0, 0.0, 0.0, 1.0 ]
+					m_bIsAttachment = false
+					m_sName = ""
+				},
+			]
+			m_nTargetAxis = 0
+			m_nSlaveAxis = 0
+		},
+		{
+			_class = "CParentConstraint"
+			m_name = ""
+			m_vUpVector = [ 0.0, 0.0, 0.0 ]
+			m_slaves = 
+			[
+				{
+					m_nBoneHash = 3404650927
+					m_flWeight = 0.75
+					m_vBasePosition = [ 0.0, 0.0, 0.0 ]
+					m_qBaseOrientation = [ 0.0, 0.0, 0.0, 1.0 ]
+					m_sName = ""
+				},
+			]
+			m_targets = 
+			[
+				{
+					m_nBoneHash = 2008498285
+					m_flWeight = 1.0
+					m_vOffset = [ 0.000019, -0.000004, -0.000023 ]
+					m_qOffset = [ 0.0, 0.0, 0.0, 1.0 ]
+					m_bIsAttachment = false
+					m_sName = ""
+				},
+			]
+		},
+		{
+			_class = "CAimConstraint"
+			m_name = ""
+			m_vUpVector = [ 0.0, 0.0, 1.0 ]
+			m_slaves = 
+			[
+				{
+					m_nBoneHash = 3404650927
+					m_flWeight = 1.0
+					m_vBasePosition = [ 0.0, 0.0, 0.0 ]
+					m_qBaseOrientation = [ 0.0, 0.0, 0.0, 1.0 ]
+					m_sName = ""
+				},
+			]
+			m_targets = 
+			[
+				{
+					m_nBoneHash = 1237665725
+					m_flWeight = 1.0
+					m_vOffset = [ 0.000027, -0.000002, -0.000031 ]
+					m_qOffset = [ 0.0, 0.0, 0.0, 1.0 ]
+					m_bIsAttachment = false
+					m_sName = ""
+				},
+			]
+			m_qAimOffset = [ 0.0, 0.0, 0.707107, 0.707107 ]
+			m_nUpType = 3
+		},
+		{
+			_class = "COrientConstraint"
+			m_name = ""
+			m_vUpVector = [ 0.0, 0.0, 0.0 ]
+			m_slaves = 
+			[
+				{
+					m_nBoneHash = 3404650927
+					m_flWeight = 0.35
+					m_vBasePosition = [ 0.0, 0.0, 0.0 ]
+					m_qBaseOrientation = [ 0.0, 0.0, 0.0, 1.0 ]
+					m_sName = ""
+				},
+			]
+			m_targets = 
+			[
+				{
+					m_nBoneHash = 1237665725
+					m_flWeight = 1.0
+					m_vOffset = [ 0.000027, -0.000002, -0.000031 ]
+					m_qOffset = [ 0.0, 0.0, 0.0, 1.0 ]
+					m_bIsAttachment = false
+					m_sName = ""
+				},
+			]
+		},
+	]
+	guid = "3b6fcd6b-ed65-439d-a794-bf93a0fb5b4a"
+}
+"""
+	}
+	m_ExtParts = [  ]
+	m_refMeshes = [ null ]
+	m_refMeshGroupMasks = [ -1 ]
+	m_refPhysGroupMasks = [  ]
+	m_refLODGroupMasks = [ 255 ]
+	m_lodGroupSwitchDistances = [  ]
+	m_refPhysicsData = [  ]
+	m_refPhysicsHitboxData = [  ]
+	m_refAnimGroups = [  ]
+	m_refSequenceGroups = [  ]
+	m_meshGroups = [  ]
+	m_materialGroups = [  ]
+	m_nDefaultMeshGroupMask = -1
+	m_modelSkeleton = 
+	{
+		m_boneName = 
+		[
+			"pelvis",
+			"spine_0",
+			"spine_1",
+			"spine_2",
+			"neck_0",
+			"head",
+			"clavicle_L",
+			"arm_upper_L",
+			"arm_lower_L",
+			"hand_L",
+			"clavicle_R",
+			"arm_upper_R",
+			"arm_lower_R",
+			"hand_R",
+			"leg_upper_R",
+			"leg_lower_R",
+			"ankle_R",
+			"leg_upper_L",
+			"leg_lower_L",
+			"ankle_L",
+			"root_IK",
+			"aim_matrix_01",
+			"aim_matrix_02a",
+			"aim_matrix_02b",
+			"foot_R_IK_target",
+			"foot_L_IK_target",
+			"hand_R_IK_attach",
+			"hand_R_IK_target",
+			"hand_L_IK_attach",
+			"hand_L_IK_target",
+			"arm_upper_L_twist1",
+			"arm_upper_L_twist0",
+			"arm_lower_L_twist1",
+			"arm_lower_L_twist0",
+			"finger_thumb_0_L",
+			"finger_thumb_1_L",
+			"finger_thumb_2_L",
+			"finger_index_meta_L",
+			"finger_index_0_L",
+			"finger_index_1_L",
+			"finger_index_2_L",
+			"finger_middle_meta_L",
+			"finger_middle_0_L",
+			"finger_middle_1_L",
+			"finger_middle_2_L",
+			"finger_ring_meta_L",
+			"finger_ring_0_L",
+			"finger_ring_1_L",
+			"finger_ring_2_L",
+			"finger_pinky_meta_L",
+			"finger_pinky_0_L",
+			"finger_pinky_1_L",
+			"finger_pinky_2_L",
+			"hand_R_to_L_ikrule",
+			"arm_elbow_helper_L",
+			"arm_upper_R_twist1",
+			"arm_upper_R_twist0",
+			"arm_lower_R_twist1",
+			"arm_lower_R_twist0",
+			"finger_thumb_0_R",
+			"finger_thumb_1_R",
+			"finger_thumb_2_R",
+			"finger_index_meta_R",
+			"finger_index_0_R",
+			"finger_index_1_R",
+			"finger_index_2_R",
+			"finger_middle_meta_R",
+			"finger_middle_0_R",
+			"finger_middle_1_R",
+			"finger_middle_2_R",
+			"finger_ring_meta_R",
+			"finger_ring_0_R",
+			"finger_ring_1_R",
+			"finger_ring_2_R",
+			"finger_pinky_meta_R",
+			"finger_pinky_0_R",
+			"finger_pinky_1_R",
+			"finger_pinky_2_R",
+			"hand_L_to_R_ikrule",
+			"arm_elbow_helper_R",
+			"leg_upper_R_twist1",
+			"leg_upper_R_twist0",
+			"leg_lower_R_twist1",
+			"leg_lower_R_twist0",
+			"ball_R",
+			"leg_knee_helper_R",
+			"leg_upper_L_twist0",
+			"leg_upper_L_twist1",
+			"leg_lower_L_twist1",
+			"leg_lower_L_twist0",
+			"ball_L",
+			"leg_knee_helper_L",
+		]
+		m_nParent = 
+		[
+			-1, 0, 1, 2,
+			3, 4, 3, 6,
+			7, 8, 3, 10,
+			11, 12, 0, 14,
+			15, 0, 17, 18,
+			-1, 20, 20, 22,
+			20, 20, 20, 26,
+			20, 28, 7, 7,
+			8, 8, 9, 34,
+			35, 9, 37, 38,
+			39, 9, 41, 42,
+			43, 9, 45, 46,
+			47, 9, 49, 50,
+			51, 9, 8, 11,
+			11, 12, 12, 13,
+			59, 60, 13, 62,
+			63, 64, 13, 66,
+			67, 68, 13, 70,
+			71, 72, 13, 74,
+			75, 76, 13, 12,
+			14, 14, 15, 15,
+			16, 15, 17, 17,
+			18, 18, 19, 18,
+		]
+		m_boneSphere = 
+		[
+			11.70917, 12.616455, 11.071912, 11.023254,
+			7.830144, 0.0, 10.440062, 0.0,
+			0.0, 4.639189, 10.43995, 0.0,
+			0.0, 4.639014, 0.0, 0.0,
+			7.596613, 0.0, 0.0, 7.59751,
+			0.0, 0.0, 0.0, 0.0,
+			0.0, 0.0, 0.0, 0.0,
+			0.0, 0.0, 6.572011, 10.69411,
+			7.452765, 9.834114, 2.906701, 2.097351,
+			1.326394, 3.85055, 2.841299, 1.389478,
+			1.07507, 3.22211, 3.404042, 1.535493,
+			1.081452, 3.326174, 3.049234, 1.415993,
+			0.988323, 2.824976, 2.344323, 1.088002,
+			0.934087, 0.0, 4.48896, 6.571891,
+			10.693968, 7.452682, 9.835689, 2.90644,
+			2.097116, 1.326148, 3.850394, 2.841018,
+			1.38902, 1.074629, 3.221909, 3.403735,
+			1.535126, 1.081042, 3.326078, 3.04892,
+			1.415571, 0.987878, 2.827905, 2.344208,
+			1.096119, 0.940349, 0.0, 4.488827,
+			10.76174, 14.672979, 12.568188, 15.688383,
+			4.270653, 5.741673, 14.672974, 10.7617,
+			12.568501, 15.688367, 4.271033, 5.741688,
+		]
+		m_nFlag = 
+		[
+			261584, 261584, 261568, 261584,
+			261568, 261456, 261568, 261584,
+			261584, 261584, 261568, 261584,
+			261584, 261584, 261584, 261584,
+			261584, 261584, 261584, 261584,
+			261312, 261312, 261312, 261312,
+			261312, 261312, 261312, 261312,
+			261312, 261312, 261312, 261312,
+			261312, 261312, 261312, 261312,
+			261312, 261312, 261312, 261312,
+			261312, 261312, 261312, 261312,
+			261312, 261312, 261312, 261312,
+			261312, 261312, 261312, 261312,
+			261312, 261312, 261312, 261312,
+			261312, 261312, 261312, 261312,
+			261312, 261312, 261312, 261312,
+			261312, 261312, 261312, 261312,
+			261312, 261312, 261312, 261312,
+			261312, 261312, 261312, 261312,
+			261312, 261312, 261312, 261312,
+			261312, 261312, 261312, 261312,
+			261312, 261312, 261312, 261312,
+			261312, 261312, 261312, 261312,
+		]
+		m_bonePosParent = 
+		[
+			[ 0.196858, 0.000016, 36.614086 ],
+			[ 3.149567, 0.295287, 0.000007 ],
+			[ 4.429131, 0.000004, 0.0 ],
+			[ 4.429165, 0.000011, 0.000001 ],
+			[ 8.562248, -0.953027, 0.000115 ],
+			[ 3.512146, -0.000008, -0.000027 ],
+			[ 5.707726, -0.788749, 0.787248 ],
+			[ 6.59865, 0.000016, -0.000011 ],
+			[ 10.534044, 0.000018, -0.000031 ],
+			[ 9.779493, 0.000006, 0.000008 ],
+			[ 5.70776, -0.788746, -0.787258 ],
+			[ 6.598623, 0.000006, -0.000023 ],
+			[ 10.534046, -0.0, -0.000027 ],
+			[ 9.779512, -0.000008, -0.000027 ],
+			[ -1.739197, -0.458342, -3.923373 ],
+			[ 16.052332, 0.000002, -0.000201 ],
+			[ 15.469936, 0.000015, -0.000011 ],
+			[ -1.739189, -0.458335, 3.923362 ],
+			[ 16.052315, 0.00001, 0.000161 ],
+			[ 15.469902, 0.000001, -0.000009 ],
+			[ 0.19685, 0.000007, 0.0 ],
+			[ 5.708649, 0.000002, 11.811 ],
+			[ 5.70865, 0.000002, 9.842501 ],
+			[ 3.937, -0.0, 0.000002 ],
+			[ -2.122888, -7.432411, 3.609607 ],
+			[ -2.123802, 7.432355, 3.609679 ],
+			[ -0.0, -0.0, 0.0 ],
+			[ 0.96276, -20.168072, 38.81826 ],
+			[ -0.0, -0.0, 0.0 ],
+			[ 0.962766, 20.168015, 38.818195 ],
+			[ 5.267025, 0.000009, -0.000027 ],
+			[ 0.000015, 0.000007, -0.000046 ],
+			[ 4.889753, 0.0, -0.000011 ],
+			[ 0.000015, -0.000004, -0.000008 ],
+			[ 1.130953, 1.213994, 0.933704 ],
+			[ 1.707506, -0.000019, -0.000013 ],
+			[ 1.417328, -0.000019, -0.00005 ],
+			[ 1.480561, 1.034366, -0.024406 ],
+			[ 2.664352, -0.000019, -0.000057 ],
+			[ 1.690128, -0.000024, -0.00013 ],
+			[ 1.096535, -0.000057, -0.000153 ],
+			[ 1.499931, 0.50267, -0.002487 ],
+			[ 2.673404, -0.00002, -0.000034 ],
+			[ 2.098074, -0.000023, -0.000101 ],
+			[ 1.241516, -0.000029, -0.000084 ],
+			[ 1.511909, -0.086659, 0.021931 ],
+			[ 2.434992, -0.000014, -0.00008 ],
+			[ 1.831163, -0.000032, -0.000137 ],
+			[ 1.151516, -0.000024, -0.000084 ],
+			[ 1.524225, -0.755392, 0.049641 ],
+			[ 2.096739, -0.000018, -0.000065 ],
+			[ 1.470804, -0.00002, -0.000139 ],
+			[ 0.832611, -0.000023, -0.000103 ],
+			[ -26.689335, 7.194953, 29.375187 ],
+			[ 0.000023, -0.00001, -0.000023 ],
+			[ 5.267014, 0.000001, -0.000042 ],
+			[ 0.000004, 0.000004, -0.000034 ],
+			[ 4.889757, -0.000002, -0.000031 ],
+			[ 0.000002, 0.000004, -0.000053 ],
+			[ 1.130939, 1.214023, -0.933807 ],
+			[ 1.707491, 0.000027, -0.000034 ],
+			[ 1.417294, 0.000044, -0.000034 ],
+			[ 1.480533, 1.034389, 0.024326 ],
+			[ 2.664351, 0.000041, -0.000038 ],
+			[ 1.690123, 0.000055, -0.000038 ],
+			[ 1.096542, 0.000072, -0.000071 ],
+			[ 1.499904, 0.502715, 0.002373 ],
+			[ 2.673373, 0.000039, -0.000031 ],
+			[ 2.098061, 0.000054, -0.000051 ],
+			[ 1.241508, 0.000073, -0.000059 ],
+			[ 1.511887, -0.086638, -0.022022 ],
+			[ 2.435006, 0.000042, -0.000038 ],
+			[ 1.83116, 0.000073, -0.000061 ],
+			[ 1.151535, 0.000059, -0.000061 ],
+			[ 1.524197, -0.755366, -0.049744 ],
+			[ 2.096739, 0.000024, -0.000053 ],
+			[ 1.470819, 0.000039, -0.000038 ],
+			[ 0.832626, 0.000049, -0.000063 ],
+			[ -26.689274, 7.19507, -29.375359 ],
+			[ 0.000008, 0.000006, -0.000046 ],
+			[ 8.207726, 0.000008, -0.000017 ],
+			[ 0.000023, 0.000006, -0.000032 ],
+			[ 7.734982, 0.000011, -0.000018 ],
+			[ 0.000015, 0.00001, -0.000022 ],
+			[ 5.31206, -0.003602, -0.03344 ],
+			[ 0.000021, 0.000009, -0.00002 ],
+			[ 0.000019, 0.000007, -0.000035 ],
+			[ 8.207703, 0.000015, -0.000028 ],
+			[ 7.734958, 0.000002, -0.000013 ],
+			[ 0.0, 0.000002, -0.000017 ],
+			[ 5.312052, -0.00361, 0.033435 ],
+			[ 0.000006, 0.000002, -0.000018 ],
+		]
+		m_boneRotParent = 
+		[
+			[ -0.499999, -0.500001, -0.499999, 0.500001 ],
+			[ -0.000001, -0.0, 0.0, 1.0 ],
+			[ -0.0, 0.0, 0.0, 1.0 ],
+			[ 0.0, 0.0, -0.0, 1.0 ],
+			[ -0.0, 0.0, 0.198465, 0.980108 ],
+			[ 0.0, -0.0, -0.198465, 0.980108 ],
+			[ 0.069454, -0.735651, -0.016189, 0.673596 ],
+			[ -0.131776, -0.405022, -0.02817, 0.904322 ],
+			[ 0.0, -0.0, 0.210472, 0.9776 ],
+			[ 0.130525, -0.003493, 0.000202, 0.991439 ],
+			[ -0.069455, 0.735652, -0.016188, 0.673595 ],
+			[ 0.131777, 0.405023, -0.02817, 0.904322 ],
+			[ -0.000001, -0.0, 0.210472, 0.9776 ],
+			[ -0.130525, 0.003493, 0.000202, 0.991439 ],
+			[ -0.007826, 0.997181, -0.047229, 0.057772 ],
+			[ -0.0, -0.0, -0.032528, 0.999471 ],
+			[ 0.068293, 0.033065, 0.470834, 0.878953 ],
+			[ -0.00784, 0.997181, 0.047228, -0.057772 ],
+			[ 0.0, 0.0, -0.032527, 0.999471 ],
+			[ -0.068238, -0.03297, 0.470956, 0.878895 ],
+			[ 0.0, -0.0, -0.0, 1.0 ],
+			[ 0.0, 0.000001, 0.0, 1.0 ],
+			[ 0.0, 0.000001, 0.0, 1.0 ],
+			[ -0.0, 0.0, -0.0, 1.0 ],
+			[ 0.688102, 0.162833, -0.291201, 0.644362 ],
+			[ 0.64447, 0.291139, -0.162741, 0.688049 ],
+			[ 0.0, 0.000001, 0.0, 1.0 ],
+			[ 0.338653, 0.209616, -0.544174, 0.73841 ],
+			[ 0.0, 0.000001, 0.0, 1.0 ],
+			[ 0.73841, 0.544174, -0.209615, 0.338654 ],
+			[ -0.0, -0.0, 0.0, 1.0 ],
+			[ 0.0, 0.0, -0.0, 1.0 ],
+			[ 0.065403, -0.0, 0.0, 0.997859 ],
+			[ -0.0, -0.0, 0.0, 1.0 ],
+			[ 0.526091, -0.021359, 0.252146, 0.811907 ],
+			[ -0.001094, -0.115278, -0.07581, 0.990436 ],
+			[ 0.0, -0.094215, 0.0, 0.995552 ],
+			[ 0.03158, 0.000447, 0.041271, 0.998649 ],
+			[ -0.000452, -0.167957, -0.083552, 0.982247 ],
+			[ -0.000001, -0.250779, 0.0, 0.968044 ],
+			[ 0.0, -0.042524, -0.000002, 0.999095 ],
+			[ -0.014914, 0.027961, -0.056437, 0.997903 ],
+			[ 0.000341, -0.276103, -0.058848, 0.959325 ],
+			[ -0.000001, -0.207282, -0.0, 0.978281 ],
+			[ -0.000178, -0.046416, 0.000009, 0.998922 ],
+			[ -0.11664, 0.000193, -0.138197, 0.983512 ],
+			[ 0.008133, -0.208613, -0.052313, 0.976564 ],
+			[ 0.0, -0.194582, -0.000001, 0.980886 ],
+			[ -0.000001, -0.035103, 0.000002, 0.999384 ],
+			[ -0.136382, -0.111438, -0.210921, 0.961506 ],
+			[ 0.000819, -0.106843, -0.002148, 0.994273 ],
+			[ -0.000254, -0.170009, 0.000175, 0.985442 ],
+			[ -0.000405, 0.000076, 0.003081, 0.999995 ],
+			[ -0.178377, -0.661673, -0.000001, 0.728265 ],
+			[ 0.000001, -0.0, -0.777969, 0.628303 ],
+			[ 0.0, -0.0, -0.0, 1.0 ],
+			[ 0.0, -0.0, -0.0, 1.0 ],
+			[ -0.065403, 0.0, 0.0, 0.997859 ],
+			[ 0.0, -0.0, -0.0, 1.0 ],
+			[ -0.526092, 0.021359, 0.252146, 0.811907 ],
+			[ 0.001094, 0.115278, -0.075811, 0.990435 ],
+			[ -0.0, 0.094216, 0.0, 0.995552 ],
+			[ -0.03158, -0.000447, 0.041271, 0.998649 ],
+			[ 0.000452, 0.167957, -0.083552, 0.982247 ],
+			[ 0.0, 0.250779, -0.0, 0.968045 ],
+			[ -0.000001, 0.042524, -0.000002, 0.999095 ],
+			[ 0.014914, -0.027961, -0.056437, 0.997903 ],
+			[ -0.00034, 0.276103, -0.058848, 0.959325 ],
+			[ 0.000001, 0.207282, -0.0, 0.978281 ],
+			[ 0.000178, 0.046416, 0.000009, 0.998922 ],
+			[ 0.11664, -0.000193, -0.138196, 0.983513 ],
+			[ -0.008133, 0.208613, -0.052314, 0.976564 ],
+			[ 0.000002, 0.194582, -0.000001, 0.980886 ],
+			[ 0.0, 0.035102, 0.000002, 0.999384 ],
+			[ 0.136382, 0.111438, -0.21092, 0.961506 ],
+			[ -0.000818, 0.106843, -0.00215, 0.994273 ],
+			[ 0.000254, 0.17001, 0.000176, 0.985442 ],
+			[ 0.000405, -0.000076, 0.003082, 0.999995 ],
+			[ 0.178377, 0.661674, 0.000001, 0.728265 ],
+			[ 0.0, 0.0, -0.777969, 0.628302 ],
+			[ 0.000086, -0.0, 0.0, 1.0 ],
+			[ 0.0, 0.0, 0.0, 1.0 ],
+			[ 0.038493, -0.0, -0.0, 0.999259 ],
+			[ 0.0, 0.0, 0.0, 1.0 ],
+			[ 0.000002, -0.000009, 0.322536, 0.946557 ],
+			[ -0.0, 0.0, 0.718515, 0.695512 ],
+			[ 0.0, 0.0, -0.0, 1.0 ],
+			[ -0.000086, 0.0, 0.0, 1.0 ],
+			[ -0.038493, -0.0, -0.0, 0.999259 ],
+			[ 0.0, 0.0, 0.0, 1.0 ],
+			[ -0.000123, 0.000036, 0.322417, 0.946598 ],
+			[ -0.0, -0.0, 0.718514, 0.695512 ],
+		]
+	}
+	m_remappingTable = 
+	[
+		0, 1, 2, 3,
+		6, 10, 7, 11,
+		8, 12, 9, 13,
+		37, 41, 45, 49,
+		62, 66, 70, 74,
+		14, 17, 20, 34,
+		38, 42, 46, 50,
+		59, 63, 67, 71,
+		75, 15, 18, 22,
+		26, 28, 35, 39,
+		43, 47, 51, 60,
+		64, 68, 72, 76,
+		16, 19, 21, 23,
+		24, 25, 27, 29,
+		4, 30, 31, 32,
+		33, 36, 40, 44,
+		48, 52, 53, 54,
+		55, 56, 57, 58,
+		61, 65, 69, 73,
+		77, 78, 79, 80,
+		81, 82, 83, 84,
+		85, 86, 87, 88,
+		89, 90, 91, 0,
+		1, 2, 3, 4,
+		5, 10, 11, 12,
+		13, 6, 7, 8,
+		9, 14, 15, 16,
+		17, 18, 19,
+	]
+	m_remappingTableStarts = [ 0 ]
+	m_boneFlexDrivers = [  ]
+	m_BodyGroupsHiddenInTools = [  ]
+}
+

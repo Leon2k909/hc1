@@ -35,6 +35,36 @@ Prefix shell commands with `rtk`, as required by the user-level instructions.
 - Attach to the existing editor with `--connect` / `--call`. Use `--project` only for a requested
   launch: an editor owned by that CLI closes when the connection exits.
 
+# Visual reviews: use the actual viewport
+
+- User preference (2026-11-06): retain all created model and material variants for
+  possible reuse, including unselected proposals. Removing replaced geometry from
+  an active map does not mean deleting reusable assets or historical variants.
+- User preference (2026-11-06): use native s&box frame captures for before/after pictures
+  without Computer Use. This applies across chats; do not invoke Computer Use for visual
+  reviews unless explicitly requested. Use native `bridge_call` with `command=screenshot_game`
+  for a direct window capture (works while occluded). Discover/describe that handler first.
+  If `ScreenshotService.RequestCapture()` does not write a frame, use this native window
+  capture before asking the user to bring the editor into view.
+- User preference (2026-11-05): visual judgments, upgrade recommendations and before/after
+  reviews must use the actual running game view or live editor viewport as displayed on screen.
+  Prefer a direct capture of the existing application window. Confirm the correct project,
+  scene and view first. A native MCP connection alone does not make a render representative.
+- Do not create temporary cameras, clone or isolate scenes, call `RenderToBitmap`, or change
+  exposure, lighting, post-processing or render settings to produce review evidence. Screenshot
+  helpers that create cameras or rerender a view are subject to this same restriction.
+- Temporary/offscreen renders are allowed only when the user explicitly requests that type of
+  preview. Label them clearly as temporary/offscreen previews; never present them as game or
+  editor viewport captures or use them to claim how the map looks during normal play.
+- For comparisons, use the same real viewport camera, framing, lighting and display settings.
+  If an actual viewport capture is unavailable, state that limitation and defer the visual
+  judgment instead of substituting a temporary render. Keep the user's scene/play state.
+- Verified native frame capture: `Sandbox.ScreenshotService.RequestCapture()` captures the
+  currently displayed scene layer and returns a path under the engine's `screenshots` folder.
+  Verify the saved image shows the intended scene; another tab may have become active, and a
+  background/minimized editor may not write the requested frame until it displays again.
+  `editor_camera_screenshot` uses `RenderToBitmap` and is not a substitute for this workflow.
+
 `CLAUDE.md` contains subsystem notes and verified asset values. Read the relevant sections
 before changing those systems. Keep work single-agent and follow the existing local
 performance hygiene instructions.

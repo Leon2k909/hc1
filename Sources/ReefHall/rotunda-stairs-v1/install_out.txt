@@ -1,0 +1,17 @@
+rotunda OBJ: original | new stair model compiled: True
+scene file names the stairs: False
+kept the scene as it is now: Sources\ReefHall\rotunda-stairs-v1\old\reefhall.scene.before
+{"Active": "reefhall", "HasUnsavedChanges": false, "Aquarium": "98c9a088-e17a-562a-95d1-9750ff2e8401", "Found": [], "ModelError": false, "ModelTris": [7458, 4832, 1752], "RoomError": false, "RoomTris": [10668]}
+editor copy vs reefhall.scene: 696 objects, 0 only in the editor, 0 only in the file, 0 with different fields; editor dirty flag: False
+{'Retry': False, 'Active': 'reefhall', 'Objects': ['064b982d-9acc-4692-8fbf-0b97f1a69559', '83c5e246-6785-4e0f-bd60-c5628af9a7f3'], 'Saved': True}
+Traceback (most recent call last):
+  File "C:\sbox-projects\hc1\forked-shooter-main\Sources\ReefHall\rotunda-stairs-v1\install.py", line 288, in <module>
+    main()
+    ~~~~^^
+  File "C:\sbox-projects\hc1\forked-shooter-main\Sources\ReefHall\rotunda-stairs-v1\install.py", line 271, in main
+    set_flag(cfg['flag'], True)
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\sbox-projects\hc1\forked-shooter-main\Sources\ReefHall\rotunda-stairs-v1\install.py", line 161, in set_flag
+    assert f'{name} = {on}' in new, 'could not set the generator flag'
+           ^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: could not set the generator flag

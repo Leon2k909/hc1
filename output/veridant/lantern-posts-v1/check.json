@@ -1,0 +1,1 @@
+{"code":"var s=Editor.SceneEditorSession.All.First(x=>x.Scene.Name==\"veridant\");var m=Model.Load(\"models/maps/veridant/lantern-posts-v1/frames.vmdl\");return new{m.IsError,Objects=s.Scene.GetAllObjects(true).Count(x=>x.Name==\"North terrace lantern frames\"),s.HasUnsavedChanges,Game.IsPlaying};"}

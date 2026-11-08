@@ -1,0 +1,1 @@
+var t = typeof( Editor.Mcp.SceneTools ); return t.GetMethods( System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static ).Select( m => m.Name + "(" + string.Join( ", ", m.GetParameters().Select( p => p.ParameterType.Name + " " + p.Name ) ) + ")" ).OrderBy( x => x ).ToArray();

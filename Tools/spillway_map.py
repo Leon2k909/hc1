@@ -530,10 +530,8 @@ def cargo_yard():
     for e in (-380,570):
         pipe(m,[(e,-1050,-70),(e,-1190,-70),(e,-1240,-145)],19,"rv_pipe",sides=12)
     for e,n,z in ((570,-400,0),(-1110,-600,0),(1290,-250,0),(1630,-1600,128)):
-        box(m,e-9,e+9,n-9,n+9,z,z+13,"rv_plinth")
-        P.rod(m,(e,n,z+8),(e,n,z+310),3,"rv_steel",10)
+        # The mast itself is a model of its own, placed by scene(): Sources/Spillway/floodlight-mast-v1. Only its lights are made here.
         for off in (-35,35): P.wall_light(m,f"Yard mast {e} {off}",(e+off,n,z+310),(0,-1,0),radius=430)
-        P.rod(m,(e-42,n,z+302),(e+42,n,z+302),2,"rv_steel",8)
     # Marked loading bay with broken, worn paint rather than a solid bright decal.
     for e in range(-440,700,80):
         box(m,e,e+37,-1140,-1137,.3,.5,"rv_line_yellow")

@@ -638,7 +638,10 @@ public sealed class ZombieAI : Component, Component.IDamageable
 		if ( damage > 0f && !burn && _timeSinceBloodImpact >= 0.03f )
 		{
 			_timeSinceBloodImpact = 0;
-			SpawnBlood( info.Position == default ? WorldPosition + Vector3.Up * 30f : info.Position );
+			var position = info.Position == default ? WorldPosition + Vector3.Up * 30f : info.Position;
+			SpawnBlood( position );
+			var direction = attacker.IsValid() ? position - (attacker.WorldPosition + Vector3.Up * 54f) : Vector3.Zero;
+			BroadcastBloodSplat( position, direction );
 		}
 		Health -= damage;
 
@@ -879,6 +882,12 @@ public sealed class ZombieAI : Component, Component.IDamageable
 	}
 
 	private TimeSince _timeSinceBloodImpact = 1f;
+
+	[Rpc.Broadcast( NetFlags.HostOnly )]
+	private void BroadcastBloodSplat( Vector3 position, Vector3 force )
+	{
+		Scene.GetSystem<RoundBloodDecals>()?.Splat( GameObject.Root, position, force );
+	}
 
 	private void SpawnBlood( Vector3 pos )
 	{

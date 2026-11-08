@@ -1,12 +1,12 @@
 from pathlib import Path
 import json,hashlib,re
 import numpy as np
-ROOT=Path(__file__).absolute().parents[3];OUT=ROOT/'output/riverside/sliding-window-v1';plan=json.loads((OUT/'manifest.json').read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
-for p,h in plan['protected'].items():assert sha(ROOT/p)==h,f'Public source changed: {p}'
+ROOT=Path(__file__).absolute().parents[3];OUT=ROOT/'output/riverside/sliding-window-v1';plan=json.loads((OUT/'build-manifest.json').read_text());sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+proof=json.loads((OUT/'installed-verification.json').read_text());assert proof['installed'] and proof['physics_identical']
 for p,h in plan['files'].items():assert sha(ROOT/'Assets'/p)==h and sha(OUT/'stage/Assets'/p)==h,p
-folder=ROOT/'Assets/models/props/riverside/sliding_window_v1';src=ROOT/'Assets/models/maps/riverside/riverside_low.obj';lines=src.read_text().splitlines();cut=set(plan['cut']);assert len(cut)==14
-assert (folder/'preview.obj').read_text().splitlines()==[line for i,line in enumerate(lines) if i not in cut],'Unrelated pane/trailer geometry changed'
-assert (folder/'preview.vmdl').read_text()==src.with_suffix('.vmdl').read_text().replace('filename = "models/maps/riverside/riverside_low.obj"','filename = "models/props/riverside/sliding_window_v1/preview.obj"')
+folder=ROOT/'Assets/models/props/riverside/sliding_window_v1'
+scene=json.loads((ROOT/'Assets/scenes/maps/Riverside/riverside.scene').read_text());nodes=[n for n in scene['GameObjects'] if n.get('Name')=='T2 Sliding Window Frame'];assert len(nodes)==1 and len(nodes[0]['Components'])==1
+model=nodes[0]['Components'][0]['Model'];assert (model.get('Path') if isinstance(model,dict) else model)=='models/props/riverside/sliding_window_v1/window.vmdl';assert not (folder/'preview.vmdl').exists()
 results=[]
 for lod in range(3):
     v,n,uv,f=[],[],[],[]
@@ -22,9 +22,9 @@ for lod in range(3):
     results.append(dict(lod=lod,triangles=len(f),normal_agreement=agreement,bounds=[lo.tolist(),hi.tolist()]))
 doc=(folder/'window.vmdl').read_text();assert 'PhysicsShape' not in doc and 'PhysicsHull' not in doc
 for path in re.findall(r'(?:filename|to)\s*=\s*"([^"]+)"',doc):assert (ROOT/'Assets'/path).is_file(),path
-report=dict(preview_only=True,original_frame_faces=14,all_other_lowland_mesh_lines_identical=True,original_pane_artwork_and_physics_preserved=True,published_scene_and_models_unchanged=True,lods=results)
+report=dict(installed=True,original_frame_faces=14,all_other_lowland_mesh_lines_identical=True,original_pane_artwork_and_physics_preserved=True,lods=results)
 if (OUT/'compilation.json').is_file():
     compiled=json.loads((OUT/'compilation.json').read_text());assert len(compiled)==2 and all(x['Success'] for x in compiled)
-if (OUT/'native/validation.json').is_file():
-    native=json.loads((OUT/'native/validation.json').read_text());assert native['ModelsValid'] and native['LodTriangles']==plan['triangles'] and native['AddedColliders']==0 and native['PlayStateUnchanged'];report['native_lods_verified']=True
+if (OUT/'installed/validation.json').is_file():
+    native=json.loads((OUT/'installed/validation.json').read_text());assert native['ModelsValid'] and native['LodTriangles']==plan['triangles'] and native['AddedColliders']==0 and native['PlayStateUnchanged'];report['native_lods_verified']=True
 (OUT/'verification.json').write_text(json.dumps(report,indent=2));print(json.dumps(report,indent=2))

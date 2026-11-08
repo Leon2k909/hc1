@@ -1,0 +1,1 @@
+{"code":"return new { exchangeDirectory, Widget=typeof(Editor.Widget).GetMethods().Where(m=>m.Name.Contains(\"Grab\")||m.Name.Contains(\"Capture\")||m.Name.Contains(\"Find\")).Select(m=>m.ToString()).ToArray(), Pixmap=typeof(Editor.Pixmap).GetMethods().Where(m=>m.Name.Contains(\"Save\")||m.Name.Contains(\"Byte\")).Select(m=>m.ToString()).ToArray() };"}

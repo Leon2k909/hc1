@@ -1,0 +1,1 @@
+{"code":"var s=Editor.SceneEditorSession.All.First(x=>x.Scene.Name==\"veridant\");var m=Model.Load(\"models/maps/veridant/pergola-bases-v1/bases.vmdl\");return new{m.IsError,Objects=s.Scene.GetAllObjects(true).Count(x=>x.Name==\"Cafe terrace pergola bases\"),s.HasUnsavedChanges,Game.IsPlaying};"}

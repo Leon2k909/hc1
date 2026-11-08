@@ -53,6 +53,7 @@ import cerroblanco_extinguishers
 import cerroblanco_parasols
 import cerroblanco_tables
 import cerroblanco_materials as CM
+import cerroblanco_doors as Doors
 from cerroblanco_glass import GlassModel
 
 TITLE = "Cerro Blanco"
@@ -1460,6 +1461,39 @@ def write_scene( written, light_list, props, glazing=None, spot_list=() ):
                          EndDistance=60000, FalloffExponent=1.5, Height=9000, VerticalFalloffExponent=1.2 ),
         ] ),
         look_object(),
+        *Doors.scene_objects( ids ),
+        *Doors.scene_objects( ids, courtyard=True ),
+        *Doors.north_gallery_scene_objects( ids ),
+        *Doors.north_gallery_ground_scene_objects( ids ),
+        *Doors.cafe_north_scene_objects( ids ),
+        *Doors.cafe_south_scene_objects( ids ),
+        *Doors.north_gallery_main_scene_objects( ids ),
+        *Doors.north_gallery_east_scene_objects( ids ),
+        *Doors.north_gallery_south_scene_objects( ids ),
+        *Doors.north_gallery_southeast_scene_objects( ids ),
+        *Doors.north_gallery_end_scene_objects( ids ),
+        *Doors.west_gallery_garden_scene_objects( ids ),
+        *Doors.west_gallery_far_garden_scene_objects( ids ),
+        *Doors.west_gallery_link_scene_objects( ids ),
+        *Doors.walnut_scene_objects( ids ),
+        *Doors.east_champagne_scene_objects( ids ),
+        *Doors.courtyard_champagne_scene_objects( ids ),
+        *Doors.end_champagne_scene_objects( ids ),
+        *Doors.east_gallery_garden_scene_objects( ids ),
+        *Doors.east_gallery_courtyard_scene_objects( ids ),
+        *Doors.east_gallery_north_courtyard_scene_objects( ids ),
+        *Doors.east_gallery_outer_scene_objects( ids ),
+        *Doors.east_gallery_outer_south_scene_objects( ids ),
+        *Doors.south_gallery_courtyard_scene_objects( ids ),
+        *Doors.south_gallery_rear_scene_objects( ids ),
+        *Doors.south_gallery_east_scene_objects( ids ),
+        *Doors.south_gallery_west_north_scene_objects( ids ),
+        *Doors.south_gallery_west_south_scene_objects( ids ),
+        *Doors.south_gallery_rear_west_scene_objects( ids ),
+        *Doors.south_gallery_main_scene_objects( ids ),
+        *Doors.south_gallery_rear_main_scene_objects( ids ),
+        *Doors.west_gallery_balcony_scene_objects( ids ),
+        *Doors.north_gallery_upper_link_scene_objects( ids ),
         world,
         K.game_object( ids, "Trees", "foliage", children=foliage ),
         K.game_object( ids, "Lights", "lights", children=light_objects ),

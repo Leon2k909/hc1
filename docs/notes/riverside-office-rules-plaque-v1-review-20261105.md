@@ -1,0 +1,3 @@
+# Riverside rules sign - revised review,2026-11-05
+
+Orange/rusty perimeter rejected. Revision uses neutral sheet metal, rounded corners, smooth curls, folded back edge, two centreline screws and sparse grey paint chips. Original worn print retained. No rs_rust reference remains.2120/864/320 triangles; existing materials only. Exactly2 old triangles hidden only in private pad copy, public source/scene/material hashes unchanged. Native matched whole/detail/context captures without inspection fill; whole/detail inspected. Geometry/winding/UV checks pass. Not installed. Recipe Sources/Riverside/office-rules-plaque-v1/README.md; evidence output/riverside/office-rules-plaque-v1/. No gameplay/LOD test.

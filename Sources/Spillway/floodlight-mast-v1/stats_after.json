@@ -1,0 +1,179 @@
+{
+ "label": "AFTER",
+ "objs": [
+  {
+   "triangles": 8654,
+   "vertices": 5054,
+   "materials": [
+    "mast_hw",
+    "mast_pier",
+    "mast_lens"
+   ],
+   "extent_in": [
+    94.0,
+    312.64,
+    28.54
+   ],
+   "extent_m": [
+    2.388,
+    7.941,
+    0.725
+   ],
+   "bytes": 816625,
+   "path": "models/props/spillway/floodlight_mast_v1/mast_lod0.obj"
+  },
+  {
+   "triangles": 3842,
+   "vertices": 2527,
+   "materials": [
+    "mast_hw",
+    "mast_pier",
+    "mast_lens"
+   ],
+   "extent_in": [
+    94.0,
+    311.65,
+    28.56
+   ],
+   "extent_m": [
+    2.388,
+    7.916,
+    0.725
+   ],
+   "bytes": 412722,
+   "path": "models/props/spillway/floodlight_mast_v1/mast_lod1.obj"
+  },
+  {
+   "triangles": 932,
+   "vertices": 640,
+   "materials": [
+    "mast_hw",
+    "mast_pier",
+    "mast_lens"
+   ],
+   "extent_in": [
+    94.01,
+    311.65,
+    24.74
+   ],
+   "extent_m": [
+    2.388,
+    7.916,
+    0.628
+   ],
+   "bytes": 99657,
+   "path": "models/props/spillway/floodlight_mast_v1/mast_lod2.obj"
+  }
+ ],
+ "textures": [
+  {
+   "vmat": "materials/spillway/floodlight_mast_v1/mast_hw.vmat",
+   "slot": "TextureAmbientOcclusion",
+   "path": "materials/spillway/floodlight_mast_v1/mast_hw_ao.png",
+   "w": 1024,
+   "h": 1024,
+   "file_bytes": 263557,
+   "est_gpu_bytes": 5592265,
+   "compiled_bytes": 248957
+  },
+  {
+   "vmat": "materials/spillway/floodlight_mast_v1/mast_hw.vmat",
+   "slot": "TextureColor",
+   "path": "materials/spillway/floodlight_mast_v1/mast_hw_color.png",
+   "w": 2048,
+   "h": 2048,
+   "file_bytes": 2375267,
+   "est_gpu_bytes": 22369062,
+   "compiled_bytes": 2518416
+  },
+  {
+   "vmat": "materials/spillway/floodlight_mast_v1/mast_hw.vmat",
+   "slot": "TextureMetalness",
+   "path": "materials/spillway/floodlight_mast_v1/mast_hw_metal.png",
+   "w": 1024,
+   "h": 1024,
+   "file_bytes": 267865,
+   "est_gpu_bytes": 5592265,
+   "compiled_bytes": 0
+  },
+  {
+   "vmat": "materials/spillway/floodlight_mast_v1/mast_hw.vmat",
+   "slot": "TextureNormal",
+   "path": "materials/spillway/floodlight_mast_v1/mast_hw_normal.png",
+   "w": 2048,
+   "h": 2048,
+   "file_bytes": 1880172,
+   "est_gpu_bytes": 22369062,
+   "compiled_bytes": 2768231
+  },
+  {
+   "vmat": "materials/spillway/floodlight_mast_v1/mast_hw.vmat",
+   "slot": "TextureRoughness",
+   "path": "materials/spillway/floodlight_mast_v1/mast_hw_rough.png",
+   "w": 2048,
+   "h": 2048,
+   "file_bytes": 1057127,
+   "est_gpu_bytes": 22369062,
+   "compiled_bytes": 0
+  },
+  {
+   "vmat": "materials/spillway/sw_trim_v2.vmat",
+   "slot": "TextureColor",
+   "path": "materials/spillway/scans/concrete_layers_02_diff_2k.jpg",
+   "w": 2048,
+   "h": 2048,
+   "file_bytes": 2555097,
+   "est_gpu_bytes": 22369062,
+   "compiled_bytes": 5725923
+  },
+  {
+   "vmat": "materials/spillway/sw_trim_v2.vmat",
+   "slot": "TextureNormal",
+   "path": "materials/spillway/scans/concrete_layers_02_nor_dx_2k.jpg",
+   "w": 2048,
+   "h": 2048,
+   "file_bytes": 3388060,
+   "est_gpu_bytes": 22369062,
+   "compiled_bytes": 12166940
+  },
+  {
+   "vmat": "materials/spillway/sw_trim_v2.vmat",
+   "slot": "TextureRoughness",
+   "path": "materials/spillway/scans/concrete_layers_02_rough_2k.jpg",
+   "w": 2048,
+   "h": 2048,
+   "file_bytes": 1920563,
+   "est_gpu_bytes": 22369062,
+   "compiled_bytes": 738990
+  }
+ ],
+ "vmdl": [
+  {
+   "path": "models/props/spillway/floodlight_mast_v1/mast.vmdl",
+   "vmdl_c_bytes": 260902,
+   "lods": [
+    [
+     "lod0",
+     "models/props/spillway/floodlight_mast_v1/mast_lod0.obj",
+     null
+    ],
+    [
+     "lod1",
+     "models/props/spillway/floodlight_mast_v1/mast_lod1.obj",
+     null
+    ],
+    [
+     "lod2",
+     "models/props/spillway/floodlight_mast_v1/mast_lod2.obj",
+     null
+    ]
+   ]
+  }
+ ],
+ "totals": {
+  "unique_textures": 8,
+  "texture_pixels": 27262976,
+  "est_gpu_bytes": 145398902,
+  "compiled_vtex_bytes": 24167457
+ }
+}

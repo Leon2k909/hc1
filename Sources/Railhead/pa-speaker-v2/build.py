@@ -144,7 +144,7 @@ count=K.write_model(MODEL,RES,'pa_speaker',m)
 public=ROOT/'Assets/models/maps/railhead/railhead_dress_centre.vmdl'
 source=ROOT/'Assets/models/maps/railhead/clock-v1/dressing_without_clock.obj'
 assert 'models/maps/railhead/clock-v1/dressing_without_clock.obj' in public.read_text()
-legacy=K.Model();D.loudspeaker(legacy,7.7,820.,214.,'+e');R.configure(legacy)
+legacy=K.Model();D.legacy_loudspeaker(legacy,7.7,820.,214.,'+e');R.configure(legacy)
 K.write_obj(OUT/'legacy-speaker.obj',legacy,'legacy_speaker')
 def records(path):
  lines=path.read_text().splitlines(keepends=True);vs=[tuple(round(float(v),3) for v in l.split()[1:4]) for l in lines if l.startswith('v ')]

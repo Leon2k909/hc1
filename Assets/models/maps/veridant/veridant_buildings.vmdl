@@ -116,7 +116,7 @@
 					{
 						_class = "RenderMeshFile"
 						name = "veridant_buildings"
-						filename = "models/maps/veridant/lounger-v2/veridant_buildings-base.obj"
+						filename = "models/maps/veridant/court-stair-rail-v1/base_without_court_rail_0.obj"
 						import_translation = [ 0.0, 0.0, 0.0 ]
 						import_rotation = [ 0.0, 0.0, 0.0 ]
 						import_scale = 1.0
@@ -126,6 +126,85 @@
 						parent_bone = ""
 						import_filter = { exclude_by_default = false exception_list = [ ] }
 					},
+{
+						_class = "RenderMeshFile"
+						name = "reception_stair_closure_v1"
+						filename = "models/maps/veridant/reception-stair-closure-v1/closure.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "terrace_pedestal_stools_v1"
+						filename = "models/maps/veridant/terrace-stools-v1/stools.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "terrace_umbrella_cloth_v1"
+						filename = "models/maps/veridant/terrace-umbrella-v1/canopy.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "reception_stair_rail_v1"
+						filename = "models/maps/veridant/reception-stair-rail-v1/rail.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "operations_banner_cloth_v1"
+						filename = "models/maps/veridant/operations-banner-v1/cloth.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+{
+						_class = "RenderMeshFile"
+						name = "reception_wall_light_v1"
+						filename = "models/maps/veridant/reception-wall-light-v1/wall_light.obj"
+						import_translation = [ 0.0, 0.0, 0.0 ]
+						import_rotation = [ 0.0, 0.0, 0.0 ]
+						import_scale = 1.0
+						align_origin_x_type = "None"
+						align_origin_y_type = "None"
+						align_origin_z_type = "None"
+						parent_bone = ""
+						import_filter = { exclude_by_default = false exception_list = [ ] }
+					},
+
 {
 						_class = "RenderMeshFile"
 						name = "veridant_buildings_loungers_v2"
@@ -180,45 +259,9 @@
 						parent_bone = ""
 						import_filter = { exclude_by_default = false exception_list = [ ] }
 					},
-{
-						_class = "RenderMeshFile"
-						name = "veridant_buildings_cases_v4_0"
-						filename = "models/maps/veridant/cases-v4/veridant_buildings-0.obj"
-						import_translation = [ 0.0, 0.0, 0.0 ]
-						import_rotation = [ 0.0, 0.0, 0.0 ]
-						import_scale = 1.0
-						align_origin_x_type = "None"
-						align_origin_y_type = "None"
-						align_origin_z_type = "None"
-						parent_bone = ""
-						import_filter = { exclude_by_default = false exception_list = [ ] }
-					},
-{
-						_class = "RenderMeshFile"
-						name = "veridant_buildings_cases_v4_1"
-						filename = "models/maps/veridant/cases-v4/veridant_buildings-1.obj"
-						import_translation = [ 0.0, 0.0, 0.0 ]
-						import_rotation = [ 0.0, 0.0, 0.0 ]
-						import_scale = 1.0
-						align_origin_x_type = "None"
-						align_origin_y_type = "None"
-						align_origin_z_type = "None"
-						parent_bone = ""
-						import_filter = { exclude_by_default = false exception_list = [ ] }
-					},
-{
-						_class = "RenderMeshFile"
-						name = "veridant_buildings_cases_v4_2"
-						filename = "models/maps/veridant/cases-v4/veridant_buildings-2.obj"
-						import_translation = [ 0.0, 0.0, 0.0 ]
-						import_rotation = [ 0.0, 0.0, 0.0 ]
-						import_scale = 1.0
-						align_origin_x_type = "None"
-						align_origin_y_type = "None"
-						align_origin_z_type = "None"
-						parent_bone = ""
-						import_filter = { exclude_by_default = false exception_list = [ ] }
-					},
+
+
+
 {
 						_class = "RenderMeshFile"
 						name = "veridant_spa_windows_v2"
@@ -1024,39 +1067,15 @@
 					{
 						_class = "PhysicsShapeBox"
 						parent_bone = ""
-						surface_prop = "plastic"
+						surface_prop = "default"
 						collision_tags = "solid"
-						origin = [ 4.0000, 236.0000, 11.0000 ]
-						angles = [ -0.0000, -90.0000, 0.0000 ]
-						dimensions = [ 20.0000, 30.0000, 22.0000 ]
+						origin = [ 12.5, 233, 12 ]
+						angles = [ 0, 0, 0 ]
+						dimensions = [ 47, 42, 24 ]
 					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "plastic"
-						collision_tags = "solid"
-						origin = [ 36.0000, 236.0000, 11.0000 ]
-						angles = [ -0.0000, -90.0000, 0.0000 ]
-						dimensions = [ 20.0000, 30.0000, 22.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "plastic"
-						collision_tags = "solid"
-						origin = [ 4.0000, 214.0000, 11.0000 ]
-						angles = [ -0.0000, -90.0000, 0.0000 ]
-						dimensions = [ 20.0000, 30.0000, 22.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "plastic"
-						collision_tags = "solid"
-						origin = [ 36.0000, 214.0000, 11.0000 ]
-						angles = [ -0.0000, -90.0000, 0.0000 ]
-						dimensions = [ 20.0000, 30.0000, 22.0000 ]
-					},
+					
+					
+					
 					{
 						_class = "PhysicsShapeBox"
 						parent_bone = ""
@@ -1750,24 +1769,8 @@
 						angles = [ -0.0000, 90.0000, 0.0000 ]
 						dimensions = [ 36.0000, 84.0000, 30.0000 ]
 					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "plastic"
-						collision_tags = "solid"
-						origin = [ -641.5745, -300.8694, 140.0000 ]
-						angles = [ -0.0000, -89.6485, 0.0000 ]
-						dimensions = [ 46.0000, 28.0000, 24.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "plastic"
-						collision_tags = "solid"
-						origin = [ -640.2587, -300.7190, 162.0000 ]
-						angles = [ -0.0000, -91.4569, -0.0000 ]
-						dimensions = [ 40.0000, 26.0000, 20.0000 ]
-					},
+					
+					
 					{
 						_class = "PhysicsShapeBox"
 						parent_bone = ""
@@ -1777,78 +1780,14 @@
 						angles = [ -0.0000, -90.0000, 0.0000 ]
 						dimensions = [ 160.0000, 30.0000, 40.0000 ]
 					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "plastic"
-						collision_tags = "solid"
-						origin = [ -417.4644, -199.7005, 12.0000 ]
-						angles = [ -0.0000, -90.5861, -0.0000 ]
-						dimensions = [ 46.0000, 28.0000, 24.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "plastic"
-						collision_tags = "solid"
-						origin = [ -418.3155, -199.3789, 34.0000 ]
-						angles = [ -0.0000, -89.6550, 0.0000 ]
-						dimensions = [ 40.0000, 26.0000, 20.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "plastic"
-						collision_tags = "solid"
-						origin = [ -420.9848, -641.7202, 12.0000 ]
-						angles = [ -0.0000, -86.8884, 0.0000 ]
-						dimensions = [ 46.0000, 28.0000, 24.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "plastic"
-						collision_tags = "solid"
-						origin = [ -418.0163, -639.5026, 34.0000 ]
-						angles = [ -0.0000, -89.4758, 0.0000 ]
-						dimensions = [ 40.0000, 26.0000, 20.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "plastic"
-						collision_tags = "solid"
-						origin = [ -640.5111, -1.3920, 12.0000 ]
-						angles = [ -0.0000, -79.4363, 0.0000 ]
-						dimensions = [ 46.0000, 28.0000, 24.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "plastic"
-						collision_tags = "solid"
-						origin = [ -641.1031, 1.5266, 34.0000 ]
-						angles = [ -0.0000, -81.5119, 0.0000 ]
-						dimensions = [ 40.0000, 26.0000, 20.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "plastic"
-						collision_tags = "solid"
-						origin = [ -379.3274, -458.5065, 12.0000 ]
-						angles = [ -0.0000, -76.4165, 0.0000 ]
-						dimensions = [ 46.0000, 28.0000, 24.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "plastic"
-						collision_tags = "solid"
-						origin = [ -378.7205, -460.5138, 34.0000 ]
-						angles = [ -0.0000, -71.3274, 0.0000 ]
-						dimensions = [ 40.0000, 26.0000, 20.0000 ]
-					},
+					
+					
+					
+					
+					
+					
+					
+					
 					{
 						_class = "PhysicsShapeBox"
 						parent_bone = ""
@@ -2029,33 +1968,9 @@
 						angles = [ -0.0000, -90.0000, 0.0000 ]
 						dimensions = [ 120.0000, 130.0000, 26.5000 ]
 					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "plastic"
-						collision_tags = "solid"
-						origin = [ 539.9234, -170.2910, 140.0000 ]
-						angles = [ -0.0000, -2.3662, 0.0000 ]
-						dimensions = [ 46.0000, 28.0000, 24.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "plastic"
-						collision_tags = "solid"
-						origin = [ 540.7991, -170.3881, 162.0000 ]
-						angles = [ -0.0000, -0.2703, 0.0000 ]
-						dimensions = [ 40.0000, 26.0000, 20.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "plastic"
-						collision_tags = "solid"
-						origin = [ 290.0000, -150.0000, 139.0000 ]
-						angles = [ -0.0000, -81.4692, 0.0000 ]
-						dimensions = [ 44.0000, 26.0000, 22.0000 ]
-					},
+					
+					
+					
 					{
 						_class = "PhysicsShapeBox"
 						parent_bone = ""
@@ -2137,78 +2052,14 @@
 						angles = [ -0.0000, -90.0000, 0.0000 ]
 						dimensions = [ 440.0000, 120.0000, 16.0000 ]
 					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "plastic"
-						collision_tags = "solid"
-						origin = [ -330.6964, -859.5065, 210.0000 ]
-						angles = [ -0.0000, -87.2375, 0.0000 ]
-						dimensions = [ 62.0000, 40.0000, 36.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "plastic"
-						collision_tags = "solid"
-						origin = [ -326.9363, -858.5870, 242.0000 ]
-						angles = [ -0.0000, -93.4362, -0.0000 ]
-						dimensions = [ 54.0000, 36.0000, 28.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "plastic"
-						collision_tags = "solid"
-						origin = [ -250.0000, -860.0000, 209.0000 ]
-						angles = [ -0.0000, -84.2894, 0.0000 ]
-						dimensions = [ 60.0000, 40.0000, 34.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "plastic"
-						collision_tags = "solid"
-						origin = [ -380.0000, -940.0000, 207.0000 ]
-						angles = [ -0.0000, -0.0000, 0.0000 ]
-						dimensions = [ 56.0000, 36.0000, 30.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "plastic"
-						collision_tags = "solid"
-						origin = [ 159.9513, -1099.4964, 204.0000 ]
-						angles = [ -0.0000, -4.2024, 0.0000 ]
-						dimensions = [ 46.0000, 28.0000, 24.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "plastic"
-						collision_tags = "solid"
-						origin = [ 161.4248, -1098.7584, 226.0000 ]
-						angles = [ -0.0000, 1.1253, 0.0000 ]
-						dimensions = [ 40.0000, 26.0000, 20.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "plastic"
-						collision_tags = "solid"
-						origin = [ 617.1593, -639.5647, 204.0000 ]
-						angles = [ -0.0000, -94.4352, -0.0000 ]
-						dimensions = [ 46.0000, 28.0000, 24.0000 ]
-					},
-					{
-						_class = "PhysicsShapeBox"
-						parent_bone = ""
-						surface_prop = "plastic"
-						collision_tags = "solid"
-						origin = [ 619.7963, -638.5478, 226.0000 ]
-						angles = [ -0.0000, -87.0104, 0.0000 ]
-						dimensions = [ 40.0000, 26.0000, 20.0000 ]
-					},
+					
+					
+					
+					
+					
+					
+					
+					
 					{
 						_class = "PhysicsShapeBox"
 						parent_bone = ""

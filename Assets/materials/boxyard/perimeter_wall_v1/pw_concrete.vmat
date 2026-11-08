@@ -1,0 +1,14 @@
+// Sources/Boxyard/perimeter-wall-v1/pw_tex.py (the field, coping and piers: Spillway's Poly Haven concrete_wall_009 scan, used as it is)
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    g_flRoughnessScaleFactor "1"
+    g_flMetalness "0.00"
+    TextureColor "materials/spillway/scans/concrete_wall_009_diff_2k.jpg"
+    TextureNormal "materials/boxyard/perimeter_wall_v1/pw_concrete_normal.jpg"
+    TextureRoughness "materials/spillway/scans/concrete_wall_009_rough_2k.jpg"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[0.93 0.96 1.0 1.0]"
+    g_flModelTintAmount "1.0"
+}

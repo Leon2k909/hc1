@@ -1,0 +1,107 @@
+{
+ "label": "BEFORE (old poles as drawn in the dressing mesh)",
+ "objs": [
+  {
+   "triangles": 136,
+   "vertices": 272,
+   "materials": [
+    "rs_pole",
+    "rs_steel"
+   ],
+   "extent_in": [
+    96.0,
+    430.0,
+    13.0
+   ],
+   "extent_m": [
+    2.438,
+    10.922,
+    0.33
+   ],
+   "bytes": 19842,
+   "path": "models/props/riverside/utility_pole_original/pole_2arm_original.obj"
+  },
+  {
+   "triangles": 100,
+   "vertices": 200,
+   "materials": [
+    "rs_pole",
+    "rs_steel"
+   ],
+   "extent_in": [
+    96.0,
+    400.0,
+    13.0
+   ],
+   "extent_m": [
+    2.438,
+    10.16,
+    0.33
+   ],
+   "bytes": 15055,
+   "path": "models/props/riverside/utility_pole_original/pole_1arm_original.obj"
+  }
+ ],
+ "textures": [
+  {
+   "vmat": "materials/riverside/rs_pole.vmat",
+   "slot": "TextureColor",
+   "path": "materials/riverside/rs_pole_color.jpg",
+   "w": 512,
+   "h": 512,
+   "file_bytes": 49338,
+   "est_gpu_bytes": 1398066,
+   "compiled_bytes": 111825
+  },
+  {
+   "vmat": "materials/riverside/rs_pole.vmat",
+   "slot": "TextureNormal",
+   "path": "materials/riverside/rs_pole_normal.jpg",
+   "w": 512,
+   "h": 512,
+   "file_bytes": 157417,
+   "est_gpu_bytes": 1398066,
+   "compiled_bytes": 255913
+  },
+  {
+   "vmat": "materials/riverside/rs_pole.vmat",
+   "slot": "TextureRoughness",
+   "path": "materials/riverside/rs_pole_rough.png",
+   "w": 512,
+   "h": 512,
+   "file_bytes": 920,
+   "est_gpu_bytes": 1398066,
+   "compiled_bytes": 0
+  }
+ ],
+ "vmdl": [
+  {
+   "path": "models/props/riverside/utility_pole_original/pole_2arm_original.vmdl",
+   "vmdl_c_bytes": 6310,
+   "lods": [
+    [
+     "pole_2arm_original",
+     "models/props/riverside/utility_pole_original/pole_2arm_original.obj",
+     null
+    ]
+   ]
+  },
+  {
+   "path": "models/props/riverside/utility_pole_original/pole_1arm_original.vmdl",
+   "vmdl_c_bytes": 5654,
+   "lods": [
+    [
+     "pole_1arm_original",
+     "models/props/riverside/utility_pole_original/pole_1arm_original.obj",
+     null
+    ]
+   ]
+  }
+ ],
+ "totals": {
+  "unique_textures": 3,
+  "texture_pixels": 786432,
+  "est_gpu_bytes": 4194198,
+  "compiled_vtex_bytes": 367738
+ }
+}

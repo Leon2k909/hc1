@@ -1,0 +1,158 @@
+{
+ "label": "AFTER-end-section",
+ "objs": [
+  {
+   "triangles": 866,
+   "vertices": 562,
+   "materials": [
+    "rh_black",
+    "rh_glass",
+    "rh_steel"
+   ],
+   "extent_in": [
+    123.43,
+    43.16,
+    3.4
+   ],
+   "extent_m": [
+    3.135,
+    1.096,
+    0.086
+   ],
+   "bytes": 55726,
+   "path": "models/props/reefhall/lobby_rail_v1/lobby_rail_section_end_lod0.obj"
+  },
+  {
+   "triangles": 478,
+   "vertices": 310,
+   "materials": [
+    "rh_black",
+    "rh_glass",
+    "rh_steel"
+   ],
+   "extent_in": [
+    123.3,
+    43.16,
+    3.4
+   ],
+   "extent_m": [
+    3.132,
+    1.096,
+    0.086
+   ],
+   "bytes": 30334,
+   "path": "models/props/reefhall/lobby_rail_v1/lobby_rail_section_end_lod1.obj"
+  },
+  {
+   "triangles": 170,
+   "vertices": 108,
+   "materials": [
+    "rh_glass",
+    "rh_steel"
+   ],
+   "extent_in": [
+    122.08,
+    42.87,
+    3.4
+   ],
+   "extent_m": [
+    3.101,
+    1.089,
+    0.086
+   ],
+   "bytes": 9761,
+   "path": "models/props/reefhall/lobby_rail_v1/lobby_rail_section_end_lod2.obj"
+  }
+ ],
+ "textures": [
+  {
+   "vmat": "materials/reefhall/rh_black.vmat",
+   "slot": "TextureColor",
+   "path": "materials/reefhall/rh_black_color.png",
+   "w": 512,
+   "h": 512,
+   "file_bytes": 93959,
+   "est_gpu_bytes": 1398066,
+   "compiled_bytes": 46213
+  },
+  {
+   "vmat": "materials/reefhall/rh_black.vmat",
+   "slot": "TextureNormal",
+   "path": "materials/reefhall/plain_normal.png",
+   "w": 512,
+   "h": 512,
+   "file_bytes": 127667,
+   "est_gpu_bytes": 1398066,
+   "compiled_bytes": 264441
+  },
+  {
+   "vmat": "materials/reefhall/rh_black.vmat",
+   "slot": "TextureRoughness",
+   "path": "materials/reefhall/plain_rough.png",
+   "w": 512,
+   "h": 512,
+   "file_bytes": 194073,
+   "est_gpu_bytes": 1398066,
+   "compiled_bytes": 0
+  },
+  {
+   "vmat": "materials/reefhall/rh_steel.vmat",
+   "slot": "TextureColor",
+   "path": "materials/reefhall/rh_steel_color.png",
+   "w": 1024,
+   "h": 1024,
+   "file_bytes": 592799,
+   "est_gpu_bytes": 5592265,
+   "compiled_bytes": 140388
+  },
+  {
+   "vmat": "materials/reefhall/rh_steel.vmat",
+   "slot": "TextureNormal",
+   "path": "materials/reefhall/steel_normal.png",
+   "w": 1024,
+   "h": 1024,
+   "file_bytes": 806329,
+   "est_gpu_bytes": 5592265,
+   "compiled_bytes": 1013872
+  },
+  {
+   "vmat": "materials/reefhall/rh_steel.vmat",
+   "slot": "TextureRoughness",
+   "path": "materials/reefhall/steel_rough.png",
+   "w": 1024,
+   "h": 1024,
+   "file_bytes": 720521,
+   "est_gpu_bytes": 5592265,
+   "compiled_bytes": 0
+  }
+ ],
+ "vmdl": [
+  {
+   "path": "models/props/reefhall/lobby_rail_v1/lobby_rail_section_end.vmdl",
+   "vmdl_c_bytes": 39194,
+   "lods": [
+    [
+     "lod0",
+     "models/props/reefhall/lobby_rail_v1/lobby_rail_section_end_lod0.obj",
+     null
+    ],
+    [
+     "lod1",
+     "models/props/reefhall/lobby_rail_v1/lobby_rail_section_end_lod1.obj",
+     null
+    ],
+    [
+     "lod2",
+     "models/props/reefhall/lobby_rail_v1/lobby_rail_section_end_lod2.obj",
+     null
+    ]
+   ]
+  }
+ ],
+ "totals": {
+  "unique_textures": 6,
+  "texture_pixels": 3932160,
+  "est_gpu_bytes": 20970993,
+  "compiled_vtex_bytes": 1464914
+ }
+}

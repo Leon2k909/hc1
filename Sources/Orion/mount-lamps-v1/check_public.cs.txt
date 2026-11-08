@@ -1,0 +1,5 @@
+var model=Model.Load("models/maps/orion/orion_pad.vmdl");
+if(model.IsError)throw new InvalidOperationException("Public pad failed to load");
+var folder=System.IO.Path.Combine(Sandbox.Project.Current.GetRootPath(),"Assets/models/maps/orion/mount-lamps-v1");
+if(System.IO.Directory.GetFiles(folder,"before.*").Length!=0)throw new InvalidOperationException("Old assets remain");
+return new{PublicModel=model.ResourcePath,PublicError=model.IsError,OldAssetsRemoved=true};

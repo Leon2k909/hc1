@@ -47,6 +47,10 @@ import map_kit as K
 import reefhall_materials as RM
 import reefhall_consoles as RC
 import reefhall_display_pedestal as DP
+import reefhall_reception_desk as RD
+import reefhall_lobby_rail as RL
+import reefhall_stairs as RS
+import reefhall_office_doors as OfficeDoors
 from map_kit import Model, normalise
 
 TITLE = "Reef Hall"
@@ -688,20 +692,24 @@ def sea_grass( model, base, rng, count=None, height=None ):
     fit_obstacle( model, before, ( b[0], b[1] ) )
 
 
-def railing( model, p0, p1, z, height=42.0, glass=True, post_every=60.0, rail="rh_steel", collide=True ):
+def railing( model, p0, p1, z, height=42.0, glass=True, post_every=60.0, rail="rh_steel", collide=True, draw=True ):
     """ A balcony railing from p0 to p1 (plan): steel posts, a round handrail and glass panels. Players can't pass it;
-    rounds go through the glass. """
+    rounds go through the glass. draw=False builds only its collision (the lobby balcony's rail is the standalone
+    models of Sources/ReefHall/lobby-rail-v1 while RL.ENABLED). """
     p0, p1 = np.asarray( p0, float )[:2], np.asarray( p1, float )[:2]
     length = np.linalg.norm( p1 - p0 )
     if length < 1:
         return
     fr = Frame( p0, p1 - p0 )
     count = max( 1, int( math.ceil( length / post_every ) ) )
-    for k in range( count + 1 ):
-        u = length * k / count
-        fbox( model, fr, u - 1.25, u + 1.25, -1.25, 1.25, z, z + height - 2, "rh_gunmetal" )
-    tube( model, fr.p( -1, 0, z + height ), fr.p( length + 1, 0, z + height ), 1.6, rail, sides=8 )
-    if glass:
+    if draw:
+        for k in range( count + 1 ):
+            u = length * k / count
+            fbox( model, fr, u - 1.25, u + 1.25, -1.25, 1.25, z, z + height - 2, "rh_gunmetal" )
+        tube( model, fr.p( -1, 0, z + height ), fr.p( length + 1, 0, z + height ), 1.6, rail, sides=8 )
+    if not draw:
+        pass
+    elif glass:
         for k in range( count ):
             a, b = length * k / count + 2.5, length * ( k + 1 ) / count - 2.5
             facing( model, "rh_glass", [ fr.p( a, 0, z + 4 ), fr.p( b, 0, z + 4 ), fr.p( b, 0, z + height - 4 ), fr.p( a, 0, z + height - 4 ) ],
@@ -717,9 +725,11 @@ def railing( model, p0, p1, z, height=42.0, glass=True, post_every=60.0, rail="r
         fbox( model, fr, 0, length, -1.6, 1.6, z + height - 4, z + height + 1.6, None, METAL )
 
 
-def stair( model, lo, hi, z0, z1, climb, tread="rh_floor", side="rh_wall", surface=STONE, nosing="rh_brass" ):
+def stair( model, lo, hi, z0, z1, climb, tread="rh_floor", side="rh_wall", surface=STONE, nosing="rh_brass", draw=True ):
     """ A straight flight over the plan rectangle lo..hi ( e, n ), climbing towards climb ('+e', '-e', '+n', '-n') from
-    z0 to z1 in risers of about 8: each step a solid box down to z0, with a brass nosing strip. """
+    z0 to z1 in risers of about 8: each step a solid box down to z0, with a brass nosing strip. draw=False builds only
+    its collision (the lobby's and the control room's flights are the standalone models of Sources/ReefHall/stairs-v1
+    while RS.LOBBY / RS.CONTROL). """
     steps = max( 1, round( ( z1 - z0 ) / 8 ) )
     rise = ( z1 - z0 ) / steps
     axis = 0 if climb[1] == "e" else 1
@@ -729,16 +739,20 @@ def stair( model, lo, hi, z0, z1, climb, tread="rh_floor", side="rh_wall", surfa
         s0, s1 = ( a0 + k * run, a0 + ( k + 1 ) * run ) if climb[0] == "+" else ( a1 - ( k + 1 ) * run, a1 - k * run )
         blo, bhi = list( lo ), list( hi )
         blo[axis], bhi[axis] = s0, s1
-        model.box( ( blo[0], blo[1], z0 ), ( bhi[0], bhi[1], z0 + rise * ( k + 1 ) ), { "+z": tread, "default": side }, surface )
-        if nosing:
+        if draw:
+            model.box( ( blo[0], blo[1], z0 ), ( bhi[0], bhi[1], z0 + rise * ( k + 1 ) ), { "+z": tread, "default": side }, surface )
+        elif surface:
+            model.collision_box( ( blo[0], blo[1], z0 ), ( bhi[0], bhi[1], z0 + rise * ( k + 1 ) ), surface )
+        if nosing and draw:
             edge = s0 if climb[0] == "+" else s1
             nlo, nhi = list( blo ), list( bhi )
             nlo[axis], nhi[axis] = ( edge, edge + 2.0 ) if climb[0] == "+" else ( edge - 2.0, edge )
             model.box( ( nlo[0], nlo[1], z0 + rise * ( k + 1 ) ), ( nhi[0], nhi[1], z0 + rise * ( k + 1 ) + 0.15 ), nosing )
 
 
-def metal_stair( model, lo, hi, z0, z1, climb, surface=METAL ):
-    """ An open steel stair: grating treads between two stringers, its collision a smooth ramp of steps. """
+def metal_stair( model, lo, hi, z0, z1, climb, surface=METAL, draw=True ):
+    """ An open steel stair: grating treads between two stringers, its collision a smooth ramp of steps. draw=False builds
+    only the collision (the filter hall's flights are the standalone models of Sources/ReefHall/filter-stairs-v1 while RS.FILTER). """
     steps = max( 1, round( ( z1 - z0 ) / 8 ) )
     rise = ( z1 - z0 ) / steps
     axis = 0 if climb[1] == "e" else 1
@@ -750,9 +764,10 @@ def metal_stair( model, lo, hi, z0, z1, climb, surface=METAL ):
         blo, bhi = list( lo ), list( hi )
         blo[axis], bhi[axis] = s0, s1
         top = z0 + rise * ( k + 1 )
-        model.box( ( blo[0], blo[1], top - 2 ), ( bhi[0], bhi[1], top ), { "+z": "rh_grate", "default": "rh_gunmetal" } )
+        if draw:
+            model.box( ( blo[0], blo[1], top - 2 ), ( bhi[0], bhi[1], top ), { "+z": "rh_grate", "default": "rh_gunmetal" } )
         model.collision_box( ( blo[0], blo[1], z0 ), ( bhi[0], bhi[1], top ), surface )
-    for side in ( lo[other], hi[other] ):
+    for side in ( lo[other], hi[other] ) if draw else ():
         p_lo, p_hi = [ 0.0, 0.0 ], [ 0.0, 0.0 ]
         p_lo[axis], p_hi[axis] = ( a0, a1 ) if climb[0] == "+" else ( a1, a0 )
         p_lo[other] = p_hi[other] = side
@@ -763,8 +778,9 @@ def metal_stair( model, lo, hi, z0, z1, climb, surface=METAL ):
     return steps
 
 
-def stair_rail( model, lo, hi, z0, z1, climb, sides=( True, True ), glass=False ):
-    """ Handrails along a straight flight's sides, sloping with it. """
+def stair_rail( model, lo, hi, z0, z1, climb, sides=( True, True ), glass=False, draw=True ):
+    """ Handrails along a straight flight's sides, sloping with it. draw=False builds only their collision hulls (the
+    standalone stair models of Sources/ReefHall/stairs-v1 carry the balustrades while RS.LOBBY / RS.CONTROL). """
     axis = 0 if climb[1] == "e" else 1
     other = 1 - axis
     a0, a1 = ( lo[axis], hi[axis] ) if climb[0] == "+" else ( hi[axis], lo[axis] )
@@ -777,11 +793,12 @@ def stair_rail( model, lo, hi, z0, z1, climb, sides=( True, True ), glass=False 
         p0, p1 = np.array( p0 ), np.array( p1 )
         length = np.linalg.norm( ( p1 - p0 )[:2] )
         count = max( 1, int( length / 60 ) )
-        for k in range( count + 1 ):
-            t = k / count
-            p = p0 + ( p1 - p0 ) * t
-            model.box( ( p[0] - 1.2, p[1] - 1.2, p[2] ), ( p[0] + 1.2, p[1] + 1.2, p[2] + 38 ), "rh_gunmetal" )
-        tube( model, p0 + ( 0, 0, 40 ), p1 + ( 0, 0, 40 ), 1.6, "rh_steel", sides=8 )
+        if draw:
+            for k in range( count + 1 ):
+                t = k / count
+                p = p0 + ( p1 - p0 ) * t
+                model.box( ( p[0] - 1.2, p[1] - 1.2, p[2] ), ( p[0] + 1.2, p[1] + 1.2, p[2] + 38 ), "rh_gunmetal" )
+            tube( model, p0 + ( 0, 0, 40 ), p1 + ( 0, 0, 40 ), 1.6, "rh_steel", sides=8 )
         fr = Frame( p0, ( p1 - p0 )[:2] )
         hull = []
         for t, p in ( ( 0, p0 ), ( 1, p1 ) ):
@@ -943,8 +960,10 @@ def arc_wall( model, r_in, r_out, a0, a1, z0, z1, paints, surface=STONE ):
                 "back": paints.get( "back" ) }, surface )
 
 
-def round_stair( model, r0, r1, a_foot, a_top, z0, z1, tread="rh_floor", side="rh_wall_dark", nosing="rh_brass" ):
-    """ A curved flight in the band r0..r1 from angle a_foot (at z0) to a_top (z1): solid steps, each a hull. """
+def round_stair( model, r0, r1, a_foot, a_top, z0, z1, tread="rh_floor", side="rh_wall_dark", nosing="rh_brass", draw=True ):
+    """ A curved flight in the band r0..r1 from angle a_foot (at z0) to a_top (z1): solid steps, each a hull. draw=False
+    builds only the hulls (the Rotunda's two flights are the standalone models of Sources/ReefHall/rotunda-stairs-v1 while
+    RS.ROTUNDA). """
     steps = max( 1, round( ( z1 - z0 ) / 8 ) )
     rise = ( z1 - z0 ) / steps
     sign = 1 if a_top > a_foot else -1
@@ -952,22 +971,24 @@ def round_stair( model, r0, r1, a_foot, a_top, z0, z1, tread="rh_floor", side="r
         a = a_foot + ( a_top - a_foot ) * k / steps
         b = a_foot + ( a_top - a_foot ) * ( k + 1 ) / steps
         top = z0 + rise * ( k + 1 )
-        sector( model, tread, r0, r1, a, b, top, steps=1 )
-        down = polar( a - sign * 90, 1.0 )
-        pa0, pa1 = polar( a, r0 ), polar( a, r1 )
-        facing( model, side, [ ( *pa0, top - rise ), ( *pa1, top - rise ), ( *pa1, top ), ( *pa0, top ) ], ( *down, 0 ) )
-        # The sides face out of the step: the inner one towards the centre, the outer one away from it.
-        lo_a, hi_a = min( a, b ), max( a, b )
-        drum( model, side, r0, lo_a, hi_a, z0, top, inward=True, steps=1, smooth=False )
-        drum( model, side, r1, lo_a, hi_a, z0, top, inward=False, steps=1, smooth=False )
-        if nosing:
-            na = a + ( b - a ) * 0.1
-            facing( model, nosing, [ ( *polar( a, r0 ), top + 0.15 ), ( *polar( na, r0 ), top + 0.15 ),
-                                     ( *polar( na, r1 ), top + 0.15 ), ( *polar( a, r1 ), top + 0.15 ) ], ( 0, 0, 1 ) )
+        if draw:
+            sector( model, tread, r0, r1, a, b, top, steps=1 )
+            down = polar( a - sign * 90, 1.0 )
+            pa0, pa1 = polar( a, r0 ), polar( a, r1 )
+            facing( model, side, [ ( *pa0, top - rise ), ( *pa1, top - rise ), ( *pa1, top ), ( *pa0, top ) ], ( *down, 0 ) )
+            # The sides face out of the step: the inner one towards the centre, the outer one away from it.
+            lo_a, hi_a = min( a, b ), max( a, b )
+            drum( model, side, r0, lo_a, hi_a, z0, top, inward=True, steps=1, smooth=False )
+            drum( model, side, r1, lo_a, hi_a, z0, top, inward=False, steps=1, smooth=False )
+            if nosing:
+                na = a + ( b - a ) * 0.1
+                facing( model, nosing, [ ( *polar( a, r0 ), top + 0.15 ), ( *polar( na, r0 ), top + 0.15 ),
+                                         ( *polar( na, r1 ), top + 0.15 ), ( *polar( a, r1 ), top + 0.15 ) ], ( 0, 0, 1 ) )
         model.hull( [ ( *polar( x, r ), z ) for x in ( a, b ) for r in ( r0, r1 ) for z in ( z0, top ) ], STONE )
     # The last step's end, facing up the flight, down to the floor.
-    pb0, pb1 = polar( a_top, r0 ), polar( a_top, r1 )
-    facing( model, side, [ ( *pb0, z0 ), ( *pb1, z0 ), ( *pb1, z1 ), ( *pb0, z1 ) ], ( *polar( a_top + sign * 90, 1.0 ), 0 ) )
+    if draw:
+        pb0, pb1 = polar( a_top, r0 ), polar( a_top, r1 )
+        facing( model, side, [ ( *pb0, z0 ), ( *pb1, z0 ), ( *pb1, z1 ), ( *pb0, z1 ) ], ( *polar( a_top + sign * 90, 1.0 ), 0 ) )
 
 
 def arc_railing( model, r, a0, a1, z, glass=True, piece=8.0, collide=True ):
@@ -980,10 +1001,11 @@ def arc_railing( model, r, a0, a1, z, glass=True, piece=8.0, collide=True ):
         railing( model, polar( a, r ), polar( b, r ), z, glass=glass, collide=collide )
 
 
-def sloped_arc_railing( model, r, a_foot, a_top, z0, z1, piece=6.0 ):
-    """ A handrail along a curved flight, rising with it. """
+def sloped_arc_railing( model, r, a_foot, a_top, z0, z1, piece=6.0, draw=True ):
+    """ A handrail along a curved flight, rising with it. draw=False builds only the collision hulls (the Rotunda's
+    standalone stair models carry the balustrades while RS.ROTUNDA). """
     steps = max( 1, int( math.ceil( abs( a_top - a_foot ) / piece ) ) )
-    for k in range( steps + 1 ):
+    for k in range( steps + 1 if draw else 0 ):
         a = a_foot + ( a_top - a_foot ) * k / steps
         z = z0 + ( z1 - z0 ) * k / steps
         p = polar( a, r )
@@ -992,9 +1014,10 @@ def sloped_arc_railing( model, r, a_foot, a_top, z0, z1, piece=6.0 ):
         a, b = a_foot + ( a_top - a_foot ) * k / steps, a_foot + ( a_top - a_foot ) * ( k + 1 ) / steps
         za, zb = z0 + ( z1 - z0 ) * k / steps, z0 + ( z1 - z0 ) * ( k + 1 ) / steps
         pa, pb = polar( a, r ), polar( b, r )
-        tube( model, ( *pa, za + 40 ), ( *pb, zb + 40 ), 1.6, "rh_steel", sides=8 )
-        for zz in ( 14, 27 ):
-            tube( model, ( *pa, za + zz ), ( *pb, zb + zz ), 0.8, "rh_gunmetal", sides=6 )
+        if draw:
+            tube( model, ( *pa, za + 40 ), ( *pb, zb + 40 ), 1.6, "rh_steel", sides=8 )
+            for zz in ( 14, 27 ):
+                tube( model, ( *pa, za + zz ), ( *pb, zb + zz ), 0.8, "rh_gunmetal", sides=6 )
         fr = Frame( pa, pb - pa )
         model.hull( [ ( *( p + fr.f * w ), z ) for p, zz in ( ( pa, za ), ( pb, zb ) ) for w in ( -1.6, 1.6 ) for z in ( zz, zz + 42 ) ],
                     METAL )
@@ -1125,15 +1148,15 @@ def rotunda( model, inside, lights, rng ):
 
     # The curved stairs to the balcony.
     for foot, top in STAIRS:
-        round_stair( model, *STAIR_BAND, foot, top, 0, L1 )
-        sloped_arc_railing( model, STAIR_BAND[0] + 2, foot, top, 0, L1 )
+        round_stair( model, *STAIR_BAND, foot, top, 0, L1, draw=not RS.ROTUNDA )     # RS: Sources/ReefHall/rotunda-stairs-v1
+        sloped_arc_railing( model, STAIR_BAND[0] + 2, foot, top, 0, L1, draw=not RS.ROTUNDA )
         span = ( top - foot ) * 4 / 26
-        sloped_arc_railing( model, STAIR_BAND[1] - 2, foot, top - span, 0, L1 * 22 / 26 )
+        sloped_arc_railing( model, STAIR_BAND[1] - 2, foot, top - span, 0, L1 * 22 / 26, draw=not RS.ROTUNDA )
 
     # The floor: the emblem, benches facing the tank, display tanks for cover, information stands.
     decal( model, "rh_emblem", -130, 130, -560, -300, 0.0 )
     # Each slides along its own length, away from the display case it would otherwise run into.
-    for a, slide in ( ( 205.0, 42.0 ), ( 335.0, -42.0 ) ):
+    for a, slide in ( ( 205.0, 54.0 ), ( 335.0, -42.0 ) ):
         fr = Frame( polar( a, 420 ), ( math.cos( math.radians( a + 90 ) ), math.sin( math.radians( a + 90 ) ) ) )
         bench( model, fr.p( slide, 0, 0 ), a + 90 )
     for a in ( 160.0, 200.0, 340.0, 20.0 ):
@@ -1659,7 +1682,7 @@ def lobby_north( model, inside, lights, rng ):
     model.box( ( e0, v_n1, L1 - SLAB ), ( e1, n1, L1 ), { "+z": "rh_floor", "-z": "rh_ceiling", "default": None }, STONE )
     fr_s, _, _ = side_frame( ( v_e0, v_e1, v_n1, n1 ), "s" )
     fascia( model, fr_s, 0, v_e1 - v_e0 )
-    railing( model, ( v_e0, v_n1 + 2 ), ( v_e1, v_n1 + 2 ), L1 )
+    railing( model, ( v_e0, v_n1 + 2 ), ( v_e1, v_n1 + 2 ), L1, draw=not RL.ENABLED )   # RL: Sources/ReefHall/lobby-rail-v1
     downlight_line( model, ( e0 + 90, 910 ), ( e1 - 80, 910 ), L1 - SLAB, every=120 )
     for e in ( -2500.0, -2100.0 ):
         lights.append( light( f"Lobby north under balcony {int( e )}", ( e, 910, 180 ), WARM, 300 ) )
@@ -1670,8 +1693,8 @@ def lobby_north( model, inside, lights, rng ):
 
     # The north flight: up the void's west side to the west balcony.
     s_e0, s_e1, s_n0, s_n1 = LOBBY_STAIR
-    stair( model, ( s_e0, s_n0 ), ( s_e1, s_n1 ), 0.0, L1, "-e", side="rh_wall_dark" )
-    stair_rail( model, ( s_e0, s_n0 + 2 ), ( s_e1, s_n1 - 2 ), 0.0, L1, "-e" )
+    stair( model, ( s_e0, s_n0 ), ( s_e1, s_n1 ), 0.0, L1, "-e", side="rh_wall_dark", draw=not RS.LOBBY )   # RS: Sources/ReefHall/stairs-v1
+    stair_rail( model, ( s_e0, s_n0 + 2 ), ( s_e1, s_n1 - 2 ), 0.0, L1, "-e", draw=not RS.LOBBY )
 
     # Things on the floor: a display case and a drain; a bench and a display case upstairs.
     skip_cases( rng, stacks=2 )
@@ -1838,23 +1861,27 @@ def lobby( model, inside, lights, rng ):
         tube( model, ( *p, 366 ), ( *p, LOBBY_TOP ), 0.8, "rh_steel", sides=6 )
     lights.append( light( "Lobby halo", ( *( tc + ( 140, 0 ) ), 320 ), WARM, 360 ) )
     # The desk: a curved counter, laminate top, a precast concrete front with a warm strip, screens facing the staff.
+    # With RD.ENABLED the visible desk is the standalone model (Sources/ReefHall/reception-desk-v1, one scene object) and
+    # only its collision, the sixteen wedges, is built here; with it off the original flat-faceted desk is drawn again.
+    drawn = not RD.ENABLED
     d0, d1, da, db = 212.0, 250.0, -62.0, 62.0
     steps = 16
     for k in range( steps ):
         a, b = da + ( db - da ) * k / steps, da + ( db - da ) * ( k + 1 ) / steps
         pa0, pb0, pa1, pb1 = tc + polar( a, d0 ), tc + polar( b, d0 ), tc + polar( a, d1 ), tc + polar( b, d1 )
-        facing( model, "rh_laminate", [ ( *pa0, 42 ), ( *pb0, 42 ), ( *pb1, 42 ), ( *pa1, 42 ) ], ( 0, 0, 1 ) )
-        out = np.array( ( *polar( ( a + b ) / 2, 1 ), 0.0 ) )
-        facing( model, "rh_smooth", [ ( *pa1, 0 ), ( *pb1, 0 ), ( *pb1, 42 ), ( *pa1, 42 ) ], out )
-        facing( model, "rh_smooth", [ ( *pa0, 0 ), ( *pb0, 0 ), ( *pb0, 42 ), ( *pa0, 42 ) ], -out )
-        qa, qb = tc + polar( a, d1 + 0.2 ), tc + polar( b, d1 + 0.2 )
-        facing( model, "rh_led_warm", [ ( *qa, 5 ), ( *qb, 5 ), ( *qb, 8 ), ( *qa, 8 ) ], out )
+        if drawn:
+            facing( model, "rh_laminate", [ ( *pa0, 42 ), ( *pb0, 42 ), ( *pb1, 42 ), ( *pa1, 42 ) ], ( 0, 0, 1 ) )
+            out = np.array( ( *polar( ( a + b ) / 2, 1 ), 0.0 ) )
+            facing( model, "rh_smooth", [ ( *pa1, 0 ), ( *pb1, 0 ), ( *pb1, 42 ), ( *pa1, 42 ) ], out )
+            facing( model, "rh_smooth", [ ( *pa0, 0 ), ( *pb0, 0 ), ( *pb0, 42 ), ( *pa0, 42 ) ], -out )
+            qa, qb = tc + polar( a, d1 + 0.2 ), tc + polar( b, d1 + 0.2 )
+            facing( model, "rh_led_warm", [ ( *qa, 5 ), ( *qb, 5 ), ( *qb, 8 ), ( *qa, 8 ) ], out )
         model.hull( [ ( *p, z ) for p in ( pa0, pb0, pa1, pb1 ) for z in ( 0, 42 ) ], WOOD )
-    for a in ( da, db ):
+    for a in ( da, db ) if drawn else ():
         pa0, pa1 = tc + polar( a, d0 ), tc + polar( a, d1 )
         side = np.array( ( *polar( a + ( 90 if a > 0 else -90 ), 1 ), 0.0 ) )
         facing( model, "rh_smooth", [ ( *pa0, 0 ), ( *pa1, 0 ), ( *pa1, 42 ), ( *pa0, 42 ) ], side )
-    for a in ( -32.0, 0.0, 32.0 ):
+    for a in ( -32.0, 0.0, 32.0 ) if drawn else ():
         p = tc + polar( a, 228 )
         fr_m = Frame( p, polar( a + 90, 1 ), -polar( a, 1 ) )
         fbox( model, fr_m, -11, 11, -1.5, 1.5, 47, 62, { "default": "rh_black", "front": "rh_screen_data" } )
@@ -1941,9 +1968,10 @@ def server_rack( model, fr, u0, u1, z=0.0, height=84.0, depth=30.0 ):
     fbox( model, fr, u0, u1, 0, depth, z, z + height, None, METAL )
 
 
-def partition( model, p0, p1, z0, z1, gaps=() ):
+def partition( model, p0, p1, z0, z1, gaps=(), draw=True ):
     """ An office's glass wall from p0 to p1 ( plan ), frosted glass in a gunmetal frame, with door gaps ( u ranges
-    along it ). The glass is 1 thick, so rounds go through. """
+    along it ). The glass is 1 thick, so rounds go through. draw=False builds only the collision (the control room office's
+    two walls are the standalone model of Sources/ReefHall/office-partitions-v1 while RS.OFFICE). """
     p0, p1 = np.asarray( p0, float ), np.asarray( p1, float )
     length = float( np.linalg.norm( p1 - p0 ) )
     fr = Frame( p0, p1 - p0 )
@@ -1955,19 +1983,20 @@ def partition( model, p0, p1, z0, z1, gaps=() ):
         posts = max( 1, int( math.ceil( ( b - a ) / 90 ) ) )
         for j in range( posts + 1 ):
             u = a + ( b - a ) * j / posts
-            fbox( model, fr, max( a, u - 2 ), min( b, u + 2 ), -2, 2, z0, z1, "rh_gunmetal", METAL )
-        for zz in ( z0, z0 + 96 ):
+            fbox( model, fr, max( a, u - 2 ), min( b, u + 2 ), -2, 2, z0, z1, "rh_gunmetal" if draw else None, METAL )
+        for zz in ( z0, z0 + 96 ) if draw else ():
             fbox( model, fr, a, b, -2, 2, zz, zz + 4 if zz > z0 else zz + 6, "rh_gunmetal" )
-        for w, d in ( ( 0.5, 1 ), ( -0.5, -1 ) ):
+        for w, d in ( ( 0.5, 1 ), ( -0.5, -1 ) ) if draw else ():
             facing( model, "rh_glass_office", [ fr.p( a, w, z0 + 6 ), fr.p( b, w, z0 + 6 ), fr.p( b, w, z0 + 96 ), fr.p( a, w, z0 + 96 ) ],
                     fr.vec( 0, d, 0 ) )
             facing( model, "rh_glass", [ fr.p( a, w, z0 + 100 ), fr.p( b, w, z0 + 100 ), fr.p( b, w, z1 ), fr.p( a, w, z1 ) ],
                     fr.vec( 0, d, 0 ) )
         fbox( model, fr, a, b, -0.5, 0.5, z0 + 6, z1, None, GLASS )
-    fbox( model, fr, 0, length, -2.5, 2.5, z1, z1 + 6, "rh_gunmetal" )
+    if draw:
+        fbox( model, fr, 0, length, -2.5, 2.5, z1, z1 + 6, "rh_gunmetal" )
     for a, b in gaps:
         for u in ( a, b ):
-            fbox( model, fr, u - 2, u + 2, -2.5, 2.5, z0, z1, "rh_gunmetal", METAL )
+            fbox( model, fr, u - 2, u + 2, -2.5, 2.5, z0, z1, "rh_gunmetal" if draw else None, METAL )
 
 
 def desk( model, centre, yaw, z=0.0 ):
@@ -2072,8 +2101,8 @@ def control_room( model, inside, lights, rng ):
     railing( model, ( 1878, -CORRIDOR + 2 ), ( 1878, 562 ), L1 )
     railing( model, ( e0, -CORRIDOR + 2 ), ( 1878, -CORRIDOR + 2 ), L1 )
     s_e0, s_e1, s_n0, s_n1 = CONTROL_STAIR
-    stair( model, ( s_e0, s_n0 ), ( s_e1, s_n1 ), 0.0, L1, "-e", side="rh_wall_dark" )
-    stair_rail( model, ( s_e0, s_n0 + 2 ), ( s_e1, s_n1 - 2 ), 0.0, L1, "-e", sides=( True, False ) )
+    stair( model, ( s_e0, s_n0 ), ( s_e1, s_n1 ), 0.0, L1, "-e", side="rh_wall_dark", draw=not RS.CONTROL )   # RS: Sources/ReefHall/stairs-v1
+    stair_rail( model, ( s_e0, s_n0 + 2 ), ( s_e1, s_n1 - 2 ), 0.0, L1, "-e", sides=( True, False ), draw=not RS.CONTROL )
     for e in ( 1800.0, 2100.0 ):
         downlight_line( model, ( e, 600 ), ( e, 860 ), L1 - SLAB, every=110 )
     downlight_line( model, ( 1800, -60 ), ( 1800, 500 ), L1 - SLAB, every=110 )
@@ -2082,8 +2111,8 @@ def control_room( model, inside, lights, rng ):
 
     # The office: glass walls, a lower ceiling with a light strip, desks.
     o_e0, o_e1, o_n0, o_n1 = OFFICE
-    partition( model, ( 1880, o_n0 ), ( o_e1, o_n0 ), L1, OFFICE_TOP, gaps=( ( 120, 200 ), ) )
-    partition( model, ( o_e1, o_n0 ), ( o_e1, o_n1 ), L1, OFFICE_TOP, gaps=( ( 60, 130 ), ) )
+    partition( model, ( 1880, o_n0 ), ( o_e1, o_n0 ), L1, OFFICE_TOP, gaps=( ( 120, 200 ), ), draw=not RS.OFFICE )     # RS: Sources/ReefHall/office-partitions-v1
+    partition( model, ( o_e1, o_n0 ), ( o_e1, o_n1 ), L1, OFFICE_TOP, gaps=( ( 60, 130 ), ), draw=not RS.OFFICE )
     model.box( ( o_e0, o_n0, OFFICE_TOP ), ( o_e1 + 2.5, o_n1, OFFICE_TOP + 12 ),
                { "-z": "rh_ceiling", "+z": "rh_gunmetal", "+e": "rh_gunmetal", "-n": "rh_gunmetal", "default": None }, STONE )
     for e in ( 1820.0, 1980.0, 2140.0 ):
@@ -2304,10 +2333,10 @@ def filter_hall( model, inside, lights, rng ):
     railing( model, ( 586, 1298 ), ( 972, 1298 ), L1, glass=False )
     railing( model, ( 588, 1250 ), ( 588, 1298 ), L1, glass=False )
     for lo, hi, climb in FILTER_STAIRS:
-        metal_stair( model, lo, hi, 0.0, L1, climb )
+        metal_stair( model, lo, hi, 0.0, L1, climb, draw=not RS.FILTER )     # RS: Sources/ReefHall/filter-stairs-v1
         stair_rail( model, ( lo[0] + ( 0 if climb[1] == "e" else 2 ), lo[1] + ( 2 if climb[1] == "e" else 0 ) ),
                     ( hi[0] - ( 0 if climb[1] == "e" else 2 ), hi[1] - ( 2 if climb[1] == "e" else 0 ) ), 0.0, L1, climb,
-                    sides=( True, True ) if climb[1] == "e" else ( False, True ) )
+                    sides=( True, True ) if climb[1] == "e" else ( False, True ), draw=not RS.FILTER )
     for e in range( -1000, 1000, 160 ):
         downlight_rings( model, ( e + 80, 1760 ), L1 - SLAB )
 
@@ -2521,7 +2550,7 @@ def tunnel_hall( model, inside, lights, rng ):
     drain( model, -1000, -160, -1504, -1496, NAVE_Z )
     drain( model, 160, 1000, -1504, -1496, NAVE_Z )
     for e in ( -560.0, 560.0 ):
-        bench( model, ( e, -1500 ), 0.0, z=NAVE_Z )
+        bench( model, ( e, -1468 if e < 0 else -1500 ), 0.0, z=NAVE_Z )
     for e in ( -820.0, 820.0 ):
         display_case( model, ( e, -1500 ), ( 44, 44 ), z=NAVE_Z, tank_name="display", rng=rng, inside=inside )
     skip_cases( rng, stacks=3 )
@@ -3223,6 +3252,9 @@ def write_scene( rooms, lights ):
                for kind in ( "Bench", "Stand" )
                for k, prop in enumerate( p for p in model.props if p.get( "kind" ) == kind ) ) ) ] )
     building['Children'].append(DP.scene_object(ids))
+    building['Children'].extend(RD.scene_objects(ids))
+    building['Children'].extend(RL.scene_objects(ids))
+    building['Children'].extend(RS.scene_objects(ids))
     light_objects = [
         K.game_object( ids, name, f"light/{name}", K.to_world( position ), tags="light_point,light", components=[
             K.component( ids, "Sandbox.PointLight", f"light/{name}/light", Attenuation=1, FogMode="Enabled", FogStrength=1,
@@ -3303,6 +3335,7 @@ def write_scene( rooms, lights ):
                          EndDistance=9000, FalloffExponent=1.4, Height=1200, VerticalFalloffExponent=1.0 ),
         ] ),
         building,
+        *OfficeDoors.scene_objects( ids ),
         climbable_pipe_objects(),
         K.game_object( ids, "Fauna", "fauna", children=fauna_objects( rooms ) ),
         K.game_object( ids, "Lights", "lights", children=light_objects ),

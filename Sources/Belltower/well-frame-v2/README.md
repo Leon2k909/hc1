@@ -13,4 +13,4 @@ during streaming when another editor selection changed, before camera/model muta
 Effective GPU exposure is not independently measured.
 
 Evidence: `output/belltower/well-frame-v2/{before,after}-final.png`, with camera/restore receipts.
-Native compile/source verification: `review.json`. NOT installed; awaiting visual approval.
+Native compile/source verification: `review.json`. Approved and installed. Removed 72 old render triangles from three mesh sources; deleted eleven obsolete private assets. Native centre compilation, scene save and physics/object-ID/editor-state preservation passed. See installed.json.

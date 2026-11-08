@@ -14,7 +14,7 @@ if not (OUT/'source-guard.json').exists():
  (OUT/'source-guard.json').write_text(json.dumps({str(p.relative_to(ROOT)).replace('\\','/'):sha(p) for p in paths if p.is_file() and p.suffix!='.meta' and not p.name.endswith('_c') and 'sand-bin-v1' not in p.parts},indent=2))
 audit=dict(target='Court sand bin at (-1250,258)',existing_improvement_found=False,checked=['Sources and docs for sand_bin/grit_bin','Asset filenames for sand/grit models','Existing Boxyard wheelie bin and Railhead station bin upgrades'],findings=['No existing sand/grit bin replacement found','Wheelie bin and station bin shapes are different functional props','Live bin is still the original box and flat lid'],reuse=['Original yellow finish and SAND label atlas'])
 (OUT/'existing-upgrade-audit.json').write_text(json.dumps(audit,indent=2))
-legacy=K.Model();Y.sand_bin(legacy,'court sand',(-1250,258),(0,1));R.configure(legacy);K.write_obj(OUT/'legacy-body.obj',legacy,'legacy_body')
+legacy=K.Model();Y.legacy_sand_bin(legacy,'court sand',(-1250,258),(0,1));R.configure(legacy);K.write_obj(OUT/'legacy-body.obj',legacy,'legacy_body')
 K.write_obj(OUT/'legacy-full.obj',legacy,'legacy_full')
 def records(path):
  lines=path.read_text().splitlines(keepends=True);vs=[tuple(round(float(v),3) for v in l.split()[1:4]) for l in lines if l.startswith('v ')]

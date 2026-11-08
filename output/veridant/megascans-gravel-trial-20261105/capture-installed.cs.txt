@@ -1,0 +1,51 @@
+var root = Sandbox.Project.Current.GetRootPath();
+var config = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/veridant/megascans-gravel-trial-20261105/capture-request.json")));
+var destination = System.IO.Path.Combine(root,"output/veridant/quality",config["directory"].GetValue<string>());
+System.IO.Directory.CreateDirectory(destination);
+var before = Editor.SceneEditorSession.Active;
+var gameId = Game.ActiveScene?.Id; var playing = Game.IsPlaying;
+var scene = Scene.CreateEditorScene();
+var flags = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic;
+try {
+    var data = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"Assets/scenes/maps/Veridant/veridant.scene"))).AsObject();
+    var visual = new System.Collections.Generic.HashSet<string>(StringComparer.OrdinalIgnoreCase) { "Sun","Sky","Fog","Look","Veridant","Lights","Reflection Probes","Volumetric Fog" };
+    var objects = new System.Text.Json.Nodes.JsonArray();
+    foreach (var obj in data["GameObjects"].AsArray()) if(visual.Contains(obj["Name"]?.GetValue<string>() ?? "")) objects.Add(obj.DeepClone());
+    data["GameObjects"] = objects;
+    data["SceneProperties"]["NavMesh"]["Enabled"] = false;
+    data["SceneProperties"]["WantsSystemScene"] = false;
+    CameraComponent camera;
+    using(scene.Push()) {
+        scene.Deserialize(data);
+        var go = new GameObject(true,"Removal verification camera");
+        camera = go.Components.Create<CameraComponent>();
+        camera.WorldPosition = Vector3.Parse(config["position"].GetValue<string>());
+        camera.WorldRotation = Rotation.From(Angles.Parse(config["angles"].GetValue<string>()));
+        camera.FieldOfView = config["fov"].GetValue<float>();
+        camera.FovAxis = CameraComponent.Axis.Horizontal;
+        camera.CustomSize = new Vector2(config["width"].GetValue<int>(), config["height"].GetValue<int>());
+        camera.ZNear=4;camera.ZFar=120000;
+        foreach(var tone in scene.GetAllComponents<Tonemapping>()) {
+            tone.MinimumExposure=tone.MaximumExposure=config["exposure"].GetValue<float>();
+            tone.ExposureCompensation=0;
+            tone.Mode=Enum.Parse<Tonemapping.TonemappingMode>("ACES");
+        }
+    }
+    using var bitmap = new Bitmap(config["width"].GetValue<int>(),config["height"].GetValue<int>());
+    var cameraProperty=typeof(Scene).GetProperty("Camera",flags);
+    for(var frame=0;frame<20;frame++) {
+        using(scene.Push()) {
+            scene.EditorTick(.016f,.016f);
+            cameraProperty.SetValue(scene,camera);
+            typeof(Scene).GetMethod("PreRender",flags,null,Type.EmptyTypes,null).Invoke(scene,null);
+            typeof(Scene).GetMethod("PreCameraRender",flags,null,Type.EmptyTypes,null).Invoke(scene,null);
+            var post=scene.GetSystem<PostProcessSystem>();
+            typeof(PostProcessSystem).GetMethod("UpdateCamera",flags)?.Invoke(post,new object[]{camera});
+            camera.RenderToBitmap(bitmap,false);
+        }
+        await Task.Delay(33,cancellationToken);
+    }
+    var path=System.IO.Path.Combine(destination,config["name"].GetValue<string>()+".png");
+    System.IO.File.WriteAllBytes(path,bitmap.ToPng());
+    return new { Path=path, ErrorModels=scene.GetAllComponents<ModelRenderer>().Where(r=>r.Model is null || r.Model.IsError).Select(r=>r.GameObject.Name).ToArray(), EditorStatePreserved=ReferenceEquals(before,Editor.SceneEditorSession.Active)&&Game.ActiveScene?.Id==gameId&&Game.IsPlaying==playing };
+} finally { scene.Destroy(); }

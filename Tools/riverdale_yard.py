@@ -1370,6 +1370,15 @@ def cable_reel( m, name, c, axis, R=20.0, width=26.0, wound=15.0 ):
 
 def sand_bin( m, name, c, facing ):
     """ A yellow sand bin with a sloping lid, its label to the front. """
+    if np.allclose(np.asarray(c)[:2],(-1250.,258.)) and np.allclose(unit2(facing),(0.,1.)):
+        f=unit2(facing);right=np.cross(UP,v(f[0],f[1],0))
+        note('prop',name,rect_pts(np.asarray(c)[:2],right[:2],36.0,26.0),30.0)
+        return  # Approved independent Court Sand Bin; retain original collision note.
+    legacy_sand_bin(m,name,c,facing)
+
+
+def legacy_sand_bin(m,name,c,facing):
+    """Original sand bin for other placements and historical review baselines."""
     f = unit2( facing )
     fv = v( f[0], f[1], 0 )
     right = np.cross( UP, fv )

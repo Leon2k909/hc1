@@ -1,0 +1,15 @@
+// Quixel Stucco Wall vigrejf: 2 x 2 m scan; original 2K maps.
+Layer0
+{
+ shader "shaders/complex.shader"
+ F_SPECULAR 1
+ g_flMetalness "0"
+ g_flRoughnessScaleFactor "1"
+ g_vColorTint "[1.30 1.25 1.16 1]"
+ g_flModelTintAmount "1"
+ g_vTexCoordScale "[3.2512 3.2512]"
+ TextureColor "materials/ridgeback/quixel_stucco_v1/Stucco_Wall_vigrejf_2K_BaseColor.jpg"
+ TextureNormal "materials/ridgeback/quixel_stucco_v1/Stucco_Wall_vigrejf_2K_Normal.jpg"
+ TextureRoughness "materials/ridgeback/quixel_stucco_v1/Stucco_Wall_vigrejf_2K_Roughness.jpg"
+ TextureAmbientOcclusion "materials/ridgeback/quixel_stucco_v1/Stucco_Wall_vigrejf_2K_AO.jpg"
+}

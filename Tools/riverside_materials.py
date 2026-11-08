@@ -17,7 +17,7 @@ Run this before Tools/riverside_map.py. It writes:
     rs_plywood      plywood sheets nailed over windows, water stained (96 in tile)
     rs_wood         weathered grey planks: porches, decks, crates, fences (64 in tile)
     rs_pole         creosoted pole timber, checked along its grain (64 in tile)
-    rs_ties         railroad ties stacked into the retaining walls (96 in tile)
+    rs_ties         railroad ties stacked into the retaining walls, from a real scan (Tools/riverside_sleepers.py, 96 in tile)
     rs_concrete     cracked, dirty slabs and steps (192 in tile)
     rs_rust         rusted sheet steel: drums, the wrecked truck, the towers (48 in tile)
     rs_chainlink    galvanised 2 in chain-link, alpha tested (24 in tile)
@@ -1581,7 +1581,12 @@ def all_paints():
 
 def build( name, out ):
     done = {}
-    if name in SURFACES:
+    if name == "rs_ties":
+        # The sleeper walls are laid out from a real timber scan (Tools/riverside_sleepers.py, 2026-11-07); ties() is the
+        # old paint, kept for reference, and its rs_ties_*.jpg maps stay on disk.
+        import riverside_sleepers
+        done[name] = riverside_sleepers.write( out, max( 512, px( 4096 ) ) ) * 255
+    elif name in SURFACES:
         c, r, h, ppi = SURFACES[name]()
         tints = SIDING_TINTS if name == "rs_siding" else BOARD_TINTS if name == "rs_boards" else None
         done[name] = write_surface( out, name, c, r, h, ppi, METALNESS.get( name, 0.0 ), tints=tints )

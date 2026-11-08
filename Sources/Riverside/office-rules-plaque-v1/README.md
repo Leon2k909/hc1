@@ -1,0 +1,9 @@
+# Riverside Park Rules sign - revised review
+
+User rejected the orange/rusty perimeter. Revised model uses neutral grey sheet metal, rounded corners, a thin closed edge/back return, subtle pressed border, two centreline screws and small irregular exposed-metal paint losses. The top-right and bottom-left corners bend away from the wall between the screws. Analytic per-vertex normals smooth the curl. The original worn print/UVs remain unchanged; no orange material or front perimeter tube. Rejected screenshots are archived under rejected-orange-rim/.
+
+Same original21.818 x30-inch sign, engine -579.4,622.767076,176,yaw0. Three LODs2120/864/320 triangles, switches15/40. Resource models/props/riverside/office_rules_plaque_v1/plaque.vmdl. Existing rs_signs,rs_steel,rs_alu,rs_dark materials reused unchanged; no new materials/textures/lights/collision. Actual thin sheet with folded back perimeter and rounded corners; centre screws allow the outside corners to curl plausibly.
+
+Not installed. Exactly2 original sign triangles hidden only in a private current-pad copy; public pad and saved scene hashes verified unchanged. Native models valid; whole/detail/context captures use matched cameras/exposure and existing map lights without fill. Shared sign/lit atlases requested at4096 for original print. Whole/detail visually inspected after smoothing. Geometry, winding and UV checks pass on all3 LODs. No gameplay/LOD-transition test.
+
+Recipe build.py, verify.py ., review-office-rules.cs.txt, compose.py .; prefix shell commands with rtk. Disposable render scene destroyed in finally. Evidence output/riverside/office-rules-plaque-v1/final-review.json and screenshots. Approval required before integrating the2-triangle source cut and narrow generator hook. The private pad copy must never replace the public pad model.

@@ -1,0 +1,15 @@
+var type=typeof(Editor.SceneEditorSession);var flags=System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic|System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.Static;
+var ops=typeof(System.Reflection.Emit.OpCodes).GetFields().Where(f=>f.FieldType==typeof(System.Reflection.Emit.OpCode)).Select(f=>(System.Reflection.Emit.OpCode)f.GetValue(null)).ToDictionary(o=>(ushort)o.Value);
+var result=new System.Collections.Generic.Dictionary<string,object>();
+foreach(var name in new[]{"CreateFromPath","MakeActive","set_Active"})
+{
+ var method=type.GetMethods(flags).Single(m=>m.Name==name);var bytes=method.GetMethodBody()?.GetILAsByteArray();var calls=new System.Collections.Generic.List<string>();
+ for(int i=0;bytes!=null&&i<bytes.Length;)
+ {
+  ushort code=bytes[i++];if(code==254)code=(ushort)(0xfe00|bytes[i++]);var op=ops[code];var operand=op.OperandType;
+  if(operand==System.Reflection.Emit.OperandType.InlineMethod){int token=BitConverter.ToInt32(bytes,i);try{var target=method.Module.ResolveMethod(token);calls.Add(target.DeclaringType.FullName+"."+target);}catch{} }
+  int size=operand switch{System.Reflection.Emit.OperandType.InlineNone=>0,System.Reflection.Emit.OperandType.ShortInlineBrTarget=>1,System.Reflection.Emit.OperandType.ShortInlineI=>1,System.Reflection.Emit.OperandType.ShortInlineVar=>1,System.Reflection.Emit.OperandType.InlineVar=>2,System.Reflection.Emit.OperandType.InlineI8=>8,System.Reflection.Emit.OperandType.InlineR=>8,System.Reflection.Emit.OperandType.InlineSwitch=>4+4*BitConverter.ToInt32(bytes,i),_=>4};i+=size;
+ }
+ result[name]=calls;
+}
+return result;

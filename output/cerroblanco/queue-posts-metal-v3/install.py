@@ -1,0 +1,9 @@
+from pathlib import Path
+import json,hashlib
+R=Path('C:/sbox-projects/hc1/forked-shooter-main');O=R/'output/cerroblanco/queue-posts-metal-v3';S=R/'Assets/models/maps/cerroblanco/cerroblanco_fitout_fine.obj'
+p=json.loads((O/'checks.json').read_text());assert hashlib.sha256(S.read_bytes()).hexdigest()==p['source_sha256']
+B=O/'installed';B.mkdir(exist_ok=True);(B/'before.obj').write_bytes(S.read_bytes());(B/'before.vmdl').write_bytes(S.with_suffix('.vmdl').read_bytes())
+code='''var root=Sandbox.Project.Current.GetRootPath();var o=System.IO.Path.Combine(root,"output/cerroblanco/queue-posts-metal-v3");var dest=System.IO.Path.Combine(root,"Assets/models/maps/cerroblanco/cerroblanco_fitout_fine.obj");System.IO.File.WriteAllText(dest,System.IO.File.ReadAllText(System.IO.Path.Combine(o,"stage/models/maps/cerroblanco/queue-posts-metal-v3/fine.obj")).Replace("mtllib fine.mtl","mtllib cerroblanco_fitout_fine.mtl"));var model=System.IO.Path.ChangeExtension(dest,".vmdl");System.IO.File.WriteAllText(model,System.IO.File.ReadAllText(System.IO.Path.Combine(o,"stage/models/maps/cerroblanco/queue-posts-metal-v3/fine.vmdl")).Replace("models/maps/cerroblanco/queue-posts-metal-v3/fine.obj","models/maps/cerroblanco/cerroblanco_fitout_fine.obj"));Editor.AssetSystem.RegisterFile(dest);Editor.AssetSystem.RegisterFile(model);return new{Installed=true};'''
+(O/'install.json').write_text(json.dumps({'code':code}))
+(R/'Tools/cerroblanco_queue_posts.py').write_text((R/'Sources/CerroBlanco/queue-posts-metal-v3/model.py').read_text())
+f=R/'Tools/cerroblanco_fitout.py';s=f.read_text();marker='    """ Queue posts (chrome, weighted bases) with black belts between them. """';s=s.replace(marker,marker+'\n    from cerroblanco_queue_posts import LANES,build\n    if list(points)==LANES[0]:\n        m.extend(build());return\n    if list(points)==LANES[1]:return');f.write_text(s)

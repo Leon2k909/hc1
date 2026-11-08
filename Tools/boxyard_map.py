@@ -523,10 +523,16 @@ WALL_RUNS = [
     ( "South", ( 0.0, 1.0 ), ( 800.0, -832.0 ), ( -800.0, -832.0 ) ),
 ]
 PANELS = 7
+# Since 2026-11-06 the wall is drawn by separate models (Sources/Boxyard/perimeter-wall-v1/): a panel between two posts and a
+# pier at each post, placed as scene objects by wall_objects() (they have no colliders). The yard model keeps only the wall's
+# four collision boxes. OLD_WALL_IN_YARD = True draws the old faces into the yard model again and drops the instances
+# (Sources/Boxyard/perimeter-wall-v1/revert.py does the same on the files that are already written).
+OLD_WALL_IN_YARD = False
+WALL_MODEL_DIR = "models/props/boxyard/perimeter_wall_v1"
 
 
-def wall( m ):
-    """ Precast concrete panels between steel H-posts, 128 high, with two strands of wire over them. """
+def old_wall_faces( m ):
+    """ The old wall's drawn faces: precast concrete panels between steel H-posts, 128 high, with two strands of wire over them. """
     for name, normal, left, right in WALL_RUNS:
         N = np.array( ( *normal, 0.0 ) )
         a0, b0 = np.array( ( *left, 0.0 ) ), np.array( ( *right, 0.0 ) )
@@ -549,6 +555,12 @@ def wall( m ):
         middle = -N * ( WALL_T / 2 )
         for z in ( 134.0, 140.0 ):
             rod( m, a0 + middle + up * z, b0 + middle + up * z, 0.15, "bx_galv", sides=4 )
+
+
+def wall( m ):
+    """ The wall's collision, four boxes round the yard: what stops players and shots. How it looks is wall_objects(). """
+    if OLD_WALL_IN_YARD:
+        old_wall_faces( m )
     m.collision_box( ( 798, -870, -16 ), ( 830, 870, WALL_H ), STONE )
     m.collision_box( ( -830, -870, -16 ), ( -798, 870, WALL_H ), STONE )
     m.collision_box( ( -870, 830, -16 ), ( 870, 862, WALL_H ), STONE )
@@ -1089,6 +1101,38 @@ def bin_object( e, n, heading, colour ):
                      Model=f"{WHEELIE_BIN_DIR}/wheelie_bin_{colour}.vmdl", RenderType="On", Tint="1,1,1,1" ) ] )
 
 
+def wall_objects():
+    """ The perimeter wall's draw-only models, under one "Perimeter Wall" object: a panel between each two of a run's posts
+    (a and b alternate along the north and south runs, 228.571 a panel; c and d along the east and west runs, 240) and a pier
+    at each post (the north and south runs end against the east and west ones, so no pier at their ends). A model's x runs
+    along the wall, left to right seen from the yard, its y goes out of the yard and its origin is on the inner face at the
+    post, so an instance needs only the run's yaw. Their 56 instances sit where the old wall's 28 panels and 32 posts were. """
+    if OLD_WALL_IN_YARD:
+        return []
+    out = []
+    for name, normal, left, right in WALL_RUNS:
+        a0, b0 = np.array( left, float ), np.array( right, float )
+        along = ( b0 - a0 ) / np.linalg.norm( b0 - a0 )
+        yaw = math.degrees( math.atan2( -along[0], along[1] ) )        # plan ( e, n ) is world ( n, -e )
+        yaw = 180.0 if abs( yaw + 180.0 ) < 1e-9 else ( 0.0 if abs( yaw ) < 1e-9 else yaw )
+        crosswise = name in ( "North", "South" )
+        panels = ( "perimeter_panel_a_v1", "perimeter_panel_b_v1" ) if crosswise else ( "perimeter_panel_c_v1", "perimeter_panel_d_v1" )
+        for k in range( PANELS + 1 ):
+            c = a0 + ( b0 - a0 ) * k / PANELS
+            at = K.to_world( ( round( float( c[0] ), 4 ), round( float( c[1] ), 4 ), 0.0 ) )
+            items = []
+            if k < PANELS:
+                items.append( ( "Panel", panels[k % 2] ) )
+            if not ( crosswise and k in ( 0, PANELS ) ):
+                items.append( ( "Pier", ( "perimeter_pier_a_v1", "perimeter_pier_b_v1" )[k % 2] ) )
+            for kind, stem in items:
+                key = f"world/wall/{name.lower()}/{kind.lower()}/{k}"
+                out.append( K.game_object( ids, f"{name} {kind} {k + 1}", key, at, K.yaw_rotation( yaw ), components=[
+                    K.component( ids, "Sandbox.ModelRenderer", f"{key}/renderer", BodyGroups=18446744073709551615,
+                                 Model=f"{WALL_MODEL_DIR}/{stem}.vmdl", RenderType="On", Tint="1,1,1,1" ) ] ) )
+    return [ K.game_object( ids, "Perimeter Wall", "world/wall", children=out ) ]
+
+
 def probe_object( name, centre, box ):
     e0, e1, n0, n1, z0, z1 = box
     at = K.to_world( centre )
@@ -1128,7 +1172,8 @@ def write_scene( written, light_list, probe_list, tops ):
         *( cone_object( *placed ) for placed in CONES ),
         *( ibc_object( *placed ) for placed in IBCS ),
         *( bin_object( *placed ) for placed in BINS ),
-        *gantry_objects() ] )
+        *gantry_objects(),
+        *wall_objects() ] )
     light_objects = [
         K.game_object( ids, name, f"light/{name}", K.to_world( position ), tags="light_point,light", components=[
             K.component( ids, "Sandbox.PointLight", f"light/{name}/light", Attenuation=1, FogMode="Enabled", FogStrength=1,

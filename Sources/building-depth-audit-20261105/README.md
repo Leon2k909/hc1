@@ -1,0 +1,9 @@
+# Building depth audit — 2026-11-05
+
+Requested after the approved Riverdale court sand-bin installation. Read-only native inspection of two locally authored maps, with the user's Cerroblanco scene stopped and clean. Temporary scenes used existing map lighting; no scene switch, source/resource mutation, new lights or geometry proposal was made. Captures and preservation receipt are under `output/building-depth-audit-20261105`.
+
+Best candidate: Orion's undercroft/deck south face. `Tools/orion_map.py:527` emits four door/lit-panel boxes only 0.1 inches deep against the solid concrete wall (plan n=900). The mezzanine's upper lit doorway is only 0.2 inches deep. Actual engine context/detail captures confirm featureless flush rectangles with no jamb depth or frames. Add properly inset panels/doors, concrete reveals, projecting frames, thresholds/sills and a transom where appropriate. Preserve existing routes/collision unless separately requested. This is a major visible improvement at player height, rather than adding tiny surface decoration.
+
+Second candidate: Riverside's Lucky Stop storefront. `Tools/riverside_map.py:461` draws the shop-window image, black surround and neon artwork as flat quads, offset fractions of an inch from the clapboard wall. Native screenshots show the flat bright shelf picture and blank door-like slab. A real frame, inset glazing, sill, mullions and shallow interior depth would improve side views. Existing approved sign, fridges, ice cabinet, steps and lighting should be retained.
+
+Railhead backdrop was also checked in source and already has holed walls, six-inch window reveals and projecting sills/dressings, so it is a weaker target. Veridant's main lobby already has physical glazing mullions and wall openings. Its distant village uses shallow window cards, but those background buildings are lower priority than player-facing façades.

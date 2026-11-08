@@ -223,7 +223,8 @@ def launch_mount( m, centre, top_z, w=520.0, d=520.0, hole=220.0, name="mount" )
         beam( m, c + dvec * ( h2 + 30 ) + UP * zt, c + dvec * ( h2 - 10 ) + UP * ( zt + 40 ), 10, "oa_steel" )
     for k, ( sx, sy ) in enumerate( ( ( -1, -1 ), ( 1, -1 ), ( 1, 1 ), ( -1, 1 ) ) ):
         q = c + v( sx * ( w / 2 - 40 ), sy * ( d / 2 - 40 ), zt )
-        box( m, q[0] - 14, q[0] + 14, q[1] - 10, q[1] + 10, zt, zt + 40, "oa_dark" )
+        from orion_mount_pedestals import build as draw_service_pedestal
+        draw_service_pedestal(m,q)
         work_lamp( m, q + v( 0, 0, 46 ), f"{name} lamp {k}" if k % 2 == 0 else None, 220 )
     # Pipes along the deck's sides.
     for k, r_ in enumerate( ( 9.0, 6.0, 6.0 ) ):

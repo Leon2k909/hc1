@@ -1,0 +1,1 @@
+{"code":"return Editor.SceneEditorSession.All.Select(s=>new{Scene=s.Scene?.Name,Renderers=s.Scene?.GetAllComponents<ModelRenderer>().Where(x=>x.GameObject.Name==\"Buildings\" || (x.Model?.ResourcePath?.Contains(\"veridant_buildings\")??false)).Select(x=>new{x.Id,x.GameObject.Name,Model=x.Model?.ResourcePath}).ToArray()}).ToArray();"}

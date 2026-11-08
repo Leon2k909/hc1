@@ -1,0 +1,1 @@
+{"code": "var s=Editor.SceneEditorSession.Active;if(Game.IsPlaying||s.Scene.Name!=\"veridant\")throw new Exception(\"Wrong scene\");var go=s.Scene.GetAllObjects(true).Single(x=>x.Id==Guid.Parse(\"4cce916e-5444-49ba-b215-b15e4358ae50\"));var r=go.Components.Get<ModelRenderer>();return new{go.WorldPosition,Model=r.Model.ResourcePath,Override=r.MaterialOverride?.ResourcePath};"}

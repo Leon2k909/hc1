@@ -1,0 +1,11 @@
+Layer0
+{
+ shader "shaders/complex.shader"
+ F_SPECULAR "1"
+ TextureColor "materials/ares/bulkhead_lamp_native_v1/steel_color.png"
+ TextureNormal "materials/ares/bulkhead_lamp_native_v1/steel_normal.png"
+ TextureRoughness "materials/ares/bulkhead_lamp_native_v1/steel_roughness.png"
+ TextureAmbientOcclusion "materials/default/default_ao.tga"
+ g_flMetalness "0.96"
+ g_flRoughnessScaleFactor "1"
+}

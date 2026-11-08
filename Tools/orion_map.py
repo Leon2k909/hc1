@@ -47,6 +47,7 @@ import orion_task_chairs as OTC
 import orion_launch_vehicle as OLV
 import orion_cable_reel as OCR
 import orion_generator as OG
+import orion_deck_shed as ODS
 import orion_textures as OT
 import railhead_map as R
 import railhead_preview as PV
@@ -453,7 +454,8 @@ def launch_deck( m ):
     d0, d1, dn0, dn1 = DECK
     t0, t1, tn0, tn1 = TUNNEL
     # The deck's mass: solid west of the tunnel and east of it; the tunnel and the red room hollow under a slab.
-    box( m, d0, t0, dn0, dn1, 0, G, { "default": "oa_wall", "-y": "oa_wall_dark", "+z": "oa_deck" }, STONE )
+    # Approved recessed frontage is a separate renderer; retain this mass's collision.
+    box( m, d0, t0, dn0, dn1, 0, G, { "default": "oa_wall", "-y": "oa_wall_dark", "+z": "oa_deck" }, STONE, skip=("-n",) )
     box( m, t1, d1, dn0, dn1, 0, G, { "default": "oa_wall", "-y": "oa_wall_dark", "+z": "oa_deck" }, STONE )
     box( m, -900, d0, 700, dn1, 0, G, { "default": "oa_wall", "-y": "oa_wall_dark", "+z": "oa_deck" }, STONE )
     s0, s1, sn0, sn1 = DECK_STAIR
@@ -526,7 +528,7 @@ def launch_deck( m ):
         P.ceiling_light( m, f"Arcade lamp {k}", ( e, mn0 + 56, WALK_Z - 20 ), ( 1, 0 ), "warm", 300, light=k != 1, hang=6 )
     # The undercroft's back wall is the deck's south face: doors, lit alcoves, lamps, a poster.
     for k, e in enumerate( ( -500, -380, -250, -130 ) ):
-        box( m, e - 30, e + 30, dn0 - 0.1, dn0, 10, 96, "oa_window_lit" if k % 2 else "oa_door" )
+        # Door/window geometry now belongs to the approved recessed frontage.
         P.wall_light( m, f"Undercroft lamp {k}", ( e, dn0, 112 ), ( 0, -1 ), "cool" if k % 2 else "warm", 220 )
     OP.plate( m, "poster_safety", ( -315, dn0 - 0.4, 60 ), v( 1, 0, 0 ), 36 )
     OP.plate( m, "authorised", ( -200, dn0 - 0.4, 108 ), v( 1, 0, 0 ), 12 )
@@ -562,7 +564,8 @@ def launch_deck( m ):
     LCN.build( m, -360, 1290, G, "20", "e", "rw_container_red", door_end=1 )
     for k, ( e, n ) in enumerate( ( ( -520, 1110 ), ( 140, 1330 ), ( 330, 1060 ) ) ):
         OP.case_block( m, ( e, n ), ( 1, 0.1 * k ), 2, 1, ( 48, 30, 28 ), 1 + k % 2, "rv_case" if k % 2 else "rv_olive", seed=410 + k, z0=G )
-    box( m, -230, -110, 1290, 1380, G, G + 110, { "default": "oa_steel", "+z": "oa_dark" }, METAL )
+    # Approved standalone control shed (Sources/Orion/deck-shed-v1) replaces the plain render box; retain its collision.
+    ODS.collision( m, G )
     # More clutter on the deck's top (the picture's strip of machinery and cases along it): a generator, cable drums,
     # crates and a run of pipes on stands.
     # Approved standalone generator replaces the plain box; retain its collision.
@@ -1364,7 +1367,7 @@ def write_scene( written, light_list, path ):
           for name, title, collide, shadows in SCENE_MODELS if name in written ]
         + OTC.objects(ids, OP.CHAIRS)
         + OLV.objects(ids, OP.LAUNCH_VEHICLES)
-        + ( [ OCR.scene_object(), OG.scene_object() ] if "orion_launch_deck" in written else [] )
+        + ( [ OCR.scene_object(), OG.scene_object(), ODS.scene_object() ] if "orion_launch_deck" in written else [] )
         + [ red_crate_object( *placed ) for placed in OP.RED_CRATES ]
         + [ tarp_pile_object( *placed ) for placed in OP.TARP_PILES ]
         + [ whiteboard_object( *placed ) for placed in WHITEBOARDS ] )
@@ -1485,6 +1488,8 @@ def write_scene( written, light_list, path ):
         K.prefab_instance( ids, "prefabs/game_modes/bomb_defusal.prefab" ),
         K.prefab_instance( ids, "scenes/maps/defusemap_01/game_setup.prefab" ),
     ]
+    from orion_undercroft_facade import scene_object as undercroft_facade_object
+    objects.append(undercroft_facade_object(ids))
     scene = {
         "__guid": ids( "scene" ),
         "GameObjects": objects,

@@ -14,9 +14,203 @@ This file is kept short on purpose. The full notes that used to live here (~900 
 - Model upgrades: check existing approved models and pending review candidates before building a replacement and reuse suitable ones. Prioritize substantial rebuilds of crude assets; small detail passes were insufficient. Orion uses the existing dark Collider chair, not a pale duplicate (2026-11-04).
 - Prioritize model upgrades players can see up close during normal play; avoid inaccessible roofs and similar details (user request, 2026-11-04).
 - Always show both before and after images for model and graphics improvements, with matching camera, framing and lighting. Include both images directly in the review response.
+- Visual reviews and upgrade recommendations must use actual game/editor viewport captures. No temporary cameras, isolated scenes or offscreen renders unless explicitly requested and labelled; see `AGENTS.md` (user correction, 2026-11-05).
+- Terrain relief is selective: the user does not want rises on every map or repeated patches just for coverage. Add only where the local ground and surroundings justify it; leave suitable flat areas alone (user preference, 2026-11-05).
 - Keep this file small. Add new long notes as a new file in `docs/notes/` and a line in the index below.
 
 ## Index of docs/notes
+
+- [Veridant fountain roaring-lion crown - prototype layout: recumbent roaring bronze lions (CC-BY beachmouse scan, baked verdigris), carved acanthus pier, fitted bronze base; rejected as a downgrade, Barye crown restored, assets kept unused, 2026-11-08](Sources/Veridant/roaring-lion-crown/README.md)
+
+- [Riverside sleeper retaining walls - procedural rs_ties replaced by a texture laid out from the brown_planks_03 oak scan (43 px/in, Tools/riverside_sleepers.py), installed and kept by the user; old maps and vmat kept for rollback, 2026-11-07](Sources/Riverside/sleeper-wall-v1/README.md)
+
+- [Riverdale spawn guard huts v2 - plain 100 in box replaced by a steel-clad gatehouse (real glass on three sides, ribbed cladding, recessed door, lit furnished interior; 7,118 tris, map materials), render only; review pending, old faces kept, install.py revert tested, 2026-11-07](Sources/Riverdale/guard-hut-v1/README.md)
+
+- [Riverdale B1 control-room desk - plain box replaced by a steel workstation desk with drawers, kneehole and edge detail (1,006 tris, 3 LODs, map materials), render only; approved by the user, old box deleted, 2026-11-06](Sources/Riverdale/b1-desk-v1/README.md)
+
+- [Riverdale locker banks - eight plain steel slabs replaced by two-tier locker-bank models (4- and 6-door, 3 LODs, existing map materials), installed render-only, collision unchanged; approved by the user, old slabs deleted, 2026-11-06](Sources/Riverdale/locker-bank-v1/README.md)
+
+- [Orion launch-deck control shed - rebuilt (9.6k tris, 3 LODs, procedural textures), installed render-only; approved by the user, old box deleted, 2026-11-06](Sources/Orion/deck-shed-v1/README.md)
+
+- [Riverside utility poles — nine timber poles rebuilt (round trunk, bolted bevelled arms, steel braces, real-scan wood), approved and installed; old poles kept as utility_pole_original, revert.py tested, 2026-11-06](Sources/Riverside/utility-pole-v1/README.md)
+
+- [Veridant south garden pergola — approved teak materials/member helper reused, 2026-11-06](Sources/Veridant/garden-pergola-teak-v1-README.md)
+
+- [Veridant colonnade soil — existing courtyard material reused, 2026-11-06](Sources/Veridant/colonnade-soil-reuse-v1-README.md)
+
+- [Veridant colonnade tree — centred and rooted in stone planter; alternatives retained, 2026-11-06](Sources/Veridant/colonnade-tree-fit-v1-README.md)
+
+- [All six Cerro Blanco CCTV cameras replaced; legacy geometry and generator fallback removed, 2026-11-06](output/cerroblanco/all-cameras/README.md)
+
+- [Cerro Blanco courtyard CCTV — approved Riverdale model/materials reused, native review, 2026-11-06](Sources/CerroBlanco/courtyard-cctv-v1/README.md)
+
+- [All 11 red display vases installed; zero plain cylinders remaining, 2026-11-06](output/cerroblanco/all-vases/README.md)
+- [Cerro Blanco central cafe pendant shade — spun shell and rolled rim, native review, 2026-11-06](Sources/CerroBlanco/cafe-pendant-v1/README.md)
+
+- [Veridant café planter — approved Reef Hall bronze shell and textures reused, 2026-11-06](Sources/Veridant/colonnade-planter-reuse-v1-README.md)
+
+- [Veridant operations counter — original active; panel-built alternative retained unused, 2026-11-06](Sources/Veridant/operations-counter-v1-README.md)
+
+- [Veridant operations painting — reversed-facing frame corrected and print upgraded, 2026-11-06](Sources/Veridant/operations-art-v1-README.md)
+
+- [Veridant gallery garden painting — high-resolution east-wall print, 2026-11-06](Sources/Veridant/gallery-art-garden-v1-README.md)
+
+- [Veridant gallery seascape — high-resolution west-wall print, 2026-11-06](Sources/Veridant/gallery-art-sea-v1-README.md)
+
+- [Riverside spawn-pad watch deck — timber rebuild approved and installed; old deck kept as watch_deck_original; generator updated (OLD_DECK_IN_PAD), 2026-11-06](Sources/Riverside/watch-deck-v1/README.md)
+
+- [Veridant gallery olive-grove artwork — companion high-resolution print, 2026-11-06](Sources/Veridant/gallery-art-olive-v1-README.md)
+
+- [Veridant gallery coastal artwork — high-resolution generated print, 2026-11-06](Sources/Veridant/gallery-art-v1-README.md)
+
+- [Veridant rug texture density — tiled wool replaces stretched image, 2026-11-06](Sources/Veridant/gallery-rug-v3-README.md)
+
+- [Veridant generated wool rug — replaces rejected flat stripes, 2026-11-06](Sources/Veridant/gallery-rug-v2-README.md)
+
+- [Veridant gallery rug — woven surface, tonal stripes and bound edge, 2026-11-06](Sources/Veridant/gallery-rug-v1-README.md)
+
+- [Veridant terrace tarp — continuous UVs and matte woven canvas, 2026-11-06](Sources/Veridant/terrace-tarp-v1/README.md)
+
+- [Veridant kiosk wall lights — approved reception fixture reused, 2026-11-06](Sources/Veridant/kiosk-wall-lights-v1/README.md)
+
+- [Veridant kiosk service door — frame, panels and hardware replacing plain rectangle, 2026-11-06](Sources/Veridant/kiosk-service-door-v1/README.md)
+
+- [Veridant terrace utility cabinet — framed doors and vents replacing plain block, 2026-11-06](Sources/Veridant/kiosk-cabinet-v1/README.md)
+
+- [Veridant forecourt lamp posts — tapered shafts and shaped bases; original retained, 2026-11-06](Sources/Veridant/forecourt-posts-v1/README.md)
+
+- [Cerro Blanco queue bars — actual brushed colour/normal/roughness textures, close-up review; all variants retained, 2026-11-06](Sources/CerroBlanco/queue-posts-metal-v3/README.md)
+- [Cerro Blanco queue barrier — earlier silver finish retained, 2026-11-06](Sources/CerroBlanco/queue-posts-metal-v2/README.md)
+- [Cerro Blanco lobby queue barrier — first proposal retained, 2026-11-06](Sources/CerroBlanco/queue-posts-v1/README.md)
+- [Cerro Blanco cafe pan dulce — rounded buns and scored crusts installed, old meshes removed, 2026-11-06](Sources/CerroBlanco/pan-dulce-v1/README.md)
+- [Cerro Blanco cafe pastry display — curved glazing and continuous frames installed, old geometry removed, 2026-11-06](Sources/CerroBlanco/cafe-display-v1/README.md)
+- [Cerro Blanco second East Hall vase — approved vessel reused and installed, 2026-11-06](Sources/CerroBlanco/east-hall-vase-v2/README.md)
+- [Cerro Blanco cafe grinder — transparent hopper and dosing hardware installed, old geometry removed, 2026-11-06](Sources/CerroBlanco/cafe-grinder-v1/README.md)
+- [Cerro Blanco East Hall display vase — turned form and hollow mouth installed, old cylinder removed, 2026-11-06](Sources/CerroBlanco/gallery-vase-v1/README.md)
+- [Cerro Blanco courtyard bin — corrected hood sockets installed, old geometry removed, 2026-11-06](Sources/CerroBlanco/courtyard-bin-v1/README.md)
+- [Cerro Blanco courtyard bench — original active; standalone stone-pier/teak alternative retained for another map, 2026-11-06](Sources/CerroBlanco/courtyard-bench-piers-v1/README.md)
+
+- [Veridant terrace flag — smooth static cloth folds; original retained, 2026-11-06](Sources/Veridant/terrace-flag-v1/README.md)
+
+- [Veridant carved fountain bowl — hollow bowl and shaped pedestal; original retained, 2026-11-06](Sources/Veridant/fountain-bowl-v1/README.md)
+
+- [Veridant terrace pergola beam saddles — rejected and removed, 2026-11-06](Sources/Veridant/pergola-brackets-v1/README.md)
+
+- [Veridant café terrace pergola — bolted steel baseplates and collars, 2026-11-06](Sources/Veridant/pergola-bases-v1/README.md)
+
+- [Veridant lounge coffee tables — eased tops and recessed pedestals; original retained, 2026-11-06](Sources/Veridant/lounge-tables-v1/README.md)
+
+- [Veridant forecourt fountain water — existing pool water and stone liner reused, 2026-11-06](Sources/Veridant/fountain-water-v1/README.md)
+
+- [Veridant courtyard planter lights — originals active; louvred housings retained unused, 2026-11-06](Sources/Veridant/planter-lights-v1/README.md)
+
+- [Veridant gallery paintings — moved from glazing onto solid wall piers, 2026-11-06](Sources/Veridant/gallery-wall-art-v1/README.md)
+
+- [Cerro Blanco North Gallery terrace doors (saved and movement checked, 2026-11-06)](docs/notes/cerroblanco-north-gallery-terrace-doors-v1-20261106.md)
+
+- [Veridant terrace bar — plain bar restored; timber frontage retained unused, 2026-11-06](Sources/Veridant/terrace-bar-front-v1/README.md)
+
+- [Veridant north terrace lantern glazing frames — applied review, 2026-11-06](Sources/Veridant/lantern-posts-v1/README.md)
+
+- [Veridant forecourt fountain stone coping — applied review, 2026-11-06](Sources/Veridant/fountain-rim-v1/README.md)
+
+- [Veridant reception ceiling light bezels — applied review, 2026-11-06](Sources/Veridant/downlight-bezels-v1/README.md)
+
+- [Cerro Blanco café courtyard doors (saved and movement checked, 2026-11-06)](docs/notes/cerroblanco-cafe-courtyard-doors-v1-20261106.md)
+
+- [Veridant courtyard drains — rejected layout; all removed for continuous paving, 2026-11-06](Sources/Veridant/courtyard-drains-v1/README.md)
+
+- [Cerro Blanco café terrace doors (direct window comparison, 2026-11-06)](docs/notes/cerroblanco-cafe-terrace-doors-v1-20261106.md)
+
+- [Veridant terrace pedestal stools — applied review; old umbrella retained separately, 2026-11-06](Sources/Veridant/terrace-stools-v1/README.md)
+
+- [Veridant furled terrace umbrella — gathered cloth and fitted tie, applied review, 2026-11-05](Sources/Veridant/terrace-umbrella-v1/README.md)
+
+- [Reef Hall south office doors and glass transom (direct window comparison, 2026-11-05)](docs/notes/reefhall-office-doors-v1-20261105.md)
+
+- [Veridant reception stair rail — smooth tubes and mounted fixings, applied review, 2026-11-05](Sources/Veridant/reception-stair-rail-v1/README.md)
+
+- [Veridant café/lounge link doors (direct window comparison, 2026-11-05)](docs/notes/veridant-lounge-cafe-doors-v1-20261105.md)
+
+- [Veridant operations banner — static cloth folds, applied review, 2026-11-05](Sources/Veridant/operations-banner-v1/README.md)
+
+- [Veridant gallery roof-terrace doors (direct displayed viewport captures, 2026-11-05)](docs/notes/veridant-gallery-terrace-doors-v1-20261105.md)
+
+- [Veridant lounge side doors (direct displayed viewport captures, 2026-11-05)](docs/notes/veridant-lounge-side-doors-v1-20261105.md)
+
+- [Veridant reception entrance wall fixture — applied, 2026-11-05](Sources/Veridant/reception-wall-light-v1/README.md)
+
+- [Veridant café northwest doors (direct displayed viewport captures, 2026-11-05)](docs/notes/veridant-cafe-west-north-doors-v1-20261105.md)
+
+- [Veridant desk — original active; walnut rebuild retained as reusable shared prop, 2026-11-05](Sources/Veridant/reception-desk-v1/README.md)
+
+- [Veridant café west doors (direct displayed viewport captures, 2026-11-05)](docs/notes/veridant-cafe-west-doors-v1-20261105.md)
+
+- [Veridant lounge west doors (direct window captures, 2026-11-05)](docs/notes/veridant-lounge-west-doors-v1-20261105.md)
+
+- [Veridant reception sign v2 — rejected; original restored, 2026-11-05](Sources/Veridant/sign-v2/README.md)
+
+- [Veridant lounge garden doors (saved; runtime validation blocked, 2026-11-05)](docs/notes/veridant-lounge-garden-doors-v1-20261105.md)
+
+- [Veridant breakable railing panes (147 installed, 2026-11-05)](docs/notes/veridant-breakable-rails-20261105.md)
+
+- [Veridant operations south garden doors (actual viewport comparison, 2026-11-05)](docs/notes/veridant-ops-garden-doors-v1-20261105.md)
+
+- [Veridant operations east doors (actual viewport comparison, 2026-11-05)](docs/notes/veridant-ops-east-doors-v1-20261105.md)
+
+- [Veridant operations courtyard doors (actual viewport comparison, 2026-11-05)](docs/notes/veridant-ops-courtyard-doors-v1-20261105.md)
+
+- [Veridant upper gallery balcony doors (actual viewport comparison, 2026-11-05)](docs/notes/veridant-gallery-balcony-doors-v1-20261105.md)
+
+- [Veridant lounge courtyard doors (actual viewport comparison, 2026-11-05)](docs/notes/veridant-lounge-courtyard-doors-v1-20261105.md)
+
+- [Veridant north café entrance doors (actual viewport comparison, 2026-11-05)](docs/notes/veridant-cafe-north-doors-v1-20261105.md)
+
+- [Veridant upper operations lobby doors (installed, 2026-11-05)](docs/notes/veridant-ops-lobby-doors-v1-20261105.md)
+
+- [Veridant café south entrance doors (installed, 2026-11-05)](docs/notes/veridant-cafe-doors-v1-20261105.md)
+
+- [Ares main airlock lightbox (installed and native verified, 2026-11-05)](docs/notes/ares-main-airlock-sign-review-20261105.md)
+
+- [Ares northeast pump isolation valve (accepted valve reused; native review, 2026-11-05)](docs/notes/ares-pump-isolation-valve-review-20261105.md)
+
+- [Ares concourse pillar impact guard (rejected; original retained, 2026-11-05)](docs/notes/ares-concourse-column-guard-review-20261105.md)
+
+- [Ares west control-room operator console (approved core model reused; native review, 2026-11-05)](docs/notes/ares-west-operator-console-review-20261105.md)
+
+- [Door placement audit and candidate shortlist (2026-11-05)](docs/notes/door-placement-audit-20261105.md)
+- [Orion recessed undercroft façade (installed and native verified, 2026-11-05)](Sources/Orion/undercroft-facade-v1/README.md)
+- [Riverside shopfront depth (actual glazed openings and stocked interior; private native review, 2026-11-05)](Sources/Riverside/storefront-depth-v1/README.md)
+
+- [Ares west main-stair landing railing (native review, 2026-11-05)](docs/notes/ares-stair-landing-rail-review-20261105.md)
+
+- [Veridant usable glazed reception doors (2026-11-05)](docs/notes/veridant-reception-doors-v1-20261105.md)
+
+- [Ares west control-room display (existing approved monitor adapted, native review, 2026-11-05)](docs/notes/ares-control-room-display-review-20261105.md)
+
+- [Ares lower-hall bulkhead lamp installed (old embedded geometry removed, 2026-11-05)](docs/notes/ares-bulkhead-lamp-installed-20261105.md)
+
+- [Ridgeback town house Quixel stucco (exterior material review trial, 2026-11-05)](docs/notes/ridgeback-town-house-quixel-stucco-v1-20261105.md)
+
+- [Ridgeback Megascans brick workshop (single exterior review trial, 2026-11-05)](docs/notes/ridgeback-megascans-workshop-v1-20261105.md)
+
+- [Belltower well frame installed; gate pier review (2026-11-05)](docs/notes/belltower-well-installed-gate-pier-review-20261105.md)
+
+- [Cerro Blanco courtyard bench (compiled review candidate; not installed, 2026-11-05)](docs/notes/cerroblanco-courtyard-bench-v1-review-20261105.md)
+
+- [Riverside subtle trailer-yard edge (installed review trial, 2026-11-05)](docs/notes/riverside-trailer-yard-relief-v1-20261105.md)
+
+- [Riverside subtle entrance shoulder (installed review trial, 2026-11-05)](docs/notes/riverside-entrance-relief-v1-20261105.md)
+
+- [Veridant shallow south garden relief (installed review trial, 2026-11-05)](docs/notes/veridant-garden-relief-v1-20261105.md)
+
+- [Lowtide shallow mud-bank relief (installed review trial, 2026-11-05)](docs/notes/lowtide-mud-relief-v1-20261105.md)
+
+- [Belltower subtle orchard lawn relief (installed review trial, 2026-11-05)](docs/notes/belltower-orchard-relief-v1-20261105.md)
+
+- [Cerro Blanco subtle lawn relief (staged offline comparison, 2026-11-05)](docs/notes/cerroblanco-lawn-relief-v1-review-20261105.md)
+
+- [Landing impacts on moving surfaces (code only, 2026-11-05)](docs/notes/landing-relative-impact-20261105.md)
 
 - [Sprays and personal loading screens (code only, 2026-11-05)](docs/notes/sprays-and-loading-screens-20261105.md)
 
@@ -24,8 +218,9 @@ This file is kept short on purpose. The full notes that used to live here (~900 
 
 - [Radial blast impulse falloff (code only, 2026-11-04)](docs/notes/radial-blast-impulse-20261104.md)
 
-- [Riverside west-yard privacy fence (close-range rebuild in review, 2026-11-04)](docs/notes/riverside-yard-fence-v1-20261104.md)
-- [Riverside Lucky Stop timber entrance steps (approved installation, 2026-11-04)](docs/notes/riverside-store-timber-steps-v1-20261104.md)
+- [Riverdale north-lane fire hydrant (revision 2 realism review, 2026-11-05)](docs/notes/riverdale-hydrant-v1-20261105.md)
+- [Riverside west-yard privacy fence (installed; original deleted, 2026-11-05)](docs/notes/riverside-yard-fence-v1-20261104.md)
+- [Riverside Lucky Stop timber entrance steps (installed; originals deleted, 2026-11-05)](docs/notes/riverside-store-timber-steps-v1-20261104.md)
 
 - [Riverdale sand bin v3 (structural realism rebuild; staged review, 2026-11-04)](docs/notes/riverdale-sand-bin-v3-20261104.md)
 
@@ -37,11 +232,12 @@ This file is kept short on purpose. The full notes that used to live here (~900 
 - [Riverside guard-tower corrugated roof v1 (installed; original removed, 2026-11-04)](docs/notes/riverside-tower-roof-v1-review-20261104.md)
 - [Riverside STILL HERE plank board v1 (installed; old board removed, 2026-11-04)](docs/notes/riverside-still-here-board-v1-review-20261104.md)
 
-- [Riverdale sand bin (new model after existing-upgrade audit; staged review, 2026-11-04)](docs/notes/riverdale-sand-bin-v1-20261104.md)
+- [Riverdale sand bin (installed and native verified, 2026-11-05)](docs/notes/riverdale-sand-bin-v1-20261104.md)
 
 - [Reef Hall close-range display pedestal (installed; old geometry deleted, 2026-11-04)](docs/notes/reefhall-display-pedestal-v1-20261104.md)
 - [Reef Hall display coral (rejected; original retained, 2026-11-04)](docs/notes/reefhall-display-coral-v1-20261104.md)
-- [Riverside close-range T2 sliding-window frame (review candidate, 2026-11-04)](docs/notes/riverside-sliding-window-v1-20261104.md)
+- [Riverside close-range T2 sliding-window frame (installed, 2026-11-05)](docs/notes/riverside-sliding-window-v1-20261104.md)
+- [Ares close-range control console (existing proposal reused, native review, 2026-11-05)](docs/notes/ares-control-console-native-v1-20261105.md)
 
 - [Riverdale shared cone (existing approved asset reused; review) and reel installation, 2026-11-04](docs/notes/riverdale-shared-cone-v1-20261104.md)
 
@@ -70,7 +266,10 @@ This file is kept short on purpose. The full notes that used to live here (~900 
 - [ReefHall circulation pump v1 (filter-room replacement installed, 2026-11-04)](docs/notes/reefhall-circulation-pump-v1-review-20261104.md)
 - [Railhead smoking-area ashtrays v1 (all four installed; old geometry and preview removed, 2026-11-04)](docs/notes/railhead-ashtray-v1-review-20261104.md)
 - [ReefHall sealed wall light v1 (installed; old mesh and preview removed, 2026-11-04)](docs/notes/reefhall-wall-light-v1-review-20261104.md)
-- [Railhead taxi-rank sign v1 (review candidate; existing upgrades audited first, 2026-11-04)](docs/notes/railhead-taxi-post-v1-review-20261104.md)
+- [Railhead taxi-rank sign v1 (installed and native verified, 2026-11-05)](docs/notes/railhead-taxi-post-v1-review-20261104.md)
+- [Railhead platform help point (installed and native verified, 2026-11-05)](Sources/Railhead/help-point-v1/README.md)
+- [Railhead PA speaker (installed and native verified, 2026-11-05)](Sources/Railhead/pa-speaker-v2/README.md)
+- [Railhead concourse poster lightbox (installed and native verified, 2026-11-05)](Sources/Railhead/city-light-v1/README.md)
 
 - [Belltower terracotta pots v2 (all twelve installed, 2026-11-04)](docs/notes/belltower-terracotta-pots-v2-20261104.md)
 - [Preamble](docs/notes/00-preamble.md) (0 KB)
@@ -308,7 +507,9 @@ This file is kept short on purpose. The full notes that used to live here (~900 
 - [Reef Hall bronze entrance planter v1 (2 installed, 2026-11-04)](docs/notes/reefhall-bronze-planter-v1-20261104.md)
 - [Reef Hall upper-office workstation v1 (installed, old asset retained by request, 2026-11-04)](docs/notes/reefhall-office-desk-v1-review-20261104.md)
 - [Boxyard southwest pallet stack (rejected; keep original texture active, 2026-11-04)](docs/notes/boxyard-pallet-stack-v1-review-20261104.md)
-- [Orion launch-platform cage lights (review candidate, original materials retained, 2026-11-04)](docs/notes/orion-mount-lamps-v1-review-20261104.md)
+- [Orion launch-platform cage lights (4 installed, old assets removed by request, 2026-11-04)](docs/notes/orion-mount-lamps-v1-review-20261104.md)
+- [Orion launch-mount service pedestals (4 installed, old assets removed by request, 2026-11-05)](docs/notes/orion-mount-pedestals-v1-review-20261105.md)
+- [Reef Hall suspended whale skeleton (review candidate, original bone material retained, 2026-11-05)](docs/notes/reefhall-whale-skeleton-v1-review-20261105.md)
 - [Riverside cash register v1 (installed, 2026-11-04)](docs/notes/riverside-register-v1-20261104.md)
 - [Riverside camper rebuild (installed; old version deleted, 2026-11-04)](docs/notes/riverside-camper-v2-review-20261104.md)
 - [Riverside office rooftop AC v1 (installed, 2026-11-04)](docs/notes/riverside-roof-ac-v1-review-20261104.md)
@@ -335,3 +536,23 @@ This file is kept short on purpose. The full notes that used to live here (~900 
 
 - [Riverside folded blue tarp v1 (installed; original retained, 2026-11-04)](docs/notes/riverside-folded-tarp-v1-review-20261104.md)
 
+- [Riverside office porch railing (review candidate, 2026-11-05)](docs/notes/riverside-office-porch-rail-v1-review-20261105.md)
+
+- [Riverside office door (approved trailer door reused; installed, 2026-11-05)](docs/notes/riverside-office-door-reuse-v1-review-20261105.md)
+
+- [Riverside office Park Rules plaque (review candidate, 2026-11-05)](docs/notes/riverside-office-rules-plaque-v1-review-20261105.md)
+
+- [Veridant operations lobby garden window � removed opaque backing, retained original; 2026-11-06](Sources/Veridant/operations-window-backing-v1/README.md)
+
+- [Veridant east terrace lanterns � approved framing/post designs reused; originals retained, review pending, 2026-11-06](Sources/Veridant/east-lanterns-v1/README.md)
+
+- [Veridant map-wide framed lanterns � all 32 active, originals retained, 2026-11-06](Sources/Veridant/all-lanterns-v1/README.md)
+- [Veridant operations hall columns � smooth geometry and cylindrical stone UVs, originals retained, review pending, 2026-11-06](Sources/Veridant/hall-columns-v1/README.md)
+
+- [Veridant courtyard stair rail � smooth tubes and side anchors, original retained, review pending, 2026-11-06](Sources/Veridant/court-stair-rail-v1/README.md)
+
+- [Veridant cafe rooftop pergola � approved teak members/materials reused; original retained, review pending, 2026-11-06](Sources/Veridant/cafe-pergola-teak-v1/README.md)
+
+- [Veridant playable lawn � texture swap rejected and reverted; scan retained, 2026-11-06](Sources/Veridant/garden-lawn-reuse-v1/README.md)
+
+- [Veridant garden 3D grass � one-bed blade geometry review; original ground restored, 2026-11-06](Sources/Veridant/garden-grass-blades-v1/README.md)

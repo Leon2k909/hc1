@@ -1,0 +1,85 @@
+{
+  "__guid": "c6d51414-55c2-5f71-8bc2-10d21c8a152c",
+  "__version": 2,
+  "Flags": 0,
+  "Name": "Lucky Stop Open Glazed Entry",
+  "Position": "0,0,0",
+  "Rotation": "0,0,0,1",
+  "Scale": "1,1,1",
+  "Tags": "",
+  "Enabled": true,
+  "NetworkMode": 2,
+  "NetworkFlags": 0,
+  "NetworkOrphaned": 0,
+  "NetworkTransmit": true,
+  "OwnerTransfer": 1,
+  "Components": [
+    {
+      "__type": "Sandbox.ModelRenderer",
+      "__guid": "831654b3-e6e8-5d7f-9130-37ece5a968cc",
+      "__enabled": true,
+      "Flags": 0,
+      "Model": "models/props/riverside/store_entry_depth_v1/frame.vmdl",
+      "RenderType": "On",
+      "Tint": "1,1,1,1"
+    }
+  ],
+  "Children": [
+    {
+      "__guid": "5582d91a-ebf5-5619-8d52-430d5101720d",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Open Glazed Shop Door",
+      "Position": "640,-201.2,20",
+      "Rotation": "0,0,-0.7071068,0.7071068",
+      "Scale": "1,1.15609,0.74",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.ModelRenderer",
+          "__guid": "055fb635-30df-5ef6-a9ca-e46ae3ce9fcf",
+          "__enabled": true,
+          "Flags": 0,
+          "Model": "models/props/veridant/reception_doors_v1/leaf.vmdl",
+          "RenderType": "On",
+          "Tint": "1,1,1,1"
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "6a697dc3-670a-5e01-92fc-e3e0b215d1a2",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Open Glazed Shop Door",
+      "Position": "640,-268.8,20",
+      "Rotation": "0,0,-0.7071068,0.7071068",
+      "Scale": "1,1.15609,0.74",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.ModelRenderer",
+          "__guid": "de118b5b-bcdc-5e7c-8e4f-c0fe5c3f3208",
+          "__enabled": true,
+          "Flags": 0,
+          "Model": "models/props/veridant/reception_doors_v1/leaf.vmdl",
+          "RenderType": "On",
+          "Tint": "1,1,1,1"
+        }
+      ],
+      "Children": []
+    }
+  ]
+}

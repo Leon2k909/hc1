@@ -66,7 +66,7 @@ def make(lod):
   a=np.array(pts);n=np.array(n)
   horizontal=np.ptp(a[:,0])>10
   if horizontal:
-   coords=[(v[1]/12+.27,v[0]/64+.13) for v in a] if abs(n[0])<.7 else [(v[1]/12+.27,v[2]/12+.13) for v in a]
+   coords=[((v[1] if abs(n[2])>abs(n[1]) else v[2])/12+.27,v[0]/64+.13) for v in a]
   else:
    dominant=int(np.argmax(abs(n)))
    coords=[(v[0]/12+.27,v[2]/48+.13) for v in a] if dominant==1 else [(v[1]/12+.27,v[2]/48+.13) for v in a] if dominant==0 else [(v[0]/12+.27,v[1]/12+.13) for v in a]

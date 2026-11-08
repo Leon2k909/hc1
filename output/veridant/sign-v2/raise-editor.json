@@ -1,0 +1,1 @@
+{"code":"var t=AppDomain.CurrentDomain.GetAssemblies().Select(a=>a.GetType(\"Editor.EditorMainWindow\")).First(x=>x!=null); var w=(Editor.Widget)t.GetField(\"Current\",System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic).GetValue(null); w.Raise();w.Focus();w.Update(); return new { w.WindowTitle,w.Visible };"}

@@ -50,6 +50,7 @@ import railhead_map as R  # noqa: E402
 import railhead_preview as PV  # noqa: E402
 import riverside_materials as RM  # noqa: E402
 import riverside_parts as P  # noqa: E402
+import riverside_sliding_window as SW  # noqa: E402
 import riverdale_parts as RP  # noqa: E402
 from riverdale_parts import v, card, box, obox, rod, UP  # noqa: E402
 
@@ -319,7 +320,7 @@ RAISED = 96.0           # the raised trailer's stilts
 
 
 def build_trailer( name, L, W, tint, side, seed, extra ):
-    part, info = P.trailer( L, W, tint, seed=seed, door_side=side, lit_share=0.6, boarded_share=0.15, aerial_model=( name == "T2" ), entry_door_model=( name == "T2" ), hitch_model=( name == "T2" ), roof_vent_model=( name == "T2" ), entry_steps_model=( name == "T2" ) )
+    part, info = P.trailer( L, W, tint, seed=seed, door_side=side, lit_share=0.6, boarded_share=0.15, aerial_model=( name == "T2" ), entry_door_model=( name == "T2" ), hitch_model=( name == "T2" ), roof_vent_model=( name == "T2" ), entry_steps_model=( name == "T2" ), sliding_window_model=( name == "T2" ) )
     if extra in ( "porch", "porch_small" ):
         y0 = side * W / 2
         depth = 100 if extra == "porch" else 70
@@ -424,11 +425,12 @@ def store( m ):
     box( m, e0, e1, n0, n1, 0, F, { "default": "rs_concrete", "+z": "rs_wood" }, "wood" )
     d0, d1 = STORE_DOOR
 
-    def wall_box( a0, a1, b0, b1, z0, z1 ):
-        box( m, a0, a1, b0, b1, z0, z1, { "default": "rs_boards_dark", "+z": "rs_dark", "-z": None }, "wood" )
+    def wall_box( a0, a1, b0, b1, z0, z1, skip=() ):
+        box( m, a0, a1, b0, b1, z0, z1, { "default": "rs_boards_dark", "+z": "rs_dark", "-z": None }, "wood", skip=skip )
     # The front wall split round the door, the sides and the back.
-    wall_box( e0, d0, n0, n0 + wt, F, T )
-    wall_box( d1, e1, n0, n0 + wt, F, T )
+    # The approved glazing model supplies these two wall faces around real openings.
+    wall_box( e0, d0, n0, n0 + wt, F, T, skip=("-n","+n") )
+    wall_box( d1, e1, n0, n0 + wt, F, T, skip=("-n","+n") )
     wall_box( d0, d1, n0, n0 + wt, STORE_DOOR_TOP, T )
     wall_box( e0, e0 + wt, n0, n1, F, T )
     wall_box( e0, e1, n1 - wt, n1, F, T )
@@ -459,13 +461,7 @@ def store( m ):
     P.light( "store sign", sc + v( 0, -60, 10 ), P.WARM, 420, shadows=True, scale=0.44 )
     # The front: windows lit from inside, the OPEN and COLD BEER neon, posters, the door's frame.
     front = n0 - 0.2
-    for cx, ww in ( ( ( d1 + e1 ) / 2, min( 70.0, e1 - d1 - 24 ) ), ( ( e0 + d0 ) / 2, min( 90.0, d0 - e0 - 30 ) ) ):
-        wc = v( cx, front, F + 62 )
-        RP.quad( m, "rs_dark", wc, r, UP, ww + 6, 58, off=0.2 )
-        P.lit( m, "window", wc, r, 52, off=0.4, w=ww )
-        if cx > d1:
-            P.lit( m, "open", wc + v( -ww * 0.2, 0, 14 ), r, 12, off=0.7 )
-            P.lit( m, "beer", wc + v( ww * 0.18, 0, -14 ), r, 10, off=0.7 )
+    # Real glazing and the retained neon plates are independent approved geometry.
     for k, ( name, e, z ) in enumerate( ( ( "poster_lotto", e0 + 14, F + 100 ), ( "poster_ice", d0 - 14, F + 100 ), ( "poster_bait", e1 - 22, F + 32 ),
                                           ( "poster_propane", d1 + 12, F + 100 ) ) ):
         P.sign( m, name, v( e, front, z ), r, 22, off=0.5 )
@@ -515,33 +511,75 @@ def store( m ):
 # ---------------------------------------------------------------------------------------------------------------------
 # The pad: the office, the gate, the dog run, the camper
 
+# The deck's looks are the timber model Sources/Riverside/watch-deck-v1 builds (a scene object, watch_deck_objects). The
+# old deck's render (812 triangles) is no longer drawn into the Pad; set OLD_DECK_IN_PAD to draw it again (and then no model
+# is placed). It is also kept as a model of its own: models/props/riverside/watch_deck_original/deck_original.vmdl.
+OLD_DECK_IN_PAD = False
+WATCH_DECK_MODEL = "models/props/riverside/watch_deck_v1/deck.vmdl"
+WATCH_DECK_AT = ( 60.0, -445.0, HIGH )              # the model's origin: the deck's centre on the pad (plan e, n, z)
+
+
+def render_dropped( m, drop ):
+    """ Context: what the block draws into m is taken out again when drop (its collision, and anything else it records,
+    stays). Only the polygons, and their authored UVs and normals, are removed. """
+    class _Block:
+        def __enter__( self ):
+            self.marks = { paint: len( items ) for paint, items in m.polygons.items() }
+
+        def __exit__( self, *exc ):
+            if not drop or exc[0] is not None:
+                return False
+            for paint in list( m.polygons ):
+                keep = self.marks.get( paint, 0 )
+                del m.polygons[paint][keep:]
+                for table in ( m.polygon_uvs, m.polygon_normals ):
+                    for key in [ k for k in table if k[0] == paint and k[1] >= keep ]:
+                        del table[key]
+                if not m.polygons[paint] and paint not in self.marks:
+                    del m.polygons[paint]
+            return False
+    return _Block()
+
+
 def watch_deck( m, gz ):
     """ A timber deck the survivors built on the pad to watch the lane from: 6x6 posts, joists and boards 5 ft up, a rail
     round its sides and back, sandbags along its front, steps up its back. A player standing on it sees the park as the
-    picture does (REF_EYE). """
+    picture does (REF_EYE). Here: its collision, sandbags and rail clips, and (OLD_DECK_IN_PAD) the old render. """
     e0, e1, n0, n1, h = DECK
     top = gz + h
-    for e in ( e0 + 3, e1 - 3 ):
-        for n in ( n0 + 3, n1 - 3 ):
-            box( m, e - 2.75, e + 2.75, n - 2.75, n + 2.75, gz, top - 4, "rs_wood" )
-            box( m, e - 7, e + 7, n - 7, n + 7, gz, gz + 2, "rs_concrete" )
-    for e in np.linspace( e0 + 2, e1 - 2, 5 ):
-        box( m, e - 0.75, e + 0.75, n0, n1, top - 10, top - 4, "rs_wood" )
-    for k, n in enumerate( np.arange( n0, n1, 5.6 ) ):
-        box( m, e0 - 1, e1 + 1 + ( 1.5 if k % 3 == 0 else 0 ), n + 0.2, n + 5.4, top - 4, top, "rs_wood" )
+    drop = not OLD_DECK_IN_PAD
+    with render_dropped( m, drop ):
+        for e in ( e0 + 3, e1 - 3 ):
+            for n in ( n0 + 3, n1 - 3 ):
+                box( m, e - 2.75, e + 2.75, n - 2.75, n + 2.75, gz, top - 4, "rs_wood" )
+                box( m, e - 7, e + 7, n - 7, n + 7, gz, gz + 2, "rs_concrete" )
+        for e in np.linspace( e0 + 2, e1 - 2, 5 ):
+            box( m, e - 0.75, e + 0.75, n0, n1, top - 10, top - 4, "rs_wood" )
+        for k, n in enumerate( np.arange( n0, n1, 5.6 ) ):
+            box( m, e0 - 1, e1 + 1 + ( 1.5 if k % 3 == 0 else 0 ), n + 0.2, n + 5.4, top - 4, top, "rs_wood" )
     m.collision_box( v( e0, n0, gz ), v( e1, n1, top ), "wood" )
     # X braces under it on its sides.
-    for e in ( e0 + 3, e1 - 3 ):
-        m.beam( v( e, n0 + 4, gz + 6 ), v( e, n1 - 4, top - 12 ), ( 1.5, 5.5 ), "rs_wood", up=( 1, 0, 0 ) )
-        m.beam( v( e, n1 - 4, gz + 6 ), v( e, n0 + 4, top - 12 ), ( 1.5, 5.5 ), "rs_wood", up=( 1, 0, 0 ) )
+    with render_dropped( m, drop ):
+        for e in ( e0 + 3, e1 - 3 ):
+            m.beam( v( e, n0 + 4, gz + 6 ), v( e, n1 - 4, top - 12 ), ( 1.5, 5.5 ), "rs_wood", up=( 1, 0, 0 ) )
+            m.beam( v( e, n1 - 4, gz + 6 ), v( e, n0 + 4, top - 12 ), ( 1.5, 5.5 ), "rs_wood", up=( 1, 0, 0 ) )
     # Rails on the two sides and the back, open over the steps; the front has sandbags, below the view.
-    RP.railing( m, [ ( e0 + 2, n1 - 2 ), ( e0 + 2, n0 + 2 ), ( ( e0 + e1 ) / 2 - 20, n0 + 2 ) ], top, "rs_wood", height=38,
-                post_every=46, kick=False, clip_to=48, name="deck rail" )
-    RP.railing( m, [ ( ( e0 + e1 ) / 2 + 20, n0 + 2 ), ( e1 - 2, n0 + 2 ), ( e1 - 2, n1 - 2 ) ], top, "rs_wood", height=38,
-                post_every=46, kick=False, clip_to=48, name="deck rail" )
+    with render_dropped( m, drop ):
+        RP.railing( m, [ ( e0 + 2, n1 - 2 ), ( e0 + 2, n0 + 2 ), ( ( e0 + e1 ) / 2 - 20, n0 + 2 ) ], top, "rs_wood", height=38,
+                    post_every=46, kick=False, clip_to=48, name="deck rail" )
+        RP.railing( m, [ ( ( e0 + e1 ) / 2 + 20, n0 + 2 ), ( e1 - 2, n0 + 2 ), ( e1 - 2, n1 - 2 ) ], top, "rs_wood", height=38,
+                    post_every=46, kick=False, clip_to=48, name="deck rail" )
     P.sandbag_wall( m, ( e0 + 4, n1 - 7 ), ( e1 - 4, n1 - 7 ), rows=2, z0=top, seed=21 )
-    RP.stairs( m, ( ( e0 + e1 ) / 2, n0 - 80 ), ( ( e0 + e1 ) / 2, n0 ), 38, gz, top, tread="rs_wood", side="rs_wood",
-               rails=( True, True ), rail_paint="rs_wood", surface="wood", name="deck stair" )
+    with render_dropped( m, drop ):
+        RP.stairs( m, ( ( e0 + e1 ) / 2, n0 - 80 ), ( ( e0 + e1 ) / 2, n0 ), 38, gz, top, tread="rs_wood", side="rs_wood",
+                   rails=( True, True ), rail_paint="rs_wood", surface="wood", name="deck stair" )
+
+
+def watch_deck_objects():
+    if OLD_DECK_IN_PAD:
+        return []
+    return [ K.game_object( ids, "Timber Watch Deck", "watch_deck/0", K.to_world( WATCH_DECK_AT ), K.yaw_rotation( 0.0 ), components=[
+        K.component( ids, "Sandbox.ModelRenderer", "watch_deck/0/renderer", Model=WATCH_DECK_MODEL, RenderType="On", Tint="1,1,1,1" ) ] ) ]
 
 
 def lantern( m, at ):
@@ -563,10 +601,14 @@ DOG_GATE = ( 1, 5, 50 )
 def pad( m ):
     gz = HIGH
     name, c, yaw, L, W = OFFICE
-    part, info = P.trailer( L, W, "rs_siding_white", seed=51, door_side=1, lit_share=0.8, boarded_share=0.0, door_lit=True, roof_ac_model=True )
+    part, info = P.trailer( L, W, "rs_siding_white", seed=51, door_side=1, lit_share=0.8, boarded_share=0.0, door_lit=True, roof_ac_model=True, entry_door_model=True )
+    for item in list(P.TRAILER_DOORS):
+        if item[0] is part:
+            P.TRAILER_DOORS.remove(item)
+            P.OFFICE_DOORS.append(item)
     door_x = info["door"][0]
     P.lit( part, "office", v( door_x, W / 2 + 0.5, P.FLOOR + 92 ), P.right_for( ( 0, 1 ) ), 14, off=0.5 )
-    P.sign( part, "office_rules", v( door_x + 70, W / 2, P.FLOOR + 50 ), P.right_for( ( 0, 1 ) ), 30, off=0.6 )
+    P.OFFICE_RULES.append([part, (float(door_x + 70), W / 2 + .6, P.FLOOR + 50), 90.0])
     P.porch_deck( part, door_x - 80, door_x + 80, W / 2, 80, P.FLOOR - 2, sy=1, string_lights=False, seed=3 )
     place_into( m, part, ( c[0], c[1], gz ), yaw )
     add_trailer_lights( name, ( c[0], c[1], gz ), yaw, info )
@@ -692,7 +734,7 @@ def dressing( m ):
     P.blood( m, "trail", v( -40, -160, HIGH + 0.45 ), v( 1, 0, 0 ), 110, up=v( 0.3, 1, 0 ), off=0.0 )
     P.blood( m, "trail", v( -80, 560, 0.45 ), v( 1, 0, 0 ), 120, up=v( -0.2, 1, 0 ), off=0.0 )
     # Plank fences between yards, sandbags and crates across the north lane.
-    P.plank_fence( m, [ ( -1400, 960 ), ( -1400, 1460 ) ], seed=1 )
+    P.plank_fence( m, [ ( -1400, 960 ), ( -1400, 1460 ) ], seed=1, model=True )
     P.plank_fence( m, [ ( -1080, 2250 ), ( -1080, 2700 ) ], seed=2 )
     P.sandbag_wall( m, ( 120, 3050 ), ( 260, 3090 ), rows=4, seed=7 )
     for k in range( 4 ):
@@ -1167,6 +1209,12 @@ def store_step_objects():
         for k, ( owner, pos, yaw ) in enumerate( P.STORE_STEPS ) ]
 
 
+def yard_fence_objects():
+    return [ K.game_object( ids, "West Yard Privacy Fence", f"yard_fence/{k}", K.to_world( pos ), K.yaw_rotation( yaw ), components=[
+        K.component( ids, "Sandbox.ModelRenderer", f"yard_fence/{k}/renderer", Model="models/props/riverside/yard_fence_v1/fence.vmdl", RenderType="On", Tint="1,1,1,1" ) ] )
+        for k, ( owner, pos, yaw ) in enumerate( P.YARD_FENCES ) ]
+
+
 def water_tank_objects():
     """Approved A vessel; original support structure and lights remain in the backdrop."""
     out = []
@@ -1225,6 +1273,23 @@ def pole_insulator_objects():
     return out
 
 
+UTILITY_POLE_MODELS = { 2: "models/props/riverside/utility_pole_v1/pole_2arm.vmdl", 1: "models/props/riverside/utility_pole_v1/pole_1arm.vmdl" }
+
+
+def utility_pole_objects():
+    """ The nine poles' shafts, crossarms and braces: Sources/Riverside/utility-pole-v1's models, one per pole, turned to its
+    facing (the models face plan north at their origin). riverside_parts.OLD_POLES_IN_DRESSING draws the old shapes into the
+    dressing mesh instead, and then none are placed. Collision, insulators, transformer cans and lamp arms are the dressing's. """
+    out = []
+    for k, ( owner, base, yaw, arms ) in enumerate( P.UTILITY_POLES ):
+        key = f"utility_pole/{k}"
+        heading = ( math.cos( math.radians( yaw ) ), math.sin( math.radians( yaw ) ) )
+        out.append( K.game_object( ids, f"Utility Pole {k + 1}", key, K.to_world( base ), K.yaw_rotation( K.plan_yaw( heading ) ), components=[
+            K.component( ids, "Sandbox.ModelRenderer", f"{key}/renderer", Model=UTILITY_POLE_MODELS[arms], RenderType="On", Tint="1,1,1,1" ) ] ) )
+        out[-1]["Position"] = ",".join( f"{q:.6f}" for q in K.to_world( base ) )
+    return out
+
+
 def trailer_door_objects():
     """The approved T2 entry door; window cards remain in the lowland mesh."""
     out = []
@@ -1233,6 +1298,32 @@ def trailer_door_objects():
         heading = ( math.cos( math.radians( yaw ) ), math.sin( math.radians( yaw ) ) )
         out.append( K.game_object( ids, "T2 Entry Door", key, K.to_world( position ), K.yaw_rotation( K.plan_yaw( heading ) ), components=[
             K.component( ids, "Sandbox.ModelRenderer", f"{key}/renderer", Model="models/props/riverside/trailer_door_v1/door.vmdl",
+                         RenderType="On", Tint="1,1,1,1" ) ] ) )
+        out[-1]["Position"] = ",".join( f"{v:.6f}" for v in K.to_world( position ) )
+    return out
+
+
+def office_door_objects():
+    """The approved T2 entry door; window cards remain in the lowland mesh."""
+    out = []
+    for k, ( owner, position, yaw ) in enumerate( P.OFFICE_DOORS ):
+        key = f"office_door/{k}"
+        heading = ( math.cos( math.radians( yaw ) ), math.sin( math.radians( yaw ) ) )
+        out.append( K.game_object( ids, "Office Entry Door", key, K.to_world( position ), K.yaw_rotation( K.plan_yaw( heading ) ), components=[
+            K.component( ids, "Sandbox.ModelRenderer", f"{key}/renderer", Model="models/props/riverside/trailer_door_v1/door.vmdl",
+                         RenderType="On", Tint="1,1,1,1" ) ] ) )
+        out[-1]["Position"] = ",".join( f"{v:.6f}" for v in K.to_world( position ) )
+    return out
+
+
+def office_rules_objects():
+    """The approved T2 entry door; window cards remain in the lowland mesh."""
+    out = []
+    for k, ( owner, position, yaw ) in enumerate( P.OFFICE_RULES ):
+        key = f"office_rules/{k}"
+        heading = ( math.cos( math.radians( yaw ) ), math.sin( math.radians( yaw ) ) )
+        out.append( K.game_object( ids, "Office Rules Sign", key, K.to_world( position ), K.yaw_rotation( K.plan_yaw( heading ) ), components=[
+            K.component( ids, "Sandbox.ModelRenderer", f"{key}/renderer", Model="models/props/riverside/office_rules_plaque_v1/plaque.vmdl",
                          RenderType="On", Tint="1,1,1,1" ) ] ) )
         out[-1]["Position"] = ",".join( f"{v:.6f}" for v in K.to_world( position ) )
     return out
@@ -1346,6 +1437,7 @@ def write_scene( written ):
         K.game_object( ids, "Shed Downlights", "shed_downlights", children=shed_light_objects() ),
         K.game_object( ids, "Streetlight Heads", "street_lights", children=street_light_objects() ),
         K.game_object( ids, "Pole Insulators", "pole_insulators", children=pole_insulator_objects() ),
+        K.game_object( ids, "Utility Poles", "utility_poles", children=utility_pole_objects() ),
         K.game_object( ids, "Roof Air Conditioners", "roof_acs", children=roof_ac_objects() ),
         K.game_object( ids, "Store Ceiling Lights", "fluorescents", children=fluorescent_objects() ),
         K.game_object( ids, "Roof TV Aerials", "roof_aerials", children=aerial_objects() ),
@@ -1356,9 +1448,13 @@ def write_scene( written ):
         K.game_object( ids, "Guard Tower Roofs", "tower_roofs", children=tower_roof_objects() ),
         K.game_object( ids, "Interior Drinks Fridges", "interior_fridges", children=interior_fridge_objects() ),
         K.game_object( ids, "Store Timber Steps", "store_steps", children=store_step_objects() ),
+        K.game_object( ids, "West Yard Fences", "yard_fences", children=yard_fence_objects() ),
         K.game_object( ids, "Trailer Entry Doors", "trailer_doors", children=trailer_door_objects() ),
+        K.game_object( ids, "Office Entry Doors", "office_doors", children=office_door_objects() ),
+        K.game_object( ids, "Office Rules Signs", "office_rules", children=office_rules_objects() ),
         K.game_object( ids, "Passive Roof Vents", "roof_vents", children=roof_vent_objects() ),
         K.game_object( ids, "Precast Entry Steps", "precast_entry_steps", children=entry_step_objects() ),
+        K.game_object( ids, "Watch Deck", "watch_deck", children=watch_deck_objects() ),
         K.game_object( ids, "Reflection Probes", "probes", children=[ probe_object( *p ) for p in PROBES ] ),
         K.game_object( ids, "Volumetric Fog", "haze", children=[ haze_object( *h ) for h in HAZE ] ),
         K.game_object( ids, "Player Spawns", "spawns", children=spawns ),
@@ -1370,6 +1466,8 @@ def write_scene( written ):
         K.prefab_instance( ids, ZOMBIES_MODE ),
         K.prefab_instance( ids, "scenes/maps/defusemap_01/game_setup.prefab" ),
     ]
+    from riverside_storefront_depth import scene_object as glazed_storefront_object
+    objects.append(glazed_storefront_object())
     scene = {
         "__guid": ids( "scene" ),
         "GameObjects": objects,
@@ -1394,6 +1492,7 @@ def write_scene( written ):
         "__version": 3,
     }
     SCENE_FILE.parent.mkdir( parents=True, exist_ok=True )
+    scene['GameObjects'].append(SW.scene_object(ids))
     K.write_text( SCENE_FILE, json.dumps( scene, indent=2 ), newline=None )
     print( f"wrote {SCENE_FILE.relative_to( K.ROOT )}: {len( P.LIGHTS )} lights ({sum( 1 for l in P.LIGHTS if l[4] )} shadowed), "
            f"{len( P.SPOTLIGHTS )} spots, {len( P.FIRES )} fires, {len( RP.CLIPS )} clips" )

@@ -1,0 +1,109 @@
+{
+ "label": "BEFORE",
+ "objs": [
+  {
+   "triangles": 616,
+   "vertices": 1232,
+   "materials": [
+    "bx_galv",
+    "bx_steel_dark",
+    "bx_wall_panel"
+   ],
+   "extent_in": [
+    1620.0,
+    140.15,
+    1686.0
+   ],
+   "extent_m": [
+    41.148,
+    3.56,
+    42.824
+   ],
+   "bytes": 87142,
+   "path": "Sources/Boxyard/perimeter-wall-v1/old_wall.obj"
+  }
+ ],
+ "textures": [
+  {
+   "vmat": "materials/boxyard/bx_wall_panel.vmat",
+   "slot": "TextureColor",
+   "path": "materials/boxyard/bx_wall_panel_color.jpg",
+   "w": 2048,
+   "h": 1024,
+   "file_bytes": 440238,
+   "est_gpu_bytes": 11184531,
+   "compiled_bytes": 809907,
+   "shared": false,
+   "shared_note": ""
+  },
+  {
+   "vmat": "materials/boxyard/bx_wall_panel.vmat",
+   "slot": "TextureNormal",
+   "path": "materials/boxyard/bx_wall_panel_normal.jpg",
+   "w": 2048,
+   "h": 1024,
+   "file_bytes": 2073463,
+   "est_gpu_bytes": 11184531,
+   "compiled_bytes": 2458978,
+   "shared": false,
+   "shared_note": ""
+  },
+  {
+   "vmat": "materials/boxyard/bx_wall_panel.vmat",
+   "slot": "TextureRoughness",
+   "path": "materials/boxyard/bx_wall_panel_rough.png",
+   "w": 2048,
+   "h": 1024,
+   "file_bytes": 64937,
+   "est_gpu_bytes": 11184531,
+   "compiled_bytes": 0,
+   "shared": false,
+   "shared_note": ""
+  },
+  {
+   "vmat": "materials/boxyard/bx_galv.vmat",
+   "slot": "TextureColor",
+   "path": "materials/boxyard/bx_galv_color.jpg",
+   "w": 1024,
+   "h": 1024,
+   "file_bytes": 234944,
+   "est_gpu_bytes": 5592265,
+   "compiled_bytes": 441916,
+   "shared": true,
+   "shared_note": "existing Boxyard map material (also used by other Boxyard props)"
+  },
+  {
+   "vmat": "materials/boxyard/bx_galv.vmat",
+   "slot": "TextureNormal",
+   "path": "materials/boxyard/bx_galv_normal.jpg",
+   "w": 1024,
+   "h": 1024,
+   "file_bytes": 29301,
+   "est_gpu_bytes": 5592265,
+   "compiled_bytes": 991177,
+   "shared": true,
+   "shared_note": "existing Boxyard map material (also used by other Boxyard props)"
+  },
+  {
+   "vmat": "materials/boxyard/bx_galv.vmat",
+   "slot": "TextureRoughness",
+   "path": "materials/boxyard/bx_galv_rough.png",
+   "w": 1024,
+   "h": 1024,
+   "file_bytes": 629058,
+   "est_gpu_bytes": 5592265,
+   "compiled_bytes": 0,
+   "shared": true,
+   "shared_note": "existing Boxyard map material (also used by other Boxyard props)"
+  }
+ ],
+ "vmdl": [],
+ "totals": {
+  "unique_textures": 6,
+  "texture_pixels": 9437184,
+  "est_gpu_bytes": 50330388,
+  "compiled_vtex_bytes": 4701978,
+  "shared_texture_pixels": 3145728,
+  "new_texture_pixels": 6291456
+ }
+}

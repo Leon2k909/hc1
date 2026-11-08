@@ -1,0 +1,7 @@
+var root=Sandbox.Project.Current.GetRootPath();var folder=System.IO.Path.Combine(root,"output/riverside/storefront-depth-v1/install-stage");
+var target=Editor.SceneEditorSession.All.Single(s=>s.Scene?.Source?.ResourcePath?.Equals("scenes/maps/riverside/riverside.scene",StringComparison.OrdinalIgnoreCase)==true);
+if(target.IsPlaying||target.HasUnsavedChanges)throw new Exception("Need clean Riverside edit scene");
+var saved=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"Assets/scenes/maps/Riverside/riverside.scene")));
+var live=System.Text.Json.Nodes.JsonNode.Parse(target.Scene.Serialize().ToJsonString());
+var a=saved["GameObjects"].AsArray().Select(n=>n["__guid"]?.ToString()).ToHashSet();var b=live["GameObjects"].AsArray().Select(n=>n["__guid"]?.ToString()).ToHashSet();if(!a.SetEquals(b))return new{NeedsReconcile=true,SavedOnly=saved["GameObjects"].AsArray().Where(n=>!b.Contains(n["__guid"]?.ToString())).Select(n=>new{Name=n["Name"]?.ToString(),Id=n["__guid"]?.ToString()}).ToArray(),LiveOnly=live["GameObjects"].AsArray().Where(n=>!a.Contains(n["__guid"]?.ToString())).Select(n=>new{Name=n["Name"]?.ToString(),Id=n["__guid"]?.ToString()}).ToArray()};
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"live-before.json"),live.ToJsonString());return new{Target=target.Scene.Name,Roots=a.Count,Clean=true};

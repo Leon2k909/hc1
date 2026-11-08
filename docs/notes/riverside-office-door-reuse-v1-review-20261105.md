@@ -1,0 +1,3 @@
+# Riverside office door - installed,2026-11-05
+
+Approved trailer door reused unchanged; one saved office renderer. Exactly16 old panel/backing/handle triangles deleted from active pad import. All other pad lines, ModelDoc/physics, original window, prior scene roots and properties retained. Targeted generator light/window/collision equality checks pass. Native saved-model capture visually verified without inspection fill. Nine obsolete private comparison resources archived/deleted; shared door resources retained for T2 and office. Recipe Sources/Riverside/office-door-reuse-v1/README.md; evidence output/riverside/office-door-reuse-v1/installed/. No gameplay/LOD test.

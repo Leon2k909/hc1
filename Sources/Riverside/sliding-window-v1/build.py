@@ -64,21 +64,5 @@ for lod in range(3):
 K.write_vmdl(MODEL/'window.vmdl',RES,'window_lod0',models[0]);doc=(MODEL/'window.vmdl').read_text();a=doc.index('\t\t\t{\n\t\t\t\t_class = "RenderMeshList"');b=doc.index('\n\t\t\t},',a)+len('\n\t\t\t},')
 meshes='\n'.join(f'{{ _class = "RenderMeshFile" name = "lod{i}" filename = "{RES}/window_lod{i}.obj" import_scale = 1 align_origin_x_type = "None" align_origin_y_type = "None" align_origin_z_type = "None" import_filter = {{ exclude_by_default = false exception_list = [] }} }},' for i in range(3));groups='\n'.join(f'{{ _class = "LODGroup" switch_threshold = {d} meshes = ["lod{i}"] }},' for i,d in enumerate((0,25,70)))
 (MODEL/'window.vmdl').write_text(doc[:a]+f'{{ _class = "RenderMeshList" children = [ {meshes} ] }},\n{{ _class = "LODGroupList" children = [ {groups} ] }},'+doc[b:])
-old=K.Model();P.window(old,target['world_plan'],target['right'],W,H,target['style'],target['seed']);old.polygons={k:v for k,v in old.polygons.items() if k=='rs_alu'};R.configure(old);K.write_obj(OUT/'old.obj',old,'old')
-def records(path):
-    lines=path.read_text().splitlines(keepends=True);v=[tuple(round(float(x),3) for x in l.split()[1:4]) for l in lines if l.startswith('v ')];paint='';faces=[]
-    for i,line in enumerate(lines):
-        if line.startswith('usemtl '):paint=line.split()[1]
-        elif line.startswith('f '):faces.append((i,(paint,tuple(sorted(v[int(t.split('/')[0])-1] for t in line.split()[1:])))))
-    return lines,faces
-_,wanted=records(OUT/'old.obj');remaining=Counter(key for _,key in wanted);src=ROOT/'Assets/models/maps/riverside/riverside_low.obj';lines,current=records(src);cut=set()
-for i,key in current:
-    if remaining[key]:remaining[key]-=1;cut.add(i)
-assert len(cut)==14 and not +remaining,'Selected frame differs from current saved trailer'
-(MODEL/'preview.obj').write_text(''.join(line for i,line in enumerate(lines) if i not in cut));(MODEL/'riverside_low.mtl').write_bytes(src.with_suffix('.mtl').read_bytes())
-(MODEL/'preview.vmdl').write_text(src.with_suffix('.vmdl').read_text().replace('filename = "models/maps/riverside/riverside_low.obj"',f'filename = "{RES}/preview.obj"'))
-for name in ('old.obj','old.mtl'):(OUT/name).unlink()
-protected=[src,src.with_suffix('.vmdl'),src.with_suffix('.mtl'),ROOT/'Assets/scenes/maps/Riverside/riverside.scene']
-manifest=dict(preview_only=True,triangles=counts,old_faces=14,cut=sorted(cut),position_world=K.to_world(target['world_plan']).tolist(),existing_upgrade_audit=target['existing_upgrade_audit'],
- protected={p.relative_to(ROOT).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in protected},files={p.relative_to(STAGE).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in MODEL.iterdir() if p.is_file()})
-(OUT/'manifest.json').write_text(json.dumps(manifest,indent=2));print(json.dumps({'triangles':counts,'old_faces':14,'position':manifest['position_world']}))
+manifest=dict(installed=True,triangles=counts,files={p.relative_to(STAGE).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in STAGE.rglob('*') if p.is_file()})
+(OUT/'build-manifest.json').write_text(json.dumps(manifest,indent=2));print(json.dumps({'triangles':counts,'installed':True}))

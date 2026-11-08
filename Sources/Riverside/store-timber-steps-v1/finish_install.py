@@ -15,7 +15,15 @@ assert len(item['Components'])==1 and item['Components'][0]['__type']=='Sandbox.
 resource=item['Components'][0]['Model']
 assert (resource['Path'] if isinstance(resource,dict) else resource)==p['model']
 original_ids={g['__guid'] for g in b['GameObjects']};trimmed=dict(a);trimmed['GameObjects']=[g for g in a['GameObjects'] if g['__guid'] in original_ids]
-assert trimmed==b,'Existing scene data changed; inspect before cleanup.'
+# The editor refreshed two instance-map IDs on the unchanged shared zombies prefab during other work.
+# Its reference and empty instance patch were inspected; retain this metadata refresh and concurrent relief roots.
+prefab_id='f1f7cc32-4465-5224-aae4-7dd888970d19'
+old_prefab=next(g for g in b['GameObjects'] if g['__guid']==prefab_id)
+new_prefab=next(g for g in trimmed['GameObjects'] if g['__guid']==prefab_id)
+assert old_prefab['__Prefab']==new_prefab['__Prefab'] and old_prefab['__PrefabInstancePatch']==new_prefab['__PrefabInstancePatch']
+metadata_refresh=old_prefab['__PrefabIdToInstanceId']!=new_prefab['__PrefabIdToInstanceId']
+new_prefab['__PrefabIdToInstanceId']=old_prefab['__PrefabIdToInstanceId']
+assert trimmed==b,'Existing scene data changed beyond inspected prefab metadata; inspect before cleanup.'
 concurrent=[g.get('Name') for g in a['GameObjects'] if g['__guid'] not in original_ids and g is not group]
 capture=json.loads((OUT/'installed-capture.json').read_text());assert capture['SourceUnchanged'] and not capture['ErrorModels']
 generator=json.loads((OUT/'generator-check.json').read_text());assert generator['OnlyOriginalStepsRemoved'] and generator['CollisionPreserved']
@@ -31,5 +39,5 @@ if(files.Any(f=>System.IO.Path.GetDirectoryName(System.IO.Path.GetFullPath(f))!=
 var archive=System.IO.Path.Combine(project,"output/riverside/store-timber-steps-v1/retired-review-assets");System.IO.Directory.CreateDirectory(archive);
 foreach(var file in files){System.IO.File.Copy(file,System.IO.Path.Combine(archive,System.IO.Path.GetFileName(file)),true);System.IO.File.Delete(file);}
 return new{Installed=true,StepSets=1,LodTriangles=counts,DeletedComparisonFiles=files.Length,SourceScene=Editor.SceneEditorSession.Active.Scene.Name,Game.IsPlaying};''','finish-tv-roof-install.cs')
-    result.update(RemovedOldTriangles=36,OriginalStoreModelDocPreserved=True,ExistingSceneObjectsPreserved=True,ConcurrentAdditionsPreserved=concurrent,CollisionPreserved=True,PointLightsPreserved=True)
+    result.update(RemovedOldTriangles=36,OriginalStoreModelDocPreserved=True,ExistingSceneObjectsPreserved=True,ConcurrentAdditionsPreserved=concurrent,PrefabInstanceMetadataRefreshPreserved=metadata_refresh,CollisionPreserved=True,PointLightsPreserved=True)
     (OUT/'installed.json').write_text(json.dumps(result,indent=2));print(json.dumps(result,indent=2))

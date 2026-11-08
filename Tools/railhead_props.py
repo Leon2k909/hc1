@@ -2946,6 +2946,10 @@ def sos_pillar( model, e, n, facing="+e", z0=0.0 ):
     """ A help point column (Notruf / Info, 1.6 m): a slim blue column on a base plate, its head with the "i" and the
     SOS plate, the intercom's speaker grille, a blue information and a red emergency button, the camera dome on top.
     One box of metal collision. """
+    if (e, n, facing, z0) == (-1154.0, 378.0, '+e', 0.0):
+        # Approved independent renderer; preserve the legacy metal collision.
+        frame_for(e,n,z0,facing).collide(model,-5.6,5.6,-4.8,4.8,0.0,62.6,'metal')
+        return
     import railhead_furniture as FU
     FU.sos_pillar( model, frame_for( e, n, z0, facing ) )
 

@@ -1,0 +1,1 @@
+{"code":"var s=Editor.SceneEditorSession.Active;return new{Scene=s.Scene.Name,Groups=s.Scene.GetAllObjects(true).Where(x=>x.Name.Contains(\"CeDRI\")).Select(x=>new{x.Name,x.Enabled,x.Id}).ToArray(), Models=s.Scene.GetAllComponents<ModelRenderer>().Where(x=>x.Model?.ResourcePath.Contains(\"garden_foliage\")==true).Select(x=>x.Model.ResourcePath).ToArray()};"}

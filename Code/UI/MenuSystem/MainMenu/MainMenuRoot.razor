@@ -96,6 +96,10 @@
                             <i>theaters</i>
                             <label>@Tr( "THEATER" )</label>
                         </div>
+                        <div class="gnav-menu-item" @onclick=@OpenAssetCredits>
+                            <i>attribution</i>
+                            <label>@Tr( "ASSET CREDITS" )</label>
+                        </div>
                         <div class="gnav-menu-item" @onclick=@ReportBug>
                             <i>bug_report</i>
                             <label>@Tr( "REPORT A BUG" )</label>
@@ -196,6 +200,7 @@
         AddDestination( "/barracks/career", typeof( CareerLanding ) );
         AddDestination( "/barracks",    typeof( BarracksPage ) );
         AddDestination( "/theater",     typeof( TheaterPage ) );
+        AddDestination( "/credits",     typeof( AssetCreditsPage ) );
         AddDestination( "/settings",    typeof( SettingsPage ) );
     }
 
@@ -330,6 +335,12 @@
     {
         CloseMenu();
         this.Navigate( "/theater" );
+    }
+
+    private void OpenAssetCredits()
+    {
+        CloseMenu();
+        this.Navigate( "/credits" );
     }
 
     private void ReportBug()

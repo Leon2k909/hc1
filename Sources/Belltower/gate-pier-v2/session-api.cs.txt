@@ -1,0 +1,1 @@
+return typeof(Editor.SceneEditorSession).GetMethods(System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic|System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.Static).Where(m=>m.Name.Contains("Create")||m.Name.Contains("Load")||m.Name.Contains("Active")).Select(m=>m.ToString()).ToArray();

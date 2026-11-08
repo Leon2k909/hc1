@@ -23,6 +23,6 @@ for name in ('review.py','verify.py','import.cs.txt'):
  for a,b in [('store-timber-steps-v1','yard-fence-v1'),('store_timber_steps_v1','yard_fence_v1'),('legacy_steps','legacy_fence'),('steps.vmdl','fence.vmdl'),('steps_lod','fence_lod')]:s=s.replace(a,b)
  (HERE/name).write_text(s)
 s=(ROOT/'Sources/Riverside/store-timber-steps-v1/context.cs.txt').read_text()
-for a,b in [('store-timber-steps-v1','yard-fence-v1'),('store_timber_steps_v1/steps.vmdl','yard_fence_v1/fence.vmdl'),('store_timber_steps_v1/legacy_steps.vmdl','yard_fence_v1/legacy_fence.vmdl'),('store_timber_steps_v1/store_without_steps.vmdl','yard_fence_v1/dressing_without_fence.vmdl'),('riverside_store.vmdl','riverside_dressing.vmdl'),('Local(-90,-100,64),Local(15,0,12),52f','Local(-300,-250,64),Local(0,-250,30),80f'),('StepMaterials','FenceMaterials')]:s=s.replace(a,b)
-s=s.replace('("entrance",Local(-300,-250,64),Local(0,-250,30),80f,true),','("whole",Local(-300,-250,64),Local(0,-250,30),80f,true),\n    ("detail",Local(-100,-235,64),Local(0,-250,34),62f,true),')
+for a,b in [('store-timber-steps-v1','yard-fence-v1'),('store_timber_steps_v1/steps.vmdl','yard_fence_v1/fence.vmdl'),('store_timber_steps_v1/legacy_steps.vmdl','yard_fence_v1/legacy_fence.vmdl'),('store_timber_steps_v1/store_without_steps.vmdl','yard_fence_v1/dressing_without_fence.vmdl'),('riverside_store.vmdl','riverside_dressing.vmdl'),('Local(-90,-100,64),Local(15,0,12),52f','Local(-110,-40,64),Local(0,-250,30),75f'),('StepMaterials','FenceMaterials')]:s=s.replace(a,b)
+s=s.replace('("entrance",Local(-110,-40,64),Local(0,-250,30),75f,true),','("whole",Local(-110,-40,64),Local(0,-250,30),75f,true),\n    ("detail",Local(-100,-235,64),Local(0,-250,34),62f,true),')
 (HERE/'context.cs.txt').write_text(s)

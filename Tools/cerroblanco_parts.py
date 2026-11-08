@@ -1126,6 +1126,12 @@ def bollard_light( m, e, n, h=34.0 ):
 
 
 def litter_bin( m, e, n ):
+    if (e,n) in ((380,-650),(-150,50)):
+        from cerroblanco_hooded_bin import build_into
+        build_into(m,e,n)
+        # Retain the original solid 16-sided collision hull.
+        m.cylinder((e,n),9,0,34,{"side":None,"top":None,"bottom":None},sides=16,surface=METAL)
+        return
     m.cylinder( ( e, n ), 9, 0, 34, { "side": STEEL, "top": BLACK, "bottom": None }, sides=16, surface=METAL )
 
 
@@ -1133,7 +1139,8 @@ def display_plinth( m, e, n, w=26.0, h=40.0, thing=None ):
     """ A white gallery plinth, with something on it (a 'bust': a bronze lump, or a vase). """
     m.box( ( e - w / 2, n - w / 2, 0 ), ( e + w / 2, n + w / 2, h ), { "default": WHITE, "-z": None }, STONE )
     if thing == "vase":
-        m.cylinder( ( e, n ), 6, h, h + 14, { "side": RED, "top": BLACK, "bottom": None }, sides=12 )
+        from cerroblanco_display_vase import build_into
+        build_into(m,e,n,h)
     elif thing:
         boulder( m, ( e, n, h ), ( 8, 7, 14 ), keyed( "bust", e, n ), paint=BRONZE, surface=None, points=14 )
 

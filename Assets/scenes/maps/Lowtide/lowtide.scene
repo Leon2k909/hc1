@@ -123,11 +123,54 @@
           "__guid": "4c3e6de3-fdf1-5a50-83a8-855d86dda0c0",
           "__enabled": true,
           "Flags": 0,
+          "__version": 1,
+          "AnimationCurve": [
+            {
+              "x": 0,
+              "y": 0,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 0.5,
+              "y": 1,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            }
+          ],
+          "AnimationDuration": 2,
+          "AnimationEnabled": false,
+          "AnimationGradient": {
+            "blend": "Linear",
+            "color": [
+              {
+                "t": 0.5,
+                "c": "1,1,1,1"
+              }
+            ],
+            "alpha": []
+          },
+          "AnimationPattern": "Flicker",
+          "AnimationSpeed": 1,
+          "AnimationTimeOffset": 0,
+          "BakeLightIndex": -1,
           "ContactShadows": true,
           "Contribution": "Diffuse, Specular, Transmissive",
           "FogMode": "Enabled",
           "FogStrength": 1,
+          "IncludeStaticShadowCasters": false,
+          "Intensity": 1,
           "LightColor": "1.45,1.26,1.02,1",
+          "MixedShadows": false,
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
@@ -140,6 +183,7 @@
           "ShadowHardness": 0.35,
           "Shadows": true,
           "SkyColor": "0.42,0.48,0.58,1",
+          "Temperature": 6500,
           "Visualizer": {}
         }
       ],
@@ -3807,7 +3851,7 @@
               "Flags": 0,
               "Name": "Mooring Bollard",
               "Position": "-1580,-360,0",
-              "Rotation": "0,0,-0.0784591,0.9969173",
+              "Rotation": "0,0,-0.0784590989,0.996917307",
               "Scale": "1,1,1",
               "Tags": "",
               "Enabled": true,
@@ -3823,7 +3867,27 @@
                   "__enabled": true,
                   "Flags": 0,
                   "BodyGroups": 18446744073709551615,
-                  "Model": "models/maps/lowtide/mooring_bollard_v2/mooring_bollard.vmdl",
+                  "CreateAttachments": false,
+                  "LodOverride": null,
+                  "MaterialGroup": null,
+                  "MaterialOverride": null,
+                  "Materials": null,
+                  "Model": {
+                    "Id": "f865aa69-a130-4e01-b406-aa38f067e6eb",
+                    "Path": "models/maps/lowtide/mooring_bollard_v2/mooring_bollard.vmdl"
+                  },
+                  "OnComponentDestroy": null,
+                  "OnComponentDisabled": null,
+                  "OnComponentEnabled": null,
+                  "OnComponentFixedUpdate": null,
+                  "OnComponentStart": null,
+                  "OnComponentUpdate": null,
+                  "RenderOptions": {
+                    "GameLayer": true,
+                    "OverlayLayer": false,
+                    "BloomLayer": false,
+                    "AfterUILayer": false
+                  },
                   "RenderType": "On",
                   "Tint": "1,1,1,1"
                 }
@@ -3836,7 +3900,7 @@
               "Flags": 0,
               "Name": "Mooring Bollard",
               "Position": "-1584,-690,0",
-              "Rotation": "0,0,-0.1478094,0.9890159",
+              "Rotation": "0,0,-0.147809401,0.989015877",
               "Scale": "1,1,1",
               "Tags": "",
               "Enabled": true,
@@ -3852,7 +3916,27 @@
                   "__enabled": true,
                   "Flags": 0,
                   "BodyGroups": 18446744073709551615,
-                  "Model": "models/maps/lowtide/mooring_bollard_v2/mooring_bollard.vmdl",
+                  "CreateAttachments": false,
+                  "LodOverride": null,
+                  "MaterialGroup": null,
+                  "MaterialOverride": null,
+                  "Materials": null,
+                  "Model": {
+                    "Id": "f865aa69-a130-4e01-b406-aa38f067e6eb",
+                    "Path": "models/maps/lowtide/mooring_bollard_v2/mooring_bollard.vmdl"
+                  },
+                  "OnComponentDestroy": null,
+                  "OnComponentDisabled": null,
+                  "OnComponentEnabled": null,
+                  "OnComponentFixedUpdate": null,
+                  "OnComponentStart": null,
+                  "OnComponentUpdate": null,
+                  "RenderOptions": {
+                    "GameLayer": true,
+                    "OverlayLayer": false,
+                    "BloomLayer": false,
+                    "AfterUILayer": false
+                  },
                   "RenderType": "On",
                   "Tint": "1,1,1,1"
                 }
@@ -3865,7 +3949,7 @@
               "Flags": 0,
               "Name": "Mooring Bollard",
               "Position": "-1580,-1020,0",
-              "Rotation": "0,0,0.1908090,0.9816272",
+              "Rotation": "0,0,0.190808997,0.981627226",
               "Scale": "1,1,1",
               "Tags": "",
               "Enabled": true,
@@ -3881,7 +3965,27 @@
                   "__enabled": true,
                   "Flags": 0,
                   "BodyGroups": 18446744073709551615,
-                  "Model": "models/maps/lowtide/mooring_bollard_v2/mooring_bollard.vmdl",
+                  "CreateAttachments": false,
+                  "LodOverride": null,
+                  "MaterialGroup": null,
+                  "MaterialOverride": null,
+                  "Materials": null,
+                  "Model": {
+                    "Id": "f865aa69-a130-4e01-b406-aa38f067e6eb",
+                    "Path": "models/maps/lowtide/mooring_bollard_v2/mooring_bollard.vmdl"
+                  },
+                  "OnComponentDestroy": null,
+                  "OnComponentDisabled": null,
+                  "OnComponentEnabled": null,
+                  "OnComponentFixedUpdate": null,
+                  "OnComponentStart": null,
+                  "OnComponentUpdate": null,
+                  "RenderOptions": {
+                    "GameLayer": true,
+                    "OverlayLayer": false,
+                    "BloomLayer": false,
+                    "AfterUILayer": false
+                  },
                   "RenderType": "On",
                   "Tint": "1,1,1,1"
                 }
@@ -3894,7 +3998,7 @@
               "Flags": 0,
               "Name": "Mooring Bollard",
               "Position": "-1580,-1350,0",
-              "Rotation": "0,0,-0.0087265,0.9999619",
+              "Rotation": "0,0,-0.00872649997,0.999961913",
               "Scale": "1,1,1",
               "Tags": "",
               "Enabled": true,
@@ -3910,7 +4014,27 @@
                   "__enabled": true,
                   "Flags": 0,
                   "BodyGroups": 18446744073709551615,
-                  "Model": "models/maps/lowtide/mooring_bollard_v2/mooring_bollard.vmdl",
+                  "CreateAttachments": false,
+                  "LodOverride": null,
+                  "MaterialGroup": null,
+                  "MaterialOverride": null,
+                  "Materials": null,
+                  "Model": {
+                    "Id": "f865aa69-a130-4e01-b406-aa38f067e6eb",
+                    "Path": "models/maps/lowtide/mooring_bollard_v2/mooring_bollard.vmdl"
+                  },
+                  "OnComponentDestroy": null,
+                  "OnComponentDisabled": null,
+                  "OnComponentEnabled": null,
+                  "OnComponentFixedUpdate": null,
+                  "OnComponentStart": null,
+                  "OnComponentUpdate": null,
+                  "RenderOptions": {
+                    "GameLayer": true,
+                    "OverlayLayer": false,
+                    "BloomLayer": false,
+                    "AfterUILayer": false
+                  },
                   "RenderType": "On",
                   "Tint": "1,1,1,1"
                 }
@@ -3923,7 +4047,7 @@
               "Flags": 0,
               "Name": "Mooring Bollard",
               "Position": "-1580,-1680,0",
-              "Rotation": "0,0,0.1564345,0.9876883",
+              "Rotation": "0,0,0.156434506,0.987688303",
               "Scale": "1,1,1",
               "Tags": "",
               "Enabled": true,
@@ -3939,7 +4063,27 @@
                   "__enabled": true,
                   "Flags": 0,
                   "BodyGroups": 18446744073709551615,
-                  "Model": "models/maps/lowtide/mooring_bollard_v2/mooring_bollard.vmdl",
+                  "CreateAttachments": false,
+                  "LodOverride": null,
+                  "MaterialGroup": null,
+                  "MaterialOverride": null,
+                  "Materials": null,
+                  "Model": {
+                    "Id": "f865aa69-a130-4e01-b406-aa38f067e6eb",
+                    "Path": "models/maps/lowtide/mooring_bollard_v2/mooring_bollard.vmdl"
+                  },
+                  "OnComponentDestroy": null,
+                  "OnComponentDisabled": null,
+                  "OnComponentEnabled": null,
+                  "OnComponentFixedUpdate": null,
+                  "OnComponentStart": null,
+                  "OnComponentUpdate": null,
+                  "RenderOptions": {
+                    "GameLayer": true,
+                    "OverlayLayer": false,
+                    "BloomLayer": false,
+                    "AfterUILayer": false
+                  },
                   "RenderType": "On",
                   "Tint": "1,1,1,1"
                 }
@@ -3952,7 +4096,7 @@
               "Flags": 0,
               "Name": "Mooring Bollard",
               "Position": "-1580,-2010,0",
-              "Rotation": "0,0,-0.1478094,0.9890159",
+              "Rotation": "0,0,-0.147809401,0.989015877",
               "Scale": "1,1,1",
               "Tags": "",
               "Enabled": true,
@@ -3968,7 +4112,27 @@
                   "__enabled": true,
                   "Flags": 0,
                   "BodyGroups": 18446744073709551615,
-                  "Model": "models/maps/lowtide/mooring_bollard_v2/mooring_bollard.vmdl",
+                  "CreateAttachments": false,
+                  "LodOverride": null,
+                  "MaterialGroup": null,
+                  "MaterialOverride": null,
+                  "Materials": null,
+                  "Model": {
+                    "Id": "f865aa69-a130-4e01-b406-aa38f067e6eb",
+                    "Path": "models/maps/lowtide/mooring_bollard_v2/mooring_bollard.vmdl"
+                  },
+                  "OnComponentDestroy": null,
+                  "OnComponentDisabled": null,
+                  "OnComponentEnabled": null,
+                  "OnComponentFixedUpdate": null,
+                  "OnComponentStart": null,
+                  "OnComponentUpdate": null,
+                  "RenderOptions": {
+                    "GameLayer": true,
+                    "OverlayLayer": false,
+                    "BloomLayer": false,
+                    "AfterUILayer": false
+                  },
                   "RenderType": "On",
                   "Tint": "1,1,1,1"
                 }
@@ -3981,7 +4145,7 @@
               "Flags": 0,
               "Name": "Mooring Bollard",
               "Position": "-1580,360,0",
-              "Rotation": "0,0,0.1478094,0.9890159",
+              "Rotation": "0,0,0.147809401,0.989015877",
               "Scale": "1,1,1",
               "Tags": "",
               "Enabled": true,
@@ -3997,7 +4161,27 @@
                   "__enabled": true,
                   "Flags": 0,
                   "BodyGroups": 18446744073709551615,
-                  "Model": "models/maps/lowtide/mooring_bollard_v2/mooring_bollard.vmdl",
+                  "CreateAttachments": false,
+                  "LodOverride": null,
+                  "MaterialGroup": null,
+                  "MaterialOverride": null,
+                  "Materials": null,
+                  "Model": {
+                    "Id": "f865aa69-a130-4e01-b406-aa38f067e6eb",
+                    "Path": "models/maps/lowtide/mooring_bollard_v2/mooring_bollard.vmdl"
+                  },
+                  "OnComponentDestroy": null,
+                  "OnComponentDisabled": null,
+                  "OnComponentEnabled": null,
+                  "OnComponentFixedUpdate": null,
+                  "OnComponentStart": null,
+                  "OnComponentUpdate": null,
+                  "RenderOptions": {
+                    "GameLayer": true,
+                    "OverlayLayer": false,
+                    "BloomLayer": false,
+                    "AfterUILayer": false
+                  },
                   "RenderType": "On",
                   "Tint": "1,1,1,1"
                 }
@@ -4010,7 +4194,7 @@
               "Flags": 0,
               "Name": "Mooring Bollard",
               "Position": "-1584,690,0",
-              "Rotation": "0,0,-0.0610485,0.9981348",
+              "Rotation": "0,0,-0.0610485002,0.998134792",
               "Scale": "1,1,1",
               "Tags": "",
               "Enabled": true,
@@ -4026,7 +4210,27 @@
                   "__enabled": true,
                   "Flags": 0,
                   "BodyGroups": 18446744073709551615,
-                  "Model": "models/maps/lowtide/mooring_bollard_v2/mooring_bollard.vmdl",
+                  "CreateAttachments": false,
+                  "LodOverride": null,
+                  "MaterialGroup": null,
+                  "MaterialOverride": null,
+                  "Materials": null,
+                  "Model": {
+                    "Id": "f865aa69-a130-4e01-b406-aa38f067e6eb",
+                    "Path": "models/maps/lowtide/mooring_bollard_v2/mooring_bollard.vmdl"
+                  },
+                  "OnComponentDestroy": null,
+                  "OnComponentDisabled": null,
+                  "OnComponentEnabled": null,
+                  "OnComponentFixedUpdate": null,
+                  "OnComponentStart": null,
+                  "OnComponentUpdate": null,
+                  "RenderOptions": {
+                    "GameLayer": true,
+                    "OverlayLayer": false,
+                    "BloomLayer": false,
+                    "AfterUILayer": false
+                  },
                   "RenderType": "On",
                   "Tint": "1,1,1,1"
                 }
@@ -4039,7 +4243,7 @@
               "Flags": 0,
               "Name": "Mooring Bollard",
               "Position": "-1580,1020,0",
-              "Rotation": "0,0,0.1305262,0.9914449",
+              "Rotation": "0,0,0.1305262,0.991444886",
               "Scale": "1,1,1",
               "Tags": "",
               "Enabled": true,
@@ -4055,7 +4259,27 @@
                   "__enabled": true,
                   "Flags": 0,
                   "BodyGroups": 18446744073709551615,
-                  "Model": "models/maps/lowtide/mooring_bollard_v2/mooring_bollard.vmdl",
+                  "CreateAttachments": false,
+                  "LodOverride": null,
+                  "MaterialGroup": null,
+                  "MaterialOverride": null,
+                  "Materials": null,
+                  "Model": {
+                    "Id": "f865aa69-a130-4e01-b406-aa38f067e6eb",
+                    "Path": "models/maps/lowtide/mooring_bollard_v2/mooring_bollard.vmdl"
+                  },
+                  "OnComponentDestroy": null,
+                  "OnComponentDisabled": null,
+                  "OnComponentEnabled": null,
+                  "OnComponentFixedUpdate": null,
+                  "OnComponentStart": null,
+                  "OnComponentUpdate": null,
+                  "RenderOptions": {
+                    "GameLayer": true,
+                    "OverlayLayer": false,
+                    "BloomLayer": false,
+                    "AfterUILayer": false
+                  },
                   "RenderType": "On",
                   "Tint": "1,1,1,1"
                 }
@@ -4068,7 +4292,7 @@
               "Flags": 0,
               "Name": "Mooring Bollard",
               "Position": "-1580,1350,0",
-              "Rotation": "0,0,0.1822355,0.9832549",
+              "Rotation": "0,0,0.182235494,0.98325491",
               "Scale": "1,1,1",
               "Tags": "",
               "Enabled": true,
@@ -4084,7 +4308,27 @@
                   "__enabled": true,
                   "Flags": 0,
                   "BodyGroups": 18446744073709551615,
-                  "Model": "models/maps/lowtide/mooring_bollard_v2/mooring_bollard.vmdl",
+                  "CreateAttachments": false,
+                  "LodOverride": null,
+                  "MaterialGroup": null,
+                  "MaterialOverride": null,
+                  "Materials": null,
+                  "Model": {
+                    "Id": "f865aa69-a130-4e01-b406-aa38f067e6eb",
+                    "Path": "models/maps/lowtide/mooring_bollard_v2/mooring_bollard.vmdl"
+                  },
+                  "OnComponentDestroy": null,
+                  "OnComponentDisabled": null,
+                  "OnComponentEnabled": null,
+                  "OnComponentFixedUpdate": null,
+                  "OnComponentStart": null,
+                  "OnComponentUpdate": null,
+                  "RenderOptions": {
+                    "GameLayer": true,
+                    "OverlayLayer": false,
+                    "BloomLayer": false,
+                    "AfterUILayer": false
+                  },
                   "RenderType": "On",
                   "Tint": "1,1,1,1"
                 }
@@ -4097,7 +4341,7 @@
               "Flags": 0,
               "Name": "Mooring Bollard",
               "Position": "-1580,1680,0",
-              "Rotation": "0,0,-0.1218693,0.9925462",
+              "Rotation": "0,0,-0.121869303,0.992546201",
               "Scale": "1,1,1",
               "Tags": "",
               "Enabled": true,
@@ -4113,7 +4357,27 @@
                   "__enabled": true,
                   "Flags": 0,
                   "BodyGroups": 18446744073709551615,
-                  "Model": "models/maps/lowtide/mooring_bollard_v2/mooring_bollard.vmdl",
+                  "CreateAttachments": false,
+                  "LodOverride": null,
+                  "MaterialGroup": null,
+                  "MaterialOverride": null,
+                  "Materials": null,
+                  "Model": {
+                    "Id": "f865aa69-a130-4e01-b406-aa38f067e6eb",
+                    "Path": "models/maps/lowtide/mooring_bollard_v2/mooring_bollard.vmdl"
+                  },
+                  "OnComponentDestroy": null,
+                  "OnComponentDisabled": null,
+                  "OnComponentEnabled": null,
+                  "OnComponentFixedUpdate": null,
+                  "OnComponentStart": null,
+                  "OnComponentUpdate": null,
+                  "RenderOptions": {
+                    "GameLayer": true,
+                    "OverlayLayer": false,
+                    "BloomLayer": false,
+                    "AfterUILayer": false
+                  },
                   "RenderType": "On",
                   "Tint": "1,1,1,1"
                 }
@@ -4126,7 +4390,7 @@
               "Flags": 0,
               "Name": "Mooring Bollard",
               "Position": "-1580,2010,0",
-              "Rotation": "0,0,-0.0523360,0.9986295",
+              "Rotation": "0,0,-0.0523359999,0.99862951",
               "Scale": "1,1,1",
               "Tags": "",
               "Enabled": true,
@@ -4142,7 +4406,27 @@
                   "__enabled": true,
                   "Flags": 0,
                   "BodyGroups": 18446744073709551615,
-                  "Model": "models/maps/lowtide/mooring_bollard_v2/mooring_bollard.vmdl",
+                  "CreateAttachments": false,
+                  "LodOverride": null,
+                  "MaterialGroup": null,
+                  "MaterialOverride": null,
+                  "Materials": null,
+                  "Model": {
+                    "Id": "f865aa69-a130-4e01-b406-aa38f067e6eb",
+                    "Path": "models/maps/lowtide/mooring_bollard_v2/mooring_bollard.vmdl"
+                  },
+                  "OnComponentDestroy": null,
+                  "OnComponentDisabled": null,
+                  "OnComponentEnabled": null,
+                  "OnComponentFixedUpdate": null,
+                  "OnComponentStart": null,
+                  "OnComponentUpdate": null,
+                  "RenderOptions": {
+                    "GameLayer": true,
+                    "OverlayLayer": false,
+                    "BloomLayer": false,
+                    "AfterUILayer": false
+                  },
                   "RenderType": "On",
                   "Tint": "1,1,1,1"
                 }
@@ -4198,7 +4482,7 @@
               "MaterialOverride": null,
               "Materials": null,
               "Model": {
-                "Id": "d38c6121-743f-4ce0-941c-931c50e1455b",
+                "Id": "3fd7c42f-9778-49d9-96b6-bd7dfdcbfd45",
                 "Path": "models/sbox_props/trees/oak/tree_oak_medium_a.vmdl"
               },
               "OnComponentDestroy": null,
@@ -4247,7 +4531,7 @@
               "MaterialOverride": null,
               "Materials": null,
               "Model": {
-                "Id": "d38c6121-743f-4ce0-941c-931c50e1455b",
+                "Id": "3fd7c42f-9778-49d9-96b6-bd7dfdcbfd45",
                 "Path": "models/sbox_props/trees/oak/tree_oak_medium_a.vmdl"
               },
               "OnComponentDestroy": null,
@@ -4296,7 +4580,7 @@
               "MaterialOverride": null,
               "Materials": null,
               "Model": {
-                "Id": "d38c6121-743f-4ce0-941c-931c50e1455b",
+                "Id": "3fd7c42f-9778-49d9-96b6-bd7dfdcbfd45",
                 "Path": "models/sbox_props/trees/oak/tree_oak_medium_a.vmdl"
               },
               "OnComponentDestroy": null,
@@ -4345,7 +4629,7 @@
               "MaterialOverride": null,
               "Materials": null,
               "Model": {
-                "Id": "d38c6121-743f-4ce0-941c-931c50e1455b",
+                "Id": "3fd7c42f-9778-49d9-96b6-bd7dfdcbfd45",
                 "Path": "models/sbox_props/trees/oak/tree_oak_medium_a.vmdl"
               },
               "OnComponentDestroy": null,
@@ -4406,11 +4690,55 @@
               "__guid": "563ab226-4743-5adc-83f7-c1b69183e6ae",
               "__enabled": false,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 1,
+              "Intensity": 1,
               "LightColor": "1.6,1.3,0.95,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -4420,21 +4748,64 @@
               "Radius": 520,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": true
+              "Shadows": true,
+              "Temperature": 6500
             },
             {
               "__type": "Sandbox.SpotLight",
               "__guid": "8dc82c51-0a6c-4583-b6f3-c76ea567757a",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
               "ConeInner": 30,
               "ConeOuter": 55,
               "Contribution": "Diffuse, Specular, Transmissive",
               "Cookie": null,
               "FogMode": "Enabled",
               "FogStrength": 1,
+              "Intensity": 1,
               "LightColor": "1.36,1.105,0.8075,0.85",
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -4444,7 +4815,8 @@
               "Radius": 520,
               "ShadowBias": 0,
               "ShadowHardness": 0.25,
-              "Shadows": true
+              "Shadows": true,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -4470,11 +4842,55 @@
               "__guid": "86cdef92-6b50-5121-9477-e8f1571032f2",
               "__enabled": false,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 1,
+              "Intensity": 1,
               "LightColor": "1.6,1.3,0.95,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -4484,21 +4900,64 @@
               "Radius": 520,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             },
             {
               "__type": "Sandbox.SpotLight",
               "__guid": "f73c4dbd-b5b0-4719-ad2b-aeb0d185df34",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
               "ConeInner": 30,
               "ConeOuter": 55,
               "Contribution": "Diffuse, Specular, Transmissive",
               "Cookie": null,
               "FogMode": "Enabled",
               "FogStrength": 1,
+              "Intensity": 1,
               "LightColor": "1.36,1.105,0.8075,0.85",
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -4508,7 +4967,8 @@
               "Radius": 520,
               "ShadowBias": 0,
               "ShadowHardness": 0.25,
-              "Shadows": true
+              "Shadows": true,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -4534,11 +4994,55 @@
               "__guid": "9732645a-1d02-5591-8af9-438deca3e82a",
               "__enabled": false,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 1,
+              "Intensity": 1,
               "LightColor": "1.6,1.3,0.95,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -4548,21 +5052,64 @@
               "Radius": 340,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             },
             {
               "__type": "Sandbox.SpotLight",
               "__guid": "a2bf3ba5-7c25-42ce-812f-3eae00c402f7",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
               "ConeInner": 30,
               "ConeOuter": 55,
               "Contribution": "Diffuse, Specular, Transmissive",
               "Cookie": null,
               "FogMode": "Enabled",
               "FogStrength": 1,
+              "Intensity": 1,
               "LightColor": "1.36,1.105,0.8075,0.85",
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -4572,7 +5119,8 @@
               "Radius": 340,
               "ShadowBias": 0,
               "ShadowHardness": 0.25,
-              "Shadows": true
+              "Shadows": true,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -4598,11 +5146,55 @@
               "__guid": "24abb8e0-c18e-518b-8621-9f7642d8fd96",
               "__enabled": false,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 1,
+              "Intensity": 1,
               "LightColor": "1.6,1.3,0.95,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -4612,21 +5204,64 @@
               "Radius": 340,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             },
             {
               "__type": "Sandbox.SpotLight",
               "__guid": "e72e3e6e-dfa3-4668-9676-359ef045e6a4",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
               "ConeInner": 30,
               "ConeOuter": 55,
               "Contribution": "Diffuse, Specular, Transmissive",
               "Cookie": null,
               "FogMode": "Enabled",
               "FogStrength": 1,
+              "Intensity": 1,
               "LightColor": "1.36,1.105,0.8075,0.85",
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -4636,7 +5271,8 @@
               "Radius": 340,
               "ShadowBias": 0,
               "ShadowHardness": 0.25,
-              "Shadows": true
+              "Shadows": true,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -4662,11 +5298,55 @@
               "__guid": "0edb7538-0c91-5d7d-8d10-58dc37f47114",
               "__enabled": false,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 1,
+              "Intensity": 1,
               "LightColor": "1.6,1.3,0.95,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -4676,21 +5356,64 @@
               "Radius": 340,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             },
             {
               "__type": "Sandbox.SpotLight",
               "__guid": "1c39f2a7-423d-440c-9750-3ef93d5cfb14",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
               "ConeInner": 30,
               "ConeOuter": 55,
               "Contribution": "Diffuse, Specular, Transmissive",
               "Cookie": null,
               "FogMode": "Enabled",
               "FogStrength": 1,
+              "Intensity": 1,
               "LightColor": "1.36,1.105,0.8075,0.85",
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -4700,7 +5423,8 @@
               "Radius": 340,
               "ShadowBias": 0,
               "ShadowHardness": 0.25,
-              "Shadows": true
+              "Shadows": true,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -4726,11 +5450,55 @@
               "__guid": "5b7927ae-ff76-584c-8605-1772bb0b7776",
               "__enabled": false,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 1,
+              "Intensity": 1,
               "LightColor": "1.6,1.3,0.95,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -4740,21 +5508,64 @@
               "Radius": 340,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             },
             {
               "__type": "Sandbox.SpotLight",
               "__guid": "a0e02bca-87a5-4f75-a583-f32ca15f604b",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
               "ConeInner": 30,
               "ConeOuter": 55,
               "Contribution": "Diffuse, Specular, Transmissive",
               "Cookie": null,
               "FogMode": "Enabled",
               "FogStrength": 1,
+              "Intensity": 1,
               "LightColor": "1.36,1.105,0.8075,0.85",
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -4764,7 +5575,8 @@
               "Radius": 340,
               "ShadowBias": 0,
               "ShadowHardness": 0.25,
-              "Shadows": true
+              "Shadows": true,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -4790,11 +5602,55 @@
               "__guid": "6be683f9-03ce-5c80-8258-181f46c1d40b",
               "__enabled": false,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 1,
+              "Intensity": 1,
               "LightColor": "1.6,1.3,0.95,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -4804,21 +5660,64 @@
               "Radius": 320,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             },
             {
               "__type": "Sandbox.SpotLight",
               "__guid": "59bbf15a-2480-41a4-bee8-4ae4472c0988",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
               "ConeInner": 30,
               "ConeOuter": 55,
               "Contribution": "Diffuse, Specular, Transmissive",
               "Cookie": null,
               "FogMode": "Enabled",
               "FogStrength": 1,
+              "Intensity": 1,
               "LightColor": "1.36,1.105,0.8075,0.85",
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -4828,7 +5727,8 @@
               "Radius": 320,
               "ShadowBias": 0,
               "ShadowHardness": 0.25,
-              "Shadows": true
+              "Shadows": true,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -4854,11 +5754,55 @@
               "__guid": "4af8aa15-df04-5885-8e7f-d6666dc7ae09",
               "__enabled": false,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 1,
+              "Intensity": 1,
               "LightColor": "1.6,1.3,0.95,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -4868,21 +5812,64 @@
               "Radius": 320,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             },
             {
               "__type": "Sandbox.SpotLight",
               "__guid": "30819ad9-1c48-4ece-8c45-5c03a0c4d726",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
               "ConeInner": 30,
               "ConeOuter": 55,
               "Contribution": "Diffuse, Specular, Transmissive",
               "Cookie": null,
               "FogMode": "Enabled",
               "FogStrength": 1,
+              "Intensity": 1,
               "LightColor": "1.36,1.105,0.8075,0.85",
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -4892,7 +5879,8 @@
               "Radius": 320,
               "ShadowBias": 0,
               "ShadowHardness": 0.25,
-              "Shadows": true
+              "Shadows": true,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -4918,11 +5906,55 @@
               "__guid": "99310d37-8fe4-54d5-848f-4b65d4cd4e1e",
               "__enabled": false,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 1,
+              "Intensity": 1,
               "LightColor": "1.6,1.3,0.95,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -4932,21 +5964,64 @@
               "Radius": 320,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             },
             {
               "__type": "Sandbox.SpotLight",
               "__guid": "e51b9554-00d6-4998-ab9b-29920b06a0e4",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
               "ConeInner": 30,
               "ConeOuter": 55,
               "Contribution": "Diffuse, Specular, Transmissive",
               "Cookie": null,
               "FogMode": "Enabled",
               "FogStrength": 1,
+              "Intensity": 1,
               "LightColor": "1.36,1.105,0.8075,0.85",
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -4956,7 +6031,8 @@
               "Radius": 320,
               "ShadowBias": 0,
               "ShadowHardness": 0.25,
-              "Shadows": true
+              "Shadows": true,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -4982,11 +6058,55 @@
               "__guid": "6ac16831-6d3c-50ec-a6ec-031afad5f685",
               "__enabled": false,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 1,
+              "Intensity": 1,
               "LightColor": "1.6,1.3,0.95,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -4996,21 +6116,64 @@
               "Radius": 520,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": true
+              "Shadows": true,
+              "Temperature": 6500
             },
             {
               "__type": "Sandbox.SpotLight",
               "__guid": "f6788838-4b69-42a0-a8e9-ecb081540473",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
               "ConeInner": 30,
               "ConeOuter": 55,
               "Contribution": "Diffuse, Specular, Transmissive",
               "Cookie": null,
               "FogMode": "Enabled",
               "FogStrength": 1,
+              "Intensity": 1,
               "LightColor": "1.36,1.105,0.8075,0.85",
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -5020,7 +6183,8 @@
               "Radius": 520,
               "ShadowBias": 0,
               "ShadowHardness": 0.25,
-              "Shadows": true
+              "Shadows": true,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -5046,11 +6210,55 @@
               "__guid": "b24d90ef-59eb-5c54-91ec-64e0f9cc4332",
               "__enabled": false,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 1,
+              "Intensity": 1,
               "LightColor": "1.6,1.3,0.95,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -5060,21 +6268,64 @@
               "Radius": 520,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             },
             {
               "__type": "Sandbox.SpotLight",
               "__guid": "c1a89cae-f8cf-425e-950d-90e417e28d3a",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
               "ConeInner": 30,
               "ConeOuter": 55,
               "Contribution": "Diffuse, Specular, Transmissive",
               "Cookie": null,
               "FogMode": "Enabled",
               "FogStrength": 1,
+              "Intensity": 1,
               "LightColor": "1.36,1.105,0.8075,0.85",
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -5084,7 +6335,8 @@
               "Radius": 520,
               "ShadowBias": 0,
               "ShadowHardness": 0.25,
-              "Shadows": true
+              "Shadows": true,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -5110,11 +6362,55 @@
               "__guid": "cb2133ae-2827-5601-8ee3-5b8f0cf57acd",
               "__enabled": false,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 1,
+              "Intensity": 1,
               "LightColor": "1.6,1.3,0.95,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -5124,21 +6420,64 @@
               "Radius": 340,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             },
             {
               "__type": "Sandbox.SpotLight",
               "__guid": "abd6e281-893f-4b9a-88b7-7c01be803600",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
               "ConeInner": 30,
               "ConeOuter": 55,
               "Contribution": "Diffuse, Specular, Transmissive",
               "Cookie": null,
               "FogMode": "Enabled",
               "FogStrength": 1,
+              "Intensity": 1,
               "LightColor": "1.36,1.105,0.8075,0.85",
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -5148,7 +6487,8 @@
               "Radius": 340,
               "ShadowBias": 0,
               "ShadowHardness": 0.25,
-              "Shadows": true
+              "Shadows": true,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -5174,11 +6514,55 @@
               "__guid": "7b23d415-7f38-55ab-9816-2be7d38ff72c",
               "__enabled": false,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 1,
+              "Intensity": 1,
               "LightColor": "1.6,1.3,0.95,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -5188,21 +6572,64 @@
               "Radius": 340,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             },
             {
               "__type": "Sandbox.SpotLight",
               "__guid": "c106d81d-6497-460a-8ca8-e4d592ef65d7",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
               "ConeInner": 30,
               "ConeOuter": 55,
               "Contribution": "Diffuse, Specular, Transmissive",
               "Cookie": null,
               "FogMode": "Enabled",
               "FogStrength": 1,
+              "Intensity": 1,
               "LightColor": "1.36,1.105,0.8075,0.85",
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -5212,7 +6639,8 @@
               "Radius": 340,
               "ShadowBias": 0,
               "ShadowHardness": 0.25,
-              "Shadows": true
+              "Shadows": true,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -5238,11 +6666,55 @@
               "__guid": "5e4fa8b3-990f-5164-b742-2ff5659b6be8",
               "__enabled": false,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 1,
+              "Intensity": 1,
               "LightColor": "1.6,1.3,0.95,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -5252,21 +6724,64 @@
               "Radius": 340,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             },
             {
               "__type": "Sandbox.SpotLight",
               "__guid": "40a7ecb8-a459-4cfa-b504-0c7d751de889",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
               "ConeInner": 30,
               "ConeOuter": 55,
               "Contribution": "Diffuse, Specular, Transmissive",
               "Cookie": null,
               "FogMode": "Enabled",
               "FogStrength": 1,
+              "Intensity": 1,
               "LightColor": "1.36,1.105,0.8075,0.85",
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -5276,7 +6791,8 @@
               "Radius": 340,
               "ShadowBias": 0,
               "ShadowHardness": 0.25,
-              "Shadows": true
+              "Shadows": true,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -5302,11 +6818,55 @@
               "__guid": "1f745c9c-d60a-5b26-b66f-67f1644e15b7",
               "__enabled": false,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 1,
+              "Intensity": 1,
               "LightColor": "1.6,1.3,0.95,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -5316,21 +6876,64 @@
               "Radius": 340,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             },
             {
               "__type": "Sandbox.SpotLight",
               "__guid": "5651abbf-342a-4ed2-aaf7-0f439917d672",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
               "ConeInner": 30,
               "ConeOuter": 55,
               "Contribution": "Diffuse, Specular, Transmissive",
               "Cookie": null,
               "FogMode": "Enabled",
               "FogStrength": 1,
+              "Intensity": 1,
               "LightColor": "1.36,1.105,0.8075,0.85",
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -5340,7 +6943,8 @@
               "Radius": 340,
               "ShadowBias": 0,
               "ShadowHardness": 0.25,
-              "Shadows": true
+              "Shadows": true,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -5366,11 +6970,55 @@
               "__guid": "328b18aa-bf0c-5066-a39c-e7861c37706b",
               "__enabled": false,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 1,
+              "Intensity": 1,
               "LightColor": "1.6,1.3,0.95,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -5380,21 +7028,64 @@
               "Radius": 320,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             },
             {
               "__type": "Sandbox.SpotLight",
               "__guid": "d805cb39-071e-4cce-9899-f951a6d037cf",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
               "ConeInner": 30,
               "ConeOuter": 55,
               "Contribution": "Diffuse, Specular, Transmissive",
               "Cookie": null,
               "FogMode": "Enabled",
               "FogStrength": 1,
+              "Intensity": 1,
               "LightColor": "1.36,1.105,0.8075,0.85",
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -5404,7 +7095,8 @@
               "Radius": 320,
               "ShadowBias": 0,
               "ShadowHardness": 0.25,
-              "Shadows": true
+              "Shadows": true,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -5430,11 +7122,55 @@
               "__guid": "6215c1f3-1392-58ad-a49a-ccfb99911deb",
               "__enabled": false,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 1,
+              "Intensity": 1,
               "LightColor": "1.6,1.3,0.95,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -5444,21 +7180,64 @@
               "Radius": 320,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             },
             {
               "__type": "Sandbox.SpotLight",
               "__guid": "60e99f5e-d2e2-4125-b022-bf1671bb493e",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
               "ConeInner": 30,
               "ConeOuter": 55,
               "Contribution": "Diffuse, Specular, Transmissive",
               "Cookie": null,
               "FogMode": "Enabled",
               "FogStrength": 1,
+              "Intensity": 1,
               "LightColor": "1.36,1.105,0.8075,0.85",
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -5468,7 +7247,8 @@
               "Radius": 320,
               "ShadowBias": 0,
               "ShadowHardness": 0.25,
-              "Shadows": true
+              "Shadows": true,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -5494,11 +7274,55 @@
               "__guid": "15adceb2-18da-5611-abe2-0b0d1af4a6bb",
               "__enabled": false,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 1,
+              "Intensity": 1,
               "LightColor": "1.6,1.3,0.95,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -5508,21 +7332,64 @@
               "Radius": 320,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             },
             {
               "__type": "Sandbox.SpotLight",
               "__guid": "07669524-9a90-4e96-86bf-45500d7be501",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
               "ConeInner": 30,
               "ConeOuter": 55,
               "Contribution": "Diffuse, Specular, Transmissive",
               "Cookie": null,
               "FogMode": "Enabled",
               "FogStrength": 1,
+              "Intensity": 1,
               "LightColor": "1.36,1.105,0.8075,0.85",
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -5532,7 +7399,8 @@
               "Radius": 320,
               "ShadowBias": 0,
               "ShadowHardness": 0.25,
-              "Shadows": true
+              "Shadows": true,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -5558,11 +7426,55 @@
               "__guid": "6ddd307c-8c95-5055-b85b-e77ba3fc3ebc",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 1,
+              "Intensity": 1,
               "LightColor": "1,1.12,1.3,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -5572,7 +7484,8 @@
               "Radius": 360,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -5598,11 +7511,55 @@
               "__guid": "997f2a78-7f79-56c0-bfc1-6dc305e09486",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 1,
+              "Intensity": 1,
               "LightColor": "1,1.12,1.3,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -5612,7 +7569,8 @@
               "Radius": 260,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": false
+              "Shadows": false,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -5638,11 +7596,55 @@
               "__guid": "03895e89-7fe8-54dd-94e3-c75578eb41ed",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 0.15,
+              "Intensity": 1,
               "LightColor": "3.4,2.3,1.25,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -5652,7 +7654,8 @@
               "Radius": 330,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": true
+              "Shadows": true,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -5678,11 +7681,55 @@
               "__guid": "3501b286-0dc9-573c-b3df-57df9b53123a",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 0.15,
+              "Intensity": 1,
               "LightColor": "3.4,2.3,1.25,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -5692,7 +7739,8 @@
               "Radius": 330,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": true
+              "Shadows": true,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -5718,11 +7766,55 @@
               "__guid": "4de8e417-a812-5350-8c64-c17efeccea60",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 0.15,
+              "Intensity": 1,
               "LightColor": "3.4,2.3,1.25,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -5732,7 +7824,8 @@
               "Radius": 330,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": true
+              "Shadows": true,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -5758,11 +7851,55 @@
               "__guid": "9515bc3d-9adc-564f-9f6b-5a0dd75be480",
               "__enabled": true,
               "Flags": 0,
+              "__version": 1,
+              "AnimationCurve": [
+                {
+                  "x": 0,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 0.5,
+                  "y": 1,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                },
+                {
+                  "x": 1,
+                  "y": 0,
+                  "in": 0,
+                  "out": 0,
+                  "mode": "Mirrored"
+                }
+              ],
+              "AnimationDuration": 2,
+              "AnimationEnabled": false,
+              "AnimationGradient": {
+                "blend": "Linear",
+                "color": [
+                  {
+                    "t": 0.5,
+                    "c": "1,1,1,1"
+                  }
+                ],
+                "alpha": []
+              },
+              "AnimationPattern": "Flicker",
+              "AnimationSpeed": 1,
+              "AnimationTimeOffset": 0,
               "Attenuation": 1,
+              "BakeLightIndex": -1,
+              "ConstantAttenuation": 0,
               "Contribution": "Diffuse, Specular, Transmissive",
               "FogMode": "Enabled",
               "FogStrength": 0.15,
+              "Intensity": 1,
               "LightColor": "3.4,2.3,1.25,1",
+              "LinearAttenuation": 0,
+              "MixedShadows": false,
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -5772,7 +7909,8 @@
               "Radius": 330,
               "ShadowBias": 0,
               "ShadowHardness": 0,
-              "Shadows": true
+              "Shadows": true,
+              "Temperature": 6500
             }
           ],
           "Children": []
@@ -13052,7 +15190,7 @@
         "45d2f9c1-e34d-4756-807d-b5197dfc0e92": "ecd3c2ad-dcbb-5fa9-a94e-05f3635918b4",
         "35f22135-8476-417b-b33c-fea8b2524a75": "9ffbdd7f-f0e0-5ca4-b4bc-691272670678",
         "ec32f16b-5053-4522-8948-4eaef65a809a": "3dca7149-b39b-5cea-b157-dac7749a271f",
-        "ede1eb20-ea2d-4554-8925-3bb3c95dc72a": "281f4421-6de1-88fd-b149-c6e878de6c38"
+        "b943e69d-9262-4f23-b70d-dc17b87a1fcd": "1cc5f18d-3f72-86de-b6b5-b6b76a9b10f9"
       }
     },
     {
@@ -13219,7 +15357,7 @@
         "c3b437df-9396-434e-90be-11b99ef6f0c5": "9460aa07-06d5-56e5-9f9d-09910c4c7298",
         "01e48aeb-9352-4716-ad31-3833d2f5ccef": "32429354-0329-54d4-bb23-c918a636420e",
         "a3a74cfa-fb01-442b-830c-1b445a6b5109": "11a3032c-50ba-5409-a58a-7c146fe13bb6",
-        "88b53699-e8b6-4313-a920-c4cdb28950d0": "4975211e-b1c2-8cef-a473-955b34357d54"
+        "dc6226a2-1593-4128-b7be-627753b5618b": "1642d6ba-9dfc-8a23-9ffb-eb8dcee973ca"
       }
     },
     {
@@ -13267,6 +15405,7 @@
         "62e7124f-7d96-4d4a-b3ba-4c0ef58f6b4a": "d5bb1584-648d-5397-a8e8-6b41cd91af43",
         "37b4fba5-67ef-81bb-866f-c8cfc5b5a492": "ba7b463f-5657-8c39-b3e1-db2ba3fe3609",
         "932f5e2c-242a-8101-95e4-a2a78a7da717": "49e8d973-1950-8f90-b3ad-7ecb9ddd8afb",
+        "0501fc7f-ec2f-8532-90d2-5f88bb898cdb": "68a209d9-bf34-8741-9a1e-62604b1f0778",
         "91d5d71c-7576-48cb-8996-eb3c468aaf59": "b148f146-8779-58e1-9972-d935be791fc4",
         "b4ca6d36-f647-49b3-9151-8ef4c63aeddd": "98eb522a-89e2-59f0-a448-8c949024d254",
         "4dc414cd-ed6d-4fcd-bd26-0c4c340b5301": "854d497a-c79a-5d72-a116-cd368df05aed"
@@ -13299,7 +15438,10 @@
           "MaterialGroup": null,
           "MaterialOverride": null,
           "Materials": null,
-          "Model": "models/props/lowtide/lpg_canister_v2/lpg_canister.vmdl",
+          "Model": {
+            "Id": "4a328d21-e0b4-4a45-b69c-df5a7d4c2ff6",
+            "Path": "models/props/lowtide/lpg_canister_v2/lpg_canister.vmdl"
+          },
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
@@ -13324,7 +15466,10 @@
           "Elasticity": null,
           "Friction": null,
           "IsTrigger": false,
-          "Model": "models/props/lowtide/lpg_canister_v2/lpg_canister.vmdl",
+          "Model": {
+            "Id": "4a328d21-e0b4-4a45-b69c-df5a7d4c2ff6",
+            "Path": "models/props/lowtide/lpg_canister_v2/lpg_canister.vmdl"
+          },
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
@@ -13364,7 +15509,7 @@
           "RollingResistance": null,
           "Static": true,
           "Surface": {
-            "Id": "79ca6cfc-2d30-4e1a-95a7-0d647376d764",
+            "Id": "04afdd34-4d33-49c9-bd4f-d49db00dab3d",
             "Path": "surfaces/metal.surface"
           },
           "SurfaceVelocity": "0,0,0"
@@ -13380,7 +15525,10 @@
             "Id": "ccafda37-2b20-410b-b963-092402aeb846",
             "Path": "sounds/world/lpg/jet.sound"
           },
-          "IntactModel": "models/props/lowtide/lpg_canister_v2/lpg_canister.vmdl",
+          "IntactModel": {
+            "Id": "4a328d21-e0b4-4a45-b69c-df5a7d4c2ff6",
+            "Path": "models/props/lowtide/lpg_canister_v2/lpg_canister.vmdl"
+          },
           "LeakSound": {
             "Id": "90baf635-83a3-4b7e-9fab-342fcae57475",
             "Path": "sounds/world/lpg/leak.sound"
@@ -13391,7 +15539,10 @@
           "OnComponentFixedUpdate": null,
           "OnComponentStart": null,
           "OnComponentUpdate": null,
-          "RupturedModel": "models/props/lowtide/lpg_canister_v2/lpg_canister_ruptured.vmdl",
+          "RupturedModel": {
+            "Id": "26151953-895c-472a-99dc-144cf1ea1f6e",
+            "Path": "models/props/lowtide/lpg_canister_v2/lpg_canister_ruptured.vmdl"
+          },
           "RuptureSound": {
             "Id": "d945c676-3641-44aa-a453-802113e84c20",
             "Path": "sounds/weapons/grenade/he_grenade_explode.sound"
@@ -13427,7 +15578,10 @@
           "MaterialGroup": null,
           "MaterialOverride": null,
           "Materials": null,
-          "Model": "models/props/lowtide/lpg_canister_v2/lpg_canister.vmdl",
+          "Model": {
+            "Id": "4a328d21-e0b4-4a45-b69c-df5a7d4c2ff6",
+            "Path": "models/props/lowtide/lpg_canister_v2/lpg_canister.vmdl"
+          },
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
@@ -13452,7 +15606,10 @@
           "Elasticity": null,
           "Friction": null,
           "IsTrigger": false,
-          "Model": "models/props/lowtide/lpg_canister_v2/lpg_canister.vmdl",
+          "Model": {
+            "Id": "4a328d21-e0b4-4a45-b69c-df5a7d4c2ff6",
+            "Path": "models/props/lowtide/lpg_canister_v2/lpg_canister.vmdl"
+          },
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
@@ -13492,7 +15649,7 @@
           "RollingResistance": null,
           "Static": true,
           "Surface": {
-            "Id": "79ca6cfc-2d30-4e1a-95a7-0d647376d764",
+            "Id": "04afdd34-4d33-49c9-bd4f-d49db00dab3d",
             "Path": "surfaces/metal.surface"
           },
           "SurfaceVelocity": "0,0,0"
@@ -13508,7 +15665,10 @@
             "Id": "ccafda37-2b20-410b-b963-092402aeb846",
             "Path": "sounds/world/lpg/jet.sound"
           },
-          "IntactModel": "models/props/lowtide/lpg_canister_v2/lpg_canister.vmdl",
+          "IntactModel": {
+            "Id": "4a328d21-e0b4-4a45-b69c-df5a7d4c2ff6",
+            "Path": "models/props/lowtide/lpg_canister_v2/lpg_canister.vmdl"
+          },
           "LeakSound": {
             "Id": "90baf635-83a3-4b7e-9fab-342fcae57475",
             "Path": "sounds/world/lpg/leak.sound"
@@ -13519,7 +15679,10 @@
           "OnComponentFixedUpdate": null,
           "OnComponentStart": null,
           "OnComponentUpdate": null,
-          "RupturedModel": "models/props/lowtide/lpg_canister_v2/lpg_canister_ruptured.vmdl",
+          "RupturedModel": {
+            "Id": "26151953-895c-472a-99dc-144cf1ea1f6e",
+            "Path": "models/props/lowtide/lpg_canister_v2/lpg_canister_ruptured.vmdl"
+          },
           "RuptureSound": {
             "Id": "d945c676-3641-44aa-a453-802113e84c20",
             "Path": "sounds/weapons/grenade/he_grenade_explode.sound"
@@ -13555,7 +15718,10 @@
           "MaterialGroup": null,
           "MaterialOverride": null,
           "Materials": null,
-          "Model": "models/props/lowtide/lpg_canister_v2/lpg_canister.vmdl",
+          "Model": {
+            "Id": "4a328d21-e0b4-4a45-b69c-df5a7d4c2ff6",
+            "Path": "models/props/lowtide/lpg_canister_v2/lpg_canister.vmdl"
+          },
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
@@ -13580,7 +15746,10 @@
           "Elasticity": null,
           "Friction": null,
           "IsTrigger": false,
-          "Model": "models/props/lowtide/lpg_canister_v2/lpg_canister.vmdl",
+          "Model": {
+            "Id": "4a328d21-e0b4-4a45-b69c-df5a7d4c2ff6",
+            "Path": "models/props/lowtide/lpg_canister_v2/lpg_canister.vmdl"
+          },
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
@@ -13620,7 +15789,7 @@
           "RollingResistance": null,
           "Static": true,
           "Surface": {
-            "Id": "79ca6cfc-2d30-4e1a-95a7-0d647376d764",
+            "Id": "04afdd34-4d33-49c9-bd4f-d49db00dab3d",
             "Path": "surfaces/metal.surface"
           },
           "SurfaceVelocity": "0,0,0"
@@ -13636,7 +15805,10 @@
             "Id": "ccafda37-2b20-410b-b963-092402aeb846",
             "Path": "sounds/world/lpg/jet.sound"
           },
-          "IntactModel": "models/props/lowtide/lpg_canister_v2/lpg_canister.vmdl",
+          "IntactModel": {
+            "Id": "4a328d21-e0b4-4a45-b69c-df5a7d4c2ff6",
+            "Path": "models/props/lowtide/lpg_canister_v2/lpg_canister.vmdl"
+          },
           "LeakSound": {
             "Id": "90baf635-83a3-4b7e-9fab-342fcae57475",
             "Path": "sounds/world/lpg/leak.sound"
@@ -13647,7 +15819,10 @@
           "OnComponentFixedUpdate": null,
           "OnComponentStart": null,
           "OnComponentUpdate": null,
-          "RupturedModel": "models/props/lowtide/lpg_canister_v2/lpg_canister_ruptured.vmdl",
+          "RupturedModel": {
+            "Id": "26151953-895c-472a-99dc-144cf1ea1f6e",
+            "Path": "models/props/lowtide/lpg_canister_v2/lpg_canister_ruptured.vmdl"
+          },
           "RuptureSound": {
             "Id": "d945c676-3641-44aa-a453-802113e84c20",
             "Path": "sounds/weapons/grenade/he_grenade_explode.sound"
@@ -13683,7 +15858,10 @@
           "MaterialGroup": null,
           "MaterialOverride": null,
           "Materials": null,
-          "Model": "models/props/lowtide/lpg_canister_v2/lpg_canister.vmdl",
+          "Model": {
+            "Id": "4a328d21-e0b4-4a45-b69c-df5a7d4c2ff6",
+            "Path": "models/props/lowtide/lpg_canister_v2/lpg_canister.vmdl"
+          },
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
@@ -13708,7 +15886,10 @@
           "Elasticity": null,
           "Friction": null,
           "IsTrigger": false,
-          "Model": "models/props/lowtide/lpg_canister_v2/lpg_canister.vmdl",
+          "Model": {
+            "Id": "4a328d21-e0b4-4a45-b69c-df5a7d4c2ff6",
+            "Path": "models/props/lowtide/lpg_canister_v2/lpg_canister.vmdl"
+          },
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
@@ -13748,7 +15929,7 @@
           "RollingResistance": null,
           "Static": true,
           "Surface": {
-            "Id": "79ca6cfc-2d30-4e1a-95a7-0d647376d764",
+            "Id": "04afdd34-4d33-49c9-bd4f-d49db00dab3d",
             "Path": "surfaces/metal.surface"
           },
           "SurfaceVelocity": "0,0,0"
@@ -13764,7 +15945,10 @@
             "Id": "ccafda37-2b20-410b-b963-092402aeb846",
             "Path": "sounds/world/lpg/jet.sound"
           },
-          "IntactModel": "models/props/lowtide/lpg_canister_v2/lpg_canister.vmdl",
+          "IntactModel": {
+            "Id": "4a328d21-e0b4-4a45-b69c-df5a7d4c2ff6",
+            "Path": "models/props/lowtide/lpg_canister_v2/lpg_canister.vmdl"
+          },
           "LeakSound": {
             "Id": "90baf635-83a3-4b7e-9fab-342fcae57475",
             "Path": "sounds/world/lpg/leak.sound"
@@ -13775,7 +15959,10 @@
           "OnComponentFixedUpdate": null,
           "OnComponentStart": null,
           "OnComponentUpdate": null,
-          "RupturedModel": "models/props/lowtide/lpg_canister_v2/lpg_canister_ruptured.vmdl",
+          "RupturedModel": {
+            "Id": "26151953-895c-472a-99dc-144cf1ea1f6e",
+            "Path": "models/props/lowtide/lpg_canister_v2/lpg_canister_ruptured.vmdl"
+          },
           "RuptureSound": {
             "Id": "d945c676-3641-44aa-a453-802113e84c20",
             "Path": "sounds/weapons/grenade/he_grenade_explode.sound"
@@ -13805,11 +15992,55 @@
           "__guid": "5d70bc52-df71-4e42-bb16-f971d7228ce8",
           "__enabled": true,
           "Flags": 0,
+          "__version": 1,
+          "AnimationCurve": [
+            {
+              "x": 0,
+              "y": 0,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 0.5,
+              "y": 1,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            }
+          ],
+          "AnimationDuration": 2,
+          "AnimationEnabled": false,
+          "AnimationGradient": {
+            "blend": "Linear",
+            "color": [
+              {
+                "t": 0.5,
+                "c": "1,1,1,1"
+              }
+            ],
+            "alpha": []
+          },
+          "AnimationPattern": "Flicker",
+          "AnimationSpeed": 1,
+          "AnimationTimeOffset": 0,
           "Attenuation": 1,
+          "BakeLightIndex": -1,
+          "ConstantAttenuation": 0,
           "Contribution": "Diffuse, Specular, Transmissive",
           "FogMode": "Enabled",
           "FogStrength": 1,
+          "Intensity": 1,
           "LightColor": "1.2,1.25,1.35,1",
+          "LinearAttenuation": 0,
+          "MixedShadows": false,
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
@@ -13819,7 +16050,8 @@
           "Radius": 70,
           "ShadowBias": 0,
           "ShadowHardness": 0,
-          "Shadows": false
+          "Shadows": false,
+          "Temperature": 6500
         }
       ],
       "Children": []
@@ -13845,11 +16077,55 @@
           "__guid": "ca190502-c528-4efe-80ed-dbcd28388a05",
           "__enabled": true,
           "Flags": 0,
+          "__version": 1,
+          "AnimationCurve": [
+            {
+              "x": 0,
+              "y": 0,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 0.5,
+              "y": 1,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            }
+          ],
+          "AnimationDuration": 2,
+          "AnimationEnabled": false,
+          "AnimationGradient": {
+            "blend": "Linear",
+            "color": [
+              {
+                "t": 0.5,
+                "c": "1,1,1,1"
+              }
+            ],
+            "alpha": []
+          },
+          "AnimationPattern": "Flicker",
+          "AnimationSpeed": 1,
+          "AnimationTimeOffset": 0,
           "Attenuation": 1,
+          "BakeLightIndex": -1,
+          "ConstantAttenuation": 0,
           "Contribution": "Diffuse, Specular, Transmissive",
           "FogMode": "Enabled",
           "FogStrength": 1,
+          "Intensity": 1,
           "LightColor": "1.2,1.25,1.35,1",
+          "LinearAttenuation": 0,
+          "MixedShadows": false,
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
@@ -13859,7 +16135,8 @@
           "Radius": 70,
           "ShadowBias": 0,
           "ShadowHardness": 0,
-          "Shadows": false
+          "Shadows": false,
+          "Temperature": 6500
         }
       ],
       "Children": []
@@ -13885,11 +16162,55 @@
           "__guid": "fed6fc56-aaec-4204-bb0e-cee4a5717c82",
           "__enabled": true,
           "Flags": 0,
+          "__version": 1,
+          "AnimationCurve": [
+            {
+              "x": 0,
+              "y": 0,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 0.5,
+              "y": 1,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            }
+          ],
+          "AnimationDuration": 2,
+          "AnimationEnabled": false,
+          "AnimationGradient": {
+            "blend": "Linear",
+            "color": [
+              {
+                "t": 0.5,
+                "c": "1,1,1,1"
+              }
+            ],
+            "alpha": []
+          },
+          "AnimationPattern": "Flicker",
+          "AnimationSpeed": 1,
+          "AnimationTimeOffset": 0,
           "Attenuation": 1,
+          "BakeLightIndex": -1,
+          "ConstantAttenuation": 0,
           "Contribution": "Diffuse, Specular, Transmissive",
           "FogMode": "Enabled",
           "FogStrength": 1,
+          "Intensity": 1,
           "LightColor": "1.2,1.25,1.35,1",
+          "LinearAttenuation": 0,
+          "MixedShadows": false,
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
@@ -13899,7 +16220,8 @@
           "Radius": 70,
           "ShadowBias": 0,
           "ShadowHardness": 0,
-          "Shadows": false
+          "Shadows": false,
+          "Temperature": 6500
         }
       ],
       "Children": []
@@ -13925,11 +16247,55 @@
           "__guid": "6c04e36a-862e-4360-af55-aae760893cf2",
           "__enabled": true,
           "Flags": 0,
+          "__version": 1,
+          "AnimationCurve": [
+            {
+              "x": 0,
+              "y": 0,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 0.5,
+              "y": 1,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            }
+          ],
+          "AnimationDuration": 2,
+          "AnimationEnabled": false,
+          "AnimationGradient": {
+            "blend": "Linear",
+            "color": [
+              {
+                "t": 0.5,
+                "c": "1,1,1,1"
+              }
+            ],
+            "alpha": []
+          },
+          "AnimationPattern": "Flicker",
+          "AnimationSpeed": 1,
+          "AnimationTimeOffset": 0,
           "Attenuation": 1,
+          "BakeLightIndex": -1,
+          "ConstantAttenuation": 0,
           "Contribution": "Diffuse, Specular, Transmissive",
           "FogMode": "Enabled",
           "FogStrength": 1,
+          "Intensity": 1,
           "LightColor": "1.2,1.25,1.35,1",
+          "LinearAttenuation": 0,
+          "MixedShadows": false,
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
@@ -13939,7 +16305,8 @@
           "Radius": 70,
           "ShadowBias": 0,
           "ShadowHardness": 0,
-          "Shadows": false
+          "Shadows": false,
+          "Temperature": 6500
         }
       ],
       "Children": []
@@ -13965,11 +16332,55 @@
           "__guid": "3b458772-4c8c-40eb-8fae-ca4f39b11443",
           "__enabled": true,
           "Flags": 0,
+          "__version": 1,
+          "AnimationCurve": [
+            {
+              "x": 0,
+              "y": 0,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 0.5,
+              "y": 1,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            }
+          ],
+          "AnimationDuration": 2,
+          "AnimationEnabled": false,
+          "AnimationGradient": {
+            "blend": "Linear",
+            "color": [
+              {
+                "t": 0.5,
+                "c": "1,1,1,1"
+              }
+            ],
+            "alpha": []
+          },
+          "AnimationPattern": "Flicker",
+          "AnimationSpeed": 1,
+          "AnimationTimeOffset": 0,
           "Attenuation": 1,
+          "BakeLightIndex": -1,
+          "ConstantAttenuation": 0,
           "Contribution": "Diffuse, Specular, Transmissive",
           "FogMode": "Enabled",
           "FogStrength": 1,
+          "Intensity": 1,
           "LightColor": "1.2,1.25,1.35,1",
+          "LinearAttenuation": 0,
+          "MixedShadows": false,
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
@@ -13979,7 +16390,8 @@
           "Radius": 70,
           "ShadowBias": 0,
           "ShadowHardness": 0,
-          "Shadows": false
+          "Shadows": false,
+          "Temperature": 6500
         }
       ],
       "Children": []
@@ -14005,11 +16417,55 @@
           "__guid": "56a00ee8-301f-4aca-bd3d-f19d3a168441",
           "__enabled": true,
           "Flags": 0,
+          "__version": 1,
+          "AnimationCurve": [
+            {
+              "x": 0,
+              "y": 0,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 0.5,
+              "y": 1,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            }
+          ],
+          "AnimationDuration": 2,
+          "AnimationEnabled": false,
+          "AnimationGradient": {
+            "blend": "Linear",
+            "color": [
+              {
+                "t": 0.5,
+                "c": "1,1,1,1"
+              }
+            ],
+            "alpha": []
+          },
+          "AnimationPattern": "Flicker",
+          "AnimationSpeed": 1,
+          "AnimationTimeOffset": 0,
           "Attenuation": 1,
+          "BakeLightIndex": -1,
+          "ConstantAttenuation": 0,
           "Contribution": "Diffuse, Specular, Transmissive",
           "FogMode": "Enabled",
           "FogStrength": 1,
+          "Intensity": 1,
           "LightColor": "1.2,1.25,1.35,1",
+          "LinearAttenuation": 0,
+          "MixedShadows": false,
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
@@ -14019,7 +16475,8 @@
           "Radius": 70,
           "ShadowBias": 0,
           "ShadowHardness": 0,
-          "Shadows": false
+          "Shadows": false,
+          "Temperature": 6500
         }
       ],
       "Children": []
@@ -14045,11 +16502,55 @@
           "__guid": "302105df-09e8-47ce-b71b-9796ef6298e2",
           "__enabled": true,
           "Flags": 0,
+          "__version": 1,
+          "AnimationCurve": [
+            {
+              "x": 0,
+              "y": 0,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 0.5,
+              "y": 1,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            }
+          ],
+          "AnimationDuration": 2,
+          "AnimationEnabled": false,
+          "AnimationGradient": {
+            "blend": "Linear",
+            "color": [
+              {
+                "t": 0.5,
+                "c": "1,1,1,1"
+              }
+            ],
+            "alpha": []
+          },
+          "AnimationPattern": "Flicker",
+          "AnimationSpeed": 1,
+          "AnimationTimeOffset": 0,
           "Attenuation": 1,
+          "BakeLightIndex": -1,
+          "ConstantAttenuation": 0,
           "Contribution": "Diffuse, Specular, Transmissive",
           "FogMode": "Enabled",
           "FogStrength": 1,
+          "Intensity": 1,
           "LightColor": "1.2,1.25,1.35,1",
+          "LinearAttenuation": 0,
+          "MixedShadows": false,
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
@@ -14059,7 +16560,8 @@
           "Radius": 70,
           "ShadowBias": 0,
           "ShadowHardness": 0,
-          "Shadows": false
+          "Shadows": false,
+          "Temperature": 6500
         }
       ],
       "Children": []
@@ -14085,11 +16587,55 @@
           "__guid": "6f42576f-b88e-411b-bddf-ea62e3794fa7",
           "__enabled": true,
           "Flags": 0,
+          "__version": 1,
+          "AnimationCurve": [
+            {
+              "x": 0,
+              "y": 0,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 0.5,
+              "y": 1,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            }
+          ],
+          "AnimationDuration": 2,
+          "AnimationEnabled": false,
+          "AnimationGradient": {
+            "blend": "Linear",
+            "color": [
+              {
+                "t": 0.5,
+                "c": "1,1,1,1"
+              }
+            ],
+            "alpha": []
+          },
+          "AnimationPattern": "Flicker",
+          "AnimationSpeed": 1,
+          "AnimationTimeOffset": 0,
           "Attenuation": 1,
+          "BakeLightIndex": -1,
+          "ConstantAttenuation": 0,
           "Contribution": "Diffuse, Specular, Transmissive",
           "FogMode": "Enabled",
           "FogStrength": 1,
+          "Intensity": 1,
           "LightColor": "1.2,1.25,1.35,1",
+          "LinearAttenuation": 0,
+          "MixedShadows": false,
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
@@ -14099,7 +16645,8 @@
           "Radius": 70,
           "ShadowBias": 0,
           "ShadowHardness": 0,
-          "Shadows": false
+          "Shadows": false,
+          "Temperature": 6500
         }
       ],
       "Children": []
@@ -14125,11 +16672,55 @@
           "__guid": "8ad560ef-d8ca-4868-8292-a82c6857d519",
           "__enabled": true,
           "Flags": 0,
+          "__version": 1,
+          "AnimationCurve": [
+            {
+              "x": 0,
+              "y": 0,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 0.5,
+              "y": 1,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            }
+          ],
+          "AnimationDuration": 2,
+          "AnimationEnabled": false,
+          "AnimationGradient": {
+            "blend": "Linear",
+            "color": [
+              {
+                "t": 0.5,
+                "c": "1,1,1,1"
+              }
+            ],
+            "alpha": []
+          },
+          "AnimationPattern": "Flicker",
+          "AnimationSpeed": 1,
+          "AnimationTimeOffset": 0,
           "Attenuation": 1,
+          "BakeLightIndex": -1,
+          "ConstantAttenuation": 0,
           "Contribution": "Diffuse, Specular, Transmissive",
           "FogMode": "Enabled",
           "FogStrength": 1,
+          "Intensity": 1,
           "LightColor": "1.2,1.25,1.35,1",
+          "LinearAttenuation": 0,
+          "MixedShadows": false,
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
@@ -14139,7 +16730,8 @@
           "Radius": 70,
           "ShadowBias": 0,
           "ShadowHardness": 0,
-          "Shadows": false
+          "Shadows": false,
+          "Temperature": 6500
         }
       ],
       "Children": []
@@ -14165,11 +16757,55 @@
           "__guid": "88567b3a-a2cb-4337-a317-56d36ab2d1c3",
           "__enabled": true,
           "Flags": 0,
+          "__version": 1,
+          "AnimationCurve": [
+            {
+              "x": 0,
+              "y": 0,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 0.5,
+              "y": 1,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            }
+          ],
+          "AnimationDuration": 2,
+          "AnimationEnabled": false,
+          "AnimationGradient": {
+            "blend": "Linear",
+            "color": [
+              {
+                "t": 0.5,
+                "c": "1,1,1,1"
+              }
+            ],
+            "alpha": []
+          },
+          "AnimationPattern": "Flicker",
+          "AnimationSpeed": 1,
+          "AnimationTimeOffset": 0,
           "Attenuation": 1,
+          "BakeLightIndex": -1,
+          "ConstantAttenuation": 0,
           "Contribution": "Diffuse, Specular, Transmissive",
           "FogMode": "Enabled",
           "FogStrength": 1,
+          "Intensity": 1,
           "LightColor": "1.2,1.25,1.35,1",
+          "LinearAttenuation": 0,
+          "MixedShadows": false,
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
@@ -14179,7 +16815,8 @@
           "Radius": 70,
           "ShadowBias": 0,
           "ShadowHardness": 0,
-          "Shadows": false
+          "Shadows": false,
+          "Temperature": 6500
         }
       ],
       "Children": []
@@ -14205,11 +16842,55 @@
           "__guid": "bca00906-472a-40c2-93c0-809ebb6089e1",
           "__enabled": true,
           "Flags": 0,
+          "__version": 1,
+          "AnimationCurve": [
+            {
+              "x": 0,
+              "y": 0,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 0.5,
+              "y": 1,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            }
+          ],
+          "AnimationDuration": 2,
+          "AnimationEnabled": false,
+          "AnimationGradient": {
+            "blend": "Linear",
+            "color": [
+              {
+                "t": 0.5,
+                "c": "1,1,1,1"
+              }
+            ],
+            "alpha": []
+          },
+          "AnimationPattern": "Flicker",
+          "AnimationSpeed": 1,
+          "AnimationTimeOffset": 0,
           "Attenuation": 1,
+          "BakeLightIndex": -1,
+          "ConstantAttenuation": 0,
           "Contribution": "Diffuse, Specular, Transmissive",
           "FogMode": "Enabled",
           "FogStrength": 1,
+          "Intensity": 1,
           "LightColor": "1.2,1.25,1.35,1",
+          "LinearAttenuation": 0,
+          "MixedShadows": false,
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
@@ -14219,7 +16900,8 @@
           "Radius": 70,
           "ShadowBias": 0,
           "ShadowHardness": 0,
-          "Shadows": false
+          "Shadows": false,
+          "Temperature": 6500
         }
       ],
       "Children": []
@@ -14245,11 +16927,55 @@
           "__guid": "bfe8201e-62cc-4813-b6f0-862356a46970",
           "__enabled": true,
           "Flags": 0,
+          "__version": 1,
+          "AnimationCurve": [
+            {
+              "x": 0,
+              "y": 0,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 0.5,
+              "y": 1,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            }
+          ],
+          "AnimationDuration": 2,
+          "AnimationEnabled": false,
+          "AnimationGradient": {
+            "blend": "Linear",
+            "color": [
+              {
+                "t": 0.5,
+                "c": "1,1,1,1"
+              }
+            ],
+            "alpha": []
+          },
+          "AnimationPattern": "Flicker",
+          "AnimationSpeed": 1,
+          "AnimationTimeOffset": 0,
           "Attenuation": 1,
+          "BakeLightIndex": -1,
+          "ConstantAttenuation": 0,
           "Contribution": "Diffuse, Specular, Transmissive",
           "FogMode": "Enabled",
           "FogStrength": 1,
+          "Intensity": 1,
           "LightColor": "1.2,1.25,1.35,1",
+          "LinearAttenuation": 0,
+          "MixedShadows": false,
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
@@ -14259,7 +16985,8 @@
           "Radius": 70,
           "ShadowBias": 0,
           "ShadowHardness": 0,
-          "Shadows": false
+          "Shadows": false,
+          "Temperature": 6500
         }
       ],
       "Children": []
@@ -14285,11 +17012,55 @@
           "__guid": "66ecdead-04d9-444c-9271-d3bebd0f0934",
           "__enabled": true,
           "Flags": 0,
+          "__version": 1,
+          "AnimationCurve": [
+            {
+              "x": 0,
+              "y": 0,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 0.5,
+              "y": 1,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            }
+          ],
+          "AnimationDuration": 2,
+          "AnimationEnabled": false,
+          "AnimationGradient": {
+            "blend": "Linear",
+            "color": [
+              {
+                "t": 0.5,
+                "c": "1,1,1,1"
+              }
+            ],
+            "alpha": []
+          },
+          "AnimationPattern": "Flicker",
+          "AnimationSpeed": 1,
+          "AnimationTimeOffset": 0,
           "Attenuation": 1,
+          "BakeLightIndex": -1,
+          "ConstantAttenuation": 0,
           "Contribution": "Diffuse, Specular, Transmissive",
           "FogMode": "Enabled",
           "FogStrength": 1,
+          "Intensity": 1,
           "LightColor": "1.2,1.25,1.35,1",
+          "LinearAttenuation": 0,
+          "MixedShadows": false,
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
@@ -14299,7 +17070,8 @@
           "Radius": 70,
           "ShadowBias": 0,
           "ShadowHardness": 0,
-          "Shadows": false
+          "Shadows": false,
+          "Temperature": 6500
         }
       ],
       "Children": []
@@ -14325,11 +17097,55 @@
           "__guid": "8086883a-7a1f-445a-8aaf-a4be897ee212",
           "__enabled": true,
           "Flags": 0,
+          "__version": 1,
+          "AnimationCurve": [
+            {
+              "x": 0,
+              "y": 0,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 0.5,
+              "y": 1,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            }
+          ],
+          "AnimationDuration": 2,
+          "AnimationEnabled": false,
+          "AnimationGradient": {
+            "blend": "Linear",
+            "color": [
+              {
+                "t": 0.5,
+                "c": "1,1,1,1"
+              }
+            ],
+            "alpha": []
+          },
+          "AnimationPattern": "Flicker",
+          "AnimationSpeed": 1,
+          "AnimationTimeOffset": 0,
           "Attenuation": 1,
+          "BakeLightIndex": -1,
+          "ConstantAttenuation": 0,
           "Contribution": "Diffuse, Specular, Transmissive",
           "FogMode": "Enabled",
           "FogStrength": 1,
+          "Intensity": 1,
           "LightColor": "1.2,1.25,1.35,1",
+          "LinearAttenuation": 0,
+          "MixedShadows": false,
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
@@ -14339,7 +17155,8 @@
           "Radius": 70,
           "ShadowBias": 0,
           "ShadowHardness": 0,
-          "Shadows": false
+          "Shadows": false,
+          "Temperature": 6500
         }
       ],
       "Children": []
@@ -14365,11 +17182,55 @@
           "__guid": "dd8d4869-fb1d-4f4e-b0bf-ae87b8e61124",
           "__enabled": true,
           "Flags": 0,
+          "__version": 1,
+          "AnimationCurve": [
+            {
+              "x": 0,
+              "y": 0,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 0.5,
+              "y": 1,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            }
+          ],
+          "AnimationDuration": 2,
+          "AnimationEnabled": false,
+          "AnimationGradient": {
+            "blend": "Linear",
+            "color": [
+              {
+                "t": 0.5,
+                "c": "1,1,1,1"
+              }
+            ],
+            "alpha": []
+          },
+          "AnimationPattern": "Flicker",
+          "AnimationSpeed": 1,
+          "AnimationTimeOffset": 0,
           "Attenuation": 1,
+          "BakeLightIndex": -1,
+          "ConstantAttenuation": 0,
           "Contribution": "Diffuse, Specular, Transmissive",
           "FogMode": "Enabled",
           "FogStrength": 1,
+          "Intensity": 1,
           "LightColor": "1.2,1.25,1.35,1",
+          "LinearAttenuation": 0,
+          "MixedShadows": false,
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
@@ -14379,7 +17240,8 @@
           "Radius": 70,
           "ShadowBias": 0,
           "ShadowHardness": 0,
-          "Shadows": false
+          "Shadows": false,
+          "Temperature": 6500
         }
       ],
       "Children": []
@@ -14405,11 +17267,55 @@
           "__guid": "c055301c-f26d-45f4-b049-eca80f5880f5",
           "__enabled": true,
           "Flags": 0,
+          "__version": 1,
+          "AnimationCurve": [
+            {
+              "x": 0,
+              "y": 0,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 0.5,
+              "y": 1,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            },
+            {
+              "x": 1,
+              "y": 0,
+              "in": 0,
+              "out": 0,
+              "mode": "Mirrored"
+            }
+          ],
+          "AnimationDuration": 2,
+          "AnimationEnabled": false,
+          "AnimationGradient": {
+            "blend": "Linear",
+            "color": [
+              {
+                "t": 0.5,
+                "c": "1,1,1,1"
+              }
+            ],
+            "alpha": []
+          },
+          "AnimationPattern": "Flicker",
+          "AnimationSpeed": 1,
+          "AnimationTimeOffset": 0,
           "Attenuation": 1,
+          "BakeLightIndex": -1,
+          "ConstantAttenuation": 0,
           "Contribution": "Diffuse, Specular, Transmissive",
           "FogMode": "Enabled",
           "FogStrength": 1,
+          "Intensity": 1,
           "LightColor": "1.2,1.25,1.35,1",
+          "LinearAttenuation": 0,
+          "MixedShadows": false,
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,
@@ -14419,7 +17325,85 @@
           "Radius": 70,
           "ShadowBias": 0,
           "ShadowHardness": 0,
-          "Shadows": false
+          "Shadows": false,
+          "Temperature": 6500
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "bb209960-3faf-4aac-846a-a624ff5411eb",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Mud bank relief - REVIEW TRIAL",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.ModelRenderer",
+          "__guid": "b5ff0f6c-fcc5-4b4b-865e-9c2d4b3bfb09",
+          "__enabled": true,
+          "Flags": 0,
+          "BodyGroups": 18446744073709551615,
+          "CreateAttachments": false,
+          "LodOverride": null,
+          "MaterialGroup": null,
+          "MaterialOverride": null,
+          "Materials": null,
+          "Model": {
+            "Id": "72d0ce8a-fa18-4f5b-990f-bdd4239d29ab",
+            "Path": "models/maps/lowtide/mud-relief-v1/mud_bank_relief.vmdl"
+          },
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "RenderOptions": {
+            "GameLayer": true,
+            "OverlayLayer": false,
+            "BloomLayer": false,
+            "AfterUILayer": false
+          },
+          "RenderType": "On",
+          "Tint": "1,1,1,1"
+        },
+        {
+          "__type": "Sandbox.ModelCollider",
+          "__guid": "ccf99e4b-cd3c-4a9b-9f5e-a9c44bc937f1",
+          "__enabled": true,
+          "Flags": 0,
+          "ColliderFlags": 0,
+          "Elasticity": null,
+          "Friction": null,
+          "IsTrigger": false,
+          "Model": {
+            "Id": "72d0ce8a-fa18-4f5b-990f-bdd4239d29ab",
+            "Path": "models/maps/lowtide/mud-relief-v1/mud_bank_relief.vmdl"
+          },
+          "OnComponentDestroy": null,
+          "OnComponentDisabled": null,
+          "OnComponentEnabled": null,
+          "OnComponentFixedUpdate": null,
+          "OnComponentStart": null,
+          "OnComponentUpdate": null,
+          "OnObjectTriggerEnter": null,
+          "OnObjectTriggerExit": null,
+          "OnTriggerEnter": null,
+          "OnTriggerExit": null,
+          "RollingResistance": null,
+          "Static": true,
+          "Surface": null,
+          "SurfaceVelocity": "0,0,0"
         }
       ],
       "Children": []

@@ -1,0 +1,1 @@
+{"code":"var w=Editor.Application.FocusWidget; return new { Focus=w?.GetType().FullName, Window=w?.GetWindow()?.WindowTitle, Properties=typeof(Editor.Widget).GetProperties().Where(p=>p.Name.Contains(\"Child\")||p.Name.Contains(\"Parent\")||p.Name.Contains(\"Visible\")).Select(p=>p.ToString()).ToArray(), Scene=Editor.Application.Editor.Scene?.Name };"}

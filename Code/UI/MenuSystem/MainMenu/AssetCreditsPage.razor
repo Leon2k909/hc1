@@ -1,0 +1,70 @@
+@using Sandbox;
+@using Sandbox.UI;
+@using Sandbox.UI.Navigation;
+
+@inherits Panel
+@implements INavigatorPage
+@attribute [StyleSheet]
+@namespace Facepunch.UI
+
+<root class="hc1 asset-credits-page">
+    <MenuTopbar Title="ASSET CREDITS" />
+
+    <div class="credits-body">
+        <label class="credits-intro">@Tr( "Third-party assets and the people who made them." )</label>
+        <div class="credits-list">
+            @foreach ( var credit in Credits )
+            {
+                <div class="credit-row">
+                    <div class="credit-info">
+                        <label class="credit-title">@credit.Title</label>
+                        <label class="credit-author">@credit.Creator · @credit.License</label>
+                        <label class="credit-note">@credit.Changes</label>
+                    </div>
+                    <button class="credit-copy" onclick=@(() => CopyCredit( credit ))>
+                        <i>content_copy</i>
+                        <label>@Tr( _copied == credit ? "Copied" : "Copy credit" )</label>
+                    </button>
+                </div>
+            }
+        </div>
+    </div>
+</root>
+
+@code
+{
+    private record Credit( string Title, string Creator, string Source, string License, string LicensePath, string Changes )
+    {
+        public string Attribution => $"{Title} by {Creator}\n{Source}\n{License} · https://creativecommons.org/licenses/{LicensePath}/4.0/\n{Changes}";
+    }
+
+    // Sources and porting notes come from the attribution files bundled with the assets.
+    private static readonly Credit[] Credits =
+    {
+        new( "Realistic Palm Tree Free", "Next Spring", "https://sketchfab.com/3d-models/realistic-palm-tree-free-39052ea764c945858449e699318efa53", "CC BY 4.0", "by", "Converted to OBJ and adapted for s&box." ),
+        new( "Olive Tree Portugal", "CeDRI", "https://sketchfab.com/3d-models/olive-tree-portugal-e0b57e421ac546c6b7e4cb563f524640", "CC BY 4.0", "by", "Veridant trial asset. Converted to OBJ and adapted for s&box." ),
+        new( "SCAR", "JUST", "https://skfb.ly/oMtZw", "CC BY 4.0", "by", "Fixed and ported to Source 2 by Zombie Extinguisher." ),
+        new( "M4A1 Carbine Kit", "Kelisei Ventura", "https://skfb.ly/6XBXn", "CC BY 4.0", "by", Source2Port ),
+        new( "Attachments of M4A1 carbine", "Namelezz404", "https://skfb.ly/onFOQ", "CC BY 4.0", "by", Source2Port ),
+        new( "Silencers Pack 1", "Pedro Silva", "https://skfb.ly/6WLXE", "CC BY 4.0", "by", Source2Port ),
+        new( "Suppressor", "firebase1", "https://skfb.ly/6GFOX", "CC BY 4.0", "by", Source2Port ),
+        new( "Sight+rail weapon attachments", "Young_Wizard", "https://skfb.ly/6YnTF", "CC BY 4.0", "by", Source2Port ),
+        new( "Leapers UTG (MNT-973)", "Yksnawel", "https://skfb.ly/6ZVWZ", "CC BY-NC-ND 4.0", "by-nc-nd", Source2Port ),
+        new( "Sniper Scope", "CALD", "https://skfb.ly/opJGO", "CC BY 4.0", "by", Source2Port ),
+        new( "Walther MRS Reflex Sight", "Vextin", "https://skfb.ly/6SrWV", "CC BY-SA 4.0", "by-sa", Source2Port ),
+        new( "H&K USP Rail Adapter Accessory Low Poly", "8sianDude", "https://skfb.ly/o7UY9", "CC BY 4.0", "by", Source2Port ),
+    };
+
+    private const string Source2Port = "Ported to Source 2 by Zombie Extinguisher.";
+    private Credit _copied;
+
+    public void OnNavigationOpen() => MainMenuRoot.Instance?.SetActiveRoute( "/credits" );
+    public void OnNavigationClose() { }
+
+    private void CopyCredit( Credit credit )
+    {
+        Clipboard.SetText( credit.Attribution );
+        _copied = credit;
+        StateHasChanged();
+    }
+}

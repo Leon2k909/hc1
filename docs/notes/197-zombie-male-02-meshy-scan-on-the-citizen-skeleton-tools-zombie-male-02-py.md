@@ -14,7 +14,11 @@
   (smart UV project, 800-2,700 islands on decimated cloth, 2 px apart, repacked) and gets its own colour, roughness
   and normal maps baked from the scan (2048 / 1024 / 1024 / 512). The scan's custom normals are cleared first: after
   decimation the bake made up for them triangle by triangle, which the engine's tangents wouldn't match. The install
-  fills every pixel outside the islands from the nearest one, so the lower mips don't bleed black at the seams.
+  fills every pixel outside the islands from the nearest one, so the lower mips don't bleed black at the seams, and
+  the few left black inside them: triangles smaller than a pixel in UV (1.2% of LOD1's, 16% of LOD3's), which no
+  bake ray lands on. Doubling the rays' reach didn't change them. LOD0's maps use 53% of the texture.
+- Known: thin dark streaks along the open shirt's front edges on LOD0 and LOD1, where the decimated flap reaches past
+  the scan's and its rays find the T-shirt behind.
 - The rig (`Tools/zombie_male_02.py`, its docstring has the steps):
   - `FIT` is where the citizen's main joints sit in the scan, from its cross-sections. The trunk's joints share out
     pelvis to neck_0 as the citizen's do. Each main bone maps the scan onto the citizen's rest pose: limbs turn and
@@ -29,8 +33,11 @@
     rigid with the hand. A hanging arm is the scan below the armpit wider than 0.26 m and above 0.7 m: without the
     height limit the turned-out feet counted as hands and were spun by the untwist.
   - The skeleton is the compiled citizen's (Source2Viewer's DATA dump of `citizen_human_male.vmdl_c`, GUID block
-    stripped), all 96 bones. The REF FBX's bone heads match it to 0.0004".
-- `python Tools/zombie_male_02.py --preview` renders the fit, the rest pose over the citizen, and the body on the
-  driver's clips (idle, three walk frames, run, attacks A, C and E, ported by `zombie_anims.port_all`). Checked in
-  those renders: the hands hang palm to thigh in the idle and grab palm down in the attacks, the shoulders and elbows
-  bend cleanly. `--install` writes the assets; without it nothing goes into `Assets`.
+    stripped), all 96 bones. The REF FBX's bone heads match it to 0.0004". ModelDoc keeps the 34 that carry weight;
+    in the compiled model (2026-11-03) all 34 are the driver's and match its rest pose to 0.0001".
+- `python Tools/zombie_male_02.py --preview` makes offscreen Blender previews (not game captures): the fit, the rest
+  pose over the citizen, and the body on the driver's clips (idle, three walk frames, run, attacks A, C and E, ported
+  by `zombie_anims.port_all`). In them the hands hang palm to thigh in the idle and grab palm down in the attacks,
+  and the shoulders and elbows bend cleanly. `--install` writes the assets; without it nothing goes into `Assets`.
+- Not yet seen in the editor viewport or a match. The 2026-11-07 install (gap-filled maps, same DMX) hasn't been
+  compiled: the editor was closed.

@@ -1,0 +1,32 @@
+var root=Sandbox.Project.Current.GetRootPath();var output=System.IO.Path.Combine(root,"output/ares/west-operator-console-v1/installed");System.IO.Directory.CreateDirectory(output);
+var active=Editor.SceneEditorSession.Active?.Scene?.Id;var playing=Game.IsPlaying;
+var data=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"Assets/scenes/maps/Ares/ares.scene"))).AsObject();
+var names=new[]{"Sun","Sky","Fog","Look","Ares","Lights","Reflection Probes","Ares bounced lighting","Core Process Console","Lower Hall Bulkhead Lamp","West Control Room Display","West Stair Landing Rail","ARES transport cases","West Control Room Operator Console"}.ToHashSet(StringComparer.OrdinalIgnoreCase);
+var roots=new System.Text.Json.Nodes.JsonArray();foreach(var n in data["GameObjects"].AsArray())if(names.Contains(n["Name"]?.GetValue<string>()??""))roots.Add(n.DeepClone());data["GameObjects"]=roots;
+data["SceneProperties"]["NavMesh"]["Enabled"]=false;data["SceneProperties"]["WantsSystemScene"]=false;
+var scene=Scene.CreateEditorScene();var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic;
+var preRender=typeof(Scene).GetMethod("PreRender",flags,null,Type.EmptyTypes,null);var preCamera=typeof(Scene).GetMethod("PreCameraRender",flags,null,Type.EmptyTypes,null);
+try{
+ CameraComponent camera;ModelRenderer room,replacement;Model old,cut;
+ using(scene.Push()){
+  scene.Deserialize(data);room=scene.GetAllComponents<ModelRenderer>().Single(r=>r.Model?.ResourcePath=="models/maps/ares/ares_hall.vmdl");old=room.Model;cut=old;
+  replacement=scene.GetAllComponents<ModelRenderer>().Single(r=>r.Model?.ResourcePath=="models/props/ares/west_operator_console_v1/after.vmdl");replacement.LodOverride=0;
+  if(old.IsError||cut.IsError||replacement.Model.IsError)throw new Exception("Invalid model");
+  camera=new GameObject(true,"Review camera").AddComponent<CameraComponent>();camera.ZNear=.5f;camera.ZFar=14000;
+  var tone=camera.GameObject.AddComponent<Tonemapping>();tone.Mode=Tonemapping.TonemappingMode.ACES;tone.AutoExposureEnabled=false;tone.ExposureCompensation=0;
+  scene.EditorTick(.016f,.016f);preRender?.Invoke(scene,null);preCamera?.Invoke(scene,null);
+ }
+ foreach(var mat in old.Materials.Concat(replacement.Model.Materials).Distinct())foreach(var tex in new[]{"g_tColor","g_tNormal","g_tRoughness","g_tAmbientOcclusion"}.Select(mat.GetTexture).Append(mat.FirstTexture).Where(t=>t is not null).Distinct())tex.MarkUsed(2048);
+ for(var i=0;i<30;i++){using(scene.Push()){scene.EditorTick(.016f,.016f);preRender?.Invoke(scene,null);}await Task.Delay(20,cancellationToken);}
+ var views=new[]{("player",new Vector3(195,974,64),new Vector3(240,1074,38),52f),("detail",new Vector3(214,1013,60),new Vector3(240,1074,39),60f)};
+ foreach(var after in new[]{true}){
+  using(scene.Push()){room.Model=after?cut:old;replacement.GameObject.Enabled=after;}
+  foreach(var view in views){using var bitmap=new Bitmap(1200,1000);
+   for(var frame=0;frame<12;frame++){using(scene.Push()){camera.WorldPosition=view.Item2;camera.WorldRotation=Rotation.LookAt(view.Item3-camera.WorldPosition);camera.FieldOfView=view.Item4;scene.EditorTick(.016f,.016f);preRender?.Invoke(scene,null);preCamera?.Invoke(scene,null);camera.RenderToBitmap(bitmap,false);}await Task.Delay(16,cancellationToken);}
+   System.IO.File.WriteAllBytes(System.IO.Path.Combine(output,view.Item1+(after?"-after":"-before")+".png"),bitmap.ToPng());
+  }
+ }
+ var trace=scene.Trace.Ray(new Vector3(-540,-290,64),new Vector3(-540,-290,-20)).Run();var info=replacement.Model.MeshInfo;
+ var result=new{Installed=true,ReusedExistingCandidate=true,ModelsValid=true,Lods=info.LodCount,LodTriangles=Enumerable.Range(0,info.LodCount).Select(l=>info.Meshes.Where(m=>(m.LodMask&(1<<l))!=0).Sum(m=>m.Triangles)).ToArray(),AddedColliders=replacement.GameObject.Components.GetAll<ModelCollider>().Count(),PlayerFloorHit=trace.Hit,PlayerFloorZ=trace.EndPosition.z,SceneUnchanged=active==Editor.SceneEditorSession.Active?.Scene?.Id,PlayStateUnchanged=playing==Game.IsPlaying};
+ System.IO.File.WriteAllText(System.IO.Path.Combine(output,"validation.json"),System.Text.Json.JsonSerializer.Serialize(result));return result;
+}finally{scene.Destroy();}

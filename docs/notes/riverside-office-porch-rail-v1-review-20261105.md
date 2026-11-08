@@ -1,0 +1,3 @@
+# Riverside office porch railing - review, 2026-11-05
+
+Close-range timber railing candidate after shed-light installation. Eased handrail, bottom stretcher, joint hardware, lengthwise grain and two snapped balusters. Reuses existing pallet timber/rust/dark materials; no new materials/textures.2552/1496/408 triangles; tint0.55. Exact300 old triangles hidden only in private pad copy. Native matched whole/detail/context captures use existing map lights without fill; both models valid, whole/detail visually inspected. Geometry/winding/UV/public source/material checks pass. Not installed; saved map/collision remain unchanged. Recipe `Sources/Riverside/office-porch-rail-v1/README.md`; evidence `output/riverside/office-porch-rail-v1/`. No gameplay/LOD test.

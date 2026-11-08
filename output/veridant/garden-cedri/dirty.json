@@ -1,0 +1,1 @@
+{"code":"var s=Editor.SceneEditorSession.Active;if(Game.IsPlaying||s.Scene.Name!=\"veridant\"||s.Scene.GetAllObjects(true).Count(x=>x.Name==\"CeDRI garden olive\")!=19)throw new Exception(\"Unexpected scene\");s.GetType().GetProperty(\"HasUnsavedChanges\").SetValue(s,true);return s.HasUnsavedChanges;"}

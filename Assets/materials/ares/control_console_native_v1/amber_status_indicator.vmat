@@ -1,0 +1,17 @@
+Layer0
+{
+ shader "shaders/complex.shader"
+ F_SPECULAR "1"
+ TextureColor "[0.350000 0.130000 0.018000 1]"
+ TextureNormal "materials/default/default_normal.tga"
+ TextureRoughness "[0.55 0.55 0.55 0]"
+ TextureAmbientOcclusion "materials/default/default_ao.tga"
+ g_flMetalness "0"
+ g_flRoughnessScaleFactor "1"
+ g_flModelTintAmount "1"
+ F_SELF_ILLUM "1"
+ TextureSelfIllumMask "[1 1 1 0]"
+ g_flSelfIllumBrightness "1"
+ g_flSelfIllumAlbedoFactor "0"
+ g_vSelfIllumTint "[1.5 0.48 0.0375 0]"
+}

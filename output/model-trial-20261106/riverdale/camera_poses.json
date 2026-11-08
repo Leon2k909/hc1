@@ -1,0 +1,40 @@
+{
+  "note": "Native editor viewport captures (bridge screenshot_game = PrintWindow of the editor window, cropped to the 3D viewport x428 y100 w1102 h455, so every image is 1102 x 455). Editor camera set with set_editor_camera (FOV 80). World axes: +x north, +y west (world = n, -e, up). Settle 10 s after each camera move. BEFORE = the old plain boxes in place; AFTER must use exactly the same poses. Editor gizmos (light icons, spawn mannequins, zone boxes) are part of the editor viewport and appear identically in both.",
+  "target": "Riverdale plain steel lockers: 3 boxes 52 x 20 x 80 in against the west wall of the west spawn building's upstairs room (plan e -2296..-2276, n centres -1100/-1040/-980, floor z 200) and 2 boxes 80 x 20 x 80 in on the south wall of the B1 upper control room (plan e -120..-40 and 40..120, n -1000..-980, floor z 192). The east spawn building has three more.",
+  "close": {
+    "before": "before.png",
+    "after": "after.png",
+    "position": "-1040,2170,262",
+    "angles": "6,90,0",
+    "distance_in": 106,
+    "note": "standing in the west spawn building's upstairs room, 2.7 m from the three lockers, eye 62 in above the floor, looking west"
+  },
+  "far": {
+    "before": "before_far.png",
+    "after": "after_far.png",
+    "position": "-700,2095,262",
+    "angles": "4,155,0",
+    "distance_in": 439,
+    "note": "about 11 m to the far locker: the north end of the same room, by the door, looking down its length (the longest sight line the room has)"
+  },
+  "b1": {
+    "before": "before_b1.png",
+    "after": "after_b1.png",
+    "position": "-790,0,256",
+    "angles": "6,179.9,0",
+    "distance_in": 190,
+    "note": "B1's upper control room, standing 4.8 m from the south wall, both 80 in lockers either side of the desk (the spawn-point mannequin gizmo and zone box are editor gizmos)"
+  },
+  "mean_luma_before": {
+    "close": 65.9,
+    "far": 94.4,
+    "b1": 113.0
+  },
+  "shot_at": "2026-11-06 about 22:20-22:25 in the live editor, Riverdale opened for the shots only (Reef Hall restored as the active scene and its camera restored afterwards, lock released). The editor window was not minimized this time; the earlier blank shots were from a minimized window and were deleted.",
+  "mean_luma_after": {
+    "close": 63.1,
+    "far": 94.2,
+    "b1": 112.9
+  },
+  "after_note": "AFTER taken 2026-11-06 about 22:47 in the same live editor with the same three poses, same crop (1102 x 455), settle 10 s; scene riverdale active and camera verified before and after each capture. The three map OBJs had the old plain slabs cut and the scene carried the 'Locker Banks' group (8 banks). Mean luma matches the BEFORE shots within 3 points (65.9 -> 63.1, 94.4 -> 94.2, 113.0 -> 112.9): same lighting, no exposure or post change. Reef Hall restored as the active scene and its camera restored afterwards, Riverdale closed again, lock released."
+}

@@ -1,0 +1,983 @@
+{
+  "Count": 163,
+  "Handlers": [
+    {
+      "Command": "add_beam",
+      "HandlerClass": "AddBeamHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "add_cave_waypoint",
+      "HandlerClass": "AddCaveWaypointHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "add_collider",
+      "HandlerClass": "AddColliderHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "add_component_to_new_object",
+      "HandlerClass": "AddComponentToNewObjectHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "add_component_with_properties",
+      "HandlerClass": "AddComponentWithPropertiesHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "add_envmap_probe",
+      "HandlerClass": "AddEnvmapProbeHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "add_forest_poi",
+      "HandlerClass": "AddForestPOIHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "add_forest_trail",
+      "HandlerClass": "AddForestTrailHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "add_joint",
+      "HandlerClass": "AddJointHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "add_light",
+      "HandlerClass": "AddLightHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "add_network_helper",
+      "HandlerClass": "AddNetworkHelperHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "add_physics",
+      "HandlerClass": "AddPhysicsHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "add_post_process",
+      "HandlerClass": "AddPostProcessHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "add_ragdoll",
+      "HandlerClass": "AddRagdollHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "add_rpc_method",
+      "HandlerClass": "AddRpcMethodHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "add_screen_panel",
+      "HandlerClass": "AddScreenPanelHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "add_sync_property",
+      "HandlerClass": "AddSyncPropertyHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "add_terrain_clearing",
+      "HandlerClass": "AddTerrainClearingHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "add_terrain_hill",
+      "HandlerClass": "AddTerrainHillHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "add_terrain_trail",
+      "HandlerClass": "AddTerrainTrailHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "add_trail",
+      "HandlerClass": "AddTrailHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "add_world_panel",
+      "HandlerClass": "AddWorldPanelHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "align_objects",
+      "HandlerClass": "AlignObjectsHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "apply_atmosphere",
+      "HandlerClass": "ApplyAtmosphereHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "apply_post_fx_look",
+      "HandlerClass": "ApplyPostFxLookHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "assign_material",
+      "HandlerClass": "AssignMaterialHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "assign_model",
+      "HandlerClass": "AssignModelHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "assign_patrol_route",
+      "HandlerClass": "AssignPatrolRouteHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "assign_sound",
+      "HandlerClass": "AssignSoundHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "bake_navmesh",
+      "HandlerClass": "BakeNavMeshHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "bake_reflections",
+      "HandlerClass": "BakeReflectionsHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "build_terrain_mesh",
+      "HandlerClass": "BuildTerrainMeshHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "capture_view",
+      "HandlerClass": "CaptureViewHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "clear_cave_path",
+      "HandlerClass": "ClearCavePathHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "clear_forest_pois",
+      "HandlerClass": "ClearForestPOIsHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "clear_terrain_features",
+      "HandlerClass": "ClearTerrainFeaturesHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "configure_network",
+      "HandlerClass": "ConfigureNetworkHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "console_run",
+      "HandlerClass": "ConsoleRunHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "create_game_manager",
+      "HandlerClass": "CreateGameManagerHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "create_gameobject",
+      "HandlerClass": "CreateGameObjectHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "create_health_system",
+      "HandlerClass": "CreateHealthSystemHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "create_lobby_manager",
+      "HandlerClass": "CreateLobbyManagerHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "create_material",
+      "HandlerClass": "CreateMaterialHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "create_network_events",
+      "HandlerClass": "CreateNetworkEventsHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "create_networked_player",
+      "HandlerClass": "CreateNetworkedPlayerHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "create_npc_brain",
+      "HandlerClass": "CreateNpcBrainHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "create_npc_controller",
+      "HandlerClass": "CreateNpcControllerHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "create_npc_spawner",
+      "HandlerClass": "CreateNpcSpawnerHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "create_objective_system",
+      "HandlerClass": "CreateObjectiveSystemHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "create_particle_effect",
+      "HandlerClass": "CreateParticleEffectHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "create_pickup",
+      "HandlerClass": "CreatePickupHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "create_player_controller",
+      "HandlerClass": "CreatePlayerControllerHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "create_prefab",
+      "HandlerClass": "CreatePrefabHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "create_razor_ui",
+      "HandlerClass": "CreateRazorUIHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "create_scene",
+      "HandlerClass": "CreateSceneHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "create_script",
+      "HandlerClass": "CreateScriptHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "create_sound_event",
+      "HandlerClass": "CreateSoundEventHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "create_trigger_zone",
+      "HandlerClass": "CreateTriggerZoneHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "delete_gameobject",
+      "HandlerClass": "DeleteGameObjectHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "delete_script",
+      "HandlerClass": "DeleteScriptHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "describe_type",
+      "HandlerClass": "DescribeTypeHandler",
+      "ReadOnly": true,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "distribute_objects",
+      "HandlerClass": "DistributeObjectsHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "dress_citizen",
+      "HandlerClass": "DressCitizenHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "duplicate_gameobject",
+      "HandlerClass": "DuplicateGameObjectHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "edit_script",
+      "HandlerClass": "EditScriptHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "equip_model",
+      "HandlerClass": "EquipModelHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "find_in_project",
+      "HandlerClass": "FindInProjectHandler",
+      "ReadOnly": true,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "find_objects",
+      "HandlerClass": "FindObjectsHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "focus_object",
+      "HandlerClass": "FocusObjectHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "frame_camera",
+      "HandlerClass": "FrameCameraHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "get_all_properties",
+      "HandlerClass": "GetAllPropertiesHandler",
+      "ReadOnly": true,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "get_asset_info",
+      "HandlerClass": "GetAssetInfoHandler",
+      "ReadOnly": true,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "get_bounds",
+      "HandlerClass": "GetBoundsHandler",
+      "ReadOnly": true,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "get_method_signature",
+      "HandlerClass": "GetMethodSignatureHandler",
+      "ReadOnly": true,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "get_navmesh_path",
+      "HandlerClass": "GetNavMeshPathHandler",
+      "ReadOnly": true,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "get_network_status",
+      "HandlerClass": "GetNetworkStatusHandler",
+      "ReadOnly": true,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "get_package_details",
+      "HandlerClass": "GetPackageDetailsHandler",
+      "ReadOnly": true,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "get_prefab_info",
+      "HandlerClass": "GetPrefabInfoHandler",
+      "ReadOnly": true,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "get_profiler_stats",
+      "HandlerClass": "GetProfilerStatsHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "get_project_config",
+      "HandlerClass": "GetProjectConfigHandler",
+      "ReadOnly": true,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "get_project_info",
+      "HandlerClass": "GetProjectInfoHandler",
+      "ReadOnly": true,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "get_property",
+      "HandlerClass": "GetPropertyHandler",
+      "ReadOnly": true,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "get_runtime_property",
+      "HandlerClass": "GetRuntimePropertyHandler",
+      "ReadOnly": true,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "get_scene_hierarchy",
+      "HandlerClass": "GetSceneHierarchyHandler",
+      "ReadOnly": true,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "get_selected_objects",
+      "HandlerClass": "GetSelectedObjectsHandler",
+      "ReadOnly": true,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "get_tags",
+      "HandlerClass": "GetTagsHandler",
+      "ReadOnly": true,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "grid_duplicate",
+      "HandlerClass": "GridDuplicateHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "group_objects",
+      "HandlerClass": "GroupObjectsHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "install_asset",
+      "HandlerClass": "InstallAssetHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "instantiate_prefab",
+      "HandlerClass": "InstantiatePrefabHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "invoke_button",
+      "HandlerClass": "InvokeButtonHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "is_playing",
+      "HandlerClass": "IsPlayingHandler",
+      "ReadOnly": true,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "list_animations",
+      "HandlerClass": "ListAnimationsHandler",
+      "ReadOnly": true,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "list_asset_library",
+      "HandlerClass": "ListAssetLibraryHandler",
+      "ReadOnly": true,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "list_available_components",
+      "HandlerClass": "ListAvailableComponentsHandler",
+      "ReadOnly": true,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "list_component_buttons",
+      "HandlerClass": "ListComponentButtonsHandler",
+      "ReadOnly": true,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "list_libraries",
+      "HandlerClass": "ListLibrariesHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "list_prefabs",
+      "HandlerClass": "ListPrefabsHandler",
+      "ReadOnly": true,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "list_project_files",
+      "HandlerClass": "ListProjectFilesHandler",
+      "ReadOnly": true,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "list_scenes",
+      "HandlerClass": "ListScenesHandler",
+      "ReadOnly": true,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "list_sounds",
+      "HandlerClass": "ListSoundsHandler",
+      "ReadOnly": true,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "load_scene",
+      "HandlerClass": "LoadSceneHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "measure_distance",
+      "HandlerClass": "MeasureDistanceHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "network_spawn",
+      "HandlerClass": "NetworkSpawnHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "paint_forest_density",
+      "HandlerClass": "PaintForestDensityHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "physics_overlap",
+      "HandlerClass": "PhysicsOverlapHandler",
+      "ReadOnly": true,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "place_along_path",
+      "HandlerClass": "PlaceAlongPathHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "place_patrol_route",
+      "HandlerClass": "PlacePatrolRouteHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "play_animation",
+      "HandlerClass": "PlayAnimationHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "play_sound_preview",
+      "HandlerClass": "PlaySoundPreviewHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "pose_citizen",
+      "HandlerClass": "PoseCitizenHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "randomize_transforms",
+      "HandlerClass": "RandomizeTransformsHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "raycast",
+      "HandlerClass": "RaycastHandler",
+      "ReadOnly": true,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "raycast_terrain",
+      "HandlerClass": "RaycastTerrainHandler",
+      "ReadOnly": true,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "read_file",
+      "HandlerClass": "ReadFileHandler",
+      "ReadOnly": true,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "recompile_asset",
+      "HandlerClass": "RecompileAssetHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "redo",
+      "HandlerClass": "RedoHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "remove_component",
+      "HandlerClass": "RemoveComponentHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "rename_gameobject",
+      "HandlerClass": "RenameGameObjectHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "replace_model",
+      "HandlerClass": "ReplaceModelHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "restart_editor",
+      "HandlerClass": "RestartEditorHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "save_scene",
+      "HandlerClass": "SaveSceneHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "scatter_props",
+      "HandlerClass": "ScatterPropsHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "screenshot_from",
+      "HandlerClass": "ScreenshotFromHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "screenshot_game",
+      "HandlerClass": "WindowCaptureHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "sculpt_terrain",
+      "HandlerClass": "SculptTerrainHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "search_assets",
+      "HandlerClass": "SearchAssetsHandler",
+      "ReadOnly": true,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "search_types",
+      "HandlerClass": "SearchTypesHandler",
+      "ReadOnly": true,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "select_object",
+      "HandlerClass": "SelectObjectHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "set_animgraph_param",
+      "HandlerClass": "SetAnimgraphParamHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "set_bodygroup",
+      "HandlerClass": "SetBodygroupHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "set_component_reference",
+      "HandlerClass": "SetComponentReferenceHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "set_enabled",
+      "HandlerClass": "SetEnabledHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "set_expression",
+      "HandlerClass": "SetExpressionHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "set_fog",
+      "HandlerClass": "SetFogHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "set_forest_seed",
+      "HandlerClass": "SetForestSeedHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "set_look_at",
+      "HandlerClass": "SetLookAtHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "set_material_property",
+      "HandlerClass": "SetMaterialPropertyHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "set_ownership",
+      "HandlerClass": "SetOwnershipHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "set_parent",
+      "HandlerClass": "SetParentHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "set_prefab_ref",
+      "HandlerClass": "SetPrefabRefHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "set_project_config",
+      "HandlerClass": "SetProjectConfigHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "set_project_thumbnail",
+      "HandlerClass": "SetProjectThumbnailHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "set_property",
+      "HandlerClass": "SetPropertyHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "set_runtime_property",
+      "HandlerClass": "SetRuntimePropertyHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "set_skybox",
+      "HandlerClass": "SetSkyboxHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "set_tags",
+      "HandlerClass": "SetTagsHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "set_tint",
+      "HandlerClass": "SetTintHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "set_transform",
+      "HandlerClass": "SetTransformHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "simulate_input",
+      "HandlerClass": "SimulateInputHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "simulate_npc_perception",
+      "HandlerClass": "SimulateNpcPerceptionHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "snap_to_ground",
+      "HandlerClass": "SnapToGroundHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "spawn_citizen",
+      "HandlerClass": "SpawnCitizenHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "spawn_model",
+      "HandlerClass": "SpawnModelHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "spawn_particle",
+      "HandlerClass": "SpawnParticleHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "spawn_vpcf",
+      "HandlerClass": "SpawnVpcfHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "start_play",
+      "HandlerClass": "StartPlayHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "stop_play",
+      "HandlerClass": "StopPlayHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "take_screenshot",
+      "HandlerClass": "TakeScreenshotHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "trigger_hotload",
+      "HandlerClass": "TriggerHotloadHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "undo",
+      "HandlerClass": "UndoHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": true
+    },
+    {
+      "Command": "validate_project",
+      "HandlerClass": "ValidateProjectHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": false
+    },
+    {
+      "Command": "write_file",
+      "HandlerClass": "WriteFileHandler",
+      "ReadOnly": false,
+      "BlockedDuringPlay": false
+    }
+  ]
+}

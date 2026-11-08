@@ -34,7 +34,9 @@ class Lod:
 # Smart UV project cuts a decimated body into 800-2,700 islands (the cloth's folds), so the gaps between them are kept
 # to ISLAND_GAP pixels and the LODs seen far off get bigger maps and wider islands than their distance alone needs.
 # zombie_male_02.py fills every pixel outside the islands from the nearest one, so lower mips don't bleed black.
-# The lower LODs' surfaces stray further from the scan: with 3-8 cm of reach their rays missed 0.2-1.8% of the map.
+# The lower LODs' surfaces stray further from the scan, so their rays reach further. (Their unbaked pixels, 0.2% of
+# LOD1's islands and 1.8% of LOD3's, are triangles smaller than a pixel in UV, not misses: reach didn't change them.
+# zombie_male_02.py fills those from their neighbours.)
 LODS = [Lod(30000, 2048, 0.01, 0.025, 80), Lod(15000, 1024, 0.012, 0.05, 80), Lod(7000, 1024, 0.02, 0.08, 89),
         Lod(3000, 512, 0.03, 0.12, 89)]
 ISLAND_GAP = 2

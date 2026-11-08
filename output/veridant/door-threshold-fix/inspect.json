@@ -1,0 +1,1 @@
+{"code":"return new { exchangeDirectory, Camera = Game.ActiveScene.Camera?.WorldTransform, Objects = Editor.SceneEditorSession.Active.Scene.GetAllObjects(true).Where(x=>x.Components.Get<ModelRenderer>() != null).Select(x=>new { x.Name, x.Id, Model=x.Components.Get<ModelRenderer>().Model?.ResourcePath }).ToArray() };"}

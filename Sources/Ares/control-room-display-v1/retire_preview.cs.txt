@@ -1,0 +1,4 @@
+var root=Sandbox.Project.Current.GetRootPath();var assets=System.IO.Path.Combine(root,"Assets/models/props/ares/control_room_display_v1");var archive=System.IO.Path.Combine(root,"output/ares/control-room-display-v1/retired-preview");System.IO.Directory.CreateDirectory(archive);
+if(!System.IO.File.ReadAllText(System.IO.Path.Combine(root,"Assets/scenes/maps/Ares/ares.scene")).Contains("West Control Room Display"))throw new Exception("Not installed");
+foreach(var f in new[]{"preview.obj","preview.obj.meta","preview.vmdl","preview.vmdl.meta","preview.vmdl_c","hall_base.mtl"}){var p=System.IO.Path.Combine(assets,f);var dest=System.IO.Path.Combine(archive,f);if(System.IO.File.Exists(p)){if(System.IO.File.Exists(dest))throw new Exception("Archive exists");System.IO.File.Move(p,dest);}}
+return new{Retired=true,SharedMaterialsRetained=true};

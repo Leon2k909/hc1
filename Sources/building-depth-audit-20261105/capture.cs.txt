@@ -1,0 +1,29 @@
+var root=Sandbox.Project.Current.GetRootPath();var output=System.IO.Path.Combine(root,"output/building-depth-audit-20261105");System.IO.Directory.CreateDirectory(output);
+var active=Editor.SceneEditorSession.Active?.Scene?.Id;var playing=Game.IsPlaying;var dirty=Editor.SceneEditorSession.Active?.HasUnsavedChanges;
+var surveys=new[]{
+ new {Name="orion",Path="Assets/scenes/maps/Orion/orion.scene",Names=new[]{"Sun","Sky","Fog","Look","Orion","Lights","Volumetric Fog","Reflection Probes","Operator Chair","Orion Launch Vehicle"},Views=new[]{("context",new Vector3(730,300,64),new Vector3(900,310,64),85f),("detail",new Vector3(785,340,64),new Vector3(899.9f,380,53),52f)}},
+ new {Name="riverside",Path="Assets/scenes/maps/Riverside/riverside.scene",Names=new[]{"Moon","Sky","Fog","Look","Riverside","Lights","Reflection Probes","Volumetric Fog","Porch Lights","Store Ceiling Lights","Interior Drinks Fridges","Store Timber Steps","Shed Downlights","West Yard Fences","Office Entry Doors","Office Rules Signs","T2 Sliding Window Frame","Trailer Entry Doors","Roof Air Conditioners","Streetlight Heads","Pole Insulators","Roof TV Aerials","Trailer Hitches","Passive Roof Vents","Water Tower Tanks"},Views=new[]{("context",new Vector3(350,-50,100),new Vector3(600,-220,95),65f),("detail",new Vector3(565,-250,85),new Vector3(639.5f,-320,82),58f)}}
+};
+var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic;
+var preRender=typeof(Scene).GetMethod("PreRender",flags,null,Type.EmptyTypes,null);var preCamera=typeof(Scene).GetMethod("PreCameraRender",flags,null,Type.EmptyTypes,null);
+var written=new System.Collections.Generic.List<string>();
+foreach(var survey in surveys){
+ var data=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,survey.Path))).AsObject();var names=survey.Names.ToHashSet(StringComparer.OrdinalIgnoreCase);var roots=new System.Text.Json.Nodes.JsonArray();
+ foreach(var n in data["GameObjects"].AsArray())if(names.Contains(n["Name"]?.GetValue<string>()??""))roots.Add(n.DeepClone());data["GameObjects"]=roots;
+ data["SceneProperties"]["NavMesh"]["Enabled"]=false;data["SceneProperties"]["WantsSystemScene"]=false;
+ var scene=Scene.CreateEditorScene();var elapsed=0f;
+ try{
+  CameraComponent camera;
+  using(scene.Push()){
+   scene.Deserialize(data);camera=new GameObject(true,"Building depth audit camera").AddComponent<CameraComponent>();camera.ZNear=.5f;camera.ZFar=30000;
+   var tone=camera.GameObject.AddComponent<Tonemapping>();tone.Mode=Tonemapping.TonemappingMode.ACES;tone.AutoExposureEnabled=false;tone.ExposureCompensation=0;
+   scene.EditorTick(elapsed+=.016f,.016f);preRender?.Invoke(scene,null);preCamera?.Invoke(scene,null);
+  }
+  foreach(var mat in scene.GetAllComponents<ModelRenderer>().Where(r=>r.Model is not null).SelectMany(r=>r.Model.Materials).Distinct())foreach(var tex in new[]{"g_tColor","g_tNormal","g_tRoughness"}.Select(mat.GetTexture).Append(mat.FirstTexture).Where(t=>t is not null).Distinct())tex.MarkUsed(2048);
+  foreach(var view in survey.Views){using var bitmap=new Bitmap(1400,1000);
+   for(var frame=0;frame<100;frame++){using(scene.Push()){camera.WorldPosition=view.Item2;camera.WorldRotation=Rotation.LookAt(view.Item3-camera.WorldPosition);camera.FieldOfView=view.Item4;scene.EditorTick(elapsed+=.016f,.016f);preRender?.Invoke(scene,null);preCamera?.Invoke(scene,null);camera.RenderToBitmap(bitmap,false);}await Task.Delay(16,cancellationToken);}
+   var filename=survey.Name+"-"+view.Item1+".png";System.IO.File.WriteAllBytes(System.IO.Path.Combine(output,filename),bitmap.ToPng());written.Add(filename);
+  }
+ }finally{scene.Destroy();}
+}
+var result=new{ReadOnlyAudit=true,ExistingMapLighting=true,Written=written,SceneUnchanged=active==Editor.SceneEditorSession.Active?.Scene?.Id,PlayStateUnchanged=playing==Game.IsPlaying,DirtyStateUnchanged=dirty==Editor.SceneEditorSession.Active?.HasUnsavedChanges};System.IO.File.WriteAllText(System.IO.Path.Combine(output,"native.json"),System.Text.Json.JsonSerializer.Serialize(result));return result;

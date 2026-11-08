@@ -1,0 +1,1620 @@
+[
+  {
+    "scene": "Assets/scenes/maps/thieves_aesthetic.scene",
+    "roots": [
+      "Map"
+    ],
+    "doors": []
+  },
+  {
+    "scene": "Assets/scenes/maps/Ares/ares.scene",
+    "roots": [
+      "Scene Information",
+      "Minimap Renderer",
+      "Sun",
+      "Sky",
+      "Fog",
+      "Look",
+      "Ares",
+      "Lights",
+      "Reflection Probes",
+      "Team Spawns",
+      "Deathmatch Spawns",
+      "Retakes Spawns",
+      "Bomb Sites",
+      "Buy Zones",
+      "Callouts",
+      "Play Area",
+      "Catch Floor",
+      "Objective Spots",
+      "Cash Grab",
+      {
+        "Id": "2511d0e8-bd1b-426e-b0c1-27b2b2dc3797",
+        "Path": "prefabs/game_modes/team_deathmatch.prefab"
+      },
+      {
+        "Id": "af50feff-a263-4c20-997f-58b4bb560e1f",
+        "Path": "prefabs/game_modes/bomb_defusal.prefab"
+      },
+      {
+        "Id": "ee813720-722c-4ee9-89c2-d1907b232008",
+        "Path": "scenes/maps/defusemap_01/game_setup.prefab"
+      },
+      "Ares bounced lighting",
+      "Ares west automatic sliding door",
+      "Ares east automatic sliding door",
+      "Ares east control-room automatic door",
+      "Ares west sector doorway threshold",
+      "Ares west north doorway threshold",
+      "Ares east sector doorway threshold",
+      "Ares east north doorway threshold",
+      "Core Process Console",
+      "Lower Hall Bulkhead Lamp",
+      "West Control Room Display"
+    ],
+    "doors": [
+      {
+        "name": "Sector Door -1",
+        "position": "-340,1250,318",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "North Door -1",
+        "position": "620,1250,318",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Sector Door 1",
+        "position": "-340,-1250,318",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "North Door 1",
+        "position": "620,-1250,318",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Ares west automatic sliding door",
+        "position": "0,1116,0",
+        "types": [
+          "Facepunch.AutomaticSlidingDoor"
+        ]
+      },
+      {
+        "name": "Ares east automatic sliding door",
+        "position": "0,-1116,0",
+        "types": [
+          "Facepunch.AutomaticSlidingDoor"
+        ]
+      },
+      {
+        "name": "Ares east control-room automatic door",
+        "position": "156,-960,0",
+        "types": [
+          "Facepunch.AutomaticSlidingDoor"
+        ]
+      },
+      {
+        "name": "Door head trim",
+        "position": "0,0,95",
+        "types": [
+          "Sandbox.ModelRenderer",
+          "Sandbox.ModelCollider"
+        ]
+      },
+      {
+        "name": "Door sill",
+        "position": "0,0,0.75",
+        "types": [
+          "Sandbox.ModelRenderer",
+          "Sandbox.ModelCollider"
+        ]
+      },
+      {
+        "name": "Ares west sector doorway threshold",
+        "position": "-340,1116,200",
+        "types": [
+          "Sandbox.BoxCollider"
+        ]
+      },
+      {
+        "name": "Ares west north doorway threshold",
+        "position": "640,1116,200",
+        "types": [
+          "Sandbox.BoxCollider"
+        ]
+      },
+      {
+        "name": "Ares east sector doorway threshold",
+        "position": "-340,-1116,200",
+        "types": [
+          "Sandbox.BoxCollider"
+        ]
+      },
+      {
+        "name": "Ares east north doorway threshold",
+        "position": "640,-1116,200",
+        "types": [
+          "Sandbox.BoxCollider"
+        ]
+      }
+    ]
+  },
+  {
+    "scene": "Assets/scenes/maps/Belltower/belltower.scene",
+    "roots": [
+      "Scene Information",
+      "Minimap Renderer",
+      "Sun",
+      "Sky",
+      "Fog",
+      "Look",
+      "Town",
+      "Trees and planting",
+      "Lights",
+      "Team Spawns",
+      "Deathmatch Spawns",
+      "Retakes Spawns",
+      "Bomb Sites",
+      "Buy Zones",
+      "Callouts",
+      "Play Area",
+      "Player Clip",
+      "Catch Floor",
+      "Objective Spots",
+      "Cash Grab",
+      {
+        "Id": "2511d0e8-bd1b-426e-b0c1-27b2b2dc3797",
+        "Path": "prefabs/game_modes/team_deathmatch.prefab"
+      },
+      {
+        "Id": "af50feff-a263-4c20-997f-58b4bb560e1f",
+        "Path": "prefabs/game_modes/bomb_defusal.prefab"
+      },
+      {
+        "Id": "ee813720-722c-4ee9-89c2-d1907b232008",
+        "Path": "scenes/maps/defusemap_01/game_setup.prefab"
+      },
+      "Reflections",
+      "Indirect Light",
+      "Landscape trees",
+      "Distant woodland",
+      "Doorway flowerpots",
+      "Menu boards",
+      "Bistro chairs",
+      "Bistro tables",
+      "Wall lanterns",
+      "Suspended lamps",
+      "Bakery sack piles",
+      "Market cross model",
+      "Orchard lawn relief - REVIEW TRIAL",
+      "Garden well frame",
+      "Churchyard gate piers"
+    ],
+    "doors": [
+      {
+        "name": "Hall Entrance Doors",
+        "position": "0,0,0",
+        "types": [
+          "Sandbox.ModelRenderer"
+        ]
+      },
+      {
+        "name": "Doorway flowerpots",
+        "position": "0,0,0",
+        "types": []
+      }
+    ]
+  },
+  {
+    "scene": "Assets/scenes/maps/Boxyard/boxyard.scene",
+    "roots": [
+      "Scene Information",
+      "Minimap Renderer",
+      "Sun",
+      "Sky",
+      "Fog",
+      "Look",
+      "Boxyard",
+      "Lights",
+      "Reflection Probes",
+      "Team Spawns",
+      "Deathmatch Spawns",
+      "Retakes Spawns",
+      "Bomb Sites",
+      "Buy Zones",
+      "Callouts",
+      "Play Area",
+      "Player Clips",
+      "Catch Floor",
+      "Objective Spots",
+      "Cash Grab",
+      {
+        "Id": "2511d0e8-bd1b-426e-b0c1-27b2b2dc3797",
+        "Path": "prefabs/game_modes/team_deathmatch.prefab"
+      },
+      {
+        "Id": "af50feff-a263-4c20-997f-58b4bb560e1f",
+        "Path": "prefabs/game_modes/bomb_defusal.prefab"
+      },
+      {
+        "Id": "ee813720-722c-4ee9-89c2-d1907b232008",
+        "Path": "scenes/maps/defusemap_01/game_setup.prefab"
+      },
+      "Gantry Crane 01",
+      "Gantry Crane 02",
+      "Gantry Crane 03"
+    ],
+    "doors": []
+  },
+  {
+    "scene": "Assets/scenes/maps/CerroBlanco/cerroblanco.scene",
+    "roots": [
+      "Scene Information",
+      "Minimap Renderer",
+      "Sun",
+      "Sky",
+      "Fog",
+      "Look",
+      "Cerro Blanco",
+      "Trees",
+      "Lights",
+      "Art Lights",
+      "Reflection Probes",
+      "Team Spawns",
+      "Deathmatch Spawns",
+      "Retakes Spawns",
+      "Bomb Sites",
+      "Buy Zones",
+      "Callouts",
+      "Play Area",
+      "Player Clips",
+      "Catch Floor",
+      "Objective Spots",
+      "Cash Grab",
+      {
+        "Id": "2511d0e8-bd1b-426e-b0c1-27b2b2dc3797",
+        "Path": "prefabs/game_modes/team_deathmatch.prefab"
+      },
+      {
+        "Id": "af50feff-a263-4c20-997f-58b4bb560e1f",
+        "Path": "prefabs/game_modes/bomb_defusal.prefab"
+      },
+      {
+        "Id": "ee813720-722c-4ee9-89c2-d1907b232008",
+        "Path": "scenes/maps/defusemap_01/game_setup.prefab"
+      },
+      "Cerro Blanco construction details",
+      "Museum indirect light",
+      "Garden lawn relief - REVIEW TRIAL"
+    ],
+    "doors": []
+  },
+  {
+    "scene": "Assets/scenes/maps/Collider/collider.scene",
+    "roots": [
+      "Scene Information",
+      "Look",
+      "Ambient",
+      "Collider",
+      "Lights",
+      "Reflection Probes",
+      "Team Spawns",
+      "Deathmatch Spawns",
+      "Retakes Spawns",
+      "Bomb Sites",
+      "Buy Zones",
+      "Callouts",
+      "Cash Grab",
+      "Objective Spots",
+      "Play Area",
+      "Minimap Renderer",
+      {
+        "Id": "2511d0e8-bd1b-426e-b0c1-27b2b2dc3797",
+        "Path": "prefabs/game_modes/team_deathmatch.prefab"
+      },
+      {
+        "Id": "af50feff-a263-4c20-997f-58b4bb560e1f",
+        "Path": "prefabs/game_modes/bomb_defusal.prefab"
+      },
+      {
+        "Id": "ee813720-722c-4ee9-89c2-d1907b232008",
+        "Path": "scenes/maps/defusemap_01/game_setup.prefab"
+      },
+      "Collider indirect lighting",
+      "Automatic west lab door",
+      "Chair comparison - Revised v2 (woven / stitched)"
+    ],
+    "doors": [
+      {
+        "name": "Automatic west lab door",
+        "position": "0,1412,0",
+        "types": [
+          "Facepunch.AutomaticSlidingDoor"
+        ]
+      }
+    ]
+  },
+  {
+    "scene": "Assets/scenes/maps/Depot/Depot.scene",
+    "roots": [
+      "Scene Information",
+      "Map",
+      "Minimap Renderer",
+      "prefabs/game_modes/team_deathmatch.prefab",
+      "Play Area",
+      "scenes/maps/defusemap_01/game_setup.prefab",
+      "GameMode"
+    ],
+    "doors": []
+  },
+  {
+    "scene": "Assets/scenes/maps/Edinburgh/edinburgh.scene",
+    "roots": [
+      "Scene Information",
+      "Map",
+      "Map",
+      "Deathmatch Spawn (39)",
+      "Minimap Renderer",
+      "Deathmatch Spawn (28)",
+      "Deathmatch Spawn (1)",
+      "Deathmatch Spawn (2)",
+      "Deathmatch Spawn (26)",
+      "Deathmatch Spawn (34)",
+      "Deathmatch Spawn (35)",
+      "Deathmatch Spawn (27)",
+      "Deathmatch Spawn (3)",
+      "Deathmatch Spawn (4)",
+      "Deathmatch Spawn (5)",
+      "Deathmatch Spawn (6)",
+      "Deathmatch Spawn (7)",
+      "Deathmatch Spawn (8)",
+      "Deathmatch Spawn (9)",
+      "Deathmatch Spawn (10)",
+      "Deathmatch Spawn (11)",
+      "Deathmatch Spawn (12)",
+      "Deathmatch Spawn (13)",
+      "Deathmatch Spawn (14)",
+      "Deathmatch Spawn (15)",
+      "Deathmatch Spawn (16)",
+      "Deathmatch Spawn (17)",
+      "Deathmatch Spawn (18)",
+      "Deathmatch Spawn (19)",
+      "Deathmatch Spawn (20)",
+      "Deathmatch Spawn (21)",
+      "Deathmatch Spawn (22)",
+      "Deathmatch Spawn (23)",
+      "Deathmatch Spawn (24)",
+      "Deathmatch Spawn (25)",
+      "Deathmatch Spawn (29)",
+      "Deathmatch Spawn (30)",
+      "Deathmatch Spawn (31)",
+      "Deathmatch Spawn (32)",
+      "Deathmatch Spawn (33)",
+      "scenes/maps/defusemap_01/game_setup.prefab",
+      "prefabs/game_modes/team_deathmatch.prefab",
+      "Play Area",
+      "Point Light",
+      "Point Light (1)",
+      "Point Light (2)",
+      "Point Light (7)",
+      "Point Light (3)",
+      "Point Light (4)"
+    ],
+    "doors": []
+  },
+  {
+    "scene": "Assets/scenes/maps/Flatgrass/Flatgrass.scene",
+    "roots": [
+      "Scene Information",
+      "Map",
+      "Flatgrass Spawn Points",
+      {
+        "Id": "ee813720-722c-4ee9-89c2-d1907b232008",
+        "Path": "scenes/maps/defusemap_01/game_setup.prefab"
+      },
+      {
+        "Id": "2511d0e8-bd1b-426e-b0c1-27b2b2dc3797",
+        "Path": "prefabs/game_modes/team_deathmatch.prefab"
+      },
+      {
+        "Id": "af50feff-a263-4c20-997f-58b4bb560e1f",
+        "Path": "prefabs/game_modes/bomb_defusal.prefab"
+      },
+      {
+        "Id": "3e94b1f0-3d88-4f48-aabf-7a1fd3035304",
+        "Path": "prefabs/game_modes/deathmatch.prefab"
+      },
+      {
+        "Id": "e747d0d2-cf94-4cd5-9e0c-f8d498402914",
+        "Path": "prefabs/game_modes/gun_game.prefab"
+      },
+      "Bomb Site A",
+      "Bomb Site B",
+      "Lightweight Bot Manager"
+    ],
+    "doors": []
+  },
+  {
+    "scene": "Assets/scenes/maps/ForestBase/forestbase.scene",
+    "roots": [
+      "Scene Information",
+      "Military Outpost",
+      "Forest Backdrop",
+      "Cool Daylight",
+      "Sky",
+      "Forest Mist",
+      "Reflections",
+      "Rain Reflections",
+      "Warm Military Lights",
+      "Closed Player Boundary",
+      "Military AO",
+      "Team Spawns",
+      "Free For All Spawns",
+      "Domination A",
+      "Domination B",
+      "Domination C",
+      "Hot Zone Motor Pool",
+      "Hot Zone Command",
+      "Hot Zone Logistics",
+      "Hot Zone Workshop",
+      "Hot Zone Catwalk",
+      "A Motor Pool",
+      "B Barracks",
+      "C Command",
+      "D Logistics",
+      "E Workshop",
+      "F Catwalk",
+      "Bomb Site A",
+      "Bomb Site B",
+      "Buy Terrorist",
+      "Buy CounterTerrorist",
+      "Retakes",
+      "Minimap",
+      {
+        "Id": "2511d0e8-bd1b-426e-b0c1-27b2b2dc3797",
+        "Path": "prefabs/game_modes/team_deathmatch.prefab"
+      },
+      {
+        "Id": "af50feff-a263-4c20-997f-58b4bb560e1f",
+        "Path": "prefabs/game_modes/bomb_defusal.prefab"
+      },
+      {
+        "Id": "ee813720-722c-4ee9-89c2-d1907b232008",
+        "Path": "scenes/maps/defusemap_01/game_setup.prefab"
+      }
+    ],
+    "doors": [
+      {
+        "name": "Barracks door -1220.0 214",
+        "position": "612,1220,204",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Barracks door -1220.0 358",
+        "position": "612,1220,348",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Barracks door -695.0 214",
+        "position": "612,695,204",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Barracks door -695.0 358",
+        "position": "612,695,348",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Command door 25.0 214",
+        "position": "682,-25,204",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Command door 25.0 358",
+        "position": "682,-25,348",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Command door 490.0 214",
+        "position": "682,-490,204",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Command door 490.0 358",
+        "position": "682,-490,348",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      }
+    ]
+  },
+  {
+    "scene": "Assets/scenes/maps/InnocentHotel/innocent_hotel.scene",
+    "roots": [
+      "Scene Information",
+      "Map",
+      "Map Spawn Settings",
+      "Minimap Renderer",
+      "prefabs/game_modes/team_deathmatch.prefab",
+      "scenes/maps/defusemap_01/game_setup.prefab",
+      "Team Spawns"
+    ],
+    "doors": []
+  },
+  {
+    "scene": "Assets/scenes/maps/Lowtide/lowtide.scene",
+    "roots": [
+      "Scene Information",
+      "Minimap Renderer",
+      "Sun",
+      "Sky",
+      "Fog",
+      "Look",
+      "Lowtide",
+      "Trees",
+      "Lights",
+      "Reflection Probes",
+      "Team Spawns",
+      "Deathmatch Spawns",
+      "Retakes Spawns",
+      "Bomb Sites",
+      "Buy Zones",
+      "Callouts",
+      "Play Area",
+      "Player Clips",
+      "Catch Floor",
+      "Objective Spots",
+      "Cash Grab",
+      {
+        "Id": "2511d0e8-bd1b-426e-b0c1-27b2b2dc3797",
+        "Path": "prefabs/game_modes/team_deathmatch.prefab"
+      },
+      {
+        "Id": "af50feff-a263-4c20-997f-58b4bb560e1f",
+        "Path": "prefabs/game_modes/bomb_defusal.prefab"
+      },
+      {
+        "Id": "ee813720-722c-4ee9-89c2-d1907b232008",
+        "Path": "scenes/maps/defusemap_01/game_setup.prefab"
+      },
+      "Forklift LPG (east warehouse)",
+      "Forklift LPG (east quay)",
+      "Forklift LPG (west warehouse)",
+      "Forklift LPG (west quay)",
+      "Bollard diffuser east 1050",
+      "Bollard diffuser east 1210",
+      "Bollard diffuser east 1370",
+      "Bollard diffuser east 1530",
+      "Bollard diffuser east 1690",
+      "Bollard diffuser east 1850",
+      "Bollard diffuser east 2010",
+      "Bollard diffuser east 2170",
+      "Bollard diffuser west 1050",
+      "Bollard diffuser west 1210",
+      "Bollard diffuser west 1370",
+      "Bollard diffuser west 1530",
+      "Bollard diffuser west 1690",
+      "Bollard diffuser west 1850",
+      "Bollard diffuser west 2010",
+      "Bollard diffuser west 2170",
+      "Mud bank relief - REVIEW TRIAL"
+    ],
+    "doors": []
+  },
+  {
+    "scene": "Assets/scenes/maps/Motel/motel.scene",
+    "roots": [
+      "Map",
+      "Map",
+      "Minimap Renderer",
+      "Game",
+      "Play Area",
+      "deathmatch"
+    ],
+    "doors": []
+  },
+  {
+    "scene": "Assets/scenes/maps/Orion/orion.scene",
+    "roots": [
+      "Scene Information",
+      "Minimap Renderer",
+      "Sun",
+      "Sky",
+      "Fog",
+      "Look",
+      "Orion",
+      "Lights",
+      "Volumetric Fog",
+      "Reflection Probes",
+      "Steam",
+      "Team Spawns",
+      "Deathmatch Spawns",
+      "Retakes Spawns",
+      "Bomb Sites",
+      "Buy Zones",
+      "Callouts",
+      "Play Area",
+      "Player Clips",
+      "Catch Floor",
+      "Objective Spots",
+      "Cash Grab",
+      {
+        "Id": "2511d0e8-bd1b-426e-b0c1-27b2b2dc3797",
+        "Path": "prefabs/game_modes/team_deathmatch.prefab"
+      },
+      {
+        "Id": "af50feff-a263-4c20-997f-58b4bb560e1f",
+        "Path": "prefabs/game_modes/bomb_defusal.prefab"
+      },
+      {
+        "Id": "ee813720-722c-4ee9-89c2-d1907b232008",
+        "Path": "scenes/maps/defusemap_01/game_setup.prefab"
+      },
+      "Operator Chair",
+      "Operator Chair",
+      "Operator Chair",
+      "Operator Chair",
+      "Operator Chair",
+      "Operator Chair",
+      "Orion Launch Vehicle"
+    ],
+    "doors": [
+      {
+        "name": "Overlook door lamp 0",
+        "position": "-522.5,240,130",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Overlook door lamp 1",
+        "position": "-522.5,-120,130",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Overlook door lamp 2",
+        "position": "-522.5,-480,130",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Mezzanine door lamp",
+        "position": "882.5,450,234",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Fuel yard door lamp 0",
+        "position": "470,-542.5,126",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Fuel yard door lamp 1",
+        "position": "860,-542.5,116",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "OPS door lamp",
+        "position": "782,-682.5,340",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      }
+    ]
+  },
+  {
+    "scene": "Assets/scenes/maps/Railhead/railhead.scene",
+    "roots": [
+      "Scene Information",
+      "Minimap Renderer",
+      "Sun",
+      "Sky",
+      "Fog",
+      "Look",
+      "Station",
+      "Trees",
+      "Lights",
+      "Reflection Probes",
+      "Volumetric Haze",
+      "Team Spawns",
+      "Deathmatch Spawns",
+      "Retakes Spawns",
+      "Bomb Sites",
+      "Buy Zones",
+      "Callouts",
+      "Play Area",
+      "Player Clips",
+      "Catch Floor",
+      "Objective Spots",
+      "Cash Grab",
+      {
+        "Id": "2511d0e8-bd1b-426e-b0c1-27b2b2dc3797",
+        "Path": "prefabs/game_modes/team_deathmatch.prefab"
+      },
+      {
+        "Id": "af50feff-a263-4c20-997f-58b4bb560e1f",
+        "Path": "prefabs/game_modes/bomb_defusal.prefab"
+      },
+      {
+        "Id": "ee813720-722c-4ee9-89c2-d1907b232008",
+        "Path": "scenes/maps/defusemap_01/game_setup.prefab"
+      },
+      "Station Indirect Light"
+    ],
+    "doors": []
+  },
+  {
+    "scene": "Assets/scenes/maps/ReefHall/reefhall.scene",
+    "roots": [
+      "Scene Information",
+      "Minimap Renderer",
+      "Ambient",
+      "Fog",
+      "Aquarium",
+      "Climbable Pipes",
+      "Fauna",
+      "Lights",
+      "Reflection Probes",
+      "Team Spawns",
+      "Deathmatch Spawns",
+      "Retakes Spawns",
+      "Bomb Sites",
+      "Buy Zones",
+      "Callouts",
+      "Play Area",
+      "Objective Spots",
+      "Cash Grab",
+      {
+        "Id": "2511d0e8-bd1b-426e-b0c1-27b2b2dc3797",
+        "Path": "prefabs/game_modes/team_deathmatch.prefab"
+      },
+      {
+        "Id": "af50feff-a263-4c20-997f-58b4bb560e1f",
+        "Path": "prefabs/game_modes/bomb_defusal.prefab"
+      },
+      {
+        "Id": "ee813720-722c-4ee9-89c2-d1907b232008",
+        "Path": "scenes/maps/defusemap_01/game_setup.prefab"
+      }
+    ],
+    "doors": [
+      {
+        "name": "Lobby door 0",
+        "position": "-197.5,2885,184",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Lobby door 1",
+        "position": "0,2885,184",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Lobby door 2",
+        "position": "197.5,2885,184",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Door gallery tank 0",
+        "position": "-297.5,3274,166",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Door gallery tank 0 spill",
+        "position": "-297.5,3130,86",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Door gallery tank 1",
+        "position": "-100,3274,166",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Door gallery tank 1 spill",
+        "position": "-100,3130,86",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Door gallery tank 2",
+        "position": "97.5,3274,166",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Door gallery tank 2 spill",
+        "position": "97.5,3130,86",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Door gallery tank 3",
+        "position": "310,3274,166",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Door gallery tank 3 spill",
+        "position": "310,3130,86",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Door gallery n tank",
+        "position": "469.5,3085,166",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Door gallery n tank spill",
+        "position": "330,3085,86",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Door gallery s tank",
+        "position": "-469.5,3085,166",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Door gallery s tank spill",
+        "position": "-330,3085,86",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Door gallery planter -197",
+        "position": "-135.5,3140,164",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Door gallery wash -197",
+        "position": "-177.5,3040,120",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Door gallery planter 0",
+        "position": "62,3140,164",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Door gallery wash 0",
+        "position": "20,3040,120",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Door gallery planter 197",
+        "position": "259.5,3140,164",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Door gallery wash 197",
+        "position": "217.5,3040,120",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Door gallery fill",
+        "position": "0,3020,150",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Probe Lobby Door Gallery",
+        "position": "0,3060,90",
+        "types": [
+          "Sandbox.EnvmapProbe"
+        ]
+      }
+    ]
+  },
+  {
+    "scene": "Assets/scenes/maps/Refinery/Refinery.scene",
+    "roots": [
+      "Scene Information",
+      "-- GAME SETUP --",
+      "scenes/maps/defusemap_01/game_setup.prefab",
+      "prefabs/game_modes/bomb_defusal.prefab",
+      "prefabs/game_modes/team_deathmatch.prefab",
+      "Environment",
+      "Buy Zones",
+      "Minimap Renderer",
+      "-- GAMEMODE COMPONENTS --",
+      "Defuse",
+      "Team Spawns",
+      "Cash Grab",
+      "Deathmatch Spawns",
+      "Retakes Spawns",
+      "-- MAP OBJECTS --",
+      "Ladder Volume",
+      "prefabs/door.prefab",
+      "prefabs/door.prefab",
+      "prefabs/door.prefab",
+      "prefabs/door.prefab",
+      "prefabs/door.prefab",
+      "prefabs/door.prefab",
+      "Map Instance",
+      "Play Area",
+      "Editor",
+      "Callouts"
+    ],
+    "doors": [
+      {
+        "name": "BACKDOORS",
+        "position": "-4064.19507,90.5588379,247.719696",
+        "types": [
+          "Facepunch.MapLocation",
+          "Zone",
+          "Sandbox.BoxCollider"
+        ]
+      },
+      {
+        "name": "BACKDOORS",
+        "position": "-3668.83301,30.10536,247.7202",
+        "types": [
+          "Facepunch.MapLocation",
+          "Zone",
+          "Sandbox.BoxCollider"
+        ]
+      }
+    ]
+  },
+  {
+    "scene": "Assets/scenes/maps/Ridgeback/ridgeback.scene",
+    "roots": [
+      "Scene Information",
+      "Terrain",
+      "Sun",
+      "Sky",
+      "Fog",
+      "Map Bounds",
+      "Battle Royale Area",
+      "Spawn Points",
+      "Sites",
+      "Buildings",
+      "Lightweight Bot Manager",
+      {
+        "Id": "e0d81395-b7c1-4df6-a623-8cd2e466b77d",
+        "Path": "prefabs/game_modes/battle_royale.prefab"
+      },
+      {
+        "Id": "ee813720-722c-4ee9-89c2-d1907b232008",
+        "Path": "scenes/maps/defusemap_01/game_setup.prefab"
+      },
+      "Grass",
+      "Far Grass",
+      "Trees",
+      "River",
+      "Mossy Stone Wall - Megascans Preview"
+    ],
+    "doors": []
+  },
+  {
+    "scene": "Assets/scenes/maps/Riverdale/riverdale.scene",
+    "roots": [
+      "Scene Information",
+      "Minimap Renderer",
+      "Sun",
+      "Sky",
+      "Fog",
+      "Look",
+      "Riverdale",
+      "Lights",
+      "Reflection Probes",
+      "Volumetric Fog",
+      "Team Spawns",
+      "Deathmatch Spawns",
+      "Retakes Spawns",
+      "Bomb Sites",
+      "Buy Zones",
+      "Callouts",
+      "Play Area",
+      "Player Clips",
+      "Catch Floor",
+      "Objective Spots",
+      "Cash Grab",
+      {
+        "Id": "2511d0e8-bd1b-426e-b0c1-27b2b2dc3797",
+        "Path": "prefabs/game_modes/team_deathmatch.prefab"
+      },
+      {
+        "Id": "af50feff-a263-4c20-997f-58b4bb560e1f",
+        "Path": "prefabs/game_modes/bomb_defusal.prefab"
+      },
+      {
+        "Id": "ee813720-722c-4ee9-89c2-d1907b232008",
+        "Path": "scenes/maps/defusemap_01/game_setup.prefab"
+      },
+      "Indirect Light",
+      "Pipe Solids",
+      "Yard Prop Solids"
+    ],
+    "doors": [
+      {
+        "name": "Upper door lamp -680.0",
+        "position": "1982.5,680,388",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Upper door lamp -330.0",
+        "position": "1982.5,330,388",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Upper door lamp 330.0",
+        "position": "1982.5,-330,388",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Upper door lamp 680.0",
+        "position": "1982.5,-680,388",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "North door lamp -410.0",
+        "position": "1982.5,410,140",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "North door lamp 410.0",
+        "position": "1982.5,-410,140",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "B1 door lamp -1",
+        "position": "-895,177.5,304",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "B1 door lamp 1",
+        "position": "-895,-177.5,304",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Turbine door lamp",
+        "position": "-1222.5,-0,124",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Hall south door lamp",
+        "position": "-257.5,-0,140",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "A2 west door lamp",
+        "position": "-200,1717.5,140",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Turbine block door lamp -1",
+        "position": "-1232.5,1500,116",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Spawn door lamp -1 4",
+        "position": "-280,2282.5,126",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Spawn door lamp -1 7",
+        "position": "620,2282.5,126",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Spawn door lamp -1 10",
+        "position": "1520,2282.5,126",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Spawn door lamp -1",
+        "position": "-905,2042.5,308",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "A1 west door lamp",
+        "position": "-200,-1717.5,140",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Turbine block door lamp 1",
+        "position": "-1232.5,-1500,116",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Spawn door lamp 1 4",
+        "position": "-280,-2282.5,126",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Spawn door lamp 1 7",
+        "position": "620,-2282.5,126",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Spawn door lamp 1 10",
+        "position": "1520,-2282.5,126",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Spawn door lamp 1",
+        "position": "-905,-2042.5,308",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Hall north door lamp -410.0",
+        "position": "2057.5,410,140",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Hall north door lamp 410.0",
+        "position": "2057.5,-410,140",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Turbine hall door lamp -1900.0",
+        "position": "-1732.5,2150,122",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Turbine hall door lamp -1100.0",
+        "position": "-1732.5,1250,122",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Turbine hall door lamp 1100.0",
+        "position": "-1732.5,-850,122",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Turbine hall door lamp 1900.0",
+        "position": "-1732.5,-2050,122",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      }
+    ]
+  },
+  {
+    "scene": "Assets/scenes/maps/Riverside/riverside.scene",
+    "roots": [
+      "Scene Information",
+      "Minimap Renderer",
+      "Moon",
+      "Sky",
+      "Fog",
+      "Wind",
+      "Look",
+      "Riverside",
+      "Lights",
+      "Fires",
+      "Burn Drums",
+      "Cooler",
+      "Teddy",
+      "Propane Cylinders",
+      "Lawn Chairs",
+      "Reflection Probes",
+      "Volumetric Fog",
+      "Player Spawns",
+      "Zombie Spawns",
+      "Station Spots",
+      "Play Area",
+      "Player Clips",
+      "Catch Floor",
+      {
+        "Id": "12c378c4-7ca6-48a4-8289-2ed2a063a2e5",
+        "Path": "prefabs/game_modes/zombies.prefab"
+      },
+      {
+        "Id": "ee813720-722c-4ee9-89c2-d1907b232008",
+        "Path": "scenes/maps/defusemap_01/game_setup.prefab"
+      },
+      "Supply Crates",
+      "Sandbags",
+      "Speed-Limit Signs",
+      "Porch Lights",
+      "Roof Air Conditioners",
+      "Streetlight Heads",
+      "Store Ceiling Lights",
+      "Pole Insulators",
+      "Roof TV Aerials",
+      "Trailer Entry Doors",
+      "Boarded Camper",
+      "Trailer Hitches",
+      "Passive Roof Vents",
+      "Water Tower Tanks",
+      "Guard Tower Ladders",
+      "Park Graffiti Boards",
+      "Precast Entry Steps",
+      "Guard Tower Roofs",
+      "Shed Downlights",
+      "Interior Drinks Fridges",
+      "Store Timber Steps",
+      "Entrance soil relief - REVIEW TRIAL",
+      "Trailer yard relief - REVIEW TRIAL",
+      "T2 Sliding Window Frame",
+      "West Yard Fences",
+      "Office Entry Doors",
+      "Office Rules Signs"
+    ],
+    "doors": [
+      {
+        "name": "Trailer Entry Doors",
+        "position": "0,0,0",
+        "types": []
+      },
+      {
+        "name": "T2 Entry Door",
+        "position": "995,891.826538,30",
+        "types": [
+          "Sandbox.ModelRenderer"
+        ]
+      },
+      {
+        "name": "Office Entry Doors",
+        "position": "0,0,0",
+        "types": []
+      },
+      {
+        "name": "Office Entry Door",
+        "position": "-580,692.76709,126",
+        "types": [
+          "Sandbox.ModelRenderer"
+        ]
+      }
+    ]
+  },
+  {
+    "scene": "Assets/scenes/maps/sewage/sewage.scene",
+    "roots": [
+      "Sewage map information",
+      "Waterworks shell",
+      "Waterworks tower",
+      "Waterworks catwalks",
+      "Waterworks pipework",
+      "Waterworks details",
+      "Power cabinet 1",
+      "Power cabinet 2",
+      "Power cabinet 3",
+      "Waterworks signage",
+      "Waterworks water",
+      "Waterworks cascades",
+      "Practical work lights",
+      "Ambient reflected green",
+      "Chamber atmosphere",
+      "Basin mist",
+      "Chamber reflection 0",
+      "Chamber reflection 1",
+      "Chamber reflection 2",
+      "Co-op spawn landing",
+      {
+        "Id": "12c378c4-7ca6-48a4-8289-2ed2a063a2e5",
+        "Path": "prefabs/game_modes/zombies.prefab"
+      },
+      {
+        "Id": "ee813720-722c-4ee9-89c2-d1907b232008",
+        "Path": "scenes/maps/defusemap_01/game_setup.prefab"
+      },
+      "Reference composition camera",
+      "Skylight shaft 0",
+      "Skylight shaft 1",
+      "Skylight shaft 2",
+      "Chamber suspended moisture",
+      "Waterworks bolted flanges",
+      "Waterworks valve wheels",
+      "Waterworks caged work lamps",
+      "Waterworks louvred vent housings",
+      "Waterworks tower safety railing"
+    ],
+    "doors": []
+  },
+  {
+    "scene": "Assets/scenes/maps/Shipment/Shipment.scene",
+    "roots": [
+      "Game",
+      "Team Deathmatch",
+      "2D Skybox",
+      "Map",
+      "Camera",
+      "Sun",
+      "Deathmatch Spawns",
+      "Envmap Probe",
+      "Gradient Fog",
+      "MinimapRenderer",
+      "Box",
+      "shipping_container_closed_dev (7)",
+      "shipping_container_closed_dev (9)",
+      "shipping_container_closed_dev (8)",
+      "shipping_container_closed_dev (6)",
+      "shipping_container_closed_dev (1)",
+      "shipping_container_open_dev (1)",
+      "shipping_container_closed_dev",
+      "shipping_container_open_dev",
+      "shipping_container_closed_dev (2)",
+      "shipping_container_open_dev (7)",
+      "shipping_container_open_dev (8)",
+      "shipping_container_open_dev (5)",
+      "shipping_container_open_dev (2)",
+      "shipping_container_open_dev (6)",
+      "shipping_container_closed_dev (5)",
+      "shipping_container_closed_dev (3)",
+      "shipping_container_open_dev (3)",
+      "shipping_container_open_dev (4)",
+      "shipping_container_closed_dev (4)",
+      "Box",
+      "forklift_up_dev",
+      "crate_dev_large",
+      "dumpster_dev",
+      "crate_stack_01 (1)",
+      "cone_dev (2)",
+      "cone_dev (1)",
+      "cone_dev",
+      "watertote_dev (1)",
+      "watertote_dev",
+      "shipping_container_closed_dev",
+      "pipe_dev_64 (1)",
+      "pipe_dev_64 (2)",
+      "pipe_dev_corner_16 (1)",
+      "pipe_dev_64 (3)",
+      "pipe_dev_64",
+      "pipe_dev_corner_16",
+      "van_dev",
+      "oildrum_dev (2)",
+      "oildrum_dev (1)",
+      "oildrum_dev",
+      "swat_dev",
+      "crate_dev_large (1)",
+      "crate_dev_large",
+      "cone_dev",
+      "pallet_dev",
+      "cone_dev",
+      "dumpster_small_dev (2)",
+      "dumpster_small_dev (1)",
+      "dumpster_small_dev",
+      "Player Clips"
+    ],
+    "doors": []
+  },
+  {
+    "scene": "Assets/scenes/maps/spillway/spillway.scene",
+    "roots": [
+      "Scene Information",
+      "Minimap Renderer",
+      "Sun",
+      "Sky",
+      "Fog",
+      "Look",
+      "Spillway",
+      "Lights",
+      "Reflection Probes",
+      "Volumetric Fog",
+      "Team Spawns",
+      "Deathmatch Spawns",
+      "Retakes Spawns",
+      "Bomb Sites",
+      "Buy Zones",
+      "Callouts",
+      "Play Area",
+      "Player Clips",
+      "Catch Floor",
+      "Objective Spots",
+      "Cash Grab",
+      {
+        "Id": "2511d0e8-bd1b-426e-b0c1-27b2b2dc3797",
+        "Path": "prefabs/game_modes/team_deathmatch.prefab"
+      },
+      {
+        "Id": "af50feff-a263-4c20-997f-58b4bb560e1f",
+        "Path": "prefabs/game_modes/bomb_defusal.prefab"
+      },
+      {
+        "Id": "ee813720-722c-4ee9-89c2-d1907b232008",
+        "Path": "scenes/maps/defusemap_01/game_setup.prefab"
+      },
+      "Sky Fill",
+      "Spillway indirect light"
+    ],
+    "doors": []
+  },
+  {
+    "scene": "Assets/scenes/maps/Veridant/veridant.scene",
+    "roots": [
+      "Scene Information",
+      "Minimap Renderer",
+      "Sun",
+      "Sky",
+      "Fog",
+      "Look",
+      "Veridant",
+      "Lights",
+      "Reflection Probes",
+      "Volumetric Fog",
+      "Team Spawns",
+      "Deathmatch Spawns",
+      "Retakes Spawns",
+      "Bomb Sites",
+      "Buy Zones",
+      "Callouts",
+      "Play Area",
+      "Player Clips",
+      "Catch Floor",
+      "Objective Spots",
+      "Cash Grab",
+      {
+        "Id": "2511d0e8-bd1b-426e-b0c1-27b2b2dc3797",
+        "Path": "prefabs/game_modes/team_deathmatch.prefab"
+      },
+      {
+        "Id": "af50feff-a263-4c20-997f-58b4bb560e1f",
+        "Path": "prefabs/game_modes/bomb_defusal.prefab"
+      },
+      {
+        "Id": "ee813720-722c-4ee9-89c2-d1907b232008",
+        "Path": "scenes/maps/defusemap_01/game_setup.prefab"
+      },
+      "Veridant Backbar practical lights",
+      "South garden relief - REVIEW TRIAL",
+      "Reception glazed door left",
+      "Reception glazed door right",
+      "Operations courtyard doorway threshold"
+    ],
+    "doors": [
+      {
+        "name": "Lounge door lamp",
+        "position": "-250,183.75,114",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Reception door lamp",
+        "position": "183.75,-170,118",
+        "types": [
+          "Sandbox.PointLight"
+        ]
+      },
+      {
+        "name": "Reception glazed door left",
+        "position": "208,-140.649994,0",
+        "types": [
+          "Sandbox.ModelRenderer",
+          "Sandbox.BoxCollider",
+          "Facepunch.Door"
+        ]
+      },
+      {
+        "name": "Reception glazed door right",
+        "position": "208,-199.350006,0",
+        "types": [
+          "Sandbox.ModelRenderer",
+          "Sandbox.BoxCollider",
+          "Facepunch.Door"
+        ]
+      },
+      {
+        "name": "Operations courtyard doorway threshold",
+        "position": "0,0,0",
+        "types": [
+          "Sandbox.ModelRenderer"
+        ]
+      }
+    ]
+  }
+]

@@ -49,6 +49,9 @@ import riverdale_notice_boards as NOTICE_BOARDS
 import riverdale_hose_reels as HOSE_REELS
 import riverdale_emergency_phones as EMERGENCY_PHONES
 import riverdale_first_aid as FIRST_AID
+import riverdale_lockers as LOCKERS
+import riverdale_desks as DESKS
+import riverdale_huts as HUTS
 import riverdale_lifebuoys as LIFEBUOYS
 import riverdale_parts as P
 import riverdale_hall as H
@@ -653,7 +656,7 @@ def spawn_side( m, sx ):
         F.coping( m, *E( a_, b_ ), c_, d_, SPAWN_TOP + 26 )
     P.ceiling_light( m, f"Spawn room {sx}", ( f * ( t0 + t1 ) / 2, ( tn0 + tn1 ) / 2, SPAWN_TOP - 26 ), ( 0, 1 ), "cool", 380 )
     for k, n in enumerate( ( -1100.0, -1040.0, -980.0 ) ):
-        box( m, *E( t0 + 4, t0 + 24 ), n - 26, n + 26, SPAWN_ROOM_Z, SPAWN_ROOM_Z + 80, "rv_steel", METAL )
+        LOCKERS.bank( m, *E( t0 + 4, t0 + 24 ), n - 26, n + 26, SPAWN_ROOM_Z, ( f, 0 ) )      # 52 in locker banks facing into the room (were plain slabs)
     P.case_stack( m, ( f * -2200, -760 ), ( 0, 1 ), "dark", seed=150 + sx )
     # The wing (its roof part of the upper deck), the landing and the stair.
     box( m, *E( SPAWN_WING[0], SPAWN_WING[1] ), SPAWN_WING[2], SPAWN_WING[3], 0, SPAWN_ROOM_Z, { "default": None, "+z": "rv_floor" }, STONE )
@@ -828,7 +831,10 @@ def guard_hut( m, he, f ):
     w.rect( F.room_paint( "office", True ), -1487, -1413, 48, 92, 0.7, uv=[ ( 0, 0 ), ( 1, 0 ), ( 1, 1 ), ( 0, 1 ) ] )
     w.box( -1491, -1409, 42, 46, 0, 2.5, "rv_steel" )
     n = F.Face( m, "+n", -1400, he - 50, he + 50, 0, 110 )
-    P.door( m, n.p( he - f * 20, 0, 0 ), n.right, 36, 82, paint="rv_fc_door_blue", double=False, mount="surface" )
+    if HUTS.NEW_DOOR:
+        HUTS.door( m, n.p( he - f * 20, 0, 0 ) )
+    else:
+        P.door( m, n.p( he - f * 20, 0, 0 ), n.right, 36, 82, paint="rv_fc_door_blue", double=False, mount="surface" )
     P.obox( m, ( he, -1450, 122 ), ( 1, 0 ), ( 30, 22, 16 ), { "default": "rv_white", "+z": "rv_fc_flashing" } )
     P.cylinder( m, ( he, -1450 ), 8.0, 130, 130.6, "rv_black", 12, top="rv_black" )
 
@@ -876,9 +882,9 @@ def b1( m, glass ):
         P.railing( m, mirror_pts( [ ( -200, -940 ), ( -160, -940 ) ], f ), ROOM_Z, clip_to=160, name=f"B1 landing rail {sx}" )
     b1_faces( m, up_door )
     # Inside the room: lockers, a table, cases.
-    box( m, -120, -40, -1000, -980, ROOM_Z, ROOM_Z + 80, "rv_steel", METAL )
-    box( m, 40, 120, -1000, -980, ROOM_Z, ROOM_Z + 80, "rv_steel", METAL )
-    box( m, -36, 36, -960, -920, ROOM_Z, ROOM_Z + 30, { "default": "rv_desk", "+z": "rv_dark" }, METAL )
+    LOCKERS.bank( m, -120, -40, -1000, -980, ROOM_Z, ( 0, 1 ) )      # two 80 in locker banks (were plain slabs); collision as before
+    LOCKERS.bank( m, 40, 120, -1000, -980, ROOM_Z, ( 0, 1 ) )
+    DESKS.desk( m, -36, 36, -960, -920, ROOM_Z )      # steel workstation desk (was a plain box); collision as before
     P.case_stack( m, ( -100, -760 ), ( 1, 0 ), "dark", seed=201 )
     P.case_stack( m, ( 100, -760 ), ( 1, 0 ), "olive", seed=202 )
     # On the roof: an air handling unit, fans and vents showing over the parapet.
@@ -1618,6 +1624,12 @@ def write_scene( written, light_list, probe_list ):
     from riverdale_shared_reel import scene_object as approved_reel
     world["Children"].append(approved_reel())
     world["Children"].append( FIRST_AID.scene_group( ids ) )
+    if LOCKERS.NEW_LOCKERS:
+        world["Children"].append( LOCKERS.scene_group( ids ) )
+    if DESKS.NEW_DESK:
+        world["Children"].append( DESKS.scene_group( ids ) )
+    if HUTS.NEW_DOOR:
+        world["Children"].append( HUTS.scene_group( ids ) )
     light_objects = [ light_object( light ) for light in light_list ]
 
     team_spawns = [ spawn_object( f"Red Spawn {k + 1}", f"spawn/red/{k}", p, "Terrorist" ) for k, p in enumerate( RED_SPAWNS ) ]
@@ -1769,6 +1781,8 @@ def write_scene( written, light_list, probe_list ):
         K.prefab_instance( ids, "prefabs/game_modes/bomb_defusal.prefab" ),
         K.prefab_instance( ids, "scenes/maps/defusemap_01/game_setup.prefab" ),
     ]
+    from riverdale_sand_bin import scene_object as court_sand_bin_object
+    objects.append(court_sand_bin_object(ids))
     scene = {
         "__guid": ids( "scene" ),
         "GameObjects": objects,
@@ -1880,6 +1894,9 @@ def partition_trees( source, original_name ):
 def build():
     """ Every model by name. """
     EMERGENCY_PHONES.PLACED.clear()
+    LOCKERS.PLACED.clear()
+    DESKS.PLACED.clear()
+    HUTS.PLACED.clear()
     P.reset()
     hall, hall_dress, pool, water, glass = H.build()
     middle, west, east, north, boundary = K.Model(), K.Model(), K.Model(), K.Model(), K.Model()

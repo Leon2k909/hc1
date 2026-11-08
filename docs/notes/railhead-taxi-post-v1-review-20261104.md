@@ -1,4 +1,6 @@
-# Railhead taxi-rank head sign v1 — review candidate
+# Railhead taxi-rank head sign v1 — installed
+
+Approved and installed 2026-11-05 through the native editor. Exactly 124 old faces removed from the active east dressing source; one baked-coordinate renderer saved. Native compilation, installed screenshots and exact source/scene verification pass. Original post collision and every unrelated ModelDoc/OBJ record remain unchanged. The generator retains the new renderer and original collision. Unused preview backgrounds archived outside Assets. See `Sources/Railhead/taxi-post-v1/README.md` and `output/railhead/taxi-post-v1/installed-verification.json`. Historical review follows.
 
 - Checked existing project models, source upgrade/status/install records, notes and historical taxi outputs before selection. No newer taxi-rank post asset found. `rw_taxi_sign`/`railhead_furniture.taxi_sign` are car roof lamps; Riverside's installed speed-limit sign has a different panel, post and purpose. Existing planter, speaker, chair and inspection-cover upgrades were excluded. Audit: `output/railhead/taxi-post-v1/existing-upgrade-audit.json`.
 - Candidate at plan (1488, 1180, 0): 4,472 triangles, smooth stainless post, weather cap, anchored foot, split collars/bolts, rounded rolled-edge double-sided cassette, edge rivets and underside straps. Original 102-inch top height and panel width/height retained; the cassette grows in depth to enclose the pole. The original Taxi atlas art is unchanged and reads correctly on both faces. No material/texture/light edits.

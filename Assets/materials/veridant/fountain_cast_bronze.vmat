@@ -1,0 +1,13 @@
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    g_flMetalness "0.28"
+    g_flRoughnessScaleFactor "2.4"
+    TextureColor "materials/belltower/fountain_bronze_color.png"
+    TextureNormal "materials/belltower/fountain_bronze_normal.png"
+    TextureRoughness "materials/belltower/fountain_bronze_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    g_vColorTint "[0.56 0.68 0.67 1.0]"
+    g_flModelTintAmount "1.0"
+}

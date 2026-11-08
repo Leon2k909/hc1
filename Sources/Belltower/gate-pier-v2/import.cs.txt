@@ -1,0 +1,34 @@
+// Import private review assets only; existing map/material/physics remain saved as before.
+var root=Sandbox.Project.Current.GetRootPath();
+if(!string.Equals(System.IO.Path.GetFullPath(root).TrimEnd('\\','/'),@"C:\sbox-projects\hc1\forked-shooter-main",StringComparison.OrdinalIgnoreCase))throw new InvalidOperationException("Wrong checkout.");
+var directory=System.IO.Path.Combine(System.IO.Path.GetTempPath(),"belltower-gate-pier-v2");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(directory,"manifest.json")));
+if(manifest["revision"].GetValue<string>()!="belltower-gate-pier-v2" || !manifest["review_only"].GetValue<bool>())throw new InvalidOperationException("Unexpected review.");
+string Hash(string p) {using var stream=System.IO.File.OpenRead(p);return Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(stream)).ToLowerInvariant();}
+foreach(var pair in manifest["guards"].AsObject())
+ if(Hash(System.IO.Path.Combine(root,pair.Key))!=pair.Value.GetValue<string>())throw new InvalidOperationException("Shared source changed: "+pair.Key);
+if(Hash(System.IO.Path.Combine(root,"Sources/Belltower/gate-pier-v2/build.py"))!=manifest["source_sha256"].GetValue<string>())throw new InvalidOperationException("Builder changed.");
+var previous=Editor.SceneEditorSession.Active;
+var playing=Game.IsPlaying;var runtime=Game.ActiveScene?.Id;
+var plan=new System.Collections.Generic.List<(string Source,string Target,string Hash)>();
+foreach(var pair in manifest["files"].AsObject())
+{
+ if(!pair.Key.StartsWith("Assets/models/maps/belltower/gate-pier-v2/") || pair.Key.Contains(".."))throw new InvalidOperationException("Unexpected target.");
+ var source=System.IO.Path.Combine(directory,"stage",pair.Key);var target=System.IO.Path.Combine(root,pair.Key);var hash=pair.Value.GetValue<string>();
+ if(Hash(source)!=hash)throw new InvalidOperationException("Stage differs: "+pair.Key);
+ if(System.IO.File.Exists(target) && Hash(target)!=hash)throw new InvalidOperationException("Private target already differs: "+pair.Key);
+ plan.Add((source,target,hash));
+}
+foreach(var item in plan.OrderBy(p=>p.Target.EndsWith(".vmdl") ? 1 : 0))
+{
+ cancellationToken.ThrowIfCancellationRequested();
+ System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(item.Target));
+ if(!System.IO.File.Exists(item.Target))System.IO.File.Copy(item.Source,item.Target);
+ if(Hash(item.Target)!=item.Hash)throw new InvalidOperationException("Imported source differs.");
+ Editor.AssetSystem.RegisterFile(item.Target);
+}
+var preserved=ReferenceEquals(previous,Editor.SceneEditorSession.Active)&&Game.IsPlaying==playing&&Game.ActiveScene?.Id==runtime;
+var result=new{ImportedPrivateFiles=plan.Count,ReviewOnly=true,ExistingSourcesPreserved=true,EditorStatePreserved=preserved};
+System.IO.File.WriteAllText(System.IO.Path.Combine(directory,"native-import.json"),System.Text.Json.JsonSerializer.Serialize(result));
+if(!preserved)throw new InvalidOperationException("Editor state changed; inspect before continuing.");
+return result;

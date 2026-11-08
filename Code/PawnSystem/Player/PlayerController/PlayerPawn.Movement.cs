@@ -653,7 +653,7 @@ public partial class PlayerPawn : IGameEventHandler<WeaponShotEvent>
 		if ( !wasOnGround && isOnGround && Global.EnableFallDamage && !IsNoclipping )
 		{
 			var minimumVelocity = MinimumFallVelocity;
-			var vel = MathF.Abs( _previousVelocity.z );
+			var vel = LandingImpactSpeed();
 
 			if ( vel >= FallKnockdownVelocity )
 				StartFallKnockdown();

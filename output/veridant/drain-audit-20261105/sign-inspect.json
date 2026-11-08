@@ -1,0 +1,1 @@
+{"code":"return Editor.SceneEditorSession.Active.Scene.GetAllObjects(true).Where(x=> x.Name == \"Dressing\").Select(x=>new { x.Name, x.Id, Model=x.Components.Get<ModelRenderer>()?.Model?.ResourcePath, IsError=x.Components.Get<ModelRenderer>()?.Model?.IsError }).ToArray();"}

@@ -36,7 +36,7 @@ var rotation=Rotation.FromYaw(manifest["yaw"].GetValue<float>());
 Vector3 Local(float x,float y,float z)=>at+rotation*new Vector3(x,y,z);
 var views=new (string Name,Vector3 Eye,Vector3 Target,float Fov,bool Cooler)[]
 {
-    ("whole",Local(-300,-250,64),Local(0,-250,30),80f,true),
+    ("whole",Local(-110,-40,64),Local(0,-250,30),75f,true),
     ("detail",Local(-100,-235,64),Local(0,-250,34),62f,true),
 };
 

@@ -1425,9 +1425,7 @@ def garden_well( model ):
     model.boxes.extend( well_collision.boxes )
     Well.build( model, GARDEN_WELL, z )
     for se in ( -1, 1 ):
-        model.box( ( e + se * 38 - 4, n - 4, z + 34 ), ( e + se * 38 + 4, n + 4, z + 116 ), "planks_dark", WOOD )
-    model.beam( ( e - 44, n, z + 106 ), ( e + 44, n, z + 106 ), ( 6, 6 ), "planks_dark" )
-    axle( model, ( e, n, z + 96 ), ( 1, 0, 0 ), 6, 50, { "side": "planks", "end": "planks_dark" } )
+        model.box( ( e + se * 38 - 4, n - 4, z + 34 ), ( e + se * 38 + 4, n + 4, z + 116 ), None, WOOD )
     gable_roof( model, e - 50, e + 50, n - 26, n + 26, z + 112, "e", "roof_tiles", "planks_dark", over=6, ends_over=( 4, 4 ),
                 thick=3, hull=None, cap=False )
 
@@ -1609,6 +1607,16 @@ def low_wall( model, e0, e1, n0, n1, z0, z1, paint="rubble", cap="ashlar_grey" )
 
 
 def pier( model, centre, z0, height, size=18.0 ):
+    if abs(height-64)<1e-6 and abs(size-18)<1e-6:
+        import belltower_gate_piers as Piers
+        legacy=Model();_legacy_pier(legacy,centre,z0,height,size)
+        model.boxes.extend(legacy.boxes);model.hulls.extend(legacy.hulls)
+        Piers.place(model,centre,z0)
+        return
+    _legacy_pier(model,centre,z0,height,size)
+
+
+def _legacy_pier( model, centre, z0, height, size=18.0 ):
     """ A gate pier with a ball on top. """
     e, n = centre
     h = size / 2
@@ -2940,6 +2948,8 @@ def write_scene( lights, models ):
     import belltower_bistro_tables as Tables
     import belltower_dish_lamps as Lamps
     import belltower_market_cross as Cross
+    import belltower_well_frame as WellFrame
+    import belltower_gate_piers as Piers
     import belltower_sack_piles as Piles
     import belltower_wall_lanterns as Lanterns
     foliage = []
@@ -2950,6 +2960,7 @@ def write_scene( lights, models ):
     lantern_positions = []
     lamp_positions = []
     pile_positions = []
+    pier_positions = []
     for region, model in models:
         pot_positions += [ ( region, prop["position"] ) for prop in model.props if prop.get( "kind" ) == "doorway_pot" ]
         board_positions += [ ( region, prop["position"], prop["yaw"], prop["picture"] ) for prop in model.props if prop.get( "kind" ) == "menu_board" ]
@@ -2958,8 +2969,9 @@ def write_scene( lights, models ):
         lantern_positions += [ ( region, prop["position"], prop["yaw"] ) for prop in model.props if prop.get( "kind" ) == "wall_lantern" ]
         lamp_positions += [ ( region, prop["position"] ) for prop in model.props if prop.get( "kind" ) == "dish_lamp" ]
         pile_positions += [ ( region, prop["position"] ) for prop in model.props if prop.get( "kind" ) == "sack_pile" ]
+        pier_positions += [ ( region, prop["position"] ) for prop in model.props if prop.get( "kind" ) == "gate_pier" ]
         # Standalone props must not renumber the existing trees and planting.
-        for index, prop in enumerate( p for p in model.props if p.get( "kind" ) not in ( "doorway_pot", "menu_board", "bistro_chair", "bistro_table", "wall_lantern", "dish_lamp", "sack_pile" ) ):
+        for index, prop in enumerate( p for p in model.props if p.get( "kind" ) not in ( "doorway_pot", "menu_board", "bistro_chair", "bistro_table", "wall_lantern", "dish_lamp", "sack_pile", "gate_pier" ) ):
             key = f"foliage/{region}/{index}"
             foliage.append( K.game_object( ids, prop["name"], key, K.to_world( prop["position"] ),
                 K.yaw_rotation( prop["yaw"] ), scale=K.vec( prop["scale"] ), components=[
@@ -3080,6 +3092,8 @@ def write_scene( lights, models ):
         Lamps.group( ids, lamp_positions ),
         Piles.group( ids, pile_positions ),
         Cross.group( ids ),
+        WellFrame.group( ids ),
+        Piers.group( ids, pier_positions ),
         K.game_object( ids, "Lights", "lights", children=light_objects ),
         # Free-for-all modes spawn at every active spawn point, so the spawn roads' team spawns are left out of them.
         mode_group( "Team Spawns", "spawns", ( "Deathmatch", "Gun Game" ), team_spawns, inverse=True ),

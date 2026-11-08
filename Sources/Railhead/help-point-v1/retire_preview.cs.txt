@@ -1,0 +1,11 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var folder=System.IO.Path.Combine(root,"Assets/models/props/railhead/help_point_v1");
+var archive=System.IO.Path.Combine(root,"output/railhead/help-point-v1/retired-preview");
+System.IO.Directory.CreateDirectory(archive);var moved=new System.Collections.Generic.List<string>();
+foreach(var name in new[]{"preview.obj","preview.vmdl","preview.vmdl_c","railhead_dress_west.mtl"})
+foreach(var suffix in new[]{"",".meta"}){
+ var from=System.IO.Path.Combine(folder,name+suffix);var to=System.IO.Path.Combine(archive,name+suffix);
+ if(!System.IO.File.Exists(from))continue;if(System.IO.File.Exists(to))throw new Exception("Already archived; inspect");
+ System.IO.File.Move(from,to);moved.Add(name+suffix);
+}
+return new{ArchivedUnusedPreview=moved,InstalledHelpPointRetained=true};

@@ -1,0 +1,21 @@
+var root=Sandbox.Project.Current.GetRootPath();var folder=System.IO.Path.Combine(root,"Sources/Orion/mount-pedestals-v1/review");
+var plan=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"install-plan.json")));
+var preview=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"preview-plan.json")));
+var editor=Editor.SceneEditorSession.Active;
+var before=new{Editor=editor.Scene.Id,Runtime=Game.ActiveScene?.Id,Game.IsPlaying,Dirty=editor.HasUnsavedChanges};
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+foreach(var pair in plan["guards"].AsObject())if(Hash(System.IO.Path.Combine(root,pair.Key))!=pair.Value.GetValue<string>())throw new InvalidOperationException("Input changed: "+pair.Key);
+foreach(var pair in preview["files"].AsObject())if(Hash(System.IO.Path.Combine(root,pair.Key))!=pair.Value.GetValue<string>())throw new InvalidOperationException("Preview dependency changed: "+pair.Key);
+var allowed=new[]{"Tools/orion_mount_pedestals.py","Tools/orion_parts.py","Assets/models/maps/orion/orion_pad.obj"};
+foreach(var pair in plan["files"].AsObject()) {
+ if(!allowed.Contains(pair.Key))throw new InvalidOperationException("Unexpected target");
+ if(Hash(System.IO.Path.Combine(folder,"install-stage",pair.Key))!=pair.Value.GetValue<string>())throw new InvalidOperationException("Stage changed");
+}
+if(System.IO.File.Exists(System.IO.Path.Combine(root,"Tools/orion_mount_pedestals.py")))throw new InvalidOperationException("Helper already installed; inspect before replacing");
+foreach(var pair in plan["files"].AsObject()) {
+ var target=System.IO.Path.Combine(root,pair.Key);System.IO.File.Copy(System.IO.Path.Combine(folder,"install-stage",pair.Key),target+".planter-writing",true);
+ System.IO.File.Move(target+".planter-writing",target,true);if(pair.Key.StartsWith("Assets/"))Editor.AssetSystem.RegisterFile(target);
+}
+var result=new{ServicePedestals=4,SceneChanged=false,CollisionChanged=false,
+ UserStatePreserved=editor.Scene.Id==before.Editor&&Game.ActiveScene?.Id==before.Runtime&&Game.IsPlaying==before.IsPlaying&&editor.HasUnsavedChanges==before.Dirty};
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"installed.json"),System.Text.Json.JsonSerializer.Serialize(result));return result;

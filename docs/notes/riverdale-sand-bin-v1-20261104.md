@@ -1,3 +1,7 @@
-# Riverdale sand bin — review, 2026-11-04
+# Riverdale sand bin — installed 2026-11-05
+
+Approved and installed through the native editor: 38 old faces removed, one `Court Sand Bin` renderer saved, original collision note and complete public ModelDoc physics retained. Compilation, installed captures and exact source/scene verification pass. Source hooks preserve the upgrade. Unused private background resources are archived outside Assets; rollback inputs remain under `output/riverdale/sand-bin-v1/install-before`. Receipt: `installed-verification.json`. Historical review follows.
+
+Rechecked 2026-11-05 against the unchanged current yard-props import and ModelDoc. The existing uninstalled 2,126-triangle asset is reused. Fresh matched native editor views use Riverdale's existing lighting in a disposable scene, with no added lights or scene/play changes. Exact face scope, geometry/winding, shared dependencies and native model loading pass. Latest evidence: `output/riverdale/sand-bin-v1/current-native/verification.json` and `{whole,detail}-{before,after}.png`. Original remains active pending approval.
 
 After checking existing upgrades and finding no suitable sand/grit bin, rebuilt the crude court bin at plan (-1250,258): rounded tapered body, formed sloping lid and weather lip, hinge knuckles/pins, recessed handle and skids. Original yellow finish and SAND artwork retained; no new texture. Exactly 38 old triangles removed only from a private review base. All other source geometry, saved scene and collision are unchanged. Native in-game comparison, source guards and validation: `output/riverdale/sand-bin-v1/`. Reproduction: `Sources/Riverdale/sand-bin-v1/README.md`. Staged pending approval.

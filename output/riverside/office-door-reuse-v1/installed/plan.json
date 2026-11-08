@@ -1,0 +1,55 @@
+{
+  "source": "Assets/models/maps/riverside/riverside_pad.obj",
+  "before_sha256": "fde170d786d379cfdb32930a773d94b2e71e0c9a5a4b738768ff0a6c2697bd3b",
+  "after_sha256": "9e49cdb27d9fc4df8d502d15826c58a9eae6de4ba787cf61b277b45631ae118f",
+  "model_sha256": "dd98d6355f9d85fccbba54a67faa67e9663a47b9a5f0a7bc642b9fa780306f6b",
+  "scene_sha256": "faa860978f158cd3adcb795c31e3a28be94cecacd35932cb86e4458d2b01d7d1",
+  "removed_triangles": 16,
+  "group": {
+    "__guid": "2c6425dc-088a-5cc1-bbbb-0637d5fc4202",
+    "__version": 2,
+    "Flags": 0,
+    "Name": "Office Entry Doors",
+    "Position": "0,0,0",
+    "Rotation": "0,0,0,1",
+    "Scale": "1,1,1",
+    "Tags": "",
+    "Enabled": true,
+    "NetworkMode": 2,
+    "NetworkFlags": 0,
+    "NetworkOrphaned": 0,
+    "NetworkTransmit": true,
+    "OwnerTransfer": 1,
+    "Components": [],
+    "Children": [
+      {
+        "__guid": "f3ca5778-54da-569c-afd8-8be888b4829b",
+        "__version": 2,
+        "Flags": 0,
+        "Name": "Office Entry Door",
+        "Position": "-580.000000,692.767076,126.000000",
+        "Rotation": "0,0,-0.0000000,1.0000000",
+        "Scale": "1,1,1",
+        "Tags": "",
+        "Enabled": true,
+        "NetworkMode": 2,
+        "NetworkFlags": 0,
+        "NetworkOrphaned": 0,
+        "NetworkTransmit": true,
+        "OwnerTransfer": 1,
+        "Components": [
+          {
+            "__type": "Sandbox.ModelRenderer",
+            "__guid": "a49826ad-cd56-5f91-b7da-d5a015c686cd",
+            "__enabled": true,
+            "Flags": 0,
+            "Model": "models/props/riverside/trailer_door_v1/door.vmdl",
+            "RenderType": "On",
+            "Tint": "1,1,1,1"
+          }
+        ],
+        "Children": []
+      }
+    ]
+  }
+}

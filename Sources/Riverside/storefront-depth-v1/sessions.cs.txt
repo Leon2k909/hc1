@@ -1,0 +1,1 @@
+return Editor.SceneEditorSession.All.Select(s=>new{s.Scene?.Name,Path=s.Scene?.Source?.ResourcePath,s.HasUnsavedChanges,s.IsPlaying,Active=s==Editor.SceneEditorSession.Active}).ToArray();

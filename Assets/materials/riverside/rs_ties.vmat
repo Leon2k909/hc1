@@ -1,14 +1,15 @@
-// Tools/riverside_materials.py
+// Tools/riverside_sleepers.py: sleeper retaining walls from a real timber scan (old maps: rs_ties_*.jpg, kept)
 "Layer0"
 {
     shader "shaders/complex.shader"
     F_SPECULAR "1"
     g_flRoughnessScaleFactor "1"
     g_flMetalness "0.00"
-    TextureColor "materials/riverside/rs_ties_color.jpg"
-    TextureNormal "materials/riverside/rs_ties_normal.jpg"
-    TextureRoughness "materials/riverside/rs_ties_rough.png"
-    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    TextureColor "materials/riverside/rs_ties_v2_color.png"
+    TextureNormal "materials/riverside/rs_ties_v2_normal.png"
+    TextureRoughness "materials/riverside/rs_ties_v2_rough.png"
+    TextureAmbientOcclusion "materials/riverside/rs_ties_v2_ao.png"
+    g_flAmbientOcclusionDirectDiffuse "0.300"
     g_vColorTint "[1.000000 1.000000 1.000000 1.000000]"
     g_flModelTintAmount "1.0"
 }

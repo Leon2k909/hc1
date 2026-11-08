@@ -50,6 +50,10 @@ public partial class GunsmithPart : GameResource
 
 	/// <summary>Original weapon material slots replaced by this kit's geometry.</summary>
 	[Property] public List<string> HiddenWeaponMaterials { get; set; } = new();
+	/// <summary>Factory material variants for this part, applied before any weapon camo.</summary>
+	[Property] public Dictionary<string, string> MaterialReplacements { get; set; } = new();
+	/// <summary>A factory appearance choice, available without changing the attachment unlock ladder.</summary>
+	[Property] public bool IsCosmeticVariant { get; set; }
 	[Property] public bool IsSuppressor { get; set; }
 	[Property, ShowIf( nameof( Category ), GunsmithPartType.Ammunition )]
 	public bool UsesTracerRounds { get; set; }

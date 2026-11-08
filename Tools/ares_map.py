@@ -232,6 +232,12 @@ def railing( m, a, b, z, lamps=True, collide=True ):
         return
     along = ( b - a ) / length
     side = np.cross( UP, along )
+    if lamps and np.allclose(a,(-760,-158,208),atol=.001,rtol=0) and np.allclose(b,(-760,-80,208),atol=.001,rtol=0):
+        # Approved standalone west landing rail; preserve both original collision boxes.
+        if collide:
+            m.oriented_box( ( a + b ) / 2 + UP * 40.0, ( along, side, UP ), ( length, 3.0, 8.0 ), { "default": None }, METAL )
+            m.oriented_box( ( a + b ) / 2 + UP * 3.0, ( along, side, UP ), ( length, 1.0, 6.0 ), { "default": None }, METAL )
+        return
     m.beam( a + UP * 41.0, b + UP * 41.0, ( 2.4, 2.6 ), "ar_gunmetal" )
     m.beam( a + UP * 22.0, b + UP * 22.0, ( 1.4, 1.4 ), "ar_brass" )
     toe_paint = "ar_in_frame" if abs( z - G ) < 0.01 and all( abs( p[0] ) <= HALL_E and HALL_N0 <= p[1] <= DECK_N1 for p in ( a, b ) ) else "ar_hazard"
@@ -346,6 +352,8 @@ def door_frame( m, axis, r0, r1, d0, d1, z0, z1, depth=3.0, width=8.0 ):
 
 def lit_sign( m, name, centre, facing, width=96.0, height=24.0, depth=3.0 ):
     """ A back-lit sign box: its face (LIT region) facing plan direction facing ( de, dn ), centred at centre. """
+    if name == 'airlock07' and np.allclose(centre, (0, -1398.5, 250)) and tuple(facing) == (0, 1) and width == 128 and height == 32:
+        return  # Approved independent Main Airlock Lightbox renderer.
     c = np.asarray( centre, float )
     f = K.normalise( ( facing[0], facing[1], 0.0 ) )
     right = np.array( ( -f[1], f[0], 0.0 ) )
@@ -410,13 +418,25 @@ def case_stack( m, e, n, heading, layers, seed=0, z=0.0, big=False ):
 
 def pump_unit( m, e, n, heading ):
     from ares_interior import pump_unit as draw_pump
-    return draw_pump( m, e, n, heading )
+    result=draw_pump( m, e, n, heading )
+    if abs(e-270)<.001 and abs(n-270)<.001 and abs(heading-135)<.001:
+        from ares_pump_isolation_valve import apply_pipe_gap
+        apply_pipe_gap(m)
+    return result
 
 
 def console( m, e, n, heading, screen=0, z=0.0 ):
     """ A control desk: a steel body with a sloped screen and a lit keyboard strip, 60 wide. The operator stands on its
     -x side. """
     F = Frame( e, n, heading, z )
+    if (e,n,heading,screen,z)==(-1074,240,180.0,0,0.0):
+        # Approved standalone west operator console; retain the original cover hull.
+        F.box( m, -14, 14, -30, 30, 0, 34, None, METAL )
+        return
+    if (e,n,heading,screen,z)==(230,-440,90.0,2,0.0):
+        # Approved standalone core console draws this one placement; retain original hull.
+        F.box( m, -14, 14, -30, 30, 0, 34, None, METAL )
+        return
     F.box( m, -14, 14, -30, 30, 0, 34, { "default": "ar_steel", "+z": "ar_gunmetal" }, METAL )
     F.box( m, -16, -12, -30, 30, 34, 35.5, "ar_led_cyan" )
     # The screen, leaning back.
@@ -445,6 +465,9 @@ def light_bar( m, e0, e1, n0, n1, z, paint="ar_led" ):
 
 def wall_lamp( m, e, n, z, facing ):
     """ A small caged bulkhead lamp on a wall, facing plan direction facing. """
+    from ares_bulkhead_lamp import is_replaced
+    if is_replaced(e,n,z,facing):
+        return
     f = np.array( ( facing[0], facing[1], 0.0 ) )
     right = np.array( ( f[1], -f[0], 0.0 ) )
     c = np.array( ( e, n, z ), float )
@@ -674,7 +697,9 @@ def control_rooms( m, glass ):
             face = s * ( HALL_E - 0.5 )
             pts = [ ( face, nn + s * 30, 80 ), ( face, nn - s * 30, 80 ), ( face, nn - s * 30, 130 ), ( face, nn + s * 30, 130 ) ]
             uv = [ AM.region_uv( AM.SCREEN, AM.SCREEN_ATLAS, name, a, b ) for a, b in ( ( 0, 0 ), ( 1, 0 ), ( 1, 1 ), ( 0, 1 ) ) ]
-            card( m, "ar_screens", pts, ( -s, 0, 0 ), uv=uv )
+            # The approved physical display owns the west GAS / COMPOSITION screen.
+            if not (s == -1 and k == 0):
+                card( m, "ar_screens", pts, ( -s, 0, 0 ), uv=uv )
         le0, le1 = sorted( ( s * ( VOID_E + 40 ), s * ( HALL_E - 40 ) ) )
         light_bar( m, le0, le1, 330 - 4, 330 + 4, G - DT - 2.5, "ar_led" )
 
@@ -1587,6 +1612,20 @@ def write_scene( written, light_list, probe_list, case_props=None ):
     objects.extend( automatic_door_objects() )
     from ares_door_thresholds import scene_objects as doorway_threshold_objects
     objects.extend( doorway_threshold_objects() )
+    from ares_control_console import scene_object as core_console_object
+    objects.append( core_console_object(ids) )
+    from ares_bulkhead_lamp import scene_object as bulkhead_lamp_object
+    objects.append( bulkhead_lamp_object(ids) )
+    from ares_control_room_display import scene_object as control_room_display_object
+    objects.append( control_room_display_object(ids) )
+    from ares_stair_landing_rail import scene_object as stair_landing_rail_object
+    objects.append( stair_landing_rail_object(ids) )
+    from ares_west_operator_console import scene_object as west_operator_console_object
+    objects.append( west_operator_console_object(ids) )
+    from ares_pump_isolation_valve import scene_object as pump_isolation_valve_object
+    objects.append( pump_isolation_valve_object(ids) )
+    from ares_main_airlock_sign import scene_object as main_airlock_sign_object
+    objects.append( main_airlock_sign_object(ids) )
 
     scene = {
         "__guid": ids( "scene" ),

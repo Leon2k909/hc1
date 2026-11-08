@@ -2358,6 +2358,14 @@ def write_scene( written, light_list, props ):
     indirect = railhead_quality_lighting.load_object()
     if indirect is not None:
         objects.append(indirect)
+    from railhead_taxi_post import scene_object as taxi_rank_head_object
+    objects.append(taxi_rank_head_object(ids))
+    from railhead_help_point import scene_object as platform_help_point_object
+    objects.append(platform_help_point_object(ids))
+    from railhead_pa_speaker import scene_object as central_pa_speaker_object
+    objects.append(central_pa_speaker_object(ids))
+    from railhead_city_light import scene_object as concourse_lightbox_object
+    objects.append(concourse_lightbox_object(ids))
     references = sorted( { reference for prop in props for reference in PROP_PACKAGES.get( prop["path"], () ) } )
     scene = {
         "__guid": ids( "scene" ),

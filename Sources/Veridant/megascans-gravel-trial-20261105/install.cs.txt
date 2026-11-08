@@ -1,0 +1,33 @@
+var root=Sandbox.Project.Current.GetRootPath();
+if(!string.Equals(System.IO.Path.GetFullPath(root).TrimEnd('\\'),@"C:\sbox-projects\hc1\forked-shooter-main",StringComparison.OrdinalIgnoreCase)) throw new InvalidOperationException("Wrong checkout");
+var folder=System.IO.Path.Combine(root,"output/veridant/megascans-gravel-trial-20261105");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(folder,"manifest.json")));
+string Hash(string path)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+var rel="models/maps/veridant/veridant_ground.vmdl";
+var path=System.IO.Path.Combine(root,"Assets",rel);
+var oldText=System.IO.File.ReadAllText(path);
+var original="{ from = \"vr_gravel.vmat\" to = \"materials/veridant/vr_gravel.vmat\" }";
+var replacement="{ from = \"vr_gravel.vmat\" to = \"materials/veridant/trials/megascans-gravel-trial-20261105/gravel.vmat\" }";
+if(oldText.Split(original).Length!=2) throw new InvalidOperationException("Expected exactly one original gravel remap");
+foreach(var kv in manifest["files"].AsObject()) {
+    var asset=System.IO.Path.Combine(root,"Assets",manifest["relative_asset_directory"].GetValue<string>(),kv.Key);
+    if(Hash(asset)!=kv.Value.GetValue<string>()) throw new InvalidOperationException("Trial asset changed: "+kv.Key);
+}
+var mat=Material.Load("materials/veridant/trials/megascans-gravel-trial-20261105/gravel.vmat");
+if(mat is null || mat.IsError) throw new InvalidOperationException("Trial material is invalid");
+var scenePath=System.IO.Path.Combine(root,"Assets/scenes/maps/Veridant/veridant.scene");
+var beforeScene=Hash(scenePath);var playing=Game.IsPlaying;var active=Editor.SceneEditorSession.Active;
+var backup=System.IO.Path.Combine(folder,"installed-ground-before.vmdl");
+if(System.IO.File.Exists(backup)) throw new InvalidOperationException("Existing installation evidence; inspect before retrying");
+System.IO.File.Copy(path,backup);
+var beforeHash=Hash(path);
+var updated=oldText.Replace(original,replacement);
+if(oldText[oldText.IndexOf("_class = \"PhysicsShapeList\"")..]!=updated[updated.IndexOf("_class = \"PhysicsShapeList\"")..]) throw new InvalidOperationException("Collision changed");
+if(Hash(path)!=beforeHash) throw new InvalidOperationException("Concurrent model edit");
+var incoming=System.IO.Path.Combine(System.IO.Path.GetTempPath(),Guid.NewGuid()+".vmdl");
+System.IO.File.WriteAllText(incoming,updated);
+try {System.IO.File.Move(incoming,path,true);} finally {if(System.IO.File.Exists(incoming)) System.IO.File.Delete(incoming);}
+Editor.AssetSystem.RegisterFile(path);
+var result=new {Model=rel,BeforeHash=beforeHash,AfterHash=Hash(path),Backup=backup,SceneHash=beforeScene,SceneUnchanged=Hash(scenePath)==beforeScene,PlayStatePreserved=Game.IsPlaying==playing,ActiveScenePreserved=ReferenceEquals(active,Editor.SceneEditorSession.Active),OriginalMaterialPreserved=true,CollisionUnchanged=true};
+System.IO.File.WriteAllText(System.IO.Path.Combine(folder,"install-receipt.json"),System.Text.Json.JsonSerializer.Serialize(result));
+return result;

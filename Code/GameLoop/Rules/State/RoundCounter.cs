@@ -36,12 +36,14 @@ public sealed class RoundCounter : Component,
 	void IGameEventHandler<RoundCounterResetEvent>.OnGameEvent( RoundCounterResetEvent eventArgs )
 	{
 		Round = 1;
+		RoundBloodDecals.ResetRound();
 	}
 
 	[Early]
 	void IGameEventHandler<RoundCounterIncrementedEvent>.OnGameEvent( RoundCounterIncrementedEvent eventArgs )
 	{
 		Round += 1;
+		RoundBloodDecals.ResetRound();
 	}
 
 	[Early]

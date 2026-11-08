@@ -1,0 +1,1 @@
+{"code":"var s=Editor.SceneEditorSession.Active;return s.GetType().GetMethods(System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.NonPublic|System.Reflection.BindingFlags.Instance).Where(x=>x.Name.Contains(\"Save\")||x.Name.Contains(\"Dirty\")||x.Name.Contains(\"Change\")).Select(x=>x.ToString()).ToArray();"}

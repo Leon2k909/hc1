@@ -1,0 +1,4 @@
+var root=Sandbox.Project.Current.GetRootPath();var source=System.IO.Path.Combine(root,"Assets/models/props/ares/west_operator_console_v1");var archive=System.IO.Path.Combine(root,"output/ares/west-operator-console-v1/retired-preview");System.IO.Directory.CreateDirectory(archive);
+if(!System.IO.File.ReadAllText(System.IO.Path.Combine(root,"Assets/scenes/maps/Ares/ares.scene")).Contains("West Control Room Operator Console"))throw new Exception("Not installed");
+foreach(var basename in new[]{"before.obj","before.vmdl","before.mtl","preview.obj","preview.vmdl","hall_base.mtl","after_lod1.vmdl","after_lod2.vmdl"})foreach(var suffix in new[]{"",".meta","_c"}){var file=basename+suffix;var p=System.IO.Path.Combine(source,file);var dest=System.IO.Path.Combine(archive,file);if(System.IO.File.Exists(p)){if(System.IO.File.Exists(dest))throw new Exception("Archive exists");System.IO.File.Move(p,dest);}}
+return new{Retired=true,ApprovedRenderMeshAndLodDependenciesRetained=true};

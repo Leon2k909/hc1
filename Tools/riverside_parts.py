@@ -41,18 +41,28 @@ GRAFFITI_BOARDS = []    # approved STILL HERE plank board
 TOWER_ROOFS = []        # approved formed corrugated guard-tower canopy
 INTERIOR_FRIDGES = []   # approved stocked cabinet instances; original collision and lights retained
 STORE_STEPS = []        # approved Lucky Stop timber stair, original collision wedge retained
+YARD_FENCES = []        # approved first west-yard privacy fence, original collider retained
 WATER_TANKS = []        # [ owner, vessel base, plan yaw ]: approved A water-tower vessel
 HITCHES = []            # [ owner, body-end centre, plan yaw ]: approved T2 trailer hitch
 AERIALS = []            # [ owner, mast base, plan yaw ]: approved T2 rooftop aerial
 FLUORESCENTS = []       # [ owner, base, plan yaw ]: approved store ceiling fixtures; existing point lights stay
 STREET_LIGHTS = []      # [ owner, head centre, plan yaw ]: approved sodium cobra-heads, existing arms/lights retained
 CAMPERS = []            # [ owner, ground origin, plan yaw ]: approved separate boarded camper
+OFFICE_RULES = []       # approved neutral grey rules plaque
+OFFICE_DOORS = []       # approved office reuse of the standard trailer door
 TRAILER_DOORS = []      # [ owner, sill centre, plan outward yaw ]: approved T2 door; original window retained
 ENTRY_STEPS = []        # [owner, foot, plan heading]: approved weathered T2 precast entry
 ROOF_VENTS = []         # [ owner, base, plan heading ]: approved first T2 vent, with roof-specific flashing
 PIN_INSULATORS = []     # [ owner, base, plan wire yaw, wired ]: glazed pins, original wire contacts retained
+UTILITY_POLES = []      # [ owner, base, plan yaw of the facing, arms ]: shaft, crossarms and braces are Sources/Riverside/utility-pole-v1's models
 
-WARM = "1.00,0.72,0.42,1"
+# The poles' shafts, crossarms and braces are models the scene places (UTILITY_POLES, riverside_map.utility_pole_objects). Set this
+# to draw the old ones into the dressing mesh instead (and then no pole model is placed). The old geometry is also kept as models
+# of its own: models/props/riverside/utility_pole_original/. Collision, insulators, transformer cans and lamp arms are unaffected.
+OLD_POLES_IN_DRESSING = False
+POLE_KINDS = ( ( 430, 2 ), ( 400, 1 ) )     # ( height, arms ) the two pole models are built for
+
+WARM ="1.00,0.72,0.42,1"
 PORCH = "1.00,0.78,0.50,1"
 SODIUM = "1.00,0.62,0.30,1"
 COOL = "0.75,0.85,1.00,1"
@@ -80,13 +90,17 @@ def reset():
     TOWER_ROOFS.clear()
     INTERIOR_FRIDGES.clear()
     STORE_STEPS.clear()
+    YARD_FENCES.clear()
     WATER_TANKS.clear()
     HITCHES.clear()
     AERIALS.clear()
     FLUORESCENTS.clear()
     STREET_LIGHTS.clear()
     PIN_INSULATORS.clear()
+    UTILITY_POLES.clear()
     CAMPERS.clear()
+    OFFICE_RULES.clear()
+    OFFICE_DOORS.clear()
     TRAILER_DOORS.clear()
     ENTRY_STEPS.clear()
     ROOF_VENTS.clear()
@@ -183,13 +197,14 @@ WALL = 88.0                 # floor to the eaves
 WINDOW_STYLES = ( "lit", "lit_b", "tv", "dark", "dark", "boarded", "curtain_dark" )
 
 
-def window( m, centre, right, w, h, style, seed=0 ):
+def window( m, centre, right, w, h, style, seed=0, frame_model=False ):
     """ An aluminium-framed window on a wall facing cross( right, UP ): lit, dark, a TV's flicker, or boarded up. """
     right = unit( right )
     out = np.cross( right, UP )
     c = v( *centre )
     # The frame.
-    RP.quad( m, "rs_alu", c, right, UP, w + 3.0, h + 3.0, off=0.35 )
+    if not frame_model:
+        RP.quad( m, "rs_alu", c, right, UP, w + 3.0, h + 3.0, off=0.35 )
     if style in ( "lit", "lit_b", "tv" ):
         name = { "lit": "trailer_window", "lit_b": "trailer_window_b", "tv": "trailer_window_tv" }[style]
         lit( m, name, c, right, h, off=0.55, w=w )
@@ -204,7 +219,8 @@ def window( m, centre, right, w, h, style, seed=0 ):
             u2 = unit( np.cross( out, r2 ) )
             RP.quad( m, "rs_plywood", c + UP * dz + out * 0.4, r2, u2, w + 10, h * 0.3, off=0.6 + 0.1 * k )
     # The sill.
-    obox( m, c - UP * ( h / 2 + 2.5 ) + out * 1.2, right, ( w + 5, 2.4, 1.2 ), "rs_alu" )
+    if not frame_model:
+        obox( m, c - UP * ( h / 2 + 2.5 ) + out * 1.2, right, ( w + 5, 2.4, 1.2 ), "rs_alu" )
 
 
 def door( m, centre_foot, right, w=32.0, h=76.0, paint_name="rs_alu", lit_window=False, open_=False, model=False ):
@@ -252,7 +268,7 @@ def steps( m, foot, along, width, z_top, paint_name="rs_concrete", surface=STONE
 
 def trailer( length=560.0, width=120.0, tint="rs_siding_white", seed=0, door_x=None, door_side=1, porch_light=True,
              lit_share=0.45, boarded_share=0.2, hitch=True, antenna=None, ac=True, end_window=True, styles=None,
-             skirt=True, door_lit=None, roof_ac_model=False, aerial_model=False, entry_door_model=False, hitch_model=False, roof_vent_model=False, entry_steps_model=False ):
+             skirt=True, door_lit=None, roof_ac_model=False, aerial_model=False, entry_door_model=False, hitch_model=False, roof_vent_model=False, entry_steps_model=False, sliding_window_model=False ):
     """ A single-wide in its own frame: x along its length (hitch at -x), y across, z up from the ground. Returns
     ( model, info ) where info has the door's outside point and the porch light's place. """
     rng = np.random.default_rng( seed )
@@ -302,7 +318,8 @@ def trailer( length=560.0, width=120.0, tint="rs_siding_white", seed=0, door_x=N
                 "boarded" if roll < lit_share + boarded_share else "dark" )
             wz = F + 46
             ww, wh = ( 30.0, 30.0 ) if rng.random() < 0.7 else ( 44.0, 30.0 )
-            window( m, v( x, sy * ( hy ), wz ), right, ww, wh, style, seed=seed * 31 + i )
+            window( m, v( x, sy * ( hy ), wz ), right, ww, wh, style, seed=seed * 31 + i,
+                    frame_model=( sliding_window_model and sy == -1 and abs(x) < .001 and ww == 30 and wh == 30 ) )
             if style in ( "lit", "lit_b", "tv" ) and rng.random() < 0.55:
                 info.setdefault( "lit_windows", [] ).append( ( v( x, sy * ( hy + 20 ), wz ), style ) )
         if sy == door_side:
@@ -455,8 +472,12 @@ def pole( m, base, height=420.0, facing=( 1, 0 ), arms=2, transformer=False, lam
     side = np.cross( UP, f )
     tilt = v( *( f * math.sin( math.radians( lean ) ) ) ) + UP * math.cos( math.radians( lean ) )
     top = b + tilt * height
+    old = OLD_POLES_IN_DRESSING
+    if not old:
+        assert lean == 0.0 and ( height, arms ) in POLE_KINDS, "no utility pole model for this pole"
+        UTILITY_POLES.append( [ m, ( float( b[0] ), float( b[1] ), float( b[2] ) ), math.degrees( math.atan2( f[1], f[0] ) ), arms ] )
     # The shaft in four tapering stages so it shades round.
-    for k in range( 4 ):
+    for k in range( 4 if old else 0 ):
         z0, z1 = height * k / 4, height * ( k + 1 ) / 4
         r0, r1 = 6.0 - 1.6 * k / 4, 6.0 - 1.6 * ( k + 1 ) / 4
         lathe_seg( m, b + tilt * z0, b + tilt * z1, r0, r1, "rs_pole" )
@@ -467,14 +488,16 @@ def pole( m, base, height=420.0, facing=( 1, 0 ), arms=2, transformer=False, lam
         z = height - 14 - k * 28
         c = b + tilt * z
         L = 96 if k == 0 else 72
-        obox( m, c + f * 5, side, ( L, 4, 4.5 ), "rs_pole" )
+        if old:
+            obox( m, c + f * 5, side, ( L, 4, 4.5 ), "rs_pole" )
         for s in ( -0.45, -0.15, 0.15, 0.45 ) if k == 0 else ( -0.4, 0.4 ):
             p = c + f * 5 + side * ( L * s ) + UP * 2.3
             PIN_INSULATORS.append( [ m, tuple( float( q ) for q in p ), 0.0, False ] )
             taps.append( p + UP * 5 )
         # Braces.
-        m.beam( c + f * 5 + side * ( L * 0.3 ), b + tilt * ( z - 22 ) + f * 5, ( 1.4, 1.4 ), "rs_steel" )
-        m.beam( c + f * 5 - side * ( L * 0.3 ), b + tilt * ( z - 22 ) + f * 5, ( 1.4, 1.4 ), "rs_steel" )
+        if old:
+            m.beam( c + f * 5 + side * ( L * 0.3 ), b + tilt * ( z - 22 ) + f * 5, ( 1.4, 1.4 ), "rs_steel" )
+            m.beam( c + f * 5 - side * ( L * 0.3 ), b + tilt * ( z - 22 ) + f * 5, ( 1.4, 1.4 ), "rs_steel" )
     if transformer:
         c = b + tilt * ( height - 80 ) - f * 12
         from riverside_pole_transformer import transformer as draw_transformer
@@ -563,7 +586,7 @@ def chainlink( m, pts, height=72.0, post_every=120.0, z=0.0, gaps=(), collide=Tr
                 RP.clip( name, p0, p1, z, clip_to )
 
 
-def plank_fence( m, pts, height=60.0, z=0.0, collide=True, seed=0, name="plank fence" ):
+def plank_fence( m, pts, height=60.0, z=0.0, collide=True, seed=0, name="plank fence", model=False ):
     """ A weathered privacy fence: posts, two rails and vertical boards, a few missing. """
     rng = np.random.default_rng( seed )
     pts = [ v( p[0], p[1], 0 ) for p in pts ]
@@ -572,14 +595,19 @@ def plank_fence( m, pts, height=60.0, z=0.0, collide=True, seed=0, name="plank f
         L = float( np.linalg.norm( d ) )
         dn = d / L
         side = np.cross( UP, dn )
-        for t in np.arange( 0, L, 5.75 ):
-            if rng.random() < 0.06:
-                continue
-            p = a + dn * ( t + 2.8 )
-            h = height * rng.uniform( 0.94, 1.0 )
-            obox( m, p + UP * ( z + h / 2 ), dn, ( 5.4, 0.8, h ), "rs_wood" )
-        for zz in ( 14, height - 12 ):
-            obox( m, ( a + b ) / 2 + side * 1.4 + UP * ( z + zz ), dn, ( L, 1.6, 3.5 ), "rs_wood" )
+        if model:
+            if abs(L-500)>0.001 or height!=60 or seed!=1:
+                raise ValueError("The approved fence fits only the first 500-inch yard run")
+            YARD_FENCES.append([m,tuple(float(q) for q in a+UP*z),math.degrees(math.atan2(dn[1],dn[0]))])
+        else:
+            for t in np.arange( 0, L, 5.75 ):
+                if rng.random() < 0.06:
+                    continue
+                p = a + dn * ( t + 2.8 )
+                h = height * rng.uniform( 0.94, 1.0 )
+                obox( m, p + UP * ( z + h / 2 ), dn, ( 5.4, 0.8, h ), "rs_wood" )
+            for zz in ( 14, height - 12 ):
+                obox( m, ( a + b ) / 2 + side * 1.4 + UP * ( z + zz ), dn, ( L, 1.6, 3.5 ), "rs_wood" )
         if collide:
             m.oriented_box( ( a + b ) / 2 + UP * ( z + height / 2 ), ( dn, side, UP ), ( L, 3.0, height ), None, WOOD )
 
@@ -710,7 +738,7 @@ def propane( m, c, z0=0.0, size="100" ):
 def carry( dst, part, origin, yaw ):
     """ Moves the model instances in part into dst's frame, as place() does its geometry. """
     c, s = math.cos( math.radians( yaw ) ), math.sin( math.radians( yaw ) )
-    for item in PROPANE + LAWN_CHAIRS + CRATES + SANDBAGS + SPEED_SIGNS + PORCH_FIXTURES + ROOF_ACS + STREET_LIGHTS + FLUORESCENTS + PIN_INSULATORS + AERIALS + CAMPERS + TRAILER_DOORS + HITCHES + WATER_TANKS + GRAFFITI_BOARDS + TOWER_LADDERS + TOWER_ROOFS + INTERIOR_FRIDGES + STORE_STEPS + ROOF_VENTS + ENTRY_STEPS:
+    for item in PROPANE + LAWN_CHAIRS + CRATES + SANDBAGS + SPEED_SIGNS + PORCH_FIXTURES + ROOF_ACS + STREET_LIGHTS + FLUORESCENTS + PIN_INSULATORS + AERIALS + CAMPERS + TRAILER_DOORS + OFFICE_DOORS + OFFICE_RULES + HITCHES + WATER_TANKS + GRAFFITI_BOARDS + TOWER_LADDERS + TOWER_ROOFS + INTERIOR_FRIDGES + STORE_STEPS + YARD_FENCES + ROOF_VENTS + ENTRY_STEPS + UTILITY_POLES:
         if item[0] is part:
             x, y, z = item[1]
             item[0] = dst

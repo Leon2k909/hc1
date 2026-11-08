@@ -1,0 +1,75 @@
+var scene = Editor.SceneEditorSession.Active.Scene;
+if (scene.Name != "cerroblanco") throw new Exception("Wrong active scene");
+if (scene.GetAllObjects(true).Any(x => x.Name == "Cerro lawn relief REVIEW ONLY")) throw new Exception("Preview already exists");
+var path = @"C:\sbox-projects\hc1\forked-shooter-main\output\cerroblanco\lawn-relief-v1\stage\models\maps\cerroblanco\lawn-relief-v1\garden_lawn_relief.obj";
+var pos = new System.Collections.Generic.List<Vector3>();
+var normals = new System.Collections.Generic.List<Vector3>();
+var uv = new System.Collections.Generic.List<Vector2>();
+var vertices = new System.Collections.Generic.List<Vertex>();
+var indices = new System.Collections.Generic.List<int>();
+var culture = System.Globalization.CultureInfo.InvariantCulture;
+foreach (var line in System.IO.File.ReadLines(path))
+{
+    var p = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+    if (p.Length == 0) continue;
+    if (p[0] == "v" || p[0] == "vn")
+    {
+        var v = new Vector3(float.Parse(p[3], culture),float.Parse(p[1], culture),float.Parse(p[2], culture));
+        if (p[0] == "v") pos.Add(v); else normals.Add(v);
+    }
+    else if (p[0] == "vt") uv.Add(new Vector2(float.Parse(p[1],culture),float.Parse(p[2],culture)));
+    else if (p[0] == "f")
+    {
+        var pp = new Vector3[3]; var nn = new Vector3[3]; var tt = new Vector2[3];
+        for (int j=0;j<3;j++)
+        {
+            var f = p[j+1].Split('/');
+            pp[j] = pos[int.Parse(f[0])-1];
+            tt[j] = uv[int.Parse(f[1])-1];
+            nn[j] = normals[int.Parse(f[2])-1];
+        }
+        var duv1 = tt[1]-tt[0]; var duv2 = tt[2]-tt[0];
+        var determinant = duv1.x*duv2.y-duv1.y*duv2.x;
+        var tangent = MathF.Abs(determinant)>0.000001f ? ((pp[1]-pp[0])*duv2.y-(pp[2]-pp[0])*duv1.y)/determinant : Vector3.Forward;
+        for(int j=0;j<3;j++)
+        {
+            indices.Add(vertices.Count);
+            vertices.Add(new Vertex(pp[j],nn[j],tangent.Normal,new Vector4(tt[j].x,tt[j].y,0,0)));
+        }
+    }
+}
+var material = Material.Load("materials/buildings/lawn.vmat");
+var mesh = new Mesh(material);
+mesh.CreateVertexBuffer(vertices.Count,vertices.ToArray());
+mesh.CreateIndexBuffer(indices.Count,indices.ToArray());
+mesh.Bounds = new BBox(new Vector3(-1830,1260,0),new Vector3(-880,2220,8));
+var model = Model.Builder.AddMesh(mesh).Create();
+var overlay = new SceneObject(scene.SceneWorld, model, global::Transform.Zero);
+var holder = scene.CreateObject(true);
+holder.Flags |= GameObjectFlags.NotSaved | GameObjectFlags.NotNetworked;
+var camera = holder.Components.Create<CameraComponent>();
+camera.ZNear = 1;
+camera.ZFar = 100000;
+var output = @"C:\sbox-projects\hc1\forked-shooter-main\output\cerroblanco\lawn-relief-v1\native";
+try
+{
+    foreach (var view in new[] {
+        (Name: "eye", Position: new Vector3(-1006,1390,64), Target: new Vector3(-1280,1660,4)),
+        (Name: "detail", Position: new Vector3(-1006,1390,24), Target: new Vector3(-1126,1510,3)) })
+    {
+        camera.WorldPosition = view.Position;
+        camera.WorldRotation = Rotation.LookAt(view.Target-view.Position,Vector3.Up);
+        camera.FieldOfView = view.Name == "eye" ? 75 : 65;
+        foreach(var state in new[]{"before","after"})
+        {
+            overlay.RenderingEnabled = state == "after";
+            using var bitmap = new Bitmap(1440,960);
+            using(scene.Push()) { scene.EditorTick(0.016f,0.016f); camera.RenderToBitmap(bitmap,false); }
+            await Task.Delay(500,cancellationToken);
+            using(scene.Push()) camera.RenderToBitmap(bitmap,false);
+            System.IO.File.WriteAllBytes(System.IO.Path.Combine(output,view.Name+"-"+state+".png"),bitmap.ToPng());
+        }
+    }
+    return new { Captured=true, Triangles=indices.Count/3, Output=output };
+}
+finally { overlay.Delete(); holder.Destroy(); }

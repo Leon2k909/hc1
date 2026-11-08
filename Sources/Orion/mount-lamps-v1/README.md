@@ -5,7 +5,9 @@ Rebuild of the four7-inch glowing cubes above the launch platform's equipment bo
 diffuser, top rain cap, three guard rings and eight bent guard uprights. Uses only the original `oa_steel`,
 `oa_dark` and `oa_lamp_warm` materials: no new textures, external assets, generated imagery or added lights.
 
-**Preview only.** Public map, generator and scene remain unchanged pending acceptance. Render-only change replaces
+**Accepted and installed.** Public pad and generator now use the four new fixtures. The old `before.*` cube-light
+comparison assets were removed from game Assets at the user's request; receipt/rollback archive in `review/`.
+Original shared materials remain because the new lights and other map assets use them. Render-only change replaces
 48 original cube triangles with22,384 new triangles across four fixtures, retaining90,294 other pad faces exactly.
 Existing light declarations and original collision stay unchanged. New fixtures keep the7×7-inch footprint and
 original top height; bases extend2.5 inches downward to meet the equipment-box tops instead of floating above them.

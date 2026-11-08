@@ -1,0 +1,1 @@
+{"code": "var s=Editor.SceneEditorSession.All.Single(x=>x.Scene.Name==\"veridant\");return new{s.HasUnsavedChanges,Models=new[]{\"models/maps/veridant/veridant_ground.vmdl\",\"models/maps/veridant/veridant_dress.vmdl\",\"models/maps/veridant/garden-relief-v1/garden_strip_relief.vmdl\"}.Select(x=>new{Path=x,Error=Model.Load(x).IsError}).ToArray()};"}

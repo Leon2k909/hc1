@@ -1114,6 +1114,55 @@
             }
           ],
           "Children": []
+        },
+        {
+          "__guid": "f9f797d1-ef13-5fbd-ba74-8264ab94053f",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "ORION control shed",
+          "Position": "1335,170,240",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.ModelRenderer",
+              "__guid": "41cc9e5b-8691-5729-9e80-9184b5c1a384",
+              "__enabled": true,
+              "Flags": 0,
+              "BodyGroups": 18446744073709551615,
+              "CreateAttachments": false,
+              "LodOverride": null,
+              "MaterialGroup": null,
+              "MaterialOverride": null,
+              "Materials": null,
+              "Model": {
+                "Id": "3c0c750c-3641-45c7-b1b1-f2d7d5446fea",
+                "Path": "models/props/orion/deck_shed_v1/shed.vmdl"
+              },
+              "OnComponentDestroy": null,
+              "OnComponentDisabled": null,
+              "OnComponentEnabled": null,
+              "OnComponentFixedUpdate": null,
+              "OnComponentStart": null,
+              "OnComponentUpdate": null,
+              "RenderOptions": {
+                "GameLayer": true,
+                "OverlayLayer": false,
+                "BloomLayer": false,
+                "AfterUILayer": false
+              },
+              "RenderType": "On",
+              "Tint": "1,1,1,1"
+            }
+          ],
+          "Children": []
         }
       ]
     },
@@ -14059,6 +14108,94 @@
         }
       ],
       "Children": []
+    },
+    {
+      "__guid": "cda5dfd2-3a5f-5cb9-8e12-4e3c3dc064ea",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Orion Undercroft Façade",
+      "Position": "0,0,0",
+      "Rotation": "0,0,0,1",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.ModelRenderer",
+          "__guid": "9c09bcf5-76de-5d3c-9bf8-05a0ddc8b4b3",
+          "__enabled": true,
+          "Flags": 0,
+          "Model": "models/props/orion/undercroft_facade_v1/facade.vmdl",
+          "BodyGroups": 18446744073709551615,
+          "RenderType": "On",
+          "Tint": "1,1,1,1"
+        }
+      ],
+      "Children": [
+        {
+          "__guid": "f90e12cc-52bf-510c-804c-d20e1570a579",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Utility Room Ceiling Light",
+          "Position": "926,380,90",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.PointLight",
+              "__guid": "b44e0881-e7b6-52ca-a6e8-91e6e9b292fd",
+              "__enabled": true,
+              "Flags": 0,
+              "Radius": 90,
+              "LightColor": "0.9,0.82,0.65,1",
+              "Shadows": true,
+              "Attenuation": 1
+            }
+          ],
+          "Children": []
+        },
+        {
+          "__guid": "8b8c68b9-aaab-584c-a493-38e704f8a157",
+          "__version": 2,
+          "Flags": 0,
+          "Name": "Utility Room Ceiling Light",
+          "Position": "926,130,90",
+          "Rotation": "0,0,0,1",
+          "Scale": "1,1,1",
+          "Tags": "",
+          "Enabled": true,
+          "NetworkMode": 2,
+          "NetworkFlags": 0,
+          "NetworkOrphaned": 0,
+          "NetworkTransmit": true,
+          "OwnerTransfer": 1,
+          "Components": [
+            {
+              "__type": "Sandbox.PointLight",
+              "__guid": "097b84ed-eaad-544c-8af5-150b65660670",
+              "__enabled": true,
+              "Flags": 0,
+              "Radius": 90,
+              "LightColor": "0.9,0.82,0.65,1",
+              "Shadows": true,
+              "Attenuation": 1
+            }
+          ],
+          "Children": []
+        }
+      ]
     }
   ],
   "SceneProperties": {

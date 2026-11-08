@@ -1,0 +1,22 @@
+var root=Sandbox.Project.Current.GetRootPath();var output=System.IO.Path.Combine(root,"output/riverside/storefront-depth-v1");var plan=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(output,"install-plan.json")));
+string Hash(string p)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(p))).ToLowerInvariant();
+foreach(var p in plan["protected"].AsObject())if(Hash(System.IO.Path.Combine(root,p.Key))!=p.Value.GetValue<string>())throw new Exception("Input changed: "+p.Key);
+foreach(var p in plan["files"].AsObject())if(Hash(System.IO.Path.Combine(output,"install-stage",p.Key))!=p.Value.GetValue<string>())throw new Exception("Stage changed");
+var active=Editor.SceneEditorSession.Active;var activeId=active?.Scene?.Id;var playing=Game.IsPlaying;
+var target=Editor.SceneEditorSession.All.Single(s=>s.Scene?.Source?.ResourcePath?.Equals("scenes/maps/riverside/riverside.scene",StringComparison.OrdinalIgnoreCase)==true);
+if(target.IsPlaying||target.HasUnsavedChanges)throw new Exception("Riverside session changed");
+void Normalize(System.Text.Json.Nodes.JsonNode node){if(node is System.Text.Json.Nodes.JsonObject o){o.Remove("__PrefabIdToInstanceId");foreach(var p in o.ToArray())if(p.Value is not null)Normalize(p.Value);}else if(node is System.Text.Json.Nodes.JsonArray a)foreach(var n in a)if(n is not null)Normalize(n);}
+var prior=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(output,"install-stage/live-before.json")));
+var before=prior["GameObjects"].DeepClone();var now=System.Text.Json.Nodes.JsonNode.Parse(target.Scene.Serialize().ToJsonString())["GameObjects"].DeepClone();Normalize(before);Normalize(now);if(!System.Text.Json.Nodes.JsonNode.DeepEquals(before,now))throw new Exception("Live scene changed after staging");
+var model=Model.Load("models/props/riverside/storefront_depth_v1/windows.vmdl");if(model.IsError||model.MeshInfo.LodCount!=3)throw new Exception("Invalid approved glazing");
+if(target.Scene.GetAllObjects(true).Any(g=>g.Name=="Lucky Stop Glazed Windows"))throw new Exception("Already installed; inspect");
+var node=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(output,"install-stage/node.json"))).AsObject();
+var source=System.IO.Path.Combine(root,"Assets",plan["active_base"].GetValue<string>());System.IO.File.Copy(System.IO.Path.Combine(output,"install-stage/store_without_flat_windows.obj"),source,true);Editor.AssetSystem.RegisterFile(source);
+using(target.Scene.Push()){
+ var group=new GameObject(false,"Lucky Stop Glazed Windows");group.Deserialize(node);
+ if(group.GetComponentsInChildren<ModelRenderer>().Count()!=1||group.GetComponentsInChildren<Collider>().Any())throw new Exception("Unexpected glazing group");
+ target.HasUnsavedChanges=true;target.Save(false);
+}
+var after=System.Text.Json.Nodes.JsonNode.Parse(target.Scene.Serialize().ToJsonString());var unchanged=after["GameObjects"].AsArray();var installed=unchanged.Single(n=>n["Name"]?.ToString()=="Lucky Stop Glazed Windows");unchanged.Remove(installed);Normalize(after);if(!System.Text.Json.Nodes.JsonNode.DeepEquals(before,after["GameObjects"]))throw new Exception("Unrelated live scene changed; inspect saved result");
+System.IO.File.WriteAllText(System.IO.Path.Combine(output,"live-after-without-new-group.json"),after.ToJsonString());
+var result=new{Installed=true,OldFacesRemoved=20,AddedRenderers=1,AddedColliders=0,AddedLights=0,UnrelatedLiveSceneUnchanged=true,NativeSceneSaved=!target.HasUnsavedChanges,ActiveSceneUnchanged=activeId==Editor.SceneEditorSession.Active?.Scene?.Id,PlayStateUnchanged=playing==Game.IsPlaying};System.IO.File.WriteAllText(System.IO.Path.Combine(output,"installed.json"),System.Text.Json.JsonSerializer.Serialize(result));return result;

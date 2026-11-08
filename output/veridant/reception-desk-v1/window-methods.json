@@ -1,0 +1,1 @@
+{"code":"return typeof(Editor.Window).GetMethods(System.Reflection.BindingFlags.Public|System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic).Where(m=>m.Name.Contains(\"Show\")||m.Name.Contains(\"Minim\")||m.Name.Contains(\"Maxim\")||m.Name.Contains(\"Activ\")).Select(m=>m.ToString()).ToArray();"}

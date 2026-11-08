@@ -230,6 +230,7 @@ public static class AttachmentThumbnails
 				}
 
 				Dress( renderer );
+				ApplyVariantMaterials( renderer, part );
 				corners.AddRange( model.Bounds.Corners.Select( c => go.WorldTransform.PointToWorld( c ) ) );
 			}
 		}
@@ -243,6 +244,7 @@ public static class AttachmentThumbnails
 				renderer.Model = weapon;
 				renderer.BodyGroups = mask;
 				Dress( renderer );
+				ApplyVariantMaterials( renderer, part );
 				corners.AddRange( weapon.Bounds.Corners );
 			}
 		}
@@ -255,6 +257,18 @@ public static class AttachmentThumbnails
 
 		bounds = BBox.FromPoints( corners );
 		return subject;
+	}
+
+	private static void ApplyVariantMaterials( ModelRenderer renderer, GunsmithPart part )
+	{
+		if ( part.MaterialReplacements is not { Count: > 0 } || renderer.Model is null ) return;
+		for ( var i = 0; i < renderer.Model.Materials.Length; i++ )
+		{
+			var original = renderer.Model.Materials[i];
+			if ( original is null || !part.MaterialReplacements.TryGetValue( original.Name, out var path ) ) continue;
+			var replacement = Material.Load( path );
+			if ( replacement is not null && !replacement.IsError ) renderer.Materials.SetOverride( i, replacement );
+		}
 	}
 
 	private static void Dress( ModelRenderer renderer )

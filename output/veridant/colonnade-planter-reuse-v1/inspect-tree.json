@@ -1,0 +1,1 @@
+{"code":"var s=Editor.SceneEditorSession.All.First(x=>x.Scene.Name==\"veridant\");return s.Scene.GetAllObjects(true).Where(x=>x.Name.Contains(\"Colonnade olive\")||x.Name.Contains(\"Colonnade bronze\")).Select(x=>new{x.Name,x.Id,Position=x.WorldPosition.ToString()}).ToArray();"}

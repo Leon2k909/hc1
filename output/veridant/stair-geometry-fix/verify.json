@@ -1,0 +1,1 @@
+{"code":"var m=Model.Load(\"models/maps/veridant/veridant_buildings.vmdl\"); return new{Model=m.ResourcePath,m.IsError,Scene=Editor.SceneEditorSession.Active.Scene.Name,Game.IsPlaying};"}

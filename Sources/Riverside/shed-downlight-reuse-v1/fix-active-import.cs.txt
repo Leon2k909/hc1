@@ -1,0 +1,6 @@
+var root=Sandbox.Project.Current.GetRootPath();
+var p=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/riverside/shed-downlight-reuse-v1/installed/active-import-plan.json")));
+string Hash(byte[] b)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(b)).ToLowerInvariant();
+var source=System.IO.Path.Combine(root,p["source"].GetValue<string>());var stage=System.IO.File.ReadAllBytes(System.IO.Path.Combine(root,p["stage"].GetValue<string>()));
+if(Hash(System.IO.File.ReadAllBytes(source))!=p["before"].GetValue<string>() || Hash(stage)!=p["after"].GetValue<string>())throw new Exception("Active store import changed after staging");
+System.IO.File.WriteAllBytes(source,stage);return new {ActiveOldTrianglesRemoved=14};

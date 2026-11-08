@@ -1,0 +1,11 @@
+from pathlib import Path
+import json,hashlib
+R=Path('C:/sbox-projects/hc1/forked-shooter-main');O=R/'output/cerroblanco/pan-dulce-v1';S=R/'Assets/models/maps/cerroblanco/cerroblanco_fitout_fine.obj'
+p=json.loads((O/'checks.json').read_text());assert hashlib.sha256(S.read_bytes()).hexdigest()==p['source_sha256']
+B=O/'installed';B.mkdir(exist_ok=True);(B/'before.obj').write_bytes(S.read_bytes());(B/'before.vmdl').write_bytes(S.with_suffix('.vmdl').read_bytes())
+(B/'after.obj').write_text((O/'stage/models/maps/cerroblanco/pan-dulce-v1/fine.obj').read_text().replace('mtllib fine.mtl','mtllib cerroblanco_fitout_fine.mtl'))
+(B/'after.vmdl').write_text((O/'stage/models/maps/cerroblanco/pan-dulce-v1/fine.vmdl').read_text().replace('models/maps/cerroblanco/pan-dulce-v1/fine.obj','models/maps/cerroblanco/cerroblanco_fitout_fine.obj'))
+code='''var root=Sandbox.Project.Current.GetRootPath();var o=System.IO.Path.Combine(root,"output/cerroblanco/pan-dulce-v1");var p=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(o,"checks.json")));var dest=System.IO.Path.Combine(root,"Assets/models/maps/cerroblanco/cerroblanco_fitout_fine.obj");var hash=Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(dest))).ToLowerInvariant();if(hash!=p["source_sha256"].GetValue<string>())throw new Exception("Public source changed");System.IO.File.Copy(System.IO.Path.Combine(o,"installed/after.obj"),dest,true);var model=System.IO.Path.ChangeExtension(dest,".vmdl");System.IO.File.Copy(System.IO.Path.Combine(o,"installed/after.vmdl"),model,true);Editor.AssetSystem.RegisterFile(dest);Editor.AssetSystem.RegisterFile(model);return new{Installed=true,OldFacesRemoved=540};'''
+(O/'install-approved.json').write_text(json.dumps({'code':code}))
+(R/'Tools/cerroblanco_pan_dulce.py').write_text((R/'Sources/CerroBlanco/pan-dulce-v1/model.py').read_text()+'\ndef build_into(m):\n m.extend(build())\n')
+f=R/'Tools/cerroblanco_fitout.py';s=f.read_text();a=s.index('    rng = np.random.default_rng( 5 )',s.index('def cafe('));b=s.index('    # Pendant lights over the counter.',a);s=s[:a]+'    from cerroblanco_pan_dulce import build_into as pastries\n    pastries(m)\n'+s[b:];f.write_text(s)

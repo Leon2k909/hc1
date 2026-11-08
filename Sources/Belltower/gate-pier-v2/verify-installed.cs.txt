@@ -1,0 +1,3 @@
+var session=Editor.SceneEditorSession.All.Single(s=>s.Scene.IsEditor && s.Scene.Source?.ResourcePath=="scenes/maps/belltower/belltower.scene");
+var models=session.Scene.GetAllComponents<ModelRenderer>().Where(r=>r.Model?.ResourcePath=="models/maps/belltower/gate-pier-v2/gate_pier.vmdl").ToArray();
+if(models.Length!=8 || models.Any(r=>r.Model.IsError)||session.HasUnsavedChanges)throw new InvalidOperationException("Saved piers differ.");return new{SavedPiers=8,Loaded=true,SceneSaved=true};

@@ -1,0 +1,243 @@
+{
+ "label": "AFTER (new poles)",
+ "objs": [
+  {
+   "triangles": 1951,
+   "vertices": 3875,
+   "materials": [
+    "alu",
+    "rs_mud",
+    "steel",
+    "wood"
+   ],
+   "extent_in": [
+    96.0,
+    435.1,
+    34.29
+   ],
+   "extent_m": [
+    2.438,
+    11.052,
+    0.871
+   ],
+   "bytes": 320351,
+   "path": "models/props/riverside/utility_pole_v1/pole_2arm_lod0.obj"
+  },
+  {
+   "triangles": 327,
+   "vertices": 665,
+   "materials": [
+    "rs_mud",
+    "steel",
+    "wood"
+   ],
+   "extent_in": [
+    96.0,
+    435.1,
+    32.18
+   ],
+   "extent_m": [
+    2.438,
+    11.052,
+    0.817
+   ],
+   "bytes": 49921,
+   "path": "models/props/riverside/utility_pole_v1/pole_2arm_lod1.obj"
+  },
+  {
+   "triangles": 128,
+   "vertices": 264,
+   "materials": [
+    "steel",
+    "wood"
+   ],
+   "extent_in": [
+    96.0,
+    435.1,
+    13.49
+   ],
+   "extent_m": [
+    2.438,
+    11.052,
+    0.343
+   ],
+   "bytes": 18933,
+   "path": "models/props/riverside/utility_pole_v1/pole_2arm_lod2.obj"
+  },
+  {
+   "triangles": 1567,
+   "vertices": 3123,
+   "materials": [
+    "alu",
+    "rs_mud",
+    "steel",
+    "wood"
+   ],
+   "extent_in": [
+    96.0,
+    405.1,
+    34.29
+   ],
+   "extent_m": [
+    2.438,
+    10.29,
+    0.871
+   ],
+   "bytes": 256123,
+   "path": "models/props/riverside/utility_pole_v1/pole_1arm_lod0.obj"
+  },
+  {
+   "triangles": 291,
+   "vertices": 593,
+   "materials": [
+    "rs_mud",
+    "steel",
+    "wood"
+   ],
+   "extent_in": [
+    96.0,
+    405.1,
+    32.18
+   ],
+   "extent_m": [
+    2.438,
+    10.29,
+    0.817
+   ],
+   "bytes": 45140,
+   "path": "models/props/riverside/utility_pole_v1/pole_1arm_lod1.obj"
+  },
+  {
+   "triangles": 92,
+   "vertices": 192,
+   "materials": [
+    "steel",
+    "wood"
+   ],
+   "extent_in": [
+    96.0,
+    405.1,
+    13.49
+   ],
+   "extent_m": [
+    2.438,
+    10.29,
+    0.343
+   ],
+   "bytes": 14144,
+   "path": "models/props/riverside/utility_pole_v1/pole_1arm_lod2.obj"
+  }
+ ],
+ "textures": [
+  {
+   "vmat": "materials/riverside/rs_mud.vmat",
+   "slot": "TextureColor",
+   "path": "materials/riverside/rs_mud_color.jpg",
+   "w": 4096,
+   "h": 4096,
+   "file_bytes": 2726014,
+   "est_gpu_bytes": 89476248,
+   "compiled_bytes": 5051610
+  },
+  {
+   "vmat": "materials/riverside/rs_mud.vmat",
+   "slot": "TextureNormal",
+   "path": "materials/riverside/rs_mud_normal.jpg",
+   "w": 4096,
+   "h": 4096,
+   "file_bytes": 24554797,
+   "est_gpu_bytes": 89476248,
+   "compiled_bytes": 20413728
+  },
+  {
+   "vmat": "materials/riverside/rs_mud.vmat",
+   "slot": "TextureRoughness",
+   "path": "materials/riverside/rs_mud_rough.png",
+   "w": 4096,
+   "h": 4096,
+   "file_bytes": 7653297,
+   "est_gpu_bytes": 89476248,
+   "compiled_bytes": 0
+  },
+  {
+   "vmat": "materials/riverside/utility_pole_v1/pole_wood.vmat",
+   "slot": "TextureColor",
+   "path": "materials/riverside/utility_pole_v1/pole_wood_color.png",
+   "w": 1024,
+   "h": 2048,
+   "file_bytes": 3510485,
+   "est_gpu_bytes": 11184531,
+   "compiled_bytes": 1095775
+  },
+  {
+   "vmat": "materials/riverside/utility_pole_v1/pole_wood.vmat",
+   "slot": "TextureNormal",
+   "path": "materials/riverside/utility_pole_v1/pole_wood_normal.png",
+   "w": 1024,
+   "h": 2048,
+   "file_bytes": 2848283,
+   "est_gpu_bytes": 11184531,
+   "compiled_bytes": 2356056
+  },
+  {
+   "vmat": "materials/riverside/utility_pole_v1/pole_wood.vmat",
+   "slot": "TextureRoughness",
+   "path": "materials/riverside/utility_pole_v1/pole_wood_rough.png",
+   "w": 1024,
+   "h": 2048,
+   "file_bytes": 81881,
+   "est_gpu_bytes": 11184531,
+   "compiled_bytes": 0
+  }
+ ],
+ "vmdl": [
+  {
+   "path": "models/props/riverside/utility_pole_v1/pole_2arm.vmdl",
+   "vmdl_c_bytes": 52950,
+   "lods": [
+    [
+     "lod0",
+     "models/props/riverside/utility_pole_v1/pole_2arm_lod0.obj",
+     "0"
+    ],
+    [
+     "lod1",
+     "models/props/riverside/utility_pole_v1/pole_2arm_lod1.obj",
+     "35"
+    ],
+    [
+     "lod2",
+     "models/props/riverside/utility_pole_v1/pole_2arm_lod2.obj",
+     "90"
+    ]
+   ]
+  },
+  {
+   "path": "models/props/riverside/utility_pole_v1/pole_1arm.vmdl",
+   "vmdl_c_bytes": 41158,
+   "lods": [
+    [
+     "lod0",
+     "models/props/riverside/utility_pole_v1/pole_1arm_lod0.obj",
+     "0"
+    ],
+    [
+     "lod1",
+     "models/props/riverside/utility_pole_v1/pole_1arm_lod1.obj",
+     "35"
+    ],
+    [
+     "lod2",
+     "models/props/riverside/utility_pole_v1/pole_1arm_lod2.obj",
+     "90"
+    ]
+   ]
+  }
+ ],
+ "totals": {
+  "unique_textures": 6,
+  "texture_pixels": 56623104,
+  "est_gpu_bytes": 301982337,
+  "compiled_vtex_bytes": 28917169
+ }
+}

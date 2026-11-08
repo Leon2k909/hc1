@@ -1,0 +1,22 @@
+var root=Sandbox.Project.Current.GetRootPath();
+if(!string.Equals(System.IO.Path.GetFullPath(root).TrimEnd('\\'),@"C:\sbox-projects\hc1\forked-shooter-main",StringComparison.OrdinalIgnoreCase)) throw new InvalidOperationException("Wrong checkout");
+var manifest=System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(System.IO.Path.Combine(root,"output/veridant/remove-cases-20261105/manifest.json")));
+string Hash(string path)=>Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(System.IO.File.ReadAllBytes(path))).ToLowerInvariant();
+foreach(var kv in manifest["protected"].AsObject()) if(Hash(System.IO.Path.Combine(root,kv.Key))!=kv.Value.GetValue<string>()) throw new InvalidOperationException("Protected input changed: "+kv.Key);
+foreach(var session in Editor.SceneEditorSession.All.Where(s=>s.Scene.Source?.ResourcePath?.Equals("scenes/maps/veridant/veridant.scene",StringComparison.OrdinalIgnoreCase)==true))
+    if(session.HasUnsavedChanges || Game.IsPlaying) throw new InvalidOperationException("Veridant document is busy");
+foreach(var kv in manifest["files"].AsObject()) {
+    if(Hash(System.IO.Path.Combine(root,kv.Key))!=kv.Value["before"].GetValue<string>() || Hash(kv.Value["source"].GetValue<string>())!=kv.Value["after"].GetValue<string>()) throw new InvalidOperationException("Publication input changed: "+kv.Key);
+}
+var written=new System.Collections.Generic.List<string>();
+foreach(var kv in manifest["files"].AsObject()) {
+    var target=System.IO.Path.Combine(root,kv.Key);
+    var incoming=System.IO.Path.Combine(System.IO.Path.GetTempPath(),Guid.NewGuid()+".vmdl");
+    System.IO.File.Copy(kv.Value["source"].GetValue<string>(),incoming);
+    try { System.IO.File.Move(incoming,target,true); }
+    finally { if(System.IO.File.Exists(incoming)) System.IO.File.Delete(incoming); }
+    if(Hash(target)!=kv.Value["after"].GetValue<string>()) throw new InvalidOperationException("Write verification failed");
+    Editor.AssetSystem.RegisterFile(target);
+    written.Add(kv.Key);
+}
+return new { Written=written, CasesRemoved=manifest["cases_removed"].GetValue<int>(), AssetsDeleted=0 };

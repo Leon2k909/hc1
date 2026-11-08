@@ -49,6 +49,7 @@ import veridant_parts as P
 import veridant_planter_bushes as PlanterBushes
 import veridant_courtyard_olive as CourtyardTree
 import veridant_sofas as Sofas
+import veridant_reception_doors as ReceptionDoors
 from riverdale_parts import v, unit, card, box, obox, rod, UP
 
 STONE, METAL, WOOD, PLASTIC, GLASS, FABRIC = "default", "metal", "wood", "plastic", "glass", "fabric"
@@ -142,6 +143,19 @@ UNKNOWN = set()
 
 def configure( model ):
     for paint in list( model.polygons ):
+        if paint.startswith('rhp_') and paint in model.material_overrides:
+            continue
+        if paint == 'vr_gallery_art' and paint in model.material_overrides:
+            continue
+        if paint.startswith('vr_gallery_rug_') and paint in model.material_overrides:
+            continue
+        if paint == 'vr_tarp' and paint in model.material_overrides:
+            continue
+        if paint == "vr_gravel":
+            # Accepted Megascans preview, retained as the editor-visible ground material.
+            model.material_overrides[paint] = "materials/veridant/trials/megascans-gravel-trial-20261105/gravel.vmat"
+            model.tile_overrides[paint] = VM.TILES[paint]
+            continue
         if paint.startswith( "vr_ivy_" ) and paint in model.material_overrides:
             continue
         if paint.startswith( "vr_spa_" ) and paint in model.material_overrides:
@@ -287,9 +301,7 @@ def ground():
     # Beyond the play area, round to the backdrop: paving east, north and south.
     for a, b, c, d in ( ( PLAY[1], e1, n0, n1 ), ( e0, PLAY[1], n0, PLAY[2] ), ( e0, PLAY[1], PLAY[3], n1 ) ):
         floor( m, a, b, c, d, L0, "vr_gravel" )
-    # Linear drains across the courtyard, the picture's diagonal ones in the foreground.
-    for a, b in ( ( ( 380, -150 ), ( 700, 150 ) ), ( ( 300, -60 ), ( 520, 140 ) ), ( ( -180, 130 ), ( 60, 140 ) ), ( ( 560, -300 ), ( 740, -120 ) ) ):
-        P.drain( m, a, b, L0 )
+    # Courtyard paving is continuous; the user removed the diagonal drains (2026-11-06).
     return m
 
 
@@ -333,18 +345,25 @@ def lounge( m, g ):
     for k, ( e, n, f ) in enumerate( ( ( -480, -300, ( 0, 1 ) ), ( -480, -470, ( 0, 1 ) ), ( -330, -460, ( -1, 0 ) ) ) ):
         P.sofa( m, ( e, n ), f, 84, L0 )
     for e, n in ( ( -420, -390 ), ( -580, -390 ) ):
-        P.cylinder( m, ( e, n ), 16, 0, 16, "vr_stone_dark", 14, top="vr_stone_dark" )
+        from veridant_lounge_table import build_into as lounge_coffee_table
+        lounge_coffee_table(m, (e,n))
     for k, ( e, n ) in enumerate( ( ( -600, -300 ), ( -420, -300 ), ( -600, -460 ), ( -420, -460 ), ( -300, -380 ) ) ):
         P.downlight( m, f"Lounge downlight {k}", ( e, n, 112 ), 260 )
     # Upstairs: the gallery: sofas facing the sea and the courtyard, paintings, a rug, lamps.
-    floor( m, -640.0, -300.0, -500.0, -260.0, L1 + 0.2, "vr_rug" )
+    from veridant_gallery_rug import build_into as gallery_rug
+    gallery_rug(m,(-470,-380),L1+.2)
     P.sofa( m, ( -380, -300 ), ( 0, -1 ), 96, L1 )
     P.sofa( m, ( -560, -300 ), ( 0, -1 ), 96, L1 )
     P.sofa( m, ( -470, -470 ), ( 0, 1 ), 120, L1 )
-    P.art( m, "art_1", ( -560, n0 + T + 0.2, 196 ), ( -1, 0, 0 ), 52 )
-    P.art( m, "art_2", ( -360, n0 + T + 0.2, 196 ), ( -1, 0, 0 ), 52 )
-    P.art( m, "art_3", ( e1 - T - 0.2, -460, 196 ), ( 0, -1, 0 ), 44 )
-    P.art( m, "art_5", ( e0 + T + 0.2, -470, 192 ), ( 0, 1, 0 ), 50 )
+    # Hang artwork on solid piers, clear of the upper gallery windows.
+    from veridant_gallery_art import build_into as gallery_coastal_art
+    gallery_coastal_art(m,(-497,n0+T+.2),196)
+    from veridant_gallery_art_olive import build_into as gallery_olive_art
+    gallery_olive_art(m,(-433,n0+T+.2),196)
+    from veridant_gallery_art_garden import build_into as gallery_garden_art
+    gallery_garden_art(m,(e1-T-.2,-460),196)
+    from veridant_gallery_art_sea import build_into as gallery_sea_art
+    gallery_sea_art(m,(e0+T+.2,-370),192)
     for k, ( e, n ) in enumerate( ( ( -600, -260 ), ( -380, -260 ), ( -600, -470 ), ( -380, -470 ) ) ):
         P.downlight( m, f"Gallery downlight {k}", ( e, n, top - 16 ), 300, shadows=( k == 0 ) )
     P.wall_washer( m, "Lounge door lamp", ( e1, -250.0, 104.0 ), ( 1, 0 ), 220 )
@@ -382,10 +401,11 @@ def cafe( m, g ):
     for k, ( e, n ) in enumerate( ( ( -560, -80 ), ( -560, 80 ), ( -400, -60 ), ( -400, 100 ) ) ):
         P.downlight( m, f"Cafe light {k}", ( e, n, 112 ), 280, shadows=( k == 1 ) )
     # The olive in a bed of black cubes in the colonnade (the picture's, between the doors).
-    for k, ( e, n ) in enumerate( ( ( -236, 4 ), ( -236, 36 ), ( -214, 4 ), ( -214, 36 ) ) ):
-        box( m, e - 10, e + 10, n - 15, n + 15, 0, 22, { "default": "vr_case_black", "+z": "vr_soil" }, PLASTIC )
-    P.olive( m, ( -226, 20, 22 ), 96, seed=7, spread=0.8 )
-    P.uplight( m, "Colonnade olive uplight", ( -222, 20, 22.1 ), 200 )
+    m.collision_box((-254,-11,0),(-212,36,24),STONE)
+    from veridant_colonnade_planter import build_into as colonnade_planter
+    colonnade_planter(m,(-225,20))
+    P.olive( m, ( -233, 12.5, 20.5 ), 96, seed=7, spread=0.8 )
+    P.uplight( m, "Colonnade olive uplight", ( -244, -1, 22.1 ), 200 )
 
 
 def roof_terrace( m, g, foliage ):
@@ -399,8 +419,11 @@ def roof_terrace( m, g, foliage ):
     solid( m, k0 - 4, k1 + 4, kn0 - 4, kn1 + 4, L1 + 84, L1 + 90, "vr_stone_dark" )
     for n in ( -50.0, 30.0 ):
         P.wall_washer( m, f"Kiosk lamp {n}", ( k1, n, L1 + 70 ), ( 1, 0 ), 220, size=( 7.0, 4.0 ), rise=-14 )
-    box( m, k1 - 0.5, k1 + 0.2, -32, 12, L1, L1 + 76, "vr_dark" )
-    solid( m, -300.0, -270.0, 100.0, 160.0, L1, L1 + 60, { "default": "vr_dark", "+z": "vr_steel" }, METAL )
+    from veridant_kiosk_service_door import build_into as kiosk_service_door
+    kiosk_service_door(m,(k1+.2,-10),L1)
+    m.collision_box((-300,100,L1),(-270,160,L1+60),METAL)
+    from veridant_kiosk_cabinet import build_into as kiosk_cabinet
+    kiosk_cabinet(m,(-285,130),L1)
     for k, n in enumerate( ( -150.0, -110.0 ) ):
         P.lounger( m, ( -560, n ), ( 1, 0 ), L1 )
     # The balustrade along the colonnade's edge and the sea side.
@@ -444,6 +467,8 @@ def ops( m, g, foliage ):
     wall( m, "n", ( n0 + T, n1 - T ), ( e1 - T, e1 ), ( 0, 112 ), "+e", [ ( -600.0, 80.0, 0, 100 ) ] )
     wall( m, "n", ( n0 + T, n1 - T ), ( e0, e0 + T ), ( 0, 112 ), None, [ ( -490.0, 60.0, 0, 96 ) ] )
     floor( m, e0 + T, e1 - T, n0 + T, n1 - T, L0, "vr_floor" )
+    # Carry the hall floor through the courtyard doorway's 16-inch wall reveal.
+    floor( m, 280.0, 360.0, n1 - T, n1, L0, "vr_floor" )
     for axis, at, r0, r1, out in ( ( "e", n1 + 0.4, 0.0, 120.0, 1 ), ( "e", n1 + 0.4, 570.0, 670.0, 1 ), ( "e", n0 - 0.4, 270.0, 390.0, -1 ) ):
         glazing( m, g, axis, at, r0, r1, 30, 96, out )
     # The slab over the hall: the balcony's floor in front of the upper floors, the lobby's floor behind (with the
@@ -483,7 +508,9 @@ def ops( m, g, foliage ):
     for r in ( 120.0, 520.0 ):
         for z0, z1 in ( ( 150, 236 ), ( 286, 374 ) ):
             glazing( m, g, "e", n0 - 0.4, r - 70, r + 70, z0, z1, -1 )
-            box( m, r - 70, r + 70, n0 + T + 1, n0 + T + 2, z0, z1, "vr_window_dark" )
+            # The occupied lobby uses its real garden-facing glazing; only closed rooms need backing.
+            if not ( r == 520.0 and z0 == 150 ):
+                box( m, r - 70, r + 70, n0 + T + 1, n0 + T + 2, z0, z1, "vr_window_dark" )
     for z0, z1 in ( ( 150, 236 ), ( 286, 374 ) ):
         glazing( m, g, "n", e1 + 0.4, -630.0, -490.0, z0, z1, 1 )
     # The lobby inside: a reception desk, sofas, cases, the lit back wall, lamps.
@@ -491,16 +518,22 @@ def ops( m, g, foliage ):
     box( m, LOBBY[0] + 1, LOBBY[0] + 1.6, -650, -460, L1 + 10, 230, "vr_window_lit" )
     P.sofa( m, ( 240, -500 ), ( 1, 0 ), 84, L1 )
     P.sofa( m, ( 660, -500 ), ( -1, 0 ), 84, L1 )
-    P.case_stack( m, ( 300, -640 ), ( 1, 0 ), "vr_case_olive", seed=91, z0=L1 )
-    P.art( m, "art_4", ( LOBBY[0] + 2, -560, 186 ), ( 0, -1, 0 ), 44 )
+    _omit_transport_cases( m, ( 300, -640 ), ( 1, 0 ), "vr_case_olive", seed=91, z0=L1 )
+    from veridant_operations_art import build_into as operations_art
+    operations_art(m,(LOBBY[0]+2,-560),186)
     for k, ( e, n ) in enumerate( ( ( 260, -520 ), ( 460, -520 ), ( 660, -520 ), ( 460, -640 ) ) ):
         P.downlight( m, f"Lobby downlight {k}", ( e, n, 240 ), 300, shadows=( k == 1 ) )
     # The hall below: reception, columns, cases, lamps.
+    from veridant_hall_columns import build_into as hall_columns
+    hall_columns(m)
     for e in ( 100.0, 340.0, 580.0 ):
-        P.cylinder( m, ( e, -510 ), 14, 0, 112, "vr_stone", 16, surface=STONE )
+        # Preserve the original 16-sided gameplay hull independently of the smooth render mesh.
+        collision = K.Model()
+        P.cylinder( collision, ( e, -510 ), 14, 0, 112, "vr_stone", 16, surface=STONE )
+        m.hulls.extend(collision.hulls)
     P.bar_counter( m, ( -60.0, -560.0 ), ( 100.0, -530.0 ), L0, front="+n" )
     for k, ( e, n ) in enumerate( ( ( 200, -420 ), ( 640, -420 ), ( 0, -640 ), ( 460, -380 ) ) ):
-        P.case_stack( m, ( e, n ), ( 1, 0.1 * k ), "vr_case_black" if k % 2 else "vr_case_olive", seed=95 + k )
+        _omit_transport_cases( m, ( e, n ), ( 1, 0.1 * k ), "vr_case_black" if k % 2 else "vr_case_olive", seed=95 + k )
     for k, ( e, n ) in enumerate( ( ( -100, -420 ), ( 220, -420 ), ( 540, -420 ), ( -100, -620 ), ( 220, -620 ), ( 540, -620 ) ) ):
         P.downlight( m, f"Hall downlight {k}", ( e, n, 112 ), 300, shadows=( k == 1 ) )
     # The balcony: its railing over the courtyard, the banner and lamps on the face, the lounge's door at its end.
@@ -571,7 +604,7 @@ def north_block( m, g, foliage ):
     floor( m, *SLOT_TOP, L1, "vr_paving" )
     floor( m, r0, r1, rn0, rn1, L0, "vr_floor" )
     i0, i1, ifn, ihn = INNER_STAIR
-    P.stone_stair( m, ( ( i0 + i1 ) / 2, ifn ), ( ( i0 + i1 ) / 2, ihn ), i1 - i0, L0, L1, sides=( True, False ), name="reception stair" )
+    P.stone_stair( m, ( ( i0 + i1 ) / 2, ifn ), ( ( i0 + i1 ) / 2, ihn ), i1 - i0, L0, L1, sides=( True, False ), name="reception stair", closed=True )
     P.steel_rail( m, [ ( i1 + 1, ifn ), ( i1 + 1, ihn ) ], 0, slope=[ L0 + 7, L1 ], clip_to=48, name="reception stair rail", style="rails" )
     P.glass_rail( m, [ ( s0 + 1, sn1 ), ( s0 + 1, sn0 - 1 ), ( s1 + 1, sn0 - 1 ), ( s1 + 1, sn1 ) ], L1, name="stairwell rail" )
     # The reception: a desk, a sofa, the mark on the wall, lamps.
@@ -581,20 +614,23 @@ def north_block( m, g, foliage ):
     P.letters( m, "reception", ( 100.0, rn1 - 0.2, 58.0 ), ( -1, 0, 0 ), 8, "dark" )
     for k, ( e, n ) in enumerate( ( ( 0, 300 ), ( 150, 300 ), ( 150, 480 ), ( -40, 500 ) ) ):
         P.downlight( m, f"Reception downlight {k}", ( e, n, ROOM_TOP ), 260, shadows=( k == 1 ) )
+    from veridant_downlight_bezels import build_into as reception_light_bezels
+    reception_light_bezels(m)
     P.wall_washer( m, "Reception door lamp", ( ( de0 + de1 ) / 2, n0, dz + 8 ), ( 0, -1 ), 130 )
     # The north terrace: glass along the courtyard and down the stair, the bar against the spa, the umbrella, the
     # stone pine, the steps up to the east terrace.
     P.glass_rail( m, [ ( e0, n0 + 2 ), ( e1 - 1, n0 + 2 ), ( e1 - 1, STAIR[3] ) ], L1, name="north terrace rail" )
     P.bar_counter( m, ( 60.0, 712.0 ), ( 260.0, 740.0 ), L1, front="-n" )
+    from veridant_terrace_stools import build_one as terrace_stool
     for k, e in enumerate( ( 90.0, 140.0, 190.0, 240.0 ) ):
-        P.cylinder( m, ( e, 690 ), 6, L1, L1 + 28, "vr_steel", 10, top="vr_timber_dark" )
+        terrace_stool(m,(e,690),L1)
     P.umbrella_closed( m, ( 30.0, 470.0 ), 182, z0=L1 )
     P.cafe_table( m, ( 110, 380 ), L1, 3, seed=51 )
     P.planter( m, ( -60.0, 610.0 ), ( 60.0, 740.0 ), L1, L1 + 24 )
     P.stone_pine( foliage, ( 0.0, 676.0, L1 + 20 ), 360, crown_r=240, seed=8, lean=( 30.0, -40.0 ) )
     # The pine planter uses grounded beech instances in write_scene.
-    P.case_stack( m, ( 170, 540 ), ( 0, 1 ), "vr_case_olive", seed=52, z0=L1 )
-    P.hard_case( m, ( 150, 290 ), ( 44, 26, 22 ), ( 1, 0.15 ), "vr_case_black", L1, seed=53 )
+    _omit_transport_cases( m, ( 170, 540 ), ( 0, 1 ), "vr_case_olive", seed=52, z0=L1 )
+    _omit_transport_cases( m, ( 150, 290 ), ( 44, 26, 22 ), ( 1, 0.15 ), "vr_case_black", L1, seed=53 )
     for k, ( e, n ) in enumerate( ( ( -20, 300 ), ( 130, 650 ), ( 300, 520 ) ) ):
         P.lantern_post( m, f"North terrace lantern {k}", ( e, n, L1 ), 96, radius=360 )
     a, b, c, d = EAST_STEPS
@@ -615,6 +651,8 @@ def courtyard( m, foliage ):
     de0, de1, dn0, dn1, dz = DECK
     # The raised deck along the south side: 16 in up (one step), its lit nosing.
     solid( m, de0, de1, dn0, dn1, 0, dz - 1.5, { "default": "vr_stone", "+z": None, "-z": None, "-n": None, "-e": None } )
+    # The south deck face is hidden by the hall wall except in its courtyard door.
+    card( m, "vr_stone", [ v(280,dn0,0), v(360,dn0,0), v(360,dn0,dz-1.5), v(280,dn0,dz-1.5) ], v(0,-1,0) )
     solid( m, de0, de1 + 1.2, dn0, dn1 + 1.2, dz - 1.5, dz, { "default": "vr_stone_light", "-z": "vr_stone_light" } )
     floor( m, de0, de1, dn0, dn1, dz + 0.02, "vr_paving" )
     P.led( m, ( de0, dn1 + 0.5, dz - 2.6 ), ( de1, dn1 + 0.5, dz - 2.6 ), v( 0, 1, 0 ), 1.2 )
@@ -640,14 +678,14 @@ def courtyard( m, foliage ):
         P.step_light( m, f"Grand stair light east {i}", ( e1, n, z ), ( -1, 0 ), light=False )
     # The cases about the courtyard, as the picture has them.
     for k, e in enumerate( ( 20.0, 76.0, 132.0 ) ):
-        P.hard_case( m, ( e, -232.0 ), ( 50, 32, 28 ), ( 1, 0.03 * ( k - 1 ) ), "vr_case_black" if k % 2 else "vr_case_olive", dz, seed=60 + k )
-    P.case_stack( m, ( 195, 30 ), ( 0.1, 1 ), "vr_case_black", ( ( 44, 30, 28 ), ( 40, 28, 24 ) ), seed=64 )
-    P.hard_case( m, ( 290, -110 ), ( 52, 34, 22 ), ( 1, -0.2 ), "vr_case_olive", 0, seed=65 )
-    P.case_stack( m, ( 300, -262 ), ( 1, 0 ), "vr_case_black", ( ( 60, 40, 34 ), ( 52, 36, 26 ) ), seed=66, z0=dz )
-    P.hard_case( m, ( 210, -270 ), ( 56, 36, 30 ), ( 0.2, 1 ), "vr_case_olive", dz, seed=67 )
-    P.hard_case( m, ( -168, -120 ), ( 46, 28, 24 ), ( 0, 1 ), "vr_case_black", 0, seed=68 )
-    P.case_stack( m, ( -165, 110 ), ( 0, 1 ), "vr_case_olive", ( ( 46, 28, 24 ), ), seed=69 )
-    P.case_stack( m, ( 640, 120 ), ( 1, 0.2 ), "vr_case_black", ( ( 50, 32, 28 ), ( 44, 30, 22 ) ), seed=70 )
+        _omit_transport_cases( m, ( e, -232.0 ), ( 50, 32, 28 ), ( 1, 0.03 * ( k - 1 ) ), "vr_case_black" if k % 2 else "vr_case_olive", dz, seed=60 + k )
+    _omit_transport_cases( m, ( 195, 30 ), ( 0.1, 1 ), "vr_case_black", ( ( 44, 30, 28 ), ( 40, 28, 24 ) ), seed=64 )
+    _omit_transport_cases( m, ( 290, -110 ), ( 52, 34, 22 ), ( 1, -0.2 ), "vr_case_olive", 0, seed=65 )
+    _omit_transport_cases( m, ( 300, -262 ), ( 1, 0 ), "vr_case_black", ( ( 60, 40, 34 ), ( 52, 36, 26 ) ), seed=66, z0=dz )
+    _omit_transport_cases( m, ( 210, -270 ), ( 56, 36, 30 ), ( 0.2, 1 ), "vr_case_olive", dz, seed=67 )
+    _omit_transport_cases( m, ( -168, -120 ), ( 46, 28, 24 ), ( 0, 1 ), "vr_case_black", 0, seed=68 )
+    _omit_transport_cases( m, ( -165, 110 ), ( 0, 1 ), "vr_case_olive", ( ( 46, 28, 24 ), ), seed=69 )
+    _omit_transport_cases( m, ( 640, 120 ), ( 1, 0.2 ), "vr_case_black", ( ( 50, 32, 28 ), ( 44, 30, 22 ) ), seed=70 )
     # Wall washers along the courtyard's walls.
     P.wall_washer( m, "Court lamp east a", ( EAST_A[0], -80.0, 30.0 ), ( -1, 0 ), 260, rise=-10 )
     P.wall_washer( m, "Court lamp east b", ( EAST_A[0], 140.0, 30.0 ), ( -1, 0 ), 260, rise=-10 )
@@ -681,6 +719,8 @@ def resort_finish( m, foliage ):
     # An actual rooftop shade structure over the west cafe's terrace, instead
     # of another featureless slab. It is open on all sides and clear above head height.
     pe0, pe1, pn0, pn1 = -680.0, -520.0, 88.0, 177.0
+    from veridant_pergola_bases import build_into as pergola_bases
+    pergola_bases(m)
     top = 254.0
     for e in ( pe0, pe1 ):
         for n in ( pn0, pn1 ):
@@ -689,11 +729,8 @@ def resort_finish( m, foliage ):
             m.collision_box( ( e - 3, n - 3, L1 ), ( e + 3, n + 3, top - 12 ), METAL )
             box( m, e - 5.0, e + 5.0, n - 5.0, n + 5.0,
                  top - 17.0, top - 11.0, "vr_steel" )
-    for n in ( pn0, pn1 ):
-        box( m, pe0 - 8, pe1 + 8, n - 4, n + 4, top - 11, top - 2, "vr_timber_dark" )
-    for e in np.arange( pe0 + 2, pe1, 14.0 ):
-        box( m, e - 2.2, e + 2.2, pn0 - 6, pn1 + 6,
-             top - 2, top + 4.0, "vr_timber_dark" )
+    from veridant_cafe_pergola_teak import build_into as cafe_pergola_timbers
+    cafe_pergola_timbers(m,((pe0+pe1)/2,(pn0+pn1)/2),top)
     # Planters, climbers and warm practical lights soften the otherwise hard
     # resort geometry. Foliage stays above/along walls, clear of player routes.
     P.planter( m, ( -631.0, 129.0 ), ( -597.0, 163.0 ), L1, L1 + 21.0 )
@@ -744,7 +781,8 @@ def east_terrace( m, g, foliage ):
         P.wall_washer( m, f"Colonnade mouth lamp {n}", ( a0, n + ( 12 if n == tn0 else -12 ), 120.0 ), ( -1, 0 ), 200, light=False )
     # The edge over the courtyard: black steel railing with a tarp thrown over it at the picture's corner, glass on.
     P.steel_rail( m, [ ( a0 + 2, an0 ), ( a0 + 2, -45.0 ) ], L2, name="east terrace steel rail", style="tube" )
-    P.tarp_over( m, ( a0 + 2, -146.0 ), ( a0 + 2, -52.0 ), L2 + 42, ( -1, 0 ), drop_out=30, drop_in=27, seed=2, rail=1.5 )
+    from veridant_terrace_tarp import build_into as terrace_tarp
+    terrace_tarp(m,(a0+2,-146),L2)
     P.glass_rail( m, [ ( a0 + 2, -45.0 ), ( a0 + 2, an1 - 2 ), ( STAIR[1] + 1, an1 - 2 ), ( STAIR[1] + 1, EAST_STEPS[2] ) ], L2,
                   name="east terrace glass rail", cap=False )
     P.glass_rail( m, [ ( STAIR[1] + 1, EAST_STEPS[3] ), ( STAIR[1] + 1, EAST_B[3] - 2 ) ], L2, name="east terrace north rail" )
@@ -754,11 +792,11 @@ def east_terrace( m, g, foliage ):
     P.glass_rail( m, [ ( a1 - 2, fn1 ), ( a1 - 2, bn1 - 2 ) ], L2, name="east edge rail b" )
     P.glass_rail( m, [ ( BALCONY_STAIR[1], an0 + 2 ), ( a1 - 2, an0 + 2 ) ], L2, name="south edge rail" )
     # On top: cases (the picture's foreground), loungers, planters, lanterns.
-    P.case_stack( m, ( 860, -330 ), ( 1, 0 ), "vr_case_black", ( ( 62, 40, 36 ), ( 54, 36, 28 ) ), seed=80, z0=L2 )
-    P.hard_case( m, ( 860, -250 ), ( 60, 40, 34 ), ( 1, 0.1 ), "vr_case_black", L2, seed=81 )
-    P.hard_case( m, ( 940, -380 ), ( 56, 36, 30 ), ( 0, 1 ), "vr_case_olive", L2, seed=82 )
-    P.case_stack( m, ( 1100, 160 ), ( 0, 1 ), "vr_case_olive", seed=83, z0=L2 )
-    P.case_stack( m, ( 640, 620 ), ( 1, 0 ), "vr_case_black", seed=84, z0=L2 )
+    _omit_transport_cases( m, ( 860, -330 ), ( 1, 0 ), "vr_case_black", ( ( 62, 40, 36 ), ( 54, 36, 28 ) ), seed=80, z0=L2 )
+    _omit_transport_cases( m, ( 860, -250 ), ( 60, 40, 34 ), ( 1, 0.1 ), "vr_case_black", L2, seed=81 )
+    _omit_transport_cases( m, ( 940, -380 ), ( 56, 36, 30 ), ( 0, 1 ), "vr_case_olive", L2, seed=82 )
+    _omit_transport_cases( m, ( 1100, 160 ), ( 0, 1 ), "vr_case_olive", seed=83, z0=L2 )
+    _omit_transport_cases( m, ( 640, 620 ), ( 1, 0 ), "vr_case_black", seed=84, z0=L2 )
     for k, n in enumerate( ( -100.0, 0.0, 100.0 ) ):
         P.lounger( m, ( 1060, n ), ( -1, 0 ), L2 )
     for k, ( e, n ) in enumerate( ( ( 1150, -380 ), ( 1150, 700 ), ( 560, 720 ) ) ):
@@ -829,7 +867,7 @@ def promenade( m, foliage, palm_pits=None ):
     # Cover: cases, a kiosk cart, planters.
     for k, ( e, n ) in enumerate( ( ( -1300, -800 ), ( -1150, -600 ), ( -1450, 650 ), ( -1180, 560 ), ( -1000, -1100 ), ( -1450, 850 ),
                                     ( -1000, 860 ) ) ):
-        P.case_stack( m, ( e, n ), ( rng.normal( 0, 0.3 ), 1 ), "vr_case_black" if k % 2 else "vr_case_olive", seed=110 + k )
+        _omit_transport_cases( m, ( e, n ), ( rng.normal( 0, 0.3 ), 1 ), "vr_case_black" if k % 2 else "vr_case_olive", seed=110 + k )
     for k, ( e, n ) in enumerate( ( ( -1100, -150 ), ( -1100, 250 ), ( -1300, -1150 ) ) ):
         P.planter( m, ( e - 40, n - 40 ), ( e + 40, n + 40 ), 0, 30 )
         P.olive( foliage, ( e, n, 26 ), 130, seed=120 + k )
@@ -898,20 +936,6 @@ def gardens( m, foliage ):
             continue
         P.olive( foliage, ( e, n, 0 ), rng.uniform( 150, 230 ), seed=300 + k, spread=1.2 )
         m.collision_box( ( e - 7, n - 7, 0 ), ( e + 7, n + 7, 110 ), WOOD )
-    # A stone pavilion in the middle of the gardens, open north and south, closed east and west: it breaks the long
-    # look along them.
-    pv0, pv1, pn0, pn1 = 120.0, 320.0, -1180.0, -940.0
-    wall( m, "n", ( pn0, pn1 ), ( pv0, pv0 + T ), ( 0, 140 ), "-e", outside="vr_stone", inside="vr_stone" )
-    wall( m, "n", ( pn0, pn1 ), ( pv1 - T, pv1 ), ( 0, 140 ), "+e", outside="vr_stone", inside="vr_stone" )
-    for nn, out in ( ( pn0, "-n" ), ( pn1 - T, "+n" ) ):
-        wall( m, "e", ( pv0 + T, pv1 - T ), ( nn, nn + T ), ( 0, 140 ), out, [ ( ( pv0 + pv1 ) / 2, 90.0, 0, 110 ) ], outside="vr_stone", inside="vr_stone" )
-    solid( m, pv0 - 10, pv1 + 10, pn0 - 10, pn1 + 10, 140, 152, { "default": "vr_stone_dark", "-z": "vr_soffit" } )
-    floor( m, pv0 + T, pv1 - T, pn0 + T, pn1 - T, 0.2, "vr_floor" )
-    P.cafe_table( m, ( ( pv0 + pv1 ) / 2, ( pn0 + pn1 ) / 2 ), 0, 3, seed=35 )
-    P.downlight( m, "Pavilion light", ( ( pv0 + pv1 ) / 2, ( pn0 + pn1 ) / 2, 140 ), 280 )
-    for nn in ( pn0, pn1 ):
-        P.wall_washer( m, f"Pavilion lamp {nn}", ( ( pv0 + pv1 ) / 2 + 60, nn, 100.0 ), ( 0, 1 if nn > pn0 else -1 ), 220 )
-    ROOF_EXTRA.append( ( "Pavilion", ( pv0 - 10, pv1 + 10, pn0 - 10, pn1 + 10, 140, 1500 ) ) )
     # Tall clipped hedges: solid cover.
     for a, b, c, d in ( ( -600, -380, -900, -870 ), ( -260, -60, -900, -870 ), ( 1240, 1300, -1300, -1140 ), ( 1240, 1300, -1000, -840 ),
                         ( -560, -520, -1320, -1240 ) ):
@@ -919,18 +943,16 @@ def gardens( m, foliage ):
     # A pergola with a table under it in the west part.
     for e in ( -560.0, -360.0 ):
         for n in ( -1300.0, -1180.0 ):
-            box( m, e - 4, e + 4, n - 4, n + 4, 0, 110, "vr_timber_dark", WOOD )
-    for n in ( -1300.0, -1180.0 ):
-        box( m, -570, -350, n - 4, n + 4, 110, 118, "vr_timber_dark" )
-    for e in np.arange( -568, -350, 16.0 ):
-        box( m, e - 1.5, e + 1.5, -1310, -1170, 118, 122, "vr_timber_dark" )
+            m.collision_box((e-4,n-4,0),(e+4,n+4,110),WOOD)
+    from veridant_garden_pergola import build_into as garden_pergola
+    garden_pergola(m,(-460,-1240))
     P.bougainvillea( foliage, ( -460.0, -1176.0, 120.0 ), ( 1, 0, 0 ), 200, 60, seed=5 )
     P.cafe_table( m, ( -460, -1240 ), 0, 4, seed=33 )
     # Cover on site B and round it.
     for k, ( e, n ) in enumerate( ( ( 600, -1020 ), ( 780, -900 ), ( 900, -1150 ), ( 480, -1200 ), ( 1000, -860 ), ( 700, -1250 ) ) ):
-        P.case_stack( m, ( e, n ), ( 1, rng.normal( 0, 0.3 ) ), "vr_case_olive" if k % 2 else "vr_case_black", seed=320 + k )
+        _omit_transport_cases( m, ( e, n ), ( 1, rng.normal( 0, 0.3 ) ), "vr_case_olive" if k % 2 else "vr_case_black", seed=320 + k )
     for k, ( e, n ) in enumerate( ( ( -400, -1020 ), ( 200, -1250 ), ( 1500, -1020 ), ( 1700, -1250 ), ( -200, -820 ) ) ):
-        P.case_stack( m, ( e, n ), ( 1, 0 ), "vr_case_black", seed=340 + k )
+        _omit_transport_cases( m, ( e, n ), ( 1, 0 ), "vr_case_black", seed=340 + k )
     for k, ( e, n ) in enumerate( ( ( -300, -760 ), ( 300, -760 ), ( 900, -760 ), ( 1500, -800 ), ( -600, -1300 ), ( 1100, -1300 ) ) ):
         P.lantern_post( m, f"Garden lamp {k}", ( e, n, 0 ), 120, radius=460 )
 
@@ -956,8 +978,11 @@ def forecourt( m, foliage ):
     # The fountain: a round basin with a stone bowl, water in it.
     c = ( 1600.0, 150.0 )
     P.cylinder( m, c, 90, 0, 20, "vr_stone_dark", 32, top=None, surface=STONE )
+    from veridant_fountain_coping import build_into as fountain_coping
+    fountain_coping( m )
     P.cylinder( m, c, 84, 0.2, 14, "vr_black", 32, top="vr_black" )
-    P.lathe( m, c, [ ( 10, 14 ), ( 10, 46 ), ( 34, 52 ), ( 30, 58 ), ( 0, 56 ) ], "vr_stone", 20 )
+    from veridant_fountain_bowl import build_into as fountain_bowl
+    fountain_bowl(m,c)
     for k in range( 8 ):
         a = 2 * math.pi * k / 8
         P.uplight( m, f"Fountain light {k}", ( c[0] + 76 * math.cos( a ), c[1] + 76 * math.sin( a ), 14 ), 160, light=( k % 4 == 0 ) )
@@ -966,7 +991,7 @@ def forecourt( m, foliage ):
         P.planter( m, ( e - 36, n - 36 ), ( e + 36, n + 36 ), 0, 28 )
         P.palm( foliage, ( e, n, 24 ), rng.uniform( 300, 380 ), seed=400 + k, lean=( rng.normal( 0, 30 ), rng.normal( 0, 30 ) ) )
     for k, ( e, n ) in enumerate( ( ( 1500, -200 ), ( 1700, 450 ), ( 1450, 650 ), ( 1250, -620 ), ( 1050, -560 ), ( 900, -640 ) ) ):
-        P.case_stack( m, ( e, n ), ( 1, rng.normal( 0, 0.2 ) ), "vr_case_black" if k % 2 else "vr_case_olive", seed=420 + k )
+        _omit_transport_cases( m, ( e, n ), ( 1, rng.normal( 0, 0.2 ) ), "vr_case_black" if k % 2 else "vr_case_olive", seed=420 + k )
     for k, ( e, n ) in enumerate( ( ( 1500, -640 ), ( 1500, 950 ), ( 1820, 150 ) ) ):
         P.lantern_post( m, f"Forecourt lamp {k}", ( e, n, 0 ), 140, radius=520 )
 
@@ -1255,13 +1280,14 @@ def roof_clips():
 
 
 def write_scene( written, light_list, probe_list, hedge_props=() ):
+    from veridant_breakable_rails import scene_group as railing_glass_group
     world = K.game_object( ids, "Veridant", "world", children=[
         model_object( title, f"world/{name}", name, collide, shadows )
         for name, title, collide, shadows in SCENE_MODELS if name in written ] + [
         K.game_object( ids, "Beech Hedges", "hedges", children=hedge_objects( hedge_props ) ),
         PlanterBushes.scene_group( ids ),
         CourtyardTree.scene_object( ids ),
-        Sofas.scene_group( ids ) ] )
+        Sofas.scene_group( ids ), railing_glass_group() ] )
     light_objects = [
         K.game_object( ids, name, f"light/{name}", K.to_world( position ), tags="light_point,light", components=[
             K.component( ids, "Sandbox.PointLight", f"light/{name}/light", Attenuation=1, FogMode="Enabled", FogStrength=1,
@@ -1364,6 +1390,22 @@ def write_scene( written, light_list, probe_list, hedge_props=() ):
         ] ),
         look_object(),
         world,
+        *ReceptionDoors.scene_objects( ids ),
+        *ReceptionDoors.cafe_scene_objects( ids ),
+        *ReceptionDoors.cafe_scene_objects( ids, north=True ),
+        *ReceptionDoors.ops_lobby_scene_objects( ids ),
+        *ReceptionDoors.lounge_courtyard_scene_objects( ids ),
+        *ReceptionDoors.lounge_garden_scene_objects( ids ),
+        *ReceptionDoors.lounge_garden_scene_objects( ids, terrace=True ),
+        *ReceptionDoors.lounge_garden_scene_objects( ids, cafe_link=True ),
+        *ReceptionDoors.lounge_west_scene_objects( ids ),
+        *ReceptionDoors.lounge_west_scene_objects( ids, cafe=True ),
+        *ReceptionDoors.lounge_west_scene_objects( ids, cafe=True, north=True ),
+        *ReceptionDoors.gallery_balcony_scene_objects( ids ),
+        *ReceptionDoors.gallery_balcony_scene_objects( ids, side_entrance=True ),
+        *ReceptionDoors.ops_courtyard_scene_objects( ids ),
+        *ReceptionDoors.ops_courtyard_scene_objects( ids, garden=True ),
+        *ReceptionDoors.ops_east_scene_objects( ids ),
         K.game_object( ids, "Lights", "lights", children=light_objects ),
         K.game_object( ids, "Reflection Probes", "probes", children=[ probe_object( *p ) for p in probe_list ] ),
         K.game_object( ids, "Volumetric Fog", "haze", children=[ haze_object( *h ) for h in HAZE ] ),
@@ -1439,6 +1481,8 @@ def build( backdrop=True ):
     promenade( dress, foliage, palm_pits )
     gardens( dress, foliage )
     forecourt( dress, foliage )
+    from veridant_fountain_water import build_into as fountain_water
+    fountain_water(dress, water)
     models = { "veridant_ground": ground_m, "veridant_buildings": buildings, "veridant_dress": dress, "veridant_foliage": foliage,
                "veridant_glass": glass, "veridant_water": water, "veridant_palm_pits": palm_pits }
     if backdrop:
@@ -1535,7 +1579,8 @@ def main():
         written.add( name )
         if args.no_models:
             continue
-        count = K.write_model( OUT_DIR, RESOURCE_DIR, name, model )
+        from veridant_breakable_rails import write_static_model
+        count = write_static_model( OUT_DIR, RESOURCE_DIR, name, model )
         print( f"{name}: {count} triangles, {len( model.boxes )} boxes, {len( model.hulls )} hulls" )
     if args.no_backdrop:
         written |= { "veridant_backdrop", "veridant_backdrop_props", "veridant_sea" }
@@ -1573,6 +1618,12 @@ def main():
             size = ( 1152, 768 ) if name == "reference" else ( 960, 540 )
             PV.perspective( opaque, glass, eye, target, size=size, fov=fov ).convert( "RGB" ).save( out / f"{name}.png" )
             print( f"wrote {out / f'{name}.png'}" )
+
+
+
+def _omit_transport_cases(*args, **kwargs):
+    """Transport cases are intentionally absent from Veridant; assets remain reusable."""
+    return None
 
 
 if __name__ == "__main__":

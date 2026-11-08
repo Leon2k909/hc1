@@ -1,0 +1,143 @@
+{
+ "label": "AFTER",
+ "objs": [
+  {
+   "triangles": 9622,
+   "vertices": 5821,
+   "materials": [
+    "shed_body"
+   ],
+   "extent_in": [
+    133.09,
+    172.2,
+    108.5
+   ],
+   "extent_m": [
+    3.38,
+    4.374,
+    2.756
+   ],
+   "bytes": 942709,
+   "path": "models/props/orion/deck_shed_v1/shed_lod0.obj"
+  },
+  {
+   "triangles": 4604,
+   "vertices": 3204,
+   "materials": [
+    "shed_body"
+   ],
+   "extent_in": [
+    132.59,
+    172.18,
+    108.45
+   ],
+   "extent_m": [
+    3.368,
+    4.373,
+    2.755
+   ],
+   "bytes": 521440,
+   "path": "models/props/orion/deck_shed_v1/shed_lod1.obj"
+  },
+  {
+   "triangles": 948,
+   "vertices": 786,
+   "materials": [
+    "shed_body"
+   ],
+   "extent_in": [
+    127.28,
+    128.68,
+    104.02
+   ],
+   "extent_m": [
+    3.233,
+    3.268,
+    2.642
+   ],
+   "bytes": 106426,
+   "path": "models/props/orion/deck_shed_v1/shed_lod2.obj"
+  }
+ ],
+ "textures": [
+  {
+   "vmat": "materials/orion/deck_shed_v1/shed_body.vmat",
+   "slot": "TextureAmbientOcclusion",
+   "path": "materials/orion/deck_shed_v1/shed_body_ao.png",
+   "w": 1024,
+   "h": 1024,
+   "file_bytes": 453138,
+   "est_gpu_bytes": 5592265,
+   "compiled_bytes": 353673
+  },
+  {
+   "vmat": "materials/orion/deck_shed_v1/shed_body.vmat",
+   "slot": "TextureColor",
+   "path": "materials/orion/deck_shed_v1/shed_body_color.png",
+   "w": 2048,
+   "h": 2048,
+   "file_bytes": 2710142,
+   "est_gpu_bytes": 22369062,
+   "compiled_bytes": 2595297
+  },
+  {
+   "vmat": "materials/orion/deck_shed_v1/shed_body.vmat",
+   "slot": "TextureMetalness",
+   "path": "materials/orion/deck_shed_v1/shed_body_metal.png",
+   "w": 1024,
+   "h": 1024,
+   "file_bytes": 286600,
+   "est_gpu_bytes": 5592265,
+   "compiled_bytes": 0
+  },
+  {
+   "vmat": "materials/orion/deck_shed_v1/shed_body.vmat",
+   "slot": "TextureNormal",
+   "path": "materials/orion/deck_shed_v1/shed_body_normal.png",
+   "w": 2048,
+   "h": 2048,
+   "file_bytes": 1699332,
+   "est_gpu_bytes": 22369062,
+   "compiled_bytes": 2516018
+  },
+  {
+   "vmat": "materials/orion/deck_shed_v1/shed_body.vmat",
+   "slot": "TextureRoughness",
+   "path": "materials/orion/deck_shed_v1/shed_body_rough.png",
+   "w": 1024,
+   "h": 1024,
+   "file_bytes": 529010,
+   "est_gpu_bytes": 5592265,
+   "compiled_bytes": 0
+  }
+ ],
+ "vmdl": [
+  {
+   "path": "models/props/orion/deck_shed_v1/shed.vmdl",
+   "vmdl_c_bytes": 315021,
+   "lods": [
+    [
+     "lod0",
+     "models/props/orion/deck_shed_v1/shed_lod0.obj",
+     null
+    ],
+    [
+     "lod1",
+     "models/props/orion/deck_shed_v1/shed_lod1.obj",
+     null
+    ],
+    [
+     "lod2",
+     "models/props/orion/deck_shed_v1/shed_lod2.obj",
+     null
+    ]
+   ]
+  }
+ ],
+ "totals": {
+  "unique_textures": 5,
+  "texture_pixels": 11534336,
+  "est_gpu_bytes": 61514919,
+  "compiled_vtex_bytes": 5464988
+ }
+}

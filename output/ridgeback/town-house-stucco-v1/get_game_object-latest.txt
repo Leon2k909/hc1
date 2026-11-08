@@ -1,0 +1,107 @@
+{
+  "Scene": "ridgeback",
+  "Name": "town_house",
+  "Id": "45562131-d22f-54a9-a882-86e971632ca9",
+  "Enabled": true,
+  "ActiveInHierarchy": true,
+  "Tags": [],
+  "Parent": {
+    "Id": "b6f772fc-24c3-56fe-af25-8c17cce79840",
+    "Name": "Buildings"
+  },
+  "WorldPosition": "-1615,-2040,156.800003",
+  "WorldRotation": "-0,87.5,0",
+  "WorldScale": "1,1,1",
+  "Components": [
+    {
+      "Type": "ModelRenderer",
+      "Id": "718c7800-9840-55e0-bd53-2177991b14ff",
+      "Enabled": true,
+      "Properties": {
+        "__type": "Sandbox.ModelRenderer",
+        "__guid": "718c7800-9840-55e0-bd53-2177991b14ff",
+        "__enabled": true,
+        "Flags": 0,
+        "BodyGroups": 18446744073709551615,
+        "CreateAttachments": false,
+        "LodOverride": null,
+        "MaterialGroup": null,
+        "MaterialOverride": null,
+        "Materials": null,
+        "Model": {
+          "Id": "92a56632-28f4-4620-bf14-4407609f1d68",
+          "Path": "models/buildings/town_house/town_house.vmdl"
+        },
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "RenderOptions": {
+          "GameLayer": true,
+          "OverlayLayer": false,
+          "BloomLayer": false,
+          "AfterUILayer": false
+        },
+        "RenderType": "On",
+        "Tint": "1,1,1,1"
+      }
+    },
+    {
+      "Type": "ModelCollider",
+      "Id": "e23eff04-652c-5bad-bbe9-83b49ae4ec87",
+      "Enabled": true,
+      "Properties": {
+        "__type": "Sandbox.ModelCollider",
+        "__guid": "e23eff04-652c-5bad-bbe9-83b49ae4ec87",
+        "__enabled": true,
+        "Flags": 0,
+        "ColliderFlags": 0,
+        "Elasticity": null,
+        "Friction": null,
+        "IsTrigger": false,
+        "Model": {
+          "Id": "92a56632-28f4-4620-bf14-4407609f1d68",
+          "Path": "models/buildings/town_house/town_house.vmdl"
+        },
+        "OnComponentDestroy": null,
+        "OnComponentDisabled": null,
+        "OnComponentEnabled": null,
+        "OnComponentFixedUpdate": null,
+        "OnComponentStart": null,
+        "OnComponentUpdate": null,
+        "OnObjectTriggerEnter": null,
+        "OnObjectTriggerExit": null,
+        "OnTriggerEnter": null,
+        "OnTriggerExit": null,
+        "RollingResistance": null,
+        "Static": true,
+        "Surface": null,
+        "SurfaceVelocity": "0,0,0"
+      }
+    }
+  ],
+  "Children": [
+    {
+      "Id": "2566e9d0-ed97-8714-bd69-5608e41f0eec",
+      "Name": "Doors",
+      "Enabled": true
+    },
+    {
+      "Id": "d09995d2-1931-87aa-a002-2c9657045f6a",
+      "Name": "Windows",
+      "Enabled": true
+    },
+    {
+      "Id": "8b69f06b-089f-8a59-9d8c-a63450d29a0b",
+      "Name": "Window Clips",
+      "Enabled": true
+    },
+    {
+      "Id": "dbbb1d1c-d1ca-514e-a0e8-5c40640b5006",
+      "Name": "Shutters",
+      "Enabled": true
+    }
+  ]
+}

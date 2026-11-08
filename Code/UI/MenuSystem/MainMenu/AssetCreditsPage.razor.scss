@@ -1,0 +1,59 @@
+@import "/UI/Styles/MenuPage.scss";
+
+AssetCreditsPage
+{
+    @include menu-page;
+
+    .credits-body
+    {
+        flex-grow: 1;
+        flex-direction: column;
+        min-height: 0;
+        gap: 16px;
+        padding: 24px 48px 32px;
+    }
+
+    .credits-intro
+    {
+        flex-shrink: 0;
+        color: rgba( white, 0.7 );
+        font-size: 18px;
+    }
+
+    .credits-list
+    {
+        @include menu-panel;
+        flex-direction: column;
+        flex-grow: 1;
+        min-height: 0;
+        overflow-y: scroll;
+    }
+
+    .credit-row
+    {
+        flex-shrink: 0;
+        align-items: center;
+        gap: 16px;
+        padding: 14px 20px;
+        border-bottom: 1px solid rgba( white, 0.08 );
+    }
+
+    .credit-info
+    {
+        flex-direction: column;
+        flex-grow: 1;
+        min-width: 0;
+        gap: 4px;
+    }
+
+    .credit-title { font-size: 20px; font-weight: 700; }
+    .credit-author { color: $menu-accent; font-size: 16px; }
+    .credit-note { color: rgba( white, 0.62 ); font-size: 14px; }
+    .credit-copy { @include menu-action; flex-shrink: 0; }
+}
+
+.main-menu-root.narrow AssetCreditsPage
+{
+    .credits-body { padding: 16px 24px 24px; }
+    .credit-row { flex-wrap: wrap; }
+}
