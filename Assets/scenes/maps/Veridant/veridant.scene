@@ -441,10 +441,7 @@
               "MaterialGroup": null,
               "MaterialOverride": null,
               "Materials": null,
-              "Model": {
-                "Id": "7769284b-cbe6-4608-bf15-8aa5b36e998f",
-                "Path": "models/maps/veridant/operations-garden-approach/ground.vmdl"
-              },
+              "Model": "models/maps/veridant/operations-garden-approaches-v2/ground.vmdl",
               "OnComponentDestroy": null,
               "OnComponentDisabled": null,
               "OnComponentEnabled": null,
@@ -43803,6 +43800,100 @@
       "Children": []
     },
     {
+      "__guid": "880729d3-903a-571e-bba3-d62314c575d8",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Operations stair garden door left",
+      "Position": "-692,-520.65,0",
+      "Rotation": "0,0,0.0000000,1.0000000",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.ModelRenderer",
+          "__guid": "ee12d0f6-a10d-5b74-99ff-50d31fc218b5",
+          "__enabled": true,
+          "Flags": 0,
+          "Model": "models/props/veridant/stair_garden_doors/leaf.vmdl",
+          "RenderType": "On",
+          "Tint": "1,1,1,1"
+        },
+        {
+          "__type": "Sandbox.BoxCollider",
+          "__guid": "fac354cd-5844-59d5-bd94-67d37b831d37",
+          "__enabled": true,
+          "Flags": 0,
+          "Center": "0,-19.575,50",
+          "Scale": "2.4,39.15,98.8",
+          "Static": false,
+          "IsTrigger": false
+        },
+        {
+          "__type": "Facepunch.Door",
+          "__guid": "c31230a9-72af-50fc-b438-1353fb6593d6",
+          "__enabled": true,
+          "Flags": 0,
+          "TargetAngle": 90,
+          "OpenTime": 0.55,
+          "OpenAwayFromPlayer": true
+        }
+      ],
+      "Children": []
+    },
+    {
+      "__guid": "dae34353-13b2-5e5d-ad57-bcd89a8bf236",
+      "__version": 2,
+      "Flags": 0,
+      "Name": "Operations stair garden door right",
+      "Position": "-692,-599.35,0",
+      "Rotation": "0,0,1.0000000,0.0000000",
+      "Scale": "1,1,1",
+      "Tags": "",
+      "Enabled": true,
+      "NetworkMode": 2,
+      "NetworkFlags": 0,
+      "NetworkOrphaned": 0,
+      "NetworkTransmit": true,
+      "OwnerTransfer": 1,
+      "Components": [
+        {
+          "__type": "Sandbox.ModelRenderer",
+          "__guid": "3799b5b9-4202-5828-b5c7-7aa456973663",
+          "__enabled": true,
+          "Flags": 0,
+          "Model": "models/props/veridant/stair_garden_doors/leaf.vmdl",
+          "RenderType": "On",
+          "Tint": "1,1,1,1"
+        },
+        {
+          "__type": "Sandbox.BoxCollider",
+          "__guid": "03bdf433-0ea3-54b1-9ce1-65a700b51dfa",
+          "__enabled": true,
+          "Flags": 0,
+          "Center": "0,-19.575,50",
+          "Scale": "2.4,39.15,98.8",
+          "Static": false,
+          "IsTrigger": false
+        },
+        {
+          "__type": "Facepunch.Door",
+          "__guid": "ab823ee8-724e-549c-8217-59991038d1bd",
+          "__enabled": true,
+          "Flags": 0,
+          "TargetAngle": 90,
+          "OpenTime": 0.55,
+          "OpenAwayFromPlayer": true
+        }
+      ],
+      "Children": []
+    },
+    {
       "__guid": "ccd39b85-0781-4606-95a1-e69af6435f38",
       "__version": 2,
       "Flags": 0,
@@ -48304,10 +48395,7 @@
           "MaterialGroup": null,
           "MaterialOverride": null,
           "Materials": null,
-          "Model": {
-            "Id": "943abff8-f4dd-4af1-bb2f-dc10a40124f4",
-            "Path": "models/maps/veridant/operations-garden-approach/edging.vmdl"
-          },
+          "Model": "models/maps/veridant/operations-garden-approaches-v2/edging.vmdl",
           "OnComponentDestroy": null,
           "OnComponentDisabled": null,
           "OnComponentEnabled": null,

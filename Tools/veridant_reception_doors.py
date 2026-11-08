@@ -33,6 +33,7 @@ def build_stair_garden_leaf():
         'steel': 'materials/veridant/vr_steel.vmat',
         'glass': 'materials/veridant/vr_glass_clear.vmat',
     })
+    model.tile_overrides.update({key: 48 for key in model.polygons})
     return K.write_model(ROOT / 'Assets' / STAIR_GARDEN_RESOURCE, STAIR_GARDEN_RESOURCE, 'leaf', model)
 
 
