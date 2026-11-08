@@ -204,4 +204,38 @@ def lounge_garden_scene_objects(ids, terrace=False, cafe_link=False):
     objects = []
     prefix = 'lounge-cafe-door' if cafe_link else 'gallery-terrace-door' if terrace else 'lounge-garden-door'
     title = 'Lounge cafe' if cafe_link else 'Gallery terrace' if terrace else 'Lounge garden'
-    for side, y, yaw in [(
+    for side, y, yaw in [('left', 499.35, 0), ('right', 440.65, 180)]:
+        key = prefix + '/' + side
+        objects.append(K.game_object(ids, title + ' glazed door ' + side, key,
+            (-188 if terrace or cafe_link else -552, y - (40 if cafe_link else 200 if terrace else 0), 128 if terrace else 0), rotation=K.yaw_rotation(yaw),
+            scale='1,1,0.96', components=[
+                K.component(ids, 'Sandbox.ModelRenderer', key+'/renderer',
+                    Model=RESOURCE+'/leaf.vmdl', RenderType='On', Tint='1,1,1,1'),
+                K.component(ids, 'Sandbox.BoxCollider', key+'/collider',
+                    Center='0,-14.575,50', Scale='2,29.15,98.8', Static=False, IsTrigger=False),
+                K.component(ids, 'Facepunch.Door', key+'/door',
+                    TargetAngle=90, OpenTime=.55, OpenAwayFromPlayer=True),
+            ]))
+    return objects
+
+def lounge_west_scene_objects(ids, cafe=False, north=False):
+    """The lounge and café west-side 60 x 96 entrances."""
+    objects = []
+    owner = 'cafe' if cafe else 'lounge'
+    entrance = 'west north' if north else 'west'
+    for side, x, yaw in [('left', -419.35, 90), ('right', -360.65, -90)]:
+        key = owner + '-' + entrance.replace(' ', '-') + '-door/' + side
+        objects.append(K.game_object(ids, owner.title() + ' ' + entrance + ' glazed door ' + side, key,
+            (x + ((490 if north else 310) if cafe else 0), 712, 0), rotation=K.yaw_rotation(yaw),
+            scale='1,1,0.96', components=[
+                K.component(ids, 'Sandbox.ModelRenderer', key+'/renderer',
+                    Model=RESOURCE+'/leaf.vmdl', RenderType='On', Tint='1,1,1,1'),
+                K.component(ids, 'Sandbox.BoxCollider', key+'/collider',
+                    Center='0,-14.575,50', Scale='2,29.15,98.8', Static=False, IsTrigger=False),
+                K.component(ids, 'Facepunch.Door', key+'/door',
+                    TargetAngle=90, OpenTime=.55, OpenAwayFromPlayer=True),
+            ]))
+    return objects
+
+if __name__ == '__main__':
+    build()
