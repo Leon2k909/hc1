@@ -1,0 +1,23 @@
+// Sources/Boxyard/yard-concrete-v2/build.py
+"Layer0"
+{
+    shader "shaders/complex.shader"
+    F_SPECULAR "1"
+    F_DETAIL_TEXTURE "1"
+    g_flRoughnessScaleFactor "1"
+    g_flMetalness "0.00"
+    TextureColor "materials/boxyard/yard_concrete_v2/yc_slab_color.jpg"
+    TextureNormal "materials/boxyard/yard_concrete_v2/yc_slab_normal.jpg"
+    TextureRoughness "materials/boxyard/yard_concrete_v2/yc_slab_rough.png"
+    TextureAmbientOcclusion "materials/default/default_ao.tga"
+    TextureDetail "materials/boxyard/yard_concrete_v2/yc_macro_detail.png"
+    g_vTexCoordScale "[4.000 4.000]"
+    g_vDetailTexCoordScale "[0.444444 0.444444]"
+    g_vDetailTexCoordOffset "[0.055556 0.055556]"
+    g_flDetailTexCoordRotation "0.000"
+    g_flDetailBlendFactor "1.000"
+    g_bUseSecondaryUvForDetailTexture "0"
+    g_bUseSecondaryUvForDetailMask "0"
+    g_vColorTint "[1.0 1.0 1.0 1.0]"
+    g_flModelTintAmount "1.0"
+}

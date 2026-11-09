@@ -20,6 +20,8 @@ This file is kept short on purpose. The full notes that used to live here (~900 
 
 ## Index of docs/notes
 
+- [Boxyard yard concrete v2 - procedural 5.3 px/in floor replaced by a concrete_floor_02 scan slab tile (21.3 px/in) plus a world-locked macro layer (tyre rubber, oil, contact dirt) in the detail slot; installed on a review branch, old material kept, install.py revert; review pending, 2026-11-09](Sources/Boxyard/yard-concrete-v2/README.md)
+
 - [Veridant fountain roaring-lion crown - prototype layout: recumbent roaring bronze lions (CC-BY beachmouse scan, baked verdigris), carved acanthus pier, fitted bronze base; rejected as a downgrade, Barye crown restored, assets kept unused, 2026-11-08](Sources/Veridant/roaring-lion-crown/README.md)
 
 - [Riverside sleeper retaining walls - procedural rs_ties replaced by a texture laid out from the brown_planks_03 oak scan (43 px/in, Tools/riverside_sleepers.py), installed and kept by the user; old maps and vmat kept for rollback, 2026-11-07](Sources/Riverside/sleeper-wall-v1/README.md)
