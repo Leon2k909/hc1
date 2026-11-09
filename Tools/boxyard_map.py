@@ -1328,6 +1328,12 @@ def write_scene( written, light_list, probe_list, tops ):
 
 # ---------------------------------------------------------------------------------------------------------------------
 
+# The yard's floor draws the scan-built concrete (Sources/Boxyard/yard-concrete-v2, approved 2026-11-09). Its macro
+# layer is drawn for this floor card and these containers: run that folder's `build.py macro` when either moves.
+# The ground outside the wall keeps bx_concrete, and that material stays for other maps to use.
+YARD_CONCRETE = f"{BM.RESOURCE_DIR}/yard_concrete_v2/bx_yard_concrete.vmat"
+
+
 def build():
     """ Every model by name, and the containers' tops and insides. """
     boxes, tops, insides = containers()
@@ -1339,6 +1345,7 @@ def build():
     }
     for model in models.values():
         configure( model )
+    models["boxyard_yard"].material_overrides["bx_concrete"] = YARD_CONCRETE
     return models, tops, insides
 
 
