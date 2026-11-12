@@ -230,39 +230,10 @@ public sealed class HardpointZone : Component,
 			zoneColor = ControllingTeam == Team.Unassigned ? Color.White : ControllingTeam.GetColor();
 		}
 
-		DrawCircle( WorldPosition, 300f, zoneColor );
+		_ring.Draw( this, WorldPosition, 300f, zoneColor );
 	}
 
-	private void DrawCircle( Vector3 center, float radius, Color color )
-	{
-		int segments = 36;
-		Vector3 lastPoint = Vector3.Zero;
-
-		for ( int i = 0; i <= segments; i++ )
-		{
-			float angle = (i / (float)segments) * MathF.PI * 2f;
-			Vector3 offset = new Vector3( MathF.Cos( angle ) * radius, MathF.Sin( angle ) * radius, 5f );
-			Vector3 point = center + offset;
-
-			// Trace to ground to conform to terrain
-			var tr = Scene.Trace.Ray( point + Vector3.Up * 50f, point + Vector3.Down * 100f )
-				.IgnoreGameObjectHierarchy( GameObject )
-				.WithoutTags( "trigger", "playerclip", "movement" )
-				.Run();
-
-			if ( tr.Hit )
-			{
-				point = tr.HitPosition + Vector3.Up * 2f;
-			}
-
-			if ( i > 0 )
-			{
-				DebugOverlay.Line( new Line( lastPoint, point ), color, 0f );
-			}
-
-			lastPoint = point;
-		}
-	}
+	private readonly GroundRing _ring = new();
 
 	// The message goes to the toast in English with its values apart, and the toast puts it in the player's language
 	// (a team shows as its translated name).

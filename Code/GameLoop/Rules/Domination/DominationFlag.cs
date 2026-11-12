@@ -212,39 +212,10 @@ public sealed class DominationFlag : Component,
 		}
 
 		// Radius of capture zone is 300 units (collider scale 600)
-		DrawCircle( WorldPosition, 300f, teamColor );
+		_ring.Draw( this, WorldPosition, 300f, teamColor );
 	}
 
-	private void DrawCircle( Vector3 center, float radius, Color color )
-	{
-		int segments = 36;
-		Vector3 lastPoint = Vector3.Zero;
-
-		for ( int i = 0; i <= segments; i++ )
-		{
-			float angle = (i / (float)segments) * MathF.PI * 2f;
-			Vector3 offset = new Vector3( MathF.Cos( angle ) * radius, MathF.Sin( angle ) * radius, 5f );
-			Vector3 point = center + offset;
-
-			// Trace to ground to conform to terrain
-			var tr = Scene.Trace.Ray( point + Vector3.Up * 50f, point + Vector3.Down * 100f )
-				.IgnoreGameObjectHierarchy( GameObject )
-				.WithoutTags( "trigger", "playerclip", "movement" )
-				.Run();
-
-			if ( tr.Hit )
-			{
-				point = tr.HitPosition + Vector3.Up * 2f;
-			}
-
-			if ( i > 0 )
-			{
-				DebugOverlay.Line( new Line( lastPoint, point ), color, 0f );
-			}
-
-			lastPoint = point;
-		}
-	}
+	private readonly GroundRing _ring = new();
 
 	private void HandleTeamProgress( Team team, float rate )
 	{
