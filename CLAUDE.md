@@ -20,6 +20,8 @@ This file is kept short on purpose. The full notes that used to live here (~900 
 
 ## Index of docs/notes
 
+- [hc1 won't load on s&box 26.11.10 - startup content build breaks after a few thousand compiles per process (engine bug); prebuild with Tools/contentbuild, editor closed, 2026-11-11](docs/notes/content-build-job-limit-20261111.md)
+
 - [Boxyard yard concrete v2 - procedural 5.3 px/in floor replaced by a concrete_floor_02 scan slab tile (21.3 px/in) plus a world-locked macro layer (tyre rubber, oil, contact dirt) in the detail slot; approved and kept by the user; old bx_concrete material kept for another map; generator updated, 2026-11-09](Sources/Boxyard/yard-concrete-v2/README.md)
 
 - [Veridant fountain roaring-lion crown - prototype layout: recumbent roaring bronze lions (CC-BY beachmouse scan, baked verdigris), carved acanthus pier, fitted bronze base; rejected as a downgrade, Barye crown restored, assets kept unused, 2026-11-08](Sources/Veridant/roaring-lion-crown/README.md)

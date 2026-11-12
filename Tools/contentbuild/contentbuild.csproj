@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net10.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>disable</Nullable>
+		<SboxDir Condition="'$(SboxDir)' == ''">C:\Program Files (x86)\Steam\steamapps\common\sbox</SboxDir>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Reference Include="Sandbox.ContentBuild">
+			<HintPath>$(SboxDir)\bin\managed\Sandbox.ContentBuild.dll</HintPath>
+			<Private>true</Private>
+		</Reference>
+		<Reference Include="System.IO.Hashing">
+			<HintPath>$(SboxDir)\bin\managed\System.IO.Hashing.dll</HintPath>
+			<Private>true</Private>
+		</Reference>
+	</ItemGroup>
+
+</Project>
