@@ -4,6 +4,7 @@ This file is kept short on purpose. The full notes that used to live here (~900 
 
 ## Key rules
 - Active checkout on the user's PC: `C:\sbox-projects\hc1\forked-shooter-main`. Use the s&box MCP (`sbox-cli --connect`) for editor work; don't take full control of the user's PC.
+- Never start a second s&box editor (check `tasklist | findstr sbox-dev` first; attach or ask): two editors froze the user's 32 GB PC twice on 2026-11-12. Keep only the working scene tab open. See `AGENTS.md` Editor control.
 - M4: `Assets/Weapons/M4A1/weapon_m4a1.prefab` ManualOffset.AimOffset must stay `0,0,0`.
 - Shared camera look: ACES tonemapping, AO (radius 48, intensity 0.45, falloff 0.9, thin compensation 1), additive bloom (strength 0.1, threshold 1.6), vignette 0.08, PhotographicResponse 0.65. See the camera-look section.
 - No CoD names, logos or markings anywhere.

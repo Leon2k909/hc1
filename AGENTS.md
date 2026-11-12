@@ -7,6 +7,13 @@ compatibility junction to the same files on C:, with no separate working copy.
 
 # Editor control
 
+**Never start a second s&box editor.** Two editors at once (or one beside other heavy work) freeze the user's PC:
+it has 32 GB of RAM, one hc1 editor in a match uses about 16 GB, and Windows then pages to a hard disk until the
+machine locks up (hard resets on 2026-11-12 at 18:43 and 20:57 both had two editors running). Before any launch,
+check `tasklist | findstr sbox-dev` (or `Get-Process sbox-dev`); if one is running, attach to it or ask the user.
+This includes `sbox-cli --project`, test projects and retries after a failed `--connect`. Keep only the scene tab
+you are working on open (Depot alone streams about 3 GB of textures).
+
 Use the engine-provided `sbox` skill and native s&box MCP as the primary editor connection.
 The configured server is `sbox`; if its tools are not loaded in the current chat, use
 `sbox-cli --call` from this project. Resolve the executable through `FACEPUNCH_ENGINE`
